@@ -59,6 +59,8 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.OptionGroup;
+import net.sf.freecol.common.option.RangeOption;
 
 /**
  * This class encapsulates any parts of the "specification" for FreeCol that are
@@ -71,25 +73,32 @@ public final class Specification {
      * Singleton
      */
     protected static Specification specification;
-    
+
     private static final Logger logger = Logger.getLogger(Specification.class.getName());
 
     private final Map<String, FreeColGameObjectType> allTypes;
+
     private final Map<String, AbstractOption> allOptions;
 
+    private final Map<String, OptionGroup> allOptionGroups;
+
     private final Set<String> abilityKeys;
+
     private final Set<String> modifierKeys;
 
     private final List<BuildingType> buildingTypeList;
 
     private final List<GoodsType> goodsTypeList;
+
     private final List<GoodsType> farmedGoodsTypeList;
     private final List<GoodsType> newWorldGoodsTypeList;
 
     private final List<ResourceType> resourceTypeList;
 
     private final List<TileType> tileTypeList;
+
     private final List<TileImprovementType> tileImprovementTypeList;
+
     private final List<ImprovementActionType> improvementActionTypeList;
 
     private final List<UnitType> unitTypeList;
@@ -97,11 +106,13 @@ public final class Specification {
     private final List<FoundingFather> foundingFathers;
 
     private final List<Nation> nations;
+
     private final List<NationType> nationTypes;
 
     private final List<EquipmentType> equipmentTypes;
 
     private final List<DifficultyLevel> difficultyLevels;
+
 
     /**
      * Creates a new Specification object by loading it from the
@@ -121,6 +132,7 @@ public final class Specification {
 
         allTypes = new HashMap<String, FreeColGameObjectType>();
         allOptions = new HashMap<String, AbstractOption>();
+        allOptionGroups = new HashMap<String, OptionGroup>();
         abilityKeys = new HashSet<String>();
         modifierKeys = new HashSet<String>();
         buildingTypeList = new ArrayList<BuildingType>();
@@ -247,7 +259,7 @@ public final class Specification {
                             nationType = new EuropeanNationType(nationIndex++);
                         } else {
                             nationType = new IndianNationType(nationIndex++);
-                        }                             
+                        }
                         nationType.readFromXML(xsr, this);
                         allTypes.put(nationType.getId(), nationType);
                         nationTypes.add(nationType);
@@ -263,7 +275,6 @@ public final class Specification {
                         allTypes.put(nation.getId(), nation);
                         nations.add(nation);
                     }
-
 
                 } else if ("equipment-types".equals(childName)) {
 
@@ -291,15 +302,35 @@ public final class Specification {
 
                     logger.finest("Found child named " + childName);
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        AbstractOption option = (AbstractOption) null;
                         String optionType = xsr.getLocalName();
-                        if("integerOption".equals(optionType)) {
-                            IntegerOption option = new IntegerOption();
-                            option.readFromXML(xsr);
+                        if (IntegerOption.getXMLElementTagName().equals(optionType)) {
+                            option = new IntegerOption(xsr);
+                        } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
+                            option = new BooleanOption(xsr);
+                        } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
+                            option = new RangeOption(xsr);
+                        } else {
+                            logger.finest("Parsing of " + optionType + " is not implemented yet");
+                            xsr.nextTag();
+                        }
+
+                        // If the option is valid, let's find or create the
+                        // option group
+                        // and build all the references between these objects.
+                        if (option != (AbstractOption) null) {
+                            String optionGroupName = option.getGroup();
                             allOptions.put(option.getId(), option);
-                        } else if("booleanOption".equals(optionType)) {
-                            BooleanOption option = new BooleanOption();
-                            option.readFromXML(xsr);
-                            allOptions.put(option.getId(), option);
+                            if (optionGroupName != "") {
+                                OptionGroup optionGroup;
+                                try {
+                                    optionGroup = getOptionGroup(optionGroupName);
+                                } catch (IllegalArgumentException e) {
+                                    optionGroup = new OptionGroup(optionGroupName);
+                                    addOptionGroup(optionGroup);
+                                }
+                                optionGroup.add(option);
+                            }
                         }
                     }
 
@@ -307,7 +338,7 @@ public final class Specification {
                     throw new RuntimeException("unexpected: " + childName);
                 }
             }
-        
+
             // Post specification actions
             // Get Food, Bells, Crosses and Hammers
             Goods.initialize(getGoodsTypeList(), numberOfGoodsTypes());
@@ -321,8 +352,8 @@ public final class Specification {
         }
     }
 
-    // ---------------------------------------------------------- retrieval methods
-    
+    // ---------------------------------------------------------- retrieval
+    // methods
 
     public Set<String> getAbilityKeys() {
         return abilityKeys;
@@ -332,45 +363,92 @@ public final class Specification {
         return modifierKeys;
     }
 
-
     /**
-     * Returns the <code>FreeColGameObjectType</code> with the given
-     * ID. Throws an IllegalArgumentException if the ID is null, or if
-     * no such Type can be retrieved.
-     *
+     * Returns the <code>FreeColGameObjectType</code> with the given ID.
+     * Throws an IllegalArgumentException if the ID is null, or if no such Type
+     * can be retrieved.
+     * 
      * @param Id a <code>String</code> value
      * @return a <code>FreeColGameObjectType</code> value
      */
     public FreeColGameObjectType getType(String Id) throws IllegalArgumentException {
         if (Id == null) {
-            throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" +
-                                               " with ID 'null'.");
+            throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" + " with ID 'null'.");
         } else if (!allTypes.containsKey(Id)) {
-            throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" +
-                                               " with ID '" + Id + "' returned 'null'.");
+            throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" + " with ID '" + Id
+                    + "' returned 'null'.");
         } else {
             return allTypes.get(Id);
         }
     }
 
     /**
-     * Returns the <code>AbstractOption</code> with the given
-     * ID. Throws an IllegalArgumentException if the ID is null, or if
-     * no such Type can be retrieved.
-     *
+     * Returns the <code>AbstractOption</code> with the given ID. Throws an
+     * IllegalArgumentException if the ID is null or unknown.
+     * 
      * @param Id a <code>String</code> value
      * @return an <code>AbstractOption</code> value
      */
     public AbstractOption getOption(String Id) throws IllegalArgumentException {
         if (Id == null) {
-            throw new IllegalArgumentException("Trying to retrieve AbstractOption" +
-                                               " with ID 'null'.");
+            throw new IllegalArgumentException("Trying to retrieve AbstractOption" + " with ID 'null'.");
         } else if (!allOptions.containsKey(Id)) {
-            throw new IllegalArgumentException("Trying to retrieve AbstractOption" +
-                                               " with ID '" + Id + "' returned 'null'.");
+            throw new IllegalArgumentException("Trying to retrieve AbstractOption" + " with ID '" + Id
+                    + "' returned 'null'.");
         } else {
             return allOptions.get(Id);
         }
+    }
+
+    /**
+     * Returns the <code>OptionGroup</code> with the given ID. Throws an
+     * IllegalArgumentException if the ID is null or unknown.
+     * 
+     * @param Id a <code>String</code> value
+     * @return an <code>OptionGroup</code> value
+     */
+    public OptionGroup getOptionGroup(String Id) throws IllegalArgumentException {
+        if (Id == null) {
+            throw new IllegalArgumentException("Trying to retrieve OptionGroup" + " with ID 'null'.");
+        } else if (!allOptionGroups.containsKey(Id)) {
+            throw new IllegalArgumentException("Trying to retrieve OptionGroup" + " with ID '" + Id
+                    + "' returned 'null'.");
+        } else {
+            return allOptionGroups.get(Id);
+        }
+    }
+
+    /**
+     * Adds an <code>OptionGroup</code> to the specification
+     * 
+     * @param optionGroup <code>OptionGroup</code> to add
+     */
+    public void addOptionGroup(OptionGroup optionGroup) {
+        allOptionGroups.put(optionGroup.getId(), optionGroup);
+    }
+
+    /**
+     * Returns the <code>IntegerOption</code> with the given ID. Throws an
+     * IllegalArgumentException if the ID is null, or if no such Type can be
+     * retrieved.
+     * 
+     * @param Id a <code>String</code> value
+     * @return an <code>IntegerOption</code> value
+     */
+    public IntegerOption getIntegerOption(String Id) throws IllegalArgumentException {
+        return (IntegerOption) getOption(Id);
+    }
+
+    /**
+     * Returns the <code>BooleanOption</code> with the given ID. Throws an
+     * IllegalArgumentException if the ID is null, or if no such Type can be
+     * retrieved.
+     * 
+     * @param Id a <code>String</code> value
+     * @return an <code>BooleanOption</code> value
+     */
+    public BooleanOption getBooleanOption(String Id) throws IllegalArgumentException {
+        return (BooleanOption) getOption(Id);
     }
 
     // -- Buildings --
@@ -380,7 +458,7 @@ public final class Specification {
 
     /**
      * Describe <code>numberOfBuildingTypes</code> method here.
-     *
+     * 
      * @return an <code>int</code> value
      */
     public int numberOfBuildingTypes() {
@@ -389,7 +467,7 @@ public final class Specification {
 
     /**
      * Describe <code>getBuildingType</code> method here.
-     *
+     * 
      * @param buildingTypeIndex an <code>int</code> value
      * @return a <code>BuildingType</code> value
      */
@@ -408,7 +486,7 @@ public final class Specification {
 
     /**
      * Describe <code>numberOfGoodsTypes</code> method here.
-     *
+     * 
      * @return an <code>int</code> value
      */
     public int numberOfGoodsTypes() {
@@ -435,7 +513,7 @@ public final class Specification {
 
     /**
      * Describe <code>numberOfFarmedGoodsTypes</code> method here.
-     *
+     * 
      * @return an <code>int</code> value
      */
     public int numberOfFarmedGoodsTypes() {
@@ -444,7 +522,7 @@ public final class Specification {
 
     /**
      * Describe <code>getGoodsType</code> method here.
-     *
+     * 
      * @param goodsTypeIndex an <code>int</code> value
      * @return a <code>GoodsType</code> value
      */
@@ -454,7 +532,7 @@ public final class Specification {
 
     /**
      * Describe <code>getGoodsType</code> method here.
-     *
+     * 
      * @param id a <code>String</code> value
      * @return a <code>GoodsType</code> value
      */
@@ -472,16 +550,14 @@ public final class Specification {
         return goods;
     }
 
-
     /**
-     * Returns a list of GoodsTypes for which the given predicate
-     * obtains. For example, getMatchingGoodsTypes("isFarmed")
-     * returns a list of all GoodsTypes g for which g.isFarmed()
-     * returns true.
-     *
+     * Returns a list of GoodsTypes for which the given predicate obtains. For
+     * example, getMatchingGoodsTypes("isFarmed") returns a list of all
+     * GoodsTypes g for which g.isFarmed() returns true.
+     * 
      * @param methodName the name of the method to invoke on the GoodsType
      * @return a list of <code>GoodsType</code>s for which the given
-     * predicate returns true
+     *         predicate returns true
      */
     public List<GoodsType> getMatchingGoodsTypes(String methodName) throws Exception {
         Method method = GoodsType.class.getDeclaredMethod(methodName);
@@ -493,8 +569,7 @@ public final class Specification {
             }
         }
         return goodsTypes;
-    }   
-
+    }
 
     // -- Resources --
     public List<ResourceType> getResourceTypeList() {
@@ -572,7 +647,7 @@ public final class Specification {
     public UnitType getUnitType(String id) {
         return (UnitType) getType(id);
     }
-    
+
     public UnitType getExpertForProducing(GoodsType goodsType) {
         for (UnitType unitType : getUnitTypeList()) {
             if (unitType.getExpertProduction() == goodsType) {
@@ -581,10 +656,10 @@ public final class Specification {
         }
         return null;
     }
-    
+
     /**
      * Return the unit types which have any of the given abilities
-     *
+     * 
      * @param abilities The abilities for the search
      * @return a <code>List</code> of <code>UnitType</code>
      */
@@ -604,29 +679,29 @@ public final class Specification {
     /**
      * Returns the unit types that can be trained in Europe.
      */
-    public List<UnitType> getUnitTypesTrainedInEurope(){
-    	List<UnitType> result = new ArrayList<UnitType>();
-    	for (UnitType unitType : getUnitTypeList()) {
+    public List<UnitType> getUnitTypesTrainedInEurope() {
+        List<UnitType> result = new ArrayList<UnitType>();
+        for (UnitType unitType : getUnitTypeList()) {
             if (unitType.getSkill() > 0 && unitType.hasPrice()) {
                 result.add(unitType);
             }
-    	}
-    	return result;
+        }
+        return result;
     }
-    
+
     /**
      * Returns the unit types that can be purchased in Europe.
      */
-    public List<UnitType> getUnitTypesPurchasedInEurope(){
-    	List<UnitType> result = new ArrayList<UnitType>();
-    	for (UnitType unitType : getUnitTypeList()) {
+    public List<UnitType> getUnitTypesPurchasedInEurope() {
+        List<UnitType> result = new ArrayList<UnitType>();
+        for (UnitType unitType : getUnitTypeList()) {
             if (!unitType.hasSkill() && unitType.hasPrice()) {
                 result.add(unitType);
             }
-    	}
-    	return result;
+        }
+        return result;
     }
-    
+
     // -- Founding Fathers --
 
     public List<FoundingFather> getFoundingFathers() {
@@ -765,7 +840,7 @@ public final class Specification {
     public EquipmentType getEquipmentType(String id) {
         return (EquipmentType) getType(id);
     }
-    
+
     // -- DifficultyLevels --
     public List<DifficultyLevel> getDifficultyLevels() {
         return difficultyLevels;
@@ -792,27 +867,19 @@ public final class Specification {
     }
 
     /**
-     * Returns the <code>IntegerOption</code> corresponding to the ID.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>IntegerOption</code> value
+     * Applies the difficulty level to the current specification.
+     * 
+     * @param difficultyLevel difficulty level to apply
      */
-    public IntegerOption getIntegerOption(String id) {
-        return (IntegerOption) getOption(id);
-    }
-
-    /**
-     * Returns the <code>BooleanOption</code> corresponding to the ID.
-     *
-     * @param id a <code>String</code> value
-     * @return a <code>BooleanOption</code> value
-     */
-    public BooleanOption getBooleanOption(String id) {
-        return (BooleanOption) getOption(id);
+    public void applyDifficultyLevel(int difficultyLevel) {
+        for (String key : difficultyLevels.get(difficultyLevel).getOptions().keySet()) {
+            allOptions.put(key, difficultyLevels.get(difficultyLevel).getOptions().get(key));
+        }
     }
 
     /**
      * Loads the specification.
+     * 
      * @param is The stream to load the specification from.
      */
     public static void createSpecification(InputStream is) {
@@ -824,7 +891,8 @@ public final class Specification {
         if (specification == null) {
             try {
                 specification = new Specification(new FileInputStream("data/freecol/specification.xml"));
-            } catch(Exception e) {
+                logger.info("getSpecification()");
+            } catch (Exception e) {
             }
         }
         return specification;

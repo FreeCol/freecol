@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
@@ -107,6 +108,9 @@ public final class PreGameController extends Controller {
         }
         nations.addAll(FreeCol.getSpecification().getIndianNations());
         nations.addAll(FreeCol.getSpecification().getREFNations());
+
+        // Apply the selected difficulty level
+        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
         
         // Add AI players
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
@@ -150,6 +154,7 @@ public final class PreGameController extends Controller {
         
         // Inform the clients:
         setMap(map);
+        
         
         // Start the game:
         freeColServer.setGameState(FreeColServer.GameState.IN_GAME);

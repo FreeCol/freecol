@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -80,21 +81,25 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private int index;
 
+
     /**
      * Constants for describing the stance towards a player.
      */
-    public static enum Stance { WAR, CEASE_FIRE, PEACE, ALLIANCE }
+    public static enum Stance {
+        WAR, CEASE_FIRE, PEACE, ALLIANCE
+    }
+
 
     /**
-     * Only used by AI - stores the tension levels,
-     * 0-1000 with 1000 maximum hostility.
+     * Only used by AI - stores the tension levels, 0-1000 with 1000 maximum
+     * hostility.
      */
     // TODO: move this to AIPlayer
     private java.util.Map<Player, Tension> tension = new HashMap<Player, Tension>();
 
     /**
-     * Stores the stance towards the other players. One of:
-     * WAR, CEASE_FIRE, PEACE and ALLIANCE.
+     * Stores the stance towards the other players. One of: WAR, CEASE_FIRE,
+     * PEACE and ALLIANCE.
      */
     private java.util.Map<Player, Stance> stance = new HashMap<Player, Stance>();
 
@@ -105,12 +110,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
 
     /**
-     * The name of this player. This defaults to the user name in case
-     * of a human player and the rulerName of the NationType in case
-     * of an AI player.
+     * The name of this player. This defaults to the user name in case of a
+     * human player and the rulerName of the NationType in case of an AI player.
      */
     private String name;
-    
+
     public static final String UNKNOWN_ENEMY = "unknown enemy";
 
     /**
@@ -176,7 +180,11 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private PlayerType playerType;
 
-    public static enum PlayerType { NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD }
+
+    public static enum PlayerType {
+        NATIVE, COLONIAL, REBEL, INDEPENDENT, ROYAL, UNDEAD
+    }
+
 
     private int crossesRequired = 12;
 
@@ -210,6 +218,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Contains the abilities and modifiers of this type.
      */
     private FeatureContainer featureContainer = new FeatureContainer();
+
 
     /**
      * 
@@ -282,7 +291,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Player(Game game, String name, boolean admin, Nation newNation) {
         super(game);
-        
+
         this.name = name;
         this.admin = admin;
         if (newNation != null && newNation.getType() != null) {
@@ -316,7 +325,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 // indians
                 gold = 1500;
                 playerType = PlayerType.NATIVE;
-            }      
+            }
         } else {
             // virtual "enemy privateer" player
             // or undead ?
@@ -332,13 +341,12 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * 
-     * Initiates a new <code>Player</code> from an <code>Element</code>
-     * and registers this <code>Player</code> at the specified game.
+     * Initiates a new <code>Player</code> from an <code>Element</code> and
+     * registers this <code>Player</code> at the specified game.
      * 
      * @param game The <code>Game</code> this object belongs to.
      * @param in The input stream containing the XML.
-     * @throws XMLStreamException if a problem was encountered
-     * during parsing.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
     public Player(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
@@ -346,12 +354,11 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Initiates a new <code>Player</code> from an <code>Element</code>
-     * and registers this <code>Player</code> at the specified game.
+     * Initiates a new <code>Player</code> from an <code>Element</code> and
+     * registers this <code>Player</code> at the specified game.
      * 
      * @param game The <code>Game</code> this object belongs to.
-     * @param e An XML-element that will be used to initialize
-     * this object.
+     * @param e An XML-element that will be used to initialize this object.
      * 
      */
     public Player(Game game, Element e) {
@@ -360,10 +367,9 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Initiates a new <code>Player</code> with the given ID. The
-     * object should later be initialized by calling either {@link
-     * #readFromXML(XMLStreamReader)} or {@link
-     * #readFromXMLElement(Element)}.
+     * Initiates a new <code>Player</code> with the given ID. The object
+     * should later be initialized by calling either {@link
+     * #readFromXML(XMLStreamReader)} or {@link #readFromXMLElement(Element)}.
      * 
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
@@ -374,7 +380,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the index of this Player.
-     *
+     * 
      * @return an <code>int</code> value
      */
     public int getIndex() {
@@ -383,7 +389,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Get the <code>FeatureContainer</code> value.
-     *
+     * 
      * @return a <code>FeatureContainer</code> value
      */
     public final FeatureContainer getFeatureContainer() {
@@ -392,7 +398,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Set the <code>FeatureContainer</code> value.
-     *
+     * 
      * @param newFeatureContainer The new FeatureContainer value.
      */
     public final void setFeatureContainer(final FeatureContainer newFeatureContainer) {
@@ -423,17 +429,17 @@ public class Player extends FreeColGameObject implements Nameable {
      * Checks if this player owns the given <code>Settlement</code>.
      * 
      * @param s The <code>Settlement</code>.
-     * @return <code>true</code> if this <code>Player</code>
-     * owns the given <code>Settlement</code>.
+     * @return <code>true</code> if this <code>Player</code> owns the given
+     *         <code>Settlement</code>.
      */
     public boolean hasSettlement(Settlement s) {
         return settlements.contains(s);
     }
 
     /**
-     * Adds the given <code>Settlement</code> to this
-     * <code>Player</code>'s list of settlements.
-     *
+     * Adds the given <code>Settlement</code> to this <code>Player</code>'s
+     * list of settlements.
+     * 
      * @param s
      */
     public void addSettlement(Settlement s) {
@@ -446,15 +452,16 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Removes the given <code>Settlement</code> from this
-     * <code>Player</code>'s list of settlements.
+     * Removes the given <code>Settlement</code> from this <code>Player</code>'s
+     * list of settlements.
      * 
      * @param s The <code>Settlement</code> to remove.
      */
     public void removeSettlement(Settlement s) {
         if (settlements.contains(s)) {
             if (s.getOwner() == this) {
-                throw new IllegalStateException("Cannot remove the ownership of the given settlement before it has been given to another player.");
+                throw new IllegalStateException(
+                        "Cannot remove the ownership of the given settlement before it has been given to another player.");
             }
             settlements.remove(s);
         }
@@ -529,8 +536,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this player is a "royal expeditionary force.
      * 
-     * @return <code>true</code> is the given nation is a royal
-     * expeditionary force and <code>false</code> otherwise.
+     * @return <code>true</code> is the given nation is a royal expeditionary
+     *         force and <code>false</code> otherwise.
      */
     public boolean isREF() {
         return nationType != null && nationType.isREF();
@@ -538,7 +545,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the current score of the player.
-     *
+     * 
      * @return an <code>int</code> value
      */
     public int getScore() {
@@ -547,7 +554,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Get the <code>Unit</code> value.
-     *
+     * 
      * @return a <code>List<Unit></code> value
      */
     public final Unit getUnit(String id) {
@@ -556,7 +563,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Set the <code>Unit</code> value.
-     *
+     * 
      * @param newUnit The new Units value.
      */
     public final void setUnit(final Unit newUnit) {
@@ -567,7 +574,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Remove Unit.
-     *
+     * 
      * @param oldUnit an <code>Unit</code> value
      */
     public void removeUnit(final Unit oldUnit) {
@@ -623,9 +630,8 @@ public class Player extends FreeColGameObject implements Nameable {
             unit.dispose();
         }
         if (unitNames.size() > 0) {
-            addModelMessage(this, ModelMessage.MessageType.UNIT_LOST,
-                            "model.player.independence.unitsSeized", 
-                            "%units%", Utils.join(", ", unitNames));
+            addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, "model.player.independence.unitsSeized",
+                    "%units%", Utils.join(", ", unitNames));
         }
         List<Unit> veterans = new ArrayList<Unit>();
         for (Colony colony : getColonies()) {
@@ -643,10 +649,8 @@ public class Player extends FreeColGameObject implements Nameable {
                         // TODO: use a new upgrade type?
                         unit.setType(unit.getType().getPromotion());
                     }
-                    addModelMessage(colony, ModelMessage.MessageType.DEFAULT,
-                                    "model.player.continentalArmyMuster", 
-                                    "%colony%", colony.getName(),
-                                    "%number%", String.valueOf(limit));
+                    addModelMessage(colony, ModelMessage.MessageType.DEFAULT, "model.player.continentalArmyMuster",
+                            "%colony%", colony.getName(), "%number%", String.valueOf(limit));
                 }
                 veterans.clear();
             }
@@ -675,8 +679,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Gets the <code>Player</code> controlling the "Royal Expeditionary
      * Force" for this player.
      * 
-     * @return The player, or <code>null</code> if this player does
-     * not have a royal expeditionary force.
+     * @return The player, or <code>null</code> if this player does not have a
+     *         royal expeditionary force.
      */
     public Player getREFPlayer() {
         return getGame().getPlayer(nationID + "REF");
@@ -685,9 +689,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the name this player has chosen for the new land.
      * 
-     * @return The name of the new world as chosen by the
-     * <code>Player</code>.  If no land name was chosen, the default
-     * name is returned.
+     * @return The name of the new world as chosen by the <code>Player</code>.
+     *         If no land name was chosen, the default name is returned.
      */
     public String getNewLandName() {
         if (newLandName == null) {
@@ -712,9 +715,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * Returns the <code>Colony</code> with the given name.
      * 
      * @param name The name of the <code>Colony</code>.
-     * @return The <code>Colony</code> or <code>null</code> if this
-     * player does not have a <code>Colony</code> with the specified
-     * name.
+     * @return The <code>Colony</code> or <code>null</code> if this player
+     *         does not have a <code>Colony</code> with the specified name.
      */
     public Colony getColony(String name) {
         for (Colony colony : getColonies()) {
@@ -726,19 +728,18 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Creates a unique colony name.  This is done by fetching a new
-     * default colony name from the list of default names.
+     * Creates a unique colony name. This is done by fetching a new default
+     * colony name from the list of default names.
      * 
-     * @return A <code>String</code> containing a new unused colony
-     * name from the list, if any is available, and otherwise an
-     * automatically generated name.
+     * @return A <code>String</code> containing a new unused colony name from
+     *         the list, if any is available, and otherwise an automatically
+     *         generated name.
      */
     public String getDefaultColonyName() {
         try {
             String name = "";
             do {
-                name = Messages.message(nationID + ".newColonyName." +
-                                        Integer.toString(colonyNameIndex));
+                name = Messages.message(nationID + ".newColonyName." + Integer.toString(colonyNameIndex));
                 colonyNameIndex++;
             } while (getGame().getColony(name) != null);
             return name;
@@ -773,11 +774,11 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Checks if this player is indian. This method returns
-     * the opposite of {@link #isEuropean()}.
+     * Checks if this player is indian. This method returns the opposite of
+     * {@link #isEuropean()}.
      * 
      * @return <i>true</i> if this player is indian and <i>false</i>
-     * otherwise.
+     *         otherwise.
      */
     public boolean isIndian() {
         return playerType == PlayerType.NATIVE;
@@ -805,19 +806,17 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getLandPrice(Tile tile) {
         Player nationOwner = tile.getOwner();
-        if (nationOwner == null ||
-            nationOwner == this ||
-            nationOwner.isEuropean() ||
-            tile.getSettlement() != null) {
+        if (nationOwner == null || nationOwner == this || nationOwner.isEuropean() || tile.getSettlement() != null) {
             return 0;
         }
         int price = 0;
         for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
             price += tile.potential(type);
         }
-        price = price * getDifficulty().getLandPriceFactor() + 100;
-        return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier",
-                                                    null, getGame().getTurn());
+        price = price * Specification.getSpecification().getIntegerOption("model.option.landPriceFactor").getValue()
+                + 100;
+        return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier", null, getGame()
+                .getTurn());
     }
 
     /**
@@ -864,13 +863,13 @@ public class Player extends FreeColGameObject implements Nameable {
      * 
      * @param player The <code>Player</code>.
      * @param contacted <code>true</code> if this <code>Player</code> has
-     * contacted the given <code>Player</code>.
+     *            contacted the given <code>Player</code>.
      */
     public void setContacted(Player player, boolean contacted) {
 
         if (player == null || player == this || player == getGame().getUnknownEnemy()) {
             return;
-        }            
+        }
 
         if (contacted && !hasContacted(player)) {
             stance.put(player, Stance.PEACE);
@@ -896,22 +895,22 @@ public class Player extends FreeColGameObject implements Nameable {
                 // these dialogs should only appear on the first event
                 if (player.isEuropean()) {
                     if (!contactedEuro) {
-                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, 
-                                        player, "EventPanel.MEETING_EUROPEANS");
+                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
+                                "EventPanel.MEETING_EUROPEANS");
                     }
                 } else {
                     if (!contactedIndians) {
-                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                        player, "EventPanel.MEETING_NATIVES");
+                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
+                                "EventPanel.MEETING_NATIVES");
                     }
                     // special cases for Aztec/Inca
                     if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.aztec")) {
-                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                        player, "EventPanel.MEETING_AZTEC");
-                    } else if (player.getNationType() == 
-                               FreeCol.getSpecification().getNationType("model.nationType.inca")) {
-                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                        player, "EventPanel.MEETING_INCA");
+                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
+                                "EventPanel.MEETING_AZTEC");
+                    } else if (player.getNationType() == FreeCol.getSpecification().getNationType(
+                            "model.nationType.inca")) {
+                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
+                                "EventPanel.MEETING_INCA");
                     }
                 }
             } else if (!isEuropean()) {
@@ -927,8 +926,8 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns whether this player has been attacked by privateers.
      * 
-     * @return <code>true</code> if this <code>Player</code> has
-     * been attacked by privateers.
+     * @return <code>true</code> if this <code>Player</code> has been
+     *         attacked by privateers.
      */
     public boolean hasBeenAttackedByPrivateers() {
         return attackedByPrivateers;
@@ -994,14 +993,14 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setExplored(Unit unit) {
         if (getGame() == null || getGame().getMap() == null || unit == null || unit.getLocation() == null
-            || unit.getTile() == null || isIndian()) {
+                || unit.getTile() == null || isIndian()) {
             return;
         }
         if (canSeeTiles == null) {
             resetCanSeeTiles();
         }
         Iterator<Position> positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true,
-                                                                                   unit.getLineOfSight());
+                unit.getLineOfSight());
         while (positionIterator.hasNext()) {
             Map.Position p = positionIterator.next();
             canSeeTiles[p.getX()][p.getY()] = true;
@@ -1085,14 +1084,16 @@ public class Player extends FreeColGameObject implements Nameable {
                      * 
                      * logger.warning("Trying to set a non-explored Tile to be
                      * visible (3). Settlement: " + settlement + "(" +
-                     * settlement.getTile().getPosition() + "), Tile: " + position);
+                     * settlement.getTile().getPosition() + "), Tile: " +
+                     * position);
                      * 
                      * throw new IllegalStateException("Trying to set a
-                     * non-explored Tile to be visible. Settlement: " + settlement + "(" +
-                     * settlement.getTile().getPosition() + "), Tile: " + position); }
+                     * non-explored Tile to be visible. Settlement: " +
+                     * settlement + "(" + settlement.getTile().getPosition() +
+                     * "), Tile: " + position); }
                      */
-                    Iterator<Position> positionIterator = map
-                        .getCircleIterator(position, true, settlement.getLineOfSight());
+                    Iterator<Position> positionIterator = map.getCircleIterator(position, true, settlement
+                            .getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;
@@ -1102,12 +1103,13 @@ public class Player extends FreeColGameObject implements Nameable {
                          * 
                          * logger.warning("Trying to set a non-explored Tile to
                          * be visible (4). Settlement: " + settlement + "(" +
-                         * settlement.getTile().getPosition() + "), Tile: " + p);
+                         * settlement.getTile().getPosition() + "), Tile: " +
+                         * p);
                          * 
                          * throw new IllegalStateException("Trying to set a
-                         * non-explored Tile to be visible. Settlement: " + settlement +
-                         * "(" + settlement.getTile().getPosition() + "), Tile: " +
-                         * p); }
+                         * non-explored Tile to be visible. Settlement: " +
+                         * settlement + "(" + settlement.getTile().getPosition() +
+                         * "), Tile: " + p); }
                          */
                     }
                 }
@@ -1263,7 +1265,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Describe <code>getEuropeName</code> method here.
-     *
+     * 
      * @return a <code>String</code> value
      */
     public String getEuropeName() {
@@ -1481,7 +1483,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Return this Player's nation.
-     *
+     * 
      * @return a <code>String</code> value
      */
     public Nation getNation() {
@@ -1499,7 +1501,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Return the ID of this Player's nation.
-     *
+     * 
      * @return a <code>String</code> value
      */
     public String getNationID() {
@@ -1517,7 +1519,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Get the <code>RulerName</code> value.
-     *
+     * 
      * @return a <code>String</code> value
      */
     public final String getRulerName() {
@@ -1614,7 +1616,8 @@ public class Player extends FreeColGameObject implements Nameable {
             if (s instanceof IndianSettlement) {
                 indianSettlements.add((IndianSettlement) s);
             } else {
-                throw new RuntimeException("getIndianSettlements can only be called for players whose settlements are IndianSettlements.");
+                throw new RuntimeException(
+                        "getIndianSettlements can only be called for players whose settlements are IndianSettlements.");
             }
         }
         return indianSettlements;
@@ -1640,12 +1643,13 @@ public class Player extends FreeColGameObject implements Nameable {
         for (Colony colony : getColonies()) {
             if (colony == null || colony.getTile() == unit.getTile()) {
                 // This happens when is called from damageAllShips because
-                // the colony is being captured and can't be repaired in that colony
+                // the colony is being captured and can't be repaired in that
+                // colony
                 continue;
             }
             int distance;
             if (colony.hasAbility("model.ability.repairShips")
-                && (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
+                    && (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
                 closestLocation = colony;
                 shortestDistance = distance;
             }
@@ -1679,8 +1683,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return;
         }
 
-        int cost = getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ?
-                crossesRequired : crosses;
+        int cost = getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ? crossesRequired : crosses;
 
         this.crosses -= cost;
     }
@@ -1778,8 +1781,8 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!canRecruitUnits()) {
             return;
         }
-        crossesRequired += (int) featureContainer.applyModifier(getDifficulty().getCrossesIncrement(),
-                                                                "model.modifier.religiousUnrestBonus");
+        crossesRequired += (int) featureContainer.applyModifier(Specification.getSpecification().getIntegerOption(
+                "model.option.crossesIncrement").getValue(), "model.modifier.religiousUnrestBonus");
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
@@ -1823,9 +1826,9 @@ public class Player extends FreeColGameObject implements Nameable {
         } else {
             tension.get(player).modify(addToTension);
         }
-        
+
         if (origin != null && isIndian() && origin.getOwner() == player) {
-            for (Settlement settlement: settlements) {
+            for (Settlement settlement : settlements) {
                 if (settlement instanceof IndianSettlement && !origin.equals(settlement)) {
                     ((IndianSettlement) settlement).propagatedAlarm(player, addToTension);
                 }
@@ -1936,9 +1939,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 Iterator<Unit> ui = ct.getUnitIterator();
                 while (ui.hasNext()) {
                     Unit u = ui.next();
-                    if (u.getOwner() != this && u.isOffensiveUnit() && 
-                        u.getOwner().isEuropean() &&
-                        getStance(u.getOwner()) == Stance.WAR) {
+                    if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()
+                            && getStance(u.getOwner()) == Stance.WAR) {
                         value -= Math.max(0, 40 - tile.getDistanceTo(tile) * 9);
                     }
                 }
@@ -2062,10 +2064,8 @@ public class Player extends FreeColGameObject implements Nameable {
 
         allFathers.add(father);
 
-        addModelMessage(this, ModelMessage.MessageType.DEFAULT,
-                        "model.player.foundingFatherJoinedCongress", 
-                        "%foundingFather%", father.getName(),
-                        "%description%", father.getDescription());
+        addModelMessage(this, ModelMessage.MessageType.DEFAULT, "model.player.foundingFatherJoinedCongress",
+                "%foundingFather%", father.getName(), "%description%", father.getDescription());
         featureContainer.add(father.getFeatureContainer());
 
         List<AbstractUnit> units = father.getUnits();
@@ -2108,8 +2108,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     resetArrears(goodsType);
                 }
             } else if (event.equals("model.event.freeBuilding")) {
-                BuildingType type = FreeCol.getSpecification().getBuildingType(father.getEvents()
-                                                                               .get(event));
+                BuildingType type = FreeCol.getSpecification().getBuildingType(father.getEvents().get(event));
                 for (Colony colony : getColonies()) {
                     Building building = colony.getBuilding(type);
                     if (building == null && colony.canBuild(type)) {
@@ -2122,16 +2121,14 @@ public class Player extends FreeColGameObject implements Nameable {
                 int value = Integer.parseInt(father.getEvents().get(event));
                 for (Colony colony : getColonies()) {
                     /*
-                     * The number of bells to be generated in order to
-                     * get the appropriate SoL is determined by the
-                     * formula: int membership = ... in "colony.updateSoL()":
+                     * The number of bells to be generated in order to get the
+                     * appropriate SoL is determined by the formula: int
+                     * membership = ... in "colony.updateSoL()":
                      */
-                    int requiredBells = ((colony.getSoL() + value) * Colony.BELLS_PER_REBEL *
-                                         colony.getUnitCount()) / 100;
+                    int requiredBells = ((colony.getSoL() + value) * Colony.BELLS_PER_REBEL * colony.getUnitCount()) / 100;
                     colony.addGoods(Goods.BELLS, requiredBells - colony.getGoodsCount(Goods.BELLS));
                 }
             }
-
 
         }
     }
@@ -2147,7 +2144,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (isIndian()) {
             for (Tension tension1 : tension.values()) {
                 if (tension1.getValue() > 0) {
-                    tension1.modify( -(4 + tension1.getValue()/100));
+                    tension1.modify(-(4 + tension1.getValue() / 100));
                 }
             }
         }
@@ -2164,18 +2161,17 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         /*
-         * Moved founding fathers infront of units so that naval units
-         * will get their Magellan bonus the turn Magellan joins the
-         * congress.
+         * Moved founding fathers infront of units so that naval units will get
+         * their Magellan bonus the turn Magellan joins the congress.
          */
         if (isEuropean()) {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
                 addFather(currentFather);
                 currentFather = null;
-                bells -= getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ? 
-                    getTotalFoundingFatherCost() : bells;
+                bells -= getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ? getTotalFoundingFatherCost()
+                        : bells;
             }
-            
+
             // CO: since the pioneer already finishes faster, changing
             // it at both locations would double the bonus.
             /**
@@ -2196,20 +2192,16 @@ public class Player extends FreeColGameObject implements Nameable {
                 getMarket().newTurn();
             }
 
-            int numberOfColonies = settlements.size(); 
+            int numberOfColonies = settlements.size();
             if (numberOfColonies > 0) {
                 newSoL = newSoL / numberOfColonies;
                 if (oldSoL / 10 != newSoL / 10) {
                     if (newSoL > oldSoL) {
-                        addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
-                                        "model.player.SoLIncrease",
-                                        "%oldSoL%", String.valueOf(oldSoL),
-                                        "%newSoL%", String.valueOf(newSoL));
+                        addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY, "model.player.SoLIncrease",
+                                "%oldSoL%", String.valueOf(oldSoL), "%newSoL%", String.valueOf(newSoL));
                     } else {
-                        addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
-                                        "model.player.SoLDecrease",
-                                        "%oldSoL%", String.valueOf(oldSoL),
-                                        "%newSoL%", String.valueOf(newSoL));
+                        addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY, "model.player.SoLDecrease",
+                                "%oldSoL%", String.valueOf(oldSoL), "%newSoL%", String.valueOf(newSoL));
                     }
                 }
             }
@@ -2229,7 +2221,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Calculate the player's score.
-     *
+     * 
      */
     public void calculateScore() {
         score = 0;
@@ -2283,7 +2275,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
+            throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("ID", getId());
@@ -2448,13 +2440,13 @@ public class Player extends FreeColGameObject implements Nameable {
                 in.nextTag();
             }
         }
-        
+
         // sanity check: we should be on the closing tag
         if (!in.getLocalName().equals(Player.getXMLElementTagName())) {
-            logger.warning("Error parsing xml: expecting closing tag </" + Player.getXMLElementTagName() + "> "+
-                           "found instead: " +in.getLocalName());
+            logger.warning("Error parsing xml: expecting closing tag </" + Player.getXMLElementTagName() + "> "
+                    + "found instead: " + in.getLocalName());
         }
-        
+
         if (market == null) {
             market = new Market(getGame(), this);
         }
@@ -2487,7 +2479,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 total += unitType.getRecruitProbability();
             }
         }
-        
+
         int random = getGame().getModelController().getRandom(getId() + "newRecruitableUnit" + unique, total);
         UnitType recruitable = null;
         total = 0;
@@ -2523,8 +2515,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #incrementBells
      */
     public int getTotalFoundingFatherCost() {
-        return (getFatherCount() * getFatherCount() *
-                getDifficulty().getFoundingFatherFactor() + 50);
+        return (getFatherCount() * getFatherCount() * Specification.getSpecification().getIntegerOption("model.option.foundingFatherFactor").getValue() + 50);
     }
 
     /**
@@ -2580,7 +2571,8 @@ public class Player extends FreeColGameObject implements Nameable {
             data = new MarketData(goodsType);
             getMarket().putMarketData(goodsType, data);
         }
-        data.setArrears(getDifficulty().getArrearsFactor() * 100 * data.getPaidForSale());
+        data.setArrears(Specification.getSpecification().getIntegerOption("model.option.arrearsFactor").getValue()
+                * 100 * data.getPaidForSale());
     }
 
     /**
@@ -2641,9 +2633,8 @@ public class Player extends FreeColGameObject implements Nameable {
         if (data == null) {
             return true;
         } else {
-            return (data.getArrears() == 0 ||
-                    (marketAccess == Market.CUSTOM_HOUSE &&
-                     getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)));
+            return (data.getArrears() == 0 || (marketAccess == Market.CUSTOM_HOUSE && getGameOptions().getBoolean(
+                    GameOptions.CUSTOM_IGNORE_BOYCOTT)));
         }
     }
 
@@ -2678,8 +2669,8 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets the current tax. If Thomas Paine has already joined the
-     * Continental Congress, the bellsBonus is adjusted accordingly.
+     * Sets the current tax. If Thomas Paine has already joined the Continental
+     * Congress, the bellsBonus is adjusted accordingly.
      * 
      * @param amount The new tax.
      */
@@ -2700,8 +2691,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
             // found no matching modifier
-            featureContainer.addModifier(new Modifier("model.goods.bells", "model.ability.addTaxToBells",
-                                                      amount, Modifier.Type.ADDITIVE));
+            featureContainer.addModifier(new Modifier("model.goods.bells", "model.ability.addTaxToBells", amount,
+                    Modifier.Type.ADDITIVE));
         }
     }
 
@@ -2798,7 +2789,6 @@ public class Player extends FreeColGameObject implements Nameable {
         data.setIncomeAfterTaxes(oldAmount + amount);
     }
 
-
     /**
      * Returns the difficulty level.
      * 
@@ -2852,10 +2842,13 @@ public class Player extends FreeColGameObject implements Nameable {
     public boolean equals(Player o) {
         if (o == null) {
             return false;
-        } else if (getId()==null || o.getId()==null) {
-            // This only happens in the client code with the virtual "enemy privateer" player
-            // This special player is not properly associated to the Game and therefore has no ID
-            // TODO: remove this hack when the virtual "enemy privateer" player is better implemented
+        } else if (getId() == null || o.getId() == null) {
+            // This only happens in the client code with the virtual "enemy
+            // privateer" player
+            // This special player is not properly associated to the Game and
+            // therefore has no ID
+            // TODO: remove this hack when the virtual "enemy privateer" player
+            // is better implemented
             return false;
         } else {
             return getId().equals(o.getId());

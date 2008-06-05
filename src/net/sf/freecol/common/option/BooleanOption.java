@@ -40,15 +40,19 @@ public class BooleanOption extends AbstractOption {
     private boolean value;
 
     /**
-     * Creates a new empty <code>BooleanOption</code>.
+     * Creates a new <code>BooleanOption</code>.
+     * @param in The <code>XMLStreamReader</code> containing the data. 
      */
-     public BooleanOption() {
+     public BooleanOption(XMLStreamReader in) throws XMLStreamException {
          super(NO_ID);
+         readFromXML(in);
      }
 
+    //TODO remove when all options come from specification.xml
     /**
     * Creates a new <code>BooleanOption</code>.
     *
+    * @deprecated
     * @param id The identifier for this option. This is used when the object should be
     *           found in an {@link OptionGroup}.
     * @param defaultValue The default value of this option.
@@ -58,9 +62,11 @@ public class BooleanOption extends AbstractOption {
         this.value = defaultValue;
     }
 
+    //TODO remove when all options come from specification.xml
     /**
     * Creates a new <code>BooleanOption</code>.
     *
+    * @deprecated
     * @param id The identifier for this option. This is used when the object should be
     *           found in an {@link OptionGroup}.
     * @param optionGroup the OptionGroup this option belongs to.
@@ -90,9 +96,10 @@ public class BooleanOption extends AbstractOption {
         final boolean oldValue = this.value;
         this.value = value;
         
-        if (value != oldValue) {
+        if (value != oldValue && isDefined) {
             firePropertyChange("value", Boolean.valueOf(oldValue), Boolean.valueOf(value));
         }
+        isDefined = true;
     }
 
 
@@ -106,8 +113,9 @@ public class BooleanOption extends AbstractOption {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
-        out.writeStartElement(getId());
+        out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("id", getId());
         out.writeAttribute("value", Boolean.toString(value));
 
         out.writeEndElement();
@@ -120,18 +128,24 @@ public class BooleanOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        final String id = in.getAttributeValue(null, "id");
+        final String defaultValue = in.getAttributeValue(null, "defaultValue");
+        final String value = in.getAttributeValue(null, "value");
 
-        if (getId().equals(NO_ID)) {
-            // Reading the specifications
-            setId(in.getAttributeValue(null, "id"));            
-            value = Boolean.valueOf(in.getAttributeValue(null, "defaultValue")).booleanValue();
+        if (id == null && getId().equals("NO_ID")){
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+        }
+        if (defaultValue == null && value == null) {
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no value nor default value found.");
+        }
+
+        if(getId() == NO_ID) {
+            setId(id);
+        }
+        if(value != null) {
+            setValue(Boolean.parseBoolean(value));
         } else {
-            // Reading a saved value
-            final boolean oldValue = value;
-            value = Boolean.valueOf(in.getAttributeValue(null, "value")).booleanValue();
-            if (value != oldValue) {
-                firePropertyChange("value", Boolean.valueOf(oldValue), Boolean.valueOf(value));
-            }      
+            setValue(Boolean.parseBoolean(defaultValue));
         }
         in.nextTag();
 
@@ -143,7 +157,7 @@ public class BooleanOption extends AbstractOption {
     * @return "booleanOption".
     */
     public static String getXMLElementTagName() {
-        return "booleanOption";
+        return "boolean-option";
     }
 
 }

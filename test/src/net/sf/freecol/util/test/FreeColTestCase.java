@@ -29,6 +29,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -114,6 +115,7 @@ public class FreeColTestCase extends TestCase {
             }
             game.addPlayer(p);
         }
+        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
         return game;
     }
 

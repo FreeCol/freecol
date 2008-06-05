@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -114,7 +115,7 @@ public class MapGenerator {
         // Prepare imports:
         final File importFile = getMapGeneratorOptions().getFile(MapGeneratorOptions.IMPORT_FILE);
         final Game importGame;
-        if (importFile != null) {                 
+        if (importFile != null) {
             importGame = loadSaveGame(importFile);
         } else {
             importGame = null;
@@ -379,7 +380,7 @@ public class MapGenerator {
         final int minSettlementDistance = 3;
         int level = map.getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
         int number = mapGeneratorOptions.getNumberOfSettlements() *
-            FreeCol.getSpecification().getDifficultyLevel(level).getNativeSettlementDensity() / 100;
+        Specification.getSpecification().getIntegerOption("model.option.nativeSettlementDensity").getValue() / 100;
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {

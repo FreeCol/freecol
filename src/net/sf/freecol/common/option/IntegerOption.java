@@ -34,17 +34,16 @@ public class IntegerOption extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(IntegerOption.class.getName());
 
-    private static int UNDEFINED = Integer.MIN_VALUE;
-
-    private int value = UNDEFINED;
-    private int minimumValue = UNDEFINED;
-    private int maximumValue = UNDEFINED;
+    private int value;
+    private int minimumValue;
+    private int maximumValue;
 
     
-
+    //TODO remove when all options come from specification.xml
     /**
     * Creates a new <code>IntegerOption</code>.
     *
+    * @deprecated
     * @param id The identifier for this option. This is used when the object should be
     *           found in an {@link OptionGroup}.
     * @param optionGroup The OptionGroup this option belongs to. 
@@ -61,10 +60,12 @@ public class IntegerOption extends AbstractOption {
     }
 
     /**
-     * Creates a new empty <code>IntegerOption</code>.
+     * Creates a new  <code>IntegerOption</code>.
+     * @param in The <code>XMLStreamReader</code> containing the data. 
      */
-     public IntegerOption() {
+     public IntegerOption(XMLStreamReader in) throws XMLStreamException {
          super(NO_ID);
+         readFromXML(in);
      }
 
     
@@ -103,9 +104,10 @@ public class IntegerOption extends AbstractOption {
         final int oldValue = this.value;
         this.value = value;
         
-        if (value != oldValue) {
+        if (value != oldValue && isDefined) {
             firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
         }
+        isDefined = true;
     }
 
     /**
@@ -118,8 +120,9 @@ public class IntegerOption extends AbstractOption {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
-        out.writeStartElement(getId());
+        out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("id", getId());
         out.writeAttribute("value", Integer.toString(value));
 
         out.writeEndElement();
@@ -132,24 +135,28 @@ public class IntegerOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        final String id = in.getAttributeValue(null, "id");
+        final String defaultValue = in.getAttributeValue(null, "defaultValue");
+        final String value = in.getAttributeValue(null, "value");
+        
+        if (id == null && getId().equals("NO_ID")){
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+        }
+        if (defaultValue == null && value == null) {
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no value nor default value found.");
+        }
  
-        if (getId().equals(NO_ID)) {
-            // Reading the specifications
-            setId(in.getAttributeValue(null, "id"));
-            value = Integer.parseInt(in.getAttributeValue(null, "defaultValue"));
+        if(getId() == NO_ID) {
+            setId(id);
+        }
+        if(value != null) {
+            setValue(Integer.parseInt(value));
+        } else {
+            setValue(Integer.parseInt(defaultValue));
             minimumValue = Integer.parseInt(in.getAttributeValue(null, "minimumValue"));
             maximumValue = Integer.parseInt(in.getAttributeValue(null, "maximumValue"));
-        } else        {
-            // Reading a saved value
-            final int oldValue = this.value;
-            value = Integer.parseInt(in.getAttributeValue(null, "value"));
-            if (value != oldValue) {
-                firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
-            }
-       }
-
-       in.nextTag();
-        
+        }
+        in.nextTag();
     }
 
     /**
@@ -157,7 +164,7 @@ public class IntegerOption extends AbstractOption {
     * @return "integerOption".
     */
     public static String getXMLElementTagName() {
-        return "integerOption";
+        return "integer-option";
     }
 
 }

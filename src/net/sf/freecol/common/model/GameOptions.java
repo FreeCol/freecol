@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.OptionGroup;
@@ -85,7 +86,7 @@ public class GameOptions extends OptionMap {
     /**
      * The difficulty of the game.
      */
-    public static final String DIFFICULTY = "difficulty";
+    public static final String DIFFICULTY = "model.option.difficulty";
     
     /**
     * Creates a new <code>GameOptions</code>.
@@ -160,15 +161,7 @@ public class GameOptions extends OptionMap {
         add(victoryConditions);
 
         /* Difficulty settings */
-        OptionGroup difficultySettings = new OptionGroup("gameOptions.difficultySettings");
-        new RangeOption(DIFFICULTY, difficultySettings,
-                         new String[] {"veryEasy", 
-                                       "easy", 
-                                       "normal", 
-                                       "hard", 
-                                       "veryHard"}, 
-                         2);
-        add(difficultySettings);
+        add(Specification.getSpecification().getOptionGroup("gameOptions.difficultySettings"));
     }
 
     protected boolean isCorrectTagName(String tagName) {
@@ -180,7 +173,7 @@ public class GameOptions extends OptionMap {
     * @return "gameOptions".
     */
     public static String getXMLElementTagName() {
-        return "gameOptions";
+        return "game-options";
     }
 
 }

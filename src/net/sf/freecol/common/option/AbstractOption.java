@@ -29,12 +29,11 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.FreeColObject;
 
 /**
- * The super class of all options. GUI components making use of this
- * class can refer to its name and shortDescription properties. The
- * complete keys of these properties consist of the id of the option
- * group (if any), followed by a "." unless the option group is null,
- * followed by the id of the option object, followed by a ".",
- * followed by "name" or "shortDescription".
+ * The super class of all options. GUI components making use of this class can
+ * refer to its name and shortDescription properties. The complete keys of these
+ * properties consist of the id of the option group (if any), followed by a "."
+ * unless the option group is null, followed by the id of the option object,
+ * followed by a ".", followed by "name" or "shortDescription".
  */
 abstract public class AbstractOption extends FreeColObject implements Option {
 
@@ -44,7 +43,12 @@ abstract public class AbstractOption extends FreeColObject implements Option {
 
     private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
-    private final String group;
+    private String optionGroup = "";
+
+    // Determine if the option has been defined
+    // When defined an option won't change when a default value is read from an
+    // XML file.
+    protected boolean isDefined = false;
 
 
     /**
@@ -57,24 +61,24 @@ abstract public class AbstractOption extends FreeColObject implements Option {
         this(id, null);
     }
 
+    // TODO : remove this constructor when all AbstractOption come from
+    // specification.xml
     /**
      * Creates a new <code>AbstractOption</code>.
      * 
+     * @deprecated
      * @param id The identifier for this option. This is used when the object
      *            should be found in an {@link OptionGroup}.
      * @param optionGroup The OptionGroup this Option belongs to.
      */
     public AbstractOption(String id, OptionGroup optionGroup) {
         setId(id);
-        if (optionGroup == null) {
-            this.group = "";
-        } else {
-            this.group = optionGroup.getId() + ".";
+        if (optionGroup != null) {
+            setGroup(optionGroup.getId());
             optionGroup.add(this);
         }
     }
 
-    
     /**
      * Adds a new <code>PropertyChangeListener</code> for monitoring state
      * changes. Events are generated when variables are changed.
@@ -115,14 +119,14 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      * @return A short description of this <code>Option</code>.
      */
     public String getShortDescription() {
-        return Messages.message(group + getId() + ".shortDescription");
+        return Messages.message(getGroup() + "." + getId() + ".shortDescription");
     }
 
     /**
      * Returns a textual representation of this object.
      * 
      * @return The name of this <code>Option</code>.
-     * @see #getName
+     * @see #getLocalizedName
      */
     public String toString() {
         return getName();
@@ -135,7 +139,22 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      * @return The string prefix provided by the OptionGroup.
      */
     public String getGroup() {
-        return group;
+        return optionGroup;
+    }
+
+    /**
+     * Set the option group
+     * 
+     * @param <code>OptionGroup</code> to set
+     * 
+     * @return The string prefix provided by the OptionGroup.
+     */
+    public void setGroup(String group) {
+        if (group == null) {
+            optionGroup = "";
+        } else {
+            optionGroup = group;
+        }
     }
 
     /**
@@ -144,16 +163,7 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      * @return The name as provided in the constructor.
      */
     public String getName() {
-        return Messages.message(group + getId() + ".name");
-    }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     * 
-     * @return "option".
-     */
-    public static String getXMLElementTagName() {
-        return "option";
+        return Messages.message(getGroup() + "." + getId().replaceFirst("model\\.option\\.", "") + ".name");
     }
 
 }

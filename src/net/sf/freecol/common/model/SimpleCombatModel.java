@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement.SettlementType;
@@ -854,12 +855,12 @@ public class SimpleCombatModel implements CombatModel {
     private void getConvert(Unit attacker, IndianSettlement indianSettlement) {
         ModelController modelController = attacker.getGame().getModelController();
         int random = modelController.getRandom(attacker.getId() + "getConvert", 100);
-        int convertProbability = (int) FeatureContainer
-            .applyModifierSet(attacker.getOwner().getDifficulty().getNativeConvertProbability(),
-                              attacker.getGame().getTurn(),
-                              attacker.getModifierSet("model.ability.nativeConvertBonus"));
+        int convertProbability = (int) FeatureContainer.applyModifierSet(Specification.getSpecification()
+                .getIntegerOption("model.option.nativeConvertProbability").getValue(), attacker.getGame().getTurn(),
+                attacker.getModifierSet("model.ability.nativeConvertBonus"));
         // TODO: it should be bigger when tension is high
-        int burnProbability = attacker.getOwner().getDifficulty().getBurnProbability();
+        int burnProbability = Specification.getSpecification().getIntegerOption("model.option.burnProbability")
+                .getValue();
         
         if (random < convertProbability) {
             Unit missionary = indianSettlement.getMissionary();

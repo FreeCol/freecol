@@ -27,6 +27,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+
 
 /**
 * Used for grouping objects of {@link Option}s.
@@ -120,6 +122,15 @@ public class OptionGroup extends AbstractOption {
     */
     public static String getXMLElementTagName() {
         return "optionGroup";
+    }
+    
+    /**
+     * Returns the name of this <code>Option</code>.
+     * 
+     * @return The name as provided in the constructor.
+     */
+    public String getName() {
+        return Messages.message(getId() + ".name");
     }
 
 }

@@ -36,24 +36,23 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.option.IntegerOption;
 
 import org.w3c.dom.Element;
 
 /**
  * Represents Europe in the game. Each <code>Player</code> has it's own
- * <code>Europe</code>.
- * <p/>
+ * <code>Europe</code>. <p/> <br>
  * <br>
- * <br>
- * <p/>
- * Europe is the place where you can {@link #recruit} and {@link #train} new
- * units. You may also sell/buy goods.
+ * <p/> Europe is the place where you can {@link #recruit} and {@link #train}
+ * new units. You may also sell/buy goods.
  */
 public final class Europe extends FreeColGameObject implements Location, Ownable, Named {
 
     private static final Logger logger = Logger.getLogger(Europe.class.getName());
 
     private static final int RECRUIT_PRICE_INITIAL = 200;
+
     private static final int LOWER_CAP_INITIAL = 80;
 
     public static final String UNITS_TAG_NAME = "units";
@@ -69,6 +68,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     private java.util.Map<UnitType, Integer> unitPrices = new HashMap<UnitType, Integer>();
 
     private int recruitPrice;
+
     private int recruitLowerCap;
 
     /**
@@ -78,12 +78,13 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     private Player owner;
 
+
     /**
      * Creates a new <code>Europe</code>.
-     *
-     * @param game  The <code>Game</code> in which this object belong.
+     * 
+     * @param game The <code>Game</code> in which this object belong.
      * @param owner The <code>Player</code> that will be using this object of
-     *              <code>Europe</code>.
+     *            <code>Europe</code>.
      */
     public Europe(Game game, Player owner) {
         super(game);
@@ -100,12 +101,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Initializes this object from an XML-representation of this object.
      * 
-     * @param game
-     *            The <code>Game</code> in which this object belong.
-     * @param in
-     *            The input stream containing the XML.
-     * @throws XMLStreamException
-     *             if an error occurred during parsing.
+     * @param game The <code>Game</code> in which this object belong.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if an error occurred during parsing.
      */
     public Europe(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
@@ -116,10 +114,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Initializes this object from an XML-representation of this object.
      * 
-     * @param game
-     *            The <code>Game</code> in which this object belong.
-     * @param e
-     *            An XML-element that will be used to initialize this object.
+     * @param game The <code>Game</code> in which this object belong.
+     * @param e An XML-element that will be used to initialize this object.
      */
     public Europe(Game game, Element e) {
         super(game, e);
@@ -133,15 +129,12 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * {@link #readFromXML(XMLStreamReader)} or
      * {@link #readFromXMLElement(Element)}.
      * 
-     * @param game
-     *            The <code>Game</code> in which this object belong.
-     * @param id
-     *            The unique identifier for this object.
+     * @param game The <code>Game</code> in which this object belong.
+     * @param id The unique identifier for this object.
      */
     public Europe(Game game, String id) {
         super(game, id);
     }
-
 
     /**
      * Return true if this Europe could build at least one item of the
@@ -163,25 +156,23 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     /**
      * Returns true if not all recruitables are of the same type.
-     *
+     * 
      * @return a <code>boolean</code> value
      */
     public boolean recruitablesDiffer() {
-        return !(recruitables[0].equals(recruitables[1]) &&
-                 recruitables[0].equals(recruitables[2]));
+        return !(recruitables[0].equals(recruitables[1]) && recruitables[0].equals(recruitables[2]));
     }
 
     /**
      * Gets the type of the recruitable in Europe at the given slot.
      * 
-     * @param slot
-     *            The slot of the recruitable whose type needs to be returned.
+     * @param slot The slot of the recruitable whose type needs to be returned.
      *            Should be 0, 1 or 2. NOTE - used to be 1, 2 or 3 and was
      *            called with 1-3 by some classes and 0-2 by others, the method
      *            itself expected 0-2.
      * @return The type of the recruitable in Europe at the given slot.
-     * @exception IllegalArgumentException
-     *                if the given <code>slot</code> does not exist.
+     * @exception IllegalArgumentException if the given <code>slot</code> does
+     *                not exist.
      */
     public UnitType getRecruitable(int slot) {
         if ((slot >= 0) && (slot < 3)) {
@@ -194,12 +185,10 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * Sets the type of the recruitable in Europe at the given slot to the given
      * type.
      * 
-     * @param slot
-     *            The slot of the recruitable whose type needs to be set. Should
-     *            be 0, 1 or 2. NOTE - changed in order to match getRecruitable
-     *            above!
-     * @param type
-     *            The new type for the unit at the given slot in Europe. Should
+     * @param slot The slot of the recruitable whose type needs to be set.
+     *            Should be 0, 1 or 2. NOTE - changed in order to match
+     *            getRecruitable above!
+     * @param type The new type for the unit at the given slot in Europe. Should
      *            be a valid unit type.
      */
     public void setRecruitable(int slot, UnitType type) {
@@ -214,17 +203,13 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Recruits a unit from Europe.
      * 
-     * @param slot
-     *            The slot the recruited unit(type) came from. This is needed
+     * @param slot The slot the recruited unit(type) came from. This is needed
      *            for setting a new recruitable to this slot.
-     * @param unit
-     *            The recruited unit.
-     * @param newRecruitable
-     *            The recruitable that will fill the now empty slot.
-     * @exception IllegalArgumentException
-     *                if <code>unit == null</code>.
-     * @exception IllegalStateException
-     *                if the player recruiting the unit cannot afford the price.
+     * @param unit The recruited unit.
+     * @param newRecruitable The recruitable that will fill the now empty slot.
+     * @exception IllegalArgumentException if <code>unit == null</code>.
+     * @exception IllegalStateException if the player recruiting the unit cannot
+     *                afford the price.
      */
     public void recruit(int slot, Unit unit, UnitType newRecruitable) {
         if (unit == null) {
@@ -245,27 +230,20 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Causes a unit to emigrate from Europe.
      * 
-     * @param slot
-     *            The slot the emigrated unit(type) came from. This is needed
+     * @param slot The slot the emigrated unit(type) came from. This is needed
      *            for setting a new recruitable to this slot.
-     * @param unit
-     *            The recruited unit.
-     * @param newRecruitable
-     *            The recruitable that will fill the now empty slot.
-     * @exception IllegalArgumentException
-     *                If <code>unit == null</code>.
-     * @exception IllegalStateException
-     *                If there is not enough crosses to emigrate the
-     *                <code>Unit</code>.
+     * @param unit The recruited unit.
+     * @param newRecruitable The recruitable that will fill the now empty slot.
+     * @exception IllegalArgumentException If <code>unit == null</code>.
+     * @exception IllegalStateException If there is not enough crosses to
+     *                emigrate the <code>Unit</code>.
      */
     public void emigrate(int slot, Unit unit, UnitType newRecruitable) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         } else if (!unit.getOwner().checkEmigrate()) {
-            throw new IllegalStateException(
-                    "Not enough crosses to emigrate unit: "
-                            + unit.getOwner().getCrosses() + "/"
-                            + unit.getOwner().getCrossesRequired());
+            throw new IllegalStateException("Not enough crosses to emigrate unit: " + unit.getOwner().getCrosses()
+                    + "/" + unit.getOwner().getCrossesRequired());
         }
 
         unit.setLocation(this);
@@ -273,8 +251,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         unit.getOwner().reduceCrosses();
 
         if (!unit.getOwner().hasAbility("model.ability.selectRecruit")) {
-            addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit,
-                            "model.europe.emigrate", "%unit%", unit.getName());
+            addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit, "model.europe.emigrate", "%unit%", unit
+                    .getName());
         }
         // In case William Brewster is in the congress we don't need
         // to show a message to the user because he has already been
@@ -304,8 +282,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Adds a <code>Locatable</code> to this Location.
      * 
-     * @param locatable
-     *            The <code>Locatable</code> to add to this Location.
+     * @param locatable The <code>Locatable</code> to add to this Location.
      */
     public void add(Locatable locatable) {
         if (!(locatable instanceof Unit)) {
@@ -320,8 +297,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Removes a <code>Locatable</code> from this Location.
      * 
-     * @param locatable
-     *            The <code>Locatable</code> to remove from this Location.
+     * @param locatable The <code>Locatable</code> to remove from this
+     *            Location.
      */
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
@@ -335,8 +312,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * Checks if the specified <code>Locatable</code> is at this
      * <code>Location</code>.
      * 
-     * @param locatable
-     *            The <code>Locatable</code> to test the presence of.
+     * @param locatable The <code>Locatable</code> to test the presence of.
      * @return The result.
      */
     public boolean contains(Locatable locatable) {
@@ -355,8 +331,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * Checks whether or not the specified locatable may be added to this
      * <code>Location</code>.
      * 
-     * @param locatable
-     *            The <code>Locatable</code> to test the addabillity of.
+     * @param locatable The <code>Locatable</code> to test the addabillity of.
      * @return <i>true</i>.
      */
     public boolean canAdd(Locatable locatable) {
@@ -420,13 +395,13 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         }
     }
 
-
     /**
      * Returns the price of a unit in Europe.
      * 
      * @param unitType The type of unit of which you need the price.
-     * @return The price of this unit when trained in Europe. 'UnitType.UNDEFINED' is returned
-     *         in case the unit cannot be bought.
+     * @return The price of this unit when trained in Europe.
+     *         'UnitType.UNDEFINED' is returned in case the unit cannot be
+     *         bought.
      */
     public int getUnitPrice(UnitType unitType) {
         Integer price = unitPrices.get(unitType);
@@ -440,14 +415,12 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Trains a unit in Europe.
      * 
-     * @param unit
-     *            The trained unit.
-     * @exception IllegalArgumentException
-     *                if <code>unit == null</code>.
-     * @exception IllegalArgumentException
-     *                if the unit to be trained doesn't have price
-     * @exception IllegalStateException
-     *                if the player recruiting the unit cannot afford the price.
+     * @param unit The trained unit.
+     * @exception IllegalArgumentException if <code>unit == null</code>.
+     * @exception IllegalArgumentException if the unit to be trained doesn't
+     *                have price
+     * @exception IllegalStateException if the player recruiting the unit cannot
+     *                afford the price.
      */
     public void train(Unit unit) {
         if (unit == null) {
@@ -467,9 +440,16 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     private void incrementTrainingPrice(Unit unit, int price) {
-        int increasingPrice = getOwner().getDifficulty().getTrainingPriceIncrease(unit.getType());
-        if (increasingPrice > 0) {
-            unitPrices.put(unit.getType(), new Integer(price + increasingPrice));
+        IntegerOption increasingPriceOption;
+        
+        if(Specification.getSpecification().getBooleanOption("model.option.trainingPriceIncreasePerType").getValue()){
+            increasingPriceOption = Specification.getSpecification().getIntegerOption("model.option.trainingPriceIncrease." + unit.getType().getArt());
+        }
+        else {
+            increasingPriceOption = Specification.getSpecification().getIntegerOption("model.option.trainingPriceIncrease");   
+        }
+        if(increasingPriceOption != null){
+            unitPrices.put(unit.getType(), new Integer(price + increasingPriceOption.getValue()));
         }
     }
 
@@ -486,8 +466,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     private void incrementRecruitPrice() {
-        recruitPrice += getOwner().getDifficulty().getRecruitPriceIncrease();
-        recruitLowerCap += getOwner().getDifficulty().getLowerCapIncrease();
+        recruitPrice += Specification.getSpecification().getIntegerOption("model.option.recruitCapIncrease").getValue();
+        recruitLowerCap += Specification.getSpecification().getIntegerOption("model.option.lowerCapIncrease")
+                .getValue();
     }
 
     /**
@@ -500,19 +481,17 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Sets the owner of this <code>Ownable</code>.
      * 
-     * @param p
-     *            The <code>Player</code> that should take ownership of this
+     * @param p The <code>Player</code> that should take ownership of this
      *            {@link Ownable}.
-     * @exception UnsupportedOperationException
-     *                is always thrown by this method.
+     * @exception UnsupportedOperationException is always thrown by this method.
      */
     public void setOwner(Player p) {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * Prepares this object for a new turn.
-     * TODO: give Europe a shipyard and remove this
+     * Prepares this object for a new turn. TODO: give Europe a shipyard and
+     * remove this
      */
     public void newTurn() {
         // Repair any damaged ships:
@@ -520,10 +499,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
-                    addModelMessage(this, ModelMessage.MessageType.DEFAULT, this,
-                                    "model.unit.shipRepaired",
-                                    "%unit%", unit.getName(),
-                                    "%repairLocation%", getLocationName());
+                    addModelMessage(this, ModelMessage.MessageType.DEFAULT, this, "model.unit.shipRepaired", "%unit%",
+                            unit.getName(), "%repairLocation%", getLocationName());
                 }
             }
         }
@@ -576,24 +553,20 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
      * 
-     * @param out
-     *            The target stream.
-     * @param player
-     *            The <code>Player</code> this XML-representation should be
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
      *            <code>showAll == true</code>.
-     * @param showAll
-     *            Only attributes visible to <code>player</code> will be added
-     *            to the representation if <code>showAll</code> is set to
-     *            <i>false</i>.
-     * @param toSavedGame
-     *            If <code>true</code> then information that is only needed
-     *            when saving a game is added.
-     * @throws XMLStreamException
-     *             if there are any problems writing to the stream.
+     * @param showAll Only attributes visible to <code>player</code> will be
+     *            added to the representation if <code>showAll</code> is set
+     *            to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that is only
+     *            needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out, Player player,
-            boolean showAll, boolean toSavedGame) throws XMLStreamException {
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+            throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -620,13 +593,10 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     /**
      * Initialize this object from an XML-representation of this object.
      * 
-     * @param in
-     *            The input stream with the XML.
-     * @throws XMLStreamException
-     *             if a problem was encountered during parsing.
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
-    protected void readFromXMLImpl(XMLStreamReader in)
-            throws XMLStreamException {
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         Specification spec = FreeCol.getSpecification();

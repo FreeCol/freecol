@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 
 import org.w3c.dom.Element;
@@ -1395,8 +1396,8 @@ public final class Colony extends Settlement implements Location, Nameable {
 
 
     private void createSoLMessages() {
-        final int veryBadGovernment = getOwner().getDifficulty().getVeryBadGovernmentLimit();
-        final int badGovernment = getOwner().getDifficulty().getBadGovernmentLimit();
+        final int veryBadGovernment = Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
+        final int badGovernment = Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue();
         if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
             if (sonsOfLiberty > oldSonsOfLiberty) {
                 addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,

@@ -307,12 +307,13 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
-        out.writeStartElement(getId());
+        out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("id", getId());
         out.writeAttribute("accelerator", getKeyStrokeText(getAccelerator()));
 
         out.writeEndElement();
-    }
+   }
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -321,7 +322,14 @@ public abstract class FreeColAction extends AbstractAction implements Option {
      * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        String id = in.getAttributeValue(null, "id");
         String acc = in.getAttributeValue(null, "accelerator");
+
+        if (id == null){
+            // Old syntax
+            id = in.getLocalName();
+        }
+
         if (!acc.equals("")) {
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(acc));
         } else {
@@ -465,4 +473,13 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         }
 
     }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     * @return "integerOption".
+     */
+     public static String getXMLElementTagName() {
+         return "action";
+     }
+
 }

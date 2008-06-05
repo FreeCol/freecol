@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ConcurrentModificationException;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -119,8 +120,8 @@ public class UnitTest extends FreeColTestCase {
 
         assertEquals(2, dutch.getDifficulty().getIndex());
         assertEquals("model.difficulty.medium", dutch.getDifficulty().getId());
-        assertEquals(6, dutch.getDifficulty().getBadGovernmentLimit());
-        assertEquals(10, dutch.getDifficulty().getVeryBadGovernmentLimit());
+        assertEquals(6, Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue());
+        assertEquals(10, Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue());
 
         // Found colony on 6,8
         Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"),

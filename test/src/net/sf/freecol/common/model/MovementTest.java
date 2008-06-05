@@ -35,6 +35,8 @@ public class MovementTest extends FreeColTestCase {
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
 
+    EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+
     public void testMoveFromPlainsToPlains() throws Exception {
 
         Game game = getStandardGame();
@@ -146,6 +148,23 @@ public class MovementTest extends FreeColTestCase {
         assertEquals(Math.min(moveCost, colonistType.getMovement()),
                      colonist.getMoveCost(tile2));
 
+    }
+
+    public void scoutColonyTest() {
+        
+        Game game = getStandardGame();
+        Player french = game.getPlayer("model.nation.french");
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        Tile tile2 = map.getTile(4, 8);
+        tile1.setExploredBy(french, true);
+        tile2.setExploredBy(french, true);
+
+        Colony colony = getStandardColony(1, 5, 8);
+        Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
+
+        assertEquals(Unit.MoveType.ILLEGAL_MOVE, colonist.getMoveType(tile1));
     }
 
 }

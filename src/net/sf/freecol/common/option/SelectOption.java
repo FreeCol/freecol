@@ -94,7 +94,7 @@ public class SelectOption extends AbstractOption {
         } else {
             String[] localized = new String[options.length];
             for (int i = 0; i < options.length; i++) {
-                localized[i] = Messages.message(getGroup() + id + "." + options[i]);
+                localized[i] = Messages.message(getGroup() + "." + id + "." + options[i]);
             }        
             this.options = localized;
         }
