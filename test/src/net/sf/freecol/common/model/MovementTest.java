@@ -34,8 +34,10 @@ public class MovementTest extends FreeColTestCase {
 
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    UnitType braveType = spec().getUnitType("model.unit.brave");
 
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+    EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
 
     public void testMoveFromPlainsToPlains() throws Exception {
 
@@ -150,21 +152,79 @@ public class MovementTest extends FreeColTestCase {
 
     }
 
-    public void scoutColonyTest() {
+    public void testScoutColony() {
         
         Game game = getStandardGame();
         Player french = game.getPlayer("model.nation.french");
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player iroquois = game.getPlayer("model.nation.iroquois");
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
+        Tile tile3 = map.getTile(6, 8);
         tile1.setExploredBy(french, true);
         tile2.setExploredBy(french, true);
+        tile3.setExploredBy(french, true);
+        tile1.setExploredBy(dutch, true);
+        tile2.setExploredBy(dutch, true);
+        tile3.setExploredBy(dutch, true);
+        tile1.setExploredBy(iroquois, true);
+        tile3.setExploredBy(iroquois, true);
 
         Colony colony = getStandardColony(1, 5, 8);
-        Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
+        tile1.setSettlement(colony);
+        assertEquals(tile1.getColony(), colony);
 
+        Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ILLEGAL_MOVE, colonist.getMoveType(tile1));
+        colonist.equipWith(horses, true);
+        assertEquals(Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT, colonist.getMoveType(tile1));
+        colonist.equipWith(muskets, true);
+        assertEquals(Unit.MoveType.ATTACK, colonist.getMoveType(tile1));
+
+        Unit brave = new Unit(game, tile3, french, braveType, UnitState.ACTIVE);
+        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+        brave.equipWith(horses, true);
+        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+        brave.equipWith(muskets, true);
+        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+
+    }
+
+    public void testScoutIndianSettlement() {
+        
+        Game game = getStandardGame();
+        Player french = game.getPlayer("model.nation.french");
+        Player inca = game.getPlayer("model.nation.inca");
+        Player iroquois = game.getPlayer("model.nation.iroquois");
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        Tile tile2 = map.getTile(4, 8);
+        Tile tile3 = map.getTile(6, 8);
+        tile1.setExploredBy(french, true);
+        tile2.setExploredBy(french, true);
+        tile3.setExploredBy(french, true);
+        tile1.setExploredBy(iroquois, true);
+        tile3.setExploredBy(iroquois, true);
+
+        IndianSettlement settlement = new IndianSettlement(game, inca, tile1, false, null, false, null);
+
+        Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
+        assertEquals(Unit.MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST, colonist.getMoveType(tile1));
+        colonist.equipWith(horses, true);
+        assertEquals(Unit.MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT, colonist.getMoveType(tile1));
+        colonist.equipWith(muskets, true);
+        assertEquals(Unit.MoveType.ATTACK, colonist.getMoveType(tile1));
+
+        Unit brave = new Unit(game, tile3, french, braveType, UnitState.ACTIVE);
+        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+        brave.equipWith(horses, true);
+        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+        brave.equipWith(muskets, true);
+        assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
+
     }
 
 }
