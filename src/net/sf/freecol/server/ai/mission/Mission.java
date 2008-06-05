@@ -128,7 +128,9 @@ public abstract class Mission extends AIObject {
             return null;
         }
         
-        while (pathNode.next != null && pathNode.getTurns() == 0
+        while (pathNode.next != null 
+                && pathNode.getTurns() == 0
+                && this.isValid() == true
                 && (getUnit().getMoveType(pathNode.getDirection()) == MoveType.MOVE
                 || getUnit().getMoveType(pathNode.getDirection()) == MoveType.MOVE_HIGH_SEAS
                 || getUnit().getMoveType(pathNode.getDirection()) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
@@ -360,7 +362,7 @@ public abstract class Mission extends AIObject {
     }
     
     /**
-     * Disposes this mission by removing any referances to it.
+     * Disposes this mission by removing any references to it.
      */
     public void dispose() {
         // Nothing to do yet.
@@ -386,6 +388,11 @@ public abstract class Mission extends AIObject {
     * @return The default value: <code>true</code>.
     */
     public boolean isValid() {
+        if (getUnit() != null && getUnit().isDisposed()) {
+            // an AI unit can move accidentally into a lost city ruin and get killed
+            // the mission is was associated with should become invalid 
+            return false;
+        }
         return true;
     }
 

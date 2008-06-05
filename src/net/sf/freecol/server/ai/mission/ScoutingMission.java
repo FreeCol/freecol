@@ -359,7 +359,7 @@ public class ScoutingMission extends Mission {
      *         <code>false</code> otherwise.
      */
     public boolean isValid() {
-        return valid;
+        return valid && super.isValid();
     }
 
     /**
