@@ -1020,7 +1020,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
         // difficulty is in range 0-4, dx in range 2-6
         // TODO: make this work with DifficultyLevel
-        int dx = player.getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY) + 2;
+        int dx = Specification.getSpecification().getRangeOption("model.option.difficulty").getValue() + 2;
         // seasoned scouts should be more successful
         int bonus = 0;
         if (unit.hasAbility("model.ability.expertScout") && 
