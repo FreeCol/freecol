@@ -52,9 +52,11 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -239,6 +241,7 @@ public final class FreeColServer {
         preGameInputHandler = new PreGameInputHandler(this);
         inGameInputHandler = new InGameInputHandler(this);
         inGameController = new InGameController(this);
+
         try {
             server = new Server(this, port);
             server.start();
@@ -257,6 +260,10 @@ public final class FreeColServer {
             fe.initCause(e);
             throw fe;
         }
+
+        // Apply the difficulty level
+        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));        
+
         updateMetaServer(true);
         startMetaServerUpdateThread();
     }

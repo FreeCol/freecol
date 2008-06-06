@@ -109,7 +109,7 @@ public final class PreGameController extends Controller {
         nations.addAll(FreeCol.getSpecification().getIndianNations());
         nations.addAll(FreeCol.getSpecification().getREFNations());
 
-        // Apply the selected difficulty level
+        // Apply the difficulty level
         Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
         
         // Add AI players
