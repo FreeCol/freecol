@@ -2888,10 +2888,9 @@ public final class InGameController implements NetworkConstants {
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
 
-        // The scout loses his moves because the skill data and tradeable goods
-        // data is fetched
-        // from the server and the moves are the price we have to pay to obtain
-        // that data.
+        // The scout loses his moves because the skill data and
+        // tradeable goods data is fetched from the server and the
+        // moves are the price we have to pay to obtain that data.
         unit.setMovesLeft(0);
 
         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");

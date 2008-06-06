@@ -1243,16 +1243,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element reply = Message.createNewRootElement("provideSkill");
         if (settlement.getLearnableSkill() != null) {
             reply.setAttribute("skill", settlement.getLearnableSkill().getId());
-            if (unit.getType().canBeUpgraded(settlement.getLearnableSkill(), 
-                                             UnitType.UpgradeType.NATIVES)) {
-                // We now put the unit on the indian settlement.
-                // Normally we shouldn't have to this, but the
-                // movesLeft are set to 0 for unit and if the player
-                // decides to learn a skill with a
-                // learnSkillAtSettlement message then we have to be
-                // able to check if the unit can learn the skill.
-                unit.setLocation(settlement);
-            }
         }
         // Set the Tile.PlayerExploredTile attribute.
         settlement.getTile().updateIndianSettlementSkill(player);
@@ -1488,20 +1478,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
-        Element reply = Message.createNewRootElement("learnSkillResult");
-        // The unit was relocated to the indian settlement. See askSkill for
-        // more info.
-        IndianSettlement settlement = (IndianSettlement) unit.getLocation();
+        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
+        if (settlement == null) {
+            throw new IllegalStateException("No settlement to learn skill from.");
+        }
         if (!unit.getType().canBeUpgraded(settlement.getLearnableSkill(),
                                           UnitType.UpgradeType.NATIVES)) {
             throw new IllegalStateException("Unit can't learn that skill from settlement!");
         }
         
-        // FIXME: This is supposed to return the unit to the original location the unit came from
-        // outside the indian camp. This doesn't work if the unit was in a ship sailing the coast
-        Tile tile = map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile());
-        unit.setLocation(tile);
-        
+        Element reply = Message.createNewRootElement("learnSkillResult");
         if (!cancelAction) {
             Tension tension = settlement.getAlarm(player);
             if (tension == null) {
