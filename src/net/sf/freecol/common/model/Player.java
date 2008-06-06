@@ -101,7 +101,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Stores the stance towards the other players. One of: WAR, CEASE_FIRE,
      * PEACE and ALLIANCE.
      */
-    private java.util.Map<Player, Stance> stance = new HashMap<Player, Stance>();
+    private java.util.Map<String, Stance> stance = new HashMap<String, Stance>();
 
     private static final Color noNationColor = Color.BLACK;
 
@@ -854,7 +854,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == null) {
             return true;
         } else {
-            return stance.containsKey(player);
+            return stance.containsKey(player.getId());
         }
     }
 
@@ -872,7 +872,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         if (contacted && !hasContacted(player)) {
-            stance.put(player, Stance.PEACE);
+            stance.put(player.getId(), Stance.PEACE);
 
             if (isEuropean() && !isAI()) {
                 boolean contactedIndians = false;
@@ -1961,7 +1961,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == null) {
             return Stance.PEACE;
         } else {
-            return stance.get(player);
+            return stance.get(player.getId());
         }
     }
 
@@ -1999,7 +1999,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR) {
         	throw new IllegalStateException("Cease fire can only be declared when at war.");
         }
-        stance.put(player, newStance);
+        stance.put(player.getId(), newStance);
         
         if (oldStance == Stance.PEACE && newStance == Stance.WAR) {
             modifyTension(player, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
@@ -2326,9 +2326,9 @@ public class Player extends FreeColGameObject implements Nameable {
             out.writeEndElement();
         }
 
-        for (Entry<Player, Stance> entry : stance.entrySet()) {
+        for (Entry<String, Stance> entry : stance.entrySet()) {
             out.writeStartElement(STANCE_TAG);
-            out.writeAttribute("player", entry.getKey().getId());
+            out.writeAttribute("player", entry.getKey());
             out.writeAttribute("value", entry.getValue().toString());
             out.writeEndElement();
         }
@@ -2406,7 +2406,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         tension = new HashMap<Player, Tension>();
-        stance = new HashMap<Player, Stance>();
+        stance = new HashMap<String, Stance>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
@@ -2423,8 +2423,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(STANCE_TAG)) {
-                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                stance.put(player, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
+            	String playerId = in.getAttributeValue(null, "player");
+                stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
                 in.nextTag(); // close element
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
                 europe = updateFreeColGameObject(in, Europe.class);
