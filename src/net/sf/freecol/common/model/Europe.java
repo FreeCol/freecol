@@ -466,7 +466,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     private void incrementRecruitPrice() {
-        recruitPrice += Specification.getSpecification().getIntegerOption("model.option.recruitCapIncrease").getValue();
+        recruitPrice += Specification.getSpecification().getIntegerOption("model.option.recruitPriceIncrease").getValue();
         recruitLowerCap += Specification.getSpecification().getIntegerOption("model.option.lowerCapIncrease")
                 .getValue();
     }
