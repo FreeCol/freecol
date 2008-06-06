@@ -1797,13 +1797,7 @@ public class Map extends FreeColGameObject {
                 Tile t = updateFreeColGameObject(in, Tile.class);
                 setTile(t, t.getX(), t.getY());
             } else if (in.getLocalName().equals(Region.getXMLElementTagName())) {
-                String regionID = in.getAttributeValue(null, "ID");
-                Region region = (Region) getGame().getFreeColGameObject(regionID);
-                if (region == null) {
-                    region = new Region(getGame(), regionID);
-                }
-                region.readFromXML(in);
-                setRegion(region);
+                setRegion(updateFreeColGameObject(in, Region.class));
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading map");
                 in.nextTag();

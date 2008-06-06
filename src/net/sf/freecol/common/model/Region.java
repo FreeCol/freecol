@@ -118,6 +118,18 @@ public class Region extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Initiates a new <code>Region</code> from an XML representation.
+     * 
+     * @param game The <code>Game</code> this object belongs to.
+     * @param in The input stream containing the XML.
+     * @throws XMLStreamException if an error occurred during parsing.
+     */
+    public Region(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+        readFromXMLImpl(in);
+    }
+
+    /**
      * Get the <code>NameKey</code> value.
      *
      * @return a <code>String</code> value
