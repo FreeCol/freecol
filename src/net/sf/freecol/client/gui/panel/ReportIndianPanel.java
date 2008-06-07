@@ -24,11 +24,13 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -82,6 +84,8 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
         if (!player.hasContacted(opponent)) {
           return;
         }
+        
+        ImageLibrary library = getCanvas().getClient().getImageLibrary();
 
         int numberOfSettlements = opponent.getSettlements().size();
         int heights[] = new int[2 * (numberOfSettlements + EXTRA_ROWS)];
@@ -134,15 +138,19 @@ public final class ReportIndianPanel extends ReportPanel implements ActionListen
             String locationName = settlement.getLocationName() + 
                 " (" + settlement.getTile().getX() + ", " +
                 settlement.getTile().getY() + ")";
+            
+            JLabel skillLabel = new JLabel();
             UnitType skillType = settlement.getLearnableSkill();
             String skill = Messages.message("indianSettlement.skillUnknown");
             if (skillType != null) {
                 skill = skillType.getName();
+                ImageIcon skillImage = library.getUnitImageIcon(skillType);
+                skillLabel.setIcon(library.getScaledImageIcon(skillImage, 0.66f));
             }
+            skillLabel.setText(skill);
             result.add(new JLabel(locationName),
                        higConst.rc(row, labelColumn));
-            result.add(new JLabel(skill),
-                       higConst.rc(row, valueColumn));
+            result.add(skillLabel, higConst.rc(row, valueColumn));
             row += 2;
         }
         reportPanel.add(result);
