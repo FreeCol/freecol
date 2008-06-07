@@ -41,7 +41,7 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.generator.MapGenerator;
+import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 
@@ -96,7 +96,7 @@ public final class PreGameController extends Controller {
         FreeColServer freeColServer = getFreeColServer();
 
         Game game = freeColServer.getGame();
-        MapGenerator mapGenerator = freeColServer.getMapGenerator();
+        IMapGenerator mapGenerator = freeColServer.getMapGenerator();
         AIMain aiMain = new AIMain(freeColServer);
         freeColServer.setAIMain(aiMain);
         game.setFreeColGameObjectListener(aiMain);

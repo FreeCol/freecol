@@ -92,8 +92,8 @@ public class NewEmptyMapAction extends MapboardAction {
         if (size == null) {
             return;
         }
-        
-        final MapGenerator mapGenerator = freeColClient.getFreeColServer().getMapGenerator();
+        //TODO: Use an interface
+        final MapGenerator mapGenerator = (MapGenerator) freeColClient.getFreeColServer().getMapGenerator();
         mapGenerator.getTerrainGenerator().createMap(game, new boolean[size.width][size.height]);        
         
         freeColClient.getGUI().setFocus(1, 1);

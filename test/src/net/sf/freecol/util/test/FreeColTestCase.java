@@ -195,6 +195,48 @@ public class FreeColTestCase extends TestCase {
     }
 
     /**
+     * Creates a standardized map, half land (left), half sea (right)
+     * 
+     * The land half has the same given type.
+     * 
+     * Uses the getGame() method to access the currently running game.
+     * 
+     * Does not call Game.setMap(Map) with the returned map.
+     * 
+     * @param type The type of land with which to initialize the map.
+     * 
+     * @param explored Set to true if you want all the tiles on the map to have been explored by all players.
+     * 
+     * @return The map created as described above.
+     */
+    public static Map getCoastTestMap(TileType tileType) {
+    	int totalWidth = 20;
+    	int totalHeight = 15;
+    	
+    	int landWidth = (int) Math.floor(totalWidth/2);
+    	int landHeight = (int) Math.floor(totalHeight/2);
+    	
+    	Tile[][] tiles = new Tile[totalWidth][totalHeight];
+
+        for (int x = 0; x < landWidth; x++) {
+            for (int y = 0; y < landHeight; y++) {
+                tiles[x][y] = new Tile(getGame(), tileType, x, y);
+            }
+        }
+        
+        TileType oceanType = spec().getTileType("model.tile.ocean");
+        for (int x = landWidth ; x < totalWidth; x++) {
+            for (int y = landHeight ; y < totalHeight; y++) {
+                tiles[x][y] = new Tile(getGame(), oceanType, x, y);
+            }
+        }
+    	
+    	Map m = new Map(getGame(), tiles);
+        
+        return m;
+    }
+    
+    /**
      * Get a standard colony at the location 5,8 with one free colonist
      * 
      * @return

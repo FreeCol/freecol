@@ -47,7 +47,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator();
 
         for (Nation n : s.getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()) {
@@ -72,7 +72,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator();
         RangeOption mapSize = (RangeOption) gen.getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
         mapSize.setValue(MapGeneratorOptions.MAP_SIZE_SMALL);
 
@@ -104,7 +104,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
 
-        MapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator();
 
         Vector<Player> players = new Vector<Player>();
 
@@ -161,7 +161,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         Game g = new Game(new MockModelController());
 
-        MapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator();
 
         Vector<Player> players = new Vector<Player>();
 
@@ -206,7 +206,7 @@ public class MapGeneratorTest extends FreeColTestCase {
     public void testImportMap() {
         
         Game g = new Game(new MockModelController());
-        MapGenerator gen = new MapGenerator();
+        IMapGenerator gen = new MapGenerator();
         File importFile = new File("data/maps/Africa.fsg");
         gen.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
         try {

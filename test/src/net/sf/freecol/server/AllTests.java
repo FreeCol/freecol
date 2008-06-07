@@ -29,7 +29,7 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		suite.addTestSuite(SaveLoadTest.class);
 		//$JUnit-END$
-		suite.addTest(net.sf.freecol.server.ai.mission.AllTests.suite());
+		suite.addTest(net.sf.freecol.server.ai.AllTests.suite());
 		return suite;
 	}
 

@@ -75,6 +75,7 @@ import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.control.PreGameInputHandler;
 import net.sf.freecol.server.control.ServerModelController;
 import net.sf.freecol.server.control.UserConnectionHandler;
+import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.generator.MapGenerator;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -123,7 +124,7 @@ public final class FreeColServer {
 
     private AIMain aiMain;
 
-    private MapGenerator mapGenerator;
+    private IMapGenerator mapGenerator;
 
     private boolean singleplayer;
 
@@ -339,7 +340,7 @@ public final class FreeColServer {
      * 
      * @return The <code>MapGenerator</code>.
      */
-    public MapGenerator getMapGenerator() {
+    public IMapGenerator getMapGenerator() {
         return mapGenerator;
     }
     
@@ -349,7 +350,7 @@ public final class FreeColServer {
      * 
      * @param mapGenerator The <code>MapGenerator</code>.
      */
-    public void setMapGenerator(MapGenerator mapGenerator) {
+    public void setMapGenerator(IMapGenerator mapGenerator) {
         this.mapGenerator = mapGenerator;
     }
 

@@ -1386,7 +1386,7 @@ public class AIPlayer extends AIObject {
         return value;
     }
 
-    private int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
+    int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
         logger.finest("Entering method getUnitSeekAndDestroyMissionValue");
         Unit defender = newTile.getDefendingUnit(unit);
         CombatModel combatModel = unit.getGame().getCombatModel();

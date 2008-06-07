@@ -72,7 +72,7 @@ import net.sf.freecol.server.model.ServerRegion;
 /**
  * Creates random maps and sets the starting locations for the players.
  */
-public class MapGenerator {
+public class MapGenerator implements IMapGenerator {
 
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
     
@@ -96,20 +96,12 @@ public class MapGenerator {
     }
 
 
-    /**
-     * Creates a new <code>Map</code> for the given
-     * <code>Game</code>. The <code>Map</code> is
-     * {@link Game#setMap(Map) added to the game} in this process.
-     * 
-     * <br><br>
-     * 
-     * The <code>Map</code> will be created using the assigned
-     * options (see {@link #getMapGeneratorOptions()}). 
-     * 
-     * @param game The <code>Game</code> that will be getting a map.
-     * @see LandGenerator
-     * @see TerrainGenerator
-     */
+    /* (non-Javadoc)
+	 * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
+	 */
+    /* (non-Javadoc)
+	 * @see net.sf.freecol.server.generator.IMapGenerator#createMap(net.sf.freecol.common.model.Game)
+	 */
     public void createMap(Game game) throws FreeColException {        
         
         // Prepare imports:
@@ -212,10 +204,9 @@ public class MapGenerator {
         return terrainGenerator;
     }
 
-    /**
-     * Gets the options used when generating the map.
-     * @return The <code>MapGeneratorOptions</code>.
-     */
+    /* (non-Javadoc)
+	 * @see net.sf.freecol.server.generator.IMapGenerator#getMapGeneratorOptions()
+	 */
     public MapGeneratorOptions getMapGeneratorOptions() {
         return mapGeneratorOptions;
     }
@@ -226,7 +217,7 @@ public class MapGenerator {
      *
      * @param map The map to use.
      */
-    public void createLostCityRumours(Map map) {
+    private void createLostCityRumours(Map map) {
         createLostCityRumours(map, null);
     }
     
@@ -237,7 +228,7 @@ public class MapGenerator {
      * @param map The map to use.
      * @param importGame The game to lost city rumours from.
      */
-    public void createLostCityRumours(Map map, Game importGame) {
+    private void createLostCityRumours(Map map, Game importGame) {
         final boolean importRumours = getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_RUMOURS);
         
         if (importGame != null && importRumours) {
@@ -294,7 +285,7 @@ public class MapGenerator {
      *       european players. If players does not contain any indian players, 
      *       no settlements are added.
      */
-    protected void createIndianSettlements(final Map map, List<Player> players) {
+    private void createIndianSettlements(final Map map, List<Player> players) {
         /** TODO: why do we need to sort the players?
         Collections.sort(players, new Comparator<Player>() {
             public int compare(Player o, Player p) {
@@ -633,7 +624,7 @@ public class MapGenerator {
      *      and starting locations for. That is; both indian and 
      *      european players.
      */
-    protected void createEuropeanUnits(Map map, List<Player> players) {
+    private void createEuropeanUnits(Map map, List<Player> players) {
         final int width = map.getWidth();
         final int height = map.getHeight();
 
@@ -844,7 +835,7 @@ public class MapGenerator {
      * @param startingPositions The number of starting positions
      * @return True if the proposed position is too close
      */
-    protected boolean isStartingPositionTooClose(Map map, int proposedY, int startingPositions,
+    private boolean isStartingPositionTooClose(Map map, int proposedY, int startingPositions,
                                                  List<Integer> usedYPositions) {
         int distance = (map.getHeight() / 2) / startingPositions;
         for (Integer yPosition : usedYPositions) {
