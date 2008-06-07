@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2008  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -32,16 +32,17 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ServerTest;
+import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
+import net.sf.freecol.util.test.FreeColTestCase;
 
-public class TransportMissionTest extends ServerTest {
+public class TransportMissionTest extends FreeColTestCase {
     
     public void testTransportMission() {
         // start a server
-        FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
+        FreeColServer server = ServerTestHelper.startServer(false, true);
         
         // generate a random map
         Controller c = server.getController();
@@ -104,7 +105,7 @@ public class TransportMissionTest extends ServerTest {
             aiPlayer.startWorking();
             assertFalse(aiUnit.getMission() instanceof TransportMission);
         } finally {
-            this.stopServer(server);
+            ServerTestHelper.stopServer(server);
         }
     }
 }

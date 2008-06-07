@@ -1,3 +1,22 @@
+/**
+ *  Copyright (C) 2002-2008  The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package net.sf.freecol.server.ai;
 
 import net.sf.freecol.common.FreeColException;
@@ -10,13 +29,14 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ServerTest;
+import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
-public class MissionAssignmentTest extends ServerTest {
+public class MissionAssignmentTest extends FreeColTestCase {
 	TileType plainsType = spec().getTileType("model.tile.plains");
 	
 	UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
@@ -27,7 +47,7 @@ public class MissionAssignmentTest extends ServerTest {
 	
 	public void testImpossibleConditionsForTargetSelection() {
 		// start a server
-        FreeColServer server = startServer(false, true, SERVER_PORT, SERVER_NAME);
+        FreeColServer server = ServerTestHelper.startServer(false, true);
         
         Map map = getCoastTestMap(plainsType);
         
@@ -84,7 +104,7 @@ public class MissionAssignmentTest extends ServerTest {
         	
         }finally {
         	// must make sure that the server is stopped
-            this.stopServer(server);
+            ServerTestHelper.stopServer(server);
         }
 	}
 }
