@@ -22,12 +22,12 @@ package net.sf.freecol.common.model;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.Utils;
 
@@ -188,8 +189,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private int crossesRequired = 12;
 
-    // No need for a persistent storage of this variable:
+    // No need for a persistent storage of these variables:
     private int colonyNameIndex = 0;
+    private EnumMap<RegionType, Integer> regionNameIndex = new EnumMap<RegionType, Integer>(RegionType.class);
 
     private Location entryLocation;
 
@@ -629,7 +631,7 @@ public class Player extends FreeColGameObject implements Nameable {
             unitNames.add(unit.getName());
             unit.dispose();
         }
-        if (unitNames.size() > 0) {
+        if (!unitNames.isEmpty()) {
             addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, "model.player.independence.unitsSeized",
                     "%units%", Utils.join(", ", unitNames));
         }
@@ -736,21 +738,52 @@ public class Player extends FreeColGameObject implements Nameable {
      *         generated name.
      */
     public String getDefaultColonyName() {
-        try {
-            String name = "";
-            do {
-                name = Messages.message(nationID + ".newColonyName." + Integer.toString(colonyNameIndex));
+        String prefix = nationID + ".newColonyName.";
+        String name = null;
+        do {
+            if (Messages.containsKey(prefix + Integer.toString(colonyNameIndex))) {
+                name = Messages.message(prefix + Integer.toString(colonyNameIndex));
                 colonyNameIndex++;
-            } while (getGame().getColony(name) != null);
-            return name;
-        } catch (MissingResourceException e) {
-            String name = null;
+            }
+        } while (getGame().getColony(name) != null);
+        if (name == null) {
             do {
                 name = Messages.message("Colony") + colonyNameIndex;
                 colonyNameIndex++;
             } while (getColony(name) != null);
-            return name;
         }
+        return name;
+    }
+
+    /**
+     * Creates a unique region name by fetching a new default name
+     * from the list of default names if possible.
+     *
+     * @param regionType a <code>RegionType</code> value
+     * @return a <code>String</code> value
+     */
+    public String getDefaultRegionName(RegionType regionType) {
+        String prefix = nationID + ".region." + regionType.toString().toLowerCase() + ".";
+        String name = null;
+        int index = 1;
+        Integer newIndex = regionNameIndex.get(regionType);
+        if (newIndex != null) {
+            index = newIndex.intValue();
+        }
+        do {
+            if (Messages.containsKey(prefix + Integer.toString(index))) {
+                name = Messages.message(prefix + Integer.toString(index));
+                index++;
+            }
+        } while (getGame().getMap().getRegion(name) != null);
+        if (name == null) {
+            do {
+                name = Messages.message("region") + index;
+                index++;
+            } while (getGame().getMap().getRegion(name) != null);
+        }
+        regionNameIndex.put(regionType, index);
+        return name;
     }
 
     /**
@@ -1993,7 +2026,7 @@ public class Player extends FreeColGameObject implements Nameable {
             throw new IllegalArgumentException("Cannot set the stance towards ourselves.");
         }
         Stance oldStance = stance.get(player);
-        if (newStance == oldStance) {
+        if (newStance.equals(oldStance)) {
             return;
         }
         if (newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR) {

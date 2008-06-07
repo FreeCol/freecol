@@ -44,8 +44,6 @@ public class Map extends FreeColGameObject {
     
     private static final Logger logger = Logger.getLogger(Map.class.getName());
 
-    public static final int NUMBER_OF_DIRECTIONS = 8;
-
     /**
      * The directions a Unit can move to. Includes deltas for moving
      * to adjacent squares, which are required due to the isometric
@@ -115,6 +113,8 @@ public class Map extends FreeColGameObject {
         }
     }
 
+    public static final int NUMBER_OF_DIRECTIONS = Direction.values().length;
+
     /** The infinity cost as used by {@link #findPath(Unit, Tile, Tile)}. */
     public static final int COST_INFINITY = Integer.MAX_VALUE - 100000000;
 
@@ -173,14 +173,28 @@ public class Map extends FreeColGameObject {
     }
 
     /**
-     * Returns the <code>Region</code> with the given ID. Creates a
-     * new Region if necessary.
+     * Returns the <code>Region</code> with the given ID.
      *
      * @param id a <code>String</code> value
      * @return a <code>Region</code> value
      */
     public Region getRegion(final String id) {
         return regions.get(id);
+    }
+
+    /**
+     * Returns the <code>Region</code> with the given name.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>Region</code> value
+     */
+    public Region getRegionByName(final String id) {
+        for (Region region : regions.values()) {
+            if (id.equals(region.getName())) {
+                return region;
+            }
+        }
+        return null;
     }
 
     /**
