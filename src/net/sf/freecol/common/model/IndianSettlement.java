@@ -1016,36 +1016,37 @@ public class IndianSettlement extends Settlement {
             if (colony == null) {
                 // Nearby military units:
                 if (tile.getFirstUnit() != null) {
-                    Player owner =  tile.getFirstUnit().getOwner();
-                    if (owner.isEuropean()) {
-                        int alarm = extraAlarm.get(owner);
+                    Player enemy =  tile.getFirstUnit().getOwner();
+                    if (enemy.isEuropean()) {
+                        int alarm = extraAlarm.get(enemy);
                         for (Unit unit : tile.getUnitList()) {
                             if (unit.isOffensiveUnit() && !unit.isNaval()) {
                                 alarm += unit.getType().getOffence();
                             }
                         }
-                        extraAlarm.put(owner, alarm);
+                        extraAlarm.put(enemy, alarm);
                     }
                 }
                 
                 // Land being used by another settlement:
                 if (tile.getOwningSettlement() != null) {
-                    Player owner = tile.getOwningSettlement().getOwner();
-                    if (owner.isEuropean()) {
-                        extraAlarm.put(owner, extraAlarm.get(owner).intValue() + ALARM_TILE_IN_USE);
+                    Player enemy = tile.getOwningSettlement().getOwner();
+                    if (enemy.isEuropean()) {
+                        extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + ALARM_TILE_IN_USE);
                     }
                 }
             } else {
                 // Settlement:
-                extraAlarm.put(owner, extraAlarm.get(owner).intValue() + colony.getUnitCount());
+                Player enemy = colony.getOwner();
+                extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + colony.getUnitCount());
             }
         }
 
         // Missionary helps reducing alarm a bit, here and to the tribe as a whole.
         // No reduction effect on other settlements (1/4 of this) unless this is capital. 
         if (missionary != null) {
-            Player owner = missionary.getOwner();
-            extraAlarm.put(owner, extraAlarm.get(owner).intValue() + MISSIONARY_TENSION);
+            Player enemy = missionary.getOwner();
+            extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + MISSIONARY_TENSION);
         }
 
         for (Entry<Player, Integer> entry : extraAlarm.entrySet()) {
