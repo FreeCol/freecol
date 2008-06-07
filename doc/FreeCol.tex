@@ -19,7 +19,7 @@
 
 \begin{document}
 \author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
-\title{FreeCol Documentation\\User Guide for Version v0.7.2}
+\title{FreeCol Documentation\\User Guide for Version v0.8.0}
 \maketitle{}
 
 \tableofcontents
@@ -189,12 +189,11 @@ Machine for details.
 
 There are many other Java options, but you probably won't need to
 change the default settings. FreeCol is developed in English, but it
-includes translations into Breton, Finnish, French, German, Hungarian,
-Italian, (Brazilian) Portuguese, Russian, Spanish and Swedish, some of
-which are not very complete, however. Java will automatically select
-the translation for your locale, if available, and English
-otherwise. If you should wish to select a different language, or if
-language selection fails, you can choose a different language from the
+includes translations into several other languages, some of which are
+not very complete, however. Java will automatically select the
+translation for your locale, if available, and English otherwise. If
+you should wish to select a different language, or if language
+selection fails, you can choose a different language from the
 \hyperlink{Client options}{preferences menu}.
 
 FreeCol also provides several application-specific command line
@@ -292,9 +291,8 @@ If you decide to start a single-player game or a game server, you will
 be able to choose which nation to play and which colour to use. The
 \hypertarget{map generator options}{map generator options} allow you
 to load a map, or to set several parameters that will influence the
-size and terrain of a randomly generated map. FreeCol includes a large
-map of the Americas, which can be selected by clicking on the map
-icon.
+size and terrain of a randomly generated map. FreeCol includes several
+hand-made maps, which can be selected by clicking on the map icon.
 
 The game options proper allow you to select several parameters that
 influence game play, such as non-standard rules, victory conditions
@@ -465,11 +463,11 @@ to the currently selected unit:
 Note that not all orders are available at all times. The build colony
 order is only available if the unit is able to build colonies and the
 tile it is on will support a colony, for example. The unload order is
-only available if the unit is carrying units and is in a colony or in
-Europe, or if it is carrying goods. You can unload the goods anywhere,
-but if you are not in Europe or in a colony, the goods will be lost.
-You can use this feature to dump unwanted cargo\index{dump cargo} in
-order to avoid the \hyperlink{Cargo Penalty}{cargo penalty}.
+only available if the unit is carrying goods. You can unload the goods
+anywhere, but if you are not in Europe or in a colony, the goods will
+be lost.  You can use this feature to dump unwanted cargo\index{dump
+  cargo} in order to avoid the \hyperlink{Cargo Penalty}{cargo
+  penalty}.
 
 The \hypertarget{reports menu}{Reports Menu} provides access to
 various reports on the current state of your colonies. In these
@@ -696,11 +694,11 @@ different player is in the way, for instance). You can also press the
 middle mouse button, or both mouse buttons if your mouse only has two
 buttons, in order to give the selected unit a movement order.
 
-In the original Colonization game, a unit used up all movement points
-when entering a colony. In FreeCol, this is not the case --- a unit
-can enter a colony just like any other tile. If the unit is placed in
-a building, or on a colony tile, or if a carrier is loaded or
-unloaded, however, it will lose all its movement points.
+In the original Colonization game, a unit always used up all movement
+points when entering a colony. In FreeCol, this is not the case --- a
+unit can enter a colony just like any other tile. If the unit is
+placed in a building, or on a colony tile, or if a carrier is loaded
+or unloaded, however, it will lose all its movement points.
 
 Units are marked with small coloured shields, which may or may not
 display a letter. The background colour indicates the nation this unit
@@ -721,15 +719,18 @@ orange shields. The letter indicates the current state of the unit:
 If the unit is a foreign naval unit, the shield will display a number
 instead. This is the number of holds this unit is using.
 
-Indian Settlements display at least two shields: the first indicates
-the nation this settlement belongs to, and the second, which bears an
-exclamation mark ($!$), indicates the current relations between the
-nation and your colonists. Its background may be green, blue, yellow,
-orange or red, depending on whether your relations are good, mediocre
-or bad. A Settlement with a European mission displays a third shield
-bearing a cross on a black or grey background. The colour of the cross
-indicates the European nation that established the mission. The
-background of the shield is black if the mission was established by a
+Indian Settlements display at least two shields: The colour of the
+first shield indicates the nation this settlement belongs to. A $*$ on
+this shield indicates that this settlement is the nation's capital, a
+$-$ that it is not. The second shield, which bears an exclamation mark
+($!$), indicates the current relations between the nation and your
+colonists. Its background may be green, blue, yellow, orange or red,
+depending on whether your relations are good, mediocre or bad.
+
+A Settlement with a European mission displays a third shield bearing a
+cross on a black or grey background. The colour of the cross indicates
+the European nation that established the mission. The background of
+the shield is black if the mission was established by a
 \hyperlink{Jesuit Missionary}{Jesuit Missionary}, and grey otherwise.
 
 The order buttons represent some of the orders you can give to your
@@ -816,7 +817,8 @@ have to pay for the arms, horses or tools required to equip your
 units.
 
 In order to send a ship back to the New World, you must drag it to the
-Going to America section of the Europe panel.
+Going to America section of the Europe panel, or press the ``Set
+sail'' button.
 
 
 \hypertarget{colony panel}{\subsection{The Colony panel}}
@@ -887,10 +889,9 @@ red. If you do not store the excess units elsewhere, they will be lost
 at the end of the turn.
 
 If you have already built a \hyperlink{Custom House}{Custom House} in
-the colony, you can right-click on the goods in the Warehouse in order
-to export them to Europe automatically. Goods marked to be exported
-are printed in green. Right-click on the goods again to stop exporting
-them automatically.
+the colony, you can export goods to Europe automatically. Goods marked
+to be exported are printed in green. Open the warehouse dialog (see
+below) in order to change export settings.
 
 To the right of these panels you can see the units outside of your
 colony. These can be fortified units defending your colony, or units
@@ -2208,7 +2209,7 @@ reconnect to the server by using the reconnect option in the
 
 \hypertarget{Copyright Notice}{\section{Copyright Notice}}
 
-Copyright \copyright 2007
+Copyright \copyright 2008
 \href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol
 Team}.
 
