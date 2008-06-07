@@ -57,7 +57,7 @@ public class ModelMessage extends FreeColObject {
 
     private Player owner;
     private FreeColGameObject source;
-    private Tile sourceTile;
+    private Location sourceLocation;
     private FreeColObject display;
     private MessageType type;
     private String[] data;
@@ -110,20 +110,22 @@ public class ModelMessage extends FreeColObject {
     public ModelMessage(FreeColGameObject source, MessageType type, FreeColObject display,
                         String id, String... data) {
         this.source = source;
-        this.sourceTile = null;
+        this.sourceLocation = null;
         if (source instanceof Unit) {
             Unit u = (Unit) source;
             this.owner = u.getOwner();
             if (u.getTile() != null) {
-                this.sourceTile = u.getTile();
+                this.sourceLocation = u.getTile();
             } else if (u.getColony() != null) {
-                this.sourceTile = u.getColony().getTile();
+                this.sourceLocation = u.getColony().getTile();
             } else if (u.getIndianSettlement() != null) {
-                this.sourceTile = u.getIndianSettlement().getTile();
+                this.sourceLocation = u.getIndianSettlement().getTile();
+            } else if (u.isInEurope()) {
+                this.sourceLocation = u.getOwner().getEurope();
             }
         } else if (source instanceof Settlement) {
             this.owner = ((Settlement) source).getOwner();
-            this.sourceTile = ((Settlement) source).getTile();
+            this.sourceLocation = ((Settlement) source).getTile();
         } else if (source instanceof Europe) {
             this.owner = ((Europe) source).getOwner();
         } else if (source instanceof Player) {
@@ -370,9 +372,9 @@ public class ModelMessage extends FreeColObject {
         out.writeAttribute("owner", owner.getId());
         if (source!=null) {
             if (source instanceof Unit && ((Unit)source).isDisposed())
-                out.writeAttribute("source", sourceTile.getId());
+                out.writeAttribute("source", sourceLocation.getId());
             else if (source instanceof Settlement && ((Settlement)source).isDisposed())
-                out.writeAttribute("source", sourceTile.getId());
+                out.writeAttribute("source", sourceLocation.getId());
             else
                 out.writeAttribute("source", source.getId());
         }
