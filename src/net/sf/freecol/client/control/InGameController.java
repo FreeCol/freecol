@@ -68,6 +68,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
@@ -1649,7 +1650,8 @@ public final class InGameController implements NetworkConstants {
         unit.move(direction);
 
         Region region = unit.getTile().getRegion();
-        if (region != null && region.isDiscoverable()) {
+        if (region != null && region.isDiscoverable() &&
+            unit.getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {
             String defaultName = unit.getOwner().getDefaultRegionName(region.getType());
             String name = freeColClient.getCanvas().showInputDialog("nameRegion.text", defaultName,
                                                                     "ok", "cancel", 

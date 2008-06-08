@@ -172,6 +172,10 @@ public class Map extends FreeColGameObject {
         super(game, id);
     }
 
+    public Collection<Region> getRegions() {
+        return regions.values();
+    }
+
     /**
      * Returns the <code>Region</code> with the given ID.
      *

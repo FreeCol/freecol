@@ -20,12 +20,11 @@
 package net.sf.freecol.server.generator;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
@@ -109,7 +108,7 @@ public class River {
     /**
      * A list of river sections.
      */
-    private ArrayList<RiverSection> sections = new ArrayList<RiverSection>();
+    private List<RiverSection> sections = new ArrayList<RiverSection>();
 
     /**
      * The next river.
@@ -124,7 +123,7 @@ public class River {
     /**
      * A hashtable of position-river pairs.
      */
-    private Hashtable<Position, River> riverMap;
+    private java.util.Map<Position, River> riverMap;
 
 
     /**
@@ -133,7 +132,7 @@ public class River {
      * @param map The map on which the river flows.
      * @param riverMap A hashtable of position-river pairs.
      */
-    public River(Map map, Hashtable<Position, River> riverMap, ServerRegion region) {
+    public River(Map map, java.util.Map<Position, River> riverMap, ServerRegion region) {
         this.map = map;
         this.riverMap = riverMap;
         this.region = region;
@@ -141,6 +140,10 @@ public class River {
         int index = map.getGame().getModelController().getPseudoRandom().nextInt(length);
         direction = directions[index];
         logger.fine("Starting new river flowing " + direction.toString());
+    }
+
+    public List<RiverSection> getSections() {
+        return sections;
     }
 
     /**

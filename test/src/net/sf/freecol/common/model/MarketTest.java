@@ -192,6 +192,9 @@ public class MarketTest extends FreeColTestCase {
     public void testSharedMarket() {
                 
         Game g = getStandardGame();
+        // Game needs a map, otherwise newTurn will crash
+        Map map = getTestMap();
+        g.setMap(map);
 
         Player english = g.getPlayer("model.nation.english");
         Player french = g.getPlayer("model.nation.french");

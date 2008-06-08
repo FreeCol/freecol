@@ -979,7 +979,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (player.isEuropean()) {
             Region region = newTile.getRegion();
-            if (region != null && region.isDiscoverable()) {
+            if (region != null && region.isDiscoverable() &&
+                ("model.region.pacific".equals(region.getId()) ||
+                 getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS))) {
                 String name = moveElement.getAttribute("regionName");
                 if (name == null || "".equals(name)) {
                     name = player.getDefaultRegionName(region.getType());

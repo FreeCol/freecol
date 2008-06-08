@@ -778,7 +778,7 @@ public class Player extends FreeColGameObject implements Nameable {
         } while (getGame().getMap().getRegion(name) != null);
         if (name == null) {
             do {
-                name = Messages.message("region") + index;
+                name = Messages.message("model.region." + regionType.toString().toLowerCase()) + index;
                 index++;
             } while (getGame().getMap().getRegion(name) != null);
         }
@@ -2264,8 +2264,23 @@ public class Player extends FreeColGameObject implements Nameable {
                 score += unit.getType().getScoreValue();
             }
         }
+        if (getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {            
+            for (Region region : getGame().getMap().getRegions()) {
+                if (this.equals(region.getDiscoveredBy())) {
+                    score += region.getScoreValue();
+                }
+            }
+        } else {
+            Region pacific = getGame().getMap().getRegion("model.region.pacific");
+            if (pacific != null) {
+                if (this.equals(pacific.getDiscoveredBy())) {
+                    score += pacific.getScoreValue();
+                }
+            }
+        }
         score += (score * oldSoL) / 100;
         score += getGold() / 1000;
+
     }
 
     private void exploreAllColonies() {

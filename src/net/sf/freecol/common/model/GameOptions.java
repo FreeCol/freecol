@@ -58,6 +58,9 @@ public class GameOptions extends OptionMap {
 
     public static final String SAVE_PRODUCTION_OVERFLOW = "saveProductionOverflow";
 
+    /** Whether to award exploration points or not. */
+    public static final String EXPLORATION_POINTS = "explorationPoints";
+
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "fogOfWar";
 
@@ -142,6 +145,7 @@ public class GameOptions extends OptionMap {
         OptionGroup map = new OptionGroup("gameOptions.map");
         new BooleanOption(FOG_OF_WAR, map, true);
         new BooleanOption(UNIT_HIDING, map, true);
+        new BooleanOption(EXPLORATION_POINTS, map, false);
         add(map);        
 
         /* Colony options: */

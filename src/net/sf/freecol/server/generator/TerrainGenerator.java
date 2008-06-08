@@ -20,7 +20,7 @@
 package net.sf.freecol.server.generator;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -45,6 +45,7 @@ public class TerrainGenerator {
 
     private static final Logger logger = Logger.getLogger(TerrainGenerator.class.getName());
     
+    public static final int REGION_SCORE_VALUE = 10;
     public static final int PACIFIC_SCORE_VALUE = 100;
 
     private final MapGeneratorOptions mapGeneratorOptions;
@@ -390,6 +391,7 @@ public class TerrainGenerator {
                 region.setPrediscovered(true);
             } else {
                 region.setDiscoverable(true);
+                region.setScoreValue(REGION_SCORE_VALUE);
             }
             map.setRegion(region);
         }
@@ -629,13 +631,9 @@ public class TerrainGenerator {
                                                                startTile.getRegion());
                 mountainRegion.setDiscoverable(true);
                 mountainRegion.setClaimable(true);
-                // TODO: make this depend on size, or other feature?
-                mountainRegion.setScoreValue(10);
                 map.setRegion(mountainRegion);
                 Direction direction = map.getRandomDirection();
                 int length = maximumLength - random.nextInt(maximumLength/2);
-                logger.info("Direction of mountain range is " + direction +
-                        ", length of mountain range is " + length);
                 for (int index = 0; index < length; index++) {
                     p = Map.getAdjacent(p, direction);
                     Tile nextTile = map.getTile(p);
@@ -660,6 +658,11 @@ public class TerrainGenerator {
                         }
                     }
                 }
+                int scoreValue = 2 * mountainRegion.getSize();
+                mountainRegion.setScoreValue(scoreValue);
+                logger.info("Created mountain region (direction " + direction +
+                            ", length " + length + ", size " + mountainRegion.getSize() +
+                            ", score value " + scoreValue + ").");
             }
         }
         logger.info("Added " + counter + " mountain range tiles.");
@@ -716,7 +719,8 @@ public class TerrainGenerator {
     private void createRivers(Map map) {
         int number = getMapGeneratorOptions().getNumberOfRivers();
         int counter = 0;
-        Hashtable<Position, River> riverMap = new Hashtable<Position, River>();
+        HashMap<Position, River> riverMap = new HashMap<Position, River>();
+        List<River> rivers = new ArrayList<River>();
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
@@ -740,12 +744,11 @@ public class TerrainGenerator {
                                                                 map.getTile(position).getRegion());
                     riverRegion.setDiscoverable(true);
                     riverRegion.setClaimable(true);
-                    // TODO: make this depend on size, or other feature?
-                    riverRegion.setScoreValue(10);
                     map.setRegion(riverRegion);
                     River river = new River(map, riverMap, riverRegion);
                     if (river.flowFromSource(position)) {
                         logger.fine("Created new river with length " + river.getLength());
+                        rivers.add(river);
                         counter++;
                         break;
                     } else {
@@ -756,5 +759,17 @@ public class TerrainGenerator {
         }
 
         logger.info("Created " + counter + " rivers of maximum " + number + ".");
+
+        for (River river : rivers) {
+            ServerRegion region = river.getRegion();
+            int scoreValue = 0;
+            for (RiverSection section : river.getSections()) {
+                scoreValue += section.getSize();
+            }
+            scoreValue *= 2;
+            region.setScoreValue(scoreValue);
+            logger.info("Created river region (length " + river.getLength() +
+                        ", score value " + scoreValue + ").");
+        }
     }
 }
