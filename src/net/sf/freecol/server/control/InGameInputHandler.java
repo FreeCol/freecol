@@ -984,8 +984,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 if (name == null || "".equals(name)) {
                     name = player.getDefaultRegionName(region.getType());
                 }
-                System.out.println("Player is " + player.getNationAsString());
-                System.out.println("Region name is " + name);
                 region.discover(player, getGame().getTurn(), name);
                 reply.appendChild(region.toXMLElement(player, reply.getOwnerDocument()));
         
