@@ -56,8 +56,7 @@ import org.w3c.dom.Element;
 */
 public class UnitSeekAndDestroyMission extends Mission {
     private static final Logger logger = Logger.getLogger(UnitSeekAndDestroyMission.class.getName());
-
-
+    
     /**
      * The object we are trying to destroy. This can be a
      * either <code>Settlement</code> or a <code>Unit</code>.

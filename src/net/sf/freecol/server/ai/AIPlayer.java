@@ -1352,8 +1352,13 @@ public class AIPlayer extends AIObject {
         }
     }
 
-    private int getDefendColonyMissionValue(Unit u, Colony colony, int turns) {
+    int getDefendColonyMissionValue(Unit u, Colony colony, int turns) {
         logger.finest("Entering method getDefendColonyMissionValue");
+        
+        // Sanitation
+        if(colony == null)
+        	return Integer.MIN_VALUE;
+        
         // Temporary helper method for: giveMilitaryMission
         int value = 10025 - turns;
         int numberOfDefendingUnits = 0;
@@ -1367,7 +1372,8 @@ public class AIPlayer extends AIObject {
             Mission m = aui.next().getMission();
             if (m != null && m instanceof DefendSettlementMission) {
                 if (((DefendSettlementMission) m).getSettlement() == colony) {
-                    value -= 6;
+                	//TODO: this decrease seems too little
+                	value -= 6; 
                     numberOfDefendingUnits++;
                 }
             }
@@ -1378,8 +1384,9 @@ public class AIPlayer extends AIObject {
                 return 0;
             }
         }
-        if (colony != null && 
-            colony.getStockade() != null &&
+        //TODO: Does not take into consideration the various levels of
+        //fortification, only if has one or not
+        if (colony.getStockade() != null &&
             numberOfDefendingUnits > colony.getStockade().getLevel() + 1) {
             return Math.max(0, value - 9000);
         }
@@ -1388,21 +1395,30 @@ public class AIPlayer extends AIObject {
 
     int getUnitSeekAndDestroyMissionValue(Unit unit, Tile newTile, int turns) {
         logger.finest("Entering method getUnitSeekAndDestroyMissionValue");
+        
         Unit defender = newTile.getDefendingUnit(unit);
+        
+        if(!isTargetValidForSeekAndDestroy(unit, defender)){
+        	return Integer.MIN_VALUE;
+        }
+        
+        int value = 10020;
         CombatModel combatModel = unit.getGame().getCombatModel();
-        if (newTile.isLand() && !unit.isNaval() && newTile.getDefendingUnit(unit) != null
-                && defender.getOwner() != unit.getOwner()
-                && !defender.isNaval()
-                && unit.getOwner().getStance(defender.getOwner()) == Stance.WAR) {
-            int value = 10020;
-            if (getBestTreasureTrain(newTile) != null) {
-                value += Math.min(getBestTreasureTrain(newTile).getTreasureAmount() / 10, 50);
-            }
-            if (defender.getType().getOffence() > 0 &&
-                newTile.getSettlement() == null) {
-                value += 200 - combatModel.getDefencePower(unit, defender) * 2 - turns * 50;
-            }
-            if (defender.hasAbility("model.ability.expertSoldier")
+        
+        if (getBestTreasureTrain(newTile) != null) {
+        	value += Math.min(getBestTreasureTrain(newTile).getTreasureAmount() / 10, 50);
+        }
+        if (defender.getType().getOffence() > 0 &&
+        		newTile.getSettlement() == null) {
+        	value += 200 - combatModel.getDefencePower(unit, defender) * 2 - turns * 50;
+        }
+            
+        value += combatModel.getOffencePower(defender, unit) -
+              combatModel.getDefencePower(defender, unit);
+        value -= turns * 10;
+ 
+        if (!defender.isNaval()) {
+        	if (defender.hasAbility("model.ability.expertSoldier")
                     && !defender.isArmed()) {
                 value += 10 - combatModel.getDefencePower(unit, defender) * 2 - turns * 25;
             }
@@ -1420,15 +1436,51 @@ public class AIPlayer extends AIObject {
                     }
                 }
             }
-            value += combatModel.getOffencePower(defender, unit) -
-                combatModel.getDefencePower(defender, unit);
-            value -= turns * 10;
-            return Math.max(0, value);
-        } else {
-            return Integer.MIN_VALUE;
-        }
+        }   
+        return Math.max(0, value);
     }
-
+    
+    boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender){    	
+    	// Sanitation
+    	if(defender == null){
+    		return false;
+    	}
+    	
+    	// a naval unit cannot target a unit on land and vice-versa
+        if(attacker.getTile().isLand() != defender.getTile().isLand()){
+        	return false; 
+        }
+        
+        // a naval unit cannot target a land unit and vice-versa
+        if(attacker.isNaval() != defender.isNaval()){
+        	return false;
+        }
+        
+    	Player attackerPlayer = attacker.getOwner();
+    	Player defenderPlayer = defender.getOwner();
+        
+        // cannot target own units
+        if(attackerPlayer == defenderPlayer){
+        	return false;
+        }
+        
+        boolean notAtWar = attackerPlayer.getStance(defenderPlayer) != Stance.WAR;
+        // if european, can only attack units whose owners are at war
+        if(attackerPlayer.isEuropean() && notAtWar){
+        	return false;
+        }
+     
+        // if indian, cannot attack if not at war or displeased
+        if(attackerPlayer.isIndian()){
+        	boolean inFriendlyMood = attackerPlayer.getTension(defenderPlayer).getLevel().compareTo(Tension.Level.CONTENT) >= 0;
+        	
+        	if(notAtWar && inFriendlyMood)
+            	return false;
+        }
+        
+        return true;
+    }
+        
     /**
      * Gives a military <code>Mission</code> to the given unit. <br>
      * <br>
@@ -1436,7 +1488,7 @@ public class AIPlayer extends AIObject {
      * 
      * @param aiUnit The unit.
      */
-    private void giveMilitaryMission(AIUnit aiUnit) {
+    void giveMilitaryMission(AIUnit aiUnit) {
         logger.finest("Entering method giveMilitaryMission");
         /*
          * 
@@ -1564,9 +1616,7 @@ public class AIPlayer extends AIObject {
             public boolean check(Unit unit, PathNode pathNode) {
                 Tile newTile = pathNode.getTile();
                 Unit defender = newTile.getDefendingUnit(unit);
-                if (newTile.isLand() && !unit.isNaval() && defender != null
-                        && defender.getOwner() != unit.getOwner()
-                        && unit.getOwner().getStance(defender.getOwner()) == Stance.WAR) {
+                if (isTargetValidForSeekAndDestroy(unit,defender)) {
                     int value = getUnitSeekAndDestroyMissionValue(unit, pathNode.getTile(), pathNode.getTurns());
                     if (value > bestNewTargetValue) {
                         bestTarget = pathNode;
