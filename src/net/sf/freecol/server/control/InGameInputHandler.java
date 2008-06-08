@@ -977,22 +977,27 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         
 
-        Region region = newTile.getRegion();
-        if (region!=null && region.isDiscoverable()) {
-            String name = moveElement.getAttribute("regionName");
-            if (name != null) {
+        if (player.isEuropean()) {
+            Region region = newTile.getRegion();
+            if (region != null && region.isDiscoverable()) {
+                String name = moveElement.getAttribute("regionName");
+                if (name == null || "".equals(name)) {
+                    name = player.getDefaultRegionName(region.getType());
+                }
+                System.out.println("Player is " + player.getNationAsString());
+                System.out.println("Region name is " + name);
                 region.discover(player, getGame().getTurn(), name);
                 reply.appendChild(region.toXMLElement(player, reply.getOwnerDocument()));
-            }
         
-            for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-                try {
-                    Element updateElement = Message.createNewRootElement("update");
-                    updateElement.appendChild(region.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                    enemyPlayer.getConnection().send(updateElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                                   + enemyPlayer.getConnection());
+                for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
+                    try {
+                        Element updateElement = Message.createNewRootElement("update");
+                        updateElement.appendChild(region.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+                        enemyPlayer.getConnection().send(updateElement);
+                    } catch (IOException e) {
+                        logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
+                                       + enemyPlayer.getConnection());
+                    }
                 }
             }
         }

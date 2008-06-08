@@ -46,8 +46,8 @@ import org.w3c.dom.Element;
 * you create different missions.
 */
 public abstract class Mission extends AIObject {
-    private static final Logger logger = Logger.getLogger(Mission.class.getName());
 
+    private static final Logger logger = Logger.getLogger(Mission.class.getName());
 
     protected static final int MINIMUM_TRANSPORT_PRIORITY = 60,     // A transport can be used
                                NORMAL_TRANSPORT_PRIORITY = 100;     // Transport is required
