@@ -669,7 +669,7 @@ public final class UnitType extends BuildableType {
             } else if ("downgrade".equals(nodeName)) {
                 Downgrade downgrade = new Downgrade();
                 String educationUnit = in.getAttributeValue(null, "unit");
-                downgrade.asResultOf.put(DowngradeType.CLEAR_SKILL, getAttribute(in, "clearSkill", false));
+                downgrade.asResultOf.put(DowngradeType.CLEAR_SKILL, getAttribute(in, "clearSkill", true));
                 downgrade.asResultOf.put(DowngradeType.DEMOTION, getAttribute(in, "demotion", false));
                 downgrade.asResultOf.put(DowngradeType.CAPTURE, getAttribute(in, "capture", false));
                 downgrades.put(educationUnit, downgrade);
