@@ -88,9 +88,12 @@ public final class DragListener extends MouseAdapter {
                 final InGameController inGameController = unitLabel.getCanvas().getClient().getInGameController();
                 JPopupMenu menu = new JPopupMenu("Unit");
                 ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit);
-                JMenuItem name = new JMenuItem(tempUnit.getName(),
-                        imageLibrary.getScaledImageIcon(unitIcon, 0.66f));
-                name.setEnabled(false);
+
+                JMenuItem name = new JMenuItem(tempUnit.getName() + " (" +
+                                               Messages.message("menuBar.colopedia") + ")", 
+                                               imageLibrary.getScaledImageIcon(unitIcon, 0.66f));
+                name.setActionCommand(String.valueOf(UnitLabel.COLOPEDIA));
+                name.addActionListener(unitLabel);
                 menu.add(name);
 
                 JMenuItem menuItem;
@@ -221,13 +224,14 @@ public final class DragListener extends MouseAdapter {
                         }
                         if (tempUnit.canBeEquippedWith(equipmentType)) {
                             // "add new equipment" action
-                            JMenuItem newItem = new JMenuItem();
+                            JMenuItem newItem = null;
                             count = equipmentType.getMaximumCount() - count;
                             if (equipmentType.getGoodsRequired().isEmpty()) {
                                 newItem.setText(Messages.message(equipmentType.getId() + ".add"));
                             } else if (tempUnit.isInEurope() &&
                                        tempUnit.getOwner().getEurope().canBuildEquipment(equipmentType)) {
                                 int price = 0;
+                                newItem = new JMenuItem();
                                 for (AbstractGoods goodsRequired : equipmentType.getGoodsRequired()) {
                                     price += tempUnit.getOwner().getMarket().getBidPrice(goodsRequired.getType(),
                                                                                          goodsRequired.getAmount());
@@ -242,6 +246,7 @@ public final class DragListener extends MouseAdapter {
                                                 ")");
                             } else if (tempUnit.getColony() != null &&
                                        tempUnit.getColony().canBuildEquipment(equipmentType)) {
+                                newItem = new JMenuItem();
                                 for (AbstractGoods goodsRequired : equipmentType.getGoodsRequired()) {
                                     int present = tempUnit.getColony().getGoodsCount(goodsRequired.getType()) /
                                         goodsRequired.getAmount();
@@ -252,15 +257,17 @@ public final class DragListener extends MouseAdapter {
                                 }
                                 newItem.setText(Messages.message(equipmentType.getId() + ".add"));
                             }
-                            final int items = count;
-                            final EquipmentType type = equipmentType; 
-                            newItem.addActionListener(new ActionListener() {
-                                    public void actionPerformed(ActionEvent e) {
-                                        inGameController.equipUnit(tempUnit, type, items);
-                                        unitLabel.updateIcon();
-                                    }
-                                });
-                            menu.add(newItem);
+                            if (newItem != null) {
+                                final int items = count;
+                                final EquipmentType type = equipmentType; 
+                                newItem.addActionListener(new ActionListener() {
+                                        public void actionPerformed(ActionEvent e) {
+                                            inGameController.equipUnit(tempUnit, type, items);
+                                            unitLabel.updateIcon();
+                                        }
+                                    });
+                                menu.add(newItem);
+                            }
                         }
                     }
                     separatorNeeded = true;
@@ -288,12 +295,14 @@ public final class DragListener extends MouseAdapter {
                     
                 }
 
+                /*
                 Image colopediaIcon = ResourceManager.getImage("Colopedia.closedSection.image");
                 menuItem = new JMenuItem(Messages.message("menuBar.colopedia"), 
                         imageLibrary.getScaledImageIcon(colopediaIcon, 0.66f));
                 menuItem.setActionCommand(String.valueOf(UnitLabel.COLOPEDIA));
                 menuItem.addActionListener(unitLabel);
                 menu.add(menuItem);
+                */
 
                 int experience = Math.min(tempUnit.getExperience(), 200);
                 if (tempUnit.getTurnsOfTraining() > 0 || experience > 0) {
