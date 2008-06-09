@@ -1446,8 +1446,17 @@ public class AIPlayer extends AIObject {
     		return false;
     	}
     	
+    	// Needs to check if the unit is in a settlement -> attacker.getTile() == null
+    	boolean attackerInLand = true;
+    	if(attacker.getTile() != null)
+    		attackerInLand = attacker.getTile().isLand();
+    	
+    	boolean defenderInLand = true;
+    	if(defender.getTile() != null)
+    		defenderInLand = defender.getTile().isLand();
+    		
     	// a naval unit cannot target a unit on land and vice-versa
-        if(attacker.getTile().isLand() != defender.getTile().isLand()){
+        if(attackerInLand != defenderInLand){
         	return false; 
         }
         
