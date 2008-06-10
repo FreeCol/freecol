@@ -311,6 +311,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
                 inGameController.changeState(unit, UnitState.FORTIFYING);
             } else if (intCommand == SENTRY) {
                 inGameController.changeState(unit, UnitState.SENTRY);
+            } else if (intCommand == COLOPEDIA) {
+                getCanvas().showColopediaPanel(ColopediaPanel.PanelType.UNITS, unit.getType());
             } else if (!unit.isCarrier()) {
                 switch (intCommand) {
                 case LEAVE_TOWN:
@@ -318,9 +320,6 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     break;
                 case CLEAR_SPECIALITY:
                     inGameController.clearSpeciality(unit);
-                    break;
-                case COLOPEDIA:
-                    getCanvas().showColopediaPanel(ColopediaPanel.PanelType.UNITS, unit.getType());
                     break;
                 default:
                     if (intCommand >= WORK_FARMING && intCommand <= WORK_LASTFARMING) {
