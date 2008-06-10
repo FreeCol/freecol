@@ -896,13 +896,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             try {
                 if (unit.isVisibleTo(enemyPlayer)) { // && !disembark
+                    // the unit is already visible
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", direction.toString());
                     opponentMoveElement.setAttribute("unit", unit.getId());
                     enemyPlayer.getConnection().send(opponentMoveElement);
                 } else if (enemyPlayer.canSee(newTile)
-                        && (newTile.getSettlement() == null || !getGame().getGameOptions().getBoolean(
-                                GameOptions.UNIT_HIDING))) {
+                        && (newTile.getSettlement() == null || 
+                            !getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING))) {
+                    // the unit reveals itself, after leaving a settlement or carrier
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", direction.toString());
                     opponentMoveElement.setAttribute("tile", newTile.getId());
