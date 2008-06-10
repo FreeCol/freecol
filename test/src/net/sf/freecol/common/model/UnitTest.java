@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.ConcurrentModificationException;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -540,6 +538,33 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(brave.canBuildColony());
     }
     
+    public void testCashInTreasure() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        TileType plains = FreeCol.getSpecification().getTileType("model.tile.ocean");
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+        Tile tile = map.getTile(10, 4);
+        
+        UnitType shipType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
+        Unit ship = new Unit(game, tile, dutch, shipType, UnitState.ACTIVE, shipType.getDefaultEquipment());
+        
+        UnitType treasureType = FreeCol.getSpecification().getUnitType("model.unit.treasureTrain");
+        Unit treasure = new Unit(game, tile, dutch, treasureType, UnitState.ACTIVE, treasureType.getDefaultEquipment());
+        assertTrue(treasure.canCarryTreasure());
+        treasure.setTreasureAmount(100);
+        
+        assertFalse(treasure.canCashInTreasureTrain()); // from a tile
+        treasure.setLocation(ship);
+        assertFalse(treasure.canCashInTreasureTrain()); // from a ship
+        ship.setLocation(dutch.getEurope());    
+        assertTrue(treasure.canCashInTreasureTrain()); // from a ship in Europe
+        int fee = treasure.getTransportFee();
+        assertEquals(0, fee);
+        treasure.cashInTreasureTrain();
+        assertEquals(100, dutch.getGold());
+    }
+
     public void testIndianDies() {
     	 Game game = getStandardGame();
     	 Map map = getEmptyMap();
