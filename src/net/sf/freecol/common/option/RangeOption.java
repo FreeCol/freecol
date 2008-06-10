@@ -191,7 +191,6 @@ public class RangeOption extends AbstractOption {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, "id");
         final String defaultValue = in.getAttributeValue(null, "defaultValue");
-        final String optionGroupName = in.getAttributeValue(null, "optionGroup");
         final String localizedLabels = in.getAttributeValue(null, "localizedLabels");
         final String value = in.getAttributeValue(null, "value");
 
@@ -215,7 +214,6 @@ public class RangeOption extends AbstractOption {
             in.nextTag();
         } else {
             setValue(Integer.parseInt(defaultValue));
-            setGroup(optionGroupName);
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (in.getLocalName() == "range-value") {
                     String label = in.getAttributeValue(null, "label");

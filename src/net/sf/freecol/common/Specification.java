@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +60,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 
@@ -304,7 +306,9 @@ public final class Specification {
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         AbstractOption option = (AbstractOption) null;
                         String optionType = xsr.getLocalName();
-                        if (IntegerOption.getXMLElementTagName().equals(optionType)) {
+                        if (OptionGroup.getXMLElementTagName().equals(optionType)) {
+                            option = new OptionGroup(xsr);
+                        } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
                             option = new IntegerOption(xsr);
                         } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
                             option = new BooleanOption(xsr);
@@ -315,21 +319,12 @@ public final class Specification {
                             xsr.nextTag();
                         }
 
-                        // If the option is valid, let's find or create the
-                        // option group
-                        // and build all the references between these objects.
+                        // If the option is valid, add it to Specification options
                         if (option != (AbstractOption) null) {
-                            String optionGroupName = option.getGroup();
-                            allOptions.put(option.getId(), option);
-                            if (optionGroupName != "") {
-                                OptionGroup optionGroup;
-                                try {
-                                    optionGroup = getOptionGroup(optionGroupName);
-                                } catch (IllegalArgumentException e) {
-                                    optionGroup = new OptionGroup(optionGroupName);
-                                    addOptionGroup(optionGroup);
-                                }
-                                optionGroup.add(option);
+                            if(option instanceof OptionGroup) {
+                                this.addOptionGroup((OptionGroup) option);
+                            } else {
+                                this.addAbstractOption((AbstractOption) option);
                             }
                         }
                     }
@@ -424,8 +419,28 @@ public final class Specification {
      * @param optionGroup <code>OptionGroup</code> to add
      */
     public void addOptionGroup(OptionGroup optionGroup) {
+        // Add the option group
         allOptionGroups.put(optionGroup.getId(), optionGroup);
+ 
+        // Add the options of the group
+        Iterator<Option> iter = optionGroup.iterator();
+        
+        while(iter.hasNext()){
+            Option option = iter.next();
+            addAbstractOption((AbstractOption) option);
+        }
     }
+
+    /**
+     * Adds an <code>AbstractOption</code> to the specification
+     * 
+     * @param abstractOption <code>AbstractOption</code> to add
+     */
+    public void addAbstractOption(AbstractOption abstractOption) {
+        // Add the option
+        allOptions.put(abstractOption.getId(), abstractOption); 
+    }
+
 
     /**
      * Returns the <code>IntegerOption</code> with the given ID. Throws an

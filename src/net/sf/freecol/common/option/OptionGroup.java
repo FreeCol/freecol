@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -57,10 +58,21 @@ public class OptionGroup extends AbstractOption {
         super(id);
         options = new ArrayList<Option>();
     }
-
+    
+    /**
+     * Creates a new  <code>OptionGroup</code>.
+     * @param in The <code>XMLStreamReader</code> containing the data. 
+     */
+     public OptionGroup(XMLStreamReader in) throws XMLStreamException {
+         this(NO_ID);
+         readFromXML(in);
+     }
 
     /**
     * Adds the given <code>Option</code>.
+    * This method is deprecated since option groups should be created
+    * from specification.xml
+    * @deprecated
     * @param option The <code>Option</code> that should be
     *               added to this <code>OptionGroup</code>.
     */
@@ -112,7 +124,29 @@ public class OptionGroup extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException();
+        final String id = in.getAttributeValue(null, "id");
+        if(id != null){
+            setId(id);
+        }
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            AbstractOption option = (AbstractOption) null;
+            String optionType = in.getLocalName();
+            if (IntegerOption.getXMLElementTagName().equals(optionType)) {
+                option = new IntegerOption(in);
+            } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
+                option = new BooleanOption(in);
+            } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
+                option = new RangeOption(in);
+            } else {
+                logger.finest("Parsing of " + optionType + " is not implemented yet");
+                in.nextTag();
+            }
+
+            if (option != (AbstractOption) null) {
+                add(option);
+                option.setGroup(this.getId());
+            }
+        }
     }
 
 

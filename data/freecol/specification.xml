@@ -1639,12 +1639,14 @@
   </difficulty-levels>
   <options>
     <integer-option id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
-    <range-option id="model.option.difficulty" optionGroup="gameOptions.difficultySettings" defaultValue="2" localizedLabels="true">
-      <range-value label="gameOptions.difficultySettings.difficulty.veryEasy" value="0"/>
-      <range-value label="gameOptions.difficultySettings.difficulty.easy" value="1"/>
-      <range-value label="gameOptions.difficultySettings.difficulty.normal" value="2"/>
-      <range-value label="gameOptions.difficultySettings.difficulty.hard" value="3"/>
-      <range-value label="gameOptions.difficultySettings.difficulty.veryHard" value="4"/>
-    </range-option>
+    <optionGroup id="gameOptions.difficultySettings">
+      <range-option id="model.option.difficulty" defaultValue="2" localizedLabels="true">
+        <range-value label="gameOptions.difficultySettings.difficulty.veryEasy" value="0"/>
+        <range-value label="gameOptions.difficultySettings.difficulty.easy" value="1"/>
+        <range-value label="gameOptions.difficultySettings.difficulty.normal" value="2"/>
+        <range-value label="gameOptions.difficultySettings.difficulty.hard" value="3"/>
+        <range-value label="gameOptions.difficultySettings.difficulty.veryHard" value="4"/>
+      </range-option>
+    </optionGroup>
   </options>
 </freecol-specification>
