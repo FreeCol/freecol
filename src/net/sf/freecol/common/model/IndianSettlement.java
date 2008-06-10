@@ -54,6 +54,7 @@ public class IndianSettlement extends Settlement {
     public static final int TURNS_PER_TRIBUTE = 5;
     public static final int ALARM_RADIUS = 2;
     public static final int ALARM_TILE_IN_USE = 2;
+    public static final int ALARM_NEW_MISSIONARY = -100;
 
     public static final String UNITS_TAG_NAME = "units";
     public static final String OWNED_UNITS_TAG_NAME = "ownedUnits";
@@ -418,8 +419,11 @@ public class IndianSettlement extends Settlement {
                 throw new IllegalArgumentException("Specified unit is not a missionary.");
             }
             missionary.setLocation(null);
-            if (alarm.get(missionary.getOwner()) == null) {
+            Tension currentAlarm = alarm.get(missionary.getOwner());
+            if (currentAlarm == null) {
                 alarm.put(missionary.getOwner(), new Tension(0));
+            } else {
+                currentAlarm.modify(ALARM_NEW_MISSIONARY);
             }
         }
         if (missionary != this.missionary) {
@@ -1046,25 +1050,25 @@ public class IndianSettlement extends Settlement {
         // No reduction effect on other settlements (1/4 of this) unless this is capital. 
         if (missionary != null) {
             Player enemy = missionary.getOwner();
-            extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + MISSIONARY_TENSION);
+            int missionaryAlarm = MISSIONARY_TENSION;
+            if (missionary.hasAbility("model.ability.expertMissionary")) {
+                missionaryAlarm *= 2;
+            }
+            extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + missionaryAlarm);
         }
 
         for (Entry<Player, Integer> entry : extraAlarm.entrySet()) {
-            Integer alarm = entry.getValue();
-            if (alarm != null && alarm.intValue() > 0) {
+            Integer newAlarm = entry.getValue();
+            if (alarm != null) {
                 Player player = entry.getKey();
                 int modifiedAlarm = (int) player.getFeatureContainer()
-                    .applyModifier(alarm.intValue(), "model.modifier.nativeAlarmModifier",
+                    .applyModifier(newAlarm.intValue(), "model.modifier.nativeAlarmModifier",
                                    null, getGame().getTurn());
+                Tension oldAlarm = alarm.get(player);
+                if (oldAlarm != null) {
+                    modifiedAlarm -= 4 + oldAlarm.getValue()/100;
+                }
                 modifyAlarm(player, modifiedAlarm);
-            }
-        }
-
-        /* Decrease alarm slightly - independent from nation level */
-        for (Tension tension : alarm.values()) {
-            if (tension.getValue() > 0) {
-                int newAlarm = 4 + tension.getValue()/100;
-                tension.modify(-newAlarm);
             }
         }
     }
