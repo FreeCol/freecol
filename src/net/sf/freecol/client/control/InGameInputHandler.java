@@ -328,7 +328,7 @@ public final class InGameInputHandler extends InputHandler {
             if (unit.getLocation() == null) {
                 // Getting the previous tile so we can animate the movement properly
                 final Tile oldTile = map.getNeighbourOrNull(direction.getReverseDirection(), newTile);
-                unit.setLocation(oldTile); // TODO: This may be not a good idea since this method does a lot of updating
+                unit.setLocationNoUpdate(oldTile); 
             }
             
             if (getFreeColClient().getClientOptions().getBoolean(ClientOptions.DISPLAY_ANIMATIONS)) {
