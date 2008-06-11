@@ -243,42 +243,45 @@ public final class InGameInputHandler extends InputHandler {
 
         Direction direction = Enum.valueOf(Direction.class, opponentMoveElement.getAttribute("direction"));
 
-        if (!opponentMoveElement.hasAttribute("tile")) {
+        if (opponentMoveElement.hasAttribute("fromTile")) {
+            // The unit moving should be already visible
             final Unit unit = (Unit) getGame().getFreeColGameObjectSafely(opponentMoveElement.getAttribute("unit"));
-
             if (unit == null) {
                 logger.warning("Could not find the 'unit' in 'opponentMove'. Unit ID: "
                         + opponentMoveElement.getAttribute("unit"));
                 return null;
             }
-            if (unit.getTile() == null) {
+            
+            final Tile fromTile = (Tile) getGame().getFreeColGameObjectSafely(opponentMoveElement.getAttribute("fromTile"));
+            if (fromTile == null) {
                 logger.warning("Ignoring opponentMove, unit " + unit.getId() + " has no tile!");
                 return null;
             }
 
-            final Tile newTile = map.getNeighbourOrNull(direction, unit.getTile());
-            if (newTile==null) {
+            final Tile toTile = map.getNeighbourOrNull(direction, fromTile);
+            if (toTile==null) {
                 // TODO: find out why this can happen
             } else {
                 if (getFreeColClient().getClientOptions().getBoolean(ClientOptions.DISPLAY_ANIMATIONS)) {
                     //Playing the animation before actually moving the unit
                     try {
-                        new UnitMoveAnimationCanvasSwingTask(unit, newTile).invokeAndWait();
+                        new UnitMoveAnimationCanvasSwingTask(unit, toTile).invokeAndWait();
                     } catch (InvocationTargetException exception) {
                         logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
                     }
                 } else {
                     // Just refresh both Tiles
-                    new RefreshTilesSwingTask(unit.getTile(), newTile).invokeLater();
+                    new RefreshTilesSwingTask(unit.getTile(), toTile).invokeLater();
                 }
             }
-            if (newTile!=null && getFreeColClient().getMyPlayer().canSee(newTile)) {
-                unit.moveToTile(newTile);
+            if (toTile!=null && getFreeColClient().getMyPlayer().canSee(toTile)) {
+                unit.moveToTile(toTile);
             } else {
                 unit.dispose();
             }
         } else {
-            String tileID = opponentMoveElement.getAttribute("tile");
+            // the unit reveals itself, after leaving a settlement or carrier
+            String tileID = opponentMoveElement.getAttribute("toTile");
 
             Element unitElement = Message.getChildElement(opponentMoveElement, Unit.getXMLElementTagName());
             if (unitElement == null) {

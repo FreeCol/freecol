@@ -898,6 +898,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 if (unit.isVisibleTo(enemyPlayer)) { // && !disembark
                     // the unit is already visible
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
+                    opponentMoveElement.setAttribute("fromTile", unit.getTile().getId());
                     opponentMoveElement.setAttribute("direction", direction.toString());
                     opponentMoveElement.setAttribute("unit", unit.getId());
                     enemyPlayer.getConnection().send(opponentMoveElement);
@@ -907,7 +908,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     // the unit reveals itself, after leaving a settlement or carrier
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", direction.toString());
-                    opponentMoveElement.setAttribute("tile", newTile.getId());
+                    opponentMoveElement.setAttribute("toTile", newTile.getId());
                     opponentMoveElement.appendChild(unit.toXMLElement(enemyPlayer, opponentMoveElement
                             .getOwnerDocument()));
                     if (unit.getLocation() instanceof Unit && !((Unit) unit.getLocation()).isVisibleTo(enemyPlayer)) {
