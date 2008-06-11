@@ -2429,14 +2429,18 @@ public final class GUI {
         Image unitImg = lib.getUnitImageIcon(unit).getImage();
         Image chipImg = getOccupationIndicatorImage(unit);
         
-        int width = tileWidth/2 + unitImg.getWidth(null)/2;
-        int height = unitImg.getHeight(null);
+        final int width = tileWidth/2 + unitImg.getWidth(null)/2;
+        final int height = unitImg.getHeight(null);
         
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
         
-        g.drawImage(unitImg, width - unitImg.getWidth(null), 0, null);
-        g.drawImage(chipImg, ((int)(STATE_OFFSET_X * lib.getScalingFactor())), (height/2 + (UNIT_OFFSET * (int)lib.getScalingFactor())) - tileHeight/2, null);
+        final int unitX = width - unitImg.getWidth(null);
+        g.drawImage(unitImg, unitX, 0, null);
+        
+        final int chipX = ((int)(STATE_OFFSET_X * lib.getScalingFactor()));
+        final int chipY = (int) (((height / 2 + UNIT_OFFSET*lib.getScalingFactor())) - tileHeight / 2);
+        g.drawImage(chipImg, chipX, chipY, null);
         
         JLabel label = new JLabel(new ImageIcon(img));
         label.setBounds(0, 0, width, height);
