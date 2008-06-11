@@ -952,7 +952,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         }
         if (!contacted) {
-            stance.remove(player);
+            stance.remove(player.getId());
         }
     }
 
@@ -2025,7 +2025,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == this) {
             throw new IllegalArgumentException("Cannot set the stance towards ourselves.");
         }
-        Stance oldStance = stance.get(player);
+        Stance oldStance = stance.get(player.getId());
         if (newStance.equals(oldStance)) {
             return;
         }
