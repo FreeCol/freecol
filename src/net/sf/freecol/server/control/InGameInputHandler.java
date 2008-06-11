@@ -1012,7 +1012,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         if (newTile.hasLostCityRumour() && player.isEuropean()) {
             newTile.setLostCityRumour(false);
-            exploreLostCityRumour(newTile, unit, player);
+            exploreLostCityRumour(unit, player);
         }
         return reply;
     }
@@ -1021,11 +1021,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * Returns a type of Lost City Rumour. The type of rumour depends on the
      * exploring unit, as well as player settings.
      * 
-     * @param tile The <code>Tile</code> containing the lost city rumour.
      * @param unit The <code>Unit</code> exploring the lost city rumour.
      * @param player The <code>ServerPlayer</code> to send a message to.
      */
-    private void exploreLostCityRumour(Tile tile, Unit unit, ServerPlayer player) {
+    private void exploreLostCityRumour(Unit unit, ServerPlayer player) {
+        Tile tile = unit.getTile();
         // difficulty is in range 0-4, dx in range 2-6
         // TODO: make this work with DifficultyLevel
         int dx = Specification.getSpecification().getRangeOption("model.option.difficulty").getValue() + 2;
@@ -1108,7 +1108,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         dx = 10 - getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
         switch (rumour) {
         case LostCityRumour.BURIAL_GROUND:
-            Player indianPlayer = unit.getTile().getOwner();
+            Player indianPlayer = tile.getOwner();
             indianPlayer.modifyTension(player, Tension.Level.HATEFUL.getLimit());
             break;
         case LostCityRumour.EXPEDITION_VANISHES:
@@ -1129,7 +1129,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         case LostCityRumour.COLONIST:
             random = getPseudoRandom().nextInt(newUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, newUnitTypes.get(random), UnitState.ACTIVE);
-            unit.getTile().add(newUnit);
+            //tile.add(newUnit); should not be necessary
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.TREASURE:
@@ -1137,7 +1137,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             random = getPseudoRandom().nextInt(treasureUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, treasureUnitTypes.get(random), UnitState.ACTIVE);
             newUnit.setTreasureAmount(treasure);
-            unit.getTile().add(newUnit);
+            tile.add(newUnit);
             rumourElement.setAttribute("amount", Integer.toString(treasure));
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
