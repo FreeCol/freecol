@@ -113,6 +113,15 @@ public final class SpecificationTest extends TestCase {
         assertTrue(smith.hasAbility("model.ability.buildFactory"));
     }
 
+    // Check options presence and value
+    public void testOptions() {
+      Specification spec = Specification.getSpecification();
+
+      assertTrue(spec.getBooleanOption("model.option.victoryDefeatREF").getValue());
+      assertTrue(spec.getBooleanOption("model.option.victoryDefeatEuropeans").getValue());
+      assertFalse(spec.getBooleanOption("model.option.victoryDefeatHumans").getValue());
+    }
+
     public void testModifiers() {
 
     	Specification spec = Specification.getSpecification();
