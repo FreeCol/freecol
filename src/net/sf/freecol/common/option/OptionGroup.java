@@ -70,9 +70,6 @@ public class OptionGroup extends AbstractOption {
 
     /**
     * Adds the given <code>Option</code>.
-    * This method is deprecated since option groups should be created
-    * from specification.xml
-    * @deprecated
     * @param option The <code>Option</code> that should be
     *               added to this <code>OptionGroup</code>.
     */

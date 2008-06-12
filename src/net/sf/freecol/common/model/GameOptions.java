@@ -71,19 +71,19 @@ public class GameOptions extends OptionMap {
      * Victory condition: Should the <code>Player</code> who first defeats the
      * Royal Expeditionary Force win the game?
      */
-    public static final String VICTORY_DEFEAT_REF = "victoryDefeatREF";
+    public static final String VICTORY_DEFEAT_REF = "model.option.victoryDefeatREF";
     
     /** 
      * Victory condition: Should a <code>Player</code> who first defeats all
      * other european players win the game?
      */
-    public static final String VICTORY_DEFEAT_EUROPEANS = "victoryDefeatEuropeans";    
+    public static final String VICTORY_DEFEAT_EUROPEANS = "model.option.victoryDefeatEuropeans";    
 
     /** 
      * Victory condition: Should a <code>Player</code> who first defeats all
      * other human players win the game?
      */
-    public static final String VICTORY_DEFEAT_HUMANS = "victoryDefeatHumans";
+    public static final String VICTORY_DEFEAT_HUMANS = "model.option.victoryDefeatHumans";
 
 
     /**
@@ -158,12 +158,7 @@ public class GameOptions extends OptionMap {
         add(colony);
 
         /* Victory Conditions */
-        OptionGroup victoryConditions = new OptionGroup("gameOptions.victoryConditions");
-        new BooleanOption(VICTORY_DEFEAT_REF, victoryConditions, true);
-        new BooleanOption(VICTORY_DEFEAT_EUROPEANS, victoryConditions, true);
-        new BooleanOption(VICTORY_DEFEAT_HUMANS, victoryConditions, false);
-        add(victoryConditions);
-
+        add(Specification.getSpecification().getOptionGroup("gameOptions.victoryConditions"));
         /* Difficulty settings */
         add(Specification.getSpecification().getOptionGroup("gameOptions.difficultySettings"));
     }

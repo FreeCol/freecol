@@ -1639,6 +1639,14 @@
   </difficulty-levels>
   <options>
     <integer-option id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+    <optionGroup id="gameOptions.victoryConditions">
+      <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
+      <boolean-option id="model.option.victoryDefeatREF" defaultValue="true"/>
+      <!-- Victory condition: Should a player who first defeats all * other european players win the game? -->
+      <boolean-option id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
+      <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
+      <boolean-option id="model.option.victoryDefeatHumans" defaultValue="false"/>
+    </optionGroup>
     <optionGroup id="gameOptions.difficultySettings">
       <range-option id="model.option.difficulty" defaultValue="2" localizedLabels="true">
         <range-value label="gameOptions.difficultySettings.difficulty.veryEasy" value="0"/>
