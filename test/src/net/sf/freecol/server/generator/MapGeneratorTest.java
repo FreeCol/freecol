@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.RangeOption;
@@ -203,6 +204,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         }
     }
     
+    /*
     public void testImportMap() {
         
         Game g = new Game(new MockModelController());
@@ -215,5 +217,26 @@ public class MapGeneratorTest extends FreeColTestCase {
             fail();
         }
     }
+    */
+
+    public void testRegions() {
+        Game game = new Game(new MockModelController());
+        IMapGenerator gen = new MapGenerator();
+        try {
+            gen.createMap(game);
+        } catch (FreeColException e) {
+            fail();
+        }
+
+        Map map = game.getMap();
+        Region pacific = map.getRegion("model.region.pacific");
+        assertNotNull(pacific);
+        Region southPacific = map.getRegion("model.region.southPacific");
+        assertNotNull(southPacific);
+        assertFalse(southPacific.isDiscoverable());
+        assertEquals(pacific, southPacific.getDiscoverableRegion());
+
+    }        
+
 }
 

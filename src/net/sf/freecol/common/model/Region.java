@@ -250,6 +250,9 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     public final void setDiscoverable(final boolean newDiscoverable) {
         this.discoverable = newDiscoverable;
+        if (discoverable) {
+            prediscovered = false;
+        }
     }
 
     /**

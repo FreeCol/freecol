@@ -982,24 +982,32 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (player.isEuropean()) {
             Region region = newTile.getRegion();
-            if (region != null && region.isDiscoverable() &&
-                ("model.region.pacific".equals(region.getId()) ||
-                 getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS))) {
-                String name = moveElement.getAttribute("regionName");
-                if (name == null || "".equals(name)) {
-                    name = player.getDefaultRegionName(region.getType());
-                }
-                region.discover(player, getGame().getTurn(), name);
-                reply.appendChild(region.toXMLElement(player, reply.getOwnerDocument()));
+            if (region != null) {
+                region = region.getDiscoverableRegion();
+                if (region != null &&
+                    ("model.region.pacific".equals(region.getNameKey()) ||
+                     getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS))) {
+                    String name;
+                    if ("model.region.pacific".equals(region.getNameKey())) {
+                        name = region.getDisplayName();
+                    } else {
+                        name = moveElement.getAttribute("regionName");
+                        if (name == null || "".equals(name)) {
+                            name = player.getDefaultRegionName(region.getType());
+                        }
+                    }
+                    region.discover(player, getGame().getTurn(), name);
+                    reply.appendChild(region.toXMLElement(player, reply.getOwnerDocument()));
         
-                for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-                    try {
-                        Element updateElement = Message.createNewRootElement("update");
-                        updateElement.appendChild(region.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                        enemyPlayer.getConnection().send(updateElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                                       + enemyPlayer.getConnection());
+                    for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
+                        try {
+                            Element updateElement = Message.createNewRootElement("update");
+                            updateElement.appendChild(region.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
+                            enemyPlayer.getConnection().send(updateElement);
+                        } catch (IOException e) {
+                            logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
+                                           + enemyPlayer.getConnection());
+                        }
                     }
                 }
             }
