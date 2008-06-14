@@ -64,6 +64,7 @@ import net.sf.freecol.client.gui.action.RenameAction;
 import net.sf.freecol.client.gui.action.ReportCargoAction;
 import net.sf.freecol.client.gui.action.ReportColonyAction;
 import net.sf.freecol.client.gui.action.ReportContinentalCongressAction;
+import net.sf.freecol.client.gui.action.ReportExplorationAction;
 import net.sf.freecol.client.gui.action.ReportForeignAction;
 import net.sf.freecol.client.gui.action.ReportIndianAction;
 import net.sf.freecol.client.gui.action.ReportLabourAction;
@@ -291,6 +292,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ReportTradeAction.id));
         menu.add(getMenuItem(ReportTurnAction.id));
         menu.add(getMenuItem(ReportRequirementsAction.id));
+        menu.add(getMenuItem(ReportExplorationAction.id));
 
         add(menu);
 

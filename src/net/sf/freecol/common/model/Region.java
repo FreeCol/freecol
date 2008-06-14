@@ -199,6 +199,10 @@ public class Region extends FreeColGameObject implements Nameable {
         }
     }
 
+    public String getTypeName() {
+        return Messages.message("model.region." + type.toString().toLowerCase() + ".name");
+    }
+
     /**
      * Get the <code>Parent</code> value.
      *
@@ -497,10 +501,7 @@ public class Region extends FreeColGameObject implements Nameable {
         if (turn > 0) {
             discoveredIn = new Turn(turn);
         }
-        String playerID = in.getAttributeValue(null, "discoveredBy");
-        if (playerID != null) {
-            discoveredBy = getGame().getPlayer(playerID);
-        }
+        discoveredBy = getFreeColGameObject(in, "discoveredBy", Player.class, null);
         parent = getFreeColGameObject(in, "parent", Region.class);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

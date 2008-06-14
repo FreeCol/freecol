@@ -46,10 +46,8 @@ import net.sf.freecol.common.resources.ResourceManager;
  * @see Canvas#setJMenuBar
  */
 public abstract class FreeColMenuBar extends JMenuBar {
+
     private static final Logger logger = Logger.getLogger(FreeColMenuBar.class.getName());
-
-
-
 
     public static final int UNIT_ORDER_WAIT = 0;
 

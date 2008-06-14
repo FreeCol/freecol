@@ -26,25 +26,24 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.panel.ReportCargoPanel;
-
+import net.sf.freecol.client.gui.panel.ReportExplorationPanel;
 
 /**
- * Request1705771 Cargo Report
+ * 
  */
-public class ReportCargoAction extends MapboardAction {
+public class ReportExplorationAction extends MapboardAction {
+
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ReportCargoAction.class.getName());
+    private static final Logger logger = Logger.getLogger(ReportExplorationAction.class.getName());
 
-
-    public static final String id = "reportCargoAction";
+    public static final String id = "reportExplorationAction";
     
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
-    ReportCargoAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.report.cargo", null, KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
+    ReportExplorationAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.report.exploration", null, KeyStroke.getKeyStroke(KeyEvent.VK_F13, 0));
     }
     
     /**
@@ -59,7 +58,7 @@ public class ReportCargoAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "reportCargoAction"
+     * @return "reportExplorationAction"
      */
     public String getId() {
         return id;
@@ -70,6 +69,6 @@ public class ReportCargoAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showReportPanel(ReportCargoPanel.class.getName());
+        freeColClient.getCanvas().showReportPanel(ReportExplorationPanel.class.getName());
     }
 }
