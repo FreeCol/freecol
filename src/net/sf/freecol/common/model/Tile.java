@@ -209,6 +209,20 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Return the discoverable Region of this Tile, or
+     * <code>null</code> if there is none.
+     *
+     * @return a <code>Region</code> value
+     */
+    public Region getDiscoverableRegion() {
+        if (region == null) {
+            return null;
+        } else {
+            return region.getDiscoverableRegion();
+        }
+    }
+
+    /**
      * Gets the name of this tile, or shows "unexplored" if not explored by player.
      * 
      * @return The name as a <code>String</code>.

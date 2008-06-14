@@ -1649,19 +1649,16 @@ public final class InGameController implements NetworkConstants {
         // rumours
         unit.move(direction);
 
-        Region region = unit.getTile().getRegion();
+        Region region = unit.getTile().getDiscoverableRegion();
         if (region != null) {
-            region = region.getDiscoverableRegion();
-            if (region != null) {
-                if ("model.region.pacific".equals(region.getNameKey())) {
-                    canvas.showInformationMessage("model.region.pacific.discover");
-                } else if (unit.getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {
-                    String defaultName = unit.getOwner().getDefaultRegionName(region.getType());
-                    String name = freeColClient.getCanvas().showInputDialog("nameRegion.text", defaultName,
-                                                                            "ok", "cancel", 
-                                                                            "%name%", region.getDisplayName());
-                    moveElement.setAttribute("regionName", name);
-                }
+            if (region.isPacific()) {
+                canvas.showInformationMessage("model.region.pacific.discover");
+            } else if (unit.getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {
+                String defaultName = unit.getOwner().getDefaultRegionName(region.getType());
+                String name = freeColClient.getCanvas().showInputDialog("nameRegion.text", defaultName,
+                                                                        "ok", "cancel", 
+                                                                        "%name%", region.getDisplayName());
+                moveElement.setAttribute("regionName", name);
             }
         }
 

@@ -27,6 +27,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
@@ -106,6 +107,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertEquals(null, g.getMap());
 
         IMapGenerator gen = new MapGenerator();
+
+        // Apply the difficulty level
+        Specification.getSpecification().applyDifficultyLevel(g.getGameOptions().getInteger(GameOptions.DIFFICULTY));
 
         Vector<Player> players = new Vector<Player>();
 
@@ -204,7 +208,6 @@ public class MapGeneratorTest extends FreeColTestCase {
         }
     }
     
-    /*
     public void testImportMap() {
         
         Game g = new Game(new MockModelController());
@@ -217,7 +220,6 @@ public class MapGeneratorTest extends FreeColTestCase {
             fail();
         }
     }
-    */
 
     public void testRegions() {
         Game game = new Game(new MockModelController());
@@ -231,10 +233,24 @@ public class MapGeneratorTest extends FreeColTestCase {
         Map map = game.getMap();
         Region pacific = map.getRegion("model.region.pacific");
         assertNotNull(pacific);
+        assertTrue(pacific.isPacific());
+        assertEquals(pacific, pacific.getDiscoverableRegion());
+
         Region southPacific = map.getRegion("model.region.southPacific");
         assertNotNull(southPacific);
         assertFalse(southPacific.isDiscoverable());
+        assertTrue(southPacific.isPacific());
+        assertEquals(pacific, southPacific.getParent());
         assertEquals(pacific, southPacific.getDiscoverableRegion());
+
+        pacific.discover(null, null, "someName");
+
+        assertFalse(pacific.isDiscoverable());
+        assertNull(pacific.getDiscoverableRegion());
+        assertFalse(southPacific.isDiscoverable());
+        assertTrue(southPacific.isPacific());
+        assertEquals(pacific, southPacific.getParent());
+        assertNull(southPacific.getDiscoverableRegion());
 
     }        
 

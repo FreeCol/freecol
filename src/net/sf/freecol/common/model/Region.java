@@ -36,6 +36,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public class Region extends FreeColGameObject implements Nameable {
 
+    public static final String PACIFIC_NAME_KEY = "model.region.pacific";
+
     public static enum RegionType { OCEAN, COAST, LAKE, RIVER, LAND, MOUNTAIN, DESERT }
 
     /**
@@ -145,6 +147,23 @@ public class Region extends FreeColGameObject implements Nameable {
      */
     public final void setNameKey(final String newNameKey) {
         this.nameKey = newNameKey;
+    }
+
+    /**
+     * Returns <code>true</code> if this Region is the Pacific
+     * Ocean. The Pacific Ocean is special in so far as it is the only
+     * Region that could be discovered in the original game.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isPacific() {
+        if (PACIFIC_NAME_KEY.equals(nameKey)) {
+            return true;
+        } else if (parent != null) {
+            return parent.isPacific();
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -482,10 +501,8 @@ public class Region extends FreeColGameObject implements Nameable {
         if (playerID != null) {
             discoveredBy = getGame().getPlayer(playerID);
         }
-        String parentString = in.getAttributeValue(null, "parent");
-        if (parentString != null) {
-            parent = getGame().getMap().getRegion(parentString);
-        }
+        parent = getFreeColGameObject(in, "parent", Region.class);
+
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("children")) {
                 String[] childArray = readFromArrayElement("children", in, new String[0]);
