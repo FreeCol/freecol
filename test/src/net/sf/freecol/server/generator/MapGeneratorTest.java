@@ -209,15 +209,21 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
     
     public void testImportMap() {
-        
+        /**
+         * Make sure we can import all distributed maps.
+         */
         Game g = new Game(new MockModelController());
         IMapGenerator gen = new MapGenerator();
-        File importFile = new File("data/maps/Africa.fsg");
-        gen.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
-        try {
-            gen.createMap(g);
-        } catch (FreeColException e) {
-            fail();
+        File mapDir = new File("data/maps/");
+        for (File importFile : mapDir.listFiles()) {
+            if (importFile.getName().endsWith(".fsg")) {
+                gen.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, importFile);
+                try {
+                    gen.createMap(g);
+                } catch (FreeColException e) {
+                    fail();
+                }
+            }
         }
     }
 
