@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.option.RangeOption;
 
 import junit.framework.TestCase;
 
@@ -124,6 +125,18 @@ public final class SpecificationTest extends TestCase {
       assertTrue(spec.getBooleanOption("model.option.victoryDefeatREF").getValue());
       assertTrue(spec.getBooleanOption("model.option.victoryDefeatEuropeans").getValue());
       assertFalse(spec.getBooleanOption("model.option.victoryDefeatHumans").getValue());
+    }
+
+    // Check diffculty levels presence and values
+    public void testDifficultyLevels() {
+      Specification spec = Specification.getSpecification();
+      RangeOption diffOpt = (RangeOption) spec.getOption("model.option.difficulty");
+
+      assertTrue(diffOpt.getValue() == 2);
+      assertTrue(diffOpt.getRangeValues().size() == 5);
+
+      spec.applyDifficultyLevel(2);
+      assertTrue(spec.getIntegerOption("model.option.crossesIncrement").getValue() == 10);
     }
 
     public void testModifiers() {

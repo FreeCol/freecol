@@ -289,7 +289,7 @@ public final class Specification {
                         equipmentTypes.add(equipmentType);
                     }
 
-                } else if ("difficulty-levels".equals(childName)) {
+                } else if ("difficultyLevels".equals(childName)) {
 
                     logger.finest("Found child named " + childName);
                     int levelIndex = 0;
@@ -308,11 +308,11 @@ public final class Specification {
                         String optionType = xsr.getLocalName();
                         if (OptionGroup.getXMLElementTagName().equals(optionType)) {
                             option = new OptionGroup(xsr);
-                        } else if (IntegerOption.getXMLElementTagName().equals(optionType)) {
+                        } else if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
                             option = new IntegerOption(xsr);
-                        } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
+                        } else if (BooleanOption.getXMLElementTagName().equals(optionType) || "boolean-option".equals(optionType)) {
                             option = new BooleanOption(xsr);
-                        } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
+                        } else if (RangeOption.getXMLElementTagName().equals(optionType) || "range-option".equals(optionType)) {
                             option = new RangeOption(xsr);
                         } else {
                             logger.finest("Parsing of " + optionType + " is not implemented yet");

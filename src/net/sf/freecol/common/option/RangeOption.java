@@ -215,7 +215,7 @@ public class RangeOption extends AbstractOption {
         } else {
             setValue(Integer.parseInt(defaultValue));
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName() == "range-value") {
+                if (in.getLocalName() == "rangeValue") {
                     String label = in.getAttributeValue(null, "label");
                     final String rangeValue = in.getAttributeValue(null, "value");
                     if (this.localizedLabels) {
@@ -239,7 +239,7 @@ public class RangeOption extends AbstractOption {
      * @return "rangeOption".
      */
     public static String getXMLElementTagName() {
-        return "range-option";
+        return "rangeOption";
     }
 
 }

@@ -74,10 +74,10 @@ public class DifficultyLevel extends FreeColGameObjectType {
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String optionType = in.getLocalName();
-            if (IntegerOption.getXMLElementTagName().equals(optionType)) {
+            if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
                 IntegerOption option = new IntegerOption(in);
                 levelOptions.put(option.getId(), option);
-            } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
+            } else if (BooleanOption.getXMLElementTagName().equals(optionType) || "boolean-option".equals(optionType)) {
                 BooleanOption option = new BooleanOption(in);
                 levelOptions.put(option.getId(), option);
             } else {

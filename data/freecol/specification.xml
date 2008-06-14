@@ -1550,118 +1550,118 @@
        recruit-price-increase: determines how fast the price for recruiting colonists increases
        lower-cap-increase: determines how fast the minimum price for recruiting colonists increases
     -->
-  <difficulty-levels>
-    <difficulty-level id="model.difficulty.veryEasy">
-      <integer-option id="model.option.crossesIncrement" value="6"/>
-      <integer-option id="model.option.badGovernmentLimit" value="8"/>
-      <integer-option id="model.option.veryBadGovernmentLimit" value="12"/>
-      <integer-option id="model.option.landPriceFactor" value="40"/>
-      <integer-option id="model.option.foundingFatherFactor" value="5"/>
-      <integer-option id="model.option.arrearsFactor" value="300"/>
-      <integer-option id="model.option.nativeSettlementDensity" value="40"/>
-      <integer-option id="model.option.nativeConvertProbability" value="50"/>
-      <integer-option id="model.option.burnProbability" value="2"/>
-      <integer-option id="model.option.recruitPriceIncrease" value="20"/>
-      <integer-option id="model.option.lowerCapIncrease" value="0"/>
-      <boolean-option id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <boolean-option id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integer-option id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integer-option id="model.option.trainingPriceIncrease" value="0"/>
-    </difficulty-level>
-    <difficulty-level id="model.difficulty.easy">
-      <integer-option id="model.option.crossesIncrement" value="8"/>
-      <integer-option id="model.option.badGovernmentLimit" value="7"/>
-      <integer-option id="model.option.veryBadGovernmentLimit" value="11"/>
-      <integer-option id="model.option.landPriceFactor" value="50"/>
-      <integer-option id="model.option.foundingFatherFactor" value="6"/>
-      <integer-option id="model.option.arrearsFactor" value="400"/>
-      <integer-option id="model.option.nativeSettlementDensity" value="50"/>
-      <integer-option id="model.option.nativeConvertProbability" value="40"/>
-      <integer-option id="model.option.burnProbability" value="4"/>
-      <integer-option id="model.option.recruitPriceIncrease" value="30"/>
-      <integer-option id="model.option.lowerCapIncrease" value="0"/>
-      <boolean-option id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <boolean-option id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integer-option id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integer-option id="model.option.trainingPriceIncrease" value="0"/>
-    </difficulty-level>
-    <difficulty-level id="model.difficulty.medium">
-      <integer-option id="model.option.crossesIncrement" value="10"/>
-      <integer-option id="model.option.badGovernmentLimit" value="6"/>
-      <integer-option id="model.option.veryBadGovernmentLimit" value="10"/>
-      <integer-option id="model.option.landPriceFactor" value="60"/>
-      <integer-option id="model.option.foundingFatherFactor" value="7"/>
-      <integer-option id="model.option.arrearsFactor" value="500"/>
-      <integer-option id="model.option.nativeSettlementDensity" value="60"/>
-      <integer-option id="model.option.nativeConvertProbability" value="30"/>
-      <integer-option id="model.option.burnProbability" value="6"/>
-      <integer-option id="model.option.recruitPriceIncrease" value="40"/>
-      <integer-option id="model.option.lowerCapIncrease" value="0"/>
-      <boolean-option id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <boolean-option id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integer-option id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integer-option id="model.option.trainingPriceIncrease" value="0"/>
-    </difficulty-level>
-    <difficulty-level id="model.difficulty.hard">
-      <integer-option id="model.option.crossesIncrement" value="12"/>
-      <integer-option id="model.option.badGovernmentLimit" value="5"/>
-      <integer-option id="model.option.veryBadGovernmentLimit" value="9"/>
-      <integer-option id="model.option.landPriceFactor" value="70"/>
-      <integer-option id="model.option.foundingFatherFactor" value="8"/>
-      <integer-option id="model.option.arrearsFactor" value="600"/>
-      <integer-option id="model.option.nativeSettlementDensity" value="70"/>
-      <integer-option id="model.option.nativeConvertProbability" value="20"/>
-      <integer-option id="model.option.burnProbability" value="8"/>
-      <integer-option id="model.option.recruitPriceIncrease" value="30"/>
-      <integer-option id="model.option.lowerCapIncrease" value="0"/>
-      <boolean-option id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <boolean-option id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integer-option id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integer-option id="model.option.trainingPriceIncrease" value="0"/>
-    </difficulty-level>
-    <difficulty-level id="model.difficulty.veryHard">
-      <integer-option id="model.option.crossesIncrement" value="14"/>
-      <integer-option id="model.option.badGovernmentLimit" value="4"/>
-      <integer-option id="model.option.veryBadGovernmentLimit" value="8"/>
-      <integer-option id="model.option.landPriceFactor" value="80"/>
-      <integer-option id="model.option.foundingFatherFactor" value="9"/>
-      <integer-option id="model.option.arrearsFactor" value="700"/>
-      <integer-option id="model.option.nativeSettlementDensity" value="80"/>
-      <integer-option id="model.option.nativeConvertProbability" value="40"/>
-      <integer-option id="model.option.burnProbability" value="10"/>
-      <integer-option id="model.option.recruitPriceIncrease" value="30"/>
-      <integer-option id="model.option.lowerCapIncrease" value="0"/>
-      <boolean-option id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <boolean-option id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integer-option id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integer-option id="model.option.trainingPriceIncrease" value="0"/>
-    </difficulty-level>
-  </difficulty-levels>
+  <difficultyLevels>
+    <difficultyLevel id="model.difficulty.veryEasy">
+      <integerOption id="model.option.crossesIncrement" value="6"/>
+      <integerOption id="model.option.badGovernmentLimit" value="8"/>
+      <integerOption id="model.option.veryBadGovernmentLimit" value="12"/>
+      <integerOption id="model.option.landPriceFactor" value="40"/>
+      <integerOption id="model.option.foundingFatherFactor" value="5"/>
+      <integerOption id="model.option.arrearsFactor" value="300"/>
+      <integerOption id="model.option.nativeSettlementDensity" value="40"/>
+      <integerOption id="model.option.nativeConvertProbability" value="50"/>
+      <integerOption id="model.option.burnProbability" value="2"/>
+      <integerOption id="model.option.recruitPriceIncrease" value="20"/>
+      <integerOption id="model.option.lowerCapIncrease" value="0"/>
+      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
+      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
+      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+    </difficultyLevel>
+    <difficultyLevel id="model.difficulty.easy">
+      <integerOption id="model.option.crossesIncrement" value="8"/>
+      <integerOption id="model.option.badGovernmentLimit" value="7"/>
+      <integerOption id="model.option.veryBadGovernmentLimit" value="11"/>
+      <integerOption id="model.option.landPriceFactor" value="50"/>
+      <integerOption id="model.option.foundingFatherFactor" value="6"/>
+      <integerOption id="model.option.arrearsFactor" value="400"/>
+      <integerOption id="model.option.nativeSettlementDensity" value="50"/>
+      <integerOption id="model.option.nativeConvertProbability" value="40"/>
+      <integerOption id="model.option.burnProbability" value="4"/>
+      <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+      <integerOption id="model.option.lowerCapIncrease" value="0"/>
+      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
+      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
+      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+    </difficultyLevel>
+    <difficultyLevel id="model.difficulty.medium">
+      <integerOption id="model.option.crossesIncrement" value="10"/>
+      <integerOption id="model.option.badGovernmentLimit" value="6"/>
+      <integerOption id="model.option.veryBadGovernmentLimit" value="10"/>
+      <integerOption id="model.option.landPriceFactor" value="60"/>
+      <integerOption id="model.option.foundingFatherFactor" value="7"/>
+      <integerOption id="model.option.arrearsFactor" value="500"/>
+      <integerOption id="model.option.nativeSettlementDensity" value="60"/>
+      <integerOption id="model.option.nativeConvertProbability" value="30"/>
+      <integerOption id="model.option.burnProbability" value="6"/>
+      <integerOption id="model.option.recruitPriceIncrease" value="40"/>
+      <integerOption id="model.option.lowerCapIncrease" value="0"/>
+      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
+      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
+      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+    </difficultyLevel>
+    <difficultyLevel id="model.difficulty.hard">
+      <integerOption id="model.option.crossesIncrement" value="12"/>
+      <integerOption id="model.option.badGovernmentLimit" value="5"/>
+      <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
+      <integerOption id="model.option.landPriceFactor" value="70"/>
+      <integerOption id="model.option.foundingFatherFactor" value="8"/>
+      <integerOption id="model.option.arrearsFactor" value="600"/>
+      <integerOption id="model.option.nativeSettlementDensity" value="70"/>
+      <integerOption id="model.option.nativeConvertProbability" value="20"/>
+      <integerOption id="model.option.burnProbability" value="8"/>
+      <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+      <integerOption id="model.option.lowerCapIncrease" value="0"/>
+      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
+      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
+      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+    </difficultyLevel>
+    <difficultyLevel id="model.difficulty.veryHard">
+      <integerOption id="model.option.crossesIncrement" value="14"/>
+      <integerOption id="model.option.badGovernmentLimit" value="4"/>
+      <integerOption id="model.option.veryBadGovernmentLimit" value="8"/>
+      <integerOption id="model.option.landPriceFactor" value="80"/>
+      <integerOption id="model.option.foundingFatherFactor" value="9"/>
+      <integerOption id="model.option.arrearsFactor" value="700"/>
+      <integerOption id="model.option.nativeSettlementDensity" value="80"/>
+      <integerOption id="model.option.nativeConvertProbability" value="40"/>
+      <integerOption id="model.option.burnProbability" value="10"/>
+      <integerOption id="model.option.recruitPriceIncrease" value="30"/>
+      <integerOption id="model.option.lowerCapIncrease" value="0"/>
+      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
+      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
+      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
+      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+    </difficultyLevel>
+  </difficultyLevels>
   <options>
-    <integer-option id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+    <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
     <optionGroup id="gameOptions.colony">
       <!-- Does the Custom House sell boycotted goods -->
-      <boolean-option id="model.option.customIgnoreBoycott" defaultValue="false"/>
+      <booleanOption id="model.option.customIgnoreBoycott" defaultValue="false"/>
       <!-- Whether experts have connections, producing without raw materials in factories -->
-      <boolean-option id="model.option.expertsHaveConnections" defaultValue="false"/>
-      <boolean-option id="model.option.saveProductionOverflow" defaultValue="false"/>
+      <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
+      <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
     </optionGroup>
     <optionGroup id="gameOptions.victoryConditions">
       <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
-      <boolean-option id="model.option.victoryDefeatREF" defaultValue="true"/>
+      <booleanOption id="model.option.victoryDefeatREF" defaultValue="true"/>
       <!-- Victory condition: Should a player who first defeats all * other european players win the game? -->
-      <boolean-option id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
+      <booleanOption id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
       <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
-      <boolean-option id="model.option.victoryDefeatHumans" defaultValue="false"/>
+      <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>
     </optionGroup>
     <optionGroup id="gameOptions.difficultySettings">
-      <range-option id="model.option.difficulty" defaultValue="2" localizedLabels="true">
-        <range-value label="gameOptions.difficultySettings.difficulty.veryEasy" value="0"/>
-        <range-value label="gameOptions.difficultySettings.difficulty.easy" value="1"/>
-        <range-value label="gameOptions.difficultySettings.difficulty.normal" value="2"/>
-        <range-value label="gameOptions.difficultySettings.difficulty.hard" value="3"/>
-        <range-value label="gameOptions.difficultySettings.difficulty.veryHard" value="4"/>
-      </range-option>
+      <rangeOption id="model.option.difficulty" defaultValue="2" localizedLabels="true">
+        <rangeValue label="gameOptions.difficultySettings.difficulty.veryEasy" value="0"/>
+        <rangeValue label="gameOptions.difficultySettings.difficulty.easy" value="1"/>
+        <rangeValue label="gameOptions.difficultySettings.difficulty.normal" value="2"/>
+        <rangeValue label="gameOptions.difficultySettings.difficulty.hard" value="3"/>
+        <rangeValue label="gameOptions.difficultySettings.difficulty.veryHard" value="4"/>
+      </rangeOption>
     </optionGroup>
   </options>
 </freecol-specification>

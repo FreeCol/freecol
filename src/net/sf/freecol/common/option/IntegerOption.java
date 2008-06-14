@@ -164,7 +164,7 @@ public class IntegerOption extends AbstractOption {
     * @return "integerOption".
     */
     public static String getXMLElementTagName() {
-        return "integer-option";
+        return "integerOption";
     }
 
 }

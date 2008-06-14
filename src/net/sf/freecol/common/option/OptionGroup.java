@@ -128,11 +128,11 @@ public class OptionGroup extends AbstractOption {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             AbstractOption option = (AbstractOption) null;
             String optionType = in.getLocalName();
-            if (IntegerOption.getXMLElementTagName().equals(optionType)) {
+            if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
                 option = new IntegerOption(in);
-            } else if (BooleanOption.getXMLElementTagName().equals(optionType)) {
+            } else if (BooleanOption.getXMLElementTagName().equals(optionType) || "boolean-option".equals(optionType)) {
                 option = new BooleanOption(in);
-            } else if (RangeOption.getXMLElementTagName().equals(optionType)) {
+            } else if (RangeOption.getXMLElementTagName().equals(optionType) || "range-option".equals(optionType)) {
                 option = new RangeOption(in);
             } else {
                 logger.finest("Parsing of " + optionType + " is not implemented yet");

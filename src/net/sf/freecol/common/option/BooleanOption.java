@@ -157,7 +157,7 @@ public class BooleanOption extends AbstractOption {
     * @return "booleanOption".
     */
     public static String getXMLElementTagName() {
-        return "boolean-option";
+        return "booleanOption";
     }
 
 }
