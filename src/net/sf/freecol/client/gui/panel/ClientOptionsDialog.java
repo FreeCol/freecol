@@ -157,7 +157,9 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
                     
                     // Immediately redraw the minimap if that was updated.
                     MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.id);
-                    mca.getMapControls().update();
+                    if(mca.getMapControls() != null) {
+                        mca.getMapControls().update();                        
+                    }
                     break;
                 case CANCEL:
                     ui.unregister();
