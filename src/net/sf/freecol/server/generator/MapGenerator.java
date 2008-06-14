@@ -286,13 +286,6 @@ public class MapGenerator implements IMapGenerator {
      *       no settlements are added.
      */
     private void createIndianSettlements(final Map map, List<Player> players) {
-        /** TODO: why do we need to sort the players?
-        Collections.sort(players, new Comparator<Player>() {
-            public int compare(Player o, Player p) {
-                return o.getIndex() - p.getIndex();
-            }
-        });
-        */
 
         float shares = 0f;
 

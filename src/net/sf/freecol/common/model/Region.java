@@ -193,7 +193,7 @@ public class Region extends FreeColGameObject implements Nameable {
         if (prediscovered) {
             return Messages.message(nameKey);
         } else if (name == null) {
-            return Messages.message("model.region." + type.toString().toLowerCase() + ".name");
+            return Messages.message("model.region." + type.toString().toLowerCase() + ".unknown");
         } else {
             return name;
         }

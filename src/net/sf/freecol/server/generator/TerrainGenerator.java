@@ -350,43 +350,48 @@ public class TerrainGenerator {
 
         Game game = map.getGame();
 
-        ServerRegion PACIFIC =
+        ServerRegion pacific =
             new ServerRegion(game, "model.region.pacific", RegionType.OCEAN);
-        ServerRegion NORTH_PACIFIC =
-            new ServerRegion(game, "model.region.northPacific", RegionType.OCEAN, PACIFIC);
-        ServerRegion SOUTH_PACIFIC =
-            new ServerRegion(game, "model.region.southPacific", RegionType.OCEAN, PACIFIC);
-        ServerRegion ATLANTIC =
+        ServerRegion northPacific =
+            new ServerRegion(game, "model.region.northPacific", RegionType.OCEAN, pacific);
+        ServerRegion southPacific =
+            new ServerRegion(game, "model.region.southPacific", RegionType.OCEAN, pacific);
+        ServerRegion atlantic =
             new ServerRegion(game, "model.region.atlantic", RegionType.OCEAN);
-        ServerRegion NORTH_ATLANTIC =
-            new ServerRegion(game, "model.region.northAtlantic", RegionType.OCEAN, ATLANTIC);
-        ServerRegion SOUTH_ATLANTIC =
-            new ServerRegion(game, "model.region.southAtlantic", RegionType.OCEAN, ATLANTIC);
+        ServerRegion northAtlantic =
+            new ServerRegion(game, "model.region.northAtlantic", RegionType.OCEAN, atlantic);
+        ServerRegion southAtlantic =
+            new ServerRegion(game, "model.region.southAtlantic", RegionType.OCEAN, atlantic);
 
-        ServerRegion CENTER =
+        ServerRegion center =
             new ServerRegion(game, "model.region.center", RegionType.LAND);
-        ServerRegion NORTH =
+        ServerRegion north =
             new ServerRegion(game, "model.region.north", RegionType.LAND);
-        ServerRegion SOUTH =
+        ServerRegion south =
             new ServerRegion(game, "model.region.south", RegionType.LAND);
-        ServerRegion EAST =
+        ServerRegion east =
             new ServerRegion(game, "model.region.east", RegionType.LAND);
-        ServerRegion WEST =
+        ServerRegion west =
             new ServerRegion(game, "model.region.west", RegionType.LAND);
-        ServerRegion NORTH_EAST =
+        ServerRegion northEast =
             new ServerRegion(game, "model.region.northEast", RegionType.LAND);
-        ServerRegion NORTH_WEST =
+        ServerRegion northWest =
             new ServerRegion(game, "model.region.northWest", RegionType.LAND);
-        ServerRegion SOUTH_EAST =
+        ServerRegion southEast =
             new ServerRegion(game, "model.region.southEast", RegionType.LAND);
-        ServerRegion SOUTH_WEST =
+        ServerRegion southWest =
             new ServerRegion(game, "model.region.southWest", RegionType.LAND);
 
-        for (ServerRegion region : new ServerRegion[] { PACIFIC, NORTH_PACIFIC, SOUTH_PACIFIC,
-                                                        ATLANTIC, NORTH_ATLANTIC, SOUTH_ATLANTIC,
-                                                        NORTH_WEST, NORTH, NORTH_EAST,
-                                                        WEST, CENTER, EAST,
-                                                        SOUTH_WEST, SOUTH, SOUTH_EAST } ) {
+        ServerRegion arctic =
+            new ServerRegion(game, "model.region.arctic", RegionType.LAND);
+        ServerRegion antarctic =
+            new ServerRegion(game, "model.region.antarctic", RegionType.LAND);
+
+        for (ServerRegion region : new ServerRegion[] { northPacific, southPacific,
+                                                        atlantic, northAtlantic, southAtlantic,
+                                                        northWest, north, northEast,
+                                                        west, center, east,
+                                                        southWest, south, southEast } ) {
             if (region.getType() == RegionType.OCEAN) {
                 region.setPrediscovered(true);
             } else {
@@ -395,9 +400,13 @@ public class TerrainGenerator {
             }
             map.setRegion(region);
         }
-        PACIFIC.setDiscoverable(true);
-        PACIFIC.setScoreValue(PACIFIC_SCORE_VALUE);
-
+        map.setRegion(pacific);
+        pacific.setDiscoverable(true);
+        pacific.setScoreValue(PACIFIC_SCORE_VALUE);
+        map.setRegion(arctic);
+        arctic.setPrediscovered(true);
+        map.setRegion(antarctic);
+        antarctic.setPrediscovered(true);
 
         int halfHeight = map.getHeight()/2;
         int halfWidth = map.getWidth()/2;
@@ -405,48 +414,54 @@ public class TerrainGenerator {
         int twoThirdHeight = 2 * thirdHeight;
         int thirdWidth = map.getWidth()/3;
         int twoThirdWidth = 2 * thirdWidth;
+        int arcticHeight = LandGenerator.POLAR_HEIGHT;
+        int antarcticHeight = map.getHeight() - LandGenerator.POLAR_HEIGHT - 1;
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
                 if (map.isValid(x, y)) {
                     Tile tile = map.getTile(x, y);
                     if (tile.isLand()) {
-                        if (y < thirdHeight) {
+                        if (y < arcticHeight) {
+                            arctic.addTile(tile);
+                        } else if (y < thirdHeight) {
                             if (x < thirdWidth) {
-                                NORTH_WEST.addTile(tile);
+                                northWest.addTile(tile);
                             } else if (x < twoThirdWidth) {
-                                NORTH.addTile(tile);
+                                north.addTile(tile);
                             } else {
-                                NORTH_EAST.addTile(tile);
+                                northEast.addTile(tile);
                             }
                         } else if (y < twoThirdHeight) {
                             if (x < thirdWidth) {
-                                WEST.addTile(tile);
+                                west.addTile(tile);
                             } else if (x < twoThirdWidth) {
-                                CENTER.addTile(tile);
+                                center.addTile(tile);
                             } else {
-                                EAST.addTile(tile);
+                                east.addTile(tile);
+                            }
+                        } else if (y < antarcticHeight) {
+                            if (x < thirdWidth) {
+                                southWest.addTile(tile);
+                            } else if (x < twoThirdWidth) {
+                                south.addTile(tile);
+                            } else {
+                                southEast.addTile(tile);
                             }
                         } else {
-                            if (x < thirdWidth) {
-                                SOUTH_WEST.addTile(tile);
-                            } else if (x < twoThirdWidth) {
-                                SOUTH.addTile(tile);
-                            } else {
-                                SOUTH_EAST.addTile(tile);
-                            }
+                            antarctic.addTile(tile);
                         }
                     } else {
                         if (y < halfHeight) {
                             if (x < halfWidth) {
-                                NORTH_PACIFIC.addTile(tile);
+                                northPacific.addTile(tile);
                             } else {
-                                NORTH_ATLANTIC.addTile(tile);
+                                northAtlantic.addTile(tile);
                             }
                         } else {
                             if (x < halfWidth) {
-                                SOUTH_PACIFIC.addTile(tile);
+                                southPacific.addTile(tile);
                             } else {
-                                SOUTH_ATLANTIC.addTile(tile);
+                                southAtlantic.addTile(tile);
                             }
                         }
                     }
