@@ -117,6 +117,10 @@ public final class SpecificationTest extends TestCase {
     public void testOptions() {
       Specification spec = Specification.getSpecification();
 
+      assertFalse(spec.getBooleanOption("model.option.customIgnoreBoycott").getValue());
+      assertFalse(spec.getBooleanOption("model.option.expertsHaveConnections").getValue());
+      assertFalse(spec.getBooleanOption("model.option.saveProductionOverflow").getValue());
+
       assertTrue(spec.getBooleanOption("model.option.victoryDefeatREF").getValue());
       assertTrue(spec.getBooleanOption("model.option.victoryDefeatEuropeans").getValue());
       assertFalse(spec.getBooleanOption("model.option.victoryDefeatHumans").getValue());

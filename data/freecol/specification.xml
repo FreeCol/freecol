@@ -1639,6 +1639,13 @@
   </difficulty-levels>
   <options>
     <integer-option id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+    <optionGroup id="gameOptions.colony">
+      <!-- Does the Custom House sell boycotted goods -->
+      <boolean-option id="model.option.customIgnoreBoycott" defaultValue="false"/>
+      <!-- Whether experts have connections, producing without raw materials in factories -->
+      <boolean-option id="model.option.expertsHaveConnections" defaultValue="false"/>
+      <boolean-option id="model.option.saveProductionOverflow" defaultValue="false"/>
+    </optionGroup>
     <optionGroup id="gameOptions.victoryConditions">
       <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
       <boolean-option id="model.option.victoryDefeatREF" defaultValue="true"/>
