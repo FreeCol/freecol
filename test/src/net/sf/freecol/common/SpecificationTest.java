@@ -25,6 +25,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.option.RangeOption;
 
 import junit.framework.TestCase;
@@ -118,19 +119,25 @@ public final class SpecificationTest extends TestCase {
     public void testOptions() {
       Specification spec = Specification.getSpecification();
 
-      assertFalse(spec.getBooleanOption("model.option.customIgnoreBoycott").getValue());
-      assertFalse(spec.getBooleanOption("model.option.expertsHaveConnections").getValue());
-      assertFalse(spec.getBooleanOption("model.option.saveProductionOverflow").getValue());
+      assertTrue(spec.getIntegerOption(GameOptions.STARTING_MONEY).getValue() == 0);
 
-      assertTrue(spec.getBooleanOption("model.option.victoryDefeatREF").getValue());
-      assertTrue(spec.getBooleanOption("model.option.victoryDefeatEuropeans").getValue());
-      assertFalse(spec.getBooleanOption("model.option.victoryDefeatHumans").getValue());
+      assertFalse(spec.getBooleanOption(GameOptions.CUSTOM_IGNORE_BOYCOTT).getValue());
+      assertFalse(spec.getBooleanOption(GameOptions.EXPERTS_HAVE_CONNECTIONS).getValue());
+      assertFalse(spec.getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
+
+      assertFalse(spec.getBooleanOption(GameOptions.EXPLORATION_POINTS).getValue());
+      assertTrue(spec.getBooleanOption(GameOptions.FOG_OF_WAR).getValue());
+      assertTrue(spec.getBooleanOption(GameOptions.UNIT_HIDING).getValue());
+
+      assertTrue(spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF).getValue());
+      assertTrue(spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_EUROPEANS).getValue());
+      assertFalse(spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS).getValue());
     }
 
     // Check diffculty levels presence and values
     public void testDifficultyLevels() {
       Specification spec = Specification.getSpecification();
-      RangeOption diffOpt = (RangeOption) spec.getOption("model.option.difficulty");
+      RangeOption diffOpt = (RangeOption) spec.getOption(GameOptions.DIFFICULTY);
 
       assertTrue(diffOpt.getValue() == 2);
       assertTrue(diffOpt.getRangeValues().size() == 5);

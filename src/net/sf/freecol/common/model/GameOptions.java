@@ -45,27 +45,28 @@ public class GameOptions extends OptionMap {
 
 
     /** The amount of money each player will receive before the game starts. */
-    public static final String STARTING_MONEY = "startingMoney";
+    public static final String STARTING_MONEY = "model.option.startingMoney";
 
     /** The cost of a single hammer when buying a building in a colony. */
-    public static final String HAMMER_PRICE = "hammerPrice";
+    //Unused at the moment
+    // public static final String HAMMER_PRICE = "hammerPrice";
 
     /** Does the Custom House sell boycotted goods **/
-    public static final String CUSTOM_IGNORE_BOYCOTT = "customIgnoreBoycott";
+    public static final String CUSTOM_IGNORE_BOYCOTT = "model.option.customIgnoreBoycott";
 
     /** Whether experts have connections, producing without raw materials in factories */
-    public static final String EXPERTS_HAVE_CONNECTIONS = "expertsHaveConnections";
+    public static final String EXPERTS_HAVE_CONNECTIONS = "model.option.expertsHaveConnections";
 
-    public static final String SAVE_PRODUCTION_OVERFLOW = "saveProductionOverflow";
+    public static final String SAVE_PRODUCTION_OVERFLOW = "model.option.saveProductionOverflow";
 
     /** Whether to award exploration points or not. */
-    public static final String EXPLORATION_POINTS = "explorationPoints";
+    public static final String EXPLORATION_POINTS = "model.option.explorationPoints";
 
     /** Enables/disables fog of war. */
-    public static final String FOG_OF_WAR = "fogOfWar";
+    public static final String FOG_OF_WAR = "model.option.fogOfWar";
 
     /** No units are hidden on carriers or settlements if this option is set to <code>false</code>. */
-    public static final String UNIT_HIDING = "unitHiding";
+    public static final String UNIT_HIDING = "model.option.unitHiding";
     
     /** 
      * Victory condition: Should the <code>Player</code> who first defeats the
@@ -130,30 +131,22 @@ public class GameOptions extends OptionMap {
     * Adds the options to this <code>GameOptions</code>.
     */
     protected void addDefaultOptions() {
-        /* Add options here: */
-
-        /* Initial values: */
-        OptionGroup starting = new OptionGroup("gameOptions.starting");
+        Specification spec = Specification.getSpecification();
+        
         if (FreeCol.isInDebugMode()) {
-            new IntegerOption(STARTING_MONEY, starting, 0, 50000, 10000);
-        } else {
-            new IntegerOption(STARTING_MONEY, starting, 0, 50000, 0);
+            spec.getIntegerOption(STARTING_MONEY).setValue(10000);
         }
-        add(starting);
-
+        
+        /* Starting options: */
+        add(spec.getOptionGroup("gameOptions.starting"));
         /* Map options: */
-        OptionGroup map = new OptionGroup("gameOptions.map");
-        new BooleanOption(FOG_OF_WAR, map, true);
-        new BooleanOption(UNIT_HIDING, map, true);
-        new BooleanOption(EXPLORATION_POINTS, map, false);
-        add(map);        
-
+        add(spec.getOptionGroup("gameOptions.map"));
         /* Colony options: */
-        add(Specification.getSpecification().getOptionGroup("gameOptions.colony"));
+        add(spec.getOptionGroup("gameOptions.colony"));
         /* Victory Conditions */
-        add(Specification.getSpecification().getOptionGroup("gameOptions.victoryConditions"));
+        add(spec.getOptionGroup("gameOptions.victoryConditions"));
         /* Difficulty settings */
-        add(Specification.getSpecification().getOptionGroup("gameOptions.difficultySettings"));
+        add(spec.getOptionGroup("gameOptions.difficultySettings"));
     }
 
     protected boolean isCorrectTagName(String tagName) {
@@ -165,7 +158,7 @@ public class GameOptions extends OptionMap {
     * @return "gameOptions".
     */
     public static String getXMLElementTagName() {
-        return "game-options";
+        return "gameOptions";
     }
 
 }

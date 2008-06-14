@@ -1001,7 +1001,7 @@ public class Game extends FreeColGameObject {
 
         gameOptions = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(GameOptions.getXMLElementTagName()) || in.getLocalName().equals("gameOptions")) {
+            if (in.getLocalName().equals(GameOptions.getXMLElementTagName()) || in.getLocalName().equals("game-options")) {
                 // Gets the game options:
                 if (gameOptions != null) {
                     gameOptions.readFromXML(in);

@@ -1639,6 +1639,18 @@
   </difficultyLevels>
   <options>
     <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
+    <optionGroup id="gameOptions.starting">
+      <!-- The amount of money each player will receive before the game starts -->
+      <integerOption id="model.option.startingMoney" defaultValue="0" minimumValue="0" maximumValue="50000"/>
+    </optionGroup>
+    <optionGroup id="gameOptions.map">
+      <!-- Enables/disables fog of war -->
+      <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
+      <!-- No units are hidden on carriers or settlements if this option is set to false -->
+      <booleanOption id="model.option.unitHiding" defaultValue="true"/>
+      <!-- Whether to award exploration points or not -->
+      <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
+    </optionGroup>
     <optionGroup id="gameOptions.colony">
       <!-- Does the Custom House sell boycotted goods -->
       <booleanOption id="model.option.customIgnoreBoycott" defaultValue="false"/>
