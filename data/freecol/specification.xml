@@ -508,7 +508,6 @@
   <unit-types>
     <unit-type id="model.unit.freeColonist"         offence="0"  defence="1" movement="3" lineOfSight="1"
                scoreValue="3" skill="0" recruitProbability="20" pathImage="foot">
-      <available-to native="false"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -540,7 +539,6 @@
     <unit-type id="model.unit.expertFarmer" art="expertFarmer" offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="1" recruitProbability="1" expert-production="model.goods.food"
                scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -550,7 +548,6 @@
     <unit-type id="model.unit.expertFisherman" art="expertFisherman" offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.fish"
                scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -560,7 +557,6 @@
     <unit-type id="model.unit.expertFurTrapper" art="expertFurTrapper" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1"  expert-production="model.goods.furs"
                scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -570,7 +566,6 @@
     <unit-type id="model.unit.expertSilverMiner" art="expertSilverMiner" offence="0"  defence="1" movement="3" lineOfSight="1" price="900"  
                skill="1" recruitProbability="1" expert-production="model.goods.silver"
                scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -580,7 +575,6 @@
     <unit-type id="model.unit.expertLumberJack" art="expertLumberJack" offence="0"  defence="1" movement="3" lineOfSight="1" price="700"  
                skill="1" recruitProbability="1" expert-production="model.goods.lumber"
                scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -590,7 +584,6 @@
     <unit-type id="model.unit.expertOreMiner" art="expertOreMiner" offence="0"  defence="1" movement="3" lineOfSight="1" price="600"  
                skill="1" recruitProbability="1" expert-production="model.goods.ore"
                scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -600,7 +593,6 @@
     <unit-type id="model.unit.masterSugarPlanter" art="masterSugarPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.sugar"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -610,7 +602,6 @@
     <unit-type id="model.unit.masterCottonPlanter" art="masterCottonPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.cotton"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -620,7 +611,6 @@
     <unit-type id="model.unit.masterTobaccoPlanter" art="masterTobaccoPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.tobacco"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -630,7 +620,6 @@
     <unit-type id="model.unit.firebrandPreacher" art="firebrandPreacher" offence="0"  defence="1" movement="3" lineOfSight="1" price="1500" 
                skill="3" recruitProbability="1" expert-production="model.goods.crosses"
                scoreValue="6" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -641,7 +630,6 @@
                movement="3" lineOfSight="1" price="1900"
                skill="3" recruitProbability="1" expert-production="model.goods.bells"
                scoreValue="6" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -651,7 +639,6 @@
     <unit-type id="model.unit.masterCarpenter" art="masterCarpenter" offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.hammers"
                scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -661,7 +648,6 @@
     <unit-type id="model.unit.masterDistiller" art="masterDistiller" offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="2" recruitProbability="1" expert-production="model.goods.rum"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -671,7 +657,6 @@
     <unit-type id="model.unit.masterWeaver" art="masterWeaver" offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
                skill="2" recruitProbability="1" expert-production="model.goods.cloth"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -681,7 +666,6 @@
     <unit-type id="model.unit.masterTobacconist" art="masterTobacconist" offence="0"  defence="1" movement="3" lineOfSight="1" price="1200" 
                skill="2" recruitProbability="1" expert-production="model.goods.cigars"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -691,7 +675,6 @@
     <unit-type id="model.unit.masterFurTrader" art="masterFurTrader" offence="0"  defence="1" movement="3" lineOfSight="1" price="950"  
                skill="2" recruitProbability="1" expert-production="model.goods.coats"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -701,7 +684,6 @@
     <unit-type id="model.unit.masterBlacksmith" art="masterBlacksmith" offence="0"  defence="1" movement="3" lineOfSight="1" price="1050" 
                skill="2" recruitProbability="1" expert-production="model.goods.tools"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -711,7 +693,6 @@
     <unit-type id="model.unit.masterGunsmith" art="masterGunsmith" offence="0"  defence="1" movement="3" lineOfSight="1" price="850"  
                skill="2" recruitProbability="1" expert-production="model.goods.muskets"
                scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -720,7 +701,6 @@
     </unit-type>
     <unit-type id="model.unit.seasonedScout" art="seasonedScout" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1" recruitProbability="1" scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -729,7 +709,6 @@
     </unit-type>
     <unit-type id="model.unit.hardyPioneer" art="hardyPioneer" offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="1" recruitProbability="1" scoreValue="4" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -739,7 +718,6 @@
     <unit-type id="model.unit.veteranSoldier" art="veteranSoldier" offence="0"  defence="1"
                movement="3" lineOfSight="1" price="2000"
                skill="2" recruitProbability="1" scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
@@ -752,7 +730,6 @@
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary" art="jesuitMissionary" offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
                skill="3" recruitProbability="1" scoreValue="5" pathImage="foot">
-      <available-to native="false"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -761,7 +738,6 @@
     </unit-type>
     <unit-type id="model.unit.indenturedServant" art="indenturedServant" offence="0"  defence="1" movement="3" lineOfSight="1"              
                skill="-1" recruitProbability="20" scoreValue="2" pathImage="foot">
-      <available-to native="false"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -788,7 +764,6 @@
     </unit-type>
     <unit-type id="model.unit.pettyCriminal" art="pettyCriminal" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="-2" recruitProbability="20" scoreValue="1" pathImage="foot">
-      <available-to native="false"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -807,7 +782,6 @@
     <unit-type id="model.unit.indianConvert" art="indianConvert" offence="0"  defence="1"
                movement="3" lineOfSight="1" maximumAttrition="10"
                scoreValue="3" skill="0" pathImage="foot">
-      <available-to native="false"/>
       <ability id="model.ability.convert" value="true"/>
       <modifier id="model.goods.food" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
@@ -827,7 +801,6 @@
       <upgrade unit="model.unit.freeColonist" learnInSchool="false"/>
     </unit-type>
     <unit-type id="model.unit.brave" art="brave" offence="1"  defence="1" movement="3" lineOfSight="1" space="1">
-      <available-to colonial="false" rebel="false" independent="false" royal="false" undead="false" native="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.bornInIndianSettlement" value="true"/>
       <ability id="model.ability.pillageUnprotectedColony" value="true"/>
@@ -837,7 +810,6 @@
     </unit-type>
     <unit-type id="model.unit.colonialRegular" art="colonialRegular" offence="3"  defence="3" movement="3" lineOfSight="1"
                pathImage="foot" skillTaught="model.unit.veteranSoldier">
-      <available-to colonial="false" rebel="true" independent="true" royal="false" undead="false" native="false"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -847,7 +819,6 @@
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
     <unit-type id="model.unit.kingsRegular" art="kingsRegular" offence="4"  defence="4" movement="3" lineOfSight="1">
-      <available-to colonial="false" rebel="false" independent="false" royal="true" undead="false" native="false"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
@@ -858,7 +829,6 @@
     </unit-type>
     <unit-type id="model.unit.caravel" art="caravel" offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
                spaceTaken="24" hitPoints="6" price="1000" pathImage="naval" scoreValue="3">
-      <available-to native="false"/>
       <required-goods id="model.goods.hammers" value="128"/>
       <required-goods id="model.goods.tools" value="40"/>
       <required-ability id="model.ability.buildShips"/>
@@ -868,7 +838,6 @@
     </unit-type>
     <unit-type id="model.unit.frigate" art="frigate" offence="16" defence="16" movement="18" lineOfSight="2" space="4"
                spaceTaken="32" hitPoints="6" price="5000" pathImage="naval" scoreValue="6">
-      <available-to native="false"/>
       <required-goods id="model.goods.hammers" value="512"/>
       <required-goods id="model.goods.tools" value="200"/>
       <required-ability id="model.ability.buildShips"/>
@@ -879,7 +848,6 @@
     </unit-type>
     <unit-type id="model.unit.galleon" art="galleon" offence="0"  defence="10" movement="18" lineOfSight="2" space="6"
                spaceTaken="64" hitPoints="6" price="3000" pathImage="naval" scoreValue="5">
-      <available-to native="false"/>
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-ability id="model.ability.buildShips"/>
@@ -889,7 +857,6 @@
     </unit-type>
     <unit-type id="model.unit.manOWar" art="manOWar" offence="24" defence="24" movement="18" lineOfSight="2" space="6"
                spaceTaken="64" hitPoints="6" pathImage="naval" scoreValue="8">
-      <available-to colonial="false" rebel="true" independent="true" royal="true" undead="false" native="false"/>
       <required-goods id="model.goods.hammers" value="1024"/>
       <required-goods id="model.goods.tools" value="300"/>
       <required-ability id="model.ability.buildShips"/>
@@ -902,7 +869,6 @@
     </unit-type>
     <unit-type id="model.unit.merchantman" art="merchantman" offence="0"  defence="6" movement="15" lineOfSight="1" space="4"
                spaceTaken="32" hitPoints="6" price="2000" pathImage="naval" scoreValue="4">
-      <available-to native="false"/>
       <required-goods id="model.goods.hammers" value="192"/>
       <required-goods id="model.goods.tools" value="80"/>
       <required-ability id="model.ability.buildShips"/>
@@ -912,7 +878,6 @@
     </unit-type>
     <unit-type id="model.unit.privateer" art="privateer" offence="8"  defence="8" movement="24" lineOfSight="2" space="2"
                spaceTaken="24" hitPoints="6" price="2000" pathImage="naval" scoreValue="4">
-      <available-to native="false"/>
       <required-goods id="model.goods.hammers" value="256"/>
       <required-goods id="model.goods.tools" value="120"/>
       <required-ability id="model.ability.buildShips"/>
@@ -924,7 +889,6 @@
     </unit-type>
     <unit-type id="model.unit.artillery" art="artillery" offence="7"  defence="5" movement="3" lineOfSight="1"
                price="500" increasingPrice="100" pathImage="wagon" scoreValue="2">
-      <available-to native="false"/>
       <required-goods id="model.goods.hammers" value="192"/>
       <required-goods id="model.goods.tools" value="40"/>
       <required-ability id="model.ability.buildArtillery"/>
@@ -935,39 +899,33 @@
     </unit-type>
     <unit-type id="model.unit.damagedArtillery" art="damagedArtillery" offence="5"  defence="3" movement="3"
                scoreValue="1" lineOfSight="1" pathImage="wagon">
-      <available-to native="false"/>
       <ability id="model.ability.bombard" value="true"/>
     </unit-type>
     <unit-type id="model.unit.treasureTrain" art="treasureTrain" offence="0"  defence="0" movement="3"
                scoreValue="1" lineOfSight="1" spaceTaken="6" pathImage="wagon">
-      <available-to native="false"/>
       <ability id="model.ability.carryTreasure" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <unit-type id="model.unit.wagonTrain" art="wagonTrain" offence="0"  defence="1" movement="6"
                scoreValue="1" lineOfSight="1" spaceTaken="12" space="2"
                pathImage="wagon">
-      <available-to native="false"/>
       <required-goods id="model.goods.hammers" value="40"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <!--<unit-type id="model.unit.milkmaid" art="milkmaid" offence="0"  defence="1" movement="3"  lineOfSight="1"-->
                <!--expert-production="model.goods.food" pathImage="foot">-->
-      <!--<available-to native="false"/>-->
       <!--<ability id="model.ability.foundColony" value="true"/>-->
       <!--<ability id="model.ability.canBeEquipped" value="true"/>-->
       <!--<ability id="model.ability.canBeCaptured" value="true"/>-->
     <!--</unit-type>-->
     <unit-type id="model.unit.revenger" art="revenger" offence="666"  defence="666" movement="18" lineOfSight="3"
                pathImage="foot">
-      <available-to colonial="false" rebel="false" independent="false" royal="false" undead="true" native="false"/>
       <ability id="model.ability.undead" value="true"/>
       <ability id="model.ability.multipleAttacks" value="true"/>
     </unit-type>
     <unit-type id="model.unit.flyingDutchman" art="flyingDutchman" offence="666"  defence="666" movement="36" lineOfSight="3"
                space="6" hitPoints="6" pathImage="naval">
-      <available-to colonial="false" rebel="false" independent="false" royal="false" undead="true" native="false"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.carryUnits" value="true"/>
@@ -975,7 +933,6 @@
       <ability id="model.ability.undead" value="true"/>
     </unit-type>    
     <unit-type id="model.unit.undead" art="undead" offence="18"  defence="4" movement="3" lineOfSight="1" pathImage="foot">
-      <available-to colonial="false" rebel="false" independent="false" royal="false" undead="true" native="false"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>

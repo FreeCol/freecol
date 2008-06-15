@@ -132,12 +132,6 @@ public final class UnitType extends BuildableType {
     private String skillTaught;
 
     /**
-     * Describe availableTo here.
-     */
-    private EnumMap<PlayerType, Boolean> availableTo =
-        new EnumMap<PlayerType, Boolean>(PlayerType.class);
-
-    /**
      * Describe education here.
      */
     private HashMap<String, Upgrade> upgrades = new HashMap<String, Upgrade>();
@@ -498,34 +492,19 @@ public final class UnitType extends BuildableType {
 
     /**
      * Returns true if the UnitType is available to the given
-     * PlayerType.
-     *
-     * @param playerType a <code>PlayerType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean isAvailableTo(PlayerType playerType) {
-        return availableTo.get(playerType);
-    }
-
-    /**
-     * Returns true if the UnitType is available to the given
      * Player.
      *
      * @param player a <code>Player</code> value
      * @return a <code>boolean</code> value
      */
     public boolean isAvailableTo(Player player) {
-        if (availableTo.get(player.getPlayerType())) {
-            java.util.Map<String, Boolean> requiredAbilities = getAbilitiesRequired();
-            for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
-                if (player.hasAbility(entry.getKey()) != entry.getValue()) {
-                    return false;
-                }
+        java.util.Map<String, Boolean> requiredAbilities = getAbilitiesRequired();
+        for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
+            if (player.hasAbility(entry.getKey()) != entry.getValue()) {
+                return false;
             }
-            return true;
-        } else {
-            return false;
         }
+        return true;
     }
 
     public UnitType getPromotion() {
@@ -695,12 +674,6 @@ public final class UnitType extends BuildableType {
                 downgrade.asResultOf.put(DowngradeType.DEMOTION, getAttribute(in, "demotion", false));
                 downgrade.asResultOf.put(DowngradeType.CAPTURE, getAttribute(in, "capture", false));
                 downgrades.put(educationUnit, downgrade);
-                in.nextTag(); // close this element
-            } else if ("available-to".equals(nodeName)) {
-                for (PlayerType playerType : PlayerType.values()) {
-                    boolean value = getAttribute(in, playerType.toString().toLowerCase(), true);
-                    availableTo.put(playerType, value);
-                }
                 in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
                 Modifier modifier = new Modifier(in); // Modifier close the element

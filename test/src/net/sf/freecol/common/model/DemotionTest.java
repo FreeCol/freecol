@@ -318,10 +318,6 @@ public class DemotionTest extends FreeColTestCase {
         promoteMethod.invoke(combatModel, unit);
         assertEquals(unit.getType(), veteranType);
 
-        assertTrue(veteranType.isAvailableTo(PlayerType.COLONIAL));
-        assertFalse(colonialRegularType.isAvailableTo(PlayerType.COLONIAL));
-        assertTrue(colonialRegularType.isAvailableTo(PlayerType.REBEL));
-        
         // further upgrading a VeteranSoldier to ColonialRegular
         // should only work once independence is declared
         assertFalse(colonialRegularType.isAvailableTo(player));
