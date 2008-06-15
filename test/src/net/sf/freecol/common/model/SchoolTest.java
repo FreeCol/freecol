@@ -1003,9 +1003,6 @@ public class SchoolTest extends FreeColTestCase {
 
         Iterator<Unit> units = colony.getUnitIterator();
 
-        Unit soldier = units.next();
-        soldier.setType(veteranSoldierType);
-
         Unit regular = units.next();
         regular.setType(colonialRegularType);
 
@@ -1016,13 +1013,12 @@ public class SchoolTest extends FreeColTestCase {
         school.upgrade();
 
         regular.setLocation(school);
-        assertEquals(soldier, regular.getStudent());
+        Unit student = regular.getStudent();
+        assertEquals(freeColonistType, student.getType());
 
-        trainForTurns(colony, regular.getNeededTurnsOfTraining());
-        assertEquals(colonialRegularType, soldier.getType());
+        trainForTurns(colony, freeColonistType.getEducationTurns(veteranSoldierType));
+        assertEquals(veteranSoldierType, student.getType());
 
-        regular.setLocation(school);
-        assertNull(regular.getStudent());
         colony.dispose();
     }
 

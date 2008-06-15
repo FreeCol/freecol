@@ -934,12 +934,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public final void setTeacher(final Unit newTeacher) {
         if (newTeacher == null) {
             this.teacher = null;
-        } else if (newTeacher.getColony() != null &&
-                   newTeacher.getColony() == getColony() &&
-                   getColony().canTrain(newTeacher)) {
-            this.teacher = newTeacher;
         } else {
-            throw new IllegalStateException("unit can not be teacher: " + newTeacher.getName());
+            UnitType skillTaught = FreeCol.getSpecification().getUnitType(newTeacher.getType().getSkillTaught());
+            if (newTeacher.getColony() != null &&
+                newTeacher.getColony() == getColony() &&
+                getColony().canTrain(skillTaught)) {
+                this.teacher = newTeacher;
+            } else {
+                throw new IllegalStateException("unit can not be teacher: " + newTeacher.getName());
+            }
         }
     }
 
@@ -3069,7 +3072,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void train() {
         String oldName = getName();
-        UnitType learning = getUnitTypeTeaching(getTeacher().unitType, unitType);
+        UnitType skillTaught = FreeCol.getSpecification().getUnitType(getTeacher().getType().getSkillTaught());
+        UnitType learning = getUnitTypeTeaching(skillTaught, unitType);
 
         if (learning != null) {
             setType(learning);

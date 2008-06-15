@@ -127,6 +127,11 @@ public final class UnitType extends BuildableType {
     private int maximumAttrition;
 
     /**
+     * The ID of the skill this UnitType teaches, mostly its own.
+     */
+    private String skillTaught;
+
+    /**
      * Describe availableTo here.
      */
     private EnumMap<PlayerType, Boolean> availableTo =
@@ -474,6 +479,24 @@ public final class UnitType extends BuildableType {
     }
 
     /**
+     * Get the <code>SkillTaught</code> value.
+     *
+     * @return an <code>String</code> value
+     */
+    public String getSkillTaught() {
+        return skillTaught;
+    }
+
+    /**
+     * Set the <code>SkillTaught</code> value.
+     *
+     * @param newSkillTaught The new SkillTaught value.
+     */
+    public void setSkillTaught(final String newSkillTaught) {
+        this.skillTaught = newSkillTaught;
+    }
+
+    /**
      * Returns true if the UnitType is available to the given
      * PlayerType.
      *
@@ -536,12 +559,12 @@ public final class UnitType extends BuildableType {
      * Whether this UnitType can be upgraded to the given UnitType by
      * the given means of education.
      *
-     * @param unitType the UnitType to learn
+     * @param newType the UnitType to learn
      * @param educationType an <code>UpgradeType</code> value
      * @return <code>true</code> if can learn the given UnitType
      */
-    public boolean canBeUpgraded(UnitType unitType, UpgradeType educationType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
+    public boolean canBeUpgraded(UnitType newType, UpgradeType educationType) {
+        Upgrade upgrade = upgrades.get(newType.getSkillTaught());
         return upgrade != null && upgrade.asResultOf.get(educationType);
     }
 
@@ -612,6 +635,7 @@ public final class UnitType extends BuildableType {
         hitPoints = getAttribute(in, "hitPoints", 0);
         spaceTaken = getAttribute(in, "spaceTaken", 1);
         maximumAttrition = getAttribute(in, "maximumAttrition", Integer.MAX_VALUE);
+        skillTaught = getAttribute(in, "skillTaught", getId());
         
         art = in.getAttributeValue(null, "art");
         pathImage = in.getAttributeValue(null, "pathImage");
