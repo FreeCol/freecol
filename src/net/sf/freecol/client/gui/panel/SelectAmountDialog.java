@@ -151,6 +151,15 @@ public final class SelectAmountDialog extends FreeColDialog implements ActionLis
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
-        setResponse(comboBox.getSelectedItem());
+        Object item = comboBox.getSelectedItem();
+        if (item instanceof Integer) {
+            setResponse(item);
+        } else if (item instanceof String) {
+            try {
+                setResponse(Integer.valueOf((String) item));
+            } catch (NumberFormatException e) {
+                // do nothing
+            }
+        }
     }
 }
