@@ -51,6 +51,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
+    private static final int CLASSIC_PLAYER_NO = 4;
+
     private static final int    OK = 0,
                                 CANCEL = 1,
                                 SINGLE = 2,
@@ -107,10 +109,21 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
         publicServer = new JCheckBox( Messages.message("publicServer") );
         additionalNations = new JCheckBox(Messages.message("additionalNations"));
+        additionalNations.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    if (!additionalNations.isSelected()) {
+                        int players = ((Integer) singlePlayerNo.getValue()).intValue();
+                        if (players > CLASSIC_PLAYER_NO) {
+                            singlePlayerNo.setValue(CLASSIC_PLAYER_NO);
+                        }
+                    }
+                }
+            });
+
         selectAdvantages = new JCheckBox(Messages.message("selectAdvantages"));
         useAdvantages = new JCheckBox(Messages.message("useAdvantages"));
 
-        singlePlayerNo = new JSpinner(new SpinnerNumberModel(4, 1, 8, 1));
+        singlePlayerNo = new JSpinner(new SpinnerNumberModel(CLASSIC_PLAYER_NO, 1, 8, 1));
         singlePlayerNo.addChangeListener(new ChangeListener() {
                 public void stateChanged(ChangeEvent e) {
                     int players = ((Integer) singlePlayerNo.getValue()).intValue();
@@ -119,7 +132,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                     }
                 }
             });
-        multiPlayerNo = new JSpinner(new SpinnerNumberModel(4, 2, 8, 1));
+        multiPlayerNo = new JSpinner(new SpinnerNumberModel(CLASSIC_PLAYER_NO, 2, 8, 1));
 
         name = new JTextField( System.getProperty("user.name", Messages.message("defaultPlayerName")) );
         name.setColumns(20);
