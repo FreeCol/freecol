@@ -571,11 +571,9 @@ public final class UnitType extends BuildableType {
      * maximum
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        Iterator<Entry<String, Upgrade>> unitTypes = upgrades.entrySet().iterator();
-        while (unitTypes.hasNext()) {
-            Entry<String, Upgrade> pair = unitTypes.next();
-            if (pair.getValue().canBeTaught()) {
-                UnitType unitType = FreeCol.getSpecification().getUnitType(pair.getKey());
+        for (Entry<String, Upgrade> entry : upgrades.entrySet()) {
+            if (entry.getValue().canBeTaught()) {
+                UnitType unitType = FreeCol.getSpecification().getUnitType(entry.getKey());
                 if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
                     return unitType;
                 }

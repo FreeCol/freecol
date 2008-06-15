@@ -36,6 +36,7 @@ public class SchoolTest extends FreeColTestCase {
     private UnitType masterBlacksmithType = spec().getUnitType("model.unit.masterBlacksmith");
     private UnitType veteranSoldierType = spec().getUnitType("model.unit.veteranSoldier");
     private UnitType elderStatesmanType = spec().getUnitType("model.unit.elderStatesman");
+    private UnitType colonialRegularType = spec().getUnitType("model.unit.colonialRegular");
 
 
     /**
@@ -991,6 +992,38 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(0, getUnitList(colony, pettyCriminalType).size());
         assertEquals(expertOreMinerType, indenturedServant.getType());
         assertEquals(freeColonistType, criminal.getType());
+    }
+
+    public void testColonialRegular() {
+
+        Colony colony = getStandardColony(10);
+        Player owner = colony.getOwner();
+        owner.setPlayerType(Player.PlayerType.REBEL);
+        owner.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+
+        Iterator<Unit> units = colony.getUnitIterator();
+
+        Unit soldier = units.next();
+        soldier.setType(veteranSoldierType);
+
+        Unit regular = units.next();
+        regular.setType(colonialRegularType);
+
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        school.upgrade();
+        school.upgrade();
+
+        regular.setLocation(school);
+        assertEquals(soldier, regular.getStudent());
+
+        trainForTurns(colony, regular.getNeededTurnsOfTraining());
+        assertEquals(colonialRegularType, soldier.getType());
+
+        regular.setLocation(school);
+        assertNull(regular.getStudent());
+        colony.dispose();
     }
 
 }

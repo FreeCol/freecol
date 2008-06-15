@@ -508,7 +508,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
     }
 
-    private Unit findStudent(final Unit teacher) {
+    public Unit findStudent(final Unit teacher) {
         Unit student = null;
         int skill = Integer.MIN_VALUE;
         for (Unit potentialStudent : getColony().getUnitList()) {
