@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -38,6 +39,7 @@ public class CombatTest extends FreeColTestCase {
     UnitType braveType = spec().getUnitType("model.unit.brave");
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
+    UnitType colonialType = spec().getUnitType("model.unit.colonialRegular");
     UnitType artilleryType = spec().getUnitType("model.unit.artillery");
     UnitType damagedArtilleryType = spec().getUnitType("model.unit.damagedArtillery");
     UnitType colonialRegularType = spec().getUnitType("model.unit.colonialRegular");
@@ -205,6 +207,7 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
     }
+
     public void testAtackedNavalUnitIsDamaged(){
     	Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
@@ -253,4 +256,45 @@ public class CombatTest extends FreeColTestCase {
         errMsg = "Galleon should be empty";
         assertEquals(errMsg,galleon.getGoodsCount(),0);
     }
+
+    public void testUnarmedAttack() {
+
+        Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        dutch.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(french, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        // no default equipment
+        Unit colonial = new Unit(game, tile1, dutch, colonialType, UnitState.ACTIVE, 
+                                 EquipmentType.NO_EQUIPMENT);
+
+        assertEquals(UnitType.DEFAULT_OFFENCE, colonial.getType().getOffence());
+        assertEquals(UnitType.DEFAULT_DEFENCE, colonial.getType().getDefence());
+        assertFalse(colonial.isOffensiveUnit());
+
+        // has default equipment
+        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
+        assertTrue(soldier.isArmed());
+        assertTrue(soldier.isOffensiveUnit());
+
+        assertEquals("Unarmed colonial regular can not attack!",
+                     Unit.MoveType.ILLEGAL_MOVE, colonial.getMoveType(tile2));
+
+
+        combatModel.attack(soldier, colonial, new CombatResult(CombatModel.CombatResultType.WIN, 0), 0);
+        assertEquals(french, colonial.getOwner());
+        assertEquals(tile2, colonial.getTile());
+        assertEquals(colonistType, colonial.getType());
+
+   }
 }

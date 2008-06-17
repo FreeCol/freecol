@@ -264,7 +264,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         hitpoints = unitType.getHitPoints();
 
         for (EquipmentType equipmentType : initialEquipment) {
-            equipment.add(equipmentType);
+            if (EquipmentType.NO_EQUIPMENT.equals(equipmentType)) {
+                equipment.clear();
+                break;
+            } else {
+                equipment.add(equipmentType);
+            }
         }
         setRole();
 
@@ -3031,7 +3036,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         attack other units.
      */
     public boolean isOffensiveUnit() {
-        return unitType.getOffence() > 0 || isArmed() || isMounted();
+        return unitType.getOffence() > UnitType.DEFAULT_OFFENCE || isArmed() || isMounted();
     }
 
     /**
@@ -3055,7 +3060,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         {@link #isOffensiveUnit offensive}.
      */
     public boolean isDefensiveUnit() {
-        return (unitType.getDefence() > 1 || isArmed() || isMounted()) && !isNaval();
+        return (unitType.getDefence() > UnitType.DEFAULT_DEFENCE || isArmed() || isMounted()) && !isNaval();
     }
 
     /**

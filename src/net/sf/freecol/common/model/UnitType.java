@@ -39,6 +39,9 @@ import net.sf.freecol.common.model.Player.PlayerType;
 
 public final class UnitType extends BuildableType {
 
+    public static final int DEFAULT_OFFENCE = 0;
+    public static final int DEFAULT_DEFENCE = 1;
+
     public static enum UpgradeType { EDUCATION, NATIVES, EXPERIENCE,
             LOST_CITY, PROMOTION }
 
@@ -605,8 +608,8 @@ public final class UnitType extends BuildableType {
     public void readFromXML(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         setId(in.getAttributeValue(null, "id"));
-        offence = getAttribute(in, "offence", 0);
-        defence = getAttribute(in, "defence", 1);
+        offence = getAttribute(in, "offence", DEFAULT_OFFENCE);
+        defence = getAttribute(in, "defence", DEFAULT_DEFENCE);
         movement = Integer.parseInt(in.getAttributeValue(null, "movement"));
         lineOfSight = getAttribute(in, "lineOfSight", 1);
         scoreValue = getAttribute(in, "scoreValue", 0);

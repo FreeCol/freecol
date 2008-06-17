@@ -998,7 +998,6 @@ public class SchoolTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(10);
         Player owner = colony.getOwner();
-        owner.setPlayerType(Player.PlayerType.REBEL);
         owner.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
 
         Iterator<Unit> units = colony.getUnitIterator();
