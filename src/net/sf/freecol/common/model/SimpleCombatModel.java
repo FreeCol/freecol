@@ -672,37 +672,38 @@ public class SimpleCombatModel implements CombatModel {
                 for (Unit capturedUnit : colony.getUnitList()) {
                     capturedUnit.setType(attacker.getType());
                 }
-
-                attacker.setLocation(colony.getTile());
-            } else { // Indian:
-                if (colony.getUnitCount() <= 1) {
-                    myPlayer.modifyGold(plunderGold);
-                    enemy.modifyGold(-plunderGold);
-                    myPlayer.addModelMessage(enemy, ModelMessage.MessageType.DEFAULT,
-                                             "model.unit.colonyBurning",
-                                             "%colony%", colony.getName(),
-                                             "%amount%", Integer.toString(plunderGold),
-                                             "%nation%", myPlayer.getNationAsString(),
-                                             "%unit%", attacker.getName());
-                    damageAllShips(colony, attacker);
-                    colony.dispose();
-                } else {
-                    Unit victim = colony.getRandomUnit();
-                    if (victim == null) {
-                        return;
-                    }
-                    myPlayer.addModelMessage(colony, ModelMessage.MessageType.UNIT_LOST,
-                                             "model.unit.colonistSlaughtered",
-                                             "%colony%", colony.getName(),
-                                             "%unit%", victim.getName(),
-                                             "%nation%", myPlayer.getNationAsString(),
-                                             "%enemyUnit%", attacker.getName());
-                    victim.dispose();
-                }
             }
-
+            attacker.setLocation(colony.getTile());
+        } else { // Indian:
+            if (colony.getUnitCount() <= 1) {
+                myPlayer.modifyGold(plunderGold);
+                enemy.modifyGold(-plunderGold);
+                myPlayer.addModelMessage(enemy, ModelMessage.MessageType.DEFAULT,
+                                         "model.unit.colonyBurning",
+                                         "%colony%", colony.getName(),
+                                         "%amount%", Integer.toString(plunderGold),
+                                         "%nation%", myPlayer.getNationAsString(),
+                                         "%unit%", attacker.getName());
+                damageAllShips(colony, attacker);
+                colony.dispose();
+                attacker.setLocation(colony.getTile());
+            } else {
+                Unit victim = colony.getRandomUnit();
+                if (victim == null) {
+                    return;
+                }
+                myPlayer.addModelMessage(colony, ModelMessage.MessageType.UNIT_LOST,
+                                         "model.unit.colonistSlaughtered",
+                                         "%colony%", colony.getName(),
+                                         "%unit%", victim.getName(),
+                                         "%nation%", myPlayer.getNationAsString(),
+                                         "%enemyUnit%", attacker.getName());
+                victim.dispose();
+            }
         }
+
     }
+
 
     /**
      * Damages all ship located on this <code>Colony</code>'s

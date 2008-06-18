@@ -33,7 +33,7 @@ import net.sf.freecol.common.model.Unit.Role;
 
 public class EquipmentType extends BuildableType {
 
-    public static final EquipmentType NO_EQUIPMENT = new EquipmentType();
+    public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
 
     /**
      * The maximum number of equipment items that can be combined.

@@ -47,8 +47,6 @@ public final class UnitType extends BuildableType {
 
     public static enum DowngradeType { CLEAR_SKILL, DEMOTION, CAPTURE }
 
-    public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
-
     /**
      * Describe offence here.
      */
@@ -753,9 +751,9 @@ public final class UnitType extends BuildableType {
             if (hasAbility("model.ability.expertMissionary")) {
                 equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"));
             }
-            return equipment.toArray(NO_EQUIPMENT);
+            return equipment.toArray(EquipmentType.NO_EQUIPMENT);
         } else {
-            return NO_EQUIPMENT;
+            return EquipmentType.NO_EQUIPMENT;
         }
     }
 

@@ -665,7 +665,7 @@ public final class InGameController extends Controller {
         EquipmentType[] soldier = new EquipmentType[] { muskets };
         EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
         for (AbstractUnit unit : units) {
-            EquipmentType[] equipment = UnitType.NO_EQUIPMENT;
+            EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
             switch(unit.getRole()) {
             case SOLDIER:
                 equipment = soldier;

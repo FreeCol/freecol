@@ -29,6 +29,8 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class CombatTest extends FreeColTestCase {
 
+    CombatResult victory = new CombatResult(CombatModel.CombatResultType.WIN, 0);
+    CombatResult defeat = new CombatResult(CombatModel.CombatResultType.LOSS, 0);
 
     TileType plains = spec().getTileType("model.tile.plains");
     TileType hills = spec().getTileType("model.tile.hills");
@@ -291,10 +293,133 @@ public class CombatTest extends FreeColTestCase {
                      Unit.MoveType.ILLEGAL_MOVE, colonial.getMoveType(tile2));
 
 
-        combatModel.attack(soldier, colonial, new CombatResult(CombatModel.CombatResultType.WIN, 0), 0);
+        combatModel.attack(soldier, colonial, victory, 0);
         assertEquals(french, colonial.getOwner());
         assertEquals(tile2, colonial.getTile());
         assertEquals(colonistType, colonial.getType());
 
-   }
+    }
+
+    public void testAttackColonyWithVeteran() {
+
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        Colony colony = getStandardColony(1, 5, 8);
+
+        SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        Unit defender = new Unit(getGame(), colony.getTile(), dutch, veteranType, UnitState.ACTIVE, horses, muskets);
+        Unit attacker = new Unit(getGame(), tile2, french, veteranType, UnitState.ACTIVE, horses, muskets);
+
+        // defender should lose horses
+        combatModel.attack(attacker, defender, victory, 0);
+        assertTrue(attacker.isMounted());
+        assertTrue(attacker.isArmed());
+        assertEquals(veteranType, attacker.getType());
+        assertFalse(defender.isMounted());
+        assertTrue(defender.isArmed());
+        assertEquals(veteranType, defender.getType());
+
+        // attacker should lose horses
+        combatModel.attack(attacker, defender, defeat, 0);
+        assertFalse(attacker.isMounted());
+        assertTrue(attacker.isArmed());
+        assertEquals(veteranType, attacker.getType());
+        assertFalse(defender.isMounted());
+        assertTrue(defender.isArmed());
+        assertEquals(veteranType, defender.getType());
+
+        // defender should lose muskets
+        combatModel.attack(attacker, defender, victory, 0);
+        assertFalse(attacker.isMounted());
+        assertTrue(attacker.isArmed());
+        assertEquals(veteranType, attacker.getType());
+        assertFalse(defender.isMounted());
+        assertFalse(defender.isArmed());
+        assertEquals(veteranType, defender.getType());
+        // this should force DONE_SETTLEMENT
+        assertFalse(defender.isDefensiveUnit());
+
+        combatModel.captureColony(attacker, colony, 0);
+        assertFalse(attacker.isMounted());
+        assertTrue(attacker.isArmed());
+        assertEquals(veteranType, attacker.getType());
+        assertFalse(defender.isMounted());
+        assertFalse(defender.isArmed());
+        assertEquals(colonistType, defender.getType());
+        assertEquals(colony.getTile(), attacker.getTile());
+        assertEquals(colony.getTile(), defender.getTile());
+    }
+
+    public void testAttackColonyWithBrave() {
+
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        Colony colony = getStandardColony(1, 5, 8);
+
+        SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player inca = game.getPlayer("model.nation.inca");
+
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(inca, true);
+
+        Unit colonist = colony.getUnitIterator().next();
+        Unit defender = new Unit(getGame(), colony.getTile(), dutch, veteranType, UnitState.ACTIVE, horses, muskets);
+        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, horses, muskets);
+
+        // defender should lose horses
+        combatModel.attack(attacker, defender, victory, 0);
+        assertEquals(1, colony.getUnitCount());
+        assertTrue(attacker.isMounted());
+        assertTrue(attacker.isArmed());
+        assertEquals(braveType, attacker.getType());
+        assertFalse(defender.isMounted());
+        assertTrue(defender.isArmed());
+        assertEquals(veteranType, defender.getType());
+        assertTrue(defender.isDefensiveUnit());
+
+        // attacker should lose horses
+        combatModel.attack(attacker, defender, defeat, 0);
+        assertEquals(1, colony.getUnitCount());
+        assertFalse(attacker.isMounted());
+        assertTrue(attacker.isArmed());
+        assertEquals(braveType, attacker.getType());
+        assertFalse(defender.isMounted());
+        assertTrue(defender.isArmed());
+        assertEquals(veteranType, defender.getType());
+        assertTrue(defender.isDefensiveUnit());
+
+        // defender should lose muskets
+        combatModel.attack(attacker, defender, victory, 0);
+        assertEquals(1, colony.getUnitCount());
+        assertFalse(attacker.isMounted());
+        assertTrue(attacker.isArmed());
+        assertEquals(braveType, attacker.getType());
+        assertFalse(defender.isMounted());
+        assertFalse(defender.isArmed());
+        assertEquals(veteranType, defender.getType());
+        // this should force DONE_SETTLEMENT
+        assertFalse(defender.isDefensiveUnit());
+
+        // colony should be destroyed
+        combatModel.captureColony(attacker, colony, 0);
+        assertFalse(attacker.isMounted());
+        assertTrue(attacker.isArmed());
+        assertEquals(braveType, attacker.getType());
+        assertFalse(defender.isDisposed());
+        assertTrue(colonist.isDisposed());
+        assertTrue(colony.isDisposed());
+        assertEquals(colony.getTile(), attacker.getTile());
+
+    }
+
+
 }

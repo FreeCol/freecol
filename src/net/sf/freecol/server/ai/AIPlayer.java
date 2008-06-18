@@ -537,7 +537,7 @@ public class AIPlayer extends AIObject {
                 player.getPlayerType() == PlayerType.REBEL &&
                 player.getMonarch() != null) {
                 for (AbstractUnit unit : player.getMonarch().getREF()) {
-                    EquipmentType[] equipment = UnitType.NO_EQUIPMENT;
+                    EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
                     switch(unit.getRole()) {
                     case SOLDIER:
                         equipment = new EquipmentType[] { muskets };
