@@ -139,7 +139,8 @@
     </target>
 
     <target name="manifest" description="Creates the Manifest file.">
-      <exec executable="svn" output="${basedir}/build/svn.properties">
+      <exec executable="svn" failifexecutionfails="false"
+            output="${basedir}/build/svn.properties">
         <arg value="info"/>
         <arg value="."/>
       </exec>
