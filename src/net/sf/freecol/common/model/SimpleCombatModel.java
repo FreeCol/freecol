@@ -644,8 +644,20 @@ public class SimpleCombatModel implements CombatModel {
             myPlayer.modifyGold(plunderGold);
             enemy.modifyGold(-plunderGold);
 
-            colony.setOwner(myPlayer); // This also changes over all of the
-            // units...
+            // This also changes over all of the units...
+            colony.setOwner(myPlayer);
+            // However, not all units might be available
+            for (Unit capturedUnit : colony.getUnitList()) {
+                if (!capturedUnit.getType().isAvailableTo(myPlayer)) {
+                    UnitType downgrade = capturedUnit.getType().getDowngrade(DowngradeType.CAPTURE);
+                    if (downgrade != null && downgrade.isAvailableTo(myPlayer)) {
+                        capturedUnit.setType(downgrade);
+                    } else {
+                        capturedUnit.dispose();
+                    }
+                }
+            }                    
+
             myPlayer.addModelMessage(colony, ModelMessage.MessageType.DEFAULT,
                                      "model.unit.colonyCaptured", 
                                      "%colony%", colony.getName(),

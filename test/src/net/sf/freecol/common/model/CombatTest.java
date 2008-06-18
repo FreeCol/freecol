@@ -308,12 +308,16 @@ public class CombatTest extends FreeColTestCase {
 
         SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
         Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.french");
+        Player french = game.getPlayer("model.nation.frenchREF");
+
+        assertTrue(french.isREF());
 
         Tile tile2 = map.getTile(4, 8);
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
+        Unit colonist = colony.getUnitIterator().next();
+        colonist.setType(colonialType);
         Unit defender = new Unit(getGame(), colony.getTile(), dutch, veteranType, UnitState.ACTIVE, horses, muskets);
         Unit attacker = new Unit(getGame(), tile2, french, veteranType, UnitState.ACTIVE, horses, muskets);
 
@@ -355,6 +359,10 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(colonistType, defender.getType());
         assertEquals(colony.getTile(), attacker.getTile());
         assertEquals(colony.getTile(), defender.getTile());
+
+        assertEquals(attacker.getOwner(), colony.getOwner());
+        assertEquals(colonist.getType(), colonistType);
+
     }
 
     public void testAttackColonyWithBrave() {
