@@ -540,7 +540,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @see Unit#getMoveCost
      */
     public int getMoveCost(Tile fromTile) {
-        if (tileItemContainer == null) {
+        // TODO: find more elegant way to deny river movement bonus to
+        // ships
+        if (!isLand() || tileItemContainer == null) {
             return getType().getBasicMoveCost();
         } else {
             return tileItemContainer.getMoveCost(getType().getBasicMoveCost(), fromTile);
