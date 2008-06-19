@@ -365,6 +365,10 @@ public class SimpleCombatModel implements CombatModel {
                 result.add(new Modifier(Modifier.DEFENCE, 
                                         autoDefence.iterator().next().getSource(),
                                         1, Modifier.Type.ADDITIVE));
+                defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT, defender,
+                                         "model.unit.automaticDefence",
+                                         "%unit%", defender.getName(),
+                                         "%colony%", defender.getColony().getName());
             }
 
             for (EquipmentType equipment : defender.getEquipment()) {
