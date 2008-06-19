@@ -1087,7 +1087,7 @@ public class SimpleCombatModel implements CombatModel {
         String nation = unit.getOwner().getNationAsString();
         UnitType newType = unit.getType().getPromotion();
         
-        if (newType != null) {
+        if (newType != null && newType.isAvailableTo(unit.getOwner())) {
             unit.setType(newType);
             if (unit.getType().equals(newType)) {
                 // the new unit type was successfully applied
