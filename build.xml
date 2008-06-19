@@ -114,22 +114,10 @@
         <native2ascii src="${freecol.src.dir}/net/sf/freecol/client/gui/i18n" dest="${freecol.data.dir}/strings"
                     encoding="UTF-8" 
                     includes="*.properties" 
-                    excludes="*_br.properties
-                              *_de.properties
-                              *_hu.properties
-                              *_nl_BE.properties
-                              *_pt_BR.properties
-                              *_pt_PT.properties
-                              *_sv_SE.properties"/>
+                    excludes=""/>
         <native2ascii src="${freecol.src.dir}/net/sf/freecol/client/gui/i18n" dest="${freecol.data.dir}/strings"
                     encoding="ISO-8859-1"
-                    includes="*_br.properties
-                              *_de.properties
-                              *_hu.properties
-                              *_nl_BE.properties
-                              *_pt_BR.properties
-                              *_pt_PT.properties
-                              *_sv_SE.properties"/>
+                    includes=""/>
     </target>
 
     <target name="build" depends="init,compile,reencode_messages" description="Compiles the source files.">
