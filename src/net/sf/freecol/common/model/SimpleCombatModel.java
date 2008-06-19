@@ -510,6 +510,7 @@ public class SimpleCombatModel implements CombatModel {
             } else {
                 throw new IllegalStateException("Unknown type of settlement.");
             }
+            promote(attacker);
             break;
         case WIN:
             if (attacker.isNaval()) {
