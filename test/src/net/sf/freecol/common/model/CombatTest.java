@@ -325,6 +325,7 @@ public class CombatTest extends FreeColTestCase {
         Unit attacker = new Unit(getGame(), tile2, french, veteranType, UnitState.ACTIVE, horses, muskets);
 
         // defender should lose horses
+        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
         combatModel.attack(attacker, defender, victory, 0);
         assertTrue(attacker.isMounted());
         assertTrue(attacker.isArmed());
@@ -334,6 +335,7 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(veteranType, defender.getType());
 
         // attacker should lose horses
+        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
         combatModel.attack(attacker, defender, defeat, 0);
         assertFalse(attacker.isMounted());
         assertTrue(attacker.isArmed());
@@ -343,6 +345,7 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(veteranType, defender.getType());
 
         // defender should lose muskets
+        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
         combatModel.attack(attacker, defender, victory, 0);
         assertFalse(attacker.isMounted());
         assertTrue(attacker.isArmed());
@@ -387,6 +390,7 @@ public class CombatTest extends FreeColTestCase {
         Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, horses, muskets);
 
         // defender should lose horses
+        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
         combatModel.attack(attacker, defender, victory, 0);
         assertEquals(1, colony.getUnitCount());
         assertTrue(attacker.isMounted());
@@ -398,6 +402,7 @@ public class CombatTest extends FreeColTestCase {
         assertTrue(defender.isDefensiveUnit());
 
         // attacker should lose horses
+        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
         combatModel.attack(attacker, defender, defeat, 0);
         assertEquals(1, colony.getUnitCount());
         assertFalse(attacker.isMounted());
@@ -409,6 +414,7 @@ public class CombatTest extends FreeColTestCase {
         assertTrue(defender.isDefensiveUnit());
 
         // defender should lose muskets
+        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
         combatModel.attack(attacker, defender, victory, 0);
         assertEquals(1, colony.getUnitCount());
         assertFalse(attacker.isMounted());
@@ -453,6 +459,7 @@ public class CombatTest extends FreeColTestCase {
         Unit attacker = new Unit(getGame(), tile2, french, veteranType, UnitState.ACTIVE, horses, muskets);
 
         assertTrue(defender.isDefensiveUnit());
+        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
 
         // defender should lose horses
         combatModel.attack(attacker, defender, victory, 0);

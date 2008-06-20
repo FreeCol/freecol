@@ -511,18 +511,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
 
-        // Then, find the strongest defender working in a settlement, if any
-        Unit settlementDefender = null;
-        if (getSettlement() != null) {
-            settlementDefender = settlement.getDefendingUnit(attacker);
+        if ((tileDefender == null || !tileDefender.isDefensiveUnit()) &&
+            getSettlement() != null) {
+            // Then, find the strongest defender working in a settlement, if any
+            Unit settlementDefender = settlement.getDefendingUnit(attacker);
+            // return the strongest of these two units
+            if (settlementDefender != null && 
+                getGame().getCombatModel().getDefencePower(attacker, settlementDefender) > defencePower) {
+                return settlementDefender;
+            }
         }
-        // return the strongest of these two units
-        if (settlementDefender != null && 
-            getGame().getCombatModel().getDefencePower(attacker, settlementDefender) > defencePower) {
-            return settlementDefender;
-        } else {
-            return tileDefender;
-        }
+        return tileDefender;
     }
 
     /**
