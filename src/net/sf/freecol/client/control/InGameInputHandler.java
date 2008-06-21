@@ -1084,7 +1084,7 @@ public final class InGameInputHandler extends InputHandler {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             for (int i = 0; i < emigrants; i++) {
-                                int slot = getFreeColClient().getCanvas().showEmigrationPanel();
+                                int slot = getFreeColClient().getCanvas().showEmigrationPanel(true);
                                 Element selectElement = Message.createNewRootElement("selectFromFountainYouth");
                                 selectElement.setAttribute("slot", Integer.toString(slot));
                                 Element reply = freeColClient.getClient().ask(selectElement);

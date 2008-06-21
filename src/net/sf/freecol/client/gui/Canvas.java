@@ -1763,8 +1763,20 @@ public final class Canvas extends JDesktopPane {
      * @return The emigrant that was chosen by the user.
      */
     public int showEmigrationPanel() {
+        return showEmigrationPanel(false);
+    }
+
+    /**
+     * Shows the panel that allows the user to choose which unit will emigrate
+     * from Europe. This method may only be called if the user has William
+     * Brewster in congress.
+     * 
+     * @param fountainOfYouth a <code>boolean</code> value
+     * @return The emigrant that was chosen by the user.
+     */
+    public int showEmigrationPanel(boolean fountainOfYouth) {
         EmigrationPanel emigrationPanel = new EmigrationPanel(this);
-        emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope());
+        emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope(), fountainOfYouth);
 
         addAsFrame(emigrationPanel);
         emigrationPanel.requestFocus();

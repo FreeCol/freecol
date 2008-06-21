@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -45,7 +45,7 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
 
     private static final JButton[] person = new JButton[NUMBER_OF_PERSONS];
 
-    private static final JLabel question = new JLabel(Messages.message("chooseImmigrant"));
+    private JTextArea question = getDefaultTextArea(Messages.message("chooseImmigrant"));
 
 
     /**
@@ -71,8 +71,13 @@ public final class EmigrationPanel extends FreeColDialog implements ActionListen
      * 
      * @param europe The Europe Object where we can find the units that are
      *            prepared to emigrate.
+     * @param fountainOfYouth a <code>boolean</code> value
      */
-    public void initialize(Europe europe) {
+    public void initialize(Europe europe, boolean fountainOfYouth) {
+
+        if (fountainOfYouth) {
+            question.insert(Messages.message("lostCityRumour.FountainOfYouth") + "\n\n", 0);
+        }
 
         ImageLibrary library = getCanvas().getGUI().getImageLibrary();
 
