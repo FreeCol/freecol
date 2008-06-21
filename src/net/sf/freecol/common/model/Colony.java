@@ -1508,11 +1508,17 @@ public final class Colony extends Settlement implements Location, Nameable {
         } else {
             // something is preventing construction
             BuildableType currentlyBuilding = getCurrentlyBuilding();
-            if (currentlyBuilding == null || currentlyBuilding == BuildableType.NOTHING) {
-                // production idle
-                addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
-                        "model.colony.cannotBuild", 
-                        "%colony%", getName());
+            if ((currentlyBuilding == null || currentlyBuilding == BuildableType.NOTHING)) {
+                for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+                    if (goodsType.isBuildingMaterial() &&
+                        !goodsType.isStorable() &&
+                        getProductionOf(goodsType) > 0) {
+                        // production idle
+                        addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
+                                        "model.colony.cannotBuild", 
+                                        "%colony%", getName());
+                    }
+                }
             } else if (currentlyBuilding.getPopulationRequired() > getUnitCount()) {
                 // not enough units
                 addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
