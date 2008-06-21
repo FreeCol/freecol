@@ -57,6 +57,19 @@ public class ChoiceItem {
 
 
     /**
+     * Creates a new <code>ChoiceItem</code> with the
+     * given object.
+     *
+     * @param object The <code>Object</code> contained by this
+     *        choice.
+     */
+    public ChoiceItem(Object object) {
+        this.text = object.toString();
+        this.object = object;
+    }
+
+
+    /**
      * Gets the <code>Object</code> contained by this choice.
      * @return The <code>Object</code>.
      */

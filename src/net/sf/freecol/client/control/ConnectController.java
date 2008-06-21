@@ -41,6 +41,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
@@ -197,11 +198,12 @@ public final class ConnectController {
 
         List<String> vacantPlayers = getVacantPlayers(host, port);
         if (vacantPlayers != null) {
-            Object choice = canvas.showChoiceDialog(Messages.message("connectController.choicePlayer"),
-                                                    Messages.message("cancel"),
-                                                    vacantPlayers.iterator());
+            ChoiceItem choice = (ChoiceItem) canvas
+                .showChoiceDialog(Messages.message("connectController.choicePlayer"),
+                                  Messages.message("cancel"),
+                                  vacantPlayers.iterator());
             if (choice != null) {
-                username = (String) choice;
+                username = (String) choice.getObject();
             } else {
                 return;
             }

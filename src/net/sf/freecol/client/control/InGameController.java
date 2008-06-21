@@ -1361,12 +1361,16 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Goods goods = (Goods) canvas.showChoiceDialog(Messages.message("tradeProposition.text"),
-                                                      Messages.message("tradeProposition.cancel"),
-                                                      unit.getGoodsIterator());
-        if (goods == null) { // == Trade aborted by the player.
+        ChoiceItem choice = (ChoiceItem) canvas
+            .showChoiceDialog(Messages.message("tradeProposition.text"),
+                              Messages.message("tradeProposition.cancel"),
+                              unit.getGoodsIterator());
+
+        if (choice == null) { // == Trade aborted by the player.
             return;
         }
+
+        Goods goods = (Goods) choice.getObject();
 
         Element tradePropositionElement = Message.createNewRootElement("tradeProposition");
         tradePropositionElement.setAttribute("unit", unit.getId());
@@ -1460,9 +1464,12 @@ public final class InGameController implements NetworkConstants {
             for (int i = 0; i < childNodes.getLength(); i++) {
                 goodsOffered.add(new Goods(freeColClient.getGame(), (Element) childNodes.item(i)));
             }
-            Goods goodsToBuy = (Goods) freeColClient.getCanvas().showChoiceDialog(Messages.message("buyProposition.text"),
-                    Messages.message("buyProposition.cancel"), goodsOffered.iterator());
-            if (goodsToBuy != null) {
+            ChoiceItem choice = (ChoiceItem) freeColClient.getCanvas()
+                .showChoiceDialog(Messages.message("buyProposition.text"),
+                                  Messages.message("buyProposition.cancel"),
+                                  goodsOffered.iterator());
+            if (choice != null) {
+                Goods goodsToBuy = (Goods) choice.getObject();
                 buyFromSettlement(unit, goodsToBuy);
             }
         }
@@ -2076,11 +2083,14 @@ public final class InGameController implements NetworkConstants {
             } else if (choices.size() == 0) {
                 throw new IllegalStateException();
             } else {
-                destinationUnit = (Unit) canvas.showChoiceDialog(Messages.message("embark.text"), Messages
-                        .message("embark.cancel"), choices.iterator());
-                if (destinationUnit == null) { // == user cancelled
+                ChoiceItem choice = (ChoiceItem) canvas
+                    .showChoiceDialog(Messages.message("embark.text"),
+                                      Messages.message("embark.cancel"),
+                                      choices.iterator());
+                if (choice == null) { // == user cancelled
                     return;
                 }
+                destinationUnit = (Unit) choice.getObject();
             }
         }
 

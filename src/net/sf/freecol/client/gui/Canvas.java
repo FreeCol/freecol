@@ -1385,10 +1385,8 @@ public final class Canvas extends JDesktopPane {
      */
     public Object showChoiceDialog(String text, String cancelText, Iterator<?> iterator) {
         ArrayList<ChoiceItem> a = new ArrayList<ChoiceItem>();
-        int counter = 0;
         while (iterator.hasNext()) {
-            a.add(new ChoiceItem(iterator.next().toString(), counter));
-            counter++;
+            a.add(new ChoiceItem(iterator.next()));
         }
 
         return showChoiceDialog(text, cancelText, a.toArray(new ChoiceItem[0]));
