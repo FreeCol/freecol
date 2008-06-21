@@ -72,6 +72,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
@@ -83,6 +84,8 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
+
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -159,7 +162,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
     private JButton exitButton = new JButton(Messages.message("close"));
 
-    private JButton buyBuilding = new JButton(Messages.message("buyBuilding"));
+    private JButton buyBuilding = new JButton(Messages.message("colonyPanel.buyBuilding"));
 
     private JButton unloadButton = new JButton(Messages.message("unload"));
 
@@ -689,6 +692,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             //    - the building isn't finished,
             //    - the player has enough money
             int price = getColony().getPriceForBuilding();
+            if (getColony().getCurrentlyBuilding() instanceof BuildingType) {
+                buyBuilding.setText(Messages.message("colonyPanel.buyBuilding"));
+            } else if (getColony().getCurrentlyBuilding() instanceof UnitType) {
+                buyBuilding.setText(Messages.message("colonyPanel.buyUnit"));
+            }
             buyBuilding.setEnabled(isEditable() && price > 0 &&
                                    price <= freeColClient.getMyPlayer().getGold());
         }
