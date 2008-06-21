@@ -37,10 +37,16 @@
     <goods-type id="model.goods.furs" art="goods/furs.png" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
+    <goods-type id="model.goods.coffee" art="goods/coffee.png" is-farmed="true" new-world-goods="true">
+      <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
+    </goods-type>
     <goods-type id="model.goods.lumber" art="goods/lumber.png" is-farmed="true">
       <market initial-amount="3000"  initial-price="1"  price-difference="5"/>
     </goods-type>
     <goods-type id="model.goods.ore" art="goods/ore.png" is-farmed="true">
+      <market initial-amount="2000"  initial-price="4"  price-difference="3"/>
+    </goods-type>
+    <goods-type id="model.goods.hemp" art="goods/ore.hemp" is-farmed="true">
       <market initial-amount="2000"  initial-price="4"  price-difference="3"/>
     </goods-type>
     <goods-type id="model.goods.silver" art="goods/silver.png" is-farmed="true">
@@ -61,6 +67,9 @@
     </goods-type>
     <goods-type id="model.goods.coats" art="goods/coats.png" is-farmed="false" made-from="model.goods.furs">
       <market initial-amount="1000"  initial-price="10" price-difference="2"/>
+    </goods-type>
+    <goods-type id="model.goods.cordage" art="goods/cordage.png" is-farmed="false" made-from="model.goods.hemp">
+      <market initial-amount="1000"   initial-price="10"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.tradeGoods" art="goods/tradeGoods.png" is-farmed="false" trade-goods="true">
       <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
@@ -171,6 +180,7 @@
       <gen humidityMin="25" humidityMax="70" temperatureMin="10" temperatureMax="25" altitudeMin="1" altitudeMax="1"/>
       <production goods-type="model.goods.food"       value="3"/>
       <production goods-type="model.goods.tobacco"    value="3"/>
+      <production goods-type="model.goods.hemp"       value="2"/>
       <resource   type="model.resource.Tobacco"       probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.prairie"           basic-move-cost="3" basic-work-turns="3"
@@ -197,6 +207,7 @@
       <production goods-type="model.goods.food"       value="3"/>
       <production goods-type="model.goods.tobacco"    value="2"/>
       <production goods-type="model.goods.ore"        value="2"/>
+      <production goods-type="model.goods.hemp"       value="2"/>
       <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
     <tile-type    id="model.tile.swamp"             basic-move-cost="6" basic-work-turns="7"
@@ -599,6 +610,24 @@
       <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.sugar" type="multiplicative" value="2"/>
     </unit-type>
+    <unit-type id="model.unit.masterHempPlanter" art="masterHempPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="2"  expert-production="model.goods.hemp"
+               scoreValue="5" pathImage="foot">
+      <downgrade unit="model.unit.freeColonist"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
+      <modifier id="model.goods.hemp" type="multiplicative" value="2"/>
+    </unit-type>
+    <unit-type id="model.unit.masterCoffeePlanter" art="masterCoffeePlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
+               skill="2"  expert-production="model.goods.coffee"
+               scoreValue="5" pathImage="foot">
+      <downgrade unit="model.unit.freeColonist"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
+      <modifier id="model.goods.coffee" type="multiplicative" value="2"/>
+    </unit-type>
     <unit-type id="model.unit.masterCottonPlanter" art="masterCottonPlanter" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="2"  expert-production="model.goods.cotton"
                scoreValue="5" pathImage="foot">
@@ -653,6 +682,15 @@
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <modifier id="model.goods.rum" type="multiplicative" value="2"/>
+    </unit-type>
+    <unit-type id="model.unit.masterCordageMaker" art="masterCordageMaker" offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
+               skill="2" recruitProbability="1" expert-production="model.goods.rum"
+               scoreValue="5" pathImage="foot">
+      <downgrade unit="model.unit.freeColonist"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="true"/>
+      <modifier id="model.goods.cordage" type="multiplicative" value="2"/>
     </unit-type>
     <unit-type id="model.unit.masterWeaver" art="masterWeaver" offence="0"  defence="1" movement="3" lineOfSight="1" price="1300" 
                skill="2" recruitProbability="1" expert-production="model.goods.cloth"
@@ -835,6 +873,8 @@
                spaceTaken="24" hitPoints="6" price="1000" pathImage="naval" scoreValue="3">
       <required-goods id="model.goods.hammers" value="128"/>
       <required-goods id="model.goods.tools" value="40"/>
+      <required-goods id="model.goods.cloth" value="20"/>
+      <required-goods id="model.goods.cordage" value="20"/>
       <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
@@ -844,6 +884,8 @@
                spaceTaken="32" hitPoints="6" price="5000" pathImage="naval" scoreValue="6">
       <required-goods id="model.goods.hammers" value="512"/>
       <required-goods id="model.goods.tools" value="200"/>
+      <required-goods id="model.goods.cloth" value="40"/>
+      <required-goods id="model.goods.cordage" value="40"/>
       <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
@@ -854,6 +896,8 @@
                spaceTaken="64" hitPoints="6" price="3000" pathImage="naval" scoreValue="5">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="100"/>
+      <required-goods id="model.goods.cloth" value="60"/>
+      <required-goods id="model.goods.cordage" value="60"/>
       <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
@@ -863,6 +907,8 @@
                spaceTaken="64" hitPoints="6" pathImage="naval" scoreValue="8">
       <required-goods id="model.goods.hammers" value="1024"/>
       <required-goods id="model.goods.tools" value="300"/>
+      <required-goods id="model.goods.cloth" value="60"/>
+      <required-goods id="model.goods.cordage" value="60"/>
       <required-ability id="model.ability.buildShips"/>
       <required-ability id="model.ability.independenceDeclared"/>
       <ability id="model.ability.refUnit" value="true"/>
@@ -875,6 +921,8 @@
                spaceTaken="32" hitPoints="6" price="2000" pathImage="naval" scoreValue="4">
       <required-goods id="model.goods.hammers" value="192"/>
       <required-goods id="model.goods.tools" value="80"/>
+      <required-goods id="model.goods.cloth" value="40"/>
+      <required-goods id="model.goods.cordage" value="40"/>
       <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
@@ -884,6 +932,8 @@
                spaceTaken="24" hitPoints="6" price="2000" pathImage="naval" scoreValue="4">
       <required-goods id="model.goods.hammers" value="256"/>
       <required-goods id="model.goods.tools" value="120"/>
+      <required-goods id="model.goods.cloth" value="20"/>
+      <required-goods id="model.goods.cordage" value="20"/>
       <required-ability id="model.ability.buildShips"/>
       <ability id="model.ability.navalUnit" value="true"/>
       <ability id="model.ability.carryGoods" value="true"/>
@@ -911,10 +961,12 @@
       <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <unit-type id="model.unit.wagonTrain" art="wagonTrain" offence="0"  defence="1" movement="6"
-               scoreValue="1" lineOfSight="1" spaceTaken="12" space="2"
+               scoreValue="1" lineOfSight="1" spaceTaken="3" space="2"
                pathImage="wagon">
       <required-goods id="model.goods.hammers" value="40"/>
+      <required-goods id="model.goods.cloth" value="10"/>
       <ability id="model.ability.carryGoods" value="true"/>
+      <ability id="model.ability.carryUnits" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <!--<unit-type id="model.unit.milkmaid" art="milkmaid" offence="0"  defence="1" movement="3"  lineOfSight="1"-->
@@ -949,6 +1001,22 @@
                    produces="model.goods.bells" sequence="1">
       <modifier id="model.goods.bells" type="additive" value="1"/>
     </building-type>
+    <building-type id="model.building.CityHall" basicProduction="6" workplaces="3"
+                   produces="model.goods.bells" upgradesFrom="model.building.TownHall" sequence="1">
+      <modifier id="model.goods.bells" type="additive" value="1"/>
+      <modifier id="model.goods.bells" type="percentage" value="25"/>
+      <required-goods id="model.goods.hammers" value="120"/>
+      <required-goods id="model.goods.tools" value="48"/>
+      <required-population value="6"/>
+    </building-type>
+    <building-type id="model.building.Capitol" basicProduction="6" workplaces="3"
+                   produces="model.goods.bells" upgradesFrom="model.building.CityHall" sequence="1">
+      <modifier id="model.goods.bells" type="additive" value="1"/>
+      <modifier id="model.goods.bells" type="percentage" value="50"/>
+      <required-goods id="model.goods.hammers" value="240"/>
+      <required-goods id="model.goods.tools" value="72"/>
+      <required-population value="9"/>
+    </building-type>
     <building-type id="model.building.CarpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
     </building-type>
     <building-type id="model.building.LumberMill"     basicProduction="6" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" upgradesFrom="model.building.CarpenterHouse" sequence="2">
@@ -981,6 +1049,20 @@
       <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.cigars" type="percentage" value="50"/>
+      <ability id="model.ability.expertsUseConnections" value="true"/>
+    </building-type>
+    <building-type id="model.building.CordageMakerHouse" basicProduction="3" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cordage" sequence="4">
+    </building-type>
+    <building-type id="model.building.CordageMakerShop"  basicProduction="6" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cordage" upgradesFrom="model.building.CordageMakerHouse" sequence="4">
+      <required-goods id="model.goods.hammers" value="64"/>
+      <required-goods id="model.goods.tools" value="20"/>
+    </building-type>
+    <building-type id="model.building.CordageFactory"     basicProduction="6" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cordage" upgradesFrom="model.building.CordageMakerShop" sequence="4">
+      <required-goods id="model.goods.hammers" value="160"/>
+      <required-goods id="model.goods.tools" value="100"/>
+      <required-population value="8"/>
+      <required-ability id="model.ability.buildFactory"/>
+      <modifier id="model.goods.cordage" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
     <building-type id="model.building.WeaverHouse" basicProduction="3" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" sequence="5">
@@ -1136,17 +1218,6 @@
       <ability id="model.ability.repairShips" value="true"/>
       <ability id="model.ability.buildShips" value="true"/>
     </building-type>
-    <building-type id="model.building.PrintingPress" workplaces="0" sequence="16">
-      <required-goods id="model.goods.hammers" value="52"/>
-      <required-goods id="model.goods.tools" value="20"/>
-      <modifier id="model.goods.bells" type="percentage" value="50"/>
-    </building-type>
-    <building-type id="model.building.Newspaper" workplaces="0" upgradesFrom="model.building.PrintingPress" sequence="16">
-      <required-goods id="model.goods.hammers" value="120"/>
-      <required-goods id="model.goods.tools" value="50"/>
-      <required-population value="4"/>
-      <modifier id="model.goods.bells" type="percentage" value="100"/>
-    </building-type>
     <building-type id="model.building.CustomHouse" workplaces="0" sequence="17">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
@@ -1165,10 +1236,15 @@
   <founding-fathers>
     <founding-father id="model.foundingFather.adamSmith" type="trade"
                      weight1="2" weight2="8" weight3="6">
+      <modifier id="model.ability.food" type="additive" value="2"/>
+    </founding-father>
+    <founding-father id="model.foundingFather.johnnyAppleseed" type="trade"
+                     weight1="2" weight2="8" weight3="6">
       <ability id="model.ability.buildFactory" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.jacobFugger" type="trade"
                      weight1="0" weight2="5" weight3="8">
+      <nation-type id="model.nationType.trade"/>
       <event id="model.event.boycottsLifted"/>
     </founding-father>
     <founding-father id="model.foundingFather.peterMinuit" type="trade"
@@ -1184,6 +1260,7 @@
                      weight1="2" weight2="6" weight3="10">
       <ability id="model.ability.tradeWithForeignColonies" value="true"/>
       <ability id="model.ability.betterForeignAffairsReport" value="true"/>
+      <nation-type id="model.nationType.trade"/>
     </founding-father>
     <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"
                      weight1="2" weight2="10" weight3="10">
@@ -1220,6 +1297,7 @@
                      weight1="6" weight2="5" weight3="1">
       <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="100"/>
       <modifier id="model.modifier.treasureTransportFee" type="percentage" value="-100"/>
+      <nation id="model.nation.spanish"/>
     </founding-father>
     <founding-father id="model.foundingFather.georgeWashington" type="military"
                      weight1="0" weight2="4" weight3="10">
@@ -1286,6 +1364,7 @@
     <founding-father id="model.foundingFather.juanDeSepulveda" type="religious"
                      weight1="3" weight2="8" weight3="3">
       <modifier id="model.ability.nativeConvertBonus" type="percentage" value="20"/>
+      <nation id="model.nation.spanish"/>
     </founding-father>
     <founding-father id="model.foundingFather.bartolomeDeLasCasas" type="religious"
                      weight1="0" weight2="5" weight3="10">

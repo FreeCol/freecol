@@ -1354,15 +1354,6 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
-    <european-nation-type id="model.nationType.building">
-      <modifier id="model.goods.lumber" type="additive" value="2"/>
-      <modifier id="model.goods.hammers" type="additive" value="2"/>
-      <unit id="model.unit.expertLumberJack" role="pioneer"/>
-      <unit id="model.unit.masterCarpenter" role="soldier"/>
-      <unit id="model.unit.caravel"/>
-      <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.electFoundingFather"/>
-    </european-nation-type>
 
     <indian-nation-type id="model.nationType.apache" number-of-settlements="average"
                         aggression="high" type-of-settlement="indian_camp">
@@ -1452,7 +1443,7 @@
             nation-type="model.nationType.naval" selectable="true"
             monarch-art="william.png" coat-of-arms="dutch.png"/>
     <nation id="model.nation.swedish" color="#ff00ff"
-            nation-type="model.nationType.building" selectable="true"
+            nation-type="model.nationType.cooperation" selectable="true"
             monarch-art="louis.png" coat-of-arms="french.png"/>
     <nation id="model.nation.danish" color="#00ffff"
             nation-type="model.nationType.trade" selectable="true"
@@ -1623,7 +1614,7 @@
     </optionGroup>
     <optionGroup id="gameOptions.colony">
       <!-- Does the Custom House sell boycotted goods -->
-      <booleanOption id="model.option.customIgnoreBoycott" defaultValue="false"/>
+      <booleanOption id="model.option.customIgnoreBoycott" defaultValue="true"/>
       <!-- Whether experts have connections, producing without raw materials in factories -->
       <booleanOption id="model.option.expertsHaveConnections" defaultValue="false"/>
       <booleanOption id="model.option.saveProductionOverflow" defaultValue="false"/>
@@ -1631,7 +1622,7 @@
     <optionGroup id="gameOptions.victoryConditions">
       <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
       <booleanOption id="model.option.victoryDefeatREF" defaultValue="true"/>
-      <!-- Victory condition: Should a player who first defeats all * other european players win the game? -->
+      <!-- Victory condition: Should a player who first defeats all other european players win the game? -->
       <booleanOption id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
       <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
       <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>
