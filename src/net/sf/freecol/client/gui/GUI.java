@@ -1644,7 +1644,8 @@ public final class GUI {
                     continue;
                 }
 
-                if (tile.getType() == borderingTile.getType() || !borderingTile.isLand()){
+                if (tile.getType() == borderingTile.getType() ||
+                    (tile.isLand() && !borderingTile.isLand())) {
                     // Equal tiles and sea tiles have no effect
                     continue;
                 }
