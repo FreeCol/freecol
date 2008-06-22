@@ -509,6 +509,8 @@ public class TransportMission extends Mission {
                     if (newUnit.getUnit().isColonist() && !newUnit.getUnit().isArmed()
                         && !newUnit.getUnit().isMounted() && newUnit.getUnit().getRole() != Role.PIONEER) {
                         newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
+                        // FIXME: a BuildColonyMission with no target location causes NPE problems later on
+                        // We should perhaps assign the target location here?
                     }
                     addToTransportList(newUnit);
                     space--;
@@ -1194,6 +1196,22 @@ public class TransportMission extends Mission {
      */
     public static String getXMLElementTagName() {
         return "transportMission";
+    }
+    
+    /**
+     * Gets debugging information about this mission. This string is a short
+     * representation of this object's state.
+     * 
+     * @return The <code>String</code>: "(x, y) z" or "(x, y) z!" where
+     *         <code>x</code> and <code>y</code> is the coordinates of the
+     *         target tile for this mission, and <code>z</code> is the value
+     *         of building the colony. The exclamation mark is added if the unit
+     *         should continue searching for a colony site if the targeted site
+     *         is lost.
+     */
+    public String getDebuggingInfo() {
+        Unit carrier = getUnit();
+        return carrier.getState().toString();
     }
 
     /**
