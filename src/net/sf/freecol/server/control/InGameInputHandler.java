@@ -860,6 +860,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your colony!");
         }
         Tile tile = colony.getTile();
+        // TODO: modify/abort trade routes?
         colony.dispose();
         sendUpdatedTileToAll(tile, player);
         return null;
@@ -1900,9 +1901,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
+        // Inform other players the unit is moving off the map
+        sendRemoveUnitToAll(unit, player);
+        
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
-        sendRemoveUnitToAll(unit, player);
         return null;
     }
 
