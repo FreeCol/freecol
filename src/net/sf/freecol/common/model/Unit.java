@@ -2608,6 +2608,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(getTile(), 1);
         if (surroundingTiles.size() != 8) {
+            // TODO: the new carribean map has no south pole, and this allows moving to europe
+            // via the bottom edge of the map, which is approximately the equator line. 
+            // Should we enforce moving to europe requires high seas, and no movement via north/south poles?
             return true;
         } else {
             for (int i = 0; i < surroundingTiles.size(); i++) {

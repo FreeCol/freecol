@@ -1134,7 +1134,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             boolean removed = units.remove((Unit) locatable);
             if (!removed) {
                 logger.warning("Unit with ID " + ((Unit) locatable).getId() +
-                               " could not be removed from Tile with ID " +
+                               " could not be removed from " + this.toString() + " with ID " +
                                getId());
             }
         } else if (locatable instanceof TileItem) {
