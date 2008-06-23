@@ -1136,7 +1136,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         case LostCityRumour.COLONIST:
             random = getPseudoRandom().nextInt(newUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, newUnitTypes.get(random), UnitState.ACTIVE);
-            //tile.add(newUnit); should not be necessary
+            //tile.add(newUnit); don't add unit twice
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case LostCityRumour.TREASURE:
@@ -1144,7 +1144,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             random = getPseudoRandom().nextInt(treasureUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, treasureUnitTypes.get(random), UnitState.ACTIVE);
             newUnit.setTreasureAmount(treasure);
-            tile.add(newUnit);
+            //tile.add(newUnit); don't add unit twice
             rumourElement.setAttribute("amount", Integer.toString(treasure));
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
