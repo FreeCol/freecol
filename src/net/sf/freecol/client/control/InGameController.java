@@ -3870,7 +3870,7 @@ public final class InGameController implements NetworkConstants {
      * @param colony The colony to be abandoned
      */
     public void abandonColony(Colony colony) {
-        if (colony == null) {
+        if (colony == null || colony.hasAbility("model.ability.preventAbandonColony")) {
             return;
         }
 

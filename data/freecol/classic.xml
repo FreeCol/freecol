@@ -1081,6 +1081,7 @@
       <required-goods id="model.goods.hammers" value="64"/>
       <required-population value="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
+      <ability id="model.ability.preventAbandonColony" value="true"/>
     </building-type>
     <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade" sequence="11">
       <required-goods id="model.goods.hammers" value="120"/>
@@ -1088,6 +1089,7 @@
       <required-population value="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
       <ability id="model.ability.bombardShips" value="true"/>
+      <ability id="model.ability.preventAbandonColony" value="true"/>
     </building-type>
     <building-type id="model.building.Fortress" workplaces="0" upgradesFrom="model.building.Fort" sequence="12">
       <required-goods id="model.goods.hammers" value="320"/>
@@ -1095,6 +1097,7 @@
       <required-population value="8"/>
       <modifier id="model.modifier.defence" type="percentage" value="200"/>
       <ability id="model.ability.bombardShips" value="true"/>
+      <ability id="model.ability.preventAbandonColony" value="true"/>
     </building-type>
     <building-type id="model.building.Depot"              workplaces="0" sequence="13">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>

@@ -859,6 +859,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your colony!");
         }
+        if (colony.hasAbility("model.ability.preventAbandonColony")) {
+            logger.warning("Ability prevents abandoning colony.");
+            return null;
+        }
         Tile tile = colony.getTile();
         // TODO: modify/abort trade routes?
         colony.dispose();

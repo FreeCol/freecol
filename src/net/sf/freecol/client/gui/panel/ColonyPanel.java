@@ -890,10 +890,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      * Closes the <code>ColonyPanel</code>.
      */
     public void closeColonyPanel() {
-        if (getColony().getUnitCount() > 0
-                || freeColClient.getCanvas().showConfirmDialog("abandonColony.text", "abandonColony.yes",
-                        "abandonColony.no")) {
-            if (getColony().getUnitCount() <= 0) {
+        if (getColony().getUnitCount() > 0 ||
+            freeColClient.getCanvas().showConfirmDialog("abandonColony.text",
+                                                        "abandonColony.yes",
+                                                        "abandonColony.no")) {
+            if (getColony().getUnitCount() <= 0 &&
+                !getColony().hasAbility("model.ability.preventAbandonColony")) {
                 freeColClient.getInGameController().abandonColony(getColony());
             }
 
