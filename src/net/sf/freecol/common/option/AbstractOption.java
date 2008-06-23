@@ -113,16 +113,6 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     }
 
     /**
-     * Gives a short description of this <code>Option</code>. Can for
-     * instance be used as a tooltip text.
-     * 
-     * @return A short description of this <code>Option</code>.
-     */
-    public String getShortDescription() {
-        return Messages.message(getGroup() + "." + getId() + ".shortDescription");
-    }
-
-    /**
      * Returns a textual representation of this object.
      * 
      * @return The name of this <code>Option</code>.
@@ -165,5 +155,14 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     public String getName() {
         return Messages.message(getGroup() + "." + getId().replaceFirst("model\\.option\\.", "") + ".name");
     }
-
+    
+    /**
+     * Gives a short description of this <code>Option</code>. Can for
+     * instance be used as a tooltip text.
+     * 
+     * @return A short description of this <code>Option</code>.
+     */
+    public String getShortDescription() {
+        return Messages.message(getGroup() + "." + getId().replaceFirst("model\\.option\\.", "") + ".shortDescription");
+    }
 }
