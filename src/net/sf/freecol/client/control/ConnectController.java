@@ -225,7 +225,7 @@ public final class ConnectController {
     * @param port The port to use when connecting to the host.
     * @return <i>true</i> if the login was completed successfully.
     */
-    private boolean login(String username, String host, int port) {
+    public boolean login(String username, String host, int port) {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         

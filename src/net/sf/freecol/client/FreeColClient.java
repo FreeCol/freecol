@@ -164,8 +164,30 @@ public final class FreeColClient {
      * @param musicLibrary The object holding the music.
      * @param sfxLibrary The object holding the sound effects.
      */
-    public FreeColClient(boolean windowed, final Dimension innerWindowSize, ImageLibrary imageLibrary, MusicLibrary musicLibrary,
-            SfxLibrary sfxLibrary) {
+    public FreeColClient(boolean windowed, final Dimension innerWindowSize, 
+                         ImageLibrary imageLibrary, MusicLibrary musicLibrary,
+                         SfxLibrary sfxLibrary) {
+        this(windowed, innerWindowSize, imageLibrary, musicLibrary, sfxLibrary, false);
+    }
+
+    /**
+     * Creates a new <code>FreeColClient</code>. Creates the control
+     * objects and starts the GUI unless the instance is headless. A
+     * headless client can be used for testing purposes.
+     * 
+     * @param windowed Determines if the <code>Canvas</code> should be
+     *            displayed within a <code>JFrame</code> (when
+     *            <code>true</code>) or in fullscreen mode (when
+     *            <code>false</code>).
+     * @param innerWindowSize The inner size of the window (borders not included).
+     * @param imageLibrary The object holding the images.
+     * @param musicLibrary The object holding the music.
+     * @param sfxLibrary The object holding the sound effects.
+     * @param headless Whether this instance is headless
+     */
+    public FreeColClient(boolean windowed, final Dimension innerWindowSize, 
+                         ImageLibrary imageLibrary, MusicLibrary musicLibrary,
+                         SfxLibrary sfxLibrary, boolean headless) {
         this.windowed = windowed;
         this.imageLibrary = imageLibrary;
         this.musicLibrary = musicLibrary;
@@ -185,29 +207,33 @@ public final class FreeColClient {
         mapEditorController = new MapEditorController(this);
         
         // Gui:
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                startGUI(innerWindowSize);
-            }
-        });
+        if (!headless) {
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        startGUI(innerWindowSize);
+                    }
+                });
+        }
         worker = new Worker();
         worker.start();
         
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
             clientOptions.load(FreeCol.getClientOptionsFile());
-            Option o = clientOptions.getObject(ClientOptions.LANGUAGE);
-            o.addPropertyChangeListener(new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent e) {
-                    if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
-                        canvas.showInformationMessage("autodetectLanguageSelected");
-                    } else {
-                        Locale l = ((Language) e.getNewValue()).getLocale();
-                        Messages.setMessageBundle(l);
-                        canvas.showInformationMessage("newLanguageSelected", "%language%", l.getDisplayName());
-                    }
-                }
-            });
+            if (!headless) {
+                Option o = clientOptions.getObject(ClientOptions.LANGUAGE);
+                o.addPropertyChangeListener(new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent e) {
+                            if (((Language) e.getNewValue()).getKey().equals(LanguageOption.AUTO)) {
+                                canvas.showInformationMessage("autodetectLanguageSelected");
+                            } else {
+                                Locale l = ((Language) e.getNewValue()).getLocale();
+                                Messages.setMessageBundle(l);
+                                canvas.showInformationMessage("newLanguageSelected", "%language%", l.getDisplayName());
+                            }
+                        }
+                    });
+            }
         }
     }
 
