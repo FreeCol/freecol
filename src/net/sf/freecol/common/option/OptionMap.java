@@ -200,6 +200,10 @@ public abstract class OptionMap extends OptionGroup {
         }
     }
 
+    public void putOption(Option option) {
+        values.put(option.getId(), option);
+    }
+
     /**
      * Creates a <code>XMLStreamReader</code> for reading the given file.
      * Compression is automatically detected.

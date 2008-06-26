@@ -25,6 +25,7 @@ import java.io.IOException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.PreGameController;
@@ -32,12 +33,15 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.util.test.FreeColTestCase;
 
-public class ClientTest extends FreeColTestCase {
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.fail;
 
-    int port = 3541;
-    String username = "test";
+public class ClientTestHelper {
 
-    public void testStartClient() {
+    public static final int port = 3541;
+    public static final String username = "test";
+
+    public static FreeColClient startClient() {
 
         try {
             ImageLibrary imageLibrary = new ImageLibrary();
@@ -51,17 +55,17 @@ public class ClientTest extends FreeColTestCase {
             if (loggedIn) {
                 client.getPreGameController().setReady(true);
             }
+            client.getClientOptions().putOption(new BooleanOption(ClientOptions.DISPLAY_ANIMATIONS, false));
+            assertFalse(client.getClientOptions().getBoolean(ClientOptions.DISPLAY_ANIMATIONS));
+            return client;
         } catch (NoRouteToServerException e) {
             fail("Illegal state: An exception occured that can only appear in public multiplayer games.");
-            return;
         } catch (IOException e) {
             fail("server.couldNotStart");
-            return;
-        } catch(Exception e) {
-            fail("Other problem.");
+        } catch(FreeColException e) {
+            fail("Failed to create ImageLibrary.");
         }
-
-
+        return null;
     }
 
 }

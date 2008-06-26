@@ -28,9 +28,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 
 /**
-* Represents an option that can be either <i>true</i>
-* or <i>false</i>.
-*/
+ * Represents an option that can be either <i>true</i>
+ * or <i>false</i>.
+ */
 public class BooleanOption extends AbstractOption {
 
     @SuppressWarnings("unused")
@@ -43,35 +43,31 @@ public class BooleanOption extends AbstractOption {
      * Creates a new <code>BooleanOption</code>.
      * @param in The <code>XMLStreamReader</code> containing the data. 
      */
-     public BooleanOption(XMLStreamReader in) throws XMLStreamException {
-         super(NO_ID);
-         readFromXML(in);
-     }
+    public BooleanOption(XMLStreamReader in) throws XMLStreamException {
+        super(NO_ID);
+        readFromXML(in);
+    }
 
-    //TODO remove when all options come from specification.xml
     /**
-    * Creates a new <code>BooleanOption</code>.
-    *
-    * @deprecated
-    * @param id The identifier for this option. This is used when the object should be
-    *           found in an {@link OptionGroup}.
-    * @param defaultValue The default value of this option.
-    */
+     * Creates a new <code>BooleanOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object should be
+     *           found in an {@link OptionGroup}.
+     * @param defaultValue The default value of this option.
+     */
     public BooleanOption(String id, boolean defaultValue) {
         super(id);
         this.value = defaultValue;
     }
 
-    //TODO remove when all options come from specification.xml
     /**
-    * Creates a new <code>BooleanOption</code>.
-    *
-    * @deprecated
-    * @param id The identifier for this option. This is used when the object should be
-    *           found in an {@link OptionGroup}.
-    * @param optionGroup the OptionGroup this option belongs to.
-    * @param defaultValue The default value of this option.
-    */
+     * Creates a new <code>BooleanOption</code>.
+     *
+     * @param id The identifier for this option. This is used when the object should be
+     *           found in an {@link OptionGroup}.
+     * @param optionGroup the OptionGroup this option belongs to.
+     * @param defaultValue The default value of this option.
+     */
     public BooleanOption(String id, OptionGroup optionGroup, boolean defaultValue) {
         super(id, optionGroup);
         this.value = defaultValue;
@@ -80,18 +76,18 @@ public class BooleanOption extends AbstractOption {
 
 
     /**
-    * Gets the current value of this <code>BooleanOption</code>.
-    * @return The value.
-    */
+     * Gets the current value of this <code>BooleanOption</code>.
+     * @return The value.
+     */
     public boolean getValue() {
         return value;
     }
     
     
     /**
-    * Sets the current value of this <code>BooleanOption</code>.
-    * @param value The value.
-    */
+     * Sets the current value of this <code>BooleanOption</code>.
+     * @param value The value.
+     */
     public void setValue(boolean value) {
         final boolean oldValue = this.value;
         this.value = value;
@@ -153,9 +149,9 @@ public class BooleanOption extends AbstractOption {
 
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "booleanOption".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "booleanOption".
+     */
     public static String getXMLElementTagName() {
         return "booleanOption";
     }
