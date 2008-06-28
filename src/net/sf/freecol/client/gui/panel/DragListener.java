@@ -227,6 +227,7 @@ public final class DragListener extends MouseAdapter {
                             JMenuItem newItem = null;
                             count = equipmentType.getMaximumCount() - count;
                             if (equipmentType.getGoodsRequired().isEmpty()) {
+                                newItem = new JMenuItem();
                                 newItem.setText(Messages.message(equipmentType.getId() + ".add"));
                             } else if (tempUnit.isInEurope() &&
                                        tempUnit.getOwner().getEurope().canBuildEquipment(equipmentType)) {
