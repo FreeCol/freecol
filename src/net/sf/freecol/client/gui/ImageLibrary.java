@@ -186,8 +186,11 @@ public final class ImageLibrary extends ImageProvider {
      * @throws FreeColException If one of the data files could not be found. *
      */
     private void init(boolean doLookup) throws FreeColException {
-        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-                .getDefaultConfiguration();
+        GraphicsConfiguration gc = null;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        if (!ge.isHeadless()) {
+            gc = ge.getDefaultScreenDevice() .getDefaultConfiguration();
+        }
 
         Class<FreeCol> resourceLocator = net.sf.freecol.FreeCol.class;
 

@@ -34,6 +34,7 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 public class ClientTestHelper {
@@ -45,16 +46,14 @@ public class ClientTestHelper {
 
         try {
             ImageLibrary imageLibrary = new ImageLibrary();
-            FreeColClient client = new FreeColClient(false, null, imageLibrary, null, null, true);
+            FreeColClient client = new FreeColClient(false, null, imageLibrary, null, null);
             ConnectController connectController = client.getConnectController();
             FreeColServer freeColServer = new FreeColServer(false, true, port, null, 4, 0, false);
             client.setFreeColServer(freeColServer);
             client.setSingleplayer(true);
             boolean loggedIn = connectController.login(username, "127.0.0.1", port);
-
-            if (loggedIn) {
-                client.getPreGameController().setReady(true);
-            }
+            assertTrue(loggedIn);
+            client.getPreGameController().setReady(true);
             client.getClientOptions().putOption(new BooleanOption(ClientOptions.DISPLAY_ANIMATIONS, false));
             assertFalse(client.getClientOptions().getBoolean(ClientOptions.DISPLAY_ANIMATIONS));
             return client;

@@ -526,6 +526,7 @@
 	       	<formatter type="brief" usefile="false" />
         	<formatter type="plain" /> 
         	<test todir="${freecol.build.dir}" name="net.sf.freecol.${test}" />
+                <sysproperty key="java.awt.headless" value="true" />
         </junit>
     	<echo message="For more detailed information about this test run see:"/>
     	<echo message="${freecol.build.dir}/TEST-net.sf.freecol.${test}.txt"/>
@@ -564,6 +565,7 @@
                 <fileset dir="test/src" includes="**/*Test.java" />
             </batchtest>
             -->
+                <sysproperty key="java.awt.headless" value="true" />
         </junit>
         
         <junitreport>

@@ -167,27 +167,7 @@ public final class FreeColClient {
     public FreeColClient(boolean windowed, final Dimension innerWindowSize, 
                          ImageLibrary imageLibrary, MusicLibrary musicLibrary,
                          SfxLibrary sfxLibrary) {
-        this(windowed, innerWindowSize, imageLibrary, musicLibrary, sfxLibrary, false);
-    }
-
-    /**
-     * Creates a new <code>FreeColClient</code>. Creates the control
-     * objects and starts the GUI unless the instance is headless. A
-     * headless client can be used for testing purposes.
-     * 
-     * @param windowed Determines if the <code>Canvas</code> should be
-     *            displayed within a <code>JFrame</code> (when
-     *            <code>true</code>) or in fullscreen mode (when
-     *            <code>false</code>).
-     * @param innerWindowSize The inner size of the window (borders not included).
-     * @param imageLibrary The object holding the images.
-     * @param musicLibrary The object holding the music.
-     * @param sfxLibrary The object holding the sound effects.
-     * @param headless Whether this instance is headless
-     */
-    public FreeColClient(boolean windowed, final Dimension innerWindowSize, 
-                         ImageLibrary imageLibrary, MusicLibrary musicLibrary,
-                         SfxLibrary sfxLibrary, boolean headless) {
+        boolean headless = "true".equals(System.getProperty("java.awt.headless", "false"));
         this.windowed = windowed;
         this.imageLibrary = imageLibrary;
         this.musicLibrary = musicLibrary;
@@ -197,6 +177,9 @@ public final class FreeColClient {
         
         clientOptions = new ClientOptions();
         actionManager = new ActionManager(this);
+        if (!headless) {
+            actionManager.initializeActions();
+        }
         // Control:
         connectController = new ConnectController(this);
         preGameController = new PreGameController(this);
