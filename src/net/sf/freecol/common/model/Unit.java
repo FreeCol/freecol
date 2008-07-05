@@ -275,6 +275,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();
+        getOwner().modifyScore(type.getScoreValue());
     }
 
     /**
@@ -1927,6 +1928,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             location.remove(this);
         }
 
+        // Units in WorkLocations get counted twice
+        if (location instanceof WorkLocation) {
+            if (!(newLocation instanceof WorkLocation)) {
+                getOwner().modifyScore(-getType().getScoreValue());
+            }
+        } else if (newLocation instanceof WorkLocation) {
+            getOwner().modifyScore(getType().getScoreValue());
+        }
+                
         location = newLocation;
 
         if (newLocation != null) {
@@ -2257,7 +2267,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public void setOwner(Player owner) {
         Player oldOwner = this.owner;
         oldOwner.removeUnit(this);
+        oldOwner.modifyScore(-getType().getScoreValue());
         owner.setUnit(this);
+        owner.modifyScore(getType().getScoreValue());
 
         this.owner = owner;
 
@@ -2272,11 +2284,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Sets the type of the unit.
      * 
-     * @param unitType The new type of the unit.
+     * @param newUnitType The new type of the unit.
      */
-    public void setType(UnitType unitType) {
-        if (unitType.isAvailableTo(owner)) {
-            this.unitType = unitType;
+    public void setType(UnitType newUnitType) {
+        if (newUnitType.isAvailableTo(owner)) {
+            if (unitType == null) {
+                owner.modifyScore(newUnitType.getScoreValue());
+            } else {
+                owner.modifyScore(newUnitType.getScoreValue() - unitType.getScoreValue());
+            }
+            this.unitType = newUnitType;
             naval = unitType.hasAbility("model.ability.navalUnit");
             if (getMovesLeft() > getInitialMovesLeft()) {
                 setMovesLeft(getInitialMovesLeft());
@@ -2284,7 +2301,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             hitpoints = unitType.getHitPoints();
         } else {
             // ColonialRegulars only available after independence is declared
-            logger.warning(unitType.getName() + " is not available to " + owner.getPlayerType() +
+            logger.warning(newUnitType.getName() + " is not available to " + owner.getPlayerType() +
                            " player " + owner.getName());
         }
 
@@ -3452,7 +3469,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         setName(in.getAttributeValue(null, "name"));
+        UnitType oldUnitType = unitType;
         unitType = FreeCol.getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
+
         naval = unitType.hasAbility("model.ability.navalUnit");
         movesLeft = Integer.parseInt(in.getAttributeValue(null, "movesLeft"));
         state = Enum.valueOf(UnitState.class, in.getAttributeValue(null, "state"));
@@ -3468,6 +3487,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (owner == null) {
                 owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
             }
+        }
+
+        if (oldUnitType == null) {
+            owner.modifyScore(unitType.getScoreValue());
+        } else {
+            owner.modifyScore(unitType.getScoreValue() - oldUnitType.getScoreValue());
         }
 
         turnsOfTraining = Integer.parseInt(in.getAttributeValue(null, "turnsOfTraining"));

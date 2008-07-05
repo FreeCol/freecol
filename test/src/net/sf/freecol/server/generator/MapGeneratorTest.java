@@ -249,7 +249,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertEquals(pacific, southPacific.getParent());
         assertEquals(pacific, southPacific.getDiscoverableRegion());
 
-        pacific.discover(null, null, "someName");
+        pacific.discover(new Player(game, "id"), null, "someName");
 
         assertFalse(pacific.isDiscoverable());
         assertNull(pacific.getDiscoverableRegion());

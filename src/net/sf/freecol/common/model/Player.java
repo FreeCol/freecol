@@ -62,6 +62,10 @@ public class Player extends FreeColGameObject implements Nameable {
 
     private static final Logger logger = Logger.getLogger(Player.class.getName());
 
+    public static final int SCORE_SETTLEMENT_DESTROYED = -40;
+    public static final int SCORE_INDEPENDENCE_DECLARED = 100;
+    public static final int SCORE_INDEPENDENCE_GRANTED = 1000;
+
     /**
      * The XML tag name for the set of founding fathers.
      */
@@ -555,6 +559,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Modifies the score of the player by the given value.
+     *
+     * @param value an <code>int</code> value
+     */
+    public void modifyScore(int value) {
+        score += value;
+    }
+
+    /**
      * Get the <code>Unit</code> value.
      * 
      * @return a <code>List<Unit></code> value
@@ -660,6 +673,7 @@ public class Player extends FreeColGameObject implements Nameable {
         europe.dispose();
         europe = null;
         monarch = null;
+        modifyScore(SCORE_INDEPENDENCE_DECLARED);
     }
 
     /**
@@ -674,6 +688,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         setPlayerType(PlayerType.INDEPENDENT);
         changeRelationWithPlayer(getREFPlayer(), Stance.PEACE);
+        modifyScore(SCORE_INDEPENDENCE_GRANTED - getGame().getTurn().getNumber());
         addModelMessage(this, ModelMessage.MessageType.DEFAULT, "model.player.independence");
     }
 
@@ -1340,17 +1355,30 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets the amount of gold that this player has.
+     * Modifies the amount of gold that this player has. The argument can be
+     * both positive and negative.
      * 
-     * @param gold The new amount of gold.
-     * @exception IllegalArgumentException if the new amount is negative.
-     * @see #modifyGold
+     * @param amount The amount of gold that should be added to this player's
+     *            gold amount (can be negative!).
+     * @exception IllegalArgumentException if the player gets a negative amount
+     *                of gold after adding <code>amount</code>.
      */
-    public void setGold(int gold) {
+    public void modifyGold(int amount) {
         if (this.gold == -1) {
             return;
         }
-        this.gold = gold;
+        if ((gold + amount) >= 0) {
+            modifyScore((gold + amount) / 1000 - gold / 1000);
+            gold += amount;
+        } else {
+            // This can happen if the server and the client get out of synch.
+            // Perhaps it can also happen if the client tries to adjust gold
+            // for another player, where the balance is unknown. Just keep
+            // going and do the best thing possible, we don't want to crash
+            // the game here.
+            logger.warning("Cannot add " + amount + " gold for " + this + ": would be negative!");
+            gold = 0;
+        }
     }
 
     /**
@@ -1370,32 +1398,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setAI(boolean ai) {
         this.ai = ai;
-    }
-
-    /**
-     * Modifies the amount of gold that this player has. The argument can be
-     * both positive and negative.
-     * 
-     * @param amount The amount of gold that should be added to this player's
-     *            gold amount (can be negative!).
-     * @exception IllegalArgumentException if the player gets a negative amount
-     *                of gold after adding <code>amount</code>.
-     */
-    public void modifyGold(int amount) {
-        if (this.gold == -1) {
-            return;
-        }
-        if ((gold + amount) >= 0) {
-            gold += amount;
-        } else {
-            // This can happen if the server and the client get out of synch.
-            // Perhaps it can also happen if the client tries to adjust gold
-            // for another player, where the balance is unknown. Just keep
-            // going and do the best thing possible, we don't want to crash
-            // the game here.
-            logger.warning("Cannot add " + amount + " gold for " + this + ": would be negative!");
-            gold = 0;
-        }
     }
 
     /**
@@ -2240,7 +2242,6 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             // remember SoL for check changes at next turn
             oldSoL = newSoL;
-            calculateScore();
         } else {
             for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
                 Unit unit = unitIterator.next();
@@ -2250,37 +2251,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 unit.newTurn();
             }
         }
-    }
-
-    /**
-     * Calculate the player's score.
-     * 
-     */
-    public void calculateScore() {
-        score = 0;
-        for (Unit unit : getUnits()) {
-            score += unit.getType().getScoreValue();
-            if (unit.getLocation() instanceof WorkLocation) {
-                score += unit.getType().getScoreValue();
-            }
-        }
-        if (getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {            
-            for (Region region : getGame().getMap().getRegions()) {
-                if (this.equals(region.getDiscoveredBy())) {
-                    score += region.getScoreValue();
-                }
-            }
-        } else {
-            Region pacific = getGame().getMap().getRegion("model.region.pacific");
-            if (pacific != null) {
-                if (this.equals(pacific.getDiscoveredBy())) {
-                    score += pacific.getScoreValue();
-                }
-            }
-        }
-        score += (score * oldSoL) / 100;
-        score += getGold() / 1000;
-
     }
 
     private void exploreAllColonies() {

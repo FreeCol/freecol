@@ -825,6 +825,7 @@ public class SimpleCombatModel implements CombatModel {
         boolean wasCapital = settlement.isCapital();
         Tile newTile = settlement.getTile();
         ModelController modelController = attacker.getGame().getModelController();
+        SettlementType settlementType = ((IndianNationType) enemy.getNationType()).getTypeOfSettlement();
         settlement.dispose();
 
         enemy.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
@@ -844,10 +845,9 @@ public class SimpleCombatModel implements CombatModel {
             Set<Modifier> modifierSet = attacker.getModifierSet("model.modifier.nativeTreasureModifier");
             randomTreasure = (int) FeatureContainer.applyModifierSet(randomTreasure, attacker.getGame().getTurn(),
                                                                      modifierSet);
-            SettlementType settlementType = ((IndianNationType) enemy.getNationType()).getTypeOfSettlement();
             if (settlementType == SettlementType.INCA_CITY ||
                 settlementType == SettlementType.AZTEC_CITY) {
-                tTrain.setTreasureAmount(randomTreasure * 500 + 10000);
+                tTrain.setTreasureAmount(randomTreasure * 500 + 1000);
             } else {
                 tTrain.setTreasureAmount(randomTreasure * 50  + 300);
             }
@@ -862,6 +862,15 @@ public class SimpleCombatModel implements CombatModel {
                                      "%indian%", enemy.getNationAsString(),
                                      "%amount%", Integer.toString(tTrain.getTreasureAmount()));
         }
+        int atrocities = Player.SCORE_SETTLEMENT_DESTROYED;
+        if (settlementType == SettlementType.INCA_CITY ||
+            settlementType == SettlementType.AZTEC_CITY) {
+            atrocities *= 2;
+        }
+        if (wasCapital) {
+            atrocities = (atrocities * 3) / 2;
+        }
+        attacker.getOwner().modifyScore(atrocities);
         attacker.setLocation(newTile);
     }
 

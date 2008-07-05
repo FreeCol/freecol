@@ -417,6 +417,10 @@ public class Region extends FreeColGameObject implements Nameable {
         discoveredIn = turn;
         name = newName;
         discoverable = false;
+        if (getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS) ||
+            isPacific()) {
+            player.modifyScore(getScoreValue());
+        }
     }
 
     /**

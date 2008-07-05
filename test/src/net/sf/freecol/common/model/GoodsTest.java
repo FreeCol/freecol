@@ -305,6 +305,7 @@ public class GoodsTest extends FreeColTestCase {
 
             // While source moving from America, target in Europe
             cotton.setLocation(privateer1);
+            assertEquals(europe, privateer1.getLocation());
             privateer1.moveToAmerica();
             try {
                 cotton.loadOnto(privateer2);

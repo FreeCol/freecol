@@ -38,7 +38,7 @@ public class MarketTest extends FreeColTestCase {
 
         GoodsType food = s.getGoodsType("model.goods.food");
 
-        p.setGold(1000000);
+        p.modifyGold(1000000);
 
         int price = food.getInitialBuyPrice();
 

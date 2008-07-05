@@ -182,7 +182,7 @@ public final class PreGameController extends Controller {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             
             if (player.isEuropean() && !player.isREF()) {
-                player.setGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
+                player.modifyGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
             }
             if (player.isAI()) {
                 continue;
