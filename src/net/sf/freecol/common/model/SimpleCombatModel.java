@@ -1040,6 +1040,12 @@ public class SimpleCombatModel implements CombatModel {
                                          "model.unit.equipmentCaptured",
                                          "%nation%", enemyUnit.getOwner().getNationAsString(),
                                          "%equipment%", typeToLose.getName());
+                    // TODO: fix this when the AI is smarter
+                    for (IndianSettlement settlement : enemyUnit.getOwner().getIndianSettlements()) {
+                        for (AbstractGoods goods : typeToLose.getGoodsRequired()) {
+                            settlement.addGoods(goods);
+                        }
+                    }
                 }
             } else {
                 // be downgraded as a result of combat
