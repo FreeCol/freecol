@@ -306,7 +306,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildUnitSubtree(DefaultMutableTreeNode parent) {
         for (UnitType u : FreeCol.getSpecification().getUnitTypeList()) {
-            if (u.getSkill() <= 0) {
+            if (u.getSkill() <= 0 ||
+                u.hasAbility("model.ability.expertSoldier")) {
                 buildUnitItem(u, 0.5f, parent);
             }
         }
