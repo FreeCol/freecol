@@ -1229,7 +1229,9 @@
     </founding-father>
     <founding-father id="model.foundingFather.paulRevere" type="military"
                      weight1="10" weight2="2" weight3="1">
-      <ability id="model.ability.automaticDefence" value="true"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+      </ability>
     </founding-father>
     <founding-father id="model.foundingFather.francisDrake" type="military"
                      weight1="4" weight2="8" weight3="6">
@@ -1372,6 +1374,10 @@
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.west" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.sioux" number-of-settlements="average"
@@ -1380,6 +1386,10 @@
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.northWest" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.tupi" number-of-settlements="low"
@@ -1388,6 +1398,10 @@
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.southEast" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.arawak" number-of-settlements="low"
@@ -1397,6 +1411,10 @@
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.east" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average"
@@ -1406,6 +1424,10 @@
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.northEast" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average"
@@ -1415,6 +1437,10 @@
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.north" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
@@ -1423,6 +1449,10 @@
       <skill id="model.unit.expertFisherman"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
     </indian-nation-type>
@@ -1432,6 +1462,10 @@
       <skill id="model.unit.expertFisherman"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.center" />
       <region id="model.region.east" />
     </indian-nation-type>

@@ -353,22 +353,37 @@ public class SimpleCombatModel implements CombatModel {
             // Paul Revere makes an unarmed colonist in a settlement pick up
             // a stock-piled musket if attacked, so the bonus should be applied
             // for unarmed colonists inside colonies where there are muskets
-            // available.
+            // available. Indians can also pick up equipment.
             EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
             if (!defender.isArmed() &&
-                defender.isColonist() &&
-                defender.getLocation() instanceof WorkLocation &&
-                defender.getOwner().hasAbility("model.ability.automaticDefence") &&
-                defender.getColony().canBuildEquipment(muskets)) {
+                (defender.getLocation() instanceof WorkLocation ||
+                 defender.getLocation() instanceof IndianSettlement) &&
+                defender.getOwner().hasAbility("model.ability.automaticEquipment")) {
                 Set<Ability> autoDefence = defender.getOwner().getFeatureContainer()
-                    .getAbilitySet("model.ability.automaticDefence");
-                result.add(new Modifier(Modifier.DEFENCE, 
-                                        autoDefence.iterator().next().getSource(),
-                                        1, Modifier.Type.ADDITIVE));
-                defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT, defender,
-                                         "model.unit.automaticDefence",
-                                         "%unit%", defender.getName(),
-                                         "%colony%", defender.getColony().getName());
+                    .getAbilitySet("model.ability.automaticEquipment");
+                Settlement settlement;
+                if (defender.getLocation() instanceof WorkLocation) {
+                    settlement = defender.getColony();
+                } else {
+                    settlement = (Settlement) defender.getLocation();
+                }
+                for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {
+                    if (defender.canBeEquippedWith(equipment)) {
+                        for (Ability ability : autoDefence) {
+                            if (ability.appliesTo(equipment) && 
+                                settlement.canBuildEquipment(equipment)) {
+                                result.addAll(equipment.getModifierSet("model.modifier.defence"));
+                                if (defender.getColony() != null) {
+                                    defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT,
+                                                             defender,
+                                                             "model.unit.automaticDefence",
+                                                             "%unit%", defender.getName(),
+                                                             "%colony%", defender.getColony().getName());
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             for (EquipmentType equipment : defender.getEquipment()) {

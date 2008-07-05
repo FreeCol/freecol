@@ -52,6 +52,7 @@ public class CombatTest extends FreeColTestCase {
 
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+    EquipmentType[] dragoonEquipment = new EquipmentType[] { horses, muskets };
 
     public void testColonistAttackedByVeteran() throws Exception {
 
@@ -473,5 +474,78 @@ public class CombatTest extends FreeColTestCase {
         assertFalse(defender.isDefensiveUnit());
 
     }
- 
+
+
+    public void testDefendColonyWithRevere() {
+
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        Colony colony = getStandardColony(1, 5, 8);
+
+        SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player inca = game.getPlayer("model.nation.inca");
+
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(inca, true);
+
+        Unit colonist = colony.getUnitIterator().next();
+        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, horses, muskets);
+
+        assertEquals(colonist, colony.getDefendingUnit(attacker));
+
+        dutch.addFather(spec().getFoundingFather("model.foundingFather.paulRevere"));
+        for (EquipmentType equipment : dragoonEquipment) {
+            for (AbstractGoods goods : equipment.getGoodsRequired()) {
+                colony.addGoods(goods);
+            }
+        }
+
+        Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(attacker, colonist);
+        for (Modifier defenceModifier : muskets.getModifierSet("model.modifier.defence")) {
+            assertTrue(defenceModifiers.contains(defenceModifier));
+        }
+        for (Modifier defenceModifier : horses.getModifierSet("model.modifier.defence")) {
+            assertFalse(defenceModifiers.contains(defenceModifier));
+        }
+    }
+
+    public void testDefendSettlement() {
+
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+
+        SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player inca = game.getPlayer("model.nation.inca");
+
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(inca, true);
+
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(inca, true);
+
+        IndianSettlement settlement = new IndianSettlement(game, inca, tile1, true, null, false, null);
+        Unit defender = new Unit(game, settlement, inca, braveType, UnitState.ACTIVE);
+        Unit attacker = new Unit(game, tile2, dutch, colonistType, UnitState.ACTIVE, horses, muskets);
+
+        for (EquipmentType equipment : dragoonEquipment) {
+            for (AbstractGoods goods : equipment.getGoodsRequired()) {
+                settlement.addGoods(goods);
+            }
+        }
+
+        Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(attacker, defender);
+        for (Modifier defenceModifier : muskets.getModifierSet("model.modifier.defence")) {
+            assertTrue(defenceModifiers.contains(defenceModifier));
+        }
+        for (Modifier defenceModifier : horses.getModifierSet("model.modifier.defence")) {
+            assertTrue(defenceModifiers.contains(defenceModifier));
+        }
+    }
+
 }

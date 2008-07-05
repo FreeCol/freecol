@@ -1025,22 +1025,6 @@ public final class Colony extends Settlement implements Location, Nameable {
         return true;
     }
 
-    /**
-     * Return true if this Colony could build at least one item of the
-     * given EquipmentType.
-     *
-     * @param equipmentType an <code>EquipmentType</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean canBuildEquipment(EquipmentType equipmentType) {
-        for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
-            if (getGoodsCount(requiredGoods.getType()) < requiredGoods.getAmount()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private Building createBuilding(BuildingType buildingType) {
         return getGame().getModelController().createBuilding(getId() + "buildBuilding", this, buildingType);
     }

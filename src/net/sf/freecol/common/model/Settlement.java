@@ -457,4 +457,20 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return result;
     }
 
+    /**
+     * Return true if this Colony could build at least one item of the
+     * given EquipmentType.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean canBuildEquipment(EquipmentType equipmentType) {
+        for (AbstractGoods requiredGoods : equipmentType.getGoodsRequired()) {
+            if (getGoodsCount(requiredGoods.getType()) < requiredGoods.getAmount()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
