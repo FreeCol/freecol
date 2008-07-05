@@ -74,7 +74,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
      */
     public OptionGroupUI(OptionGroup option, boolean editable, int level, HashMap<String, JComponent> optionUIs) {
         
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         
         JPanel horizontalPanel = null;
         boolean buttonAdded = false;

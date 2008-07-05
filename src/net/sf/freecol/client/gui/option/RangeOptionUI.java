@@ -19,13 +19,15 @@
 
 package net.sf.freecol.client.gui.option;
 
-import java.awt.FlowLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 import java.util.Hashtable;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,6 +41,7 @@ import net.sf.freecol.common.option.RangeOption;
  * enable values to be both seen and changed.
  */
 public final class RangeOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RangeOptionUI.class.getName());
 
@@ -55,15 +58,16 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
      *            for.
      */
     public RangeOptionUI(RangeOption option, boolean editable) {
-        super(new FlowLayout(FlowLayout.LEFT));
 
+        setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
+                                                   option.getName()));
         this.option = option;
 
         String name = option.getName();
         String description = option.getShortDescription();
-        JLabel label = new JLabel(name, JLabel.LEFT);
-        label.setToolTipText((description != null) ? description : name);
-        add(label);
+        //JLabel label = new JLabel(name, JLabel.LEFT);
+        //label.setToolTipText((description != null) ? description : name);
+        //add(label);
 
         String[] strings = option.getOptions();
 
@@ -91,6 +95,7 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
         slider.setPaintTicks(true);
         slider.setSnapToTicks(true);
         slider.setPreferredSize(new Dimension(500, 50));
+        slider.setToolTipText((description != null) ? description : name);
         add(slider);
 
         slider.setEnabled(editable);

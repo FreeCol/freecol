@@ -345,14 +345,15 @@ public class MapGeneratorOptions extends OptionMap {
         final OptionGroup landGeneratorGroup = new OptionGroup("mapGeneratorOptions.landGenerator");
         String[] mapSizes = new String[sizes.length];
         for (int index = 0; index < sizes.length; index++) {
-            mapSizes[index] = sizes[index] + " (" + getWidth(index) + "x" +
-                getHeight(index) + ")";
+            mapSizes[index] = "<html><center>" + sizes[index] + "<br/>(" + getWidth(index) + "\u00D7" +
+                getHeight(index) + ")</center></html>";
         }
         new RangeOption(MAP_SIZE, landGeneratorGroup, mapSizes, 0, true);
 
         String[] landMasses = new String[sizes.length];
         for (int index = 0; index < sizes.length; index++) {
-            landMasses[index] = sizes[index] + " (" + getLandMass(index) + "%)";
+            landMasses[index] = "<html><center>" + sizes[index] + "<br/>(" + getLandMass(index) +
+                "%)</center></html>";
         }
         new RangeOption(LAND_MASS, landGeneratorGroup, landMasses, 1, true);
         add(landGeneratorGroup);
