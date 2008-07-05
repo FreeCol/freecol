@@ -939,7 +939,7 @@
     <unit-type id="model.unit.undead" art="undead" offence="18"  defence="4" movement="3" lineOfSight="1" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
-      <ability id="model.ability.canBeCaptured" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
       <ability id="model.ability.undead" value="true"/>
     </unit-type>
   </unit-types>
