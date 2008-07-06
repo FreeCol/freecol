@@ -689,7 +689,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @param goodsInput Number of input goods,
      *        including those contributed by the new_unit, if applicable.
      */
-    public int calculateOutputAdding(final int goodsInput, final Unit new_unit) {
+    private int calculateOutputAdding(final int goodsInput, final Unit new_unit) {
         int goodsOutput = applyModifiers(goodsInput);
         if (buildingType.hasAbility("model.ability.expertsUseConnections") &&
                 getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
@@ -717,7 +717,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      * @see #getProductionNextTurn
      */
-    public int calculateOutput(final int goodsInput) {
+    private int calculateOutput(final int goodsInput) {
         return calculateOutputAdding(goodsInput, null);
     }
 
@@ -728,7 +728,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @param unit The Unit that was added
      * @return The amount of goods being produced by this <code>Building</code>
      */
-    public int getProductionAdding(Unit unit) {
+    public int getProductionAdding(int available, Unit unit) {
         if (getGoodsOutputType() == null) {
             return 0;
         }
@@ -736,7 +736,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         int goodsOutput = getMaximumProductionAdding(unit);
 
         if (getGoodsInputType() != null) {
-            int available = colony.getGoodsCount(getGoodsInputType());
             if (available < getMaximumGoodsInputAdding(unit)) {
                 goodsOutput = calculateOutputAdding(available, unit);
             }
@@ -758,7 +757,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (canAutoProduce()) {
             return getAutoProduction(getGoodsInput());
         } else {
-            return getProductionAdding(null);
+            return getProductionAdding(colony.getGoodsCount(getGoodsInputType()), null);
         }
     }
     
@@ -806,35 +805,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (canAutoProduce()) {
             return getAutoProduction(getGoodsInputNextTurn());
         } else {
-            return getProductionNextTurnAdding(null);
+            return getProductionAdding(colony.getGoodsCount(getGoodsInputType()) + 
+                                       colony.getProductionNextTurn(getGoodsInputType()), null);
         }
     }
 
-    /**
-     * Returns the actual production of this building for next turn.
-     * 
-     * @param unit The Unit that was added
-     * @return The production of this building the next turn.
-     * @see #getProduction
-     */
-    public int getProductionNextTurnAdding(final Unit unit) {
-        if (getGoodsOutputType() == null) {
-            return 0;
-        }
-
-        int goodsOutput = getMaximumProductionAdding(unit);
-
-        if (getGoodsInputType() != null) {
-            int available = colony.getGoodsCount(getGoodsInputType()) + 
-                    colony.getProductionNextTurn(getGoodsInputType());
-            if (available < getMaximumGoodsInputAdding(unit)) {
-                goodsOutput = calculateOutputAdding(available, unit);
-            }
-        }
-
-        return goodsOutput;
-    }
-    
     /**
      * Returns the additional production of new <code>Unit</code> at this building for next turn.
      * 
@@ -842,7 +817,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getAdditionalProductionNextTurn(Unit addUnit) {
-        return getProductionNextTurnAdding(addUnit) - getProductionNextTurn();
+        return getProductionAdding(colony.getGoodsCount(getGoodsInputType()) + 
+                                   colony.getProductionNextTurn(getGoodsInputType()), addUnit) - 
+            getProductionNextTurn();
     }
 
     /**
@@ -961,7 +938,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         if it cannot be added, will return <code>0</code>.
      */
     public int getAdditionalProduction(Unit addUnit) {
-        return getProductionAdding(addUnit) - getProduction();
+        return getProductionAdding(colony.getGoodsCount(getGoodsInputType()), addUnit) - getProduction();
     }
 
     /**

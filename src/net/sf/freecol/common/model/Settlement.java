@@ -407,7 +407,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @return The amount of this type of Goods at this Location.
      */
     public int getGoodsCount(GoodsType type) {
-        if (type.getStoredAs() == null) {
+        if (type != null && type.getStoredAs() == null) {
             return goodsContainer.getGoodsCount(type);
         } else {
             return 0;
