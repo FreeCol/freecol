@@ -576,17 +576,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Returns the amount of goods needed to have a full production if
-     * <code>Unit</code> was added.
-     */
-    private int getMaximumGoodsInputAdding(Unit... additionalUnits) {
-        if (getGoodsInputType() == null) {
-            return 0;
-        }
-        return getProductivity(additionalUnits);
-    }
-
-    /**
      * Returns the amount of goods needed to have a full production.
      * 
      * @return The maximum level of goods needed in order to have the maximum
@@ -602,7 +591,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (canAutoProduce()) {
             return getMaximumGoodsInputAuto();
         } else {
-            return getMaximumGoodsInputAdding();
+            return getProductivity();
         }
     }
 
@@ -653,7 +642,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return getGoodsInputAutoNextTurn();
         } else {
             return calculateGoodsInput(getMaximumGoodsInput(),
-                    colony.getProductionNextTurn(getGoodsInputType()));
+                                       colony.getProductionNextTurn(getGoodsInputType()));
         }
     }
 
@@ -723,10 +712,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return 0;
         }
 
-        int goodsOutput = getMaximumProductionAdding(additionalUnits);
+        int goodsOutput = applyModifiers(getProductivity(additionalUnits));
 
         if (getGoodsInputType() != null) {
-            if (available < getMaximumGoodsInputAdding(additionalUnits)) {
+            if (available < getProductivity(additionalUnits)) {
                 goodsOutput = calculateOutputAdding(available, additionalUnits);
             }
         }
@@ -794,6 +783,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public int getProductionNextTurn() {
         if (canAutoProduce()) {
             return getAutoProduction(getGoodsInputNextTurn());
+        } else if (getGoodsInputType() == null) {
+            return getProductionAdding(0);
         } else {
             return getProductionAdding(colony.getGoodsCount(getGoodsInputType()) + 
                                        colony.getProductionNextTurn(getGoodsInputType()));
@@ -885,7 +876,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (canAutoProduce()) {
             return getMaximumAutoProduction();
         } else {
-            return getMaximumProductionAdding();
+            return applyModifiers(getProductivity());
         }
     }
     
@@ -898,16 +889,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return 0;
         }
         return Math.max(1, available / 10);
-    }
-
-    /**
-     * Returns the maximum production with a given unit to be added to this building.
-     *
-     * @return Maximum production potential from all workers
-     *         with additional worker if valid.
-     */
-    private int getMaximumProductionAdding(Unit... additionalUnits) {
-        return applyModifiers(getProductivity(additionalUnits));
     }
 
     /**
