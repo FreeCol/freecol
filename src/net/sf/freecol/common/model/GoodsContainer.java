@@ -193,8 +193,7 @@ public class GoodsContainer extends FreeColGameObject {
 
     
     /**
-     * Checks if any type of goods, except for
-     * <code>Goods.FOOD</code>, has reached the given
+     * Checks if any storable type of goods has reached the given
      * amount.
      * 
      * @param amount The amount.

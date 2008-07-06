@@ -767,10 +767,15 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Returns the actual production of a buliding with 0 workplaces
+     * Returns the actual production of a building with 0
+     * workplaces. At the moment, the only building of this type is
+     * the stable.
      */
     private int getAutoProduction() {
         if (getGoodsOutputType() == null) {
+            return 0;
+        } if (colony.getGoodsCount(getGoodsOutputType()) >=
+              colony.getWarehouseCapacity()) {
             return 0;
         }
 

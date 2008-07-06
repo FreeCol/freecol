@@ -1110,11 +1110,13 @@
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="300"/>
     </building-type>
-    <building-type id="model.building.Country" workplaces="0" consumes="model.goods.food" produces="model.goods.horses" sequence="14">
+    <building-type id="model.building.Country" workplaces="0" consumes="model.goods.food"
+                   produces="model.goods.horses" sequence="14">
       <modifier id="model.goods.horses" type="percentage" value="-50"/>
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>
-    <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.food" produces="model.goods.horses" upgradesFrom="model.building.Country" sequence="14">
+    <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.food"
+                   produces="model.goods.horses" upgradesFrom="model.building.Country" sequence="14">
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>

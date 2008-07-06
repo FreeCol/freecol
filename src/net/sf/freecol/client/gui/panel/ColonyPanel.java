@@ -728,7 +728,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     public void updateProductionPanel() {
         productionPanel.removeAll();
 
-        final int foodFarmsProduction = colony.getFoodProduction();
+        final int foodFarmsProduction = colony.getProductionOf(Goods.FOOD);
         final int foodFishProduction = colony.getProductionOf(Goods.FISH);
         final int humanFoodConsumption = colony.getFoodConsumption();
         int horsesProduced = colony.getProductionOf(Goods.HORSES);
