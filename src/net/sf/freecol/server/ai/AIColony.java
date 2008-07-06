@@ -958,7 +958,7 @@ public class AIColony extends AIObject {
                                 production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
                                         wlp.getGoodsType());
                             } else if (location instanceof Building) {
-                                production = ((Building) location).getProductivity(unit);
+                                production = ((Building) location).getUnitProductivity(unit);
                             }
                             if (bestUnit == null || production > bestProduction || production == bestProduction
                                     && unit.getSkillLevel() < bestUnit.getSkillLevel()) {
