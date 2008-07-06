@@ -690,7 +690,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *        including those contributed by the new_unit, if applicable.
      */
     public int calculateOutputAdding(final int goodsInput, final Unit new_unit) {
-        int goodsOutput = getProductionFromProductivity(goodsInput);
+        int goodsOutput = applyModifiers(goodsInput);
         if (buildingType.hasAbility("model.ability.expertsUseConnections") &&
                 getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
             int minimumProduction = 0;
@@ -756,39 +756,44 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getProduction() {
         if (canAutoProduce()) {
-            return getAutoProduction();
+            return getAutoProduction(getGoodsInput());
         } else {
             return getProductionAdding(null);
         }
     }
     
-    private boolean canAutoProduce() {
+    /**
+     * Returns true if this building can produce goods without workers.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean canAutoProduce() {
         return buildingType.hasAbility("model.ability.autoProduction");
     }
 
     /**
-     * Returns the actual production of a building with 0
-     * workplaces. At the moment, the only building of this type is
-     * the stable.
+     * Returns the production of a building with no workplaces with
+     * given input. Unlike other buildings, buildings with no
+     * workplaces stop producing as soon as the warhouse capacity has
+     * been reached. At the moment, the only building of this type is
+     * the pasture/stable.
+     *
+     * @param available an <code>int</code> value
+     * @return an <code>int</code> value
      */
-    private int getAutoProduction() {
-        if (getGoodsOutputType() == null) {
-            return 0;
-        } if (colony.getGoodsCount(getGoodsOutputType()) >=
-              colony.getWarehouseCapacity()) {
+    private int getAutoProduction(int available) {
+        if (getGoodsOutputType() == null ||
+            colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
             return 0;
         }
 
         int goodsOutput = getMaximumAutoProduction();
 
-        if (getGoodsInputType() != null) {
-            int available = getGoodsInput();
-            if (available < goodsOutput) {
-                goodsOutput = available;
-            }
+        if (getGoodsInputType() != null && available < goodsOutput) {
+            goodsOutput = available;
         }
 
-        return getProductionFromProductivity(goodsOutput);
+        return applyModifiers(goodsOutput);
     }
 
     /**
@@ -799,7 +804,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getProductionNextTurn() {
         if (canAutoProduce()) {
-            return getAutoProductionNextTurn();
+            return getAutoProduction(getGoodsInputNextTurn());
         } else {
             return getProductionNextTurnAdding(null);
         }
@@ -830,26 +835,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return goodsOutput;
     }
     
-    /**
-     * Returns the actual production of a building with 0 workplaces for next turn
-     */
-    private int getAutoProductionNextTurn() {
-        if (getGoodsOutputType() == null) {
-            return 0;
-        }
-
-        int goodsOutput = getMaximumAutoProduction();
-
-        if (getGoodsInputType() != null) {
-            int available = getGoodsInputNextTurn();
-            if (available < goodsOutput) {
-                goodsOutput = available;
-            }
-        }
-
-        return getProductionFromProductivity(goodsOutput);
-    }
-
     /**
      * Returns the additional production of new <code>Unit</code> at this building for next turn.
      * 
@@ -966,7 +951,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getMaximumProductionAdding(Unit addUnit) {
         int maximumProductivity = getProductivityAdding(addUnit);
-        return getProductionFromProductivity(maximumProductivity);
+        return applyModifiers(maximumProductivity);
     }
 
     /**
@@ -986,7 +971,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @param productivity From {@link #getProductivity}
      * @return Production based on Productivity
      */
-    public int getProductionFromProductivity(int productivity) {
+    // TODO: this really should not be public
+    public int applyModifiers(int productivity) {
         GoodsType goodsOutputType = getGoodsOutputType();
         if (goodsOutputType == null) {
             return 0;
