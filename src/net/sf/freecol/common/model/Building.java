@@ -589,7 +589,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getMaximumGoodsInput() {
         if (canAutoProduce()) {
-            return getMaximumGoodsInputAuto();
+            return 2 * getMaximumAutoProduction();
         } else {
             return getProductivity();
         }
@@ -606,19 +606,19 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getGoodsInput() {
         if (canAutoProduce()) {
-            return getGoodsInputAuto();
+            return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
         } else {
             return calculateGoodsInput(getMaximumGoodsInput(), 0);
         }
     }
     
-    private int getGoodsInputAuto() {
+    private int getGoodsInputAuto(int available) {
         if (getGoodsInputType() == null ||
             colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
             return 0;
         }
         final GoodsType inputType = getGoodsInputType();
-        int surplus = colony.getProductionOf(inputType);
+        int surplus = available;
         if (inputType.isFoodType()) {
             surplus -= colony.getFoodConsumption();
             if (surplus < 0) {
@@ -626,26 +626,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             }
         }
         return surplus / 2; // store the half of surplus
-    }
-
-    private int getGoodsInputAutoNextTurn() {
-        if (getGoodsInputType() == null ||
-            colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
-            return 0;
-        }
-        final GoodsType inputType = getGoodsInputType();
-        int surplus = colony.getProductionNextTurn(inputType);
-        if (inputType.isFoodType()) {
-            surplus -= colony.getFoodConsumption();
-            if (surplus < 0) {
-                return 0;
-            }
-        }
-        return surplus / 2; // store the half of surplus
-    }
-
-    private int getMaximumGoodsInputAuto() {
-        return 2 * getMaximumAutoProduction();
     }
 
     /**
@@ -659,19 +639,21 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getGoodsInputNextTurn() {
         if (canAutoProduce()) {
-            return getGoodsInputAutoNextTurn();
+            return getGoodsInputAuto(colony.getProductionNextTurn(getGoodsInputType()));
+        } else if (getGoodsInputType() == null) {
+            return 0;
         } else {
             return calculateGoodsInput(getMaximumGoodsInput(),
                                        colony.getProductionNextTurn(getGoodsInputType()));
         }
     }
 
-    private int calculateGoodsInput(int goodsInput, final int addToWarehouse) {
+    private int calculateGoodsInput(final int goodsInput, final int addToWarehouse) {
         if (getGoodsInputType() != null) {
             final int available = colony.getGoodsCount(getGoodsInputType()) + addToWarehouse;
             if (available < goodsInput) {
                 // Not enough goods to do this?
-                goodsInput = available;
+                return available;
             }
         }
         return goodsInput;
@@ -883,6 +865,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     private int getMaximumAutoProduction() {
         int available = colony.getGoodsCount(getGoodsOutputType());
         if (available < 2) {
+            // we need at least two horses/animals to breed
             return 0;
         }
         return Math.max(1, available / 10);

@@ -337,4 +337,28 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(3, colony.getProductionOf(clothType));
 
     }
+
+    public void testAutoProduction() {
+
+        Colony colony = getStandardColony(1);
+        List<Unit> units = colony.getUnitList();
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+
+
+        Building pasture = colony.getBuilding(spec().getBuildingType("model.building.Country"));
+        assertEquals(foodType, pasture.getGoodsInputType());
+        assertEquals(horsesType, pasture.getGoodsOutputType());
+
+        // no horses yet
+        assertEquals(10, colony.getProductionOf(foodType));
+        assertEquals(0, pasture.getProductionOf(horsesType));
+
+        colony.addGoods(horsesType, 20);
+        assertEquals(1, pasture.getProductionOf(horsesType));
+        colony.addGoods(horsesType, 20);
+        assertEquals(2, pasture.getProductionOf(horsesType));
+
+    }
+
 }
