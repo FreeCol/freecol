@@ -278,6 +278,7 @@ public class BuildingTest extends FreeColTestCase {
                 building.toXML(xsw, building.getColony().getOwner(), true, true);
                 xsw.close();
             } catch (XMLStreamException e) {
+                fail();
             }
         }
     }
@@ -303,4 +304,37 @@ public class BuildingTest extends FreeColTestCase {
 
     }
 
+    public void testCottonClothProduction() {
+
+        Colony colony = getStandardColony(2);
+        List<Unit> units = colony.getUnitList();
+        Unit colonist = units.get(0);
+        Unit worker = units.get(1);
+
+        TileType plainsType = spec().getTileType("model.tile.plains");
+        GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+        GoodsType clothType = spec().getGoodsType("model.goods.cloth");
+
+        Building weaver = colony.getBuilding(spec().getBuildingType("model.building.WeaverHouse"));
+        assertEquals(cottonType, weaver.getGoodsInputType());
+        assertEquals(clothType, weaver.getGoodsOutputType());
+
+        assertEquals(plainsType, ((WorkLocation) colonist.getLocation()).getTile().getType());
+        assertEquals(plainsType, ((WorkLocation) worker.getLocation()).getTile().getType());
+
+        weaver.add(worker);
+        assertEquals(worker, weaver.getUnitList().get(0));
+
+        assertEquals(2, colony.getProductionOf(cottonType));
+        colony.addGoods(cottonType, 2);
+        assertEquals(2, weaver.getProductionOf(clothType));
+        assertEquals(2, colony.getProductionOf(clothType));
+
+        colonist.setWorkType(cottonType);
+
+        assertEquals(4, colony.getProductionOf(cottonType));
+        colony.addGoods(cottonType, 4);
+        assertEquals(3, colony.getProductionOf(clothType));
+
+    }
 }
