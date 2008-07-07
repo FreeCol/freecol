@@ -613,13 +613,33 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
     
     private int getGoodsInputAuto() {
-        if (getGoodsInputType() == null) {
+        if (getGoodsInputType() == null ||
+            colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
             return 0;
         }
         final GoodsType inputType = getGoodsInputType();
         int surplus = colony.getProductionOf(inputType);
         if (inputType.isFoodType()) {
             surplus -= colony.getFoodConsumption();
+            if (surplus < 0) {
+                return 0;
+            }
+        }
+        return surplus / 2; // store the half of surplus
+    }
+
+    private int getGoodsInputAutoNextTurn() {
+        if (getGoodsInputType() == null ||
+            colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
+            return 0;
+        }
+        final GoodsType inputType = getGoodsInputType();
+        int surplus = colony.getProductionNextTurn(inputType);
+        if (inputType.isFoodType()) {
+            surplus -= colony.getFoodConsumption();
+            if (surplus < 0) {
+                return 0;
+            }
         }
         return surplus / 2; // store the half of surplus
     }
@@ -657,18 +677,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return goodsInput;
     }
     
-    private int getGoodsInputAutoNextTurn() {
-        if (getGoodsInputType() == null) {
-            return 0;
-        }
-        final GoodsType inputType = getGoodsInputType();
-        int surplus = colony.getProductionNextTurn(inputType);
-        if (inputType.isFoodType()) {
-            surplus -= colony.getFoodConsumption();
-        }
-        return surplus / 2; // store the half of surplus
-    }
-
     /**
      * Returns the actual production of this building if
      * <Code>Unit</code> was added.
