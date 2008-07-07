@@ -670,58 +670,45 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     /**
-     * Calculates the output of this building from the input if
-     * <code>Unit</code> was added.
-     *
-     * @param new_unit The Unit that was added, to check for Expertise.
-     *        <code>null</code> if not applicable
-     * @param goodsInput Number of input goods,
-     *        including those contributed by the new_unit, if applicable.
-     */
-    private int calculateOutputAdding(final int goodsInput, Unit... additionalUnits) {
-        int goodsOutput = applyModifiers(goodsInput);
-        if (buildingType.hasAbility("model.ability.expertsUseConnections") &&
-                getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
-            int minimumProduction = 0;
-            for (Unit unit: units) {
-                if (unit.getType() == getExpertUnitType()) {
-                    minimumProduction += 4;
-                }
-            }
-            for (Unit unit : additionalUnits) {
-                if (canAdd(unit) && unit.getType() == getExpertUnitType()) {
-                    minimumProduction += 4;
-                }
-            }
-            if (goodsOutput < minimumProduction) {
-                goodsOutput = minimumProduction;
-            }
-        }
-        return goodsOutput;
-    }
-
-    /**
      * Returns the actual production of this building if
      * <Code>Unit</code> was added.
      *
      * @param additionalUnits The Unit that was added
      * @return The amount of goods being produced by this <code>Building</code>
      */
-    private int getProductionAdding(int available, Unit... additionalUnits) {
+    private int getProductionAdding(int availableGoodsInput, Unit... additionalUnits) {
         if (getGoodsOutputType() == null) {
             return 0;
-        }
-
-        int goodsOutput = applyModifiers(getProductivity(additionalUnits));
-
-        if (getGoodsInputType() != null) {
-            if (available < getProductivity(additionalUnits)) {
-                goodsOutput = calculateOutputAdding(available, additionalUnits);
+        } else {
+            int maximumGoodsInput = getProductivity(additionalUnits);
+            if (getGoodsInputType() != null) {
+                // only consider alternatives if we really need input
+                if (availableGoodsInput < maximumGoodsInput) {
+                    maximumGoodsInput = availableGoodsInput;
+                }
+                if (buildingType.hasAbility("model.ability.expertsUseConnections") &&
+                    getGameOptions().getBoolean(GameOptions.EXPERTS_HAVE_CONNECTIONS)) {
+                    int minimumGoodsInput = 0;
+                    for (Unit unit: units) {
+                        if (unit.getType() == getExpertUnitType()) {
+                            minimumGoodsInput += 4;
+                        }
+                    }
+                    for (Unit unit : additionalUnits) {
+                        if (canAdd(unit) && unit.getType() == getExpertUnitType()) {
+                            minimumGoodsInput += 4;
+                        }
+                    }
+                    if (maximumGoodsInput < minimumGoodsInput) {
+                        maximumGoodsInput = minimumGoodsInput;
+                    }
+                }
             }
+            // output is the same as input, plus production bonuses
+            return applyModifiers(maximumGoodsInput);
         }
-
-        return goodsOutput;
     }
+
 
     /**
      * Returns the actual production of this building.
@@ -735,11 +722,30 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public int getProduction() {
         if (canAutoProduce()) {
             return getAutoProduction(getGoodsInput());
+        } else if (getGoodsInputType() == null) {
+            return getProductionAdding(0);
         } else {
             return getProductionAdding(colony.getGoodsCount(getGoodsInputType()));
         }
     }
     
+    /**
+     * Returns the actual production of this building for next turn.
+     * 
+     * @return The production of this building the next turn.
+     * @see #getProduction
+     */
+    public int getProductionNextTurn() {
+        if (canAutoProduce()) {
+            return getAutoProduction(getGoodsInputNextTurn());
+        } else if (getGoodsInputType() == null) {
+            return getProductionAdding(0);
+        } else {
+            return getProductionAdding(colony.getGoodsCount(getGoodsInputType()) + 
+                                       colony.getProductionNextTurn(getGoodsInputType()));
+        }
+    }
+
     /**
      * Returns true if this building can produce goods without workers.
      *
@@ -752,7 +758,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     /**
      * Returns the production of a building with no workplaces with
      * given input. Unlike other buildings, buildings with no
-     * workplaces stop producing as soon as the warhouse capacity has
+     * workplaces stop producing as soon as the warehouse capacity has
      * been reached. At the moment, the only building of this type is
      * the pasture/stable.
      *
@@ -772,23 +778,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
 
         return applyModifiers(goodsOutput);
-    }
-
-    /**
-     * Returns the actual production of this building for next turn.
-     * 
-     * @return The production of this building the next turn.
-     * @see #getProduction
-     */
-    public int getProductionNextTurn() {
-        if (canAutoProduce()) {
-            return getAutoProduction(getGoodsInputNextTurn());
-        } else if (getGoodsInputType() == null) {
-            return getProductionAdding(0);
-        } else {
-            return getProductionAdding(colony.getGoodsCount(getGoodsInputType()) + 
-                                       colony.getProductionNextTurn(getGoodsInputType()));
-        }
     }
 
     /**
