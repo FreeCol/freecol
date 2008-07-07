@@ -809,7 +809,7 @@
       <ability id="model.ability.canBeEquipped" value="true"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular" art="colonialRegular" movement="3" lineOfSight="1"
-               pathImage="foot" skillTaught="model.unit.veteranSoldier">
+               pathImage="foot" skillTaught="model.unit.veteranSoldier" skill="4">
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -820,7 +820,7 @@
       <modifier id="model.modifier.defence" type="additive" value="3"/>
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
-    <unit-type id="model.unit.kingsRegular" art="kingsRegular" movement="3" lineOfSight="1">
+    <unit-type id="model.unit.kingsRegular" art="kingsRegular" movement="3" lineOfSight="1" skill="4">
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
@@ -939,7 +939,7 @@
     <unit-type id="model.unit.undead" art="undead" offence="18"  defence="4" movement="3" lineOfSight="1" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
-      <ability id="model.ability.canBeCaptured" value="true"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
       <ability id="model.ability.undead" value="true"/>
     </unit-type>
   </unit-types>
@@ -1111,11 +1111,13 @@
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="300"/>
     </building-type>
-    <building-type id="model.building.Country" workplaces="0" consumes="model.goods.food" produces="model.goods.horses" sequence="14">
+    <building-type id="model.building.Country" workplaces="0" consumes="model.goods.food"
+                   produces="model.goods.horses" sequence="14">
       <modifier id="model.goods.horses" type="percentage" value="-50"/>
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>
-    <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.food" produces="model.goods.horses" upgradesFrom="model.building.Country" sequence="14">
+    <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.food"
+                   produces="model.goods.horses" upgradesFrom="model.building.Country" sequence="14">
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>
@@ -1230,7 +1232,9 @@
     </founding-father>
     <founding-father id="model.foundingFather.paulRevere" type="military"
                      weight1="10" weight2="2" weight3="1">
-      <ability id="model.ability.automaticDefence" value="true"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+      </ability>
     </founding-father>
     <founding-father id="model.foundingFather.francisDrake" type="military"
                      weight1="4" weight2="8" weight3="6">
@@ -1270,11 +1274,12 @@
     <founding-father id="model.foundingFather.williamBrewster" type="religious"
                      weight1="7" weight2="4" weight3="1">
       <ability id="model.ability.selectRecruit" value="true"/>
-      <ability id="model.ability.canRecruitUnit" value="false">
+      <ability id="model.ability.canNotRecruitUnit" value="true">
         <scope type="model.unit.indenturedServant"/>
         <scope type="model.unit.pettyCriminal"/>
         <scope type="model.unit.freeColonist"/>
       </ability>
+      <event id="model.event.newRecruits"/>
     </founding-father>
     <founding-father id="model.foundingFather.williamPenn" type="religious"
                      weight1="8" weight2="5" weight3="2">
@@ -1354,6 +1359,10 @@
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.west" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.sioux" number-of-settlements="average"
@@ -1362,6 +1371,10 @@
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.northWest" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.tupi" number-of-settlements="low"
@@ -1370,6 +1383,10 @@
       <skill id="model.unit.expertFurTrapper"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.southEast" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.arawak" number-of-settlements="low"
@@ -1379,6 +1396,10 @@
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.east" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average"
@@ -1388,6 +1409,10 @@
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.northEast" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average"
@@ -1397,6 +1422,10 @@
       <skill id="model.unit.masterTobaccoPlanter"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.north" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
@@ -1405,6 +1434,10 @@
       <skill id="model.unit.expertFisherman"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
     </indian-nation-type>
@@ -1414,6 +1447,10 @@
       <skill id="model.unit.expertFisherman"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
+      <ability id="model.ability.automaticEquipment" value="true">
+        <scope type="model.equipment.muskets"/>
+        <scope type="model.equipment.horses"/>
+      </ability>
       <region id="model.region.center" />
       <region id="model.region.east" />
     </indian-nation-type>
