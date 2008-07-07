@@ -2163,8 +2163,14 @@ public class Player extends FreeColGameObject implements Nameable {
                     int requiredBells = ((colony.getSoL() + value) * Colony.BELLS_PER_REBEL * colony.getUnitCount()) / 100;
                     colony.addGoods(Goods.BELLS, requiredBells - colony.getGoodsCount(Goods.BELLS));
                 }
+            } else if (event.equals("model.event.newRecruits")) {
+                for (int index = 0; index < 3; index++) {
+                    UnitType recruitable = getEurope().getRecruitable(index);
+                    if (featureContainer.hasAbility("model.ability.canNotRecruitUnit", recruitable)) {
+                        getEurope().setRecruitable(index, generateRecruitable("newRecruits" + index));
+                    }
+                }
             }
-
         }
     }
 
@@ -2492,7 +2498,8 @@ public class Player extends FreeColGameObject implements Nameable {
         List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
         int total = 0;
         for (UnitType unitType : unitTypes) {
-            if (unitType.isRecruitable()) {
+            if (unitType.isRecruitable() &&
+                !featureContainer.hasAbility("model.ability.canNotRecruitUnit", unitType)) {
                 recruitableUnits.add(unitType);
                 total += unitType.getRecruitProbability();
             }
