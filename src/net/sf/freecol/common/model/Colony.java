@@ -1356,19 +1356,19 @@ public final class Colony extends Settlement implements Location, Nameable {
     private void createWarehouseCapacityWarning() {
         List<Goods> storedGoods = getGoodsContainer().getFullGoods();
         for (Goods goods : storedGoods) {
-            if (!goods.getType().isStorable()) {
+            GoodsType goodsType = goods.getType();
+            if (!goodsType.isStorable() || goodsType.limitIgnored()) {
                 // no need to do anything about bells or crosses
                 continue;
-            }
-            if (getExportData(goods.getType()).isExported() &&
+            } else if (getExportData(goodsType).isExported() &&
                 owner.canTrade(goods, Market.CUSTOM_HOUSE)) {
                 // capacity will never be exceeded
                 continue;
             } else if (goods.getAmount() < getWarehouseCapacity()) {
-                int waste = (goods.getAmount() + getProductionNetOf(goods.getType()) -
+                int waste = (goods.getAmount() + getProductionNetOf(goodsType) -
                              getWarehouseCapacity());
                 if (waste > 0) {
-                    addModelMessage(this, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goods.getType(),
+                    addModelMessage(this, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
                                     "model.building.warehouseSoonFull",
                                     "%goods%", goods.getName(),
                                     "%colony%", getName(),
