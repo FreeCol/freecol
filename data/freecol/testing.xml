@@ -1210,14 +1210,18 @@
       <required-goods id="model.goods.tools" value="50"/>
       <required-population value="4"/>
       <ability id="model.ability.produceInWater" value="true"/>
-      <ability id="model.ability.repairShips" value="true"/>
+      <ability id="model.ability.repairUnits" value="true">
+        <scope ability="model.ability.navalUnit"/>
+      </ability>
     </building-type>
     <building-type id="model.building.Shipyard" workplaces="0" upgradesFrom="model.building.Drydock" sequence="15">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
       <required-population value="8"/>
       <ability id="model.ability.produceInWater" value="true"/>
-      <ability id="model.ability.repairShips" value="true"/>
+      <ability id="model.ability.repairUnits" value="true">
+        <scope ability="model.ability.navalUnit"/>
+      </ability>
       <ability id="model.ability.buildShips" value="true"/>
     </building-type>
     <building-type id="model.building.CustomHouse" workplaces="0" sequence="17">

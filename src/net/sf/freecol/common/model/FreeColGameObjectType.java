@@ -79,6 +79,10 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         return featureContainer.hasAbility(id);
     }
 
+    public boolean hasAbility(String id, FreeColGameObjectType type) {
+        return featureContainer.hasAbility(id, type);
+    }
+
     public void addAbility(Ability ability) {
         featureContainer.addAbility(ability);
     }

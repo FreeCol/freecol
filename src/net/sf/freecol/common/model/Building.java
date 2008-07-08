@@ -447,22 +447,23 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (buildingType.hasAbility("model.ability.teach")) {
             trainStudents();
         }
-        if (buildingType.hasAbility("model.ability.repairShips")) {
-            repairShips();
+        if (buildingType.hasAbility("model.ability.repairUnits")) {
+            repairUnits();
         }
         if (getGoodsOutputType() != null) {
             produceGoods();
         }
     }
 
-    // Repair any damaged ships:
-    private void repairShips() {
+    // Repair any damaged units:
+    private void repairUnits() {
         for (Unit unit : getTile().getUnitList()) {
-            if (unit.isNaval() && unit.isUnderRepair()) {
+            if (unit.isUnderRepair() &&
+                buildingType.hasAbility("model.ability.repairUnits", unit.getType())) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
                     addModelMessage(this, ModelMessage.MessageType.DEFAULT, this,
-                                    "model.unit.shipRepaired",
+                                    "model.unit.unitRepaired",
                                     "%unit%", unit.getName(),
                                     "%repairLocation%", getLocationName());
                 }

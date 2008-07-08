@@ -1683,7 +1683,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 continue;
             }
             int distance;
-            if (colony.hasAbility("model.ability.repairShips")
+            if (colony.hasAbility("model.ability.repairUnits")
                     && (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
                 closestLocation = colony;
                 shortestDistance = distance;
