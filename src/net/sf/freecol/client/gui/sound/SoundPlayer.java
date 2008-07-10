@@ -30,6 +30,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
@@ -41,6 +42,9 @@ public class SoundPlayer {
 
     private static final Logger logger = Logger.getLogger(SoundPlayer.class.getName());
 
+    private static final int MAXIMUM_FADE_MS = 7000;
+    private static final int FADE_UPDATE_MS = 5;
+    
     /** The thread-group containing all of the <i>SoundPlayerThreads</i>. */
     private ThreadGroup soundPlayerThreads = new ThreadGroup("soundPlayerThreads");
 
@@ -291,7 +295,7 @@ public class SoundPlayer {
                 while (read != -1 && !soundStopped && !shouldStopThread()) {
                     try {
                         while (soundPaused) {
-                            Thread.sleep(100);
+                            Thread.sleep(10);
                         }
                     } catch (InterruptedException e) {}
                     read = din.read(data, 0, data.length);
@@ -299,6 +303,26 @@ public class SoundPlayer {
                         written = line.write(data, 0, read);
                     }
                 }
+                
+                // Implements fading down:
+                if (!soundStopped) {
+                    FloatControl c = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+                    long ms = System.currentTimeMillis() + FADE_UPDATE_MS;
+                    long fadeStop = System.currentTimeMillis() + MAXIMUM_FADE_MS;
+                    while (read != -1
+                            && !soundStopped 
+                            && System.currentTimeMillis() < fadeStop) {
+                        read = din.read(data, 0, data.length);
+                        if (read != -1) {
+                            written = line.write(data, 0, read);
+                        }
+                        if (System.currentTimeMillis() > ms) {
+                            c.setValue(c.getValue() - 1f);
+                            ms = System.currentTimeMillis() + FADE_UPDATE_MS;
+                        }
+                    }
+                }
+                
                 line.drain();
                 line.stop();
                 line.close();
