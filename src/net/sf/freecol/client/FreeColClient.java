@@ -226,7 +226,7 @@ public final class FreeColClient {
     private void startGUI(Dimension innerWindowSize) {
         if (musicLibrary != null) {
             musicPlayer = new SoundPlayer(false, true);
-            musicPlayer.play(musicLibrary.get("intro"));
+            playMusic("intro");
         } else {
             musicPlayer = null;
         }
@@ -618,6 +618,15 @@ public final class FreeColClient {
         return client;
     }
 
+    /**
+     * Plays the music.
+     */
+    public void playMusic(String music) {
+        if (musicPlayer != null) {
+            musicPlayer.play(musicLibrary.get(music));
+        }
+    }
+    
     /**
      * Plays the given sound effect.
      * 

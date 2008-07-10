@@ -224,6 +224,8 @@ public final class PreGameController {
 
         canvas.closeMainPanel();
         canvas.closeMenus();
+        
+        freeColClient.playMusic("");
 
         InGameController inGameController = freeColClient.getInGameController();
         InGameInputHandler inGameInputHandler = freeColClient.getInGameInputHandler();

@@ -55,8 +55,12 @@ public class SoundPlayer {
     * If it does not allow multiple sounds, then using <i>play</i> will stop the sound
     * currently playing and play the new instead.
     */
-    @SuppressWarnings("unused")
     private boolean multipleSounds;
+    
+    /**
+     * Used with <code>multipleSounds</code>.
+     */
+    private SoundPlayerThread currentSoundPlayerThread;
 
     /** Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>. */
     private boolean defaultPlayContinues;
@@ -136,8 +140,10 @@ public class SoundPlayer {
     */
     public void play(Playlist playlist, boolean playContinues, int repeatMode, int pickMode) {
         if (playlist != null) {
-            SoundPlayerThread soundPlayerThread = new SoundPlayerThread(playlist, playContinues, repeatMode, pickMode);
-            soundPlayerThread.start();
+            currentSoundPlayerThread = new SoundPlayerThread(playlist, playContinues, repeatMode, pickMode);
+            currentSoundPlayerThread.start();
+        } else {
+            currentSoundPlayerThread = null;
         }
     }
 
@@ -229,6 +235,9 @@ public class SoundPlayer {
         }
 
 
+        private boolean shouldStopThread() {
+            return !multipleSounds && currentSoundPlayerThread != this; 
+        }
 
         /**
         * This thread loads and plays the sound.
@@ -245,7 +254,8 @@ public class SoundPlayer {
 
                 // Take a little break between sounds
                 try { Thread.sleep(222); } catch (Exception e) {break;}
-            } while (playContinues && playlist.hasNext() && !soundStopped);
+            } while (playContinues && playlist.hasNext()
+                    && !soundStopped && !shouldStopThread());
         }
 
         public void playSound(File file) {
@@ -278,7 +288,12 @@ public class SoundPlayer {
                 line.start();
                 int read = 0;
                 int written = 0;
-                while (read != -1) {
+                while (read != -1 && !soundStopped && !shouldStopThread()) {
+                    try {
+                        while (soundPaused) {
+                            Thread.sleep(100);
+                        }
+                    } catch (InterruptedException e) {}
                     read = din.read(data, 0, data.length);
                     if (read != -1) {
                         written = line.write(data, 0, read);
