@@ -329,12 +329,16 @@ public class BuildingTest extends FreeColTestCase {
         colony.addGoods(cottonType, 2);
         assertEquals(2, weaver.getProductionOf(clothType));
         assertEquals(2, colony.getProductionOf(clothType));
+        assertEquals(-1, colony.getProductionNetOf(cottonType));
+        assertEquals(3, colony.getProductionNetOf(clothType));
 
         colonist.setWorkType(cottonType);
 
         assertEquals(4, colony.getProductionOf(cottonType));
         colony.addGoods(cottonType, 4);
         assertEquals(3, colony.getProductionOf(clothType));
+        assertEquals(1, colony.getProductionNetOf(cottonType));
+        assertEquals(3, colony.getProductionNetOf(clothType));
 
     }
 
@@ -353,6 +357,10 @@ public class BuildingTest extends FreeColTestCase {
         // no horses yet
         assertEquals(10, colony.getProductionOf(foodType));
         assertEquals(0, pasture.getProductionOf(horsesType));
+        assertEquals(2, colony.getFoodConsumption());
+        assertEquals(0, pasture.getGoodsInputNextTurn());
+        assertEquals(8, colony.getProductionNetOf(foodType));
+        assertEquals(0, colony.getProductionNetOf(horsesType));
 
         colony.addGoods(horsesType, 20);
         assertEquals(1, pasture.getProductionOf(horsesType));

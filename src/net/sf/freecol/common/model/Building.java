@@ -38,6 +38,8 @@ import org.w3c.dom.Element;
  * Represents a building in a colony.
  */
 public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named {
+
+    public static final int AUTO_PRODUCTION_INPUT = 2;
     
     /** The colony containing this building. */
     private Colony colony;
@@ -590,10 +592,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public int getMaximumGoodsInput() {
         if (canAutoProduce()) {
-            return 2 * getMaximumAutoProduction();
+            return AUTO_PRODUCTION_INPUT * getMaximumAutoProduction();
         } else {
             return getProductivity();
         }
+    }
+
+    private int getStoredInput() {
+        return colony.getGoodsCount(getGoodsInputType());
     }
 
     /**
@@ -608,27 +614,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public int getGoodsInput() {
         if (canAutoProduce()) {
             return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
+        } else if (getGoodsInputType() == null) {
+            return 0;
         } else {
             return calculateGoodsInput(getMaximumGoodsInput(), 0);
         }
     }
     
-    private int getGoodsInputAuto(int available) {
-        if (getGoodsInputType() == null ||
-            colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
-            return 0;
-        }
-        final GoodsType inputType = getGoodsInputType();
-        int surplus = available;
-        if (inputType.isFoodType()) {
-            surplus -= colony.getFoodConsumption();
-            if (surplus < 0) {
-                return 0;
-            }
-        }
-        return surplus / 2; // store the half of surplus
-    }
-
     /**
      * Returns the amount of goods being used to get the current
      * {@link #getProduction production} at the next turn.
@@ -649,15 +641,30 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
     }
 
-    private int calculateGoodsInput(final int goodsInput, final int addToWarehouse) {
-        if (getGoodsInputType() != null) {
-            final int available = colony.getGoodsCount(getGoodsInputType()) + addToWarehouse;
-            if (available < goodsInput) {
-                // Not enough goods to do this?
-                return available;
+    private int getGoodsInputAuto(int available) {
+        int outputGoods = colony.getGoodsCount(getGoodsOutputType());
+        if (getGoodsInputType() == null ||
+            outputGoods < getGoodsOutputType().getBreedingNumber() ||
+            outputGoods >= colony.getWarehouseCapacity()) {
+            return 0;
+        }
+        int surplus = available;
+        if (getGoodsInputType().isFoodType()) {
+            surplus -= colony.getFoodConsumption();
+            if (surplus <= 0) {
+                return 0;
             }
         }
-        return goodsInput;
+        return surplus / 2; // store the half of surplus
+    }
+
+    private int calculateGoodsInput(final int maximumGoodsInput, final int addToWarehouse) {
+        final int availableInput = getStoredInput() + addToWarehouse;
+        if (availableInput < maximumGoodsInput) {
+            // Not enough goods to do this?
+            return availableInput;
+        }
+        return maximumGoodsInput;
     }
     
     /**
@@ -716,7 +723,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         } else if (getGoodsInputType() == null) {
             return getProductionAdding(0);
         } else {
-            return getProductionAdding(colony.getGoodsCount(getGoodsInputType()));
+            return getProductionAdding(getStoredInput());
         }
     }
     
@@ -732,7 +739,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         } else if (getGoodsInputType() == null) {
             return getProductionAdding(0);
         } else {
-            return getProductionAdding(colony.getGoodsCount(getGoodsInputType()) + 
+            return getProductionAdding(getStoredInput() + 
                                        colony.getProductionNextTurn(getGoodsInputType()));
         }
     }
@@ -753,10 +760,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * been reached. At the moment, the only building of this type is
      * the pasture/stable.
      *
-     * @param available an <code>int</code> value
+     * @param availableInput an <code>int</code> value
      * @return an <code>int</code> value
      */
-    private int getAutoProduction(int available) {
+    private int getAutoProduction(int availableInput) {
         if (getGoodsOutputType() == null ||
             colony.getGoodsCount(getGoodsOutputType()) >= colony.getWarehouseCapacity()) {
             return 0;
@@ -764,8 +771,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         int goodsOutput = getMaximumAutoProduction();
 
-        if (getGoodsInputType() != null && available < goodsOutput) {
-            goodsOutput = available;
+        if (getGoodsInputType() != null && availableInput < goodsOutput) {
+            goodsOutput = availableInput;
         }
 
         return applyModifiers(goodsOutput);
@@ -778,7 +785,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getAdditionalProductionNextTurn(Unit addUnit) {
-        return getProductionAdding(colony.getGoodsCount(getGoodsInputType()) + 
+        return getProductionAdding(getStoredInput() + 
                                    colony.getProductionNextTurn(getGoodsInputType()), addUnit) - 
             getProductionNextTurn();
     }
@@ -865,7 +872,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     private int getMaximumAutoProduction() {
         int available = colony.getGoodsCount(getGoodsOutputType());
-        if (available < 2) {
+        if (available < getGoodsOutputType().getBreedingNumber()) {
             // we need at least two horses/animals to breed
             return 0;
         }
@@ -879,7 +886,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *         if it cannot be added, will return <code>0</code>.
      */
     public int getAdditionalProduction(Unit addUnit) {
-        return getProductionAdding(colony.getGoodsCount(getGoodsInputType()), addUnit) - getProduction();
+        return getProductionAdding(getStoredInput(), addUnit) - getProduction();
     }
 
     /**
