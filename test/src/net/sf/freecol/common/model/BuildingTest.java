@@ -361,11 +361,16 @@ public class BuildingTest extends FreeColTestCase {
         assertEquals(0, pasture.getGoodsInputNextTurn());
         assertEquals(8, colony.getProductionNetOf(foodType));
         assertEquals(0, colony.getProductionNetOf(horsesType));
+        assertEquals(0, pasture.getMaximumProduction());
 
         colony.addGoods(horsesType, 20);
         assertEquals(1, pasture.getProductionOf(horsesType));
+        assertEquals(2, pasture.getMaximumProduction());
+        assertEquals(1, colony.getProductionNetOf(horsesType));
         colony.addGoods(horsesType, 20);
         assertEquals(2, pasture.getProductionOf(horsesType));
+        assertEquals(4, pasture.getMaximumProduction());
+        assertEquals(2, colony.getProductionNetOf(horsesType));
 
     }
 

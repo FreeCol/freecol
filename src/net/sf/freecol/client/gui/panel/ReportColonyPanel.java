@@ -149,14 +149,19 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
     private JPanel createProductionPanel(Colony colony) {
         JPanel goodsPanel = new JPanel(new GridLayout(0, 10));
         goodsPanel.setOpaque(false);
-        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType goodsType : goodsList) {
+        int netFood = colony.getFoodProduction() - colony.getFoodConsumption();
+        if (netFood != 0) {
+            ProductionLabel productionLabel = new ProductionLabel(Goods.FOOD, netFood, getCanvas());
+            productionLabel.setStockNumber(colony.getFoodCount());
+            goodsPanel.add(productionLabel);
+        }
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            if (goodsType.isFoodType()) {
+                continue;
+            }
             int newValue = colony.getProductionNetOf(goodsType);
-            int stockValue = -1;  // Show stored items in ReportColonyPanel
-            // getGoodsCount will return either the amount in storage or the Hammmer/Bell quantity
-            stockValue = colony.getGoodsCount(goodsType);
+            int stockValue = colony.getGoodsCount(goodsType);
             if (newValue != 0 || stockValue > 0) {
-                Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
                 Building building = colony.getBuildingForProducing(goodsType);
                 ProductionLabel productionLabel = new ProductionLabel(goodsType, newValue, getCanvas());
                 if (building != null) {
