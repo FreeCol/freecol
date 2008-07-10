@@ -56,9 +56,9 @@ public class SoundLibrary {
                     return false;
                 } else {
                     String s = file.getName();
-                    return (s.endsWith(".au") || s.endsWith(".rmf") || 
-                            s.endsWith(".mid") || s.endsWith(".wav") || 
-                            s.endsWith(".aif") || s.endsWith(".aiff"));
+                    return (s.endsWith(".au") || s.endsWith(".wav") || 
+                            s.endsWith(".aif") || s.endsWith(".aiff") ||
+                            s.endsWith(".ogg") || s.endsWith(".mp3"));
                 }
             }
         };

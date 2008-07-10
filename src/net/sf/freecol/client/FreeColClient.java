@@ -225,13 +225,13 @@ public final class FreeColClient {
      */
     private void startGUI(Dimension innerWindowSize) {
         if (musicLibrary != null) {
-            musicPlayer = new SoundPlayer(false, true, true);
+            musicPlayer = new SoundPlayer(false, true);
+            musicPlayer.play(musicLibrary.get("intro"));
         } else {
             musicPlayer = null;
         }
-        // TODO: Start playing some music here.
         if (sfxLibrary != null) {
-            sfxPlayer = new SoundPlayer(true, false, false);
+            sfxPlayer = new SoundPlayer(true, false);
         } else {
             sfxPlayer = null;
         }

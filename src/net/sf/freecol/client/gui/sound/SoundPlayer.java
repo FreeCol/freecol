@@ -21,26 +21,17 @@
 package net.sf.freecol.client.gui.sound;
 
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.sound.midi.InvalidMidiDataException;
-import javax.sound.midi.MetaEventListener;
-import javax.sound.midi.MetaMessage;
-import javax.sound.midi.MidiChannel;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.Sequence;
-import javax.sound.midi.Sequencer;
-import javax.sound.midi.Synthesizer;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 
 
 /**
@@ -58,9 +49,6 @@ public class SoundPlayer {
 
     /** Is the sound stopped? */
     private boolean soundStopped = true;
-
-    /** Is MIDI enabled? */
-    private boolean isMIDIEnabled = false;
 
     /**
     * Should the <i>SoundPlayer</i> play multiple sounds at the same time, or only one?
@@ -95,12 +83,11 @@ public class SoundPlayer {
     *                       or only one? If it does not allow multiple sounds, then using <i>play</i> will
     *                       stop the sound currently playing and play the new instead.
     *
-    * @param isMIDIEnabled Should MIDI be enabled?
     * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
     *
     */
-    public SoundPlayer(boolean multipleSounds, boolean isMIDIEnabled, boolean defaultPlayContinues) {
-        this(multipleSounds, isMIDIEnabled, defaultPlayContinues, Playlist.REPEAT_ALL, Playlist.FORWARDS);
+    public SoundPlayer(boolean multipleSounds, boolean defaultPlayContinues) {
+        this(multipleSounds, defaultPlayContinues, Playlist.REPEAT_ALL, Playlist.FORWARDS);
     }
 
 
@@ -112,15 +99,13 @@ public class SoundPlayer {
     *                       or only one? If it does not allow multiple sounds, then using <i>play</i> will
     *                       stop the sound currently playing and play the new instead.
     *
-    * @param isMIDIEnabled Should MIDI be enabled?
     * @param defaultRepeatMode This is the default repeat-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
     * @param defaultPickMode This is the default pick-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
     * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
     *
     */
-    public SoundPlayer(boolean multipleSounds, boolean isMIDIEnabled, boolean defaultPlayContinues, int defaultRepeatMode, int defaultPickMode) {
+    public SoundPlayer(boolean multipleSounds, boolean defaultPlayContinues, int defaultRepeatMode, int defaultPickMode) {
         this.multipleSounds = multipleSounds;
-        this.isMIDIEnabled = isMIDIEnabled;
         this.defaultPlayContinues = defaultPlayContinues;
         this.defaultRepeatMode = defaultRepeatMode;
         this.defaultPickMode = defaultPickMode;
@@ -199,7 +184,7 @@ public class SoundPlayer {
 
 
     /** Thread for playing a <i>Playlist</i>. */
-    class SoundPlayerThread extends Thread implements LineListener, MetaEventListener {
+    class SoundPlayerThread extends Thread {
 
         /** An array containing the currently selected playlist. The numbers in the array is used as an index in the <i>soundFiles</i>-array. */
         private Playlist playlist;
@@ -225,27 +210,6 @@ public class SoundPlayer {
         @SuppressWarnings("unused")
         private boolean repeatSound;
 
-        /** The sound that is prepared for/is playing. A <i>Sequence</i>, <i>BufferedInputStream</i> or a <i>Clip</i>. */
-        private Object currentSound;
-
-        /** True if MIDI is finished playing. */
-        private boolean midiEOM;
-
-        /** True if (not MIDI) audio is finished playing. */
-        @SuppressWarnings("unused")
-        private boolean audioEOM;
-
-        /** The <i>Sequencer</i> to use while playing MIDI. */
-        private Sequencer sequencer;
-
-        private Synthesizer synthesizer;
-
-        /** An array of <i>MidiChannel</i> to use while playing MIDI. */
-        @SuppressWarnings("unused")
-        private MidiChannel[] channels;
-
-
-
 
         /**
         * The constructor to use.
@@ -262,9 +226,6 @@ public class SoundPlayer {
             this.playContinues = playContinues;
             this.repeatMode = repeatMode;
             this.pickMode = pickMode;
-
-            if (isMIDIEnabled)
-              enableMIDI();
         }
 
 
@@ -280,177 +241,62 @@ public class SoundPlayer {
             soundStopped = false;
 
             do {
-                if(loadSound(playlist.next()))
-                    playSound();
+                playSound(playlist.next());
 
                 // Take a little break between sounds
                 try { Thread.sleep(222); } catch (Exception e) {break;}
             } while (playContinues && playlist.hasNext() && !soundStopped);
         }
 
-
-
-        /**
-        * Loads a sound into <i>currentSound</i>.
-        * @param file A sound-file.
-        */
-        private boolean loadSound(File file) {
+        public void playSound(File file) {
             try {
-                currentSound = AudioSystem.getAudioInputStream(file);
-            } catch(Exception e1) {
-                try {
-                    FileInputStream fileInputStream = new FileInputStream(file);
-                    currentSound = new BufferedInputStream(fileInputStream, 1024);
-                } catch (Exception e3) {
-                    logger.warning("Error while loading audio file: " + e3.getMessage());
-                    currentSound = null;
-                    return false;
+                AudioInputStream in= AudioSystem.getAudioInputStream(file);
+                AudioInputStream din = null;
+                if (in != null) {
+                    AudioFormat baseFormat = in.getFormat();
+                    AudioFormat decodedFormat = new AudioFormat(
+                            AudioFormat.Encoding.PCM_SIGNED,
+                            baseFormat.getSampleRate(),
+                            16,
+                            baseFormat.getChannels(),
+                            baseFormat.getChannels() * (16 / 8),
+                            baseFormat.getSampleRate(),
+                            baseFormat.isBigEndian());
+                    din = AudioSystem.getAudioInputStream(decodedFormat, in);
+                    rawplay(decodedFormat, din);
+                    in.close();
                 }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Could not play audio.", e);
             }
+        }
 
-            if (currentSound instanceof AudioInputStream) {
-            try {
-                    AudioInputStream stream = (AudioInputStream) currentSound;
-                    AudioFormat format = stream.getFormat();
-
-                    if ((format.getEncoding() == AudioFormat.Encoding.ULAW) ||
-                        (format.getEncoding() == AudioFormat.Encoding.ALAW))
-                    {
-                        AudioFormat tmp = new AudioFormat(
-                                                AudioFormat.Encoding.PCM_SIGNED,
-                                                format.getSampleRate(),
-                                                format.getSampleSizeInBits() * 2,
-                                                format.getChannels(),
-                                                format.getFrameSize() * 2,
-                                                format.getFrameRate(),
-                                                true);
-                        stream = AudioSystem.getAudioInputStream(tmp, stream);
-                        format = tmp;
+        private void rawplay(AudioFormat targetFormat,  AudioInputStream din) throws IOException, LineUnavailableException {
+            byte[] data = new byte[8192];
+            SourceDataLine line = getLine(targetFormat);
+            if (line != null) {
+                line.start();
+                int read = 0;
+                int written = 0;
+                while (read != -1) {
+                    read = din.read(data, 0, data.length);
+                    if (read != -1) {
+                        written = line.write(data, 0, read);
                     }
-                    DataLine.Info info = new DataLine.Info(
-                                            Clip.class,
-                                            stream.getFormat(),
-                                            ((int) stream.getFrameLength() *
-                                                format.getFrameSize()));
-
-                    Clip clip = (Clip) AudioSystem.getLine(info);
-                    clip.addLineListener(this);
-                    clip.open(stream);
-                    currentSound = clip;
-                } catch (Exception ex) {
-                    logger.warning("Error while reading audio-stream: " + ex.getMessage());
-                    currentSound = null;
-                    return false;
                 }
-            } else if (currentSound instanceof Sequence || currentSound instanceof BufferedInputStream) {
-                if (isMIDIEnabled) {
-                    try {
-                        sequencer.open();
-                        if (currentSound instanceof Sequence) {
-                            sequencer.setSequence((Sequence) currentSound);
-                        } else {
-                            sequencer.setSequence((BufferedInputStream) currentSound);
-                        }
-
-                    } catch (InvalidMidiDataException imde) {
-                        logger.warning("Unsupported audio file: " + imde.getMessage());
-                        currentSound = null;
-                        return false;
-                    } catch (Exception ex) {
-                        logger.warning("Error while loading MIDI-file: " + ex.getMessage());
-                        currentSound = null;
-                        return false;
-                    }
-                } else {
-                    logger.info("Could not load MIDI-file, because it has been disabled.");
-                    currentSound = null;
-                    return false;
-                }
-            }
-            
-            return true;
+                line.drain();
+                line.stop();
+                line.close();
+                din.close();
+            }             
         }
 
-
-
-        /**
-        * Play the sound in <code>currentSound</code>.
-        * @see #loadSound
-        */
-        private void playSound() {
-            midiEOM = audioEOM = false;
-            if (currentSound instanceof Sequence || currentSound instanceof BufferedInputStream && !soundStopped) { //isActive()
-                sequencer.start();
-
-                while (!midiEOM && !soundStopped) {
-                    try { Thread.sleep(99); } catch (Exception e) {break;}
-                }
-
-                sequencer.stop();
-                sequencer.close();
-            } else if (currentSound instanceof Clip && !soundStopped) {
-                Clip clip = (Clip) currentSound;
-                clip.start();
-
-                try { Thread.sleep(99); } catch (Exception e) { }
-
-                // Just sleep while the clip is playing, but check if the sound have been stopped every second.
-                while ((soundPaused || clip.isActive()) && !soundStopped) {
-                    try { Thread.sleep(1000); } catch (Exception e) {break;}
-                }
-
-                clip.stop();
-                clip.close();
-            }
-            currentSound = null;
+        private SourceDataLine getLine(AudioFormat audioFormat) throws LineUnavailableException {
+            SourceDataLine sdl = null;
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+            sdl = (SourceDataLine) AudioSystem.getLine(info);
+            sdl.open(audioFormat);
+            return sdl;
         }
-
-
-
-        /** This method enables MIDI, by opening a <i>sequencer</i>. */
-        public void enableMIDI() {
-
-            try {
-                sequencer = MidiSystem.getSequencer();
-
-                if (sequencer instanceof Synthesizer) {
-                    synthesizer = (Synthesizer)sequencer;
-                    channels = synthesizer.getChannels();
-                }
-
-            } catch (Exception ex) { ex.printStackTrace(); return; }
-            sequencer.addMetaEventListener(this);
-            isMIDIEnabled = true;
-        }
-
-
-
-        /** This method disables MIDI, by closing the <i>sequencer</i>.  */
-        public void disableMIDI() {
-            if (sequencer != null) {
-                sequencer.close();
-                isMIDIEnabled = false;
-            }
-        }
-
-
-
-        /** This method is the implementation of <i>MetaEventListener</i>. It is used to find out when the MIDI-file is finished playing. */
-        public void meta(MetaMessage message) {
-            if (message.getType() == 47) {  // 47 is end of track
-                midiEOM = true;
-            }
-        }
-
-
-
-        /** This method is the implementation of <i>LineListener</i>. It is used to find out when the (not MIDI) audio-file is finished playing. */
-        public void update(LineEvent event) {
-            if (event.getType() == LineEvent.Type.STOP && !soundPaused) {
-                audioEOM = true;
-            }
-        }
-
-
     }
 }
