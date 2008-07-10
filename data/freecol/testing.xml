@@ -22,7 +22,15 @@
 <freecol-specification>
   <!-- types of goods.  an element must be defined before it is referenced -->
   <goods-types>
-    <goods-type id="model.goods.food" art="goods/food.png" is-farmed="true" ignore-limit="true" is-food="true">
+    <goods-type id="model.goods.food" art="goods/food.png" is-farmed="false" ignore-limit="true" is-food="true">
+      <market initial-amount="10000" initial-price="1"  price-difference="7"/>
+    </goods-type>
+    <goods-type id="model.goods.grain" art="goods/grain.png" is-farmed="true" storable="false"
+                stored.as="model.goods.food" is-food="true">
+      <market initial-amount="10000" initial-price="1"  price-difference="7"/>
+    </goods-type>
+    <goods-type id="model.goods.fish" art="goods/fish.png" is-farmed="true" storable="false"
+                stored-as="model.goods.food" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
     <goods-type id="model.goods.sugar" art="goods/sugar.png" is-farmed="true" new-world-goods="true">
@@ -53,7 +61,7 @@
       <market initial-amount="500"   initial-price="16" price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.horses" art="goods/horses.png" is-farmed="false"
-                breeding-number="2" made-from="model.goods.food">
+                breeding-number="2" made-from="model.goods.grain">
       <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.rum" art="goods/rum.png" is-farmed="false" made-from="model.goods.sugar">
@@ -80,8 +88,6 @@
     <goods-type id="model.goods.muskets" art="goods/muskets.png" is-farmed="false" made-from="model.goods.tools">
       <market initial-amount="500"   initial-price="1"  price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.fish" art="goods/fish.png" is-farmed="true" storable="false"
-                stored-as="model.goods.food" is-food="true" />
     <goods-type id="model.goods.bells" art="goods/bells.png" is-farmed="false"
                 ignore-limit="true" storable="false" player-accumulated="true"/>
     <goods-type id="model.goods.crosses" art="goods/crosses.png" is-farmed="false"
@@ -92,8 +98,8 @@
 
   <resource-types>
     <resource-type id="model.resource.Game">
-      <modifier id="model.goods.food" type="additive" value="2"/>
-      <!-- in colonization game gives 2 food (4 for expert farmer) -->
+      <modifier id="model.goods.grain" type="additive" value="2"/>
+      <!-- in colonization game gives 2 grain (4 for expert farmer) -->
       <modifier id="model.goods.furs" type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Minerals" minimum-value="40" maximum-value="400">
@@ -122,16 +128,16 @@
       <modifier id="model.goods.cotton" type="multiplicative" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Oasis">
-      <modifier id="model.goods.food" type="additive" value="2"/>
-      <!-- in colonization game gives 2 food (4 for expert farmer) -->
+      <modifier id="model.goods.grain" type="additive" value="2"/>
+      <!-- in colonization game gives 2 grain (4 for expert farmer) -->
     </resource-type>
     <resource-type id="model.resource.Grain">
-      <modifier id="model.goods.food" type="additive" value="2"/>
-      <!-- in colonization game gives 2 food (4 for expert farmer) -->
+      <modifier id="model.goods.grain" type="additive" value="2"/>
+      <!-- in colonization game gives 2 grain (4 for expert farmer) -->
     </resource-type>
     <resource-type id="model.resource.Fish">
       <modifier id="model.goods.fish" type="additive" value="3"/>
-      <!-- in colonization game gives 3 food (6 for expert fisherman) -->
+      <!-- in colonization game gives 3 grain (6 for expert fisherman) -->
     </resource-type>
   </resource-types>
 
@@ -169,7 +175,7 @@
                   secondary-goods="model.goods.cotton">
       <art basic="terrain/plains/" minimap-color="#24801f"/>
       <gen humidityMin="0" humidityMax="60" temperatureMin="0" temperatureMax="15" altitudeMin="1" altitudeMax="2"/>
-      <production goods-type="model.goods.food"       value="5"/>
+      <production goods-type="model.goods.grain"       value="5"/>
       <production goods-type="model.goods.cotton"     value="2"/>
       <production goods-type="model.goods.ore"        value="1"/>
       <resource   type="model.resource.Grain"         probability="100"/>
@@ -178,7 +184,7 @@
                   secondary-goods="model.goods.tobacco">
       <art basic="terrain/grassland/" minimap-color="#24801f"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="10" temperatureMax="25" altitudeMin="1" altitudeMax="1"/>
-      <production goods-type="model.goods.food"       value="3"/>
+      <production goods-type="model.goods.grain"       value="3"/>
       <production goods-type="model.goods.tobacco"    value="3"/>
       <production goods-type="model.goods.hemp"       value="2"/>
       <resource   type="model.resource.Tobacco"       probability="100"/>
@@ -187,7 +193,7 @@
                   secondary-goods="model.goods.cotton">
       <art basic="terrain/prairie/" minimap-color="#24801f"/>
       <gen humidityMin="20" humidityMax="50" temperatureMin="15" temperatureMax="30" altitudeMin="1" altitudeMax="1"/>
-      <production goods-type="model.goods.food"       value="3"/>
+      <production goods-type="model.goods.grain"       value="3"/>
       <production goods-type="model.goods.cotton"     value="3"/>
       <resource   type="model.resource.Cotton"        probability="100"/>
     </tile-type>
@@ -195,7 +201,7 @@
                   secondary-goods="model.goods.sugar">
       <art basic="terrain/savannah/" minimap-color="#24801f"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
-      <production goods-type="model.goods.food"       value="4"/>
+      <production goods-type="model.goods.grain"       value="4"/>
       <production goods-type="model.goods.sugar"      value="3"/>
       <resource   type="model.resource.Sugar"         probability="100"/>
     </tile-type>
@@ -204,7 +210,7 @@
       <art basic="terrain/marsh/" minimap-color="#24803d"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="25"/>
-      <production goods-type="model.goods.food"       value="3"/>
+      <production goods-type="model.goods.grain"       value="3"/>
       <production goods-type="model.goods.tobacco"    value="2"/>
       <production goods-type="model.goods.ore"        value="2"/>
       <production goods-type="model.goods.hemp"       value="2"/>
@@ -215,7 +221,7 @@
       <art basic="terrain/swamp/" minimap-color="#24803d"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="25"/>
-      <production goods-type="model.goods.food"       value="3"/>
+      <production goods-type="model.goods.grain"       value="3"/>
       <production goods-type="model.goods.sugar"      value="2"/>
       <production goods-type="model.goods.ore"        value="2"/>
       <resource   type="model.resource.Minerals"      probability="100"/>
@@ -224,7 +230,7 @@
                   secondary-goods="model.goods.cotton">
       <art basic="terrain/desert/" minimap-color="#63732b"/><!--0.39,0.45,0.17"-->
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
-      <production goods-type="model.goods.food"       value="2"/>
+      <production goods-type="model.goods.grain"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
       <production goods-type="model.goods.ore"        value="2"/>
       <resource   type="model.resource.Oasis"         probability="100"/>
@@ -233,7 +239,7 @@
                   secondary-goods="model.goods.ore">
       <art basic="terrain/tundra/" minimap-color="#639e5e"/><!--0.39,0.62,0.37"-->
       <gen humidityMin="0" humidityMax="100" temperatureMin="-5" temperatureMax="5" altitudeMin="1" altitudeMax="3"/>
-      <production goods-type="model.goods.food"       value="3"/>
+      <production goods-type="model.goods.grain"       value="3"/>
       <production goods-type="model.goods.ore"        value="2"/>
       <resource   type="model.resource.Minerals"         probability="100"/>
     </tile-type>
@@ -242,7 +248,7 @@
       <art basic="terrain/plains/" forest="forest/mixed.png" minimap-color="#24731f"/>
       <gen humidityMin="0" humidityMax="60" temperatureMin="0" temperatureMax="15" altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <production goods-type="model.goods.food"       value="3"/>
+      <production goods-type="model.goods.grain"       value="3"/>
       <production goods-type="model.goods.cotton"     value="1"/>
       <production goods-type="model.goods.furs"       value="3"/>
       <production goods-type="model.goods.lumber"     value="6"/>
@@ -257,7 +263,7 @@
       <art basic="terrain/grassland/" forest="forest/conifer.png" minimap-color="#24731f"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="10" temperatureMax="25" altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <production goods-type="model.goods.food"       value="2"/>
+      <production goods-type="model.goods.grain"       value="2"/>
       <production goods-type="model.goods.tobacco"    value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="6"/>
@@ -268,7 +274,7 @@
       <art basic="terrain/prairie/" forest="forest/broadleaf.png" minimap-color="#24731f"/>
       <gen humidityMin="20" humidityMax="50" temperatureMin="15" temperatureMax="30" altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <production goods-type="model.goods.food"       value="2"/>
+      <production goods-type="model.goods.grain"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
@@ -279,7 +285,7 @@
       <art basic="terrain/savannah/" forest="forest/tropical.png" minimap-color="#24731f"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
-      <production goods-type="model.goods.food"       value="3"/>
+      <production goods-type="model.goods.grain"       value="3"/>
       <production goods-type="model.goods.tobacco"    value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
@@ -290,7 +296,7 @@
       <art basic="terrain/marsh/" forest="forest/wetland.png" minimap-color="#24731f"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="5" temperatureMax="15" altitudeMin="2" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <production goods-type="model.goods.food"       value="2"/>
+      <production goods-type="model.goods.grain"       value="2"/>
       <production goods-type="model.goods.tobacco"    value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
@@ -302,7 +308,7 @@
       <art basic="terrain/swamp/" forest="forest/rain.png" minimap-color="#24731f"/>
       <gen humidityMin="50" humidityMax="100" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <modifier id="model.modifier.defence" type="percentage" value="75"/>
-      <production goods-type="model.goods.food"       value="2"/>
+      <production goods-type="model.goods.grain"       value="2"/>
       <production goods-type="model.goods.sugar"      value="1"/>
       <production goods-type="model.goods.furs"       value="1"/>
       <production goods-type="model.goods.lumber"     value="4"/>
@@ -314,7 +320,7 @@
       <art basic="terrain/desert/" forest="forest/scrub.png" minimap-color="#24731f"/>
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <production goods-type="model.goods.food"       value="2"/>
+      <production goods-type="model.goods.grain"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="2"/>
@@ -326,7 +332,7 @@
       <art basic="terrain/tundra/" forest="forest/boreal.png" minimap-color="#24731f"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-5" temperatureMax="5" altitudeMin="1" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
-      <production goods-type="model.goods.food"       value="2"/>
+      <production goods-type="model.goods.grain"       value="2"/>
       <production goods-type="model.goods.furs"       value="3"/>
       <production goods-type="model.goods.lumber"     value="4"/>
       <production goods-type="model.goods.ore"        value="1"/>
@@ -337,7 +343,7 @@
       <art basic="terrain/plains/" overlay="terrain/hills/hills" minimap-color="#708052"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="2" altitudeMax="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
-      <production goods-type="model.goods.food"       value="2"/>
+      <production goods-type="model.goods.grain"       value="2"/>
       <production goods-type="model.goods.ore"        value="4"/>
       <resource   type="model.resource.Ore"           probability="100"/>
     </tile-type>
@@ -446,7 +452,7 @@
     <tileimprovement-type id="model.improvement.River" natural="true" add-work-turns="0" magnitude="1"
                           movement-cost="1">
       <tiles all-land-tiles="true"/>
-      <modifier id="model.goods.food" type="additive" value="1"/>
+      <modifier id="model.goods.grain" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
       <modifier id="model.goods.cotton" type="additive" value="1"/>
@@ -469,7 +475,7 @@
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <tile id="model.tile.hills" value="false"/>
       <tile id="model.tile.mountains" value="false"/>
-      <modifier id="model.goods.food" type="additive" value="1"/>
+      <modifier id="model.goods.grain" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
       <modifier id="model.goods.cotton" type="additive" value="1"/>
@@ -548,13 +554,13 @@
       <upgrade unit="model.unit.jesuitMissionary" turnsToLearn="8"/>
     </unit-type>
     <unit-type id="model.unit.expertFarmer" art="expertFarmer" offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
-               skill="1" recruitProbability="1" expert-production="model.goods.food"
+               skill="1" recruitProbability="1" expert-production="model.goods.grain"
                scoreValue="4" pathImage="foot">
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
-      <modifier id="model.goods.food" type="additive" value="2"/>
+      <modifier id="model.goods.grain" type="additive" value="2"/>
     </unit-type>
     <unit-type id="model.unit.expertFisherman" art="expertFisherman" offence="0"  defence="1" movement="3" lineOfSight="1" price="1000" 
                skill="1" recruitProbability="1" expert-production="model.goods.fish"
@@ -775,9 +781,9 @@
       <ability id="model.ability.expertMissionary" value="true"/>
     </unit-type>
     <unit-type id="model.unit.indenturedServant" art="indenturedServant" offence="0"  defence="1" movement="3" lineOfSight="1"              
-               skill="-1" recruitProbability="20" scoreValue="2" pathImage="foot">
+               skill="-1" recruitProbability="20" scoreValue="2" pathImage="foot" maximumAttrition="6">
       <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeEquipped" value="false"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <upgrade unit="model.unit.freeColonist" turnsToLearn="4" promotion="true"/>
       <upgrade unit="model.unit.expertFarmer" learnFromNatives="true" learnInSchool="false"/>
@@ -801,9 +807,9 @@
       <modifier id="model.goods.tools" type="additive" value="-1" />
     </unit-type>
     <unit-type id="model.unit.pettyCriminal" art="pettyCriminal" offence="0"  defence="1" movement="3" lineOfSight="1"               
-               skill="-2" recruitProbability="20" scoreValue="1" pathImage="foot">
+               skill="-2" recruitProbability="20" scoreValue="1" pathImage="foot" maximumAttrition="2">
       <ability id="model.ability.foundColony" value="true"/>
-      <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.canBeEquipped" value="false"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <upgrade unit="model.unit.indenturedServant" turnsToLearn="4" promotion="true"/>
       <upgrade unit="model.unit.seasonedScout" learnInLostCity="true" learnInSchool="false"/>
@@ -821,7 +827,7 @@
                movement="3" lineOfSight="1" maximumAttrition="10"
                scoreValue="3" skill="0" pathImage="foot">
       <ability id="model.ability.convert" value="true"/>
-      <modifier id="model.goods.food" type="additive" value="1"/>
+      <modifier id="model.goods.grain" type="additive" value="1"/>
       <modifier id="model.goods.sugar" type="additive" value="1"/>
       <modifier id="model.goods.tobacco" type="additive" value="1"/>
       <modifier id="model.goods.cotton" type="additive" value="1"/>
@@ -970,7 +976,7 @@
       <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <!--<unit-type id="model.unit.milkmaid" art="milkmaid" offence="0"  defence="1" movement="3"  lineOfSight="1"-->
-               <!--expert-production="model.goods.food" pathImage="foot">-->
+               <!--expert-production="model.goods.grain" pathImage="foot">-->
       <!--<ability id="model.ability.foundColony" value="true"/>-->
       <!--<ability id="model.ability.canBeEquipped" value="true"/>-->
       <!--<ability id="model.ability.canBeCaptured" value="true"/>-->
@@ -1190,12 +1196,12 @@
       <required-goods id="model.goods.tools" value="20"/>
       <modifier id="model.modifier.warehouseStorage" type="additive" value="300"/>
     </building-type>
-    <building-type id="model.building.Country" workplaces="0" consumes="model.goods.food"
+    <building-type id="model.building.Country" workplaces="0" consumes="model.goods.grain"
                    produces="model.goods.horses" sequence="14">
       <modifier id="model.goods.horses" type="percentage" value="-50"/>
       <ability id="model.ability.autoProduction" value="true" />
     </building-type>
-    <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.food"
+    <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.grain"
                    produces="model.goods.horses" upgradesFrom="model.building.Country" sequence="14">
       <required-goods id="model.goods.hammers" value="64"/>
       <ability id="model.ability.autoProduction" value="true" />
@@ -1242,7 +1248,7 @@
   <founding-fathers>
     <founding-father id="model.foundingFather.adamSmith" type="trade"
                      weight1="2" weight2="8" weight3="6">
-      <modifier id="model.ability.food" type="additive" value="2"/>
+      <modifier id="model.ability.grain" type="additive" value="2"/>
     </founding-father>
     <founding-father id="model.foundingFather.johnnyAppleseed" type="trade"
                      weight1="2" weight2="8" weight3="6">
