@@ -374,4 +374,12 @@ public class BuildingTest extends FreeColTestCase {
 
     }
 
+    public void testTownhallProduction() {
+        
+        Colony colony = getStandardColony(6);
+        Unit unit = colony.getRandomUnit();
+        Building building = colony.getBuilding(spec().getBuildingType("model.building.TownHall"));
+        building.add(unit);
+        building.newTurn(); 
+    }
 }
