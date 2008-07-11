@@ -596,4 +596,18 @@ public class UnitTest extends FreeColTestCase {
          assertEquals("Brave wasnt removed from camp",0, camp.getUnitCount());
          assertTrue("Brave wasnt removed from player unit list",indianPlayer.getUnit(brave.getId()) == null);
     }
+    
+    public void testKingsRegulars() {
+        Game game = getStandardGame();
+        Map map = getEmptyMap();
+        game.setMap(map);
+        
+        Player indian = game.getPlayer("model.nation.sioux");
+        Player european = game.getPlayer("model.nation.dutch");
+        Player king = game.getPlayer("model.nation.dutchREF");
+        UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.kingsRegular");
+        assertTrue(unitType.isAvailableTo(king));
+        assertFalse(unitType.isAvailableTo(indian));
+        assertFalse(unitType.isAvailableTo(european));
+   }
 }
