@@ -120,6 +120,8 @@ public class ClientOptions extends OptionMap {
     public static final int MESSAGES_GROUP_BY_TYPE = 1;
     public static final int MESSAGES_GROUP_BY_SOURCE = 2;
 
+    public static final String MUSIC_VOLUME = "musicVolume";
+    
     /**
      * Used by GUI, this defines whether SoL messages will be displayed.
      *
@@ -399,7 +401,7 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
         new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
         new BooleanOption(DISPLAY_GRID, guiGroup, false);
-        new RangeOption(ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 2, false);
+        new RangeOption(ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 3, false);
         new SelectOption(COLONY_COMPARATOR, guiGroup,
                          new String[] {"byName",
                                        "byAge",
@@ -449,6 +451,11 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(SHOW_PRECOMBAT, messagesGroup, true);
         new BooleanOption(SHOW_TUTORIAL, messagesGroup, true);
         add(messagesGroup);
+
+        OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
+        new RangeOption(MUSIC_VOLUME, audioGroup,
+                new String[] {"0%", "20%", "40%", "60%", "80%", "100%"}, 5, true);
+        add(audioGroup);
         
         OptionGroup savegamesGroup = new OptionGroup("clientOptions.savegames");
         new SelectOption(SHOW_SAVEGAME_SETTINGS, savegamesGroup,
