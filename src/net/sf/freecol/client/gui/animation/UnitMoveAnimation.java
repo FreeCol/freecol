@@ -24,6 +24,7 @@ import java.awt.Rectangle;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Location;
@@ -50,7 +51,7 @@ public final class UnitMoveAnimation extends Animation {
     // Movement variables & constants
     private final int signalX; // If X is increasing or decreasing
     private final int signalY; // If Y is increasing or decreasing
-    private static final int MOVEMENT_RATIO = 4; // pixels/frame (must be power of 2)
+    private final int movementRatio;
     private static final int X_RATIO = 2;
     private static final int Y_RATIO = 1;
     
@@ -78,12 +79,15 @@ public final class UnitMoveAnimation extends Animation {
         this.unit = unit;
         this.destinationTile = destinationTile;
         this.currentLocation = unit.getLocation();
+        final int movementSpeed = canvas.getClient().getClientOptions().getInteger(ClientOptions.ANIMATION_SPEED);
         
         GUI gui = canvas.getGUI();
         
         Point currP = gui.getTilePosition(unit.getTile());
         Point destP = gui.getTilePosition(destinationTile);
-        if (currP != null && destP != null) {
+        if (currP != null && destP != null && movementSpeed > 0) {
+            
+            this.movementRatio = (int) (Math.pow(2, movementSpeed)*canvas.getGUI().getImageLibrary().getScalingFactor());
             
             unitLabel = gui.getUnitLabel(unit);
             currentPoint = gui.getUnitLabelPositionInTile(unitLabel, currP);
@@ -105,11 +109,12 @@ public final class UnitMoveAnimation extends Animation {
             distanceToTarget = distance(destinationPoint, currentPoint);
             
         } else {
-            // Unit is offscreen - no need to animate
-            logger.finest("Unit is offscreen - no need to animate.");
+            // Unit is offscreen or animation is off - no need to animate
+            logger.finest("Unit is offscreen or animation is off - no need to animate.");
             currentPoint = destinationPoint = null;
             signalX = signalY = 0;
             distanceToTarget = 0;
+            movementRatio = 0;
         }
     }
 
@@ -121,8 +126,8 @@ public final class UnitMoveAnimation extends Animation {
         logger.finest("Calculating and setting the new unit location.");
                 
         // Calculating the new coordinates for the unit            
-        currentPoint.x += signalX*X_RATIO*MOVEMENT_RATIO;        
-        currentPoint.y += signalY*Y_RATIO*MOVEMENT_RATIO;
+        currentPoint.x += signalX*X_RATIO*movementRatio;        
+        currentPoint.y += signalY*Y_RATIO*movementRatio;
         
         //Setting new location
         unitLabel.setLocation(currentPoint);

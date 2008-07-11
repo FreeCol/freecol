@@ -104,9 +104,9 @@ public class ClientOptions extends OptionMap {
     public static final String DISPLAY_GRID = "displayGrid";
     
     /**
-     * Whether to display animations or not.
+     * Animation speed
      */
-    public static final String DISPLAY_ANIMATIONS = "displayAnimations";
+    public static final String ANIMATION_SPEED = "animationSpeed";
 
     /**
      * Used by GUI, this defines the grouping of ModelMessages.
@@ -399,7 +399,7 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
         new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
         new BooleanOption(DISPLAY_GRID, guiGroup, false);
-        new BooleanOption(DISPLAY_ANIMATIONS, guiGroup, true);
+        new RangeOption(ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 2, false);
         new SelectOption(COLONY_COMPARATOR, guiGroup,
                          new String[] {"byName",
                                        "byAge",
