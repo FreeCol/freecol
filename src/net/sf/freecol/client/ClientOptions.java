@@ -452,10 +452,10 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(SHOW_TUTORIAL, messagesGroup, true);
         add(messagesGroup);
 
-        OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
+        /*OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
         new RangeOption(MUSIC_VOLUME, audioGroup,
                 new String[] {"0%", "20%", "40%", "60%", "80%", "100%"}, 5, true);
-        add(audioGroup);
+        add(audioGroup);*/
         
         OptionGroup savegamesGroup = new OptionGroup("clientOptions.savegames");
         new SelectOption(SHOW_SAVEGAME_SETTINGS, savegamesGroup,
