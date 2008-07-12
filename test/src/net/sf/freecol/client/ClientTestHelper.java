@@ -25,7 +25,7 @@ import java.io.IOException;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.networking.NoRouteToServerException;
-import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.control.PreGameController;
@@ -54,8 +54,8 @@ public class ClientTestHelper {
             boolean loggedIn = connectController.login(username, "127.0.0.1", port);
             assertTrue(loggedIn);
             client.getPreGameController().setReady(true);
-            client.getClientOptions().putOption(new BooleanOption(ClientOptions.DISPLAY_ANIMATIONS, false));
-            assertFalse(client.getClientOptions().getBoolean(ClientOptions.DISPLAY_ANIMATIONS));
+            //client.getClientOptions().putOption(new RangeOption(ClientOptions.ANIMATION_SPEED, 0));
+            //assertEquals(0, client.getClientOptions().getInt(ClientOptions.ANIMATION_SPEED));
             return client;
         } catch (NoRouteToServerException e) {
             fail("Illegal state: An exception occured that can only appear in public multiplayer games.");
