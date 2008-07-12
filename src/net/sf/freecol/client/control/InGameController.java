@@ -3700,6 +3700,8 @@ public final class InGameController implements NetworkConstants {
                         message.setBeenDisplayed(true);
                         continue;
                     }
+                } else if (message.getType() == ModelMessage.MessageType.BUILDING_COMPLETED) {
+                    freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
                 }
                 messageList.add(message);
             }

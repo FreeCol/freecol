@@ -43,7 +43,8 @@ public class SoundLibrary {
             SUNK,
             ATTACK_DRAGOON,
             ATTACK_NAVAL,
-            CAPTURED_BY_ARTILLERY}
+            CAPTURED_BY_ARTILLERY,
+            BUILDING_COMPLETE}
 
     
     /** This array contains the playlists. */
