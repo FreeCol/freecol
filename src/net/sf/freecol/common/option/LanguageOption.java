@@ -243,11 +243,8 @@ public class LanguageOption extends AbstractOption {
         if (newValue == null) {
             newValue = languages.get(AUTO);
         }
+        setValue(newValue);
         in.nextTag();
-        
-        if (!newValue.equals(oldValue)) {
-            firePropertyChange("value", oldValue, value);
-        }
     }
 
 

@@ -67,7 +67,7 @@ public final class LanguageOptionUI extends JPanel implements OptionUpdater, Pro
         Language[] languages = option.getOptions();
 
         comboBox = new JComboBox(languages);
-        comboBox.setSelectedIndex(0);
+        reset();
         add(comboBox);
         
         comboBox.setEnabled(editable);
@@ -90,7 +90,7 @@ public final class LanguageOptionUI extends JPanel implements OptionUpdater, Pro
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            comboBox.setSelectedIndex(((Integer) event.getNewValue()).intValue());
+            comboBox.setSelectedItem((Language) event.getNewValue());
         }
     }
     
