@@ -41,6 +41,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.action.FreeColAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -162,6 +163,14 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof LanguageOption) {
                 final LanguageOptionUI soi = new LanguageOptionUI((LanguageOption) o, editable);
+                add(soi);
+                ou.add(soi);
+                buttonAdded = false;
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), soi);
+                }
+            } else if (o instanceof AudioMixerOption) {
+                final AudioMixerOptionUI soi = new AudioMixerOptionUI((AudioMixerOption) o, editable);
                 add(soi);
                 ou.add(soi);
                 buttonAdded = false;

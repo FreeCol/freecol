@@ -37,7 +37,9 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 
+import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
+import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
 
 
 /**
@@ -94,42 +96,67 @@ public class SoundPlayer {
 
     
     /**
-    * Use this constructor.
-    *
-    * @param multipleSounds Should the <i>SoundPlayer</i> play multiple sounds at the same time,
-    *                       or only one? If it does not allow multiple sounds, then using <i>play</i> will
-    *                       stop the sound currently playing and play the new instead.
-    *
-    * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
-    *
-    */
-    public SoundPlayer(PercentageOption volume, boolean multipleSounds, boolean defaultPlayContinues) {
-        this(volume, multipleSounds, defaultPlayContinues, Playlist.REPEAT_ALL, Playlist.FORWARDS);
+     * Use this constructor.
+     *
+     * @param mixerOption The option for setting the mixer used by this
+     *       <code>SoundPlayer</code>.
+     * @param volume The volume to be used when playing audio.
+
+     * @param multipleSounds Should the <i>SoundPlayer</i> play multiple sounds at the same time,
+     *                       or only one? If it does not allow multiple sounds, then using <i>play</i> will
+     *                       stop the sound currently playing and play the new instead.
+     *
+     * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
+     *
+     */
+    public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume, boolean multipleSounds, boolean defaultPlayContinues) {
+        this(mixerOption, volume, multipleSounds, defaultPlayContinues, Playlist.REPEAT_ALL, Playlist.FORWARDS);
     }
 
 
 
     /**
-    * Or this.
-    *
-    * @param multipleSounds Should the <i>SoundPlayer</i> play multiple sounds at the same time,
-    *                       or only one? If it does not allow multiple sounds, then using <i>play</i> will
-    *                       stop the sound currently playing and play the new instead.
-    *
-    * @param volume The volume to be used when playing audio.
-    * @param defaultRepeatMode This is the default repeat-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-    * @param defaultPickMode This is the default pick-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
-    * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
-    *
-    */
-    public SoundPlayer(PercentageOption volume, boolean multipleSounds, boolean defaultPlayContinues, int defaultRepeatMode, int defaultPickMode) {
+     * Or this.
+     *
+     *
+     * @param mixerOption The option for setting the mixer used by this
+     *       <code>SoundPlayer</code>.
+     * @param volume The volume to be used when playing audio.
+     * @param multipleSounds Should the <i>SoundPlayer</i> play multiple
+     *       sounds at the same time, or only one? If it does not allow
+     *       multiple sounds, then using <i>play</i> will stop the sound
+     *       currently playing and play the new instead.
+     * @param defaultRepeatMode This is the default repeat-mode for a
+     *       playlist. Refer to the field summary of the
+     *       {@link Playlist}-class to get the different values.
+     * @param defaultPickMode This is the default pick-mode for a playlist.
+     *       Refer to the field summary of the {@link Playlist}-class to
+     *       get the different values.
+     * @param defaultPlayContinues Should the player continue playing after
+     *       it it finished with a sound-clip? This is the default used
+     *       with the <i>play(Playlist playlist)</i>.
+     *
+     */
+    public SoundPlayer(AudioMixerOption mixerOption, PercentageOption volume, boolean multipleSounds, boolean defaultPlayContinues, int defaultRepeatMode, int defaultPickMode) {
+        if (mixerOption == null) {
+            throw new NullPointerException();
+        }
+        if (volume == null) {
+            throw new NullPointerException();
+        }
+        
         this.volume = volume;
         this.multipleSounds = multipleSounds;
         this.defaultPlayContinues = defaultPlayContinues;
         this.defaultRepeatMode = defaultRepeatMode;
         this.defaultPickMode = defaultPickMode;
         
-        mixer = AudioSystem.getMixer(null);
+        mixerOption.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent e) {
+                mixer = AudioSystem.getMixer(((MixerWrapper) e.getNewValue()).getMixerInfo());
+            }
+        });
+        mixer = AudioSystem.getMixer(mixerOption.getValue().getMixerInfo());
     }
 
 

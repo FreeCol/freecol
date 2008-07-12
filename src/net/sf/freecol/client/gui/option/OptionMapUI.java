@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
@@ -152,6 +153,13 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
             } else if (o instanceof LanguageOption) {
                 System.out.println("found languageOption");
                 JComponent c = new LanguageOptionUI((LanguageOption) o, editable);
+                northPanel.add(c);
+                ou.add(c);
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), c);
+                }
+            } else if (o instanceof AudioMixerOption) {
+                JComponent c = new AudioMixerOptionUI((AudioMixerOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {

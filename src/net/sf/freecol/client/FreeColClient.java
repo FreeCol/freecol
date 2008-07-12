@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
@@ -225,14 +226,21 @@ public final class FreeColClient {
      * Starts the GUI by creating and displaying the GUI-objects.
      */
     private void startGUI(Dimension innerWindowSize) {
+        final AudioMixerOption amo = (AudioMixerOption) getClientOptions().getObject(ClientOptions.AUDIO_MIXER);
         if (musicLibrary != null) {
-            musicPlayer = new SoundPlayer((PercentageOption) getClientOptions().getObject(ClientOptions.MUSIC_VOLUME), false, true);
+            musicPlayer = new SoundPlayer(amo,
+                    (PercentageOption) getClientOptions().getObject(ClientOptions.MUSIC_VOLUME),
+                    false,
+                    true);
             playMusic("intro");
         } else {
             musicPlayer = null;
         }
         if (sfxLibrary != null) {
-            sfxPlayer = new SoundPlayer((PercentageOption) getClientOptions().getObject(ClientOptions.SFX_VOLUME), true, false);
+            sfxPlayer = new SoundPlayer(amo,
+                    (PercentageOption) getClientOptions().getObject(ClientOptions.SFX_VOLUME),
+                    true,
+                    false);
         } else {
             sfxPlayer = null;
         }

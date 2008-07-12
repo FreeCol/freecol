@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.LanguageOption;
@@ -122,6 +123,7 @@ public class ClientOptions extends OptionMap {
     public static final int MESSAGES_GROUP_BY_TYPE = 1;
     public static final int MESSAGES_GROUP_BY_SOURCE = 2;
 
+    public static final String AUDIO_MIXER = "audioMixer";
     public static final String MUSIC_VOLUME = "musicVolume";
     public static final String SFX_VOLUME = "sfxVolume";
     
@@ -456,6 +458,7 @@ public class ClientOptions extends OptionMap {
         add(messagesGroup);
 
         OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
+        new AudioMixerOption(AUDIO_MIXER, audioGroup);
         new PercentageOption(MUSIC_VOLUME, audioGroup, 100);
         new PercentageOption(SFX_VOLUME, audioGroup, 100);
         add(audioGroup);
