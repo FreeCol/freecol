@@ -39,29 +39,24 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.Canvas.MissionaryAction;
-import net.sf.freecol.client.gui.Canvas.ScoutAction;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
+import net.sf.freecol.client.gui.Canvas.MissionaryAction;
+import net.sf.freecol.client.gui.Canvas.ScoutAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
-import net.sf.freecol.client.gui.animation.Animation;
 import net.sf.freecol.client.gui.animation.UnitMoveAnimation;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
-import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
-import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.CombatModel.CombatResult;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
@@ -76,33 +71,35 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Tension;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatResultType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
+import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
-import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
+import net.sf.freecol.common.networking.StealLandMessage;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -1871,10 +1868,6 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         Tile target = game.getMap().getNeighbourOrNull(direction, unit.getTile());
 
-        if (unit.hasAbility("model.ability.bombard") || unit.isNaval()) {
-            freeColClient.playSound(SoundEffect.ARTILLERY);
-        }
-
         Element attackElement = Message.createNewRootElement("attack");
         attackElement.setAttribute("unit", unit.getId());
         attackElement.setAttribute("direction", direction.toString());
@@ -1925,31 +1918,19 @@ public final class InGameController implements NetworkConstants {
                 }
             }
 
-            if (!unit.isNaval()) {
-                Unit winner;
-                if (result == CombatResultType.WIN || result == CombatResultType.GREAT_WIN) {
-                    winner = unit;
-                } else {
-                    winner = defender;
-                }
-                if (winner.isArmed()) {
-                    if (winner.isMounted()) {
-                        if (winner.getOwner().isIndian()) {
-                            freeColClient.playSound(SoundEffect.MUSKETS_HORSES);
-                        } else {
-                            freeColClient.playSound(SoundEffect.DRAGOON);
-                        }
-                    } else {
-                        freeColClient.playSound(SoundEffect.ATTACK);
-                    }
-                } else if (winner.isMounted()) {
-                    freeColClient.playSound(SoundEffect.DRAGOON);
-                }
-            } else {
-                if (result == CombatResultType.GREAT_WIN || result == CombatResultType.GREAT_LOSS) {
-                    freeColClient.playSound(SoundEffect.SUNK);
-                }
+            if (result == CombatResultType.DONE_SETTLEMENT) {
+                freeColClient.playSound(SoundEffect.CAPTURED_BY_ARTILLERY);
+            } else if (defender.isNaval() && result == CombatResultType.GREAT_WIN 
+                    || unit.isNaval() && result == CombatResultType.GREAT_LOSS) {
+                freeColClient.playSound(SoundEffect.SUNK);
+            } else if (unit.isNaval()) {
+                freeColClient.playSound(SoundEffect.ATTACK_NAVAL);
+            } else if (unit.hasAbility("model.ability.bombard")) {
+                freeColClient.playSound(SoundEffect.ATTACK_ARTILLERY);
+            } else if (unit.isMounted()) {
+                freeColClient.playSound(SoundEffect.ATTACK_DRAGOON);
             }
+
             try {
                 game.getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold);
             } catch (Exception e) {

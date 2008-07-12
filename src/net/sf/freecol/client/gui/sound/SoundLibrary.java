@@ -39,11 +39,11 @@ public class SoundLibrary {
             ILLEGAL_MOVE,
             LOAD_CARGO,
             SELL_CARGO,
-            ARTILLERY,
-            HORSES,
-            MUSKETS_HORSES,
-            DRAGOON,
-            SUNK }
+            ATTACK_ARTILLERY,
+            SUNK,
+            ATTACK_DRAGOON,
+            ATTACK_NAVAL,
+            CAPTURED_BY_ARTILLERY}
 
     
     /** This array contains the playlists. */
