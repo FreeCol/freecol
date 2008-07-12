@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
+import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.server.FreeColServer;
 
@@ -225,13 +226,13 @@ public final class FreeColClient {
      */
     private void startGUI(Dimension innerWindowSize) {
         if (musicLibrary != null) {
-            musicPlayer = new SoundPlayer(false, true);
+            musicPlayer = new SoundPlayer((PercentageOption) getClientOptions().getObject(ClientOptions.MUSIC_VOLUME), false, true);
             playMusic("intro");
         } else {
             musicPlayer = null;
         }
         if (sfxLibrary != null) {
-            sfxPlayer = new SoundPlayer(true, false);
+            sfxPlayer = new SoundPlayer((PercentageOption) getClientOptions().getObject(ClientOptions.SFX_VOLUME), true, false);
         } else {
             sfxPlayer = null;
         }

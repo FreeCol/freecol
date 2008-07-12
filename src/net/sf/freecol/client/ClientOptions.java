@@ -21,6 +21,7 @@
 package net.sf.freecol.client;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.Colony;
@@ -34,6 +35,7 @@ import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
+import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
 
@@ -121,6 +123,7 @@ public class ClientOptions extends OptionMap {
     public static final int MESSAGES_GROUP_BY_SOURCE = 2;
 
     public static final String MUSIC_VOLUME = "musicVolume";
+    public static final String SFX_VOLUME = "sfxVolume";
     
     /**
      * Used by GUI, this defines whether SoL messages will be displayed.
@@ -452,10 +455,10 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(SHOW_TUTORIAL, messagesGroup, true);
         add(messagesGroup);
 
-        /*OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
-        new RangeOption(MUSIC_VOLUME, audioGroup,
-                new String[] {"0%", "20%", "40%", "60%", "80%", "100%"}, 5, true);
-        add(audioGroup);*/
+        OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
+        new PercentageOption(MUSIC_VOLUME, audioGroup, 100);
+        new PercentageOption(SFX_VOLUME, audioGroup, 100);
+        add(audioGroup);
         
         OptionGroup savegamesGroup = new OptionGroup("clientOptions.savegames");
         new SelectOption(SHOW_SAVEGAME_SETTINGS, savegamesGroup,

@@ -21,6 +21,8 @@
 package net.sf.freecol.client.gui.sound;
 
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -32,7 +34,10 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
+
+import net.sf.freecol.common.option.PercentageOption;
 
 
 /**
@@ -83,7 +88,11 @@ public class SoundPlayer {
     */
     private final int defaultPickMode;
 
+    private Mixer mixer;
+    
+    private PercentageOption volume;
 
+    
     /**
     * Use this constructor.
     *
@@ -94,8 +103,8 @@ public class SoundPlayer {
     * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
     *
     */
-    public SoundPlayer(boolean multipleSounds, boolean defaultPlayContinues) {
-        this(multipleSounds, defaultPlayContinues, Playlist.REPEAT_ALL, Playlist.FORWARDS);
+    public SoundPlayer(PercentageOption volume, boolean multipleSounds, boolean defaultPlayContinues) {
+        this(volume, multipleSounds, defaultPlayContinues, Playlist.REPEAT_ALL, Playlist.FORWARDS);
     }
 
 
@@ -107,16 +116,20 @@ public class SoundPlayer {
     *                       or only one? If it does not allow multiple sounds, then using <i>play</i> will
     *                       stop the sound currently playing and play the new instead.
     *
+    * @param volume The volume to be used when playing audio.
     * @param defaultRepeatMode This is the default repeat-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
     * @param defaultPickMode This is the default pick-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
     * @param defaultPlayContinues Should the player continue playing after it it finished with a sound-clip? This is the default used with the <i>play(Playlist playlist)</i>.
     *
     */
-    public SoundPlayer(boolean multipleSounds, boolean defaultPlayContinues, int defaultRepeatMode, int defaultPickMode) {
+    public SoundPlayer(PercentageOption volume, boolean multipleSounds, boolean defaultPlayContinues, int defaultRepeatMode, int defaultPickMode) {
+        this.volume = volume;
         this.multipleSounds = multipleSounds;
         this.defaultPlayContinues = defaultPlayContinues;
         this.defaultRepeatMode = defaultRepeatMode;
         this.defaultPickMode = defaultPickMode;
+        
+        mixer = AudioSystem.getMixer(null);
     }
 
 
@@ -285,28 +298,50 @@ public class SoundPlayer {
             }
         }
 
+        private void updateVolume(FloatControl c, int volume) {
+            final float minGain = c.getMinimum();
+            final float gain = (volume / 100f) * (0 - minGain) + minGain;
+            c.setValue(gain);
+        }
+        
         private void rawplay(AudioFormat targetFormat,  AudioInputStream din) throws IOException, LineUnavailableException {
             byte[] data = new byte[8192];
             SourceDataLine line = getLine(targetFormat);
             if (line != null) {
                 line.start();
+                
+                // Volume control:
+                final FloatControl c = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+                final PropertyChangeListener pcl = new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent e) {
+                        int v = ((Integer) e.getNewValue()).intValue();
+                        updateVolume(c, v);
+                    }
+                };
+                volume.addPropertyChangeListener(pcl);
+                updateVolume(c, volume.getValue());
+
+                // Playing audio:
                 int read = 0;
                 int written = 0;
-                while (read != -1 && !soundStopped && !shouldStopThread()) {
-                    try {
-                        while (soundPaused) {
-                            Thread.sleep(10);
+                try {
+                    while (read != -1 && !soundStopped && !shouldStopThread()) {
+                        try {
+                            while (soundPaused) {
+                                Thread.sleep(10);
+                            }
+                        } catch (InterruptedException e) {}
+                        read = din.read(data, 0, data.length);
+                        if (read != -1) {
+                            written = line.write(data, 0, read);
                         }
-                    } catch (InterruptedException e) {}
-                    read = din.read(data, 0, data.length);
-                    if (read != -1) {
-                        written = line.write(data, 0, read);
                     }
+                } finally {
+                    volume.removePropertyChangeListener(pcl);
                 }
                 
                 // Implements fading down:
                 if (!soundStopped) {
-                    FloatControl c = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
                     long ms = System.currentTimeMillis() + FADE_UPDATE_MS;
                     long fadeStop = System.currentTimeMillis() + MAXIMUM_FADE_MS;
                     while (read != -1
@@ -333,7 +368,7 @@ public class SoundPlayer {
         private SourceDataLine getLine(AudioFormat audioFormat) throws LineUnavailableException {
             SourceDataLine sdl = null;
             DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-            sdl = (SourceDataLine) AudioSystem.getLine(info);
+            sdl = (SourceDataLine) mixer.getLine(info);
             sdl.open(audioFormat);
             return sdl;
         }
