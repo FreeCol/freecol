@@ -591,10 +591,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getMaximumGoodsInput() {
-        if (canAutoProduce()) {
-            return AUTO_PRODUCTION_INPUT * getMaximumAutoProduction();
-        } else if (getGoodsInputType() == null) {
+        if (getGoodsInputType() == null) {
             return 0;
+        } else if (canAutoProduce()) {
+            return AUTO_PRODUCTION_INPUT * getMaximumAutoProduction();
         } else {
             return getProductivity();
         }
@@ -614,10 +614,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getGoodsInput() {
-        if (canAutoProduce()) {
-            return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
-        } else if (getGoodsInputType() == null) {
+        if (getGoodsInputType() == null) {
             return 0;
+        } else if (canAutoProduce()) {
+            return getGoodsInputAuto(colony.getProductionOf(getGoodsInputType()));
         } else {
             return calculateGoodsInput(getMaximumGoodsInput(), 0);
         }
@@ -633,10 +633,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @see #getProduction
      */
     public int getGoodsInputNextTurn() {
-        if (canAutoProduce()) {
-            return getGoodsInputAuto(colony.getProductionNextTurn(getGoodsInputType()));
-        } else if (getGoodsInputType() == null) {
+        if (getGoodsInputType() == null) {
             return 0;
+        } else if (canAutoProduce()) {
+            return getGoodsInputAuto(colony.getProductionNextTurn(getGoodsInputType()));
         } else {
             return calculateGoodsInput(getMaximumGoodsInput(),
                                        colony.getProductionNextTurn(getGoodsInputType()));
