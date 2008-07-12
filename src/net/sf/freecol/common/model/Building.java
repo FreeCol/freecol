@@ -593,6 +593,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public int getMaximumGoodsInput() {
         if (canAutoProduce()) {
             return AUTO_PRODUCTION_INPUT * getMaximumAutoProduction();
+        } else if (getGoodsInputType() == null) {
+            return 0;
         } else {
             return getProductivity();
         }
