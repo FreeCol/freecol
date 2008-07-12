@@ -3702,6 +3702,10 @@ public final class InGameController implements NetworkConstants {
                     }
                 } else if (message.getType() == ModelMessage.MessageType.BUILDING_COMPLETED) {
                     freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
+                } else if (message.getType() == ModelMessage.MessageType.FOREIGN_DIPLOMACY) {
+                    if (message.getId().equals("EventPanel.MEETING_AZTEC")) {
+                        freeColClient.playMusicOnce("aztec");
+                    }
                 }
                 messageList.add(message);
             }

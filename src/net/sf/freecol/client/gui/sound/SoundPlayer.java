@@ -169,7 +169,13 @@ public class SoundPlayer {
         play(playlist, defaultPlayContinues, defaultRepeatMode, defaultPickMode);
     }
 
-
+    /**
+     * Plays a single random sound from the given playlist.
+     * @param playlist The <code>Playlist</code> to be played.
+     */
+    public void playOnce(Playlist playlist) {
+        play(playlist, false, defaultRepeatMode, defaultPickMode);
+    }
 
     /**
     * Plays a playlist.

@@ -637,6 +637,15 @@ public final class FreeColClient {
     }
     
     /**
+     * Plays a random music from the given playlist.
+     */
+    public void playMusicOnce(String music) {
+        if (musicPlayer != null) {
+            musicPlayer.playOnce(musicLibrary.get(music));
+        }
+    }
+    
+    /**
      * Plays the given sound effect.
      * 
      * @param sound The key sound effect given by {@link SfxLibrary}.
