@@ -598,17 +598,31 @@ public class UnitTest extends FreeColTestCase {
          assertTrue("Brave wasnt removed from player unit list",indianPlayer.getUnit(brave.getId()) == null);
     }
     
-    public void testKingsRegulars() {
+    public void testUnitAvailability() {
         Game game = getStandardGame();
-        Map map = getEmptyMap();
-        game.setMap(map);
         
         Player indian = game.getPlayer("model.nation.sioux");
         Player european = game.getPlayer("model.nation.dutch");
         Player king = game.getPlayer("model.nation.dutchREF");
-        UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.kingsRegular");
-        assertTrue(unitType.isAvailableTo(king));
-        assertFalse(unitType.isAvailableTo(indian));
-        assertFalse(unitType.isAvailableTo(european));
+        UnitType regular = FreeCol.getSpecification().getUnitType("model.unit.kingsRegular");
+        assertTrue(regular.isAvailableTo(king));
+        assertFalse(regular.isAvailableTo(indian));
+        assertFalse(regular.isAvailableTo(european));
+        UnitType colonial = FreeCol.getSpecification().getUnitType("model.unit.colonialRegular");
+        assertFalse(colonial.isAvailableTo(king));
+        assertFalse(colonial.isAvailableTo(indian));
+        assertFalse(colonial.isAvailableTo(european));
+        UnitType brave = FreeCol.getSpecification().getUnitType("model.unit.brave");
+        assertFalse(brave.isAvailableTo(king));
+        assertTrue(brave.isAvailableTo(indian));
+        assertFalse(brave.isAvailableTo(european));
+        UnitType undead = FreeCol.getSpecification().getUnitType("model.unit.undead");
+        assertFalse(undead.isAvailableTo(king));
+        assertFalse(undead.isAvailableTo(indian));
+        assertFalse(undead.isAvailableTo(european));
+
+        european.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+        assertTrue(colonial.isAvailableTo(european));
+
    }
 }
