@@ -830,6 +830,7 @@
       <ability id="model.ability.expertSoldier" value="true"/>
       <modifier id="model.modifier.offence" type="additive" value="4"/>
       <modifier id="model.modifier.defence" type="additive" value="4"/>
+      <required-ability id="model.ability.royalExpeditionaryForce"/>
     </unit-type>
     <unit-type id="model.unit.caravel" art="caravel" offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
                spaceTaken="24" hitPoints="6" price="1000" pathImage="naval" scoreValue="3">
@@ -1317,6 +1318,7 @@
     <european-nation-type id="model.nationType.ref" ref="true">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
       <ability id="model.ability.ambushPenalty" value="true"/>
+      <ability id="model.ability.royalExpeditionaryForce" value="true"/>
     </european-nation-type>
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">

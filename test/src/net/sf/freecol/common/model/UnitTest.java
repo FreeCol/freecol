@@ -579,7 +579,8 @@ public class UnitTest extends FreeColTestCase {
          boolean isCapital = false;
          boolean isVisited = false;
          Unit residentMissionary = null;
-         IndianSettlement camp = new IndianSettlement(game,indianPlayer,settlementTile,isCapital,skillToTeach,isVisited,residentMissionary);
+         IndianSettlement camp = new IndianSettlement(game, indianPlayer, settlementTile, isCapital,
+                                                      skillToTeach, isVisited, residentMissionary);
          
          UnitType indianBraveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
          Unit brave = new Unit(game, camp, indianPlayer, indianBraveType, UnitState.ACTIVE,
