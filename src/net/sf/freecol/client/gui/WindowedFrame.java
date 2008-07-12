@@ -21,12 +21,15 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.resources.ResourceManager;
 
 
 /**
@@ -54,6 +57,13 @@ public final class WindowedFrame extends JFrame {
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setResizable(true);
+        
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                ResourceManager.startBackgroundPreloading(canvas.getSize());
+            }
+        });
 
         logger.info("WindowedFrame created.");
     }

@@ -41,12 +41,52 @@ public class ResourceManager {
 
     private static ResourceMapping mergedContainer;
     
+    private static volatile Thread preloadThread = null;
 
     /**
      * Updates the resource mappings after making changes.
      */
     public static void update() {
         createMergedContainer();
+    }
+    
+    /**
+     * Preload resources. This method is intended to
+     * be called when starting the application, as
+     * it blocks until resources needed for the first
+     * panels have been loaded.
+     * 
+     * After that, it calls {@link #startBackgroundPreloading(Dimension)}
+     * so that other resources can be loading in the background.
+     *  
+     * @param windowSize
+     */
+    public static void preload(final Dimension windowSize) {
+        getImage("CanvasBackgroundImage", windowSize);
+        getImage("TitleImage");
+        getImage("BackgroundImage");
+        startBackgroundPreloading(windowSize);
+    }
+    
+    /**
+     * Starts background preloading of resources.
+     * @param windowSize The window size to use when scaling
+     *      full screen size images.
+     */
+    public static void startBackgroundPreloading(final Dimension windowSize) {
+        preloadThread = new Thread() {
+            public void run() {
+                getImage("EuropeBackgroundImage", windowSize);
+                for (String key : mergedContainer.getResources().keySet()) {
+                    if (preloadThread != this) {
+                        return;
+                    }
+                    getImage(key);
+                }
+            }
+        };
+        preloadThread.setPriority(2);
+        preloadThread.start();
     }
     
     /**
@@ -142,7 +182,7 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(String resource, Dimension size) {
+    public static Image getImage(String resource, Dimension size) {        
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof ImageResource)) {
             return null;
