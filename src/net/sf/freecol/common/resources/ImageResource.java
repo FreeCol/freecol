@@ -41,7 +41,7 @@ public class ImageResource extends Resource {
     private Map<Dimension, Image> scaledImages = new HashMap<Dimension, Image>();
     private Image image = null;
     private Object loadingLock = new Object();
-    private final Component _c = new Component() {};
+    private static final Component _c = new Component() {};
     
     /**
      * Do not use directly.
@@ -116,7 +116,7 @@ public class ImageResource extends Resource {
             }
             MediaTracker mt = new MediaTracker(_c);
             final Image scaledVersion = im.getScaledInstance(d.width, d.height, Image.SCALE_SMOOTH);
-            mt.addImage(im, 0, d.width, d.height);
+            mt.addImage(scaledVersion, 0, d.width, d.height);
             try {
                 mt.waitForID(0);
             } catch (InterruptedException e) {
