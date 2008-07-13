@@ -1077,6 +1077,7 @@ public final class InGameInputHandler extends InputHandler {
                 m = new ModelMessage(player, "lostCityRumour.FountainOfYouthWithoutEurope", null,
                                      ModelMessage.MessageType.LOST_CITY_RUMOUR);
             } else {
+                freeColClient.playMusicOnce("fountain");
                 m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
                                      ModelMessage.MessageType.LOST_CITY_RUMOUR);
                 if (player.hasAbility("model.ability.selectRecruit")) {
