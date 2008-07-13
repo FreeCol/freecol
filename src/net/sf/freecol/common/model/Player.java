@@ -648,10 +648,10 @@ public class Player extends FreeColGameObject implements Nameable {
             addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, "model.player.independence.unitsSeized",
                     "%units%", Utils.join(", ", unitNames));
         }
-        List<Unit> veterans = new ArrayList<Unit>();
         for (Colony colony : getColonies()) {
             int sol = colony.getSoL();
             if (sol > 50) {
+                List<Unit> veterans = new ArrayList<Unit>();
                 for (Unit unit : colony.getTile().getUnitList()) {
                     if (unit.hasAbility("model.ability.expertSoldier")) {
                         veterans.add(unit);
@@ -667,7 +667,6 @@ public class Player extends FreeColGameObject implements Nameable {
                     addModelMessage(colony, ModelMessage.MessageType.DEFAULT, "model.player.continentalArmyMuster",
                             "%colony%", colony.getName(), "%number%", String.valueOf(limit));
                 }
-                veterans.clear();
             }
         }
         europe.dispose();
@@ -700,7 +699,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         royal expeditionary force.
      */
     public Player getREFPlayer() {
-        return getGame().getPlayer(nationID + "REF");
+        return getGame().getPlayer(getNation().getRefId());
     }
 
     /**

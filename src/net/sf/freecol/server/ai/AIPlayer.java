@@ -211,7 +211,7 @@ public class AIPlayer extends AIObject {
         }
         cheat();
         determineStances();
-        moveREFToDocks();
+        //moveREFToDocks();
         rearrangeWorkersInColonies();
         abortInvalidAndOneTimeMissions();
         ensureCorrectMissions();

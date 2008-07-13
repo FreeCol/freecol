@@ -57,6 +57,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -1056,6 +1057,12 @@ public final class FreeColServer {
         }
     }
 
+    /**
+     * Describe <code>sendUpdatedTileToAll</code> method here.
+     *
+     * @param newTile a <code>Tile</code> value
+     * @param player a <code>Player</code> value
+     */
     public void sendUpdatedTileToAll(Tile newTile, Player player) {
         // TODO: can Player be null?
         for (Player enemy : getGame().getPlayers()) {
@@ -1075,5 +1082,37 @@ public final class FreeColServer {
             }
         }
     }
+
+
+    /**
+     * Adds a new AIPlayer to the Game.
+     *
+     * @param nation a <code>Nation</code> value
+     * @return a <code>ServerPlayer</code> value
+     */
+    public ServerPlayer addAIPlayer(Nation nation) {
+        String name = nation.getRulerName();
+        DummyConnection theConnection = 
+            new DummyConnection("Server connection - " + name, getInGameInputHandler());
+        ServerPlayer aiPlayer = 
+            new ServerPlayer(getGame(), name, false, true, null, theConnection, nation);
+        DummyConnection aiConnection = 
+            new DummyConnection("AI connection - " + name,
+                                new AIInGameInputHandler(this, aiPlayer, getAIMain()));
+            
+        aiConnection.setOutgoingMessageHandler(theConnection);
+        theConnection.setOutgoingMessageHandler(aiConnection);
+
+        getServer().addDummyConnection(theConnection);
+
+        getGame().addPlayer(aiPlayer);
+
+        // Send message to all players except to the new player:
+        Element addNewPlayer = Message.createNewRootElement("addPlayer");
+        addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
+        getServer().sendToAll(addNewPlayer, theConnection);
+        return aiPlayer;
+    }
+
 
 }

@@ -28,18 +28,6 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class PlayerTest extends FreeColTestCase {
 
 
-
-    public void testGetREF(){
-    	
-    	Game g = getStandardGame();
-    	
-    	// Every european non ref player should have a REF player. 
-    	for (Player p : g.getPlayers()){
-            assertEquals(p.isEuropean() && !p.isREF(), p.getREFPlayer() != null);
-    	}
-    }
-
-
     public void testUnits() {
 
         Game game = getStandardGame();
@@ -158,6 +146,7 @@ public class PlayerTest extends FreeColTestCase {
         testIndianPlayer(tupi);
         
         // royal
+        /* this works differently now
         Player dutchREF = game.getPlayer("model.nation.dutchREF");
         Player frenchREF = game.getPlayer("model.nation.frenchREF");
         Player englishREF = game.getPlayer("model.nation.englishREF");
@@ -182,6 +171,7 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals(swedishREF, swedish.getREFPlayer());
         assertEquals(danishREF, danish.getREFPlayer());
         assertEquals(russianREF, russian.getREFPlayer());
+        */
     }
 
     public void testDeclarationOfWar(){

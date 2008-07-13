@@ -145,6 +145,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = diplomaticTrade(element);
             } else if (type.equals("marketElement")) {
                 reply = marketElement(element);
+            } else if (type.equals("addPlayer")) {
+                reply = addPlayer(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -939,6 +941,24 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
+    /**
+     * Handles an "addPlayer"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    private Element addPlayer(Element element) {
+
+        Element playerElement = (Element) element.getElementsByTagName(Player.getXMLElementTagName()).item(0);
+        if (getGame().getFreeColGameObject(playerElement.getAttribute("ID")) == null) {
+            Player newPlayer = new Player(getGame(), playerElement);
+            getGame().addPlayer(newPlayer);
+        } else {
+            getGame().getFreeColGameObject(playerElement.getAttribute("ID")).readFromXMLElement(playerElement);
+        }
+
+        return null;
+    }
 
     /**
      * Handles a "marketElement"-request.

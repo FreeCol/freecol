@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nameable;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -2418,8 +2419,31 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element declareIndependence(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Nation refNation = Specification.getSpecification().getNation(player.getNation().getRefId());
+        ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
+        Element reply = Message.createNewRootElement("update");
+        reply.appendChild(refPlayer.toXMLElement(null, reply.getOwnerDocument()));
+        EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
+        EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
+        for (AbstractUnit unit : player.getMonarch().getREF()) {
+            EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
+            switch(unit.getRole()) {
+            case SOLDIER:
+                equipment = new EquipmentType[] { muskets };
+                break;
+            case DRAGOON:
+                equipment = new EquipmentType[] { horses, muskets };
+                break;
+            default:
+            }
+            for (int index = 0; index < unit.getNumber(); index++) {
+                Unit newUnit = new Unit(getGame(), refPlayer.getEurope(), refPlayer,
+                                        unit.getUnitType(), UnitState.ACTIVE, equipment);
+                reply.appendChild(newUnit.toXMLElement(null, reply.getOwnerDocument()));
+            }
+        }
         player.declareIndependence();
-        return null;
+        return reply;
     }
 
     /**

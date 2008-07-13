@@ -56,9 +56,9 @@ public class Nation extends FreeColGameObjectType {
     private boolean classic;
 
     /**
-     * Describe refID here.
+     * Describe refId here.
      */
-    private String refID;
+    private String refId;
 
     /**
      * Describe coatOfArms here.
@@ -193,21 +193,21 @@ public class Nation extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>RefID</code> value.
+     * Get the <code>RefId</code> value.
      *
      * @return a <code>String</code> value
      */
-    public final String getRefID() {
-        return refID;
+    public final String getRefId() {
+        return refId;
     }
 
     /**
-     * Set the <code>RefID</code> value.
+     * Set the <code>RefId</code> value.
      *
-     * @param newRefID The new RefID value.
+     * @param newRefId The new RefId value.
      */
-    public final void setRefID(final String newRefID) {
-        this.refID = newRefID;
+    public final void setRefId(final String newRefId) {
+        this.refId = newRefId;
     }
 
     /**
@@ -252,7 +252,7 @@ public class Nation extends FreeColGameObjectType {
         type = specification.getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
         classic = getAttribute(in, "classic", false);
-        refID = getAttribute(in, "ref-of", null);
+        refId = getAttribute(in, "ref", null);
         coatOfArms = getAttribute(in, "coat-of-arms", "native.png");
         monarchArt = getAttribute(in, "monarch-art", "louis.png");
         anthem = in.getAttributeValue(null, "anthem");

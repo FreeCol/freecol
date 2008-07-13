@@ -1495,28 +1495,28 @@
   <nations>
     <nation id="model.nation.dutch" color="#ff9d3c" anthem="anthem_dutch"
             nation-type="model.nationType.trade" selectable="true" classic="true"
-            monarch-art="william.png" coat-of-arms="dutch.png"/>
+            monarch-art="william.png" coat-of-arms="dutch.png" ref="model.nation.dutchREF"/>
     <nation id="model.nation.french" color="#0000ff" anthem="anthem_french"
             nation-type="model.nationType.cooperation" selectable="true" classic="true"
-            monarch-art="louis.png" coat-of-arms="french.png"/>
+            monarch-art="louis.png" coat-of-arms="french.png" ref="model.nation.frenchREF"/>
     <nation id="model.nation.english" color="#ff0000" anthem="anthem_english"
             nation-type="model.nationType.immigration" selectable="true" classic="true"
-            monarch-art="elizabeth.png" coat-of-arms="english.png"/>
+            monarch-art="elizabeth.png" coat-of-arms="english.png" ref="model.nation.englishREF"/>
     <nation id="model.nation.spanish" color="#ffff00" anthem="anthem_spanish"
             nation-type="model.nationType.conquest" selectable="true" classic="true"
-            monarch-art="philip.png" coat-of-arms="spanish.png"/>
+            monarch-art="philip.png" coat-of-arms="spanish.png" ref="model.nation.spanishREF"/>
     <nation id="model.nation.portuguese" color="#00ff00"
             nation-type="model.nationType.naval" selectable="true"
-            monarch-art="william.png" coat-of-arms="dutch.png"/>
+            monarch-art="william.png" coat-of-arms="dutch.png" ref="model.nation.portugueseREF"/>
     <nation id="model.nation.swedish" color="#ff00ff"
             nation-type="model.nationType.building" selectable="true"
-            monarch-art="louis.png" coat-of-arms="french.png"/>
+            monarch-art="louis.png" coat-of-arms="french.png" ref="model.nation.swedishREF"/>
     <nation id="model.nation.danish" color="#00ffff"
             nation-type="model.nationType.trade" selectable="true"
-            monarch-art="elizabeth.png" coat-of-arms="english.png"/>
+            monarch-art="elizabeth.png" coat-of-arms="english.png" ref="model.nation.danishREF"/>
     <nation id="model.nation.russian" color="#ffffff"
             nation-type="model.nationType.immigration" selectable="true"
-            monarch-art="philip.png" coat-of-arms="spanish.png"/>
+            monarch-art="philip.png" coat-of-arms="spanish.png" ref="model.nation.russionREF"/>
     <nation id="model.nation.inca" color="#f4f0c4"
             nation-type="model.nationType.inca"
             coat-of-arms="native.png"/>
@@ -1542,28 +1542,28 @@
             nation-type="model.nationType.tupi"
             coat-of-arms="native.png"/>
     <nation id="model.nation.dutchREF" color="#ff9d3c"
-            nation-type="model.nationType.ref" ref-of="model.nation.dutch"
+            nation-type="model.nationType.ref"
             coat-of-arms="dutch-ref.png"/>
     <nation id="model.nation.frenchREF" color="#0000ff"
-            nation-type="model.nationType.ref" ref-of="model.nation.french"
+            nation-type="model.nationType.ref"
             coat-of-arms="french-ref.png"/>
     <nation id="model.nation.englishREF" color="#ff0000"
-            nation-type="model.nationType.ref" ref-of="model.nation.english"
+            nation-type="model.nationType.ref"
             coat-of-arms="english-ref.png"/>
     <nation id="model.nation.spanishREF" color="#ffff00"
-            nation-type="model.nationType.ref" ref-of="model.nation.spanish"
+            nation-type="model.nationType.ref"
             coat-of-arms="spanish-ref.png"/>
     <nation id="model.nation.portugueseREF" color="#00ff00"
-            nation-type="model.nationType.ref" ref-of="model.nation.portuguese"
+            nation-type="model.nationType.ref"
             coat-of-arms="dutch-ref.png"/>
     <nation id="model.nation.swedishREF" color="#ff00ff"
-            nation-type="model.nationType.ref" ref-of="model.nation.swedish"
+            nation-type="model.nationType.ref"
             coat-of-arms="french-ref.png"/>
     <nation id="model.nation.danishREF" color="#00ffff"
-            nation-type="model.nationType.ref" ref-of="model.nation.danish"
+            nation-type="model.nationType.ref"
             coat-of-arms="english-ref.png"/>
     <nation id="model.nation.russianREF" color="#ffffff"
-            nation-type="model.nationType.ref" ref-of="model.nation.russian"
+            nation-type="model.nationType.ref"
             coat-of-arms="spanish-ref.png"/>
   </nations>
 

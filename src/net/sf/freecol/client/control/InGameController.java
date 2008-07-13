@@ -242,7 +242,8 @@ public final class InGameController implements NetworkConstants {
      * Declares independence for the home country.
      */
     public void declareIndependence() {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Game game = freeColClient.getGame();
+        if (game.getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
@@ -261,9 +262,19 @@ public final class InGameController implements NetworkConstants {
         }
 
         Element declareIndependenceElement = Message.createNewRootElement("declareIndependence");
+        Element reply = freeColClient.getClient().ask(declareIndependenceElement);
+        NodeList childNodes = reply.getChildNodes();
+        Element playerElement = (Element) childNodes.item(0);
+        Player refPlayer = (Player) game.getFreeColGameObject(playerElement.getAttribute("ID"));
+        if (refPlayer == null) {
+            refPlayer = new Player(game, playerElement);
+        }
+        for (int index = 1; index < childNodes.getLength(); index++) {
+            new Unit(game, (Element) childNodes.item(index));
+        }
+        game.addPlayer(refPlayer);
         freeColClient.getMyPlayer().declareIndependence();
         freeColClient.getActionManager().update();
-        freeColClient.getClient().sendAndWait(declareIndependenceElement);
 
         canvas.showDeclarationDialog();
     }

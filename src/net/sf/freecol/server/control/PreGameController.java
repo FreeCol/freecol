@@ -107,7 +107,7 @@ public final class PreGameController extends Controller {
             nations.addAll(game.getVacantNations().subList(0, numberOfPlayers));
         }
         nations.addAll(FreeCol.getSpecification().getIndianNations());
-        nations.addAll(FreeCol.getSpecification().getREFNations());
+        //nations.addAll(FreeCol.getSpecification().getREFNations());
 
         // Apply the difficulty level
         Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
@@ -115,37 +115,9 @@ public final class PreGameController extends Controller {
         // Add AI players
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
         for (Nation nation : nations) {
-            if (game.getPlayer(nation.getId()) != null ||
-                nation.getType().isREF() && game.getPlayer(nation.getRefID()) == null) {
-                continue;
+            if (game.getPlayer(nation.getId()) == null) {
+                freeColServer.addAIPlayer(nation);
             }
-
-            String name = nation.getRulerName();
-            DummyConnection theConnection = new DummyConnection(
-                    "Server connection - " + name,
-                    freeColServer.getInGameInputHandler());
-            ServerPlayer aiPlayer = new ServerPlayer(game,
-                                                    name,
-                                                    false,
-                                                    true,
-                                                    null,
-                                                    theConnection,
-                                                     nation);
-            DummyConnection aiConnection = new DummyConnection(
-                    "AI connection - " + name,
-                    new AIInGameInputHandler(freeColServer, aiPlayer, aiMain));
-            
-            aiConnection.setOutgoingMessageHandler(theConnection);
-            theConnection.setOutgoingMessageHandler(aiConnection);
-
-            freeColServer.getServer().addDummyConnection(theConnection);
-
-            game.addPlayer(aiPlayer);
-
-            // Send message to all players except to the new player:
-            Element addNewPlayer = Message.createNewRootElement("addPlayer");
-            addNewPlayer.appendChild(aiPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
-            freeColServer.getServer().sendToAll(addNewPlayer, theConnection);
         }
         
         // Make the map:
@@ -166,7 +138,6 @@ public final class PreGameController extends Controller {
         freeColServer.getServer().sendToAll(startGameElement);
         freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());        
     }
-    
     
     /**
      * Sets the map and sends an updated <code>Game</code>-object

@@ -343,7 +343,8 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         }
         if (refPanel != null) {
             refPanel.setOpaque(false);
-            refPanel.setBorder(BorderFactory.createTitledBorder(player.getREFPlayer().getNationAsString()));
+            String refName = Messages.message(player.getNation().getRefId() + ".name");
+            refPanel.setBorder(BorderFactory.createTitledBorder(refName));
         }
         return refPanel;
     }
