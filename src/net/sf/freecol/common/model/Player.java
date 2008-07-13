@@ -1531,7 +1531,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newNation The new nation for this player.
      */
     public void setNation(Nation newNation) {
+        final String oldNationID = nationID;
         nationID = newNation.getId();
+        firePropertyChange("nationID", oldNationID, nationID);
     }
 
     /**

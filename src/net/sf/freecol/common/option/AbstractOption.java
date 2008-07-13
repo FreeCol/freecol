@@ -19,10 +19,6 @@
 
 package net.sf.freecol.common.option;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -40,8 +36,6 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     public static final String NO_ID = "NO_ID";
 
     private static Logger logger = Logger.getLogger(AbstractOption.class.getName());
-
-    private ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
     private String optionGroup = "";
 
@@ -102,39 +96,6 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      */
     public void setPreviewEnabled(boolean previewEnabled) {
         this.previewEnabled = previewEnabled;
-    }
-    
-    /**
-     * Adds a new <code>PropertyChangeListener</code> for monitoring state
-     * changes. Events are generated when variables are changed.
-     * 
-     * @param pcl The <code>PropertyChangeListener</code> to be added.
-     */
-    public void addPropertyChangeListener(PropertyChangeListener pcl) {
-        propertyChangeListeners.add(pcl);
-    }
-
-    /**
-     * Remove the given <code>PropertyChangeListener</code>.
-     * 
-     * @param pcl The <code>PropertyChangeListener</code> to be removed.
-     */
-    public void removePropertyChangeListener(PropertyChangeListener pcl) {
-        propertyChangeListeners.remove(pcl);
-    }
-
-    /**
-     * Fires a <code>PropertyChangeEvent</code> to all listeners.
-     * 
-     * @param name The name of the changed variable.
-     * @param oldValue The old value.
-     * @param newValue The new value.
-     */
-    protected void firePropertyChange(String name, Object oldValue, Object newValue) {
-        Iterator<PropertyChangeListener> it = propertyChangeListeners.iterator();
-        while (it.hasNext()) {
-            it.next().propertyChange(new PropertyChangeEvent(this, name, oldValue, newValue));
-        }
     }
 
     /**

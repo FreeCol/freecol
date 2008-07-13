@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -396,6 +398,14 @@ public class Game extends FreeColGameObject {
         if (player.isAI() || canAddNewPlayer()) {
             players.add(player);
             vacantNations.remove(FreeCol.getSpecification().getNation(player.getNationID()));
+            player.addPropertyChangeListener("nationID", new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent e) {
+                    final Nation oldNation = FreeCol.getSpecification().getNation((String) e.getOldValue());
+                    final Nation newNation = FreeCol.getSpecification().getNation((String) e.getNewValue());
+                    vacantNations.remove(newNation);
+                    vacantNations.add(oldNation);
+                }
+            });
 
             if (currentPlayer == null) {
                 currentPlayer = player;
