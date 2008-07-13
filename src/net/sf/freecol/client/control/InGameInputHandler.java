@@ -262,7 +262,10 @@ public final class InGameInputHandler extends InputHandler {
             if (toTile==null) {
                 // TODO: find out why this can happen
             } else {
-                if (getFreeColClient().getClientOptions().getInteger(ClientOptions.ANIMATION_SPEED) > 0) {
+                final String key = (getFreeColClient().getMyPlayer() == unit.getOwner()) ?
+                        ClientOptions.MOVE_ANIMATION_SPEED
+                        : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+                if (getFreeColClient().getClientOptions().getInteger(key) > 0) {
                     //Playing the animation before actually moving the unit
                     try {
                         new UnitMoveAnimationCanvasSwingTask(unit, toTile).invokeAndWait();
@@ -331,7 +334,10 @@ public final class InGameInputHandler extends InputHandler {
                 unit.setLocationNoUpdate(oldTile); 
             }
             
-            if (getFreeColClient().getClientOptions().getInteger(ClientOptions.ANIMATION_SPEED) > 0) {
+            final String key = (getFreeColClient().getMyPlayer() == unit.getOwner()) ?
+                    ClientOptions.MOVE_ANIMATION_SPEED
+                    : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+            if (getFreeColClient().getClientOptions().getInteger(key) > 0) {
                 //Playing the animation before actually moving the unit
                 try {
                     new UnitMoveAnimationCanvasSwingTask(unit, newTile).invokeAndWait();

@@ -107,9 +107,15 @@ public class ClientOptions extends OptionMap {
     public static final String DISPLAY_GRID = "displayGrid";
     
     /**
-     * Animation speed
+     * Animation speed for friendly units.
      */
-    public static final String ANIMATION_SPEED = "animationSpeed";
+    public static final String MOVE_ANIMATION_SPEED = "moveAnimationSpeed";
+    
+    /**
+     * Animation speed for enemy units.
+     */
+    public static final String ENEMY_MOVE_ANIMATION_SPEED = "enemyMoveAnimationSpeed";
+    
 
     /**
      * Used by GUI, this defines the grouping of ModelMessages.
@@ -406,7 +412,8 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
         new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
         new BooleanOption(DISPLAY_GRID, guiGroup, false);
-        new RangeOption(ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 3, false);
+        new RangeOption(MOVE_ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 0, false);
+        new RangeOption(ENEMY_MOVE_ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 3, false);
         new SelectOption(COLONY_COMPARATOR, guiGroup,
                          new String[] {"byName",
                                        "byAge",

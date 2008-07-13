@@ -1645,7 +1645,10 @@ public final class InGameController implements NetworkConstants {
         
         // Play an animation showing the unit movement
         
-        if (freeColClient.getClientOptions().getInteger(ClientOptions.ANIMATION_SPEED) > 0) {
+        final String key = (freeColClient.getMyPlayer() == unit.getOwner()) ?
+                ClientOptions.MOVE_ANIMATION_SPEED
+                : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        if (freeColClient.getClientOptions().getInteger(key) > 0) {
             new UnitMoveAnimation(canvas, unit, direction).animate();
         }
         

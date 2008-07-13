@@ -22,15 +22,17 @@ package net.sf.freecol.client.gui.animation;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.logging.Logger;
+
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Direction;
 
 /**
  * Class for the animation of units movement.
@@ -79,7 +81,11 @@ public final class UnitMoveAnimation extends Animation {
         this.unit = unit;
         this.destinationTile = destinationTile;
         this.currentLocation = unit.getLocation();
-        final int movementSpeed = canvas.getClient().getClientOptions().getInteger(ClientOptions.ANIMATION_SPEED);
+        
+        final String key = (canvas.getClient().getMyPlayer() == unit.getOwner()) ?
+                ClientOptions.MOVE_ANIMATION_SPEED
+                : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        final int movementSpeed = canvas.getClient().getClientOptions().getInteger(key);
         
         GUI gui = canvas.getGUI();
         
