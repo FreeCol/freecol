@@ -309,7 +309,7 @@ public final class DragListener extends MouseAdapter {
                 if (tempUnit.getTurnsOfTraining() > 0 || experience > 0) {
                     menu.addSeparator();
                 }
-                if (tempUnit.getTurnsOfTraining() > 0) {
+                if (tempUnit.getTurnsOfTraining() > 0 && tempUnit.getStudent() != null) {
                     JMenuItem teaching = new JMenuItem(Messages.message("menuBar.teacher") +
                                                        ": " + tempUnit.getTurnsOfTraining() +
                                                        "/" + tempUnit.getNeededTurnsOfTraining());

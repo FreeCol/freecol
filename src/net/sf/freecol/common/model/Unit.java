@@ -708,7 +708,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (student != null) {
             return getNeededTurnsOfTraining(unitType, student.unitType);
         } else {
-            throw new IllegalStateException();
+            return 0;
         }
     }
 
