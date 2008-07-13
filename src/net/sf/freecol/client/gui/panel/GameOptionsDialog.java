@@ -183,6 +183,7 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
                 setResponse(new Boolean(true));
                 break;
             case CANCEL:
+                ui.rollback();
                 ui.unregister();
                 parent.remove(this);
                 setResponse(new Boolean(false));

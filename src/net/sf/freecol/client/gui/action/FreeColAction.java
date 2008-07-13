@@ -296,6 +296,16 @@ public abstract class FreeColAction extends AbstractAction implements Option {
         } else
             return keyStroke.toString();
     }
+    
+    /**
+     * Should this option be updated directly so that
+     * changes may be previewes?
+     * 
+     * @return <code>false</code>.
+     */
+    public boolean isPreviewEnabled() {
+        return false;
+    }
 
     /**
      * This method writes an XML-representation of this object to the given

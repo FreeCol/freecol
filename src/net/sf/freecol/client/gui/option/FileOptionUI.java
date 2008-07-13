@@ -32,6 +32,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -51,10 +53,10 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
 
 
     private final FileOption option;
-    
     private final JTextField fileField;
+    private File originalValue;
 
-
+    
     /**
     * Creates a new <code>FileOptionUI</code> for the given
     * <code>FileOption</code>.
@@ -65,6 +67,7 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
+        this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -114,6 +117,25 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
         remove.setEnabled(editable);
         fileField.setEnabled(false);
         label.setLabelFor(fileField);
+        fileField.getDocument().addDocumentListener(new DocumentListener() {
+            public void changedUpdate(DocumentEvent arg0) {
+                editUpdate();
+            }
+            public void insertUpdate(DocumentEvent arg0) {
+                editUpdate();
+            }
+            public void removeUpdate(DocumentEvent arg0) {
+                editUpdate();
+            }
+            private void editUpdate() {
+                if (option.isPreviewEnabled()) {
+                    final File value = new File(fileField.getText());
+                    if (!option.getValue().equals(value)) {
+                        option.setValue(value);
+                    }
+                }
+            }
+        });
         
         option.addPropertyChangeListener(this);
         
@@ -121,6 +143,17 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
     }
 
 
+    /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        option.setValue(originalValue);
+    }
+    
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
@@ -134,7 +167,11 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            fileField.setText(((File) event.getNewValue()).getAbsolutePath());
+            final File value = (File) event.getNewValue();
+            if (!value.equals(new File(fileField.getText()))) {
+                fileField.setText(value.getAbsolutePath());
+                originalValue = value;
+            }
         }
     }
     

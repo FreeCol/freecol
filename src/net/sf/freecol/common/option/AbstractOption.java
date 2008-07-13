@@ -50,7 +50,9 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     // XML file.
     protected boolean isDefined = false;
 
+    protected boolean previewEnabled = false;
 
+    
     /**
      * Creates a new <code>AbstractOption</code>.
      * 
@@ -79,6 +81,29 @@ abstract public class AbstractOption extends FreeColObject implements Option {
         }
     }
 
+    /**
+     * Should this option be updated directly so that
+     * changes may be previewes?
+     * 
+     * @return <code>true</code> if changes to this
+     *      option should be made directly (and reset
+     *      back later if the changes are not stored).
+     */
+    public boolean isPreviewEnabled() {
+        return previewEnabled;
+    }
+    
+    /**
+     * Sets if this option should be updated directly.
+     * 
+     * @param previewEnabled <code>true</code> if changes 
+     *      to this option should be made directly (and
+     *      reset back later if the changes are not stored).
+     */
+    public void setPreviewEnabled(boolean previewEnabled) {
+        this.previewEnabled = previewEnabled;
+    }
+    
     /**
      * Adds a new <code>PropertyChangeListener</code> for monitoring state
      * changes. Events are generated when variables are changed.

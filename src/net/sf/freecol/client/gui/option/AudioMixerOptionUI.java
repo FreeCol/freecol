@@ -21,6 +21,8 @@
 package net.sf.freecol.client.gui.option;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -32,7 +34,6 @@ import javax.swing.JPanel;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
-import net.sf.freecol.common.option.LanguageOption.Language;
 
 
 
@@ -46,18 +47,19 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
 
 
     private final AudioMixerOption option;
-    
     private final JComboBox comboBox;
+    private MixerWrapper originalValue;
 
 
     /**
     * Creates a new <code>AudioMixerOptionUI</code> for the given <code>AudioMixerOption</code>.
     * @param option The <code>AudioMixerOption</code> to make a user interface for.
     */
-    public AudioMixerOptionUI(AudioMixerOption option, boolean editable) {
+    public AudioMixerOptionUI(final AudioMixerOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
+        this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -72,11 +74,31 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
         reset();
         
         comboBox.setEnabled(editable);
+        comboBox.addActionListener(new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                if (option.isPreviewEnabled()) {
+                    MixerWrapper value = (MixerWrapper) comboBox.getSelectedItem();
+                    if (option.getValue() != value) {
+                        option.setValue(value);
+                    }
+                }
+            }
+        });
 
         option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
+    /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        option.setValue(originalValue);
+    }
     
     /**
      * Unregister <code>PropertyChangeListener</code>s.
@@ -91,7 +113,11 @@ public final class AudioMixerOptionUI extends JPanel implements OptionUpdater, P
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            comboBox.setSelectedItem(((MixerWrapper) event.getNewValue()));
+            MixerWrapper value = (MixerWrapper) event.getNewValue();
+            if (value != comboBox.getSelectedItem()) {
+                comboBox.setSelectedItem(value);
+                originalValue = value;
+            }
         }
     }
     

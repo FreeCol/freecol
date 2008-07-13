@@ -459,8 +459,8 @@ public class ClientOptions extends OptionMap {
 
         OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
         new AudioMixerOption(AUDIO_MIXER, audioGroup);
-        new PercentageOption(MUSIC_VOLUME, audioGroup, 100);
-        new PercentageOption(SFX_VOLUME, audioGroup, 100);
+        new PercentageOption(MUSIC_VOLUME, audioGroup, 100).setPreviewEnabled(true);
+        new PercentageOption(SFX_VOLUME, audioGroup, 100).setPreviewEnabled(true);
         add(audioGroup);
         
         OptionGroup savegamesGroup = new OptionGroup("clientOptions.savegames");

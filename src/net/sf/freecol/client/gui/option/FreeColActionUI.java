@@ -101,6 +101,18 @@ public final class FreeColActionUI extends JPanel implements OptionUpdater, Acti
         setOpaque(false);
     }
 
+    
+    /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        // TODO: Implement this.
+    }
+    
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */

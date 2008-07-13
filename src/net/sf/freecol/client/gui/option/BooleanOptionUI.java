@@ -21,6 +21,8 @@
 package net.sf.freecol.client.gui.option;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -44,16 +46,18 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater, Prop
 
     private final BooleanOption option;
     private final JCheckBox checkBox;
+    private boolean originalValue;
     
 
     /**
     * Creates a new <code>BooleanOptionUI</code> for the given <code>BooleanOption</code>.
     * @param option The <code>BooleanOption</code> to make a user interface for.
     */
-    public BooleanOptionUI(BooleanOption option, boolean editable) {
+    public BooleanOptionUI(final BooleanOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
+        this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -62,12 +66,33 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater, Prop
         checkBox.setToolTipText((description != null) ? description : name);
         
         option.addPropertyChangeListener(this);
+        checkBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (option.isPreviewEnabled()) {
+                    boolean value = checkBox.isSelected();
+                    if (option.getValue() != value) {
+                        option.setValue(value);
+                    }
+                }
+            }
+        });
         
         add(checkBox);
         setBorder(null);
         setOpaque(false);
     }
 
+    
+    /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        option.setValue(originalValue);
+    }
     
     /**
      * Unregister <code>PropertyChangeListener</code>s.
@@ -82,7 +107,11 @@ public final class BooleanOptionUI extends JPanel implements OptionUpdater, Prop
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            checkBox.setSelected(((Boolean) event.getNewValue()).booleanValue());
+            boolean value = ((Boolean) event.getNewValue()).booleanValue();
+            if (value != checkBox.isSelected()) {
+                checkBox.setSelected(value);
+                originalValue = value;
+            }
         }
     }
 

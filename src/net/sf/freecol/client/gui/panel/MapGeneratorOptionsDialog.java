@@ -217,6 +217,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
                 setResponse(new Boolean(true));
                 break;
             case CANCEL:
+                ui.rollback();
                 ui.unregister();
                 parent.remove(this);
                 setResponse(new Boolean(false));

@@ -21,6 +21,8 @@
 package net.sf.freecol.client.gui.option;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -44,18 +46,19 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater, Prope
 
 
     private final SelectOption option;
-    
     private final JComboBox comboBox;
+    private int originalValue;
 
 
     /**
     * Creates a new <code>SelectOptionUI</code> for the given <code>SelectOption</code>.
     * @param option The <code>SelectOption</code> to make a user interface for.
     */
-    public SelectOptionUI(SelectOption option, boolean editable) {
+    public SelectOptionUI(final SelectOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
+        this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -70,11 +73,32 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater, Prope
         add(comboBox);
         
         comboBox.setEnabled(editable);
+        comboBox.addActionListener(new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                if (option.isPreviewEnabled()) {
+                    int value = comboBox.getSelectedIndex();
+                    if (option.getValue() != value) {
+                        option.setValue(value);
+                    }
+                }
+            }
+        });
 
         option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
+
+    /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        option.setValue(originalValue);
+    }
     
     /**
      * Unregister <code>PropertyChangeListener</code>s.
@@ -89,7 +113,11 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater, Prope
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            comboBox.setSelectedIndex(((Integer) event.getNewValue()).intValue());
+            final int value = ((Integer) event.getNewValue()).intValue();
+            if (value != comboBox.getSelectedIndex()) {
+                comboBox.setSelectedIndex(value);
+                originalValue = value;
+            }
         }
     }
     

@@ -162,6 +162,7 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
                     }
                     break;
                 case CANCEL:
+                    ui.rollback();
                     ui.unregister();
                     parent.remove(this);
                     setResponse(new Boolean(false));

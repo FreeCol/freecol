@@ -31,10 +31,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.common.option.Option;
-import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.PercentageOption;
+import net.sf.freecol.common.option.RangeOption;
 
 /**
  * This class provides visualization for an {@link RangeOption}. In order to
@@ -48,6 +50,7 @@ public final class PercentageOptionUI extends JPanel implements OptionUpdater, P
     private final PercentageOption option;
 
     private final JSlider slider;
+    private int originalValue;
 
 
     /**
@@ -57,11 +60,12 @@ public final class PercentageOptionUI extends JPanel implements OptionUpdater, P
      * @param option The <code>PercentageOption</code> to make a user interface
      *            for.
      */
-    public PercentageOptionUI(PercentageOption option, boolean editable) {
+    public PercentageOptionUI(final PercentageOption option, boolean editable) {
 
         setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
                                                    option.getName()));
         this.option = option;
+        this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -87,10 +91,31 @@ public final class PercentageOptionUI extends JPanel implements OptionUpdater, P
         slider.setEnabled(editable);
         slider.setOpaque(false);
 
+        slider.addChangeListener(new ChangeListener () {
+            public void stateChanged(ChangeEvent e) {
+                if (option.isPreviewEnabled()) {;
+                    if (option.getValue() != slider.getValue()) {
+                        option.setValue(slider.getValue());
+                    }
+                }
+            }
+        });
+
         option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
+    /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        option.setValue(originalValue);
+    }
+    
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
@@ -105,7 +130,11 @@ public final class PercentageOptionUI extends JPanel implements OptionUpdater, P
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            slider.setValue(((Integer) event.getNewValue()).intValue());
+            final int value = ((Integer) event.getNewValue()).intValue();
+            if (value != slider.getValue()) {
+                slider.setValue(value);
+                originalValue = value;
+            }
         }
     }
 

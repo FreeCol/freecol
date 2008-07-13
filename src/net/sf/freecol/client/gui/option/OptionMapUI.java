@@ -180,6 +180,19 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
     }
 
     /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        for (int i = 0; i < optionUpdaters.length; i++) {
+            optionUpdaters[i].rollback();
+        }
+    }
+    
+    /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
     public void unregister() {

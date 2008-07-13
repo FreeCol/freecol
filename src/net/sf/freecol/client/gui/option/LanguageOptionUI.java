@@ -21,6 +21,8 @@
 package net.sf.freecol.client.gui.option;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -44,19 +46,19 @@ public final class LanguageOptionUI extends JPanel implements OptionUpdater, Pro
     private static final Logger logger = Logger.getLogger(LanguageOptionUI.class.getName());
 
 
-    private final LanguageOption option;
-    
+    private final LanguageOption option;   
     private final JComboBox comboBox;
-
+    private Language originalValue;
 
     /**
     * Creates a new <code>LanguageOptionUI</code> for the given <code>LanguageOption</code>.
     * @param option The <code>LanguageOption</code> to make a user interface for.
     */
-    public LanguageOptionUI(LanguageOption option, boolean editable) {
+    public LanguageOptionUI(final LanguageOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
+        this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -71,11 +73,31 @@ public final class LanguageOptionUI extends JPanel implements OptionUpdater, Pro
         add(comboBox);
         
         comboBox.setEnabled(editable);
+        comboBox.addActionListener(new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+                if (option.isPreviewEnabled()) {
+                    Language value = (Language) comboBox.getSelectedItem();
+                    if (option.getValue() != value) {
+                        option.setValue(value);
+                    }
+                }
+            }
+        });
 
         option.addPropertyChangeListener(this);
         setOpaque(false);
     }
 
+    /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        option.setValue(originalValue);
+    }
     
     /**
      * Unregister <code>PropertyChangeListener</code>s.
@@ -90,7 +112,11 @@ public final class LanguageOptionUI extends JPanel implements OptionUpdater, Pro
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            comboBox.setSelectedItem((Language) event.getNewValue());
+            final Language value = (Language) event.getNewValue();
+            if (value != comboBox.getSelectedItem()) {
+                comboBox.setSelectedItem(value);
+                originalValue = value;
+            }
         }
     }
     

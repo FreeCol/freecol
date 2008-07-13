@@ -29,6 +29,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.Option;
@@ -45,18 +47,19 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater, Prop
 
 
     private final IntegerOption option;
-    
     private final JSpinner spinner;
+    private int originalValue;
 
 
     /**
     * Creates a new <code>IntegerOptionUI</code> for the given <code>IntegerOption</code>.
     * @param option The <code>IntegerOption</code> to make a user interface for.
     */
-    public IntegerOptionUI(IntegerOption option, boolean editable) {
+    public IntegerOptionUI(final IntegerOption option, boolean editable) {
         super(new FlowLayout(FlowLayout.LEFT));
 
         this.option = option;
+        this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
@@ -71,13 +74,33 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater, Prop
         add(spinner);
         
         spinner.setEnabled(editable);
+        spinner.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                if (option.isPreviewEnabled()) {
+                    final int value = (Integer) spinner.getValue();
+                    if (option.getValue() != value) {
+                        option.setValue(value);
+                    }
+                }
+            }
+        });
         
         option.addPropertyChangeListener(this);
         
         setOpaque(false);
     }
 
-
+    /**
+     * Rollback to the original value.
+     * 
+     * This method gets called so that changes made to options with
+     * {@link Option#isPreviewEnabled()} is rolled back
+     * when an option dialoag has been cancelled.
+     */
+    public void rollback() {
+        option.setValue(originalValue);
+    }
+    
     /**
      * Unregister <code>PropertyChangeListener</code>s.
      */
@@ -91,7 +114,11 @@ public final class IntegerOptionUI extends JPanel implements OptionUpdater, Prop
      */
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("value")) {
-            spinner.setValue(event.getNewValue());
+            final int value = (Integer) event.getNewValue();
+            if (value != ((Integer) spinner.getValue()).intValue()) {
+                spinner.setValue(event.getNewValue());
+                originalValue = value;
+            }
         }
     }
     

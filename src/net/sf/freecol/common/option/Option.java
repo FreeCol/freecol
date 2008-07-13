@@ -74,6 +74,16 @@ public interface Option {
     public String getName();
 
     /**
+     * Should this option be updated directly so that
+     * changes may be previewes?
+     * 
+     * @return <code>true</code> if changes to this
+     *      option should be made directly (and reset
+     *      back later if the changes are not stored).
+     */
+    public boolean isPreviewEnabled();
+    
+    /**
      * Adds a new <code>PropertyChangeListener</code> for monitoring state
      * changes. Events are generated when variables are changed.
      * 
