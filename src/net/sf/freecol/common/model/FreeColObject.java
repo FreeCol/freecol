@@ -26,6 +26,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -288,29 +293,7 @@ public abstract class FreeColObject {
      *      during parsing.
      */
     protected abstract void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException;
-    
-
-    /**
-     * Creates an XML-representation of an array.
-     * 
-     * @param tagName The tagname for the <code>Element</code>
-     *       representing the array.
-     * @param array The array to represent.
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    protected void toArrayElement(String tagName, int[] array, XMLStreamWriter out)
-        throws XMLStreamException {
-        out.writeStartElement(tagName);
-        
-        out.writeAttribute(ARRAY_SIZE, Integer.toString(array.length));
-        for (int x=0; x < array.length; x++) {
-            out.writeAttribute("x" + Integer.toString(x), Integer.toString(array[x]));
-        }
-        
-        out.writeEndElement();
-    }
+ 
      
     /**
      * Reads an XML-representation of an array.
@@ -340,6 +323,55 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Reads an XML-representation of an array.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param in The input stream with the XML.
+     * @param type The type of the elements to be read. This type
+     *      needs to have a constructor accepting a single
+     *      <code>String</code>.
+     * @return The array.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */               
+    @SuppressWarnings("unchecked")
+    protected <T> T[] readFromArrayElement(String tagName, XMLStreamReader in, Class<T> type)
+        throws XMLStreamException {
+        if (!in.getLocalName().equals(tagName)) {
+            in.nextTag();
+        }
+        
+        final int size = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
+        T[] array = (T[]) Array.newInstance(type, size);
+        
+        for (int x=0; x<array.length; x++) {
+            try {
+                final String value = in.getAttributeValue(null, "x" + Integer.toString(x));
+                final T object;
+                if (value != null) {
+                    Constructor<T> c = type.getConstructor(type);
+                    object = c.newInstance(new Object[] {value});
+                } else {
+                    object = null;
+                }
+                array[x] = object;
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        in.nextTag();
+        return array;
+    }
+    
+    /**
      * Creates an XML-representation of an array.
      * 
      * @param tagName The tagname for the <code>Element</code>
@@ -349,18 +381,107 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toArrayElement(String tagName, String[] array, XMLStreamWriter out)
+    protected <T> void toArrayElement(String tagName, T[] array, XMLStreamWriter out)
         throws XMLStreamException {
         out.writeStartElement(tagName);
         
         out.writeAttribute(ARRAY_SIZE, Integer.toString(array.length));
         for (int x=0; x < array.length; x++) {
-            out.writeAttribute("x" + Integer.toString(x), array[x]);
+            out.writeAttribute("x" + Integer.toString(x), array[x].toString());
         }
         
         out.writeEndElement();
     }
     
+    /**
+     * Creates an XML-representation of an array.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param array The array to represent.
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toArrayElement(String tagName, int[] array, XMLStreamWriter out)
+        throws XMLStreamException {
+        out.writeStartElement(tagName);
+        
+        out.writeAttribute(ARRAY_SIZE, Integer.toString(array.length));
+        for (int x=0; x < array.length; x++) {
+            out.writeAttribute("x" + Integer.toString(x), Integer.toString(array[x]));
+        }
+        
+        out.writeEndElement();
+    }
+    
+    /**
+     * Creates an XML-representation of a list.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param array The array to represent.
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected <T> void toListElement(String tagName, List<T> array, XMLStreamWriter out)
+        throws XMLStreamException {
+        out.writeStartElement(tagName);
+        
+        out.writeAttribute(ARRAY_SIZE, Integer.toString(array.size()));
+        for (int x=0; x < array.size(); x++) {
+            out.writeAttribute("x" + Integer.toString(x), array.get(x).toString());
+        }
+        
+        out.writeEndElement();
+    }
+    
+    /**
+     * Reads an XML-representation of a list.
+     * 
+     * @param tagName The tagname for the <code>Element</code>
+     *       representing the array.
+     * @param in The input stream with the XML.
+     * @param type The type of the items to be added. This type
+     *      needs to have a constructor accepting a single
+     *      <code>String</code>.
+     * @return The list.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */               
+    protected <T> List<T> readFromListElement(String tagName, XMLStreamReader in, Class<T> type)
+            throws XMLStreamException {
+        if (!in.getLocalName().equals(tagName)) {
+            in.nextTag();
+        }
+        final int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
+        List<T> list = new ArrayList<T>(length);
+        for (int x=0; x<length; x++) {
+            try {
+                final String value = in.getAttributeValue(null, "x" + Integer.toString(x));
+                final T object;
+                if (value != null) {
+                    Constructor<T> c = type.getConstructor(type);
+                    object = c.newInstance(new Object[] {value});
+                } else {
+                    object = null;
+                }
+                list.add(object);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+        in.nextTag();
+        return list;
+    }
 
     /**
      * Reads an XML-representation of an array.
