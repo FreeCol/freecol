@@ -49,6 +49,7 @@ public class SoundPlayer {
 
     private static final Logger logger = Logger.getLogger(SoundPlayer.class.getName());
 
+    public static final int STANDARD_DELAY = 2000;
     private static final int MAXIMUM_FADE_MS = 7000;
     private static final int FADE_UPDATE_MS = 5;
     
@@ -162,11 +163,23 @@ public class SoundPlayer {
 
 
     /**
-    * Plays a playlist using the default play-continues, repeat-mode and pick-mode for this <i>SoundPlayer</i>.
-    * @param playlist The <code>Playlist</code> to be played.
-    */
+     * Plays a playlist using the default play-continues, repeat-mode
+     * and pick-mode for this <i>SoundPlayer</i>.
+     * @param playlist The <code>Playlist</code> to be played.
+     */
     public void play(Playlist playlist) {
-        play(playlist, defaultPlayContinues, defaultRepeatMode, defaultPickMode);
+        play(playlist, defaultPlayContinues, defaultRepeatMode, defaultPickMode, 0);
+    }
+    
+    /**
+     * Plays a playlist using the default play-continues, repeat-mode
+     * and pick-mode for this <i>SoundPlayer</i>.
+     * 
+     * @param playlist The <code>Playlist</code> to be played.
+     * @param delay A delay before playing the sound (ms).
+     */
+    public void play(Playlist playlist, int delay) {
+        play(playlist, defaultPlayContinues, defaultRepeatMode, defaultPickMode, delay);
     }
 
     /**
@@ -174,7 +187,17 @@ public class SoundPlayer {
      * @param playlist The <code>Playlist</code> to be played.
      */
     public void playOnce(Playlist playlist) {
-        play(playlist, false, defaultRepeatMode, defaultPickMode);
+        play(playlist, false, defaultRepeatMode, defaultPickMode, 0);
+    }
+    
+    /**
+     * Plays a single random sound from the given playlist.
+     * 
+     * @param playlist The <code>Playlist</code> to be played.
+     * @param delay A delay before playing the sound (ms).
+     */
+    public void playOnce(Playlist playlist, int delay) {
+        play(playlist, false, defaultRepeatMode, defaultPickMode, delay);
     }
 
     /**
@@ -187,10 +210,11 @@ public class SoundPlayer {
     *      should be repeated.
     * @param pickMode The method to be used for picking
     *      the songs.
+    * @param delay A delay before playing the sound (ms).
     */
-    public void play(Playlist playlist, boolean playContinues, int repeatMode, int pickMode) {
+    public void play(Playlist playlist, boolean playContinues, int repeatMode, int pickMode, int delay) {
         if (playlist != null) {
-            currentSoundPlayerThread = new SoundPlayerThread(playlist, playContinues, repeatMode, pickMode);
+            currentSoundPlayerThread = new SoundPlayerThread(playlist, playContinues, repeatMode, pickMode, delay);
             currentSoundPlayerThread.start();
         } else {
             currentSoundPlayerThread = null;
@@ -266,6 +290,7 @@ public class SoundPlayer {
         @SuppressWarnings("unused")
         private boolean repeatSound;
 
+        private int delay;
 
         /**
         * The constructor to use.
@@ -274,14 +299,16 @@ public class SoundPlayer {
         * @param playContinues Should the player continue playing after it it finished with a sound-clip?
         * @param repeatMode This is the default repeat-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
         * @param pickMode This is the default pick-mode for a playlist. Refer to the field summary of the {@link Playlist}-class to get the different values.
+        * @param delay A delay before playing the sound (ms).
         */
-        public SoundPlayerThread(Playlist playlist, boolean playContinues, int repeatMode, int pickMode) {
+        public SoundPlayerThread(Playlist playlist, boolean playContinues, int repeatMode, int pickMode, int delay) {
             super(soundPlayerThreads, "soundPlayerThread");
 
             this.playlist = playlist;
             this.playContinues = playContinues;
             this.repeatMode = repeatMode;
             this.pickMode = pickMode;
+            this.delay = delay;
         }
 
 
@@ -299,6 +326,12 @@ public class SoundPlayer {
             soundPaused = false;
             soundStopped = false;
 
+            if (delay != 0) {
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {}
+            }
+            
             do {
                 playSound(playlist.next());
 

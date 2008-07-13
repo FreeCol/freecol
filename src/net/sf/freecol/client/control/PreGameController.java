@@ -32,6 +32,7 @@ import net.sf.freecol.client.gui.CanvasMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
@@ -225,7 +226,8 @@ public final class PreGameController {
         canvas.closeMainPanel();
         canvas.closeMenus();
         
-        freeColClient.playMusic("");
+        // TODO: Nation specific intro-music:
+        freeColClient.playMusicOnce("england", SoundPlayer.STANDARD_DELAY);
 
         InGameController inGameController = freeColClient.getInGameController();
         InGameInputHandler inGameInputHandler = freeColClient.getInGameInputHandler();
@@ -251,7 +253,7 @@ public final class PreGameController {
         canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController));
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui, freeColClient.getGame().getMap()));
-
+        
         if (freeColClient.getMyPlayer().equals(freeColClient.getGame().getCurrentPlayer())) {
             canvas.requestFocus();
             freeColClient.getInGameController().nextModelMessage();

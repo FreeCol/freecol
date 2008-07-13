@@ -646,6 +646,16 @@ public final class FreeColClient {
     }
     
     /**
+     * Plays a random music from the given playlist.
+     * @param delay A delay before playing the sound (ms).
+     */
+    public void playMusicOnce(String music, int delay) {
+        if (musicPlayer != null) {
+            musicPlayer.playOnce(musicLibrary.get(music), delay);
+        }
+    }
+    
+    /**
      * Plays the given sound effect.
      * 
      * @param sound The key sound effect given by {@link SfxLibrary}.
