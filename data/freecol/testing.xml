@@ -851,6 +851,7 @@
       <ability id="model.ability.captureUnits" value="false"/>
       <ability id="model.ability.captureEquipment" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <required-ability id="model.ability.native"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular" art="colonialRegular" movement="3" lineOfSight="1"
                pathImage="foot" skillTaught="model.unit.veteranSoldier" skill="4">
@@ -874,6 +875,7 @@
       <ability id="model.ability.expertSoldier" value="true"/>
       <modifier id="model.modifier.offence" type="additive" value="4"/>
       <modifier id="model.modifier.defence" type="additive" value="4"/>
+      <required-ability id="model.ability.royalExpeditionaryForce"/>
     </unit-type>
     <unit-type id="model.unit.caravel" art="caravel" offence="0"  defence="2"  movement="12" lineOfSight="1" space="2"
                spaceTaken="24" hitPoints="6" price="1000" pathImage="naval" scoreValue="3">
@@ -985,6 +987,7 @@
                pathImage="foot">
       <ability id="model.ability.undead" value="true"/>
       <ability id="model.ability.multipleAttacks" value="true"/>
+      <required-ability id="model.ability.undead"/>
     </unit-type>
     <unit-type id="model.unit.flyingDutchman" art="flyingDutchman" offence="666"  defence="666" movement="36" lineOfSight="3"
                space="6" hitPoints="6" pathImage="naval">
@@ -993,12 +996,14 @@
       <ability id="model.ability.carryUnits" value="true"/>
       <ability id="model.ability.captureGoods" value="true"/>
       <ability id="model.ability.undead" value="true"/>
+      <required-ability id="model.ability.undead"/>
     </unit-type>    
     <unit-type id="model.unit.undead" art="undead" offence="18"  defence="4" movement="3" lineOfSight="1" pathImage="foot">
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <ability id="model.ability.undead" value="true"/>
+      <required-ability id="model.ability.undead"/>
     </unit-type>
   </unit-types>
   
@@ -1400,6 +1405,7 @@
     <european-nation-type id="model.nationType.ref" ref="true">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
       <ability id="model.ability.ambushPenalty" value="true"/>
+      <ability id="model.ability.royalExpeditionaryForce" value="true"/>
     </european-nation-type>
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">
@@ -1468,6 +1474,7 @@
         <scope type="model.equipment.muskets"/>
         <scope type="model.equipment.horses"/>
       </ability>
+      <ability id="model.ability.native"/>
       <region id="model.region.west" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.sioux" number-of-settlements="average"
@@ -1480,6 +1487,7 @@
         <scope type="model.equipment.muskets"/>
         <scope type="model.equipment.horses"/>
       </ability>
+      <ability id="model.ability.native"/>
       <region id="model.region.northWest" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.tupi" number-of-settlements="low"
@@ -1492,6 +1500,7 @@
         <scope type="model.equipment.muskets"/>
         <scope type="model.equipment.horses"/>
       </ability>
+      <ability id="model.ability.native"/>
       <region id="model.region.southEast" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.arawak" number-of-settlements="low"
@@ -1505,6 +1514,7 @@
         <scope type="model.equipment.muskets"/>
         <scope type="model.equipment.horses"/>
       </ability>
+      <ability id="model.ability.native"/>
       <region id="model.region.east" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average"
@@ -1518,6 +1528,7 @@
         <scope type="model.equipment.muskets"/>
         <scope type="model.equipment.horses"/>
       </ability>
+      <ability id="model.ability.native"/>
       <region id="model.region.northEast" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average"
@@ -1531,6 +1542,7 @@
         <scope type="model.equipment.muskets"/>
         <scope type="model.equipment.horses"/>
       </ability>
+      <ability id="model.ability.native"/>
       <region id="model.region.north" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
@@ -1543,6 +1555,7 @@
         <scope type="model.equipment.muskets"/>
         <scope type="model.equipment.horses"/>
       </ability>
+      <ability id="model.ability.native"/>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
     </indian-nation-type>
@@ -1556,6 +1569,7 @@
         <scope type="model.equipment.muskets"/>
         <scope type="model.equipment.horses"/>
       </ability>
+      <ability id="model.ability.native"/>
       <region id="model.region.center" />
       <region id="model.region.east" />
     </indian-nation-type>
@@ -1564,28 +1578,28 @@
   <nations>
     <nation id="model.nation.dutch" color="#ff9d3c" anthem="anthem_dutch"
             nation-type="model.nationType.trade" selectable="true" classic="true"
-            monarch-art="william.png" coat-of-arms="dutch.png"/>
+            monarch-art="william.png" coat-of-arms="dutch.png" ref="model.nation.dutchREF"/>
     <nation id="model.nation.french" color="#0000ff" anthem="anthem_french"
             nation-type="model.nationType.cooperation" selectable="true" classic="true"
-            monarch-art="louis.png" coat-of-arms="french.png"/>
+            monarch-art="louis.png" coat-of-arms="french.png" ref="model.nation.frenchREF"/>
     <nation id="model.nation.english" color="#ff0000" anthem="anthem_english"
             nation-type="model.nationType.immigration" selectable="true" classic="true"
-            monarch-art="elizabeth.png" coat-of-arms="english.png"/>
+            monarch-art="elizabeth.png" coat-of-arms="english.png" ref="model.nation.englishREF"/>
     <nation id="model.nation.spanish" color="#ffff00" anthem="anthem_spanish"
             nation-type="model.nationType.conquest" selectable="true" classic="true"
-            monarch-art="philip.png" coat-of-arms="spanish.png"/>
+            monarch-art="philip.png" coat-of-arms="spanish.png" ref="model.nation.spanishREF"/>
     <nation id="model.nation.portuguese" color="#00ff00"
             nation-type="model.nationType.naval" selectable="true"
-            monarch-art="william.png" coat-of-arms="dutch.png"/>
+            monarch-art="william.png" coat-of-arms="dutch.png" ref="model.nation.portugueseREF"/>
     <nation id="model.nation.swedish" color="#ff00ff"
             nation-type="model.nationType.building" selectable="true"
-            monarch-art="louis.png" coat-of-arms="french.png"/>
+            monarch-art="louis.png" coat-of-arms="french.png" ref="model.nation.swedishREF"/>
     <nation id="model.nation.danish" color="#00ffff"
             nation-type="model.nationType.trade" selectable="true"
-            monarch-art="elizabeth.png" coat-of-arms="english.png"/>
+            monarch-art="elizabeth.png" coat-of-arms="english.png" ref="model.nation.danishREF"/>
     <nation id="model.nation.russian" color="#ffffff"
             nation-type="model.nationType.immigration" selectable="true"
-            monarch-art="philip.png" coat-of-arms="spanish.png"/>
+            monarch-art="philip.png" coat-of-arms="spanish.png" ref="model.nation.russionREF"/>
     <nation id="model.nation.inca" color="#f4f0c4"
             nation-type="model.nationType.inca"
             coat-of-arms="native.png"/>
@@ -1611,28 +1625,28 @@
             nation-type="model.nationType.tupi"
             coat-of-arms="native.png"/>
     <nation id="model.nation.dutchREF" color="#ff9d3c"
-            nation-type="model.nationType.ref" ref-of="model.nation.dutch"
+            nation-type="model.nationType.ref"
             coat-of-arms="dutch-ref.png"/>
     <nation id="model.nation.frenchREF" color="#0000ff"
-            nation-type="model.nationType.ref" ref-of="model.nation.french"
+            nation-type="model.nationType.ref"
             coat-of-arms="french-ref.png"/>
     <nation id="model.nation.englishREF" color="#ff0000"
-            nation-type="model.nationType.ref" ref-of="model.nation.english"
+            nation-type="model.nationType.ref"
             coat-of-arms="english-ref.png"/>
     <nation id="model.nation.spanishREF" color="#ffff00"
-            nation-type="model.nationType.ref" ref-of="model.nation.spanish"
+            nation-type="model.nationType.ref"
             coat-of-arms="spanish-ref.png"/>
     <nation id="model.nation.portugueseREF" color="#00ff00"
-            nation-type="model.nationType.ref" ref-of="model.nation.portuguese"
+            nation-type="model.nationType.ref"
             coat-of-arms="dutch-ref.png"/>
     <nation id="model.nation.swedishREF" color="#ff00ff"
-            nation-type="model.nationType.ref" ref-of="model.nation.swedish"
+            nation-type="model.nationType.ref"
             coat-of-arms="french-ref.png"/>
     <nation id="model.nation.danishREF" color="#00ffff"
-            nation-type="model.nationType.ref" ref-of="model.nation.danish"
+            nation-type="model.nationType.ref"
             coat-of-arms="english-ref.png"/>
     <nation id="model.nation.russianREF" color="#ffffff"
-            nation-type="model.nationType.ref" ref-of="model.nation.russian"
+            nation-type="model.nationType.ref"
             coat-of-arms="spanish-ref.png"/>
   </nations>
 
