@@ -86,10 +86,7 @@ public class LanguageOption extends AbstractOption {
      *           found in an {@link OptionGroup}.
      */
     public LanguageOption(String id) {
-        super(id, null);
-        if (languages.size() == 0) {
-            prepareLanguages();
-        }
+        this(id, null);
     }
 
     public LanguageOption(String id, OptionGroup optionGroup) {
@@ -97,6 +94,7 @@ public class LanguageOption extends AbstractOption {
         if (languages.size() == 0) {
             prepareLanguages();
         }
+        value = DEFAULT;
     }
 
 
