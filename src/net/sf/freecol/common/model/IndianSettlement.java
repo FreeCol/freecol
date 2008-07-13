@@ -322,7 +322,7 @@ public class IndianSettlement extends Settlement {
         if (alarm.get(player) == null) {
             alarm.put(player, new Tension(0));
         }
-        return "indianSettlement.alarm." + alarm.get(player).toString().toLowerCase();
+        return "indianSettlement.alarm." + alarm.get(player).getLevel().toString().toLowerCase();
     }
 
     /**
