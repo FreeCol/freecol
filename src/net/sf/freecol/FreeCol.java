@@ -119,6 +119,8 @@ public final class FreeCol {
 
     private static File saveDirectory;
     
+    private static File tcUserDirectory;
+    
     private static String tc = DEFAULT_TC;
     
     private static File savegameFile = null;
@@ -495,7 +497,6 @@ public final class FreeCol {
         } else if (!mainUserDirectory.exists()) {
             mainUserDirectory.mkdir();
         }
-        clientOptionsFile = new File(mainUserDirectory, "options.xml");
         saveDirectory = new File(mainUserDirectory, "save");
         if (saveDirectory.exists() && saveDirectory.isFile()) {
             logger.warning("Could not create freecol/save under "
@@ -505,6 +506,16 @@ public final class FreeCol {
         } else if (!saveDirectory.exists()) {
             saveDirectory.mkdir();
         }
+        tcUserDirectory = new File(mainUserDirectory, tc);
+        if (tcUserDirectory.exists() && tcUserDirectory.isFile()) {
+            logger.warning("Could not create freecol/" + tc + " under "
+                    + System.getProperty("user.home") + " because there "
+                    + "already exists a regular file with the same name.");
+            return;
+        } else if (!tcUserDirectory.exists()) {
+            tcUserDirectory.mkdir();
+        }
+        clientOptionsFile = new File(tcUserDirectory, "options.xml");
     }
 
     /**
