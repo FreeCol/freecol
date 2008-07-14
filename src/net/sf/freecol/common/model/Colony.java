@@ -684,12 +684,14 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @param amount The number of bells to add.
      */
     public void addBells(int amount) {
-        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
-        getOwner().incrementBells(amount);
-        if (getMembers() <= getUnitCount() + 1 && amount > 0) {
-            addGoods(bells, amount);
+        if (FreeCol.isInDebugMode()) {
+            GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+            getOwner().incrementBells(amount);
+            if (getMembers() <= getUnitCount() + 1 && amount > 0) {
+                addGoods(bells, amount);
+            }
+            updateSoL();
         }
-        updateSoL();
     }
 
     /**
