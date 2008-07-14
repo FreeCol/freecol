@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -273,7 +274,20 @@ public class SimpleCombatModel implements CombatModel {
                 }
             }
         }
-        return result;
+
+        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
+            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
+        for (Modifier.Type type : Modifier.Type.values()) {
+            modifierMap.put(type, new ArrayList<Modifier>());
+        }
+        for (Modifier modifier : result) {
+            modifierMap.get(modifier.getType()).add(modifier);
+        }
+        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
+        for (Modifier.Type type : Modifier.Type.values()) {
+            sortedResult.addAll(modifierMap.get(type));
+        }
+        return sortedResult;
     }
 
     /**
@@ -420,7 +434,19 @@ public class SimpleCombatModel implements CombatModel {
             }
 
         }
-        return result;
+        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
+            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
+        for (Modifier.Type type : Modifier.Type.values()) {
+            modifierMap.put(type, new ArrayList<Modifier>());
+        }
+        for (Modifier modifier : result) {
+            modifierMap.get(modifier.getType()).add(modifier);
+        }
+        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
+        for (Modifier.Type type : Modifier.Type.values()) {
+            sortedResult.addAll(modifierMap.get(type));
+        }
+        return sortedResult;
     }
 
     /**
