@@ -689,6 +689,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (getMembers() <= getUnitCount() + 1 && amount > 0) {
             addGoods(bells, amount);
         }
+        updateSoL();
     }
 
     /**
@@ -1559,8 +1560,10 @@ public final class Colony extends Settlement implements Location, Nameable {
         createWarehouseCapacityWarning();
 
         // Remove bells:
-        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
-        removeGoods(bells, Math.max(0, getUnitCount() - 2));
+        int bellsToRemove = getUnitCount() - 2;
+        if (bellsToRemove > 0) {
+            removeGoods(Goods.BELLS, bellsToRemove);
+        }
 
         // Update SoL:
         updateSoL();
