@@ -211,7 +211,6 @@ public class AIPlayer extends AIObject {
         }
         cheat();
         determineStances();
-        //moveREFToDocks();
         rearrangeWorkersInColonies();
         abortInvalidAndOneTimeMissions();
         ensureCorrectMissions();
@@ -520,39 +519,6 @@ public class AIPlayer extends AIObject {
                         getPlayer().changeRelationWithPlayer(p, Stance.PEACE);
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Moves the "Royal Expeditionary Force" to the docks. This method will just
-     * return if this player is not a REF-player.
-     */
-    private void moveREFToDocks() {
-        logger.finest("Entering method moveREFToDocks");
-        Iterator<Player> it = getGame().getPlayerIterator();
-        while (it.hasNext()) {
-            Player player = it.next();
-            if (player.getREFPlayer() == getPlayer() && 
-                player.getPlayerType() == PlayerType.REBEL &&
-                player.getMonarch() != null) {
-                for (AbstractUnit unit : player.getMonarch().getREF()) {
-                    EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
-                    switch(unit.getRole()) {
-                    case SOLDIER:
-                        equipment = new EquipmentType[] { muskets };
-                        break;
-                    case DRAGOON:
-                        equipment = new EquipmentType[] { horses, muskets };
-                        break;
-                    default:
-                    }
-                    for (int index = 0; index < unit.getNumber(); index++) {
-                        new Unit(getGame(), getPlayer().getEurope(), getPlayer(),
-                                 unit.getUnitType(), UnitState.ACTIVE, equipment);
-                    }
-                }
-                player.setMonarch(null);
             }
         }
     }
