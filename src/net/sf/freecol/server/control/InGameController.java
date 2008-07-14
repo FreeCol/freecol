@@ -666,20 +666,22 @@ public final class InGameController extends Controller {
         EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
         for (AbstractUnit unit : units) {
             EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
-            switch(unit.getRole()) {
-            case SOLDIER:
-                equipment = soldier;
-                break;
-            case DRAGOON:
-                equipment = dragoon;
-                break;
-            default:
-            }
-            Unit newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer,
-                                    unit.getUnitType(), UnitState.ACTIVE, equipment);
-            nextPlayer.getEurope().add(newUnit);
-            if (element != null) {
-                element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
+            for (int count = 0; count < unit.getNumber(); count++) {
+                switch(unit.getRole()) {
+                case SOLDIER:
+                    equipment = soldier;
+                    break;
+                case DRAGOON:
+                    equipment = dragoon;
+                    break;
+                default:
+                }
+                Unit newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer,
+                                        unit.getUnitType(), UnitState.ACTIVE, equipment);
+                nextPlayer.getEurope().add(newUnit);
+                if (element != null) {
+                    element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
+                }
             }
         }
     }
