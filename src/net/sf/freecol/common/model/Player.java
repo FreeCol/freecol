@@ -2147,8 +2147,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 BuildingType type = FreeCol.getSpecification().getBuildingType(father.getEvents().get(event));
                 for (Colony colony : getColonies()) {
                     Building building = colony.getBuilding(type);
-                    if (building == null && colony.canBuild(type)) {
-                        colony.addBuilding(new Building(getGame(), colony, type));
+                    if ((type == null || !type.equals(building.getType())) &&
+                        colony.canBuild(type)) {
+                        colony.createBuilding(type);
                     }
                 }
             } else if (event.equals("model.event.seeAllColonies")) {
@@ -2210,8 +2211,8 @@ public class Player extends FreeColGameObject implements Nameable {
             if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
                 addFather(currentFather);
                 currentFather = null;
-                bells -= getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ? getTotalFoundingFatherCost()
-                        : bells;
+                bells -= getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ?
+                    getTotalFoundingFatherCost() : bells;
             }
 
             // CO: since the pioneer already finishes faster, changing

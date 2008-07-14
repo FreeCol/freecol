@@ -1025,7 +1025,13 @@ public final class Colony extends Settlement implements Location, Nameable {
         return true;
     }
 
-    private Building createBuilding(BuildingType buildingType) {
+    /**
+     * Ask the server to create a building for us.
+     *
+     * @param buildingType a <code>BuildingType</code> value
+     * @return a <code>Building</code> value
+     */
+    public Building createBuilding(BuildingType buildingType) {
         return getGame().getModelController().createBuilding(getId() + "buildBuilding", this, buildingType);
     }
 
