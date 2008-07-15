@@ -110,8 +110,9 @@ public final class DragListener extends MouseAdapter {
                         int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsType);
                         if (maxpotential > 0) {
                             UnitType expert = FreeCol.getSpecification().getExpertForProducing(goodsType);
-                            menuItem = new JMenuItem(Messages.message(goodsType.getId() + ".workAs")
-                                                     + " (" + maxpotential + " " + goodsType.getName() + ")",
+                            menuItem = new JMenuItem(Messages.message(goodsType.getId() + ".workAs",
+                                                                      "%amount%",
+                                                                      Integer.toString(maxpotential)),
                                                      imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                             menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_FARMING+goodsType.getIndex()));
                             menuItem.addActionListener(unitLabel);
