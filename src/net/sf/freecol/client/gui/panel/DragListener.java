@@ -95,6 +95,7 @@ public final class DragListener extends MouseAdapter {
                 name.setActionCommand(String.valueOf(UnitLabel.COLOPEDIA));
                 name.addActionListener(unitLabel);
                 menu.add(name);
+                menu.addSeparator();
 
                 JMenuItem menuItem;
                 boolean separatorNeeded = false;
@@ -109,7 +110,7 @@ public final class DragListener extends MouseAdapter {
                         int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsType);
                         if (maxpotential > 0) {
                             UnitType expert = FreeCol.getSpecification().getExpertForProducing(goodsType);
-                            menuItem = new JMenuItem(Messages.message("beAExpert", "%expert%", expert.getName())
+                            menuItem = new JMenuItem(Messages.message(goodsType.getId() + ".workAs")
                                                      + " (" + maxpotential + " " + goodsType.getName() + ")",
                                                      imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
                             menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_FARMING+goodsType.getIndex()));
@@ -136,6 +137,9 @@ public final class DragListener extends MouseAdapter {
                                     }
                                     locName +=  " " + goodsType.getName()+")";
                                     menuItem.setText(locName);
+                                    if (addOutput == 0) {
+                                        menuItem.setForeground(FreeColPanel.LINK_COLOR);
+                                    }
                                 }
                                 menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_BUILDING+building.getType().getIndex()));
                                 menuItem.addActionListener(unitLabel);
@@ -291,7 +295,7 @@ public final class DragListener extends MouseAdapter {
                         menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
-                        menu.addSeparator();
+                        //menu.addSeparator();
                     }
                     
                 }
