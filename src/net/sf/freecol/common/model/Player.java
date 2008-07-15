@@ -2146,10 +2146,8 @@ public class Player extends FreeColGameObject implements Nameable {
             } else if (event.equals("model.event.freeBuilding")) {
                 BuildingType type = FreeCol.getSpecification().getBuildingType(father.getEvents().get(event));
                 for (Colony colony : getColonies()) {
-                    Building building = colony.getBuilding(type);
-                    if ((building == null || !type.equals(building.getType())) &&
-                        colony.canBuild(type)) {
-                        colony.createBuilding(type);
+                    if (colony.canBuild(type)) {
+                        colony.addBuilding(colony.createBuilding(type));
                     }
                 }
             } else if (event.equals("model.event.seeAllColonies")) {

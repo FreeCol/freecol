@@ -193,7 +193,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     private boolean isFree(BuildingType buildingType) {
         float value = owner.getFeatureContainer().applyModifier(100f, 
                 "model.modifier.buildingPriceBonus", buildingType, getGame().getTurn());
-        return (value == 0f);
+        return (value == 0f && canBuild(buildingType));
     }
 
     /**

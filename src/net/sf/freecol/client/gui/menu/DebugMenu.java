@@ -25,8 +25,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.w3c.dom.Element;
 
@@ -43,8 +45,10 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -234,6 +238,31 @@ public class DebugMenu extends JMenu {
                 }
             });
         }
+
+        final JMenuItem addFather = new JMenuItem("Add Founding Father");
+        addFather.setOpaque(false);
+        addFather.setMnemonic(KeyEvent.VK_F);
+        this.add(addFather);
+        addFather.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    Player player = freeColClient.getMyPlayer();
+                    List<ChoiceItem> fathers = new ArrayList<ChoiceItem>();
+                    for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+                        if (!player.hasFather(father)) {
+                            fathers.add(new ChoiceItem(father.getName(), father));
+                        }
+                    }
+                    ChoiceItem[] choices = fathers.toArray(new ChoiceItem[fathers.size()]);
+                    ChoiceItem response = (ChoiceItem) freeColClient.getCanvas()
+                        .showChoiceDialog("Select Founding Father", "cancel", choices);
+                    FoundingFather fatherToAdd = (FoundingFather) response.getObject();
+                    player.addFather(fatherToAdd);
+                    Player serverPlayer = (Player) freeColClient.getFreeColServer().getGame().
+                        getFreeColGameObject(player.getId());
+                    serverPlayer.addFather(fatherToAdd);
+                }
+            });
+
 
         this.addSeparator();
 
