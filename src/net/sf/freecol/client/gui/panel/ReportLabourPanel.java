@@ -172,7 +172,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         if (isOverview()) {
             int rows = labourData.getSummary().getTotal().getRowCount();
 
-            for (UnitType unitType : LabourData.getLabourTypes()) {
+            for (UnitType unitType : LabourData.getLabourTypes(player)) {
                 rows += labourData.getUnitData(unitType).getUnitSummaryRowCount();
             }
 
@@ -209,7 +209,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         int minHeight = allColonistsButton.getPreferredSize().height;
         HIGLayout higLayout = (HIGLayout) reportPanel.getLayout();
 
-        for (UnitType unitType : LabourData.getLabourTypes()) {
+        for (UnitType unitType : LabourData.getLabourTypes(player)) {
             LabourData.UnitData unitData = labourData.getUnitData(unitType);
 
             JButton unitButton = createUnitNameButton(unitData.getUnitName(), unitData);

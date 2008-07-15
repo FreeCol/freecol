@@ -401,7 +401,7 @@ public class LabourData {
     }
 
     private void gatherData(Player player) {
-        List<UnitType> labourTypes = getLabourTypes();
+        List<UnitType> labourTypes = getLabourTypes(player);
 
         Iterator<Unit> units = player.getUnitIterator();
         while (units.hasNext()) {
@@ -446,11 +446,11 @@ public class LabourData {
         }
     }
 
-    public static List<UnitType> getLabourTypes() {
+    public static List<UnitType> getLabourTypes(Player player) {
         List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
         ArrayList<UnitType> labourTypes = new ArrayList<UnitType>();
         for (UnitType unitType : unitTypes) {
-            if (unitType.hasSkill()) {
+            if (unitType.hasSkill() && unitType.isAvailableTo(player)) {
                 labourTypes.add(unitType);
             }
         }
