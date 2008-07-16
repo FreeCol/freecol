@@ -1637,6 +1637,11 @@ public final class GUI {
             Map.Position p = Map.getAdjacent(pos, direction);
             if (map.isValid(p)) {
                 Tile borderingTile = map.getTile(p.x, p.y);
+                if (borderingTile == null) {
+                    // this really shouldn't happen
+                    logger.warning("Bordering Tile was null.");
+                    continue;
+                }
 
                 if (!drawUnexploredBorders && !borderingTile.isExplored() &&
                     (direction == Direction.SE || direction == Direction.S ||
