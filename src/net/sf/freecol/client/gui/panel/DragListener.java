@@ -32,10 +32,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -104,12 +104,12 @@ public final class DragListener extends MouseAdapter {
                     tempUnit.getLocation().getTile().getSettlement() != null) {
                     Colony colony = (Colony) tempUnit.getLocation().getColony();
                     
-                    List<GoodsType> farmedGoods = FreeCol.getSpecification().getFarmedGoodsTypeList();
+                    List<GoodsType> farmedGoods = Specification.getSpecification().getFarmedGoodsTypeList();
                     // Work in Field - automatically find the best location
                     for (GoodsType goodsType : farmedGoods) {
                         int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsType);
                         if (maxpotential > 0) {
-                            UnitType expert = FreeCol.getSpecification().getExpertForProducing(goodsType);
+                            UnitType expert = Specification.getSpecification().getExpertForProducing(goodsType);
                             menuItem = new JMenuItem(Messages.message(goodsType.getId() + ".workAs",
                                                                       "%amount%",
                                                                       Integer.toString(maxpotential)),
@@ -203,7 +203,7 @@ public final class DragListener extends MouseAdapter {
 
 
                 if (tempUnit.hasAbility("model.ability.canBeEquipped")) {
-                    for (EquipmentType equipmentType : FreeCol.getSpecification().getEquipmentTypeList()) {
+                    for (EquipmentType equipmentType : Specification.getSpecification().getEquipmentTypeList()) {
                         int count = 0;
                         for (EquipmentType oldEquipment : tempUnit.getEquipment()) {
                             if (equipmentType == oldEquipment) {
@@ -296,24 +296,10 @@ public final class DragListener extends MouseAdapter {
                         menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
-                        //menu.addSeparator();
                     }
                     
                 }
 
-                /*
-                Image colopediaIcon = ResourceManager.getImage("Colopedia.closedSection.image");
-                menuItem = new JMenuItem(Messages.message("menuBar.colopedia"), 
-                        imageLibrary.getScaledImageIcon(colopediaIcon, 0.66f));
-                menuItem.setActionCommand(String.valueOf(UnitLabel.COLOPEDIA));
-                menuItem.addActionListener(unitLabel);
-                menu.add(menuItem);
-                */
-
-                int experience = Math.min(tempUnit.getExperience(), 200);
-                if (tempUnit.getTurnsOfTraining() > 0 || experience > 0) {
-                    menu.addSeparator();
-                }
                 if (tempUnit.getTurnsOfTraining() > 0 && tempUnit.getStudent() != null) {
                     JMenuItem teaching = new JMenuItem(Messages.message("menuBar.teacher") +
                                                        ": " + tempUnit.getTurnsOfTraining() +
@@ -321,11 +307,16 @@ public final class DragListener extends MouseAdapter {
                     teaching.setEnabled(false);
                     menu.add(teaching);
                 }
+                int experience = Math.min(tempUnit.getExperience(), 200);
                 if (experience > 0) {
-                    JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
-                                                             ": " + experience + "/200");
-                    experienceItem.setEnabled(false);
-                    menu.add(experienceItem);
+                    UnitType workType = Specification.getSpecification()
+                        .getExpertForProducing(tempUnit.getWorkType());
+                    if (tempUnit.getType().canBeUpgraded(workType, UnitType.UpgradeType.EXPERIENCE)) {
+                        JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
+                                                                 ": " + experience + "/5000");
+                        experienceItem.setEnabled(false);
+                        menu.add(experienceItem);
+                    }
                 }
 
                 if (menu.getSubElements().length > 0) {
