@@ -292,6 +292,9 @@ public final class Colony extends Settlement implements Location, Nameable {
         for (Unit target : tile.getUnitList()) {
             target.setOwner(getOwner());
         }
+        for (ExportData exportDatum : exportData.values()) {
+            exportDatum.setExported(false);
+        }
         // Changing the owner might alter bonuses applied by founding fathers:
         updatePopulation();
     }
