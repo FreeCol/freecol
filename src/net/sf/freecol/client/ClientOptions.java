@@ -412,8 +412,6 @@ public class ClientOptions extends OptionMap {
         new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
         new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
         new BooleanOption(DISPLAY_GRID, guiGroup, false);
-        new RangeOption(MOVE_ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 0, false);
-        new RangeOption(ENEMY_MOVE_ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 3, false);
         new SelectOption(COLONY_COMPARATOR, guiGroup,
                          new String[] {"byName",
                                        "byAge",
@@ -421,6 +419,8 @@ public class ClientOptions extends OptionMap {
                                        "bySize",
                                        "bySoL"},
                          0);
+        new RangeOption(MOVE_ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 0, false);
+        new RangeOption(ENEMY_MOVE_ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 3, false);
 
         OptionGroup messagesGroup = new OptionGroup("clientOptions.messages");
         new SelectOption(MESSAGES_GROUP_BY, messagesGroup,
