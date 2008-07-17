@@ -178,6 +178,7 @@ public class IndianNationType extends NationType {
      * @param tile a <code>Tile</code> value
      * @return a <code>boolean</code> value
      */
+    /*
     public boolean canSettleTile(Tile tile) {
         if (tile.getType().canSettle()) {
             return canSettleRegion(tile.getRegion());
@@ -185,17 +186,18 @@ public class IndianNationType extends NationType {
             return false;
         }
     }
-
+    */
     /**
      * Returns true if this Nation can settle the given Region.
      *
      * @param region a <code>Region</code> value
      * @return a <code>boolean</code> value
      */
+    /*
     public boolean canSettleRegion(Region region) {
         if (regions.isEmpty()) {
             return true;
-        } else if (regions.contains(region)) {
+        } else if (regions.contains(region.getId())) {
             return true;
         } else if (region.getParent() == null) {
             return false;
@@ -203,7 +205,7 @@ public class IndianNationType extends NationType {
             return canSettleRegion(region.getParent());
         }
     }
-
+    */
 
     /**
      * Returns a list of this Nation's skills.
