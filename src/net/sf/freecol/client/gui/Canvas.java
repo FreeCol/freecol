@@ -119,6 +119,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -1741,7 +1742,7 @@ public final class Canvas extends JDesktopPane {
      * @return true or false
      * @see net.sf.freecol.common.model.Monarch
      */
-    public boolean showMonarchPanel(int action, String... replace) {
+    public boolean showMonarchPanel(MonarchAction action, String... replace) {
         closeStatusPanel();
 
         MonarchPanel monarchPanel = new MonarchPanel(this);

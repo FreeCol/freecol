@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
@@ -519,13 +520,13 @@ public final class InGameController extends Controller {
                 public void run() {
                     try {
                         Monarch monarch = nextPlayer.getMonarch();
-                        int action = monarch.getAction();
+                        MonarchAction action = monarch.getAction();
                         Element monarchActionElement = Message.createNewRootElement("monarchAction");
                         monarchActionElement.setAttribute("action", String.valueOf(action));
                         switch (action) {
-                        case Monarch.RAISE_TAX:
+                        case RAISE_TAX:
                             int oldTax = nextPlayer.getTax();
-                            int newTax = monarch.getNewTax(Monarch.RAISE_TAX);
+                            int newTax = monarch.getNewTax(MonarchAction.RAISE_TAX);
                             if (newTax > 100) {
                                 logger.warning("Tax rate exceeds 100 percent.");
                                 return;
@@ -564,8 +565,8 @@ public final class InGameController extends Controller {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
                             break;
-                        case Monarch.LOWER_TAX:
-                            int taxLowered = monarch.getNewTax(Monarch.LOWER_TAX);
+                        case LOWER_TAX:
+                            int taxLowered = monarch.getNewTax(MonarchAction.LOWER_TAX);
                             if (taxLowered < 0) {
                                 logger.warning("Tax rate less than 0 percent.");
                                 return;
@@ -578,7 +579,7 @@ public final class InGameController extends Controller {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
                             break;
-                        case Monarch.ADD_TO_REF:
+                        case ADD_TO_REF:
                             Element additionElement = monarchActionElement.getOwnerDocument().createElement("addition");
                             for (AbstractUnit unit : monarch.addToREF()) {
                                 additionElement.appendChild(unit.toXMLElement(additionElement.getOwnerDocument()));
@@ -590,7 +591,7 @@ public final class InGameController extends Controller {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
                             break;
-                        case Monarch.DECLARE_WAR:
+                        case DECLARE_WAR:
                             Player enemy = monarch.declareWar();
                             if (enemy == null) {
                                 // this should not happen
@@ -629,7 +630,7 @@ public final class InGameController extends Controller {
                                 }
                                 break;
                             */
-                        case Monarch.OFFER_MERCENARIES:
+                        case OFFER_MERCENARIES:
                             Element mercenaryElement = monarchActionElement.getOwnerDocument().createElement("mercenaries");
                             List<AbstractUnit> units = monarch.getMercenaries();
                             int price = monarch.getPrice(units, true);
@@ -643,7 +644,7 @@ public final class InGameController extends Controller {
                                 boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
                                 if (accepted) {
                                     Element updateElement = Message.createNewRootElement("monarchAction");
-                                    updateElement.setAttribute("action", String.valueOf(Monarch.ADD_UNITS));
+                                    updateElement.setAttribute("action", String.valueOf(MonarchAction.ADD_UNITS));
                                     nextPlayer.modifyGold(-price);
                                     createUnits(units, updateElement, nextPlayer);
                                     nextPlayer.getConnection().send(updateElement);

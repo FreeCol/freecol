@@ -32,6 +32,7 @@ import javax.swing.SwingConstants;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import cz.autel.dmi.HIGLayout;
 
@@ -39,9 +40,6 @@ import cz.autel.dmi.HIGLayout;
  * This panel is used to show information about a tile.
  */
 public final class MonarchPanel extends FreeColDialog implements ActionListener {
-
-
-
 
     private static final Logger logger = Logger.getLogger(MonarchPanel.class.getName());
 
@@ -100,7 +98,7 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
      * @param action The monarch action.
      * @param replace The data to be used when displaying i18n-strings.
      */
-    public void initialize(int action, String... replace) {
+    public void initialize(MonarchAction action, String... replace) {
         removeAll();
 
         Nation nation = parent.getClient().getMyPlayer().getNation();
@@ -122,32 +120,32 @@ public final class MonarchPanel extends FreeColDialog implements ActionListener 
         String okText = "ok";
         String cancelText = null;
         switch (action) {
-        case Monarch.RAISE_TAX:
+        case RAISE_TAX:
             messageID = "model.monarch.raiseTax";
             okText = "model.monarch.acceptTax";
             cancelText = "model.monarch.rejectTax";
             break;
-        case Monarch.ADD_TO_REF:
+        case ADD_TO_REF:
             messageID = "model.monarch.addToREF";
             break;
-        case Monarch.DECLARE_WAR:
+        case DECLARE_WAR:
             messageID = "model.monarch.declareWar";
             break;
-        case Monarch.SUPPORT_SEA:
+        case SUPPORT_SEA:
             messageID = "model.monarch.supportSea";
             cancelText = "display";
             break;
-        case Monarch.SUPPORT_LAND:
+        case SUPPORT_LAND:
             messageID = "model.monarch.supportLand";
             cancelText = "display";
             break;
-        case Monarch.LOWER_TAX:
+        case LOWER_TAX:
             messageID = "model.monarch.lowerTax";
             break;
-        case Monarch.WAIVE_TAX:
+        case WAIVE_TAX:
             messageID = "model.monarch.waiveTax";
             break;
-        case Monarch.OFFER_MERCENARIES:
+        case OFFER_MERCENARIES:
             messageID = "model.monarch.offerMercenaries";
             okText = "model.monarch.acceptMercenaries";
             cancelText = "model.monarch.rejectMercenaries";

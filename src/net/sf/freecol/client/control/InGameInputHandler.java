@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
@@ -769,11 +770,11 @@ public final class InGameInputHandler extends InputHandler {
         final FreeColClient freeColClient = getFreeColClient();
         Player player = freeColClient.getMyPlayer();
         Monarch monarch = player.getMonarch();
-        final int action = Integer.parseInt(element.getAttribute("action"));
+        final MonarchAction action = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
         Element reply;
 
         switch (action) {
-        case Monarch.RAISE_TAX:
+        case RAISE_TAX:
             boolean force = Boolean.parseBoolean(element.getAttribute("force"));
             final int amount = new Integer(element.getAttribute("amount")).intValue();
             if (force) {
@@ -796,19 +797,19 @@ public final class InGameInputHandler extends InputHandler {
                 }
             }
             return reply;
-		case Monarch.LOWER_TAX:
+        case LOWER_TAX:
 	
-			final int newTax = new Integer(element.getAttribute("amount")).intValue();
-			final int difference = freeColClient.getMyPlayer().getTax() - newTax;
-    
-			freeColClient.getMyPlayer().setTax(newTax);
-			player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.WARNING, null,
-    										"model.monarch.lowerTax",
-    										"%difference%",String.valueOf(difference),
-    										"%newTax%",
-    										String.valueOf(newTax)));
-			break;
-        case Monarch.ADD_TO_REF:
+            final int newTax = new Integer(element.getAttribute("amount")).intValue();
+            final int difference = freeColClient.getMyPlayer().getTax() - newTax;
+                    
+            freeColClient.getMyPlayer().setTax(newTax);
+            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.WARNING, null,
+                                                    "model.monarch.lowerTax",
+                                                    "%difference%",String.valueOf(difference),
+                                                    "%newTax%",
+                                                    String.valueOf(newTax)));
+            break;
+        case ADD_TO_REF:
             Element additionElement = Message.getChildElement(element, "addition");
             NodeList childElements = additionElement.getChildNodes();
             ArrayList<AbstractUnit> units = new ArrayList<AbstractUnit>();
@@ -825,7 +826,7 @@ public final class InGameInputHandler extends InputHandler {
                                                     "%addition%", Utils.join(" " + Messages.message("and") + " ",
                                                                              unitNames)));
             break;
-        case Monarch.DECLARE_WAR:
+        case DECLARE_WAR:
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
             player.changeRelationWithPlayer(enemy, Stance.WAR);
             player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
@@ -833,9 +834,9 @@ public final class InGameInputHandler extends InputHandler {
                                                         {"%nation%", enemy.getName()}},
                                                     ModelMessage.MessageType.WARNING));
             break;
-        case Monarch.SUPPORT_LAND:
-        case Monarch.SUPPORT_SEA:
-        case Monarch.ADD_UNITS:
+        case SUPPORT_LAND:
+        case SUPPORT_SEA:
+        case ADD_UNITS:
             NodeList unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
@@ -848,16 +849,16 @@ public final class InGameInputHandler extends InputHandler {
                 player.getEurope().add(newUnit);
             }
             SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    Canvas canvas = getFreeColClient().getCanvas();
-                    if (!canvas.isShowingSubPanel()
-                            && (action == Monarch.ADD_UNITS || !canvas.showMonarchPanel(action))) {
-                        canvas.showEuropePanel();
+                    public void run() {
+                        Canvas canvas = getFreeColClient().getCanvas();
+                        if (!canvas.isShowingSubPanel()
+                            && (action == MonarchAction.ADD_UNITS || !canvas.showMonarchPanel(action))) {
+                            canvas.showEuropePanel();
+                        }
                     }
-                }
-            });
+                });
             break;
-        case Monarch.OFFER_MERCENARIES:
+        case OFFER_MERCENARIES:
             reply = Message.createNewRootElement("hireMercenaries");
             Element mercenaryElement = Message.getChildElement(element, "mercenaries");
             childElements = mercenaryElement.getChildNodes();
@@ -874,10 +875,10 @@ public final class InGameInputHandler extends InputHandler {
                 int price = new Integer(element.getAttribute("price")).intValue();
                 freeColClient.getMyPlayer().modifyGold(-price);
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        freeColClient.getCanvas().updateGoldLabel();
-                    }
-                });
+                        public void run() {
+                            freeColClient.getCanvas().updateGoldLabel();
+                        }
+                    });
                 reply.setAttribute("accepted", String.valueOf(true));
             } else {
                 reply.setAttribute("accepted", String.valueOf(false));
@@ -993,7 +994,7 @@ public final class InGameInputHandler extends InputHandler {
 
         if (goodsElement == null) {
             // player has no colony or nothing to trade
-            new ShowMonarchPanelSwingTask(Monarch.WAIVE_TAX).confirm();
+            new ShowMonarchPanelSwingTask(MonarchAction.WAIVE_TAX).confirm();
         } else {
             final Goods goods = new Goods(getGame(), goodsElement);
             final Colony colony = (Colony) goods.getLocation();
@@ -1697,7 +1698,7 @@ public final class InGameInputHandler extends InputHandler {
          * @param action The action key.
          * @param replace The replacement values.
          */
-        public ShowMonarchPanelSwingTask(int action, String... replace) {
+        public ShowMonarchPanelSwingTask(MonarchAction action, String... replace) {
             _action = action;
             _replace = replace;
         }
@@ -1726,7 +1727,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
 
-        private int _action;
+        private MonarchAction  _action;
 
         private String[] _replace;
     }

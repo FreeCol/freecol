@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.StanceTradeItem;
@@ -260,22 +261,22 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      * 
      */
     private Element monarchAction(DummyConnection connection, Element element) {
-        int action = Integer.parseInt(element.getAttribute("action"));
+        MonarchAction action = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
         Element reply = null;
         switch (action) {
-        case Monarch.RAISE_TAX:
+        case RAISE_TAX:
             int tax = Integer.parseInt(element.getAttribute("amount"));
             boolean accept = getAIPlayer().acceptTax(tax);
             reply = Message.createNewRootElement("acceptTax");
             reply.setAttribute("accepted", String.valueOf(accept));
             break;
             
-        case Monarch.LOWER_TAX:
+        case LOWER_TAX:
             int newTax = Integer.parseInt(element.getAttribute("amount"));
             getAIPlayer().getPlayer().setTax(newTax);
             break;
 
-        case Monarch.OFFER_MERCENARIES:
+        case OFFER_MERCENARIES:
             reply = Message.createNewRootElement("hireMercenaries");
             if (getAIPlayer().getStrategy() == AIPlayer.STRATEGY_CONQUEST || getAIPlayer().getPlayer().isAtWar()) {
                 reply.setAttribute("accepted", String.valueOf(true));
