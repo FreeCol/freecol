@@ -2015,7 +2015,7 @@ public final class GUI {
                 if (map.isValid(p)) {
                     Tile borderingTile = map.getTile(p);
 
-                    if (borderingTile.isExplored()){
+                    if (borderingTile == null || borderingTile.isExplored()){
                         continue;
                     }
 
