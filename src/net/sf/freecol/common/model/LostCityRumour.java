@@ -31,17 +31,16 @@ import net.sf.freecol.common.Specification;
 public class LostCityRumour extends FreeColGameObjectType {
 
     /** Constants describing types of Lost City Rumours. */
-    public static final int NO_SUCH_RUMOUR = -1,
-        BURIAL_GROUND = 0,
-        EXPEDITION_VANISHES = 1, 
-        NOTHING = 2,
-        LEARN = 3,
-        TRIBAL_CHIEF = 4,
-        COLONIST = 5,
-        TREASURE = 6,
-        FOUNTAIN_OF_YOUTH = 7;
-
-    public static final int NUMBER_OF_RUMOURS = 8;
+    public static enum RumourType {
+        NO_SUCH_RUMOUR,
+            BURIAL_GROUND,
+            EXPEDITION_VANISHES, 
+            NOTHING,
+            LEARN,
+            TRIBAL_CHIEF,
+            COLONIST,
+            TREASURE,
+            FOUNTAIN_OF_YOUTH }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         // this class is really just an enum, but needs to inherit from FreeColGameObjectType

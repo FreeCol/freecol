@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.LostCityRumour;
+import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
@@ -1032,7 +1032,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element lostCityRumour(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
         final Player player = freeColClient.getMyPlayer();
-        int type = Integer.parseInt(element.getAttribute("type"));
+        RumourType type = Enum.valueOf(RumourType.class, element.getAttribute("type"));
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
 
         if (unit == null) {
@@ -1045,31 +1045,31 @@ public final class InGameInputHandler extends InputHandler {
         NodeList unitList;
         ModelMessage m;
         switch (type) {
-        case LostCityRumour.BURIAL_GROUND:
+        case BURIAL_GROUND:
             Player indianPlayer = tile.getOwner();
             indianPlayer.modifyTension(player, Tension.Level.HATEFUL.getLimit());
             m = new ModelMessage(unit, "lostCityRumour.BurialGround", new String[][] { { "%nation%",
                     indianPlayer.getNationAsString() } }, ModelMessage.MessageType.LOST_CITY_RUMOUR);
             break;
-        case LostCityRumour.EXPEDITION_VANISHES:
+        case EXPEDITION_VANISHES:
             m = new ModelMessage(unit, "lostCityRumour.ExpeditionVanishes", null, ModelMessage.MessageType.LOST_CITY_RUMOUR);
             unit.dispose();
             break;
-        case LostCityRumour.NOTHING:
+        case NOTHING:
             m = new ModelMessage(unit, "lostCityRumour.Nothing", null, ModelMessage.MessageType.LOST_CITY_RUMOUR);
             break;
-        case LostCityRumour.LEARN:
+        case LEARN:
             m = new ModelMessage(unit, "lostCityRumour.SeasonedScout", new String[][] { { "%unit%", unit.getName() } },
                     ModelMessage.MessageType.LOST_CITY_RUMOUR);
             unit.setType(FreeCol.getSpecification().getUnitType(element.getAttribute("unitType")));
             break;
-        case LostCityRumour.TRIBAL_CHIEF:
+        case TRIBAL_CHIEF:
             String amount = element.getAttribute("amount");
             m = new ModelMessage(unit, "lostCityRumour.TribalChief", new String[][] { { "%money%", amount } },
                     ModelMessage.MessageType.LOST_CITY_RUMOUR);
             player.modifyGold(Integer.parseInt(amount));
             break;
-        case LostCityRumour.COLONIST:
+        case COLONIST:
             m = new ModelMessage(unit, ModelMessage.MessageType.LOST_CITY_RUMOUR, null, "lostCityRumour.Colonist");
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
@@ -1083,7 +1083,7 @@ public final class InGameInputHandler extends InputHandler {
                 tile.add(newUnit);
             }
             break;
-        case LostCityRumour.TREASURE:
+        case TREASURE:
             String treasure = element.getAttribute("amount");
             m = new ModelMessage(unit, "lostCityRumour.TreasureTrain", new String[][] { { "%money%", treasure } },
                     ModelMessage.MessageType.LOST_CITY_RUMOUR);
@@ -1099,7 +1099,7 @@ public final class InGameInputHandler extends InputHandler {
                 tile.add(newUnit);
             }
             break;
-        case LostCityRumour.FOUNTAIN_OF_YOUTH:
+        case FOUNTAIN_OF_YOUTH:
             if (player.getEurope() == null) {
                 m = new ModelMessage(player, "lostCityRumour.FountainOfYouthWithoutEurope", null,
                                      ModelMessage.MessageType.LOST_CITY_RUMOUR);

@@ -50,7 +50,7 @@ import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.LostCityRumour;
+import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch;
@@ -81,6 +81,7 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -1059,92 +1060,70 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         /**
          * The higher the difficulty, the more likely bad things are to happen.
          */
-        int[] probability = new int[LostCityRumour.NUMBER_OF_RUMOURS];
+        List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
         /*
          * It should not be possible to find an indian burial ground outside
          * indian territory:
          */
-        if (tile.getOwner() == null || tile.getOwner().isEuropean()) {
-            probability[LostCityRumour.BURIAL_GROUND] = 0;
-        } else {
-            probability[LostCityRumour.BURIAL_GROUND] = dx;
-        }
-        probability[LostCityRumour.EXPEDITION_VANISHES] = dx * 2;
-        probability[LostCityRumour.NOTHING] = dx * 5;
-        // only these units can be promoted
-        if (learntUnitTypes.isEmpty()) {
-            probability[LostCityRumour.LEARN] = 0;
-        } else {
-            probability[LostCityRumour.LEARN] = (max - dx) * 3;
+        if (!player.hasAbility("model.ability.rumoursAlwaysPositive")) {
+            choices.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, dx * 2));
+            choices.add(new RandomChoice<RumourType>(RumourType.NOTHING, dx * 5));
+            if (tile.getOwner() != null && !tile.getOwner().isEuropean()) {
+                choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, dx));
+            }
+            // only these units can be promoted
+            if (!learntUnitTypes.isEmpty()) {
+                choices.add(new RandomChoice<RumourType>(RumourType.LEARN, (max - dx) * 3));
+            }
         }
         /**
          * The higher the difficulty, the less likely good things are to happen.
          */
-        probability[LostCityRumour.TRIBAL_CHIEF] = (max - dx) * 3;
-        if (newUnitTypes.isEmpty()) {
-            probability[LostCityRumour.COLONIST] = 0;
-        } else {
-            probability[LostCityRumour.COLONIST] = (max - dx) * 2;
+        choices.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF, (max - dx) * 3));
+        choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, (max - dx) + bonus / 2));
+        if (!newUnitTypes.isEmpty()) {
+            choices.add(new RandomChoice<RumourType>(RumourType.COLONIST, (max - dx) * 2));
         }
-        if (treasureUnitTypes.isEmpty()) {
-            probability[LostCityRumour.TREASURE] = 0;
-        } else {
-            probability[LostCityRumour.TREASURE] = (max - dx) * 2 + bonus;
+        if (!treasureUnitTypes.isEmpty()) {
+            choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, (max - dx) * 2 + bonus));
         }
-        probability[LostCityRumour.FOUNTAIN_OF_YOUTH] = (max - dx) + bonus / 2;
-        int start;
-        if (player.hasAbility("model.ability.rumoursAlwaysPositive")) {
-            start = 3;
-        } else {
-            start = 0;
-        }
-        int accumulator = 0;
-        for (int i = start; i < LostCityRumour.NUMBER_OF_RUMOURS; i++) {
-            accumulator += probability[i];
-            probability[i] = accumulator;
-        }
-        int rumour = LostCityRumour.NO_SUCH_RUMOUR;
-        int randomInt = getPseudoRandom().nextInt(accumulator);
-        for (int j = start; j < LostCityRumour.NUMBER_OF_RUMOURS; j++) {
-            if (randomInt < probability[j]) {
-                rumour = j;
-                break;
-            }
-        }
+
+        RumourType rumour = RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
+
         Element rumourElement = Message.createNewRootElement("lostCityRumour");
-        rumourElement.setAttribute("type", Integer.toString(rumour));
+        rumourElement.setAttribute("type", rumour.toString());
         rumourElement.setAttribute("unit", unit.getId());
         Unit newUnit;
         int random;
         // TODO: make this work with DifficultyLevel
         dx = 10 - getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
         switch (rumour) {
-        case LostCityRumour.BURIAL_GROUND:
+        case BURIAL_GROUND:
             Player indianPlayer = tile.getOwner();
             indianPlayer.modifyTension(player, Tension.Level.HATEFUL.getLimit());
             break;
-        case LostCityRumour.EXPEDITION_VANISHES:
+        case EXPEDITION_VANISHES:
             unit.dispose();
             break;
-        case LostCityRumour.NOTHING:
+        case NOTHING:
             break;
-        case LostCityRumour.LEARN:
+        case LEARN:
             random = getPseudoRandom().nextInt(learntUnitTypes.size());
             unit.setType(learntUnitTypes.get(random));
             rumourElement.setAttribute("unitType", learntUnitTypes.get(random).getId());
             break;
-        case LostCityRumour.TRIBAL_CHIEF:
+        case TRIBAL_CHIEF:
             int amount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
             player.modifyGold(amount);
             rumourElement.setAttribute("amount", Integer.toString(amount));
             break;
-        case LostCityRumour.COLONIST:
+        case COLONIST:
             random = getPseudoRandom().nextInt(newUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, newUnitTypes.get(random), UnitState.ACTIVE);
             //tile.add(newUnit); don't add unit twice
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
-        case LostCityRumour.TREASURE:
+        case TREASURE:
             int treasure = getPseudoRandom().nextInt(dx * 600) + dx * 300;
             random = getPseudoRandom().nextInt(treasureUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, treasureUnitTypes.get(random), UnitState.ACTIVE);
@@ -1153,7 +1132,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             rumourElement.setAttribute("amount", Integer.toString(treasure));
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
-        case LostCityRumour.FOUNTAIN_OF_YOUTH:
+        case FOUNTAIN_OF_YOUTH:
             if (player.getEurope() != null) {
                 if (player.hasAbility("model.ability.selectRecruit")) {
                     player.setRemainingEmigrants(dx);
