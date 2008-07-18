@@ -34,6 +34,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.util.RandomChoice;
 
 import org.w3c.dom.Element;
 
@@ -262,7 +263,7 @@ public final class Monarch extends FreeColGameObject {
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.LOWER_TAX, 10 - dx));
         }
 
-        return getWeightedRandom(choices);
+        return RandomChoice.getWeightedRandom(getGame().getModelController().getPseudoRandom(), choices);
     }
 
     /**
@@ -620,42 +621,6 @@ public final class Monarch extends FreeColGameObject {
         return "monarch";
     }
 
-
-    public class RandomChoice<T> {
-
-        private int probability = 0;
-        private T object = null;
-
-        public RandomChoice(T object, int probability) {
-            this.probability = probability;
-            this.object = object;
-        }
-
-        public int getProbability() {
-            return probability;
-        }
-
-        public T getObject() {
-            return object;
-        }
-
-    }
-
-    public <T> T getWeightedRandom(Iterable<RandomChoice<T>> input) {
-        int total = 0;
-        for (RandomChoice choice : input) {
-            total += choice.getProbability();
-        }
-        int randomInt = getGame().getModelController().getPseudoRandom().nextInt(total);
-        total = 0;
-        for (RandomChoice<T> choice : input) {
-            total += choice.getProbability();
-            if (total < randomInt) {
-                return choice.getObject();
-            }
-        }
-        return null;
-    }
 
 }
 
