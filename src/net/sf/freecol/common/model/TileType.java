@@ -32,6 +32,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.util.RandomChoice;
 
 public final class TileType extends FreeColGameObjectType {
 
@@ -58,8 +59,7 @@ public final class TileType extends FreeColGameObjectType {
     private int[] temperature = new int[2];
     private int[] altitude = new int[2];
 
-    private List<ResourceType> resourceType;
-    private List<Integer> resourceProbability;
+    private List<RandomChoice<ResourceType>> resourceType;
 
     private GoodsType secondaryGoods = null;
 
@@ -169,30 +169,16 @@ public final class TileType extends FreeColGameObjectType {
         return production;
     }
 
-    public List<ResourceType> getResourceTypeList() {
+    public List<RandomChoice<ResourceType>> getWeightedResources() {
         return resourceType;
     }
 
-    public ResourceType getRandomResourceType() {
-        int size = resourceType.size();
-        if (size <= 0) {
-            return null;
+    public List<ResourceType> getResourceTypeList() {
+        List<ResourceType> result = new ArrayList<ResourceType>();
+        for (RandomChoice<ResourceType> resource : resourceType) {
+            result.add(resource.getObject());
         }
-        int totalProb = 0;
-        int[] prob = new int[size];
-        for (int i = 0; i < size; i++) {
-            totalProb += resourceProbability.get(i);
-            prob[i] = totalProb;
-        }
-        Random rand = new Random();
-        int decision = rand.nextInt(totalProb);
-        for (int i = 0; i < size; i++) {
-            if (decision <= prob[i]) {
-                return resourceType.get(i);
-            }
-        }
-        // Not supposed to end up here
-        return null;
+        return result;
     }
 
     public boolean withinRange(RangeType rangeType, int value) {
@@ -233,8 +219,7 @@ public final class TileType extends FreeColGameObjectType {
         
         artBasic = null;
         production = new ArrayList<AbstractGoods>();
-        resourceType = new ArrayList<ResourceType>();
-        resourceProbability = new ArrayList<Integer>();
+        resourceType = new ArrayList<RandomChoice<ResourceType>>();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
@@ -267,10 +252,9 @@ public final class TileType extends FreeColGameObjectType {
                 addModifier(new Modifier(type.getId(), getId(), amount, Modifier.Type.ADDITIVE));
                 in.nextTag(); // close this element
             } else if ("resource".equals(childName)) {
-                String r = in.getAttributeValue(null, "type");
-                ResourceType rt = specification.getResourceType(r);
-                resourceType.add(rt);
-                resourceProbability.add(getAttribute(in, "probability", 100));
+                ResourceType type = specification.getResourceType(in.getAttributeValue(null, "type"));
+                int probability = getAttribute(in, "probability", 100);
+                resourceType.add(new RandomChoice<ResourceType>(type, probability));
                 in.nextTag(); // close this element
             } else {
                 throw new RuntimeException("unexpected: " + childName);

@@ -44,19 +44,31 @@ public class RandomChoice<T> {
 
 
     public static <T> T getWeightedRandom(PseudoRandom pseudoRandom, Collection<RandomChoice<T>> input) {
-        int total = 0;
-        for (RandomChoice choice : input) {
-            total += choice.getProbability();
+        if (input == null || input.isEmpty()) {
+            return null;
+        } else if (input.size() == 1) {
+            return input.iterator().next().getObject();
+        } else {
+            int total = 0;
+            for (RandomChoice choice : input) {
+                total += choice.getProbability();
+            }
+            return select(input, pseudoRandom.nextInt(total));
         }
-        return select(input, pseudoRandom.nextInt(total));
     }
 
     public static <T> T getWeightedRandom(Random random, Collection<RandomChoice<T>> input) {
-        int total = 0;
-        for (RandomChoice choice : input) {
-            total += choice.getProbability();
+        if (input == null || input.isEmpty()) {
+            return null;
+        } else if (input.size() == 1) {
+            return input.iterator().next().getObject();
+        } else {
+            int total = 0;
+            for (RandomChoice choice : input) {
+                total += choice.getProbability();
+            }
+            return select(input, random.nextInt(total));
         }
-        return select(input, random.nextInt(total));
     }
 
     private static <T> T select(Collection<RandomChoice<T>> input, int probability) {

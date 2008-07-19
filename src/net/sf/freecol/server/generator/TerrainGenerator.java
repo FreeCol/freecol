@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.server.model.ServerRegion;
+import net.sf.freecol.common.util.RandomChoice;
 
 /**
  * Class for making a <code>Map</code> based upon a land map.
@@ -174,7 +175,7 @@ public class TerrainGenerator {
         if (t.isLand()) {
             if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
                 // Create random Bonus Resource
-                t.setResource(t.getType().getRandomResourceType());
+                t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
             }
         } else {
             int adjacentLand = 0;
@@ -190,7 +191,7 @@ public class TerrainGenerator {
                 if (t.getTileItemContainer() == null) {
                     t.setTileItemContainer(new TileItemContainer(t.getGame(), t));
                 }
-                t.setResource(t.getType().getRandomResourceType());
+                t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
             }
         }
     }
