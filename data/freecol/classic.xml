@@ -1365,8 +1365,10 @@
 
     <indian-nation-type id="model.nationType.apache" number-of-settlements="average"
                         aggression="high" type-of-settlement="indian_camp">
-      <skill id="model.unit.expertScout"/>
-      <skill id="model.unit.expertFurTrapper"/>
+      <skill id="model.unit.masterCottonPlanter" probability="20"/>
+      <skill id="model.unit.expertFarmer" probability="10"/>
+      <skill id="model.unit.masterSugarPlanter" probability="3"/>
+      <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
@@ -1378,8 +1380,10 @@
     </indian-nation-type>
     <indian-nation-type id="model.nationType.sioux" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_camp">
-      <skill id="model.unit.expertScout"/>
-      <skill id="model.unit.expertFurTrapper"/>
+      <skill id="model.unit.masterTobaccoPlanter" probability="20"/>
+      <skill id="model.unit.expertFurTrapper" probability="10"/>
+      <skill id="model.unit.seasonedScout" probability="10"/>
+      <skill id="model.unit.expertFarmer" probability="3"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
@@ -1391,8 +1395,11 @@
     </indian-nation-type>
     <indian-nation-type id="model.nationType.tupi" number-of-settlements="low"
                         aggression="high" type-of-settlement="indian_camp">
-      <skill id="model.unit.expertScout"/>
-      <skill id="model.unit.expertFurTrapper"/>
+      <skill id="model.unit.masterSugarPlanter" probability="20"/>
+      <skill id="model.unit.seasonedScout" probability="10"/>
+      <skill id="model.unit.masterCottonPlanter" probability="10"/>
+      <skill id="model.unit.expertFurTrapper" probability="3"/>
+      <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
@@ -1404,9 +1411,8 @@
     </indian-nation-type>
     <indian-nation-type id="model.nationType.arawak" number-of-settlements="low"
                         aggression="low" type-of-settlement="indian_village">
-      <skill id="model.unit.masterSugarPlanter"/>
-      <skill id="model.unit.masterCottonPlanter"/>
-      <skill id="model.unit.masterTobaccoPlanter"/>
+      <skill id="model.unit.masterSugarPlanter" probability="20"/>
+      <skill id="model.unit.expertFisherman" probability="10"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
@@ -1418,9 +1424,13 @@
     </indian-nation-type>
     <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average"
                         aggression="low" type-of-settlement="indian_village">
-      <skill id="model.unit.masterSugarPlanter"/>
-      <skill id="model.unit.masterCottonPlanter"/>
-      <skill id="model.unit.masterTobaccoPlanter"/>
+      <skill id="model.unit.masterCottonPlanter" probability="20"/>
+      <skill id="model.unit.expertFisherman" probability="10"/>
+      <skill id="model.unit.expertOreMiner" probability="10"/>
+      <skill id="model.unit.seasonedScout" probability="10"/>
+      <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
+      <skill id="model.unit.expertFarmer" probability="3"/>
+      <skill id="model.unit.masterFurTrader" probability="3"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
@@ -1432,9 +1442,13 @@
     </indian-nation-type>
     <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_village">
-      <skill id="model.unit.masterSugarPlanter"/>
-      <skill id="model.unit.masterCottonPlanter"/>
-      <skill id="model.unit.masterTobaccoPlanter"/>
+      <skill id="model.unit.expertFurTrapper" probability="20"/>
+      <skill id="model.unit.expertFarmer" probability="10"/>
+      <skill id="model.unit.seasonedScout" probability="10"/>
+      <skill id="model.unit.masterCottonPlanter" probability="3"/>
+      <skill id="model.unit.masterTobaccoPlanter" probability="3"/>
+      <skill id="model.unit.expertFisherman" probability="3"/>
+      <skill id="model.unit.expertOreMiner" probability="3"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
@@ -1446,8 +1460,11 @@
     </indian-nation-type>
     <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
                         aggression="low" type-of-settlement="inca_city">
-      <skill id="model.unit.expertFarmer"/>
-      <skill id="model.unit.expertFisherman"/>
+      <skill id="model.unit.expertSilverMiner" probability="20"/>
+      <skill id="model.unit.expertOreMiner" probability="10"/>
+      <skill id="model.unit.expertFisherman" probability="10"/>
+      <skill id="model.unit.expertFarmer" probability="10"/>
+      <skill id="model.unit.masterWeaver" probability="3"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
@@ -1460,8 +1477,11 @@
     </indian-nation-type>
     <indian-nation-type id="model.nationType.aztec" number-of-settlements="high"
                         aggression="high" type-of-settlement="aztec_city">
-      <skill id="model.unit.expertFarmer"/>
-      <skill id="model.unit.expertFisherman"/>
+      <skill id="model.unit.expertSilverMiner" probability="20"/>
+      <skill id="model.unit.expertFarmer" probability="10"/>
+      <skill id="model.unit.expertFisherman" probability="10"/>
+      <skill id="model.unit.masterSugarPlanter" probability="3"/>
+      <skill id="model.unit.expertOreMiner" probability="3"/>
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">

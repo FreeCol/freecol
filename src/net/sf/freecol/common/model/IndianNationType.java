@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Settlement.SettlementType;
+import net.sf.freecol.common.util.RandomChoice;
 
 
 /**
@@ -58,7 +59,8 @@ public class IndianNationType extends NationType {
     /**
      * Stores the ids of the skills taught by this Nation.
      */
-    private List<String> skills = new ArrayList<String>();
+    private List<RandomChoice<UnitType>> skills = 
+        new ArrayList<RandomChoice<UnitType>>();
 
     /**
      * The regions that can be settled by this Nation.
@@ -212,7 +214,7 @@ public class IndianNationType extends NationType {
      *
      * @return a list of this Nation's skills.
      */
-    public List<String> getSkills() {
+    public List<RandomChoice<UnitType>> getSkills() {
         return skills;
     }
 
@@ -246,7 +248,9 @@ public class IndianNationType extends NationType {
                addModifier(modifier);
                 specification.getModifierKeys().add(modifier.getId());
             } else if ("skill".equals(childName)) {
-                skills.add(in.getAttributeValue(null, "id"));
+                UnitType unitType = specification.getUnitType(in.getAttributeValue(null, "id"));
+                int probability = getAttribute(in, "probability", 0);
+                skills.add(new RandomChoice<UnitType>(unitType, probability));
                 in.nextTag(); // close this element
             } else if (Region.getXMLElementTagName().equals(childName)) {
                 regions.add(in.getAttributeValue(null, "id"));
