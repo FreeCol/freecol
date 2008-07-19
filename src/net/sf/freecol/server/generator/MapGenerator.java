@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
@@ -64,6 +65,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
@@ -510,10 +512,10 @@ public class MapGenerator implements IMapGenerator {
     private IndianSettlement placeIndianSettlement(Player player, boolean capital,
                                        Position position, Map map) {
         final Tile tile = map.getTile(position);
-        IndianSettlement settlement = new IndianSettlement(map.getGame(), player,
-                    tile, capital,
-                    generateSkillForLocation(map, tile),
-                    false, null);
+        IndianSettlement settlement = 
+            new IndianSettlement(map.getGame(), player, tile, capital,
+                                 generateSkillForLocation(map, tile, player.getNationType()),
+                                 false, null);
         SettlementType kind = settlement.getTypeOfSettlement();
         logger.fine("Generated skill: " + settlement.getLearnableSkill().getName());
 
@@ -545,67 +547,42 @@ public class MapGenerator implements IMapGenerator {
     }
     
     /**
-    * Generates a skill that could be taught from a settlement on the given Tile.
-    * TODO: This method should be properly implemented. The surrounding terrain
-    *       should be taken into account and it should be partially randomized.
-    *       
-    * @param map The <code>Map</code>.
-    * @param tile The tile where the settlement will be located.
-    * @return A skill that can be taught to Europeans.
-    */
-    private UnitType generateSkillForLocation(Map map, Tile tile) {
-        List<GoodsType> farmedList = FreeCol.getSpecification().getFarmedGoodsTypeList();
-        int[] potentials = new int[farmedList.size()];
-        int[] bonuses = new int[farmedList.size()];
-        int bonusMultiplier = 3;
+     * Generates a skill that could be taught from a settlement on the given Tile.
+     *       
+     * @param map The <code>Map</code>.
+     * @param tile The tile where the settlement will be located.
+     * @return A skill that can be taught to Europeans.
+     */
+    private UnitType generateSkillForLocation(Map map, Tile tile, NationType nationType) {
+        List<RandomChoice<UnitType>> skills = ((IndianNationType) nationType).getSkills();
+        java.util.Map<GoodsType, Integer> scale = new HashMap<GoodsType, Integer>();
+        for (RandomChoice<UnitType> skill : skills) {
+            scale.put(skill.getObject().getExpertProduction(), 1);
+        }
 
         Iterator<Position> iter = map.getAdjacentIterator(tile.getPosition());
         while (iter.hasNext()) {
             Map.Position p = iter.next();
             Tile t = map.getTile(p);
-            // If it has a resource, take the resource, and ignore the other things produced there
-            if (t.hasResource()) {
-                ResourceType r = t.getTileItemContainer().getResource().getType();
-                for (GoodsType g : r.getModifiers().keySet()) {
-                    int index = farmedList.indexOf(g);
-                    if (index >= 0) {
-                        potentials[index]++;
-                        bonuses[index]++;
-                    }
-                }
-            } else {
-                TileType tileType = t.getType();
-                for (AbstractGoods goods : tileType.getProduction()) {
-                    int index = farmedList.indexOf(goods.getType());
-                    if (index >= 0) {
-                        potentials[index]++;
-                    }
-                }
+            for (GoodsType goodsType : scale.keySet()) {
+                scale.put(goodsType, scale.get(goodsType).intValue() + t.potential(goodsType));
             }
         }
 
-        int counter = 1;
-        for (int index = 0; index < farmedList.size(); index++) {
-            if (bonuses[index] > 0) {
-                potentials[index] *= bonuses[index] * bonusMultiplier;
-            }
-            counter += potentials[index];
-            potentials[index] = counter;
+        List<RandomChoice<UnitType>> scaledSkills = new ArrayList<RandomChoice<UnitType>>();
+        for (RandomChoice<UnitType> skill : skills) {
+            UnitType unitType = skill.getObject();
+            int scaleValue = scale.get(unitType.getExpertProduction()).intValue();
+            scaledSkills.add(new RandomChoice<UnitType>(unitType, skill.getProbability() * scaleValue));
         }
-        int newRand = random.nextInt(counter);
-        for (int index = 0; index < farmedList.size(); index++) {
-            if (newRand < potentials[index]) {
-                UnitType expert = FreeCol.getSpecification().getExpertForProducing(farmedList.get(index));
-                if (expert == null) {
-                    // Seasoned Scout
-                    List<UnitType> unitList = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
-                    expert = unitList.get(random.nextInt(unitList.size()));
-                }
-                return expert;
-            }
+        UnitType skill = RandomChoice.getWeightedRandom(random, scaledSkills);
+        if (skill == null) {
+            // Seasoned Scout
+            List<UnitType> unitList = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
+            return unitList.get(random.nextInt(unitList.size()));
+        } else {
+            return skill;
         }
-        List<UnitType> unitList = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.expertScout");
-        return unitList.get(random.nextInt(unitList.size()));
     }
 
     /**

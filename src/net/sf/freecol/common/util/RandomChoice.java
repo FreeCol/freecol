@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.util;
 
+import java.util.Collection;
+import java.util.Random;
 import net.sf.freecol.common.PseudoRandom;
 
 
@@ -41,19 +43,31 @@ public class RandomChoice<T> {
     }
 
 
-    public static <T> T getWeightedRandom(PseudoRandom pseudoRandom, Iterable<RandomChoice<T>> input) {
+    public static <T> T getWeightedRandom(PseudoRandom pseudoRandom, Collection<RandomChoice<T>> input) {
         int total = 0;
         for (RandomChoice choice : input) {
             total += choice.getProbability();
         }
-        int randomInt = pseudoRandom.nextInt(total);
-        total = 0;
+        return select(input, pseudoRandom.nextInt(total));
+    }
+
+    public static <T> T getWeightedRandom(Random random, Collection<RandomChoice<T>> input) {
+        int total = 0;
+        for (RandomChoice choice : input) {
+            total += choice.getProbability();
+        }
+        return select(input, random.nextInt(total));
+    }
+
+    private static <T> T select(Collection<RandomChoice<T>> input, int probability) {
+        int total = 0;
         for (RandomChoice<T> choice : input) {
             total += choice.getProbability();
-            if (randomInt < total) {
+            if (probability < total) {
                 return choice.getObject();
             }
         }
         return null;
     }
+
 }
