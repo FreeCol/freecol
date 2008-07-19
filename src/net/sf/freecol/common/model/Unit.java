@@ -3316,7 +3316,19 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             logger.warning("Calling newTurn for an uninitialized object: " + getId());
             return;
         }
-        checkExperiencePromotion();
+        if (location instanceof ColonyTile) {
+            checkExperiencePromotion();
+        } 
+        if (location instanceof Tile && ((Tile) location).getSettlement() == null) {
+            attrition++;
+            if (attrition > getType().getMaximumAttrition()) {
+                addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, getType(),
+                                "model.unit.attrition", "%unit%", getName());
+                dispose();
+            }
+        } else {
+            attrition = 0;
+        }
         if (isUnderRepair()) {
             movesLeft = 0;
         } else {
@@ -3325,16 +3337,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         doAssignedWork();
         if (getState() == UnitState.SKIPPED) {
             setState(UnitState.ACTIVE);
-        }
-        if (location instanceof Tile && ((Tile) location).getSettlement() == null) {
-            attrition++;
-        } else {
-            attrition = 0;
-        }
-        if (attrition > getType().getMaximumAttrition()) {
-            addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, getType(),
-                            "model.unit.attrition", "%unit%", getName());
-            dispose();
         }
     }
 
