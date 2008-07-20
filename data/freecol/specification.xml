@@ -19,6 +19,9 @@
  *
 -->
 <!-- $Revision$ -->
+<!-- specification version 0.2 -->
+<!-- in case of incompatible changes, please update version number and 
+     create a new Relax NG schema for validation. -->
 <freecol-specification>
   <!-- types of goods.  an element must be defined before it is referenced -->
   <goods-types>
@@ -356,7 +359,7 @@
     <tile-type    id="model.tile.greatRiver" basic-move-cost="3" basic-work-turns="4" is-water="true">
       <art basic="terrain/ocean/" minimap-color="#0000ff"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" 
-           altitudeMin="-3" altitudeMax="-2" latitudeMin="0" latitudeMax="3"/>
+           altitudeMin="-3" altitudeMax="-2" />
       <production goods-type="model.goods.fish"       value="2"/>
       <resource   type="model.resource.Fish"          probability="100"/>
     </tile-type>
@@ -454,7 +457,7 @@
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" overlay="model.improvement.Plow.image"
-            expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
+                          expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <tile id="model.tile.hills" value="false"/>
       <tile id="model.tile.mountains" value="false"/>
@@ -810,6 +813,7 @@
       <required-ability id="model.ability.native"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular" art="colonialRegular" movement="3" lineOfSight="1"
+               offence="0" defence="1"
                pathImage="foot" skillTaught="model.unit.veteranSoldier" skill="4">
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.foundColony" value="true"/>
@@ -821,7 +825,8 @@
       <modifier id="model.modifier.defence" type="additive" value="3"/>
       <required-ability id="model.ability.independenceDeclared"/>
     </unit-type>
-    <unit-type id="model.unit.kingsRegular" art="kingsRegular" movement="3" lineOfSight="1" skill="4">
+    <unit-type id="model.unit.kingsRegular" art="kingsRegular" movement="3" lineOfSight="1" skill="4"
+               offence="0" defence="1">
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
@@ -1136,7 +1141,7 @@
       <required-population value="4"/>
       <ability id="model.ability.produceInWater" value="true"/>
       <ability id="model.ability.repairUnits" value="true">
-        <scope ability="model.ability.navalUnit"/>
+        <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
     <building-type id="model.building.Shipyard" workplaces="0" upgradesFrom="model.building.Drydock" sequence="15">
@@ -1145,7 +1150,7 @@
       <required-population value="8"/>
       <ability id="model.ability.produceInWater" value="true"/>
       <ability id="model.ability.repairUnits" value="true">
-        <scope ability="model.ability.navalUnit"/>
+        <scope ability-id="model.ability.navalUnit"/>
       </ability>
       <ability id="model.ability.buildShips" value="true"/>
     </building-type>
@@ -1291,12 +1296,12 @@
     </founding-father>
     <founding-father id="model.foundingFather.williamPenn" type="religious"
                      weight1="8" weight2="5" weight3="2">
-      <modifier goods-type="model.goods.crosses" type="percentage" value="50"/>
+      <modifier id="model.goods.crosses" type="percentage" value="50"/>
     </founding-father>
     <founding-father id="model.foundingFather.fatherJeanDeBrebeuf" type="religious"
                      weight1="6" weight2="6" weight3="1">
       <ability id="model.ability.expertMissionary" value="true">
-        <scope ability="model.ability.missionary"/>
+        <scope ability-id="model.ability.missionary"/>
       </ability>
     </founding-father>
     <founding-father id="model.foundingFather.juanDeSepulveda" type="religious"
@@ -1363,7 +1368,7 @@
     </european-nation-type>
     <european-nation-type id="model.nationType.naval">
       <modifier id="model.modifier.movementBonus" type="additive" value="1">
-        <scope ability="model.ability.navalUnit"/>
+        <scope ability-id="model.ability.navalUnit"/>
       </modifier>
       <unit id="model.unit.freeColonist" role="pioneer"/>
       <unit id="model.unit.freeColonist" role="soldier"/>
