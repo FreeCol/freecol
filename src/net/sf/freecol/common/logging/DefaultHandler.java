@@ -52,9 +52,9 @@ public final class DefaultHandler extends Handler {
      * @throws FreeColException In case the log file could not be
      *             created/written to.
      */
-    public DefaultHandler(boolean consoleLogging) throws FreeColException {
+    public DefaultHandler(boolean consoleLogging, File directory) throws FreeColException {
         this.consoleLogging = consoleLogging;
-        File file = new File(fileName);
+        File file = new File(directory, fileName);
 
         if (file.exists()) {
             if (file.isDirectory()) {

@@ -117,6 +117,8 @@ public final class FreeCol {
     private static String serverName = null;
     private static final int DEFAULT_PORT = 3541;
 
+    private static File mainUserDirectory;
+
     private static File saveDirectory;
     
     private static File tcUserDirectory;
@@ -150,7 +152,6 @@ public final class FreeCol {
             FREECOL_REVISION = FREECOL_VERSION;
         }
 
-        initLogging();
         
         // Display splash screen:
         JWindow splash = null;
@@ -166,6 +167,8 @@ public final class FreeCol {
         }
 
         createAndSetDirectories();
+        initLogging();
+
         Locale.setDefault(getLocale());
         handleArgs(args);
         
@@ -394,7 +397,7 @@ public final class FreeCol {
             baseLogger.removeHandler(handlers[i]);
         }
         try {
-            baseLogger.addHandler(new DefaultHandler(consoleLogging));
+            baseLogger.addHandler(new DefaultHandler(consoleLogging, mainUserDirectory));
             if (inDebugMode) {
                 logLevel = Level.FINEST;
             } 
@@ -485,37 +488,47 @@ public final class FreeCol {
      * and underneath that directory a "save" directory will
      * be created.
      */
-    private static void createAndSetDirectories() {
+    private static File createAndSetDirectories() {
         // TODO: The location of the save directory should be determined by the installer.;
         
-        File mainUserDirectory = new File(System.getProperty("user.home"), "freecol");
-        if (mainUserDirectory.exists() && mainUserDirectory.isFile()) {
-            logger.warning("Could not create .freecol under "
-                    + System.getProperty("user.home") + " because there "
-                    + "already exists a regular file with the same name.");
-            return;
-        } else if (!mainUserDirectory.exists()) {
+        String freeColDirectoryName = "/".equals(System.getProperty("file.separator")) ?
+            ".freecol" : "freecol";
+
+        mainUserDirectory = new File(System.getProperty("user.home"), freeColDirectoryName);
+        if (mainUserDirectory.exists()) {
+            if (mainUserDirectory.isFile()) {
+                System.out.println("Could not create " + freeColDirectoryName + " under "
+                                   + System.getProperty("user.home") + " because there "
+                                   + "already exists a regular file with the same name.");
+                return null;
+            }
+        } else {
             mainUserDirectory.mkdir();
         }
         saveDirectory = new File(mainUserDirectory, "save");
-        if (saveDirectory.exists() && saveDirectory.isFile()) {
-            logger.warning("Could not create freecol/save under "
-                    + System.getProperty("user.home") + " because there "
-                    + "already exists a regular file with the same name.");
-            return;
-        } else if (!saveDirectory.exists()) {
+        if (saveDirectory.exists()) {
+            if (saveDirectory.isFile()) {
+                System.out.println("Could not create freecol/save under "
+                                   + System.getProperty("user.home") + " because there "
+                                   + "already exists a regular file with the same name.");
+                return null;
+            }
+        } else {
             saveDirectory.mkdir();
         }
         tcUserDirectory = new File(mainUserDirectory, tc);
-        if (tcUserDirectory.exists() && tcUserDirectory.isFile()) {
-            logger.warning("Could not create freecol/" + tc + " under "
-                    + System.getProperty("user.home") + " because there "
-                    + "already exists a regular file with the same name.");
-            return;
-        } else if (!tcUserDirectory.exists()) {
+        if (tcUserDirectory.exists()) {
+            if (tcUserDirectory.isFile()) {
+                System.out.println("Could not create freecol/" + tc + " under "
+                                   + System.getProperty("user.home") + " because there "
+                                   + "already exists a regular file with the same name.");
+                return null;
+            }
+        } else {
             tcUserDirectory.mkdir();
         }
         clientOptionsFile = new File(tcUserDirectory, "options.xml");
+        return mainUserDirectory;
     }
 
     /**
