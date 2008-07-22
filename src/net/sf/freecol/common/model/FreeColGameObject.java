@@ -530,6 +530,7 @@ abstract public class FreeColGameObject extends FreeColObject {
                 return returnValue;
             } catch(Exception e) {
                 logger.warning("Failed to update FreeColGameObject with ID " + attributeString);
+                e.printStackTrace();
                 return null;
             }
         }

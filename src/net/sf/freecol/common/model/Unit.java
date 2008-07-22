@@ -3586,7 +3586,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         
         if (goodsContainer == null && canCarryGoods()) {
-            logger.warning("Carrier did not have a \"goodsContainer\"-tag.");
+            logger.warning("Carrier with ID " + getId() + " did not have a \"goodsContainer\"-tag.");
             goodsContainer = new GoodsContainer(getGame(), this);
         }
 
