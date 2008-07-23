@@ -1747,7 +1747,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                                is the only place where this is a
                                problem, but I may be mistaken.
                              */
-                            return;
+                            continue;
                         }
                     }
                     // found no matching modifier

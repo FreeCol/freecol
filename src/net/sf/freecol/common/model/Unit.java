@@ -3602,18 +3602,22 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return "unit";
     }
 
+    /**
+     * ATTENTION!!! Longer prefixes must be checked first! For
+     * example, ColonyTile must be checked before Colony is checked!
+     */
     private Location newLocation(Game game, String locationString) {
         Location loc = null;
         if (locationString.startsWith(Tile.getXMLElementTagName())) {
             loc = new Tile(game, locationString);
+        } else if (locationString.startsWith(ColonyTile.getXMLElementTagName())) {
+            loc = new ColonyTile(game, locationString);
         } else if (locationString.startsWith(Colony.getXMLElementTagName())) {
             loc = new Colony(game, locationString);
         } else if (locationString.startsWith(IndianSettlement.getXMLElementTagName())) {
             loc = new IndianSettlement(game, locationString);
         } else if (locationString.startsWith(Europe.getXMLElementTagName())) {
             loc = new Europe(game, locationString);
-        } else if (locationString.startsWith(ColonyTile.getXMLElementTagName())) {
-            loc = new ColonyTile(game, locationString);
         } else if (locationString.startsWith(Building.getXMLElementTagName())) {
             loc = new Building(game, locationString);
         } else if (locationString.startsWith(Unit.getXMLElementTagName())) {

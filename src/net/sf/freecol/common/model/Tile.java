@@ -1713,7 +1713,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     playerExploredTiles.get(player).readFromXML(in);
                 }
             } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " loading tile");
+                logger.warning("Unknown tag: " + in.getLocalName() + " [" +
+                               in.getAttributeValue(null, "ID") + "] " +
+                               " loading tile with ID " +
+                               getId());
                 in.nextTag();
             }
         }
