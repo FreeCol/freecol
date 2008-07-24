@@ -78,6 +78,7 @@ import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
+import net.sf.freecol.client.gui.panel.PreCombatDialog;
 import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.RecruitDialog;
 import net.sf.freecol.client.gui.panel.ReportCargoPanel;
@@ -778,7 +779,7 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showPreCombatDialog(Unit attacker, Unit defender, Settlement settlement) {
 
-        FreeColDialog preCombatDialog = FreeColDialog.createPreCombatDialog(attacker, defender, settlement, this);
+        FreeColDialog preCombatDialog = new PreCombatDialog(attacker, defender, settlement, this);
         addAsFrame(preCombatDialog);
         preCombatDialog.requestFocus();
 

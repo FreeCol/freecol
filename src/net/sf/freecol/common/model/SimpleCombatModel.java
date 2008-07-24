@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -44,7 +43,7 @@ public class SimpleCombatModel implements CombatModel {
 
     private static final Logger logger = Logger.getLogger(SimpleCombatModel.class.getName());
 
-    private static PseudoRandom random;
+    private PseudoRandom random;
 
     public static final Modifier SMALL_MOVEMENT_PENALTY =
         new Modifier(Modifier.OFFENCE, "modifiers.movementPenalty",
@@ -275,19 +274,7 @@ public class SimpleCombatModel implements CombatModel {
             }
         }
 
-        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
-            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
-        for (Modifier.Type type : Modifier.Type.values()) {
-            modifierMap.put(type, new ArrayList<Modifier>());
-        }
-        for (Modifier modifier : result) {
-            modifierMap.get(modifier.getType()).add(modifier);
-        }
-        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
-        for (Modifier.Type type : Modifier.Type.values()) {
-            sortedResult.addAll(modifierMap.get(type));
-        }
-        return sortedResult;
+        return result;
     }
 
     /**
@@ -434,19 +421,7 @@ public class SimpleCombatModel implements CombatModel {
             }
 
         }
-        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
-            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
-        for (Modifier.Type type : Modifier.Type.values()) {
-            modifierMap.put(type, new ArrayList<Modifier>());
-        }
-        for (Modifier modifier : result) {
-            modifierMap.get(modifier.getType()).add(modifier);
-        }
-        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
-        for (Modifier.Type type : Modifier.Type.values()) {
-            sortedResult.addAll(modifierMap.get(type));
-        }
-        return sortedResult;
+        return result;
     }
 
     /**
