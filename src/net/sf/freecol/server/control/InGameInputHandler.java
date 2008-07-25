@@ -1088,8 +1088,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, (max - dx) * 2 + bonus));
         }
 
-        //RumourType rumour = RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
-        RumourType rumour = RumourType.FOUNTAIN_OF_YOUTH;
+        RumourType rumour = RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
 
         Element rumourElement = Message.createNewRootElement("lostCityRumour");
         rumourElement.setAttribute("type", rumour.toString());
