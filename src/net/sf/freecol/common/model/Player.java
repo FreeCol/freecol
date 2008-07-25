@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -2494,28 +2495,15 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return A random unit type of a unit that is recruitable in Europe.
      */
     public UnitType generateRecruitable(String unique) {
-        ArrayList<UnitType> recruitableUnits = new ArrayList<UnitType>();
-        List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
-        int total = 0;
-        for (UnitType unitType : unitTypes) {
+        ArrayList<RandomChoice<UnitType>> recruitableUnits = new ArrayList<RandomChoice<UnitType>>();
+        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable() &&
                 !featureContainer.hasAbility("model.ability.canNotRecruitUnit", unitType)) {
-                recruitableUnits.add(unitType);
-                total += unitType.getRecruitProbability();
+                recruitableUnits.add(new RandomChoice(unitType, unitType.getRecruitProbability()));
             }
         }
 
-        int random = getGame().getModelController().getRandom(getId() + "newRecruitableUnit" + unique, total);
-        UnitType recruitable = null;
-        total = 0;
-        for (UnitType unitType : recruitableUnits) {
-            total += unitType.getRecruitProbability();
-            if (random < total) {
-                recruitable = unitType;
-                break;
-            }
-        }
-        return recruitable;
+        return RandomChoice.getWeightedRandom(getGame().getModelController().getPseudoRandom(), recruitableUnits);
     }
 
     /**
@@ -2540,7 +2528,8 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #incrementBells
      */
     public int getTotalFoundingFatherCost() {
-        return (getFatherCount() * getFatherCount() * Specification.getSpecification().getIntegerOption("model.option.foundingFatherFactor").getValue() + 50);
+        return (getFatherCount() * getFatherCount() * Specification.getSpecification()
+                .getIntegerOption("model.option.foundingFatherFactor").getValue() + 50);
     }
 
     /**
