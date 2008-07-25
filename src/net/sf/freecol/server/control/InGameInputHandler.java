@@ -1088,7 +1088,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, (max - dx) * 2 + bonus));
         }
 
-        RumourType rumour = RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
+        //RumourType rumour = RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
+        RumourType rumour = RumourType.FOUNTAIN_OF_YOUTH;
 
         Element rumourElement = Message.createNewRootElement("lostCityRumour");
         rumourElement.setAttribute("type", rumour.toString());
@@ -1142,7 +1143,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         newUnit = new Unit(getGame(), player.getEurope(), player,
                                            player.generateRecruitable(String.valueOf(k)), UnitState.ACTIVE);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
-                        player.getEurope().add(newUnit);
+                        //player.getEurope().add(newUnit);
                     }
                 }
             }
@@ -1199,7 +1200,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         europe.setRecruitable(slot, newRecruitable);
         
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE);
-        player.getEurope().add(unit);
+        //player.getEurope().add(unit);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
         reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));

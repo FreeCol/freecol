@@ -1124,8 +1124,8 @@ public final class InGameInputHandler extends InputHandler {
                                 } else {
                                     unit.readFromXMLElement(unitElement);
                                 }
-                                player.getEurope().add(unit);
-
+                                //player.getEurope().add(unit);
+                                
                                 String newRecruitableStr = reply.getAttribute("newRecruitable");
                                 UnitType newRecruitable = FreeCol.getSpecification().getUnitType(newRecruitableStr);
                                 player.getEurope().setRecruitable(slot, newRecruitable);
@@ -1142,7 +1142,7 @@ public final class InGameInputHandler extends InputHandler {
                         } else {
                             newUnit.readFromXMLElement(unitElement);
                         }
-                        player.getEurope().add(newUnit);
+                        //player.getEurope().add(newUnit);
                     }
                }
             }
