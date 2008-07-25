@@ -620,7 +620,7 @@ public final class InGameController extends Controller {
                                 // TODO: make this generic
                                 UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.frigate");
                                 newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer, unitType, UnitState.ACTIVE);
-                                nextPlayer.getEurope().add(newUnit);
+                                //nextPlayer.getEurope().add(newUnit);
                                 monarchActionElement.appendChild(newUnit.toXMLElement(nextPlayer, monarchActionElement
                                 .getOwnerDocument()));
                                 try {
@@ -679,7 +679,7 @@ public final class InGameController extends Controller {
                 }
                 Unit newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer,
                                         unit.getUnitType(), UnitState.ACTIVE, equipment);
-                nextPlayer.getEurope().add(newUnit);
+                //nextPlayer.getEurope().add(newUnit);
                 if (element != null) {
                     element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
                 }
