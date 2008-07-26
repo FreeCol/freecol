@@ -2207,7 +2207,9 @@ public class Player extends FreeColGameObject implements Nameable {
          * their Magellan bonus the turn Magellan joins the congress.
          */
         if (isEuropean()) {
-            if (getBells() >= getTotalFoundingFatherCost() && currentFather != null) {
+            if (!hasAbility("model.ability.independenceDeclared") &&
+                getBells() >= getTotalFoundingFatherCost() && 
+                currentFather != null) {
                 addFather(currentFather);
                 currentFather = null;
                 bells -= getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ?
