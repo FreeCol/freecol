@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -48,7 +49,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * List of the units which have this <code>Building</code> as it's
      * {@link Unit#getLocation() location}.
      */
-    private final List<Unit> units = new ArrayList<Unit>();
+    private List<Unit> units = Collections.emptyList();
 
     private BuildingType buildingType;
     
@@ -324,28 +325,31 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public void add(final Locatable locatable) {
         if (!canAdd(locatable)) {
             throw new IllegalStateException();
-        }
+        } else if (!units.contains(locatable)) {
+            if (units.equals(Collections.emptyList())) {
+                units = new ArrayList<Unit>();
+            } 
+            final Unit unit = (Unit) locatable;
 
-        final Unit unit = (Unit) locatable;
+            unit.removeAllEquipment(false);
 
-        unit.removeAllEquipment(false);
-
-        Unit student = unit.getStudent();
-        if (buildingType.hasAbility("model.ability.teach")) {
-            if (student == null) {
-                student = findStudent(unit);
-                if (student != null) {
-                    unit.setStudent(student);
-                    student.setTeacher(unit);
+            Unit student = unit.getStudent();
+            if (buildingType.hasAbility("model.ability.teach")) {
+                if (student == null) {
+                    student = findStudent(unit);
+                    if (student != null) {
+                        unit.setStudent(student);
+                        student.setTeacher(unit);
+                    }
                 }
+            } else if (student != null) {
+                student.setTeacher(null);
+                unit.setStudent(null);
             }
-        } else if (student != null) {
-            student.setTeacher(null);
-            unit.setStudent(null);
-        }
 
-        units.add(unit);
-        getColony().updatePopulation();
+            units.add(unit);
+            getColony().updatePopulation();
+        }
     }
 
 

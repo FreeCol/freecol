@@ -1108,10 +1108,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
-            if (units.equals(Collections.emptyList())) {
-                units = new ArrayList<Unit>();
+            if (!units.contains(locatable)) {
+                if (units.equals(Collections.emptyList())) {
+                    units = new ArrayList<Unit>();
+                } 
+                units.add((Unit) locatable);
             }
-            units.add((Unit) locatable);
         } else if (locatable instanceof TileItem) {
             if (tileItemContainer == null) {
                 tileItemContainer = new TileItemContainer(getGame(), this);

@@ -539,10 +539,12 @@ public class IndianSettlement extends Settlement {
     @Override
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
-            if (units.equals(Collections.emptyList())) {
-                units = new ArrayList<Unit>();
+            if (!units.contains(locatable)) {
+                if (units.equals(Collections.emptyList())) {
+                    units = new ArrayList<Unit>();
+                }
+                units.add((Unit) locatable);
             }
-            units.add((Unit) locatable);
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods)locatable);
         } else {

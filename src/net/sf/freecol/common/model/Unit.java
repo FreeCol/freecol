@@ -1658,13 +1658,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit && canCarryUnits()) {
-            if (getSpaceLeft() <= 0) {
+            if (getSpaceLeft() < locatable.getSpaceTaken()) {
                 throw new IllegalStateException();
+            } else if (!units.contains(locatable)) {
+                if (units.equals(Collections.emptyList())) {
+                    units = new ArrayList<Unit>();
+                } 
+                units.add((Unit) locatable);
             }
-            if (units.equals(Collections.emptyList())) {
-                units = new ArrayList<Unit>();
-            }
-            units.add((Unit) locatable);
             spendAllMoves();
         } else if (locatable instanceof Goods && canCarryGoods()) {
             goodsContainer.addGoods((Goods) locatable);

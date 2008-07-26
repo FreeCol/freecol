@@ -287,11 +287,12 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     public void add(Locatable locatable) {
         if (!(locatable instanceof Unit)) {
             throw new IllegalArgumentException("Only units can be added to Europe.");
+        } else if (!units.contains(locatable)) {
+            if (units.equals(Collections.emptyList())) {
+                units = new ArrayList<Unit>();
+            }        
+            units.add((Unit) locatable);
         }
-        if (units.equals(Collections.emptyList())) {
-            units = new ArrayList<Unit>();
-        }
-        units.add((Unit) locatable);
     }
 
     /**
