@@ -1003,17 +1003,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 }
                 region.discover(player, getGame().getTurn(), name);
                 reply.appendChild(region.toXMLElement(player, reply.getOwnerDocument()));
-        
-                for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-                    try {
-                        Element updateElement = Message.createNewRootElement("update");
-                        updateElement.appendChild(region.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                        enemyPlayer.getConnection().send(updateElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                                       + enemyPlayer.getConnection());
-                    }
-                }
+
+                Element updateElement = Message.createNewRootElement("update");
+                updateElement.appendChild(region.toXMLElement(player, updateElement.getOwnerDocument()));
+                freeColServer.getServer().sendToAll(updateElement, player.getConnection());
             }
         }
 
@@ -1061,13 +1054,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
          * The higher the difficulty, the more likely bad things are to happen.
          */
         List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
-        /*
-         * It should not be possible to find an indian burial ground outside
-         * indian territory:
-         */
         if (!player.hasAbility("model.ability.rumoursAlwaysPositive")) {
             choices.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, dx * 2));
             choices.add(new RandomChoice<RumourType>(RumourType.NOTHING, dx * 5));
+            // It should not be possible to find an indian burial
+            // ground outside Indian territory:
             if (tile.getOwner() != null && !tile.getOwner().isEuropean()) {
                 choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, dx));
             }
@@ -1120,7 +1111,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         case COLONIST:
             random = getPseudoRandom().nextInt(newUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, newUnitTypes.get(random), UnitState.ACTIVE);
-            //tile.add(newUnit); don't add unit twice
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
         case TREASURE:
@@ -1128,7 +1118,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             random = getPseudoRandom().nextInt(treasureUnitTypes.size());
             newUnit = new Unit(getGame(), tile, player, treasureUnitTypes.get(random), UnitState.ACTIVE);
             newUnit.setTreasureAmount(treasure);
-            //tile.add(newUnit); don't add unit twice
             rumourElement.setAttribute("amount", Integer.toString(treasure));
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
             break;
@@ -1142,7 +1131,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         newUnit = new Unit(getGame(), player.getEurope(), player,
                                            player.generateRecruitable(String.valueOf(k)), UnitState.ACTIVE);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
-                        //player.getEurope().add(newUnit);
                     }
                 }
             }
@@ -1159,16 +1147,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // tell everyone the rumour has been explored
         for (ServerPlayer updatePlayer : getOtherPlayers(player)) {
-            if (!updatePlayer.canSee(tile)) {
-                continue;
-            }
-            try {
-                Element rumourUpdate = Message.createNewRootElement("update");
-                rumourUpdate.appendChild(tile.toXMLElement(updatePlayer, rumourUpdate.getOwnerDocument()));
-                updatePlayer.getConnection().send(rumourUpdate);
-            } catch (IOException e) {
-                logger.warning("Could not send update message to: " + updatePlayer.getName() + " with connection "
-                               + updatePlayer.getConnection());
+            if (updatePlayer.canSee(tile)) {
+                try {
+                    Element rumourUpdate = Message.createNewRootElement("update");
+                    rumourUpdate.appendChild(tile.toXMLElement(updatePlayer, rumourUpdate.getOwnerDocument()));
+                    updatePlayer.getConnection().send(rumourUpdate);
+                } catch (IOException e) {
+                    logger.warning("Could not send update message to: " + updatePlayer.getName() + " with connection "
+                                   + updatePlayer.getConnection());
+                }
             }
         }
     }
@@ -1199,7 +1186,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         europe.setRecruitable(slot, newRecruitable);
         
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE);
-        //player.getEurope().add(unit);
         Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
         reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
@@ -1555,10 +1541,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else if (action.equals("cancel")) {
             return null;
         } else if (action.equals("attack")) {
-            // The movesLeft has been set to 0 when the scout initiated its
-            // action.
-            // If it wants to attack then it can and it will need some moves to
-            // do it.
+            // The movesLeft has been set to 0 when the scout
+            // initiated its action.  If it wants to attack then it
+            // can and it will need some moves to do it.
             unit.setMovesLeft(1);
             return null;
         } else if (settlement.getAlarm(player) != null &&
@@ -1832,15 +1817,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element marketElement = Message.createNewRootElement("marketElement");
         marketElement.setAttribute("type", type.getId());
         marketElement.setAttribute("amount", String.valueOf(-amount/4));
-        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-            try {
-                enemyPlayer.getConnection().send(marketElement);
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() +
-                               " with connection " + enemyPlayer.getConnection());
-            }
-        }
-   
+        getFreeColServer().getServer().sendToAll(marketElement, player.getConnection());
         return null;
     }
 
@@ -1861,15 +1838,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element marketElement = Message.createNewRootElement("marketElement");
         marketElement.setAttribute("type", goods.getType().getId());
         marketElement.setAttribute("amount", String.valueOf(goods.getAmount()/4));
-        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-            try {
-                enemyPlayer.getConnection().send(marketElement);
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() +
-                               " with connection " + enemyPlayer.getConnection());
-            }
-        }
-   
+        getFreeColServer().getServer().sendToAll(marketElement, player.getConnection());
         return null;
     }
 
