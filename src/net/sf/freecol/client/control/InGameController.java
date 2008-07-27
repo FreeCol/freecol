@@ -717,24 +717,28 @@ public final class InGameController implements NetworkConstants {
         final Location destination = unit.getDestination();
 
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-        	canvas.showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
         // Trade unit is at current stop
-        if (unit.getTradeRoute() != null && unit.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()){
-        	logger.info("Trade unit " + unit.getId() + " in route " + unit.getTradeRoute().getName() + " is at " + unit.getCurrentStop().getLocation().getLocationName());
-        	followTradeRoute(unit);
-        	return;
+        if (unit.getTradeRoute() != null &&
+            unit.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()) {
+            logger.info("Trade unit " + unit.getId() + " in route " + 
+                        unit.getTradeRoute().getName() + " is at " + 
+                        unit.getCurrentStop().getLocation().getLocationName());
+            followTradeRoute(unit);
+            return;
         }
         
-        if(unit.getTradeRoute() != null){
-        	logger.info("Unit " + unit.getId() + " is a trade unit in route " + unit.getTradeRoute().getName() + ", going to " + unit.getCurrentStop().getLocation().getLocationName());
+        if (unit.getTradeRoute() != null) {
+            logger.info("Unit " + unit.getId() + " is a trade unit in route " +
+                        unit.getTradeRoute().getName() + ", going to " +
+                        unit.getCurrentStop().getLocation().getLocationName());
+        } else {
+            logger.info("Moving unit " + unit.getId() + " to position "
+                        + unit.getDestination().getLocationName());
         }
-        else
-        	logger.info("Moving unit " + unit.getId() + " to position " + unit.getDestination().getLocationName());
-        
-
 
         PathNode path;
         if (destination instanceof Europe) {
@@ -754,12 +758,6 @@ public final class InGameController implements NetworkConstants {
             setDestination(unit, null);
             return;
         }
-
-        boolean knownEnemyOnLastTile = path != null
-                && path.getLastNode() != null
-                && ((path.getLastNode().getTile().getFirstUnit() != null && path.getLastNode().getTile().getFirstUnit()
-                        .getOwner() != freeColClient.getMyPlayer()) || (path.getLastNode().getTile().getSettlement() != null && path
-                        .getLastNode().getTile().getSettlement().getOwner() != freeColClient.getMyPlayer()));
 
         while (path != null) {
             MoveType mt = unit.getMoveType(path.getDirection());
@@ -789,16 +787,16 @@ public final class InGameController implements NetworkConstants {
                 break;
             default:
                 if (path == path.getLastNode() && mt != MoveType.ILLEGAL_MOVE
-                        && (mt != MoveType.ATTACK || knownEnemyOnLastTile)) {
+                    && (mt != MoveType.ATTACK || knownEnemyOnLastTile(path))) {
                     move(unit, path.getDirection());
                 } else {
                     Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
-                    int moveCost = unit.getMoveCost(target);
-                    if (unit.getMovesLeft() == 0
-                            || (moveCost > unit.getMovesLeft()
-                                    && (target.getFirstUnit() == null || target.getFirstUnit().getOwner() == unit
-                                            .getOwner()) && (target.getSettlement() == null || target.getSettlement()
-                                    .getOwner() == unit.getOwner()))) {
+                    if (unit.getMovesLeft() == 0 ||
+                        (unit.getMoveCost(target) > unit.getMovesLeft() &&
+                         (target.getFirstUnit() == null ||
+                          target.getFirstUnit().getOwner() == unit.getOwner()) &&
+                         (target.getSettlement() == null ||
+                          target.getSettlement().getOwner() == unit.getOwner()))) {
                         // we can't go there now, but we don't want to wake up
                         unit.setMovesLeft(0);
                         nextActiveUnit();
@@ -816,17 +814,17 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        if (unit.getTile() != null && destination instanceof Europe && map.isAdjacentToMapEdge(unit.getTile())) {
+        if (unit.getTile() != null && destination instanceof Europe &&
+            map.isAdjacentToMapEdge(unit.getTile())) {
             moveToEurope(unit);
         }
 
-     // we have reached our destination
+        // we have reached our destination
         // if in a trade route, unload and update next stop
         if (unit.getTradeRoute() == null) {
             setDestination(unit, null);
-        }
-        else{
-        	followTradeRoute(unit);
+        } else {
+            followTradeRoute(unit);
         }
 
         // Display a "cash in"-dialog if a treasure train have been
@@ -841,6 +839,18 @@ public final class InGameController implements NetworkConstants {
             nextActiveUnit();
         }
         return;
+    }
+
+    private boolean knownEnemyOnLastTile(PathNode path) {
+        if ((path != null) && path.getLastNode() != null) {
+            Tile tile = path.getLastNode().getTile();
+            return ((tile.getFirstUnit() != null &&
+                     tile.getFirstUnit().getOwner() != freeColClient.getMyPlayer()) ||
+                    (tile.getSettlement() != null &&
+                     tile.getSettlement().getOwner() != freeColClient.getMyPlayer()));
+        } else {
+            return false;
+        }
     }
 
     private void checkTradeRoutesInEurope() {
@@ -1591,10 +1601,12 @@ public final class InGameController implements NetworkConstants {
     /**
      * Transfers the gold carried by this unit to the {@link Player owner}.
      * 
+     * @param unit an <code>Unit</code> value
+     * @return a <code>boolean</code> value
      * @exception IllegalStateException if this unit is not a treasure train. or
      *                if it cannot be cashed in at it's current location.
      */
-    private boolean checkCashInTreasureTrain(Unit unit) {
+    public boolean checkCashInTreasureTrain(Unit unit) {
         Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             canvas.showInformationMessage("notYourTurn");

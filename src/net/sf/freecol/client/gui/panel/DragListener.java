@@ -142,7 +142,8 @@ public final class DragListener extends MouseAdapter {
                                         menuItem.setForeground(FreeColPanel.LINK_COLOR);
                                     }
                                 }
-                                menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_BUILDING+building.getType().getIndex()));
+                                menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_BUILDING + 
+                                                                         building.getType().getIndex()));
                                 menuItem.addActionListener(unitLabel);
                                 menu.add(menuItem);
                             }
@@ -198,8 +199,19 @@ public final class DragListener extends MouseAdapter {
                     menuItem.setEnabled(tempUnit.getState() != UnitState.SENTRY);
                     menu.add(menuItem);
 
+                    if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {
+                        menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
+                        menuItem.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent e) {
+                                    inGameController.checkCashInTreasureTrain(tempUnit);
+                                }
+                            });
+                        menu.add(menuItem);
+                    }
+
                     menu.addSeparator();
                 }
+
 
 
                 if (tempUnit.hasAbility("model.ability.canBeEquipped")) {

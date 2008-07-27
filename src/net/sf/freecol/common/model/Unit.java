@@ -663,10 +663,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void cashInTreasureTrain() {
         if (!canCarryTreasure()) {
-            throw new IllegalStateException("Can't carry a treasure");
-        }
-
-        if (canCashInTreasureTrain()) {
+            throw new IllegalStateException("Unit with ID " + getId() + " can't carry a treasure");
+        } else if (canCashInTreasureTrain()) {
             int cashInAmount = getTreasureAmount() - getTransportFee();
             cashInAmount = cashInAmount * (100 - getOwner().getTax()) / 100;
             FreeColGameObject owner = getOwner();
