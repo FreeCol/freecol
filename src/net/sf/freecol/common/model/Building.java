@@ -997,6 +997,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             Unit unit = updateFreeColGameObject(in, Unit.class);
             if (!units.contains(unit)) {
+                if (units.equals(Collections.emptyList())) {
+                    units = new ArrayList<Unit>();
+                }
                 units.add(unit);
             }
         }
