@@ -951,6 +951,12 @@
           <ref name="rangeOption"/>
         </zeroOrMore>
         <zeroOrMore>
+          <ref name="selectOption"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="languageOption"/>
+        </zeroOrMore>
+        <zeroOrMore>
           <element name="optionGroup">
             <attribute name="id">
               <data type="string"/>
@@ -964,6 +970,12 @@
               </zeroOrMore>
               <zeroOrMore>
                 <ref name="rangeOption"/>
+              </zeroOrMore>
+              <zeroOrMore>
+                <ref name="selectOption"/>
+              </zeroOrMore>
+              <zeroOrMore>
+                <ref name="languageOption"/>
               </zeroOrMore>
             </interleave>
           </element>
@@ -1025,6 +1037,41 @@
       </oneOrMore>
     </element>
   </define>
+
+  <define name="selectOption">
+    <element name="selectOption">
+      <attribute name="id">
+        <data type="string"/>
+      </attribute>
+      <attribute name="defaultValue">
+        <data type="nonNegativeInteger"/>
+      </attribute>
+      <optional>
+        <attribute name="localizedLabels">
+          <data type="boolean"/>
+        </attribute>
+      </optional>
+      <oneOrMore>
+        <element name="selectValue">
+          <attribute name="label">
+            <data type="string"/>
+          </attribute>
+          <attribute name="value">
+            <data type="nonNegativeInteger"/>
+          </attribute>
+        </element>
+      </oneOrMore>
+    </element>
+  </define>
+
+  <define name="languageOption">
+    <element name="languageOption">
+      <attribute name="id">
+        <data type="string"/>
+      </attribute>
+    </element>
+  </define>
+
 
   <define name="ability">
     <element name="ability">

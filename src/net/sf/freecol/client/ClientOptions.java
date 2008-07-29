@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -65,7 +66,7 @@ public class ClientOptions extends OptionMap {
     /**
      * Option for setting the language.
      */
-    public static final String LANGUAGE = "languageOption";
+    public static final String LANGUAGE = "model.option.languageOption";
 
     /**
      * If this option is enabled, the display will recenter in order
@@ -73,7 +74,7 @@ public class ClientOptions extends OptionMap {
      * 
      * @see net.sf.freecol.client.gui.GUI
      */
-    public static final String JUMP_TO_ACTIVE_UNIT = "jumpToActiveUnit";
+    public static final String JUMP_TO_ACTIVE_UNIT = "model.option.jumpToActiveUnit";
 
     /**
      * Selected tiles always gets centered if this option is
@@ -81,40 +82,40 @@ public class ClientOptions extends OptionMap {
      * 
      * @see net.sf.freecol.client.gui.GUI
      */
-    public static final String ALWAYS_CENTER = "alwaysCenter";
+    public static final String ALWAYS_CENTER = "model.option.alwaysCenter";
 
     /**
      * Used by GUI, the number will be displayed when a group of goods are higher than this number.
      * @see net.sf.freecol.client.gui.GUI
      */
-    public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT = "guiMinNumberToDisplayGoodsCount";
+    public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT = "model.option.guiMinNumberToDisplayGoodsCount";
 
     /**
      * Used by GUI, this is the most repetitions drawn of a goods image for a single goods grouping.
      * 
      * @see net.sf.freecol.client.gui.GUI
      */
-    public static final String MAX_NUMBER_OF_GOODS_IMAGES = "guiMaxNumberOfGoodsImages";
+    public static final String MAX_NUMBER_OF_GOODS_IMAGES = "model.option.guiMaxNumberOfGoodsImages";
 
     /**
      * Whether to display a compass rose or not.
      */
-    public static final String DISPLAY_COMPASS_ROSE = "displayCompassRose";
+    public static final String DISPLAY_COMPASS_ROSE = "model.option.displayCompassRose";
 
     /**
      * Whether to display the grid by default or not.
      */
-    public static final String DISPLAY_GRID = "displayGrid";
+    public static final String DISPLAY_GRID = "model.option.displayGrid";
     
     /**
      * Animation speed for friendly units.
      */
-    public static final String MOVE_ANIMATION_SPEED = "moveAnimationSpeed";
+    public static final String MOVE_ANIMATION_SPEED = "model.option.moveAnimationSpeed";
     
     /**
      * Animation speed for enemy units.
      */
-    public static final String ENEMY_MOVE_ANIMATION_SPEED = "enemyMoveAnimationSpeed";
+    public static final String ENEMY_MOVE_ANIMATION_SPEED = "model.option.enemyMoveAnimationSpeed";
     
 
     /**
@@ -124,7 +125,7 @@ public class ClientOptions extends OptionMap {
      * @see net.sf.freecol.client.gui.GUI
      * @see net.sf.freecol.common.model.ModelMessage
      */
-    public static final String MESSAGES_GROUP_BY = "guiMessagesGroupBy";
+    public static final String MESSAGES_GROUP_BY = "model.option.guiMessagesGroupBy";
     public static final int MESSAGES_GROUP_BY_NOTHING = 0;
     public static final int MESSAGES_GROUP_BY_TYPE = 1;
     public static final int MESSAGES_GROUP_BY_SOURCE = 2;
@@ -201,12 +202,12 @@ public class ClientOptions extends OptionMap {
     /**
      * Option for setting wether or not the fog of war should be displayed.
      */
-    public static final String DISPLAY_FOG_OF_WAR = "displayFogOfWar";
+    public static final String DISPLAY_FOG_OF_WAR = "model.option.displayFogOfWar";
     
     /**
      * Option for activating autoscroll when dragging units on the mapboard.
      */
-    public static final String MAP_SCROLL_ON_DRAG = "mapScrollOnDrag";
+    public static final String MAP_SCROLL_ON_DRAG = "model.option.mapScrollOnDrag";
     
     /**
      * Option for autoload emigrants on saling to america.
@@ -216,12 +217,12 @@ public class ClientOptions extends OptionMap {
     /**
      * If selected: Enables smooth rendering of the minimap when zoomed out.
      */
-    public static final String SMOOTH_MINIMAP_RENDERING = "smoothRendering";
+    public static final String SMOOTH_MINIMAP_RENDERING = "model.option.smoothRendering";
     
     /**
      * Default zoom level of the minimap.
      */
-    public static final String DEFAULT_MINIMAP_ZOOM = "defaultZoomLevel";
+    public static final String DEFAULT_MINIMAP_ZOOM = "model.option.defaultZoomLevel";
 
     /**
      * The color to fill in around the actual map on the minimap.
@@ -229,7 +230,7 @@ public class ClientOptions extends OptionMap {
      * but at the default 'black' you can't differentiate between the background and the (unexplored) map.
      * Actually: clientOptions.minimap.color.background
      */
-    public static final String MINIMAP_BACKGROUND_COLOR = "color.background";
+    public static final String MINIMAP_BACKGROUND_COLOR = "model.option.color.background";
     public static final String COLOR_BLACK              = "black";
     public static final String COLOR_VERY_DARK_GRAY     = "gray.dark.very";
     public static final String COLOR_DARK_GRAY          = "gray.dark";
@@ -256,7 +257,7 @@ public class ClientOptions extends OptionMap {
     /**
      * Used by GUI to sort colonies.
      */
-    public static final String COLONY_COMPARATOR = "colonyComparator";
+    public static final String COLONY_COMPARATOR = "model.option.colonyComparator";
     public static final int COLONY_COMPARATOR_NAME = 0,
                             COLONY_COMPARATOR_AGE = 1,
                             COLONY_COMPARATOR_POSITION = 2,
@@ -400,53 +401,14 @@ public class ClientOptions extends OptionMap {
     * Adds the options to this <code>GameOptions</code>.
     */
     protected void addDefaultOptions() {
-        /* Add options here: */
+        Specification spec = Specification.getSpecification();
 
-        OptionGroup guiGroup = new OptionGroup("clientOptions.gui");
-        new LanguageOption(LANGUAGE, guiGroup);
-        new IntegerOption(MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT, guiGroup, 0, 10, 7);
-        new IntegerOption(MAX_NUMBER_OF_GOODS_IMAGES, guiGroup, 1, 10, 7);
-        new BooleanOption(ALWAYS_CENTER, guiGroup, false);
-        new BooleanOption(JUMP_TO_ACTIVE_UNIT, guiGroup, true);
-        new BooleanOption(DISPLAY_FOG_OF_WAR, guiGroup, false);
-        new BooleanOption(MAP_SCROLL_ON_DRAG, guiGroup, true);
-        new BooleanOption(DISPLAY_COMPASS_ROSE, guiGroup, false);
-        new BooleanOption(DISPLAY_GRID, guiGroup, false);
-        new SelectOption(COLONY_COMPARATOR, guiGroup,
-                         new String[] {"byName",
-                                       "byAge",
-                                       "byPosition",
-                                       "bySize",
-                                       "bySoL"},
-                         0);
-        new RangeOption(MOVE_ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 0, false);
-        new RangeOption(ENEMY_MOVE_ANIMATION_SPEED, guiGroup, new String[] {"off","slow", "normal", "fast"}, 3, false);
-
-        OptionGroup messagesGroup = new OptionGroup("clientOptions.messages");
-        new SelectOption(MESSAGES_GROUP_BY, messagesGroup,
-                         new String[] {"nothing",
-                                       "type",
-                                       "source"},
-                         0);
-        
-        OptionGroup minimapGroup = new OptionGroup("clientOptions.minimap");
-        new BooleanOption(SMOOTH_MINIMAP_RENDERING, minimapGroup, false);
-        new SelectOption(MINIMAP_BACKGROUND_COLOR, minimapGroup,
-                new String[] { COLOR_BLACK,
-                               COLOR_VERY_DARK_GRAY,
-                               COLOR_DARK_GRAY,
-                               COLOR_GRAY,
-                               COLOR_LIGHT_GRAY,
-                               COLOR_VERY_LIGHT_GRAY,
-                               COLOR_LIGHT_BLUE },
-                0);
-        new RangeOption(DEFAULT_MINIMAP_ZOOM, minimapGroup,
-                         new String[] {"1", "2", "3", "4", "5"}, 2, true);
-
-        guiGroup.add(minimapGroup);
+        OptionGroup guiGroup = spec.getOptionGroup("clientOptions.gui");
+        guiGroup.add(spec.getOptionGroup("clientOptions.minimap"));
         add(guiGroup);
 
         /** Boolean message display options. */
+        OptionGroup messagesGroup = spec.getOptionGroup("clientOptions.messages");
         new BooleanOption(SHOW_WARNING, messagesGroup, true);
         new BooleanOption(SHOW_SONS_OF_LIBERTY, messagesGroup, true);
         new BooleanOption(SHOW_GOVERNMENT_EFFICIENCY, messagesGroup, true);

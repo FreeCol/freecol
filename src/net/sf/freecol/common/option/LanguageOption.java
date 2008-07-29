@@ -78,6 +78,15 @@ public class LanguageOption extends AbstractOption {
 
 
     private Language value;
+    
+    /**
+     * Creates a new  <code>IntegerOption</code>.
+     * @param in The <code>XMLStreamReader</code> containing the data. 
+     */
+     public LanguageOption(XMLStreamReader in) throws XMLStreamException {
+         super(NO_ID);
+         readFromXML(in);
+     }   
 
     /**
      * Creates a new <code>LanguageOption</code>.
@@ -235,7 +244,6 @@ public class LanguageOption extends AbstractOption {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         findLanguages();
-        final Language oldValue = this.value;
         
         Language newValue = languages.get(in.getAttributeValue(null, "value"));
         if (newValue == null) {

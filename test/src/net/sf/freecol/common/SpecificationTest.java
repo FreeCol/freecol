@@ -124,14 +124,6 @@ public final class SpecificationTest extends TestCase {
       assertFalse(spec.getBooleanOption(GameOptions.CUSTOM_IGNORE_BOYCOTT).getValue());
       assertFalse(spec.getBooleanOption(GameOptions.EXPERTS_HAVE_CONNECTIONS).getValue());
       assertFalse(spec.getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
-
-      assertFalse(spec.getBooleanOption(GameOptions.EXPLORATION_POINTS).getValue());
-      assertTrue(spec.getBooleanOption(GameOptions.FOG_OF_WAR).getValue());
-      assertTrue(spec.getBooleanOption(GameOptions.UNIT_HIDING).getValue());
-
-      assertTrue(spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_REF).getValue());
-      assertTrue(spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_EUROPEANS).getValue());
-      assertFalse(spec.getBooleanOption(GameOptions.VICTORY_DEFEAT_HUMANS).getValue());
     }
 
     // Check diffculty levels presence and values

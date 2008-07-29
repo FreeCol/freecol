@@ -58,11 +58,14 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.AbstractOption;
+import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
+import net.sf.freecol.common.option.SelectOption;
 
 /**
  * This class encapsulates any parts of the "specification" for FreeCol that are
@@ -314,6 +317,10 @@ public final class Specification {
                             option = new BooleanOption(xsr);
                         } else if (RangeOption.getXMLElementTagName().equals(optionType) || "range-option".equals(optionType)) {
                             option = new RangeOption(xsr);
+                        } else if (SelectOption.getXMLElementTagName().equals(optionType) || "select-option".equals(optionType)) {
+                            option = new SelectOption(xsr);
+                        } else if (LanguageOption.getXMLElementTagName().equals(optionType) || "language-option".equals(optionType)) {
+                            option = new LanguageOption(xsr);
                         } else {
                             logger.finest("Parsing of " + optionType + " is not implemented yet");
                             xsr.nextTag();

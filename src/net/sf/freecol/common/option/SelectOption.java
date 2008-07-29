@@ -17,17 +17,18 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.option;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
-
 
 /**
  * Represents an option where the valid choice is an integer and the
@@ -44,28 +45,32 @@ import net.sf.freecol.client.gui.i18n.Messages;
 public class SelectOption extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectOption.class.getName());
-
-
-
-    protected int value;
-    protected String[] options;
-
     
+    private int value;
+
+    private boolean localizedLabels = false;
+
+    private Map<String, Integer> selectValues = new LinkedHashMap<String, Integer>();
+
+    // TODO : remove this field and corresponding methods when all rangeOption
+    // come from specification.xml
+    private String[] options;
+
     /**
      * Creates a new <code>SelectOption</code>.
-     *
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
-     * @param options All possible values.
-     * @param defaultOption The index of the default value.
+     * 
+     * @param in The <code>XMSStreamReader</code> to read the data from
      */
-    public SelectOption(String id, String[] options, int defaultOption) {
-        this(id, null, options, defaultOption, false);
+    public SelectOption(XMLStreamReader in) throws XMLStreamException {
+        super(NO_ID);
+        readFromXML(in);
     }
     
+    // TODO : remove constructor when all SelectOption come from specification.xml
     /**
      * Creates a new <code>SelectOption</code>.
      *
+     * @deprecated
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
      * @param optionGroup The OptionGroup this Option belongs to.
@@ -75,10 +80,12 @@ public class SelectOption extends AbstractOption {
     public SelectOption(String id, OptionGroup optionGroup, String[] options, int defaultOption) {
         this(id, optionGroup, options, defaultOption, false);
     }
-    
+
+    // TODO : remove constructor when all SelectOption come from specification.xml
     /**
      * Creates a new <code>SelectOption</code>.
      *
+     * @deprecated
      * @param id The identifier for this option. This is used when the object should be
      *           found in an {@link OptionGroup}.
      * @param optionGroup The OptionGroup this Option belongs to.
@@ -121,6 +128,7 @@ public class SelectOption extends AbstractOption {
         if (value != oldValue) {
             firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
         }
+        isDefined = true;
     }
 
     /**
@@ -131,15 +139,15 @@ public class SelectOption extends AbstractOption {
         return options;
     }
 
-    
     /**
-     * Sets the options of this <code>SelectOption</code>.
-     * @param options The options to be set.
+     * Gets the range values of this <code>RangeOption</code>.
+     * 
+     * @return The value.
      */
-    protected void setOptions(String[] options) {
-        this.options = options;
+    public Map<String, Integer> getSelectValues() {
+        return selectValues;
     }
-
+    
     /**
      * Gets a <code>String</code> representation of the
      * current value.
@@ -182,8 +190,9 @@ public class SelectOption extends AbstractOption {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
-        out.writeStartElement(getId());
+        out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("id", getId());
         out.writeAttribute("value", getStringValue());
 
         out.writeEndElement();
@@ -196,13 +205,47 @@ public class SelectOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final int oldValue = this.value;
-        
-        setValue(in.getAttributeValue(null, "value"));
-        in.nextTag();
-        
-        if (value != oldValue) {
-            firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
+        final String id = in.getAttributeValue(null, "id");
+        final String defaultValue = in.getAttributeValue(null, "defaultValue");
+        final String localizedLabels = in.getAttributeValue(null, "localizedLabels");
+        final String value = in.getAttributeValue(null, "value");
+
+        if (localizedLabels != null) {
+            this.localizedLabels = localizedLabels.equals("true");
+        }
+
+        if (id == null && getId().equals("NO_ID")) {
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+        }
+        if (defaultValue == null && value == null) {
+            throw new XMLStreamException("invalid <" + getXMLElementTagName()
+                    + "> tag : no value nor default value found.");
+        }
+
+        if(getId() == NO_ID) {
+            setId(id);
+        }
+        if (value != null) {
+            setValue(Integer.parseInt(value));
+            in.nextTag();
+        } else {
+            setValue(Integer.parseInt(defaultValue));
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName() == "selectValue") {
+                    String label = in.getAttributeValue(null, "label");
+                    final String selectValue = in.getAttributeValue(null, "value");
+                    if (this.localizedLabels) {
+                        label = Messages.message(label);
+                    }
+                    selectValues.put(label, Integer.parseInt(selectValue));
+                } else {
+                    throw new XMLStreamException("Unknow child \"" + in.getLocalName() + "\" in a \""
+                            + getXMLElementTagName() + "\".");
+                }
+                in.nextTag();
+            }
+
+            options = selectValues.keySet().toArray(new String[] {});
         }
     }
 

@@ -39,7 +39,14 @@ public class FileOption extends AbstractOption {
 
     private File value;
 
-    
+    /**
+     * Creates a new  <code>IntegerOption</code>.
+     * @param in The <code>XMLStreamReader</code> containing the data. 
+     */
+     public FileOption(XMLStreamReader in) throws XMLStreamException {
+         super(NO_ID);
+         readFromXML(in);
+     }   
 
     /**
      * Creates a new <code>FileOption</code>.

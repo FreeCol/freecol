@@ -50,8 +50,7 @@ public class RangeOption extends AbstractOption {
 
     // TODO : remove this field and corresponding methods when all rangeOption
     // come from specification.xml
-    String[] options;
-
+    private String[] options;
 
     /**
      * Creates a new <code>RangeOption</code>.
@@ -63,7 +62,7 @@ public class RangeOption extends AbstractOption {
         readFromXML(in);
     }
 
-    // TODO : remove constructor when all rangeOption com from specification.xml
+    // TODO : remove constructor when all RangeOption come from specification.xml
     /**
      * Creates a new <code>RangeOption</code>.
      * 

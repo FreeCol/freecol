@@ -1727,5 +1727,75 @@
         <rangeValue label="gameOptions.difficultySettings.difficulty.veryHard" value="4"/>
       </rangeOption>
     </optionGroup>
+    <optionGroup id="clientOptions.gui" >
+      <!-- Option for setting the language -->
+      <languageOption id="model.option.languageOption"/>
+      <!-- Used by GUI, the number will be displayed when a group of goods are higher than this number. -->
+      <integerOption id="model.option.guiMinNumberToDisplayGoodsCount" defaultValue="7" minimumValue="0" maximumValue="10"/>
+      <!-- Used by GUI, this is the most repetitions drawn of a goods image for a single goods grouping. -->
+      <integerOption id="model.option.guiMaxNumberOfGoodsImages" defaultValue="7" minimumValue="1" maximumValue="10"/>
+      <!-- Selected tiles always gets centered if this option is enabled -->
+      <booleanOption id="model.option.alwaysCenter" defaultValue="false"/>
+      <!-- If this option is enabled, the display will recenter in order to display the active unit -->
+      <booleanOption id="model.option.jumpToActiveUnit" defaultValue="true"/>
+      <!-- Option for setting wether or not the fog of war should be displayed. -->
+      <booleanOption id="model.option.displayFogOfWar" defaultValue="false"/>
+      <!-- Option for activating autoscroll when dragging units on the mapboard. -->
+      <booleanOption id="model.option.mapScrollOnDrag" defaultValue="true"/>
+      <!-- Whether to display a compass rose or not. -->
+      <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
+      <!-- Whether to display the grid by default or not. -->
+      <booleanOption id="model.option.displayGrid" defaultValue="false"/>
+      <!-- Used by GUI to sort colonies. -->
+      <selectOption id="model.option.colonyComparator" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.gui.colonyComparator.byName" value="0"/>
+        <selectValue label="clientOptions.gui.colonyComparator.byAge" value="1"/>
+        <selectValue label="clientOptions.gui.colonyComparator.byPosition" value="2"/>
+        <selectValue label="clientOptions.gui.colonyComparator.bySize" value="3"/>
+        <selectValue label="clientOptions.gui.colonyComparator.bySoL" value="4"/>
+      </selectOption>
+      <!-- Animation speed for friendly units. -->
+      <rangeOption id="model.option.moveAnimationSpeed" defaultValue="0" localizedLabels="true">
+        <rangeValue label="clientOptions.gui.moveAnimationSpeed.off" value="0"/>
+        <rangeValue label="clientOptions.gui.moveAnimationSpeed.slow" value="1"/>
+        <rangeValue label="clientOptions.gui.moveAnimationSpeed.normal" value="2"/>
+        <rangeValue label="clientOptions.gui.moveAnimationSpeed.fast" value="3"/>
+      </rangeOption>
+      <!-- Animation speed for enemy units. -->
+      <rangeOption id="model.option.enemyMoveAnimationSpeed" defaultValue="3" localizedLabels="true">
+        <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.off" value="0"/>
+        <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.slow" value="1"/>
+        <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.normal" value="2"/>
+        <rangeValue label="clientOptions.gui.enemyMoveAnimationSpeed.fast" value="3"/>
+      </rangeOption>
+    </optionGroup>
+    <optionGroup id="clientOptions.messages" >
+      <!-- Used by GUI, this defines the grouping of ModelMessages. -->
+      <selectOption id="model.option.guiMessagesGroupBy" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.messages.guiMessagesGroupBy.nothing" value="0"/>
+        <selectValue label="clientOptions.messages.guiMessagesGroupBy.type" value="1"/>
+        <selectValue label="clientOptions.messages.guiMessagesGroupBy.source" value="2"/>
+      </selectOption>
+    </optionGroup>
+    <optionGroup id="clientOptions.minimap" >
+      <!-- If selected: Enables smooth rendering of the minimap when zoomed out. -->
+      <booleanOption id="model.option.smoothRendering" defaultValue="false"/>
+      <!-- The color to fill in around the actual map on the minimap. -->
+      <selectOption id="model.option.color.background" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.minimap.color.background.black" value="0"/>
+        <selectValue label="clientOptions.minimap.color.background.gray.dark.very" value="1"/>
+        <selectValue label="clientOptions.minimap.color.background.gray.dark" value="2"/>
+        <selectValue label="clientOptions.minimap.color.background.gray" value="3"/>
+        <selectValue label="clientOptions.minimap.color.background.gray.light" value="4"/>
+        <selectValue label="clientOptions.minimap.color.background.gray.light.very" value="5"/>
+        <selectValue label="clientOptions.minimap.color.background.blue.light" value="6"/>
+      </selectOption>
+      <rangeOption id="model.option.defaultZoomLevel" defaultValue="2" localizedLabels="false">
+        <rangeValue label="1" value="1"/>
+        <rangeValue label="2" value="2"/>
+        <rangeValue label="3" value="3"/>
+        <rangeValue label="4" value="4"/>
+      </rangeOption>
+    </optionGroup>
   </options>
 </freecol-specification>

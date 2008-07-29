@@ -134,6 +134,10 @@ public class OptionGroup extends AbstractOption {
                 option = new BooleanOption(in);
             } else if (RangeOption.getXMLElementTagName().equals(optionType) || "range-option".equals(optionType)) {
                 option = new RangeOption(in);
+            } else if (SelectOption.getXMLElementTagName().equals(optionType) || "select-option".equals(optionType)) {
+                option = new SelectOption(in);
+            } else if (LanguageOption.getXMLElementTagName().equals(optionType) || "language-option".equals(optionType)) {
+                option = new LanguageOption(in);
             } else {
                 logger.finest("Parsing of " + optionType + " is not implemented yet");
                 in.nextTag();
