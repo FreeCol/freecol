@@ -243,8 +243,15 @@ public class LanguageOption extends AbstractOption {
      *      during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        final String id = in.getAttributeValue(null, "id");
         findLanguages();
         
+        if (id == null && getId().equals("NO_ID")){
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+        } else if(getId() == NO_ID) {
+            setId(id);
+        }
+
         Language newValue = languages.get(in.getAttributeValue(null, "value"));
         if (newValue == null) {
             newValue = languages.get(AUTO);
