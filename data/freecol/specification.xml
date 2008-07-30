@@ -19,7 +19,7 @@
  *
 -->
 <!-- $Revision$ -->
-<!-- specification version 0.2 -->
+<!-- specification version 0.3 -->
 <!-- in case of incompatible changes, please update version number and 
      create a new Relax NG schema for validation. -->
 <freecol-specification>
