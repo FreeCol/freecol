@@ -1812,5 +1812,31 @@
         <rangeValue label="4" value="4"/>
       </rangeOption>
     </optionGroup>
+    <optionGroup id="clientOptions.savegames" >
+      <!-- Use default values for savegames instead of displaying a dialog. -->
+      <selectOption id="model.option.showSavegameSettings" defaultValue="1" localizedLabels="true">
+        <selectValue label="clientOptions.savegames.showSavegameSettings.never" value="0"/>
+        <selectValue label="clientOptions.savegames.showSavegameSettings.multiplayer" value="1"/>
+        <selectValue label="clientOptions.savegames.showSavegameSettings.always" value="2"/>
+      </selectOption>
+      <!-- Option for setting the period of autosaves. The value 0 signals that autosaving is disabled -->
+      <integerOption id="model.option.autosavePeriod" defaultValue="0" minimumValue="0" maximumValue="100"/>
+      <!-- Option for setting the number of autosaves to keep. If set to 0, all autosaves are kept. -->
+      <integerOption id="model.option.autosaveGenerations" defaultValue="10" minimumValue="0" maximumValue="100"/>
+    </optionGroup>
+    <optionGroup id="clientOptions.warehouse" >
+      <!-- The Stock the custom house should keep when selling goods. -->
+      <integerOption id="model.option.customStock" defaultValue="50" minimumValue="0" maximumValue="300"/>
+      <!-- Generate warning of stock drops below this percentage of capacity. -->
+      <integerOption id="model.option.lowLevel" defaultValue="10" minimumValue="0" maximumValue="100"/>
+      <!-- Generate warning of stock exceeds this percentage of capacity. -->
+      <integerOption id="model.option.highLevel" defaultValue="90" minimumValue="0" maximumValue="100"/>
+    </optionGroup>
+    <optionGroup id="clientOptions.other" >
+      <!-- Option for autoload emigrants on saling to america. -->
+      <booleanOption id="model.option.autoloadEmigrants" defaultValue="false"/>
+      <!-- If enabled: Automatically ends the turn when no units can be made active. -->
+      <booleanOption id="model.option.autoEndTurn" defaultValue="true"/>
+    </optionGroup>
   </options>
 </freecol-specification>

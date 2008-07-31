@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client;
 
 import java.util.Comparator;
@@ -43,21 +42,21 @@ import net.sf.freecol.common.option.SelectOption;
 
 import org.w3c.dom.Element;
 
-
 /**
-* Defines how available client options are displayed on the Setting dialog from File>Preferences
-* Also contains several Comparators used for display purposes.
-*
-* <br><br>
-*
-* New options should be added to
-* {@link #addDefaultOptions()} and each option should be given an unique
-* identifier (defined as a constant in this class, then as fully-qualified strings in FreeColMessages.properties).
-* Identifiers like "guiShowSonsOfLiberty" actually REQUIRE string keys of:
-*       clientOptions.messages.guiShowSonsOfLiberty.name
-*       clientOptions.messages.guiShowSonsOfLiberty.shortDescription
-* So be sure to include both.
-*/
+ * Defines how available client options are displayed on the Setting dialog from
+ * File>Preferences Also contains several Comparators used for display purposes.
+ * 
+ * <br>
+ * <br>
+ * 
+ * New options should be added to {@link #addDefaultOptions()} and each option
+ * should be given an unique identifier (defined as a constant in this class,
+ * then as fully-qualified strings in FreeColMessages.properties). Identifiers
+ * like "guiShowSonsOfLiberty" actually REQUIRE string keys of:
+ * clientOptions.messages.guiShowSonsOfLiberty.name
+ * clientOptions.messages.guiShowSonsOfLiberty.shortDescription So be sure to
+ * include both.
+ */
 public class ClientOptions extends OptionMap {
 
     @SuppressWarnings("unused")
@@ -69,29 +68,33 @@ public class ClientOptions extends OptionMap {
     public static final String LANGUAGE = "model.option.languageOption";
 
     /**
-     * If this option is enabled, the display will recenter in order
-     * to display the active unit if it is not {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
+     * If this option is enabled, the display will recenter in order to display
+     * the active unit if it is not
+     * {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
      * 
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String JUMP_TO_ACTIVE_UNIT = "model.option.jumpToActiveUnit";
 
     /**
-     * Selected tiles always gets centered if this option is
-     * enabled (even if the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
+     * Selected tiles always gets centered if this option is enabled (even if
+     * the tile is {@link net.sf.freecol.client.gui.GUI#onScreen(Map.Position)}).
      * 
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String ALWAYS_CENTER = "model.option.alwaysCenter";
 
     /**
-     * Used by GUI, the number will be displayed when a group of goods are higher than this number.
+     * Used by GUI, the number will be displayed when a group of goods are
+     * higher than this number.
+     * 
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT = "model.option.guiMinNumberToDisplayGoodsCount";
 
     /**
-     * Used by GUI, this is the most repetitions drawn of a goods image for a single goods grouping.
+     * Used by GUI, this is the most repetitions drawn of a goods image for a
+     * single goods grouping.
      * 
      * @see net.sf.freecol.client.gui.GUI
      */
@@ -106,168 +109,193 @@ public class ClientOptions extends OptionMap {
      * Whether to display the grid by default or not.
      */
     public static final String DISPLAY_GRID = "model.option.displayGrid";
-    
+
     /**
      * Animation speed for friendly units.
      */
     public static final String MOVE_ANIMATION_SPEED = "model.option.moveAnimationSpeed";
-    
+
     /**
      * Animation speed for enemy units.
      */
     public static final String ENEMY_MOVE_ANIMATION_SPEED = "model.option.enemyMoveAnimationSpeed";
-    
 
     /**
-     * Used by GUI, this defines the grouping of ModelMessages.
-     * Possible values include nothing, type and source.
-     *
+     * Used by GUI, this defines the grouping of ModelMessages. Possible values
+     * include nothing, type and source.
+     * 
      * @see net.sf.freecol.client.gui.GUI
      * @see net.sf.freecol.common.model.ModelMessage
      */
     public static final String MESSAGES_GROUP_BY = "model.option.guiMessagesGroupBy";
+
     public static final int MESSAGES_GROUP_BY_NOTHING = 0;
+
     public static final int MESSAGES_GROUP_BY_TYPE = 1;
+
     public static final int MESSAGES_GROUP_BY_SOURCE = 2;
 
     public static final String AUDIO_MIXER = "audioMixer";
+
     public static final String MUSIC_VOLUME = "musicVolume";
+
     public static final String SFX_VOLUME = "sfxVolume";
-    
+
     /**
      * Used by GUI, this defines whether SoL messages will be displayed.
-     *
+     * 
      * @see net.sf.freecol.client.gui.GUI
      */
     public static final String SHOW_SONS_OF_LIBERTY = "model.option.guiShowSonsOfLiberty";
+
     public static final String SHOW_WARNING = "model.option.guiShowWarning";
+
     public static final String SHOW_GOVERNMENT_EFFICIENCY = "model.option.guiShowGovernmentEfficiency";
+
     public static final String SHOW_WAREHOUSE_CAPACITY = "model.option.guiShowWarehouseCapacity";
+
     public static final String SHOW_UNIT_IMPROVED = "model.option.guiShowUnitImproved";
+
     public static final String SHOW_UNIT_DEMOTED = "model.option.guiShowUnitDemoted";
+
     public static final String SHOW_UNIT_ADDED = "model.option.guiShowUnitAdded";
+
     public static final String SHOW_UNIT_LOST = "model.option.guiShowUnitLost";
+
     public static final String SHOW_BUILDING_COMPLETED = "model.option.guiShowBuildingCompleted";
+
     public static final String SHOW_FOREIGN_DIPLOMACY = "model.option.guiShowForeignDiplomacy";
+
     public static final String SHOW_MARKET_PRICES = "model.option.guiShowMarketPrices";
+
     public static final String SHOW_MISSING_GOODS = "model.option.guiShowMissingGoods";
+
     public static final String SHOW_TUTORIAL = "model.option.guiShowTutorial";
+
     public static final String SHOW_COLONY_WARNINGS = "model.option.guiShowColonyWarnings";
+
     public static final String SHOW_PRECOMBAT = "model.option.guiShowPreCombat";
-    
+
     /**
-     * Use default values for savegames instead of displaying a dialog.
-     * <br><br>
+     * Use default values for savegames instead of displaying a dialog. <br>
+     * <br>
      * Possible values for this option are:
      * <ol>
-     *   <li>{@link #SHOW_SAVEGAME_SETTINGS_NEVER}</li>
-     *   <li>{@link #SHOW_SAVEGAME_SETTINGS_MULTIPLAYER}</li>
-     *   <li>{@link #SHOW_SAVEGAME_SETTINGS_ALWAYS}</li>
+     * <li>{@link #SHOW_SAVEGAME_SETTINGS_NEVER}</li>
+     * <li>{@link #SHOW_SAVEGAME_SETTINGS_MULTIPLAYER}</li>
+     * <li>{@link #SHOW_SAVEGAME_SETTINGS_ALWAYS}</li>
      * </ol>
      */
-    public static final String SHOW_SAVEGAME_SETTINGS = "showSavegameSettings";
-    
+    public static final String SHOW_SAVEGAME_SETTINGS = "model.option.showSavegameSettings";
+
     /**
-     * A possible value for the {@link SelectOption}: {@link #SHOW_SAVEGAME_SETTINGS}.
-     * Specifies that the dialog should never be enabled.
+     * A possible value for the {@link SelectOption}:
+     * {@link #SHOW_SAVEGAME_SETTINGS}. Specifies that the dialog should never
+     * be enabled.
      */
     public static final int SHOW_SAVEGAME_SETTINGS_NEVER = 0;
-    
+
     /**
-     * A possible value for the {@link SelectOption}: {@link #SHOW_SAVEGAME_SETTINGS}.
-     * Specifies that the dialog should only be enabled when loading savegames being
-     * marked as multiplayer..
+     * A possible value for the {@link SelectOption}:
+     * {@link #SHOW_SAVEGAME_SETTINGS}. Specifies that the dialog should only
+     * be enabled when loading savegames being marked as multiplayer..
      */
     public static final int SHOW_SAVEGAME_SETTINGS_MULTIPLAYER = 1;
-    
+
     /**
-     * A possible value for the {@link SelectOption}: {@link #SHOW_SAVEGAME_SETTINGS}.
-     * Specifies that the dialog should always be enabled.
+     * A possible value for the {@link SelectOption}:
+     * {@link #SHOW_SAVEGAME_SETTINGS}. Specifies that the dialog should always
+     * be enabled.
      */
     public static final int SHOW_SAVEGAME_SETTINGS_ALWAYS = 2;
 
     /**
-     * Option for setting the period of autosaves. The value 0 signals that autosaving
-     * is disabled. 
+     * Option for setting the period of autosaves. The value 0 signals that
+     * autosaving is disabled.
      */
-    public static final String AUTOSAVE_PERIOD = "autosavePeriod"; 
+    public static final String AUTOSAVE_PERIOD = "model.option.autosavePeriod";
 
     /**
-     * Option for setting the number of autosaves to keep. If set to
-     * 0, all autosaves are kept.
+     * Option for setting the number of autosaves to keep. If set to 0, all
+     * autosaves are kept.
      */
-    public static final String AUTOSAVE_GENERATIONS = "autosaveGenerations";
+    public static final String AUTOSAVE_GENERATIONS = "model.option.autosaveGenerations";
 
     /**
      * Option for setting wether or not the fog of war should be displayed.
      */
     public static final String DISPLAY_FOG_OF_WAR = "model.option.displayFogOfWar";
-    
+
     /**
      * Option for activating autoscroll when dragging units on the mapboard.
      */
     public static final String MAP_SCROLL_ON_DRAG = "model.option.mapScrollOnDrag";
-    
+
     /**
      * Option for autoload emigrants on saling to america.
      */
-    public static final String AUTOLOAD_EMIGRANTS = "autoloadEmigrants";
+    public static final String AUTOLOAD_EMIGRANTS = "model.option.autoloadEmigrants";
 
     /**
      * If selected: Enables smooth rendering of the minimap when zoomed out.
      */
     public static final String SMOOTH_MINIMAP_RENDERING = "model.option.smoothRendering";
-    
+
     /**
      * Default zoom level of the minimap.
      */
     public static final String DEFAULT_MINIMAP_ZOOM = "model.option.defaultZoomLevel";
 
     /**
-     * The color to fill in around the actual map on the minimap.
-     * Typically only visible when the minimap is at full zoom-out,
-     * but at the default 'black' you can't differentiate between the background and the (unexplored) map.
+     * The color to fill in around the actual map on the minimap. Typically only
+     * visible when the minimap is at full zoom-out, but at the default 'black'
+     * you can't differentiate between the background and the (unexplored) map.
      * Actually: clientOptions.minimap.color.background
      */
     public static final String MINIMAP_BACKGROUND_COLOR = "model.option.color.background";
-    public static final String COLOR_BLACK              = "black";
-    public static final String COLOR_VERY_DARK_GRAY     = "gray.dark.very";
-    public static final String COLOR_DARK_GRAY          = "gray.dark";
-    public static final String COLOR_GRAY               = "gray";
-    public static final String COLOR_LIGHT_GRAY         = "gray.light";
-    public static final String COLOR_VERY_LIGHT_GRAY    = "gray.light.very";
-    public static final String COLOR_LIGHT_BLUE         = "blue.light";
 
-    /** 
+    public static final String COLOR_BLACK = "black";
+
+    public static final String COLOR_VERY_DARK_GRAY = "gray.dark.very";
+
+    public static final String COLOR_DARK_GRAY = "gray.dark";
+
+    public static final String COLOR_GRAY = "gray";
+
+    public static final String COLOR_LIGHT_GRAY = "gray.light";
+
+    public static final String COLOR_VERY_LIGHT_GRAY = "gray.light.very";
+
+    public static final String COLOR_LIGHT_BLUE = "blue.light";
+
+    /**
      * The Stock the custom house should keep when selling goods.
      */
-    public static final String CUSTOM_STOCK = "customStock";
+    public static final String CUSTOM_STOCK = "model.option.customStock";
 
     /**
      * Generate warning of stock drops below this percentage of capacity.
      */
-    public static final String LOW_LEVEL = "lowLevel";
+    public static final String LOW_LEVEL = "model.option.lowLevel";
 
     /**
      * Generate warning of stock exceeds this percentage of capacity.
      */
-    public static final String HIGH_LEVEL = "highLevel";
+    public static final String HIGH_LEVEL = "model.option.highLevel";
 
     /**
      * Used by GUI to sort colonies.
      */
     public static final String COLONY_COMPARATOR = "model.option.colonyComparator";
-    public static final int COLONY_COMPARATOR_NAME = 0,
-                            COLONY_COMPARATOR_AGE = 1,
-                            COLONY_COMPARATOR_POSITION = 2,
-                            COLONY_COMPARATOR_SIZE = 3,
-                            COLONY_COMPARATOR_SOL = 4;
+
+    public static final int COLONY_COMPARATOR_NAME = 0, COLONY_COMPARATOR_AGE = 1, COLONY_COMPARATOR_POSITION = 2,
+            COLONY_COMPARATOR_SIZE = 3, COLONY_COMPARATOR_SOL = 4;
 
     /**
      * If enabled: Automatically ends the turn when no units can be made active.
      */
     public static final String AUTO_END_TURN = "autoEndTurn";
-    
+
     /**
      * Comparators for sorting colonies.
      */
@@ -320,7 +348,6 @@ public class ClientOptions extends OptionMap {
         }
     };
 
-
     private Comparator<ModelMessage> messageSourceComparator = new Comparator<ModelMessage>() {
         // sort according to message source
         public int compare(ModelMessage message1, ModelMessage message2) {
@@ -332,11 +359,10 @@ public class ClientOptions extends OptionMap {
             int base = getClassIndex(source1) - getClassIndex(source2);
             if (base == 0) {
                 if (source1 instanceof Colony) {
-                    return getColonyComparator().compare((Colony)source1, (Colony)source2);
+                    return getColonyComparator().compare((Colony) source1, (Colony) source2);
                 } else if (source1 instanceof FreeColGameObject) {
-                    return ((FreeColGameObject) source1).getIntegerID() -
-                           ((FreeColGameObject) source2).getIntegerID();
-                } 
+                    return ((FreeColGameObject) source1).getIntegerID() - ((FreeColGameObject) source2).getIntegerID();
+                }
             }
             return base;
         }
@@ -357,8 +383,7 @@ public class ClientOptions extends OptionMap {
             }
         }
 
-    }; 
-
+    };
 
     private Comparator<ModelMessage> messageTypeComparator = new Comparator<ModelMessage>() {
         // sort according to message type
@@ -372,33 +397,30 @@ public class ClientOptions extends OptionMap {
         }
     };
 
-    
+
     /**
-    * Creates a new <code>ClientOptions</code>.
-    */
+     * Creates a new <code>ClientOptions</code>.
+     */
     public ClientOptions() {
         super(getXMLElementTagName());
     }
 
-
     /**
-    * Creates a <code>ClientOptions</code> from an XML representation.
-    *
-    * <br><br>
-    *
-    * @param element The XML <code>Element</code> from which this object
-    *                should be constructed.
-    */
+     * Creates a <code>ClientOptions</code> from an XML representation.
+     * 
+     * <br>
+     * <br>
+     * 
+     * @param element The XML <code>Element</code> from which this object
+     *            should be constructed.
+     */
     public ClientOptions(Element element) {
         super(element, getXMLElementTagName());
     }
 
-
-
-
     /**
-    * Adds the options to this <code>GameOptions</code>.
-    */
+     * Adds the options to this <code>GameOptions</code>.
+     */
     protected void addDefaultOptions() {
         Specification spec = Specification.getSpecification();
 
@@ -412,38 +434,19 @@ public class ClientOptions extends OptionMap {
         new PercentageOption(MUSIC_VOLUME, audioGroup, 100).setPreviewEnabled(true);
         new PercentageOption(SFX_VOLUME, audioGroup, 100).setPreviewEnabled(true);
         add(audioGroup);
-        
-        OptionGroup savegamesGroup = new OptionGroup("clientOptions.savegames");
-        new SelectOption(SHOW_SAVEGAME_SETTINGS, savegamesGroup,
-                         new String[] {"never",
-                                       "multiplayer",
-                                       "always"},
-                         1);
-        new IntegerOption(AUTOSAVE_PERIOD, savegamesGroup, 0, 100, 0);
-        new IntegerOption(AUTOSAVE_GENERATIONS, savegamesGroup, 0, 100, 10);
-        add(savegamesGroup);          
 
-        OptionGroup warehouseGroup = new OptionGroup("clientOptions.warehouse");
-        new IntegerOption(CUSTOM_STOCK, warehouseGroup, 0, 300, 50);
-        new IntegerOption(LOW_LEVEL, warehouseGroup, 0, 100, 10);
-        new IntegerOption(HIGH_LEVEL, warehouseGroup, 0, 100, 90);
-        add(warehouseGroup);
-
-        OptionGroup otherGroup = new OptionGroup("clientOptions.other");
-        new BooleanOption(AUTOLOAD_EMIGRANTS, otherGroup, false);
-        new BooleanOption(AUTO_END_TURN, otherGroup, true);
-        add(otherGroup);
-
+        add(spec.getOptionGroup("clientOptions.savegames"));
+        add(spec.getOptionGroup("clientOptions.warehouse"));
+        add(spec.getOptionGroup("clientOptions.other"));
     }
-
 
     /**
      * Return the client's preferred comparator for colonies.
-     *
+     * 
      * @return a <code>Comparator</code> value
      */
     public Comparator<Colony> getColonyComparator() {
-        switch(getInteger(COLONY_COMPARATOR)) {
+        switch (getInteger(COLONY_COMPARATOR)) {
         case COLONY_COMPARATOR_AGE:
             return colonyAgeComparator;
         case COLONY_COMPARATOR_POSITION:
@@ -459,10 +462,9 @@ public class ClientOptions extends OptionMap {
         }
     }
 
-
     /**
      * Return the client's preferred comparator for ModelMessages.
-     *
+     * 
      * @return a <code>Comparator</code> value
      */
     public Comparator<ModelMessage> getModelMessageComparator() {
@@ -478,7 +480,7 @@ public class ClientOptions extends OptionMap {
 
     /**
      * Returns the boolean option associated with a ModelMessage.
-     *
+     * 
      * @param message a <code>ModelMessage</code> value
      * @return a <code>BooleanOption</code> value
      */
@@ -517,9 +519,10 @@ public class ClientOptions extends OptionMap {
     protected boolean isCorrectTagName(String tagName) {
         return getXMLElementTagName().equals(tagName);
     }
-    
+
     /**
      * Gets the tag name of the root element representing this object.
+     * 
      * @return "clientOptions".
      */
     public static String getXMLElementTagName() {
@@ -527,4 +530,3 @@ public class ClientOptions extends OptionMap {
     }
 
 }
-
