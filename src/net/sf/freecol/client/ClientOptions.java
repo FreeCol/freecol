@@ -139,22 +139,21 @@ public class ClientOptions extends OptionMap {
      *
      * @see net.sf.freecol.client.gui.GUI
      */
-    public static final String SHOW_SONS_OF_LIBERTY = "guiShowSonsOfLiberty";
-    public static final String SHOW_WARNING = "guiShowWarning";
-    public static final String SHOW_GOVERNMENT_EFFICIENCY = "guiShowGovernmentEfficiency";
-    public static final String SHOW_WAREHOUSE_CAPACITY = "guiShowWarehouseCapacity";
-    public static final String SHOW_UNIT_IMPROVED = "guiShowUnitImproved";
-    public static final String SHOW_UNIT_DEMOTED = "guiShowUnitDemoted";
-    public static final String SHOW_UNIT_ADDED = "guiShowUnitAdded";
-    public static final String SHOW_UNIT_LOST = "guiShowUnitLost";
-    public static final String SHOW_BUILDING_COMPLETED = "guiShowBuildingCompleted";
-    public static final String SHOW_FOREIGN_DIPLOMACY = "guiShowForeignDiplomacy";
-    public static final String SHOW_MARKET_PRICES = "guiShowMarketPrices";
-    public static final String SHOW_LOST_CITY_RUMOURS = "guiShowLostCityRumours";
-    public static final String SHOW_MISSING_GOODS = "guiShowMissingGoods";
-    public static final String SHOW_TUTORIAL = "guiShowTutorial";
-    public static final String SHOW_COLONY_WARNINGS = "guiShowColonyWarnings";
-    public static final String SHOW_PRECOMBAT = "guiShowPreCombat";
+    public static final String SHOW_SONS_OF_LIBERTY = "model.option.guiShowSonsOfLiberty";
+    public static final String SHOW_WARNING = "model.option.guiShowWarning";
+    public static final String SHOW_GOVERNMENT_EFFICIENCY = "model.option.guiShowGovernmentEfficiency";
+    public static final String SHOW_WAREHOUSE_CAPACITY = "model.option.guiShowWarehouseCapacity";
+    public static final String SHOW_UNIT_IMPROVED = "model.option.guiShowUnitImproved";
+    public static final String SHOW_UNIT_DEMOTED = "model.option.guiShowUnitDemoted";
+    public static final String SHOW_UNIT_ADDED = "model.option.guiShowUnitAdded";
+    public static final String SHOW_UNIT_LOST = "model.option.guiShowUnitLost";
+    public static final String SHOW_BUILDING_COMPLETED = "model.option.guiShowBuildingCompleted";
+    public static final String SHOW_FOREIGN_DIPLOMACY = "model.option.guiShowForeignDiplomacy";
+    public static final String SHOW_MARKET_PRICES = "model.option.guiShowMarketPrices";
+    public static final String SHOW_MISSING_GOODS = "model.option.guiShowMissingGoods";
+    public static final String SHOW_TUTORIAL = "model.option.guiShowTutorial";
+    public static final String SHOW_COLONY_WARNINGS = "model.option.guiShowColonyWarnings";
+    public static final String SHOW_PRECOMBAT = "model.option.guiShowPreCombat";
     
     /**
      * Use default values for savegames instead of displaying a dialog.
@@ -406,25 +405,7 @@ public class ClientOptions extends OptionMap {
         OptionGroup guiGroup = spec.getOptionGroup("clientOptions.gui");
         guiGroup.add(spec.getOptionGroup("clientOptions.minimap"));
         add(guiGroup);
-
-        /** Boolean message display options. */
-        OptionGroup messagesGroup = spec.getOptionGroup("clientOptions.messages");
-        new BooleanOption(SHOW_WARNING, messagesGroup, true);
-        new BooleanOption(SHOW_SONS_OF_LIBERTY, messagesGroup, true);
-        new BooleanOption(SHOW_GOVERNMENT_EFFICIENCY, messagesGroup, true);
-        new BooleanOption(SHOW_WAREHOUSE_CAPACITY, messagesGroup, true);
-        new BooleanOption(SHOW_UNIT_IMPROVED, messagesGroup, true);
-        new BooleanOption(SHOW_UNIT_DEMOTED, messagesGroup, true);
-        new BooleanOption(SHOW_UNIT_ADDED, messagesGroup, true);
-        new BooleanOption(SHOW_UNIT_LOST, messagesGroup, true);
-        new BooleanOption(SHOW_BUILDING_COMPLETED, messagesGroup, true);
-        new BooleanOption(SHOW_FOREIGN_DIPLOMACY, messagesGroup, true);
-        new BooleanOption(SHOW_MARKET_PRICES, messagesGroup, false);
-        new BooleanOption(SHOW_MISSING_GOODS, messagesGroup, true);
-        new BooleanOption(SHOW_COLONY_WARNINGS, messagesGroup, true);
-        new BooleanOption(SHOW_PRECOMBAT, messagesGroup, true);
-        new BooleanOption(SHOW_TUTORIAL, messagesGroup, true);
-        add(messagesGroup);
+        add(spec.getOptionGroup("clientOptions.messages"));
 
         OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
         new AudioMixerOption(AUDIO_MIXER, audioGroup);

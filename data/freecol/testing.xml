@@ -1856,6 +1856,21 @@
         <selectValue label="clientOptions.messages.guiMessagesGroupBy.type" value="1"/>
         <selectValue label="clientOptions.messages.guiMessagesGroupBy.source" value="2"/>
       </selectOption>
+      <booleanOption id="model.option.guiShowWarning" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowSonsOfLiberty" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowGovernmentEfficiency" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowWarehouseCapacity" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitImproved" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitDemoted" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitAdded" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowUnitLost" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowBuildingCompleted" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowForeignDiplomacy" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowMarketPrices" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowMissingGoods" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowColonyWarnings" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowPreCombat" defaultValue="true"/>
+      <booleanOption id="model.option.guiShowTutorial" defaultValue="true"/>
     </optionGroup>
     <optionGroup id="clientOptions.minimap" >
       <!-- If selected: Enables smooth rendering of the minimap when zoomed out. -->

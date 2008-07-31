@@ -229,12 +229,13 @@ public class LanguageOption extends AbstractOption {
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
-        out.writeStartElement(getId());
+        out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("id", getId());
         out.writeAttribute("value", getValue().getKey());
 
         out.writeEndElement();
-    }
+     }
     
     /**
      * Initialize this object from an XML-representation of this object.
