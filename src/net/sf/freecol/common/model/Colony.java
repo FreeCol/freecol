@@ -1706,7 +1706,7 @@ public final class Colony extends Settlement implements Location, Nameable {
         unitCount = getAttribute(in, "unitCount", -1);
         featureContainer.addModifier(Settlement.DEFENCE_MODIFIER);
         // Read child elements:
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        loop: while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
                 ColonyTile ct = (ColonyTile) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (ct == null) {
@@ -1747,7 +1747,7 @@ public final class Colony extends Settlement implements Location, Nameable {
                                is the only place where this is a
                                problem, but I may be mistaken.
                              */
-                            continue;
+                            continue loop;
                         }
                     }
                     // found no matching modifier
