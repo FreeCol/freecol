@@ -49,22 +49,29 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGLayout;
@@ -77,13 +84,14 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
 
-    public static enum PanelType { TERRAIN, RESOURCES, UNITS, GOODS, SKILLS, BUILDINGS, FATHERS }
+    public static enum PanelType { TERRAIN, RESOURCES, UNITS, GOODS, 
+            SKILLS, BUILDINGS, FATHERS, NATIONS, NATION_TYPES }
 
-    private static final TileImprovementType road = FreeCol.getSpecification()
+    private static final TileImprovementType road = Specification.getSpecification()
         .getTileImprovementType("model.improvement.Road");
-    private static final TileImprovementType river = FreeCol.getSpecification()
+    private static final TileImprovementType river = Specification.getSpecification()
         .getTileImprovementType("model.improvement.River");
-    private static final TileImprovementType plowing = FreeCol.getSpecification()
+    private static final TileImprovementType plowing = Specification.getSpecification()
         .getTileImprovementType("model.improvement.Plow");
 
     private static final String OK = "OK";
@@ -123,7 +131,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         listPanel = new JPanel();
         listPanel.setOpaque(false);
-        // listPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         JScrollPane sl = new JScrollPane(listPanel, 
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -176,7 +183,11 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.removeAll();
         tree = buildTree();
         tree.expandRow(panelType.ordinal());
+        selectDetail(panelType, type);
+        detailPanel.validate();
+    }
 
+    public void selectDetail(PanelType panelType, FreeColGameObjectType type) {
         switch (panelType) {
         case TERRAIN:
             buildTerrainDetail((TileType) type);
@@ -197,10 +208,15 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         case FATHERS:
             buildFatherDetail((FoundingFather) type);
             break;
+        case NATIONS:
+            buildNationDetail((Nation) type);
+            break;
+        case NATION_TYPES:
+            buildNationTypeDetail((NationType) type);
+            break;
         default:
             break;
         }
-        detailPanel.validate();
     }
 
     /**
@@ -232,35 +248,47 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         buildResourceSubtree(resource);
         root.add(resource);
         
-        DefaultMutableTreeNode units;
-        units = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.UNITS,
-                                                                 Messages.message("menuBar.colopedia.unit")));
+        DefaultMutableTreeNode units =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.UNITS,
+                                                             Messages.message("menuBar.colopedia.unit")));
         buildUnitSubtree(units);
         root.add(units);
         
-        DefaultMutableTreeNode goods;
-        goods = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.GOODS,
-                                                                 Messages.message("menuBar.colopedia.goods")));
+        DefaultMutableTreeNode goods =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.GOODS,
+                                                             Messages.message("menuBar.colopedia.goods")));
         buildGoodsSubtree(goods);
         root.add(goods);
         
-        DefaultMutableTreeNode skills;
-        skills = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.SKILLS,
-                                                                  Messages.message("menuBar.colopedia.skill")));
+        DefaultMutableTreeNode skills =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.SKILLS,
+                                                             Messages.message("menuBar.colopedia.skill")));
         buildSkillsSubtree(skills);
         root.add(skills);
         
-        DefaultMutableTreeNode buildings;
-        buildings = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.BUILDINGS,
-                                                                     Messages.message("menuBar.colopedia.building")));
+        DefaultMutableTreeNode buildings =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.BUILDINGS,
+                                                             Messages.message("menuBar.colopedia.building")));
         buildBuildingSubtree(buildings);
         root.add(buildings);
         
-        DefaultMutableTreeNode fathers;
-        fathers = new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS,
-                                                                   Messages.message("menuBar.colopedia.father")));
+        DefaultMutableTreeNode fathers =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS,
+                                                             Messages.message("menuBar.colopedia.father")));
         buildFathersSubtree(fathers);
         root.add(fathers);
+        
+        DefaultMutableTreeNode nations =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATIONS,
+                                                             Messages.message("menuBar.colopedia.nation")));
+        buildNationsSubtree(nations);
+        root.add(nations);
+        
+        DefaultMutableTreeNode nationTypes =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.NATION_TYPES,
+                                                             Messages.message("menuBar.colopedia.nationType")));
+        buildNationTypesSubtree(nationTypes);
+        root.add(nationTypes);
         
         DefaultTreeModel treeModel = new DefaultTreeModel(root);
         tree = new JTree(treeModel) {
@@ -285,7 +313,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildTerrainSubtree(DefaultMutableTreeNode parent) {
-        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+        for (TileType t : Specification.getSpecification().getTileTypeList()) {
             buildTerrainItem(t, parent);
         }
     }
@@ -295,7 +323,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildResourceSubtree(DefaultMutableTreeNode parent) {
-        for (ResourceType r : FreeCol.getSpecification().getResourceTypeList()) {
+        for (ResourceType r : Specification.getSpecification().getResourceTypeList()) {
             buildResourceItem(r, parent);
         }
     }
@@ -305,7 +333,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildUnitSubtree(DefaultMutableTreeNode parent) {
-        for (UnitType u : FreeCol.getSpecification().getUnitTypeList()) {
+        for (UnitType u : Specification.getSpecification().getUnitTypeList()) {
             if (u.getSkill() <= 0 ||
                 u.hasAbility("model.ability.expertSoldier")) {
                 buildUnitItem(u, 0.5f, parent);
@@ -318,7 +346,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildGoodsSubtree(DefaultMutableTreeNode parent) {
-        for (GoodsType g : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType g : Specification.getSpecification().getGoodsTypeList()) {
             buildGoodsItem(g, parent);
         }
     }
@@ -328,7 +356,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildSkillsSubtree(DefaultMutableTreeNode parent) {
-        for (UnitType u : FreeCol.getSpecification().getUnitTypeList()) {
+        for (UnitType u : Specification.getSpecification().getUnitTypeList()) {
             if (u.getSkill() > 0) {
                 buildUnitItem(u, 0.5f, parent);
             }
@@ -343,7 +371,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         Image buildingImage = ResourceManager.getImage("Colopedia.buildingSection.image");
         ImageIcon buildingIcon = new ImageIcon((buildingImage != null) ? buildingImage : null);
 
-        List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
+        List<BuildingType> buildingTypes = Specification.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
             DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
                                                                                            buildingType.getName(),
@@ -357,8 +385,34 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildFathersSubtree(DefaultMutableTreeNode parent) {
-        for (FoundingFather foundingFather : FreeCol.getSpecification().getFoundingFathers()) {
+        for (FoundingFather foundingFather : Specification.getSpecification().getFoundingFathers()) {
             buildFatherItem(foundingFather, parent);
+        }
+    }
+    
+    /**
+     * Builds the buttons for all the nations.
+     * @param parent
+     */
+    private void buildNationsSubtree(DefaultMutableTreeNode parent) {
+        for (Nation type : Specification.getSpecification().getEuropeanNations()) {
+            buildNationItem(type, parent);
+        }
+        for (Nation type : Specification.getSpecification().getIndianNations()) {
+            buildNationItem(type, parent);
+        }
+    }
+    
+    /**
+     * Builds the buttons for all the nation types.
+     * @param parent
+     */
+    private void buildNationTypesSubtree(DefaultMutableTreeNode parent) {
+        for (EuropeanNationType type : Specification.getSpecification().getEuropeanNationTypes()) {
+            buildNationTypeItem(type, parent);
+        }
+        for (IndianNationType type : Specification.getSpecification().getIndianNationTypes()) {
+            buildNationTypeItem(type, parent);
         }
     }
     
@@ -430,6 +484,35 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         parent.add(item);
     }
 
+    /**
+     * Builds the button for the given nation.
+     * 
+     * @param foundingNation
+     * @param parent
+     */
+    private void buildNationItem(Nation nation, DefaultMutableTreeNode parent) {
+        String name = nation.getName();
+        ImageIcon icon = library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f);
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(nation,
+                                                                                       name, icon));
+        parent.add(item);
+    }
+
+    /**
+     * Builds the button for the given nation type.
+     * 
+     * @param foundingNation
+     * @param parent
+     */
+    private void buildNationTypeItem(NationType nationType, DefaultMutableTreeNode parent) {
+        String name = nationType.getName();
+        //ImageIcon icon = library.getCoatOfArmsImageIcon(nation);
+        ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
+        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(nationType,
+                                                                                       name, icon));
+        parent.add(item);
+    }
+
     private JButton getButton(String text, ImageIcon icon) {
         JButton button = new JButton(text, icon);
         button.setOpaque(false);
@@ -479,7 +562,11 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
 
     private JButton getUnitButton(final UnitType unitType) {
-        JButton unitButton = getButton(unitType.getName(), library.getUnitImageIcon(unitType));
+        return getUnitButton(unitType, Role.DEFAULT);
+    }
+
+    private JButton getUnitButton(final UnitType unitType, Role role) {
+        JButton unitButton = getButton(unitType.getName(), library.getUnitImageIcon(unitType, role));
         unitButton.setHorizontalAlignment(SwingConstants.LEFT);
         unitButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
@@ -492,6 +579,17 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             });
         return unitButton;
     }
+
+    private JButton getNationTypeButton(final NationType nationType) {
+        JButton nationTypeButton = getButton(nationType.getName(), null);
+        nationTypeButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    initialize(PanelType.NATION_TYPES, nationType);
+                }
+            });
+        return nationTypeButton;
+    }
+
 
 
     /**
@@ -684,7 +782,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             skill = String.valueOf(type.getSkill());
             schoolPanel = new JPanel();
             schoolPanel.setOpaque(false);
-            for (final BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+            for (final BuildingType buildingType : Specification.getSpecification().getBuildingTypeList()) {
                 if (buildingType.hasAbility("model.ability.teach") && 
                     buildingType.canAdd(type)) {
                     schoolPanel.add(getBuildingButton(buildingType));
@@ -694,7 +792,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         JPanel productionPanel = null;
         List<Modifier> bonusList = new ArrayList<Modifier>();
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
             bonusList.addAll(type.getModifierSet(goodsType.getId()));
         }
         int bonusNumber = bonusList.size();
@@ -718,7 +816,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             int row = 1;
             int column = 1;
             for (Modifier productionBonus : bonusList) {
-                GoodsType goodsType = FreeCol.getSpecification().getGoodsType(productionBonus.getId());
+                GoodsType goodsType = Specification.getSpecification().getGoodsType(productionBonus.getId());
                 String bonus = getModifierAsString(productionBonus);
                 productionPanel.add(getGoodsButton(goodsType, bonus),
                                     higConst.rc(row, column));
@@ -942,7 +1040,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         for (Entry<String, Boolean> entry : buildingType.getAbilitiesRequired().entrySet()) {
             if (entry.getValue()) {
                 requiresText.append(Messages.message(entry.getKey() + ".name"));
-                for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+                for (FoundingFather father : Specification.getSpecification().getFoundingFathers()) {
                     if (father.hasAbility(entry.getKey())) {
                         // TODO: this assumes that a particular
                         // ability is granted only by a FoundingFather
@@ -976,7 +1074,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         // Specialist
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.specialist")), higConst.rc(row, leftColumn));
-        final UnitType unitType = FreeCol.getSpecification().getExpertForProducing(buildingType.getProducedGoodsType());
+        final UnitType unitType = Specification.getSpecification().getExpertForProducing(buildingType.getProducedGoodsType());
         if (unitType != null) {
             detailPanel.add(getUnitButton(unitType), higConst.rc(row, rightColumn, "l"));
         }
@@ -1060,6 +1158,152 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
     
     /**
+     * Builds the details panel for the given nation.
+     * 
+     * @param nation - the Nation
+     */
+    private void buildNationDetail(Nation nation) {
+        detailPanel.removeAll();
+        detailPanel.repaint();
+        if (nation == null) {
+            return;
+        }
+
+        int[] widths = { 0, 3 * margin, 0 };
+        int[] heights = new int[9];
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = margin;
+        }
+        int row = 1;
+        int leftColumn = 1;
+        int rightColumn = 3;
+
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(rightColumn, 1);
+        detailPanel.setLayout(layout);
+
+        JLabel name = new JLabel(nation.getName(), SwingConstants.CENTER);
+        name.setFont(smallHeaderFont);
+        detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
+        row += 2;
+
+        JLabel artLabel = new JLabel(library.getMonarchImageIcon(nation));
+        detailPanel.add(artLabel, higConst.rc(row, rightColumn, "l"));
+        row += 2;
+
+        JLabel rulerLabel = new JLabel(Messages.message("colopedia.nation.ruler"));
+        detailPanel.add(rulerLabel, higConst.rc(row, leftColumn));
+        JLabel rulerName = new JLabel(nation.getRulerName());
+        detailPanel.add(rulerName, higConst.rc(row, rightColumn, "l"));
+        row += 2;
+
+        JLabel defaultLabel = new JLabel(Messages.message("colopedia.nation.defaultAdvantage"));
+        detailPanel.add(defaultLabel, higConst.rc(row, leftColumn));
+        JButton defaultAdvantage = getNationTypeButton(nation.getType());
+        detailPanel.add(defaultAdvantage, higConst.rc(row, rightColumn, "l"));
+        row += 2;
+
+        JLabel currentLabel = new JLabel(Messages.message("colopedia.nation.currentAdvantage"));
+        detailPanel.add(currentLabel, higConst.rc(row, leftColumn));
+        JButton currentAdvantage = getNationTypeButton(nation.getType());
+        detailPanel.add(currentAdvantage, higConst.rc(row, rightColumn, "l"));
+
+        detailPanel.validate();
+    }
+    
+    /**
+     * Builds the details panel for the given nation type.
+     * 
+     * @param nation - the NationType
+     */
+    private void buildNationTypeDetail(NationType nationType) {
+        if (nationType instanceof EuropeanNationType) {
+            buildEuropeanNationTypeDetail((EuropeanNationType) nationType);
+        } else if (nationType instanceof IndianNationType) {
+            //buildIndianNationTypeDetail((IndianNationType) nationType);
+            detailPanel.removeAll();
+            detailPanel.repaint();
+        }
+    }
+
+
+    /**
+     * Builds the details panel for the given nation type.
+     * 
+     * @param nation - the EuropeanNationType
+     */
+    private void buildEuropeanNationTypeDetail(EuropeanNationType nationType) {
+        detailPanel.removeAll();
+        detailPanel.repaint();
+        if (nationType == null) {
+            return;
+        }
+
+        List<AbstractUnit> startingUnits = nationType.getStartingUnits();
+        Set<Ability> abilities = nationType.getFeatureContainer().getAbilities();
+        Set<Modifier> modifiers = nationType.getFeatureContainer().getModifiers();
+        int numberOfRows = 3 + abilities.size() + modifiers.size() + startingUnits.size();
+
+        int[] widths = { 0, 3 * margin, 0 };
+        int[] heights = new int[numberOfRows * 2];
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = margin;
+        }
+        int row = 1;
+        int leftColumn = 1;
+        int rightColumn = 3;
+
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(rightColumn, 1);
+        detailPanel.setLayout(layout);
+
+        JLabel name = new JLabel(nationType.getName(), SwingConstants.CENTER);
+        name.setFont(smallHeaderFont);
+        detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
+        row += 2;
+
+        JLabel units = new JLabel(Messages.message("colopedia.nationType.units"));
+        detailPanel.add(units, higConst.rc(row, leftColumn));
+        if (startingUnits.isEmpty()) {
+            row += 2;
+        } else {
+            for (AbstractUnit startingUnit : startingUnits) {
+                detailPanel.add(getUnitButton(startingUnit.getUnitType(), startingUnit.getRole()),
+                                higConst.rc(row, rightColumn, "r"));
+                row += 2;
+            }
+        }
+
+        JLabel abilityLabel = new JLabel(Messages.message("abilities"));
+        detailPanel.add(abilityLabel, higConst.rc(row, leftColumn));
+        row += 2;
+        if (!abilities.isEmpty()) {
+            String trueString = Messages.message("true");
+            String falseString = Messages.message("false");
+            for (Ability ability : abilities) {
+                detailPanel.add(new JLabel(ability.getName()), higConst.rc(row, leftColumn, "l"));
+                String value = ability.getValue() ? trueString : falseString;
+                detailPanel.add(new JLabel(value), higConst.rc(row, rightColumn, "r"));
+                row += 2;
+            }
+        }
+
+        JLabel modifierLabel = new JLabel(Messages.message("modifiers"));
+        detailPanel.add(modifierLabel, higConst.rc(row, leftColumn));
+        row += 2;
+        if (!modifiers.isEmpty()) {
+            for (Modifier modifier : modifiers) {
+                detailPanel.add(new JLabel(modifier.getName()), higConst.rc(row, leftColumn, "l"));
+                detailPanel.add(new JLabel(getModifierAsString(modifier)),
+                                higConst.rc(row, rightColumn, "r"));
+                row += 2;
+            }
+        }
+
+        detailPanel.validate();
+    }
+    
+    /**
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
      * 
@@ -1091,27 +1335,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             ColopediaTreeItem nodeItem = (ColopediaTreeItem)node.getUserObject();
 
             if (parentItem.getPanelType() != null) {
-                switch(parentItem.getPanelType()) {
-                case TERRAIN:
-                    buildTerrainDetail((TileType) nodeItem.getFreeColGameObjectType());
-                    break;
-                case RESOURCES:
-                    buildResourceDetail((ResourceType) nodeItem.getFreeColGameObjectType());
-                    break;
-                case UNITS:
-                case SKILLS:
-                    buildUnitDetail((UnitType) nodeItem.getFreeColGameObjectType());
-                    break;
-                case GOODS:
-                    buildGoodsDetail((GoodsType) nodeItem.getFreeColGameObjectType());
-                    break;
-                case BUILDINGS:
-                    buildBuildingDetail((BuildingType) nodeItem.getFreeColGameObjectType());
-                    break;
-                case FATHERS:
-                    buildFatherDetail((FoundingFather) nodeItem.getFreeColGameObjectType());
-                    break;
-                }
+                selectDetail(parentItem.getPanelType(), nodeItem.getFreeColGameObjectType());
             }
         }
     }

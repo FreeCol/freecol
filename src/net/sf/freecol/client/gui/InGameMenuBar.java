@@ -39,6 +39,8 @@ import net.sf.freecol.client.gui.action.ClearOrdersAction;
 import net.sf.freecol.client.gui.action.ColopediaBuildingAction;
 import net.sf.freecol.client.gui.action.ColopediaFatherAction;
 import net.sf.freecol.client.gui.action.ColopediaGoodsAction;
+import net.sf.freecol.client.gui.action.ColopediaNationAction;
+import net.sf.freecol.client.gui.action.ColopediaNationTypeAction;
 import net.sf.freecol.client.gui.action.ColopediaSkillAction;
 import net.sf.freecol.client.gui.action.ColopediaTerrainAction;
 import net.sf.freecol.client.gui.action.ColopediaUnitAction;
@@ -89,12 +91,12 @@ import net.sf.freecol.client.gui.menu.DebugMenu;
 
 /**
  * This is the menu bar used in-game.
- * 
+ *
  * <br><br>
- * 
+ *
  * The menu bar that is displayed on the top left corner of the
  * <code>Canvas</code>.
- * 
+ *
  * @see Canvas#setJMenuBar
  * @see MapEditorMenuBar
  */
@@ -129,7 +131,7 @@ public class InGameMenuBar extends FreeColMenuBar {
     /**
      * Creates a new <code>FreeColMenuBar</code>. This menu bar will include
      * all of the submenus and items.
-     * 
+     *
      * @param f The main controller.
      */
     public InGameMenuBar(FreeColClient f) {
@@ -150,19 +152,19 @@ public class InGameMenuBar extends FreeColMenuBar {
         // Okay, I lied.. the update() and paintComponent() methods in this
         // MenuBar use freeColClient, too. But so what.
         // Move those to another class too. :)
-        
+
         super(f);
 
         reset();
     }
 
-    
+
     /**
      * Resets this menu bar.
      */
     public void reset() {
         removeAll();
-        
+
         buildGameMenu();
         buildViewMenu();
         buildOrdersMenu();
@@ -176,7 +178,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         update();
     }
-    
+
     private void buildGameMenu() {
         // --> Game
         JMenu menu = new JMenu(Messages.message("menuBar.game"));
@@ -314,19 +316,21 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ColopediaGoodsAction.id));
         menu.add(getMenuItem(ColopediaSkillAction.id));
         menu.add(getMenuItem(ColopediaBuildingAction.id));
-        menu.add(getMenuItem(ColopediaFatherAction.id));        
-        menu.addSeparator();        
+        menu.add(getMenuItem(ColopediaFatherAction.id));
+        menu.add(getMenuItem(ColopediaNationAction.id));
+        menu.add(getMenuItem(ColopediaNationTypeAction.id));
+        menu.addSeparator();
         menu.add(getMenuItem(AboutAction.id));
-        
+
         add(menu);
     }
-    
+
     /**
      * Paints information about gold, tax and year.
      */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
+
         String displayString = Messages.message("menuBar.statusLine",
                 "%gold%", Integer.toString(freeColClient.getMyPlayer().getGold()),
                 "%tax%", Integer.toString(freeColClient.getMyPlayer().getTax()),

@@ -36,6 +36,22 @@ public class FeatureContainer {
     private Map<String, Set<Ability>> abilities = new HashMap<String, Set<Ability>>();
     private Map<String, Set<Modifier>> modifiers = new HashMap<String, Set<Modifier>>();
 
+    public Set<Ability> getAbilities() {
+        Set<Ability> result = new HashSet<Ability>();
+        for (Set<Ability> abilitySet : abilities.values()) {
+            result.addAll(abilitySet);
+        }
+        return result;
+    }
+
+    public Set<Modifier> getModifiers() {
+        Set<Modifier> result = new HashSet<Modifier>();
+        for (Set<Modifier> modifierSet : modifiers.values()) {
+            result.addAll(modifierSet);
+        }
+        return result;
+    }
+
     /**
      * Returns a Set of Abilities with the given ID.
      *

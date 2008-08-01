@@ -65,7 +65,6 @@ public class ActionManager extends OptionGroup {
         add(new AboutAction(freeColClient));
         add(new AssignTradeRouteAction(freeColClient));
         add(new BuildColonyAction(freeColClient));
-        // add(new BuildRoadAction(freeColClient));         // Depreciated
         add(new ChangeAction(freeColClient));
         add(new ChangeWindowedModeAction(freeColClient));
         add(new ChatAction(freeColClient));
@@ -73,6 +72,8 @@ public class ActionManager extends OptionGroup {
         add(new ColopediaBuildingAction(freeColClient));
         add(new ColopediaFatherAction(freeColClient));
         add(new ColopediaGoodsAction(freeColClient));
+        add(new ColopediaNationAction(freeColClient));
+        add(new ColopediaNationTypeAction(freeColClient));
         add(new ColopediaSkillAction(freeColClient));
         add(new ColopediaTerrainAction(freeColClient));
         add(new ColopediaUnitAction(freeColClient));
@@ -100,7 +101,6 @@ public class ActionManager extends OptionGroup {
         add(new NewEmptyMapAction(freeColClient));
         add(new OpenAction(freeColClient));
         add(new PreferencesAction(freeColClient));
-        // add(new PlowAction(freeColClient));              // Depreciated
         add(new ReconnectAction(freeColClient));
         add(new RenameAction(freeColClient));
         add(new ReportContinentalCongressAction(freeColClient));

@@ -31,6 +31,8 @@ import net.sf.freecol.client.gui.action.ChangeWindowedModeAction;
 import net.sf.freecol.client.gui.action.ColopediaBuildingAction;
 import net.sf.freecol.client.gui.action.ColopediaFatherAction;
 import net.sf.freecol.client.gui.action.ColopediaGoodsAction;
+import net.sf.freecol.client.gui.action.ColopediaNationAction;
+import net.sf.freecol.client.gui.action.ColopediaNationTypeAction;
 import net.sf.freecol.client.gui.action.ColopediaSkillAction;
 import net.sf.freecol.client.gui.action.ColopediaTerrainAction;
 import net.sf.freecol.client.gui.action.ColopediaUnitAction;
@@ -55,12 +57,12 @@ import net.sf.freecol.client.gui.menu.DebugMenu;
 
 /**
  * The menu bar used when running in editor mode.
- * 
+ *
  * <br><br>
- * 
+ *
  * The menu bar that is displayed on the top left corner of the
  * <code>Canvas</code>.
- * 
+ *
  * @see Canvas#setJMenuBar
  * @see InGameMenuBar
  */
@@ -75,7 +77,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
     /**
      * Creates a new <code>MapEditorMenuBar</code>. This menu bar will include
      * all of the submenus and items.
-     * 
+     *
      * @param freeColClient The main controller.
      */
     public MapEditorMenuBar(final FreeColClient freeColClient) {
@@ -83,14 +85,14 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
         reset();
     }
-    
-    
+
+
     /**
      * Resets this menu bar.
      */
     public void reset() {
         removeAll();
-        
+
         buildGameMenu();
         buildViewMenu();
         buildToolsMenu();
@@ -112,9 +114,9 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(NewAction.id));
         menu.add(getMenuItem(NewEmptyMapAction.id));
-        
+
         menu.addSeparator();
-        
+
         menu.add(getMenuItem(OpenAction.id));
         menu.add(getMenuItem(SaveAction.id));
 
@@ -129,7 +131,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
 
         add(menu);
     }
-    
+
     private void buildViewMenu() {
         // --> View
 
@@ -143,27 +145,27 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getCheckBoxMenuItem(DisplayRegionAction.id));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.id));
         menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.id));
-        
+
         menu.addSeparator();
         menu.add(getMenuItem(ZoomInAction.id));
         menu.add(getMenuItem(ZoomOutAction.id));
 
         add(menu);
     }
-    
+
     private void buildToolsMenu() {
         // --> Tools
-        
+
         JMenu menu = new JMenu(Messages.message("menuBar.tools"));
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_T);
-        
+
         menu.add(getMenuItem(ScaleMapAction.id));
         menu.add(getMenuItem(DetermineHighSeasAction.id));
-        
+
         add(menu);
     }
-    
+
     private void buildColopediaMenu() {
         // --> Colopedia
 
@@ -177,7 +179,9 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ColopediaSkillAction.id));
         menu.add(getMenuItem(ColopediaBuildingAction.id));
         menu.add(getMenuItem(ColopediaFatherAction.id));
-        menu.addSeparator();        
+        menu.add(getMenuItem(ColopediaNationAction.id));
+        menu.add(getMenuItem(ColopediaNationTypeAction.id));
+        menu.addSeparator();
         menu.add(getMenuItem(AboutAction.id));
 
         add(menu);
