@@ -294,7 +294,7 @@ public class ClientOptions extends OptionMap {
     /**
      * If enabled: Automatically ends the turn when no units can be made active.
      */
-    public static final String AUTO_END_TURN = "autoEndTurn";
+    public static final String AUTO_END_TURN = "model.option.autoEndTurn";
 
     /**
      * Comparators for sorting colonies.
