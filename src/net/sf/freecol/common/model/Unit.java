@@ -1883,19 +1883,19 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *                a valid pioneer.
      */
     public void work(TileImprovement improvement) {
-    	
-    	if (!hasAbility("model.ability.improveTerrain")) {
+        
+        if (!hasAbility("model.ability.improveTerrain")) {
             throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
         }
-    	
-    	if (!canPerformImprovement(improvement.getType())){
+        
+        if (!canPerformImprovement(improvement.getType())){
             throw new IllegalArgumentException("Cannot perform this improvement for this tile");
-    	}
-    	
-    	if (improvement == null){
+        }
+        
+        if (improvement == null){
             throw new IllegalArgumentException("Cannot perform this improvement for this tile");
-    	}
-    	
+        }
+        
         setWorkImprovement(improvement);
         setState(UnitState.IMPROVING);
         // No need to set Location, stay at the tile it is on.
@@ -2477,17 +2477,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public String getOccupationIndicator() {
 
         if (getDestination() != null) {
-        	if(getTradeRoute() != null)
-        		return Messages.message("model.unit.occupation.inTradeRoute");
-        	else
-        		return Messages.message("model.unit.occupation.goingSomewhere");
+                if(getTradeRoute() != null)
+                        return Messages.message("model.unit.occupation.inTradeRoute");
+                else
+                        return Messages.message("model.unit.occupation.goingSomewhere");
         } else if (state == UnitState.IMPROVING && workImprovement != null) {
             return workImprovement.getOccupationString();
         } else if (state == UnitState.ACTIVE && getMovesLeft() == 0) {
-        	if(isUnderRepair())
-        		return Messages.message("model.unit.occupation.underRepair");
-        	else
-        		return Messages.message("model.unit.occupation.activeNoMovesLeft");
+                if(isUnderRepair())
+                        return Messages.message("model.unit.occupation.underRepair");
+                else
+                        return Messages.message("model.unit.occupation.activeNoMovesLeft");
         } else {
             return Messages.message("model.unit.occupation." + state.toString().toLowerCase());
         }
@@ -2548,13 +2548,33 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * in this method-call, in which case the state is set back to UnitState.ACTIVE.
      * 
      * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
-     *            FORTIFIED, ...}.
+     *            UnitState.FORTIFIED, ...}.
      */
     public void setState(UnitState s) {
+        // No need to do anything when the state is unchanged
+        if (state == s) {
+            return;
+        }
+
         if (!checkSetState(s)) {
             throw new IllegalStateException("Illegal state: " + s);
         }
 
+        // Cleanup the old UnitState, for example destroy the
+        // TileImprovment being built by a pioneer.
+        switch (state) {
+        case IMPROVING: 
+            if (workLeft > 0) {
+                workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
+                workImprovement = null;
+            }
+            break;
+        default:
+            // do nothing
+            break;
+        }
+
+        // Now initiate the new UnitState
         switch (s) {
         case ACTIVE:
             workLeft = -1;
@@ -2838,10 +2858,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return number of turns of work left.
      */
     public int getWorkLeft() {
-    	if (state == UnitState.IMPROVING && unitType.hasAbility("model.ability.expertPioneer")){
+        if (state == UnitState.IMPROVING && unitType.hasAbility("model.ability.expertPioneer")){
             return workLeft / 2;
-    	}
-    	
+        }
+        
         return workLeft;
     }
 
@@ -2885,13 +2905,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
                 switch (state) {
                 case TO_EUROPE:
-                	// trade unit arrives in Europe
-                	if(this.getTradeRoute() != null){
-                		setMovesLeft(0);
-                		setState(UnitState.ACTIVE);
-                		return;
-                	}
-                	
+                        // trade unit arrives in Europe
+                        if(this.getTradeRoute() != null){
+                                setMovesLeft(0);
+                                setState(UnitState.ACTIVE);
+                                return;
+                        }
+                        
                     addModelMessage(getOwner().getEurope(), ModelMessage.MessageType.DEFAULT, this,
                                     "model.unit.arriveInEurope",
                                     "%europe%", getOwner().getEurope().getName());
