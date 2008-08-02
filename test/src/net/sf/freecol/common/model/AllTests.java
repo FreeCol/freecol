@@ -33,6 +33,7 @@ public class AllTests {
 	suite.addTestSuite(ColonyConsumptionTest.class);
 	suite.addTestSuite(CombatTest.class);
 	suite.addTestSuite(ContactTest.class);
+	suite.addTestSuite(DefaultCostDeciderTest.class);
 	suite.addTestSuite(DemotionTest.class);
 	suite.addTestSuite(FoundingFatherTest.class);
 	suite.addTestSuite(GameTest.class);
