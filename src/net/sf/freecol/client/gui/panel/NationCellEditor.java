@@ -17,10 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.panel;
-
-//import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
@@ -28,21 +25,18 @@ import javax.swing.JComboBox;
 import net.sf.freecol.common.model.Nation;
 
 /**
-* A table cell editor that can be used to select a nation.
-*/
+ * A table cell editor that can be used to select a nation.
+ */
 public final class NationCellEditor extends DefaultCellEditor {
 
-
-    
     /**
-    * A standard constructor.
-    */
+     * A standard constructor.
+     */
     public NationCellEditor(Nation[] nations) {
         super(new JComboBox(nations));
     }
     
     public Object getCellEditorValue() {
-        //return new Integer(((JComboBox) getComponent()).getSelectedIndex());
         return ((JComboBox) getComponent()).getSelectedItem();
     }
 }

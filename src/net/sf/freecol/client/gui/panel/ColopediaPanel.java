@@ -410,10 +410,23 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildNationTypesSubtree(DefaultMutableTreeNode parent) {
-        for (EuropeanNationType type : Specification.getSpecification().getEuropeanNationTypes()) {
-            buildNationTypeItem(type, parent);
+        List<NationType> nations = new ArrayList<NationType>();
+        List<NationType> refNations = new ArrayList<NationType>();
+        List<NationType> indianNations = new ArrayList<NationType>();
+        for (NationType type : Specification.getSpecification().getNationTypes()) {
+            if (type.isEuropean()) {
+                if (type.isREF()) {
+                    refNations.add(type);
+                } else {
+                    nations.add(type);
+                }
+            } else {
+                indianNations.add(type);
+            }
         }
-        for (IndianNationType type : Specification.getSpecification().getIndianNationTypes()) {
+        nations.addAll(refNations);
+        nations.addAll(indianNations);
+        for (NationType type : nations) {
             buildNationTypeItem(type, parent);
         }
     }

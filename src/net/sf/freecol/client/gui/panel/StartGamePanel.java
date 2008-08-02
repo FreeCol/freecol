@@ -23,6 +23,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,6 +33,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -38,12 +41,15 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableCellRenderer;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
@@ -58,14 +64,10 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class StartGamePanel extends FreeColPanel implements ActionListener {
 
-
-
-
     private static final Logger logger = Logger.getLogger(StartGamePanel.class.getName());
 
     private static final int START = 0, CANCEL = 1,
-    // MAPSIZE = 2,
-            READY = 3, CHAT = 4, GAME_OPTIONS = 5, MAP_GENERATOR_OPTIONS = 6;
+        READY = 3, CHAT = 4, GAME_OPTIONS = 5, MAP_GENERATOR_OPTIONS = 6;
 
 
     public static final int NAME_COLUMN = 0, NATION_COLUMN = 1, ADVANTAGE_COLUMN = 2, COLOR_COLUMN = 3;
@@ -97,6 +99,59 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     private JButton mapGeneratorOptions;
 
     private int advantages;
+
+
+    private class HeaderRenderer implements TableCellRenderer {
+
+        private static final int NO_COLUMN = -1;
+        private int pressedColumn = NO_COLUMN;
+        private Component[] components;
+
+        public HeaderRenderer(Component... components) {
+            this.components = components;
+        }
+
+        public Component getTableCellRendererComponent(JTable table,
+                                                       Object value,
+                                                       boolean isSelected,
+                                                       boolean hasFocus,
+                                                       int row,
+                                                       int column) {
+            if (components[column] instanceof JButton) {
+                boolean isPressed = (column == pressedColumn);
+                ((JButton) components[column]).getModel().setPressed(isPressed);
+                ((JButton) components[column]).getModel().setArmed(isPressed);
+            }
+            return components[column];
+        }
+
+        public void setPressedColumn(int column) {
+            pressedColumn = column;
+        }
+    }
+
+    private class HeaderListener extends MouseAdapter {
+        JTableHeader header;
+
+        HeaderRenderer renderer;
+
+        HeaderListener(JTableHeader header, HeaderRenderer renderer) {
+            this.header = header;
+            this.renderer = renderer;
+        }
+
+        public void mousePressed(MouseEvent e) {
+            int col = header.columnAtPoint(e.getPoint());
+            renderer.setPressedColumn(col);
+            header.repaint();
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            renderer.setPressedColumn(HeaderRenderer.NO_COLUMN);
+            header.repaint();
+        }
+    }
+
 
     /**
      * The constructor that will add the items to this panel.
@@ -222,11 +277,33 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         tableModel.setData(game.getPlayers(), thisPlayer, advantages);
 
+        JLabel playerLabel = new JLabel(Messages.message("player"));
+        JButton nationButton = new JButton(Messages.message("nation"));
+        JButton advantageButton = new JButton(Messages.message("advantage"));
+        JLabel colorLabel = new JLabel(Messages.message("color"));
+
+        nationButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    parent.showColopediaPanel(PanelType.NATIONS);
+                }
+            });
+
+        advantageButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    parent.showColopediaPanel(PanelType.NATION_TYPES);
+                }
+            });
+
+        HeaderRenderer renderer = new HeaderRenderer(playerLabel, nationButton, advantageButton, colorLabel);
+        JTableHeader header = table.getTableHeader();
+        header.addMouseListener(new HeaderListener(header, renderer));
+
         TableColumn nationsColumn = table.getColumnModel().getColumn(NATION_COLUMN);
         nationsColumn.setCellEditor(new DefaultCellEditor(new JComboBox(nations)));
         nationsColumn.setCellRenderer(new NationCellRenderer(nations));
         ((NationCellRenderer) table.getColumnModel().getColumn(NATION_COLUMN).getCellRenderer())
         .setData(game.getPlayers(), thisPlayer);
+        nationsColumn.setHeaderRenderer(renderer);
 
         TableColumn advantagesColumn = table.getColumnModel().getColumn(ADVANTAGE_COLUMN);
         if (advantages == AdvantageCellRenderer.SELECTABLE) {
@@ -235,6 +312,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         advantagesColumn.setCellRenderer(new AdvantageCellRenderer());
         ((AdvantageCellRenderer) table.getColumnModel().getColumn(ADVANTAGE_COLUMN).getCellRenderer())
         .setData(game.getPlayers(), thisPlayer, advantages);
+        advantagesColumn.setHeaderRenderer(renderer);
         
         ((ColorCellEditor) table.getColumnModel().getColumn(COLOR_COLUMN).getCellEditor())
         .setData(game.getPlayers(), thisPlayer);
