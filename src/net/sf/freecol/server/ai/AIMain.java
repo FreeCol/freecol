@@ -323,7 +323,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         if (o != null) {
             o.dispose();
         }
-        //removeAIObject(id);
+        removeAIObject(id);
     }
 
     /**
@@ -342,14 +342,16 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         Iterator<AIObject> i = aiObjects.values().iterator();
         while (i.hasNext()) {
             AIObject aio = i.next();
+            
+            if ((aio instanceof Wish) && !((Wish) aio).shouldBeStored()) {
+                continue;
+            }
 
             try {
-                if (!(aio instanceof Wish) || ((Wish) aio).shouldBeStored()) {
-                    if (aio.getId() != null) {
-                        aio.toXML(out);
-                    } else {
-                        logger.warning("aio.getId() == null, for: " + aio.getClass().getName());
-                    }
+                if (aio.getId() != null) {
+                    aio.toXML(out);
+                } else {
+                    logger.warning("aio.getId() == null, for: " + aio.getClass().getName());
                 }
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
