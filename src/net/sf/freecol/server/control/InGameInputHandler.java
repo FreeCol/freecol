@@ -1062,10 +1062,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (tile.getOwner() != null && !tile.getOwner().isEuropean()) {
                 choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, dx));
             }
-            // only these units can be promoted
-            if (!learntUnitTypes.isEmpty()) {
-                choices.add(new RandomChoice<RumourType>(RumourType.LEARN, (max - dx) * 3));
-            }
+        }
+        // only these units can be promoted
+        if (!learntUnitTypes.isEmpty()) {
+            choices.add(new RandomChoice<RumourType>(RumourType.LEARN, (max - dx) * 3));
         }
         /**
          * The higher the difficulty, the less likely good things are to happen.
