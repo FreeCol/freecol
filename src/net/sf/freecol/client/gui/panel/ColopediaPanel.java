@@ -74,6 +74,8 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.util.Utils;
 import cz.autel.dmi.HIGLayout;
 
 /**
@@ -1220,9 +1222,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         if (nationType instanceof EuropeanNationType) {
             buildEuropeanNationTypeDetail((EuropeanNationType) nationType);
         } else if (nationType instanceof IndianNationType) {
-            //buildIndianNationTypeDetail((IndianNationType) nationType);
-            detailPanel.removeAll();
-            detailPanel.repaint();
+            buildIndianNationTypeDetail((IndianNationType) nationType);
         }
     }
 
@@ -1242,7 +1242,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         List<AbstractUnit> startingUnits = nationType.getStartingUnits();
         Set<Ability> abilities = nationType.getFeatureContainer().getAbilities();
         Set<Modifier> modifiers = nationType.getFeatureContainer().getModifiers();
-        int numberOfRows = 3 + abilities.size() + modifiers.size() + startingUnits.size();
+        int numberOfRows = 4 + abilities.size() + modifiers.size() + startingUnits.size();
 
         int[] widths = { 0, 3 * margin, 0 };
         int[] heights = new int[numberOfRows * 2];
@@ -1302,6 +1302,87 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         detailPanel.validate();
     }
+
+
+    /**
+     * Builds the details panel for the given nation type.
+     * 
+     * @param nation - the IndianNationType
+     */
+    private void buildIndianNationTypeDetail(IndianNationType nationType) {
+        detailPanel.removeAll();
+        detailPanel.repaint();
+        if (nationType == null) {
+            return;
+        }
+
+        List<RandomChoice<UnitType>> skills = nationType.getSkills();
+        int numberOfRows = 6;
+
+        int[] widths = { 0, 3 * margin, 0 };
+        int[] heights = new int[numberOfRows * 2];
+        for (int index = 1; index < heights.length; index += 2) {
+            heights[index] = margin;
+        }
+        int row = 1;
+        int leftColumn = 1;
+        int rightColumn = 3;
+
+        HIGLayout layout = new HIGLayout(widths, heights);
+        layout.setColumnWeight(rightColumn, 1);
+        detailPanel.setLayout(layout);
+
+        JLabel name = new JLabel(nationType.getName(), SwingConstants.CENTER);
+        name.setFont(smallHeaderFont);
+        detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
+        row += 2;
+
+        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.aggression")),
+                        higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.aggression." +
+                                                    nationType.getAggression().toString().toLowerCase())),
+                        higConst.rc(row, rightColumn, "r"));
+        row += 2;
+
+        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.numberOfSettlements")),
+                        higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.numberOfSettlements." +
+                                                    nationType.getNumberOfSettlements().toString().toLowerCase())),
+                        higConst.rc(row, rightColumn, "r"));
+        row += 2;
+
+        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.typeOfSettlements")),
+                        higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(nationType.getSettlementTypeAsString(),
+                                   new ImageIcon(library.getSettlementImage(nationType.getTypeOfSettlement())),
+                                   SwingConstants.CENTER),
+                        higConst.rc(row, rightColumn, "r"));
+        row += 2;
+
+        List<String> regionNames = new ArrayList<String>();
+        for (String regionName : nationType.getRegionNames()) {
+            regionNames.add(Messages.message(regionName + ".name"));
+        }
+        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.regions")),
+                        higConst.rc(row, leftColumn));
+        detailPanel.add(new JLabel(Utils.join(", ", regionNames)),
+                        higConst.rc(row, rightColumn, "r"));
+        row += 2;
+
+        detailPanel.add(new JLabel(Messages.message("colopedia.nationType.skills")),
+                        higConst.rc(row, leftColumn));
+        GridLayout gridLayout = new GridLayout(0, 2);
+        gridLayout.setHgap(10);
+        JPanel unitPanel = new JPanel(gridLayout);
+        unitPanel.setOpaque(false);
+        for (RandomChoice<UnitType> choice : skills) {
+            unitPanel.add(getUnitButton(choice.getObject()));                          
+        }
+        detailPanel.add(unitPanel,
+                        higConst.rc(row, rightColumn, "r"));
+        detailPanel.validate();
+    }
+
     
     /**
      * This function analyses an event and calls the right methods to take care

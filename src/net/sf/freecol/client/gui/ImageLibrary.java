@@ -1176,6 +1176,16 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * Returns the graphics that will represent the given settlement.
      * 
+     * @param settlementType The type of settlement whose graphics type is needed.
+     * @return The graphics that will represent the given settlement.
+     */
+    public Image getSettlementImage(SettlementType settlementType) {
+        return settlements.get(settlementType);
+    }
+
+    /**
+     * Returns the graphics that will represent the given settlement.
+     * 
      * @param settlement The settlement whose graphics type is needed.
      * @return The graphics that will represent the given settlement.
      */

@@ -21,6 +21,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -257,6 +259,15 @@ public class IndianNationType extends NationType {
                 in.nextTag(); // close this element
             }
         }
+
+        // sort skill according to probability
+        Collections.sort(skills, new Comparator<RandomChoice<UnitType>>() {
+                public int compare(RandomChoice<UnitType> choice1, RandomChoice<UnitType> choice2) {
+                    return choice2.getProbability() - choice1.getProbability();
+                }
+            });
+
+
     }
 
 }
