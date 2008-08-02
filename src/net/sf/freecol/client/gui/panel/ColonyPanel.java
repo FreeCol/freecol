@@ -1059,6 +1059,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
 
         @Override
+        public Component add(Component comp, boolean editState) {
+            Component result = super.add(comp, editState);
+            if (editState && result != null && result instanceof UnitLabel) {
+                updateSoLLabel();
+            }
+            return result;
+        }
+
+        @Override
         public String getUIClassID() {
             return "CargoPanelUI";
         }
