@@ -3341,7 +3341,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (location instanceof Tile && ((Tile) location).getSettlement() == null) {
             attrition++;
             if (attrition > getType().getMaximumAttrition()) {
-                addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, getType(),
+                addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, this,
                                 "model.unit.attrition", "%unit%", getName());
                 dispose();
             }

@@ -1700,7 +1700,7 @@ public final class InGameController implements NetworkConstants {
             // ship slowed
             unit.setMovesLeft(unit.getMovesLeft() - Integer.parseInt(reply.getAttribute("movesSlowed")));
             Unit slowedBy = (Unit) freeColClient.getGame().getFreeColGameObject(reply.getAttribute("slowedBy"));
-            canvas.showInformationMessage("model.unit.slowed",
+            canvas.showInformationMessage("model.unit.slowed", slowedBy,
                                           "%unit%", unit.getName(), 
                                           "%enemyUnit%", slowedBy.getName(),
                                           "%enemyNation%", slowedBy.getOwner().getNationAsString());
