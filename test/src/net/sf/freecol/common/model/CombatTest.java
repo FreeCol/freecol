@@ -63,7 +63,7 @@ public class CombatTest extends FreeColTestCase {
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
-        tile1.setType(hills);
+        tile1.setType(hills, false);
         assertEquals(hills, tile1.getType());
         tile1.setExploredBy(dutch, true);
         tile1.setExploredBy(french, true);

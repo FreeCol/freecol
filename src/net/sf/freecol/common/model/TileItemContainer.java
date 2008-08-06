@@ -162,11 +162,15 @@ public class TileItemContainer extends FreeColGameObject {
         return resource;
     }
 
-    public void clear() {
+    public void clearResource() {
         if (hasResource()) {
             resource.dispose();
             resource = null;
         }
+    }
+
+    public void clear() {
+        clearResource();
         for (TileImprovement t : improvements) {
             t.dispose();
         }

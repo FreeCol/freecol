@@ -397,7 +397,7 @@ public class River {
                     logger.fine("Added river (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
-                    tile.setType(greatRiver);   // changing the type resets the improvements
+                    tile.setType(greatRiver, true);   // changing the type resets the improvements
                     container.addRiver(section.getSize(), section.encodeStyle());
                     logger.fine("Added fjord (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
