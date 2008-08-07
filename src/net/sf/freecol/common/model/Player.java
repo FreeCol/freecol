@@ -1722,7 +1722,12 @@ public class Player extends FreeColGameObject implements Nameable {
 
         int cost = getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ? crossesRequired : crosses;
 
-        this.crosses -= cost;
+        if (cost > this.crosses) {
+            this.crosses = 0;
+        }
+        else {
+            this.crosses -= cost;
+        }
     }
 
     /**
