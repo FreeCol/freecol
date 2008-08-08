@@ -711,7 +711,7 @@ public class MapGenerator implements IMapGenerator {
                 if (colonyTile != null) {
                     for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
                         if (!t.isWater()) {
-                            colonyTile.setType(t, true);
+                            colonyTile.setType(t);
                             break;
                         }
                     }
@@ -724,7 +724,7 @@ public class MapGenerator implements IMapGenerator {
                         Tile ct = ((ColonyTile) buildColonyUnit.getLocation()).getWorkTile();
                         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
                             if (!t.isWater()) {
-                                ct.setType(t, true);
+                                ct.setType(t);
                                 break;
                             }
                         }
@@ -749,7 +749,7 @@ public class MapGenerator implements IMapGenerator {
                         Tile lt = ((ColonyTile) lumberjack.getLocation()).getWorkTile();
                         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
                             if (t.isForested()) {
-                                lt.setType(t, true);
+                                lt.setType(t);
                                 break;
                             }
                         }

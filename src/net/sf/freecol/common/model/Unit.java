@@ -2970,7 +2970,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     // Perform TileType change if any
                     TileType changeType = getWorkImprovement().getChange(getTile().getType());
                     if (changeType != null) {
-                        getTile().setType(changeType, false);
+                        getTile().setType(changeType);
                     }
                     // Finish up
                     setState(UnitState.ACTIVE);

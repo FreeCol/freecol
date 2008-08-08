@@ -925,20 +925,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Sets the type for this Tile.
      * 
      * @param t The new TileType for this Tile.
-     * @param doClearImprovements decides if tile improvements must be cleared
      */
-    public void setType(TileType t, boolean doClearImprovements) {
+    public void setType(TileType t) {
         if (t == null) {
-            throw new IllegalStateException("Tile type must be valid");
+            throw new IllegalArgumentException("Tile type must not be null");
         }
         type = t;
         if (tileItemContainer != null) {
-            if (doClearImprovements) {
-                getTileItemContainer().clear();
-            } else {
-                getTileItemContainer().clearResource();
-
-            }
+            tileItemContainer.removeIncompatibleImprovements(t);
         }
         if (!isLand()) {
             settlement = null;
@@ -997,7 +991,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             // Get the first land type from TileTypeList
             for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
                 if (!t.isWater()) {
-                    setType(t, true);
+                    setType(t);
                     break;
                 }
             }

@@ -527,7 +527,7 @@ public class TerrainGenerator {
         for (Tile t : map.getAllTiles()) {
             t.setRegion(null);
             if (t.getType() == highSeas) {
-                t.setType(ocean, true);
+                t.setType(ocean);
             }
         }
         
@@ -572,7 +572,7 @@ public class TerrainGenerator {
                           x<map.getWidth() && 
                           !map.isLandWithinDistance(x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(x, y)) {
-                    map.getTile(x, y).setType(highSeas, true);
+                    map.getTile(x, y).setType(highSeas);
                 }
             }
 
@@ -580,7 +580,7 @@ public class TerrainGenerator {
                           x<=map.getWidth()-1 &&
                           !map.isLandWithinDistance(map.getWidth()-x, y, distToLandFromHighSeas); x++) {
                 if (map.isValid(map.getWidth()-x, y)) {
-                    map.getTile(map.getWidth()-x, y).setType(highSeas, true);
+                    map.getTile(map.getWidth()-x, y).setType(highSeas);
                 }
             }
         }
@@ -655,7 +655,7 @@ public class TerrainGenerator {
                     Tile nextTile = map.getTile(p);
                     if (nextTile == null || !nextTile.isLand()) 
                         continue;
-                    nextTile.setType(mountains, true);
+                    nextTile.setType(mountains);
                     mountainRegion.addTile(nextTile);
                     counter++;
                     it = map.getCircleIterator(p, false, 1);
@@ -665,11 +665,11 @@ public class TerrainGenerator {
                             continue;
                         int r = random.nextInt(8);
                         if (r == 0) {
-                            neighborTile.setType(mountains, true);
+                            neighborTile.setType(mountains);
                             mountainRegion.addTile(neighborTile);
                             counter++;
                         } else if (r > 2) {
-                            neighborTile.setType(hills, true);
+                            neighborTile.setType(hills);
                             mountainRegion.addTile(neighborTile);
                         }
                     }
@@ -715,10 +715,10 @@ public class TerrainGenerator {
                 int k = random.nextInt(4);
                 if (k == 0) {
                     // 25% chance of mountain
-                    t.setType(mountains, true);
+                    t.setType(mountains);
                 } else {
                     // 75% chance of hill
-                    t.setType(hills, true);
+                    t.setType(hills);
                 }
                 counter++;
             }

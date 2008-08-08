@@ -201,7 +201,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
         
         public void transform(Tile t) {
-            t.setType(tileType, true);     
+            t.setType(tileType);     
             t.setLostCityRumour(false);
         }
     }
@@ -216,6 +216,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         public void transform(Tile tile) {
             if (tile.getType().canHaveRiver()) {
                 TileItemContainer tic = tile.getTileItemContainer();
+                if (tic == null) {
+                    tile.setTileItemContainer(new TileItemContainer(tile.getGame(), tile));
+                }
                 int oldMagnitude = TileImprovement.NO_RIVER;
                 if (tic.hasRiver()) {
                     oldMagnitude = tic.getRiver().getMagnitude();

@@ -180,6 +180,29 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
+     * Remove improvements incompatible with the given TileType. This
+     * method is called whenever the type of the container's tile
+     * changes, i.e. due to clearing.
+     *
+     * @param tileType a <code>TileType</code> value
+     */
+    public void removeIncompatibleImprovements(TileType tileType) {
+        Iterator<TileImprovement> improvementIterator = getImprovementIterator();
+        while (improvementIterator.hasNext()) {
+            TileImprovement improvement = improvementIterator.next();
+            if (!improvement.getType().isTileTypeAllowed(tileType)) {
+                improvementIterator.remove();
+                if (improvement == road) {
+                    road = null;
+                } else if (improvement == river) {
+                    river = null;
+                }
+                improvement.dispose();
+            }
+        }   
+    }
+
+    /**
      * Gets an <code>Iterator</code> of every <code>TileImprovement</code> in this
      * <code>TileItemContainer</code>.
      *

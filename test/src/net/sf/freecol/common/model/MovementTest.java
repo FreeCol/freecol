@@ -67,7 +67,7 @@ public class MovementTest extends FreeColTestCase {
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
-        tile2.setType(hills, false);
+        tile2.setType(hills);
         tile1.setExploredBy(dutch, true);
         tile2.setExploredBy(dutch, true);
 
