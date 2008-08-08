@@ -51,10 +51,10 @@ import org.w3c.dom.Element;
 
 /**
  * Represents a player. The player can be either a human player or an AI-player.
- * 
+ *
  * <br>
  * <br>
- * 
+ *
  * In addition to storing the name, nation e.t.c. of the player, it also stores
  * various defaults for the player. One example of this is the
  * {@link #getEntryLocation entry location}.
@@ -228,32 +228,32 @@ public class Player extends FreeColGameObject implements Nameable {
 
 
     /**
-     * 
+     *
      * This constructor should only be used by subclasses.
-     * 
+     *
      */
     protected Player() {
         // empty constructor
     }
 
     /**
-     * 
+     *
      * Creates an new AI <code>Player</code> with the specified name.
-     * 
-     * 
-     * 
+     *
+     *
+     *
      * @param game The <code>Game</code> this <code>Player</code> belongs
      *            to.
-     * 
+     *
      * @param name The name that this player will use.
-     * 
+     *
      * @param admin Whether or not this AI player shall be considered an Admin.
-     * 
+     *
      * @param ai Whether or not this AI player shall be considered an AI player
      *            (usually true here).
-     * 
+     *
      * @param nation The nation of the <code>Player</code>.
-     * 
+     *
      */
     public Player(Game game, String name, boolean admin, boolean ai, Nation nation) {
         this(game, name, admin, nation);
@@ -261,40 +261,40 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * 
+     *
      * Creates a new <code>Player</code> with specified name.
-     * 
-     * 
-     * 
+     *
+     *
+     *
      * @param game The <code>Game</code> this <code>Player</code> belongs
      *            to.
-     * 
+     *
      * @param name The name that this player will use.
-     * 
+     *
      * @param admin 'true' if this Player is an admin,
-     * 
+     *
      * 'false' otherwise.
-     * 
+     *
      */
     public Player(Game game, String name, boolean admin) {
         this(game, name, admin, game.getVacantNation());
     }
 
     /**
-     * 
+     *
      * Creates a new (human) <code>Player</code> with specified name.
-     * 
+     *
      * @param game The <code>Game</code> this <code>Player</code> belongs
      *            to.
-     * 
+     *
      * @param name The name that this player will use.
-     * 
+     *
      * @param admin 'true' if this Player is an admin,
-     * 
+     *
      * 'false' otherwise.
-     * 
+     *
      * @param newNation The nation of the <code>Player</code>.
-     * 
+     *
      */
     public Player(Game game, String name, boolean admin, Nation newNation) {
         super(game);
@@ -314,7 +314,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 /*
                  * Setting the amount of gold to
                  * "getGameOptions().getInteger(GameOptions.STARTING_MONEY)"
-                 * 
+                 *
                  * just before starting the game. See
                  * "net.sf.freecol.server.control.PreGameController".
                  */
@@ -347,10 +347,10 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * 
+     *
      * Initiates a new <code>Player</code> from an <code>Element</code> and
      * registers this <code>Player</code> at the specified game.
-     * 
+     *
      * @param game The <code>Game</code> this object belongs to.
      * @param in The input stream containing the XML.
      * @throws XMLStreamException if a problem was encountered during parsing.
@@ -363,10 +363,10 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Initiates a new <code>Player</code> from an <code>Element</code> and
      * registers this <code>Player</code> at the specified game.
-     * 
+     *
      * @param game The <code>Game</code> this object belongs to.
      * @param e An XML-element that will be used to initialize this object.
-     * 
+     *
      */
     public Player(Game game, Element e) {
         super(game, e);
@@ -377,7 +377,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Initiates a new <code>Player</code> with the given ID. The object
      * should later be initialized by calling either {@link
      * #readFromXML(XMLStreamReader)} or {@link #readFromXMLElement(Element)}.
-     * 
+     *
      * @param game The <code>Game</code> in which this object belong.
      * @param id The unique identifier for this object.
      */
@@ -387,7 +387,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the index of this Player.
-     * 
+     *
      * @return an <code>int</code> value
      */
     public int getIndex() {
@@ -396,7 +396,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Get the <code>FeatureContainer</code> value.
-     * 
+     *
      * @return a <code>FeatureContainer</code> value
      */
     public final FeatureContainer getFeatureContainer() {
@@ -405,7 +405,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Set the <code>FeatureContainer</code> value.
-     * 
+     *
      * @param newFeatureContainer The new FeatureContainer value.
      */
     public final void setFeatureContainer(final FeatureContainer newFeatureContainer) {
@@ -418,7 +418,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns this Player's Market.
-     * 
+     *
      * @return This Player's Market.
      */
     public Market getMarket() {
@@ -434,7 +434,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if this player owns the given <code>Settlement</code>.
-     * 
+     *
      * @param s The <code>Settlement</code>.
      * @return <code>true</code> if this <code>Player</code> owns the given
      *         <code>Settlement</code>.
@@ -446,7 +446,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Adds the given <code>Settlement</code> to this <code>Player</code>'s
      * list of settlements.
-     * 
+     *
      * @param s
      */
     public void addSettlement(Settlement s) {
@@ -461,7 +461,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Removes the given <code>Settlement</code> from this <code>Player</code>'s
      * list of settlements.
-     * 
+     *
      * @param s The <code>Settlement</code> to remove.
      */
     public void removeSettlement(Settlement s) {
@@ -484,7 +484,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Adds a <code>ModelMessage</code> for this player.
-     * 
+     *
      * @param modelMessage The <code>ModelMessage</code>.
      */
     public void addModelMessage(ModelMessage modelMessage) {
@@ -493,7 +493,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns all ModelMessages for this player.
-     * 
+     *
      * @return all ModelMessages for this player.
      */
     public Collection<ModelMessage> getModelMessages() {
@@ -502,7 +502,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns all new ModelMessages for this player.
-     * 
+     *
      * @return all new ModelMessages for this player.
      */
     public List<ModelMessage> getNewModelMessages() {
@@ -542,7 +542,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if this player is a "royal expeditionary force.
-     * 
+     *
      * @return <code>true</code> is the given nation is a royal expeditionary
      *         force and <code>false</code> otherwise.
      */
@@ -552,7 +552,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the current score of the player.
-     * 
+     *
      * @return an <code>int</code> value
      */
     public int getScore() {
@@ -570,7 +570,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Get the <code>Unit</code> value.
-     * 
+     *
      * @return a <code>List<Unit></code> value
      */
     public final Unit getUnit(String id) {
@@ -579,7 +579,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Set the <code>Unit</code> value.
-     * 
+     *
      * @param newUnit The new Units value.
      */
     public final void setUnit(final Unit newUnit) {
@@ -590,7 +590,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Remove Unit.
-     * 
+     *
      * @param oldUnit an <code>Unit</code> value
      */
     public void removeUnit(final Unit oldUnit) {
@@ -601,7 +601,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the total percentage of rebels in all this player's colonies.
-     * 
+     *
      * @return The total percentage of rebels in all this player's colonies.
      */
     public int getSoL() {
@@ -630,9 +630,9 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         setPlayerType(PlayerType.REBEL);
         featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
-        
+
         changeRelationWithPlayer(getREFPlayer(), Stance.WAR);
-        
+
         setTax(0);
         // Reset all arrears
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
@@ -695,7 +695,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the <code>Player</code> controlling the "Royal Expeditionary
      * Force" for this player.
-     * 
+     *
      * @return The player, or <code>null</code> if this player does not have a
      *         royal expeditionary force.
      */
@@ -705,7 +705,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the name this player has chosen for the new land.
-     * 
+     *
      * @return The name of the new world as chosen by the <code>Player</code>.
      *         If no land name was chosen, the default name is returned.
      */
@@ -720,7 +720,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns true if the player already selected a new name for the discovered
      * land.
-     * 
+     *
      * @return true if the player already set a name for the newly discovered
      *         land, otherwise false.
      */
@@ -730,7 +730,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the <code>Colony</code> with the given name.
-     * 
+     *
      * @param name The name of the <code>Colony</code>.
      * @return The <code>Colony</code> or <code>null</code> if this player
      *         does not have a <code>Colony</code> with the specified name.
@@ -747,7 +747,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Creates a unique colony name. This is done by fetching a new default
      * colony name from the list of default names.
-     * 
+     *
      * @return A <code>String</code> containing a new unused colony name from
      *         the list, if any is available, and otherwise an automatically
      *         generated name.
@@ -803,7 +803,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the name this player uses for the new land.
-     * 
+     *
      * @param newLandName This <code>Player</code>'s name for the new world.
      */
     public void setNewLandName(String newLandName) {
@@ -813,7 +813,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this player is european. This includes the "Royal Expeditionay
      * Force".
-     * 
+     *
      * @return <i>true</i> if this player is european and <i>false</i>
      *         otherwise.
      */
@@ -824,7 +824,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this player is indian. This method returns the opposite of
      * {@link #isEuropean()}.
-     * 
+     *
      * @return <i>true</i> if this player is indian and <i>false</i>
      *         otherwise.
      */
@@ -834,7 +834,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks whether this player is at war with any other player.
-     * 
+     *
      * @return <i>true</i> if this player is at war with any other.
      */
     public boolean isAtWar() {
@@ -848,7 +848,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the price of the given land.
-     * 
+     *
      * @param tile The <code>Tile</code> to get the price for.
      * @return The price of the land.
      */
@@ -869,7 +869,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Buys the given land.
-     * 
+     *
      * @param tile The <code>Tile</code> to buy.
      */
     public void buyLand(Tile tile) {
@@ -893,7 +893,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns whether this player has met with the <code>Player</code> if the
      * given <code>nation</code>.
-     * 
+     *
      * @param player The Player.
      * @return <code>true</code> if this <code>Player</code> has contacted
      *         the given nation.
@@ -908,7 +908,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets whether this player has contacted the given player.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @param contacted <code>true</code> if this <code>Player</code> has
      *            contacted the given <code>Player</code>.
@@ -973,7 +973,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns whether this player has been attacked by privateers.
-     * 
+     *
      * @return <code>true</code> if this <code>Player</code> has been
      *         attacked by privateers.
      */
@@ -989,7 +989,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the default <code>Location</code> where the units arriving from
      * {@link Europe} will be put.
-     * 
+     *
      * @return The <code>Location</code>.
      * @see Unit#getEntryLocation
      */
@@ -1000,7 +1000,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the <code>Location</code> where the units arriving from
      * {@link Europe} will be put as a default.
-     * 
+     *
      * @param entryLocation The <code>Location</code>.
      * @see #getEntryLocation
      */
@@ -1011,7 +1011,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this <code>Player</code> has explored the given
      * <code>Tile</code>.
-     * 
+     *
      * @param tile The <code>Tile</code>.
      * @return <i>true</i> if the <code>Tile</code> has been explored and
      *         <i>false</i> otherwise.
@@ -1023,7 +1023,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the given tile to be explored by this player and updates the
      * player's information about the tile.
-     * 
+     *
      * @param tile The <code>Tile</code> to set explored.
      * @see Tile#updatePlayerExploredTile(Player)
      */
@@ -1034,7 +1034,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the tiles within the given <code>Unit</code>'s line of sight to
      * be explored by this player.
-     * 
+     *
      * @param unit The <code>Unit</code>.
      * @see #setExplored(Tile)
      * @see #hasExplored
@@ -1096,11 +1096,11 @@ public class Player extends FreeColGameObject implements Nameable {
                     /*
                      * if (getGame().getViewOwner() == null &&
                      * !hasExplored(map.getTile(position))) {
-                     * 
+                     *
                      * logger.warning("Trying to set a non-explored Tile to be
                      * visible (1). Unit: " + unit.getName() + ", Tile: " +
                      * position);
-                     * 
+                     *
                      * throw new IllegalStateException("Trying to set a
                      * non-explored Tile to be visible. Unit: " + unit.getName() + ",
                      * Tile: " + position); }
@@ -1112,11 +1112,11 @@ public class Player extends FreeColGameObject implements Nameable {
                         /*
                          * if (getGame().getViewOwner() == null &&
                          * !hasExplored(map.getTile(p))) {
-                         * 
+                         *
                          * logger.warning("Trying to set a non-explored Tile to
                          * be visible (2). Unit: " + unit.getName() + ", Tile: " +
                          * p);
-                         * 
+                         *
                          * throw new IllegalStateException("Trying to set a
                          * non-explored Tile to be visible. Unit: " +
                          * unit.getName() + ", Tile: " + p); }
@@ -1129,12 +1129,12 @@ public class Player extends FreeColGameObject implements Nameable {
                     /*
                      * if (getGame().getViewOwner() == null &&
                      * !hasExplored(map.getTile(position))) {
-                     * 
+                     *
                      * logger.warning("Trying to set a non-explored Tile to be
                      * visible (3). Settlement: " + settlement + "(" +
                      * settlement.getTile().getPosition() + "), Tile: " +
                      * position);
-                     * 
+                     *
                      * throw new IllegalStateException("Trying to set a
                      * non-explored Tile to be visible. Settlement: " +
                      * settlement + "(" + settlement.getTile().getPosition() +
@@ -1148,12 +1148,12 @@ public class Player extends FreeColGameObject implements Nameable {
                         /*
                          * if (getGame().getViewOwner() == null &&
                          * !hasExplored(map.getTile(p))) {
-                         * 
+                         *
                          * logger.warning("Trying to set a non-explored Tile to
                          * be visible (4). Settlement: " + settlement + "(" +
                          * settlement.getTile().getPosition() + "), Tile: " +
                          * p);
-                         * 
+                         *
                          * throw new IllegalStateException("Trying to set a
                          * non-explored Tile to be visible. Settlement: " +
                          * settlement + "(" + settlement.getTile().getPosition() +
@@ -1169,7 +1169,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Checks if this <code>Player</code> can see the given <code>Tile</code>.
      * The <code>Tile</code> can be seen if it is in a {@link Unit}'s line of
      * sight.
-     * 
+     *
      * @param tile The given <code>Tile</code>.
      * @return <i>true</i> if the <code>Player</code> can see the given
      *         <code>Tile</code> and <i>false</i> otherwise.
@@ -1189,7 +1189,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the type of this player.
-     * 
+     *
      * @return The player type.
      */
     public PlayerType getPlayerType() {
@@ -1198,7 +1198,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if this <code>Player</code> can build colonies.
-     * 
+     *
      * @return <code>true</code> if this player is european, not the royal
      *         expeditionary force and not currently fighting the war of
      *         independence.
@@ -1209,7 +1209,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if this <code>Player</code> can get founding fathers.
-     * 
+     *
      * @return <code>true</code> if this player is european, not the royal
      *         expeditionary force and not currently fighting the war of
      *         independence.
@@ -1220,7 +1220,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the player type.
-     * 
+     *
      * @param type The new player type.
      * @see #getPlayerType
      */
@@ -1230,7 +1230,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Determines whether this player has a certain Founding father.
-     * 
+     *
      * @param someFather a <code>FoundingFather</code> value
      * @return Whether this player has this Founding father
      * @see FoundingFather
@@ -1242,7 +1242,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns the number of founding fathers in this players congress. Used to
      * calculate number of bells needed to recruit new fathers.
-     * 
+     *
      * @return The number of founding fathers in this players congress
      */
     public int getFatherCount() {
@@ -1252,7 +1252,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets this players liberty bell production to work towards recruiting
      * <code>father</code> to its congress.
-     * 
+     *
      * @param someFather a <code>FoundingFather</code> value
      * @see FoundingFather
      */
@@ -1263,7 +1263,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets the {@link FoundingFather founding father} this player is working
      * towards.
-     * 
+     *
      * @return The current FoundingFather or null if there is none
      * @see #setCurrentFather
      * @see FoundingFather
@@ -1274,7 +1274,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the bell production bonus.
-     * 
+     *
      * @return The bell production bonus.
      */
     public int getBellsBonus() {
@@ -1292,7 +1292,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this <code>Player</code> can move units to
      * <code>Europe</code>.
-     * 
+     *
      * @return <code>true</code> if this <code>Player</code> has an instance
      *         of <code>Europe</code>.
      */
@@ -1302,7 +1302,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the europe object that this player has.
-     * 
+     *
      * @return The europe object that this player has or <code>null</code> if
      *         this <code>Player</code> does not have an instance
      *         <code>Europe</code>.
@@ -1313,7 +1313,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Describe <code>getEuropeName</code> method here.
-     * 
+     *
      * @return a <code>String</code> value
      */
     public String getEuropeName() {
@@ -1326,7 +1326,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the monarch object this player has.
-     * 
+     *
      * @return The monarch object this player has or <code>null</code> if this
      *         <code>Player</code> does not have an instance
      *         <code>Monarch</code>.
@@ -1337,7 +1337,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the monarch object this player has.
-     * 
+     *
      * @param monarch The monarch object this player should have.
      */
     public void setMonarch(Monarch monarch) {
@@ -1346,7 +1346,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the amount of gold that this player has.
-     * 
+     *
      * @return The amount of gold that this player has or <code>-1</code> if
      *         the amount of gold is unknown.
      */
@@ -1357,7 +1357,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Modifies the amount of gold that this player has. The argument can be
      * both positive and negative.
-     * 
+     *
      * @param amount The amount of gold that should be added to this player's
      *            gold amount (can be negative!).
      * @exception IllegalArgumentException if the player gets a negative amount
@@ -1383,7 +1383,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Determines whether this player is an AI player.
-     * 
+     *
      * @return Whether this player is an AI player.
      */
     public boolean isAI() {
@@ -1392,7 +1392,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets whether this player is an AI player.
-     * 
+     *
      * @param ai <code>true</code> if this <code>Player</code> is controlled
      *            by the computer.
      */
@@ -1402,7 +1402,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets a new active unit.
-     * 
+     *
      * @return A <code>Unit</code> that can be made active.
      */
     public Unit getNextActiveUnit() {
@@ -1411,7 +1411,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets a new going_to unit.
-     * 
+     *
      * @return A <code>Unit</code> that can be made active.
      */
     public Unit getNextGoingToUnit() {
@@ -1420,7 +1420,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if a new active unit can be made active.
-     * 
+     *
      * @return <i>true</i> if this is the case and <i>false</i> otherwise.
      */
     public boolean hasNextActiveUnit() {
@@ -1429,7 +1429,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if a new active unit can be made active.
-     * 
+     *
      * @return <i>true</i> if this is the case and <i>false</i> otherwise.
      */
     public boolean hasNextGoingToUnit() {
@@ -1438,7 +1438,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if this player is an admin.
-     * 
+     *
      * @return <i>true</i> if the player is an admin and <i>false</i>
      *         otherwise.
      */
@@ -1449,7 +1449,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this player is dead. A <code>Player</code> dies when it
      * looses the game.
-     * 
+     *
      * @return <code>true</code> if this <code>Player</code> is dead.
      */
     public boolean isDead() {
@@ -1458,7 +1458,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets this player to be dead or not.
-     * 
+     *
      * @param dead Should be set to <code>true</code> when this
      *            <code>Player</code> dies.
      * @see #isDead
@@ -1469,7 +1469,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the name of this player.
-     * 
+     *
      * @return The name of this player.
      */
     public String getName() {
@@ -1478,7 +1478,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the name of this player.
-     * 
+     *
      * @return The name of this player.
      */
     public String toString() {
@@ -1487,7 +1487,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Set the <code>Name</code> value.
-     * 
+     *
      * @param newName The new Name value.
      */
     public void setName(String newName) {
@@ -1496,7 +1496,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the nation type of this player.
-     * 
+     *
      * @return The nation type of this player.
      */
     public NationType getNationType() {
@@ -1505,7 +1505,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the nation type of this player.
-     * 
+     *
      * @param newNationType a <code>NationType</code> value
      */
     public void setNationType(NationType newNationType) {
@@ -1518,7 +1518,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Return this Player's nation.
-     * 
+     *
      * @return a <code>String</code> value
      */
     public Nation getNation() {
@@ -1527,7 +1527,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the nation for this player.
-     * 
+     *
      * @param newNation The new nation for this player.
      */
     public void setNation(Nation newNation) {
@@ -1538,7 +1538,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Return the ID of this Player's nation.
-     * 
+     *
      * @return a <code>String</code> value
      */
     public String getNationID() {
@@ -1547,7 +1547,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the nation of this player as a String.
-     * 
+     *
      * @return The nation of this player as a String.
      */
     public String getNationAsString() {
@@ -1556,7 +1556,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Get the <code>RulerName</code> value.
-     * 
+     *
      * @return a <code>String</code> value
      */
     public final String getRulerName() {
@@ -1565,7 +1565,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the color of this player.
-     * 
+     *
      * @return The color of this player.
      */
     public Color getColor() {
@@ -1574,7 +1574,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the color for this player.
-     * 
+     *
      * @param c The new color for this player.
      */
     public void setColor(Color c) {
@@ -1583,7 +1583,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if this <code>Player</code> is ready to start the game.
-     * 
+     *
      * @return <code>true</code> if this <code>Player</code> is ready to
      *         start the game.
      */
@@ -1594,7 +1594,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets this <code>Player</code> to be ready/not ready for starting the
      * game.
-     * 
+     *
      * @param ready This indicates if the player is ready to start the game.
      */
     public void setReady(boolean ready) {
@@ -1604,7 +1604,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Gets an <code>Iterator</code> containing all the units this player
      * owns.
-     * 
+     *
      * @return The <code>Iterator</code>.
      * @see Unit
      */
@@ -1618,7 +1618,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns a list of all Settlements this player owns.
-     * 
+     *
      * @return The settlements this player owns.
      */
     public List<Settlement> getSettlements() {
@@ -1627,7 +1627,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns a list of all Colonies this player owns.
-     * 
+     *
      * @return The colonies this player owns.
      */
     public List<Colony> getColonies() {
@@ -1644,7 +1644,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns a list of all IndianSettlements this player owns.
-     * 
+     *
      * @return The indian settlements this player owns.
      */
     public List<IndianSettlement> getIndianSettlements() {
@@ -1664,7 +1664,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Returns the closest <code>Location</code> in which the given ship can
      * get repaired. This is the closest {@link Colony} with a drydock, or
      * {@link Europe} if this player has no colonies with a drydock.
-     * 
+     *
      * @param unit The ship that needs a location to be repaired.
      * @return The closest <code>Location</code> in which the ship can be
      *         repaired.
@@ -1699,7 +1699,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Increments the player's cross count, with benefits thereof.
-     * 
+     *
      * @param num The number of crosses to add.
      * @see #reduceCrosses
      */
@@ -1712,7 +1712,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the number of crosses this player possess.
-     * 
+     *
      * @see #incrementCrosses(int)
      */
     public void reduceCrosses() {
@@ -1732,7 +1732,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the number of crosses this player possess.
-     * 
+     *
      * @return The number.
      * @see #reduceCrosses
      */
@@ -1745,7 +1745,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Get the <code>TradeRoutes</code> value.
-     * 
+     *
      * @return a <code>List<TradeRoute></code> value
      */
     public final List<TradeRoute> getTradeRoutes() {
@@ -1753,13 +1753,13 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * 
+     *
      * Set the <code>TradeRoutes</code> value.
-     * 
-     * 
-     * 
+     *
+     *
+     *
      * @param newTradeRoutes The new TradeRoutes value.
-     * 
+     *
      */
     public final void setTradeRoutes(final List<TradeRoute> newTradeRoutes) {
         this.tradeRoutes = newTradeRoutes;
@@ -1768,7 +1768,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks to see whether or not a colonist can emigrate, and does so if
      * possible.
-     * 
+     *
      * @return Whether a new colonist should immigrate.
      */
     public boolean checkEmigrate() {
@@ -1780,7 +1780,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the number of crosses required to cause a new colonist to emigrate.
-     * 
+     *
      * @return The number of crosses required to cause a new colonist to
      *         emigrate.
      */
@@ -1793,7 +1793,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the number of crosses required to cause a new colonist to emigrate.
-     * 
+     *
      * @param crossesRequired The number of crosses required to cause a new
      *            colonist to emigrate.
      */
@@ -1807,7 +1807,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Checks if this <code>Player</code> can recruit units by producing
      * crosses.
-     * 
+     *
      * @return <code>true</code> if units can be recruited by this
      *         <code>Player</code>.
      */
@@ -1851,7 +1851,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Modifies the hostiliy against the given player.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @param addToTension The amount to add to the current tension level.
      */
@@ -1880,7 +1880,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the hostility against the given player.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @param newTension The <code>Tension</code>.
      */
@@ -1893,7 +1893,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the hostility this player has against the given player.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @return An object representing the tension level.
      */
@@ -1958,7 +1958,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * This method adds bonuses to the colony value if the tile is close to (but
      * not overlapping with) another friendly colony. Penalties for enemy
      * units/colonies are added as well.
-     * 
+     *
      * @param tile The <code>Tile</code>
      * @return The value of building a colony on the given tile.
      * @see Tile#getColonyValue()
@@ -1995,7 +1995,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Returns the stance towards a given player. <BR>
      * <BR>
      * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
-     * 
+     *
      * @param player The <code>Player</code>.
      * @return The stance.
      */
@@ -2009,7 +2009,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns a string describing the given stance.
-     * 
+     *
      * @param stance The stance.
      * @return A matching string.
      */
@@ -2021,9 +2021,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * Sets the stance towards a given player. <BR>
      * <BR>
      * One of: WAR, CEASE_FIRE, PEACE and ALLIANCE.
-     * This only sets this player stance, 
+     * This only sets this player stance,
      *<code>changeRelationsWithPlayer</code> should be used to set both players
-     * 
+     *
      * @param player The <code>Player</code>.
      * @param newStance The stance.
      */
@@ -2042,14 +2042,14 @@ public class Player extends FreeColGameObject implements Nameable {
         	throw new IllegalStateException("Cease fire can only be declared when at war.");
         }
         stance.put(player.getId(), newStance);
-        
+
         if (oldStance == Stance.PEACE && newStance == Stance.WAR) {
             modifyTension(player, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
         } else if (oldStance == Stance.CEASE_FIRE && newStance == Stance.WAR) {
             modifyTension(player, Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE);
         }
     }
-    
+
     public void changeRelationWithPlayer(Player player,Stance newStance){
     	setStance(player, newStance);
     	
@@ -2061,7 +2061,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the price for a recruit in europe.
-     * 
+     *
      * @return The price of a single recruit in {@link Europe}.
      */
     public int getRecruitPrice() {
@@ -2071,7 +2071,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Increments the player's bell count, with benefits thereof.
-     * 
+     *
      * @param num The number of bells to add.
      */
     public void incrementBells(int num) {
@@ -2083,7 +2083,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the current amount of bells this <code>Player</code> has.
-     * 
+     *
      * @return This player's number of bells earned towards the current Founding
      *         Father.
      * @see Goods#BELLS
@@ -2098,7 +2098,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Adds a founding father to this player's continental congress.
-     * 
+     *
      * @param father a <code>FoundingFather</code> value
      * @see FoundingFather
      */
@@ -2213,7 +2213,7 @@ public class Player extends FreeColGameObject implements Nameable {
          */
         if (isEuropean()) {
             if (!hasAbility("model.ability.independenceDeclared") &&
-                getBells() >= getTotalFoundingFatherCost() && 
+                getBells() >= getTotalFoundingFatherCost() &&
                 currentFather != null) {
                 addFather(currentFather);
                 currentFather = null;
@@ -2293,7 +2293,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Only attributes visible to the given <code>Player</code> will be added
      * to that representation if <code>showAll</code> is set to
      * <code>false</code>.
-     * 
+     *
      * @param out The target stream.
      * @param player The <code>Player</code> this XML-representation should be
      *            made for, or <code>null</code> if
@@ -2395,7 +2395,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Initialize this object from an XML-representation of this object.
-     * 
+     *
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
@@ -2487,7 +2487,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the tag name of the root element representing this object.
-     * 
+     *
      * @return "player"
      */
     public static String getXMLElementTagName() {
@@ -2497,7 +2497,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Generates a random unit type. The unit type that is returned represents
      * the type of a unit that is recruitable in Europe.
-     * 
+     *
      * @param unique a <code>String</code> value
      * @return A random unit type of a unit that is recruitable in Europe.
      */
@@ -2506,7 +2506,7 @@ public class Player extends FreeColGameObject implements Nameable {
         for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable() &&
                 !featureContainer.hasAbility("model.ability.canNotRecruitUnit", unitType)) {
-                recruitableUnits.add(new RandomChoice(unitType, unitType.getRecruitProbability()));
+                recruitableUnits.add(new RandomChoice<UnitType>(unitType, unitType.getRecruitProbability()));
             }
         }
 
@@ -2515,7 +2515,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the number of bells needed for recruiting the next founding father.
-     * 
+     *
      * @return How many more bells the <code>Player</code> needs in order to
      *         recruit the next founding father.
      * @see Goods#BELLS
@@ -2528,7 +2528,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns how many bells in total are needed to earn the Founding Father we
      * are trying to recruit.
-     * 
+     *
      * @return Total number of bells the <code>Player</code> needs to recruit
      *         the next founding father.
      * @see Goods#BELLS
@@ -2542,7 +2542,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Returns how many total bells will be produced if no colonies are lost and
      * nothing unexpected happens.
-     * 
+     *
      * @return Total number of bells this <code>Player</code>'s
      *         <code>Colony</code>s will make.
      * @see Goods#BELLS
@@ -2558,7 +2558,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the arrears due for a type of goods.
-     * 
+     *
      * @param type a <code>GoodsType</code> value
      * @return The arrears due for this type of goods.
      */
@@ -2573,7 +2573,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the arrears due for a type of goods.
-     * 
+     *
      * @param goods The goods.
      * @return The arrears due for this type of goods.
      */
@@ -2583,7 +2583,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the arrears for a type of goods.
-     * 
+     *
      * @param goodsType a <code>GoodsType</code> value
      */
     public void setArrears(GoodsType goodsType) {
@@ -2598,7 +2598,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Sets the arrears for these goods.
-     * 
+     *
      * @param goods The goods.
      */
     public void setArrears(Goods goods) {
@@ -2607,7 +2607,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Resets the arrears for this type of goods to zero.
-     * 
+     *
      * @param goodsType a <code>GoodsType</code> value
      */
     public void resetArrears(GoodsType goodsType) {
@@ -2624,7 +2624,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * <br>
      * <br>
      * <code>resetArrears(goods.getType());</code>
-     * 
+     *
      * @param goods The goods to reset the arrears for.
      * @see #resetArrears(GoodsType)
      */
@@ -2634,7 +2634,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns true if type of goods can be traded in Europe.
-     * 
+     *
      * @param type The goods type.
      * @return True if there are no arrears due for this type of goods.
      */
@@ -2644,7 +2644,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns true if type of goods can be traded at specified place.
-     * 
+     *
      * @param type The GoodsType.
      * @param marketAccess Way the goods are traded (Europe OR Custom)
      * @return <code>true</code> if type of goods can be traded.
@@ -2661,7 +2661,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns true if type of goods can be traded at specified place
-     * 
+     *
      * @param goods The goods.
      * @param marketAccess Place where the goods are traded (Europe OR Custom)
      * @return True if type of goods can be traded.
@@ -2672,7 +2672,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns true if type of goods can be traded in Europe.
-     * 
+     *
      * @param goods The goods.
      * @return True if there are no arrears due for this type of goods.
      */
@@ -2682,7 +2682,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the current tax.
-     * 
+     *
      * @return The current tax.
      */
     public int getTax() {
@@ -2692,7 +2692,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sets the current tax. If Thomas Paine has already joined the Continental
      * Congress, the bellsBonus is adjusted accordingly.
-     * 
+     *
      * @param amount The new tax.
      */
     public void setTax(int amount) {
@@ -2719,7 +2719,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the current sales.
-     * 
+     *
      * @param goodsType a <code>GoodsType</code> value
      * @return The current sales.
      */
@@ -2734,7 +2734,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Modifies the current sales.
-     * 
+     *
      * @param goodsType a <code>GoodsType</code> value
      * @param amount The new sales.
      */
@@ -2750,7 +2750,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the current incomeBeforeTaxes.
-     * 
+     *
      * @param goodsType The GoodsType.
      * @return The current incomeBeforeTaxes.
      */
@@ -2765,7 +2765,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Modifies the current incomeBeforeTaxes.
-     * 
+     *
      * @param goodsType The GoodsType.
      * @param amount The new incomeBeforeTaxes.
      */
@@ -2781,7 +2781,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the current incomeAfterTaxes.
-     * 
+     *
      * @param goodsType The GoodsType.
      * @return The current incomeAfterTaxes.
      */
@@ -2796,7 +2796,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Modifies the current incomeAfterTaxes.
-     * 
+     *
      * @param goodsType The GoodsType.
      * @param amount The new incomeAfterTaxes.
      */
@@ -2812,7 +2812,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns the difficulty level.
-     * 
+     *
      * @return The difficulty level.
      */
     public DifficultyLevel getDifficulty() {
@@ -2824,7 +2824,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Returns the most valuable goods available in one of the player's
      * colonies. The goods must not be boycotted, and the amount will not exceed
      * 100.
-     * 
+     *
      * @return A goods object, or null.
      */
     public Goods getMostValuableGoods() {
@@ -2854,7 +2854,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Checks if the given <code>Player</code> equals this object.
-     * 
+     *
      * @param o The <code>Player</code> to compare against this object.
      * @return <i>true</i> if the two <code>Player</code> are equal and none
      *         of both have <code>nation == null</code> and <i>false</i>
@@ -2927,7 +2927,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         /**
          * Creates a new <code>NextActiveUnitIterator</code>.
-         * 
+         *
          * @param owner The <code>Player</code> that needs an iterator of it's
          *            units.
          * @param predicate An object for deciding whether a <code>Unit</code>
@@ -2974,7 +2974,7 @@ public class Player extends FreeColGameObject implements Nameable {
         /**
          * Removes from the underlying collection the last element returned by
          * the iterator (optional operation).
-         * 
+         *
          * @exception UnsupportedOperationException no matter what.
          */
         public void remove() {
