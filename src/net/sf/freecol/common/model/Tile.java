@@ -1355,7 +1355,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (potential > 0 && tileType.isWater() && goodsType.isFoodType()) {
             potential += fishBonus;
         }
-        if (tiContainer != null) {
+        if (potential > 0 && tiContainer != null) {
             potential = tiContainer.getTotalBonusPotential(goodsType, potential);
         }
         return potential;
