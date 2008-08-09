@@ -1137,8 +1137,9 @@ public final class GUI {
                 Tile tile = map.getTile(tileX, tileY);
                 if (tile != null && tile.getSettlement() instanceof Colony) {
                     Colony colony = (Colony) tile.getSettlement();
-                    BufferedImage stringImage = createStringImage(g, colony.getName(), colony.getOwner().getColor(), 
-                                                                  lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
+                    BufferedImage stringImage =
+                        createColonyNameImage(g, colony,
+                                              lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
                     g.drawImage(stringImage, 
                                 xx + (lib.getTerrainImageWidth(tile.getType()) - 
                                       stringImage.getWidth())/2 + 1,
@@ -1345,8 +1346,8 @@ public final class GUI {
     }    
     
     /**
-     * Creates an image with a string of a given color with 
-     * a semi-transparent background.
+     * Creates an image with a string of a given color and with 
+     * a black border around the glyphs.
      *
      * @param c A <code>JComponent</code>-object for getting a
      *       <code>Font</code>.
@@ -1361,8 +1362,7 @@ public final class GUI {
      * @param preferredFontSize The preferred font size.
      * @return The image that was created.
      */
-    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color,
-                                            int maxWidth, int preferredFontSize) {        
+    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {        
         if (color == null) {
             logger.warning("createStringImage called with color null");
             color = Color.WHITE;
@@ -1375,6 +1375,55 @@ public final class GUI {
         do {
             nameFont = nameFont.deriveFont(Font.BOLD, fontSize);            
             nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
+            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
+            fontSize -= 2;
+        } while (bi.getWidth() > maxWidth);
+
+        Graphics2D big = bi.createGraphics();
+
+        big.setColor(color);
+        big.setFont(nameFont);
+        big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
+
+        int playerColor = color.getRGB();
+        for (int biX=0; biX<bi.getWidth(); biX++) {
+            for (int biY=0; biY<bi.getHeight(); biY++) {
+                int r = bi.getRGB(biX, biY);
+
+                if (r == playerColor) {
+                    continue;
+                }
+
+                for (int cX=-1; cX <=1; cX++) {
+                    for (int cY=-1; cY <=1; cY++) {
+                        if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
+                            if (playerColor != Color.BLACK.getRGB()) {
+                                bi.setRGB(biX, biY, Color.BLACK.getRGB());
+                            } else {
+                                bi.setRGB(biX, biY, Color.WHITE.getRGB());
+                            }
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+
+        return bi;
+    }
+
+    private BufferedImage createColonyNameImage(Graphics g, Colony colony,
+                                                int maxWidth, int preferredFontSize) {        
+        Color color = colony.getOwner().getColor();
+        String nameString = colony.getName();
+        Font nameFont = g.getFont();
+        FontMetrics nameFontMetrics = g.getFontMetrics(nameFont);
+        BufferedImage bi = null;
+
+        int fontSize = preferredFontSize;
+        do {
+            nameFont = nameFont.deriveFont(Font.BOLD, fontSize);            
+            nameFontMetrics = g.getFontMetrics(nameFont);
             bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4,
                                    nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(),
                                    BufferedImage.TYPE_INT_ARGB);
@@ -1391,7 +1440,6 @@ public final class GUI {
         big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
         return bi;
     }
-
 
     /**
     * Draws a road, between the given points, on the provided <code>Graphics</code>.
