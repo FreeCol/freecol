@@ -1345,8 +1345,8 @@ public final class GUI {
     }    
     
     /**
-     * Creates an image with a string of a given color and with 
-     * a black border around the glyphs.
+     * Creates an image with a string of a given color with 
+     * a semi-transparent background.
      *
      * @param c A <code>JComponent</code>-object for getting a
      *       <code>Font</code>.
@@ -1361,7 +1361,8 @@ public final class GUI {
      * @param preferredFontSize The preferred font size.
      * @return The image that was created.
      */
-    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {        
+    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color,
+                                            int maxWidth, int preferredFontSize) {        
         if (color == null) {
             logger.warning("createStringImage called with color null");
             color = Color.WHITE;
@@ -1374,40 +1375,20 @@ public final class GUI {
         do {
             nameFont = nameFont.deriveFont(Font.BOLD, fontSize);            
             nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
-            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
+            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4,
+                                   nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(),
+                                   BufferedImage.TYPE_INT_ARGB);
             fontSize -= 2;
         } while (bi.getWidth() > maxWidth);
 
         Graphics2D big = bi.createGraphics();
+        Color col = getForegroundColor(color);
+        big.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 100));
+        big.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 
         big.setColor(color);
         big.setFont(nameFont);
         big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
-
-        int playerColor = color.getRGB();
-        for (int biX=0; biX<bi.getWidth(); biX++) {
-            for (int biY=0; biY<bi.getHeight(); biY++) {
-                int r = bi.getRGB(biX, biY);
-
-                if (r == playerColor) {
-                    continue;
-                }
-
-                for (int cX=-1; cX <=1; cX++) {
-                    for (int cY=-1; cY <=1; cY++) {
-                        if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
-                            if (playerColor != Color.BLACK.getRGB()) {
-                                bi.setRGB(biX, biY, Color.BLACK.getRGB());
-                            } else {
-                                bi.setRGB(biX, biY, Color.WHITE.getRGB());
-                            }
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
-
         return bi;
     }
 
