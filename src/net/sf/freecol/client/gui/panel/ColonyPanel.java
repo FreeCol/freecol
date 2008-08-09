@@ -1175,7 +1175,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     add(unitLabel, higConst.rc(1, unitColumn + index));
                     if (building.getType().hasAbility("model.ability.teach")) {
                         if (unit.getStudent() != null) {
-                            JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" + unit.getNeededTurnsOfTraining());
+                            JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
+                                                         unit.getNeededTurnsOfTraining());
                             add(progress, higConst.rc(2, unitColumn + index));
                             UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
                             studentLabel.setIgnoreLocation(true);

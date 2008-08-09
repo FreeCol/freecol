@@ -932,7 +932,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         type = t;
         if (tileItemContainer != null) {
-            tileItemContainer.removeIncompatibleImprovements(t);
+            tileItemContainer.removeIncompatibleImprovements();
         }
         if (!isLand()) {
             settlement = null;
@@ -1352,11 +1352,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         // Get tile potential + bonus if any
         int potential = tileType.getPotential(goodsType);
-        if (potential > 0 && tileType.isWater() && goodsType.isFoodType()) {
-            potential += fishBonus;
-        }
-        if (potential > 0 && tiContainer != null) {
-            potential = tiContainer.getTotalBonusPotential(goodsType, potential);
+        if (potential > 0) {
+            if (tileType.isWater() && goodsType.isFoodType()) {
+                potential += fishBonus;
+            }
+            if (tiContainer != null) {
+                potential = tiContainer.getTotalBonusPotential(goodsType, potential);
+            }
         }
         return potential;
     }
