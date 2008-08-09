@@ -249,5 +249,20 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     }
 
+    public void testPaine() {
+        Colony colony = getStandardColony();
+        Player player = colony.getOwner();
 
+        assertEquals(0, player.getBellsBonus());
+
+        player.setTax(20);
+        assertEquals(0, player.getBellsBonus());
+
+        FoundingFather paine = spec().getFoundingFather("model.foundingFather.thomasPaine");
+        player.addFather(paine);
+
+        player.setTax(30);
+        assertEquals(30, player.getBellsBonus());
+
+    }
 }

@@ -1278,7 +1278,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The bell production bonus.
      */
     public int getBellsBonus() {
-        return (int) featureContainer.applyModifier(1, "model.goods.bells", null, getGame().getTurn());
+        return (int) featureContainer.applyModifier(0f, "model.goods.bells", null, getGame().getTurn());
     }
 
     /**
@@ -2696,24 +2696,26 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param amount The new tax.
      */
     public void setTax(int amount) {
-        tax = amount;
-        if (amount != tax && featureContainer.hasAbility("model.ability.addTaxToBells")) {
-            Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
-            for (Modifier modifier : bellsBonus) {
-                if ("model.ability.addTaxToBells".equals(modifier.getSource())) {
-                    modifier.setValue(amount);
-                    return;
-                } else {
-                    FreeColGameObjectType type = FreeCol.getSpecification().getType(modifier.getSource());
-                    if (type != null && type.hasAbility("model.ability.addTaxToBells")) {
+        if (amount != tax) {
+            tax = amount;
+            if(featureContainer.hasAbility("model.ability.addTaxToBells")) {
+                Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
+                for (Modifier modifier : bellsBonus) {
+                    if ("model.ability.addTaxToBells".equals(modifier.getSource())) {
                         modifier.setValue(amount);
                         return;
+                    } else {
+                        FreeColGameObjectType type = FreeCol.getSpecification().getType(modifier.getSource());
+                        if (type != null && type.hasAbility("model.ability.addTaxToBells")) {
+                            modifier.setValue(amount);
+                            return;
+                        }
                     }
                 }
+                // found no matching modifier
+                featureContainer.addModifier(new Modifier("model.goods.bells", "model.ability.addTaxToBells",
+                                                          amount, Modifier.Type.ADDITIVE));
             }
-            // found no matching modifier
-            featureContainer.addModifier(new Modifier("model.goods.bells", "model.ability.addTaxToBells", amount,
-                    Modifier.Type.ADDITIVE));
         }
     }
 
