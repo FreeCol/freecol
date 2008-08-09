@@ -760,10 +760,10 @@ public class TerrainGenerator {
                                                                 map.getTile(position).getRegion());
                     riverRegion.setDiscoverable(true);
                     riverRegion.setClaimable(true);
-                    map.setRegion(riverRegion);
                     River river = new River(map, riverMap, riverRegion);
                     if (river.flowFromSource(position)) {
                         logger.fine("Created new river with length " + river.getLength());
+                        map.setRegion(riverRegion);
                         rivers.add(river);
                         counter++;
                         break;

@@ -199,7 +199,9 @@ public class TileItemContainer extends FreeColGameObject {
                 }
                 improvement.dispose();
             }
-        }   
+        }
+        // TODO: we could discover another one
+        clearResource();
     }
 
     /**
