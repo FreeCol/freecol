@@ -39,6 +39,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -91,7 +92,8 @@ public final class GUI {
     private ImageLibrary lib;
     private TerrainCursor cursor;
     private ViewMode viewMode;
-    
+
+    private java.util.Map<Color, Color> colorMap = new HashMap<Color, Color>();
 
     /** Indicates if the game has started, has nothing to do with whether or not the
         client is logged in. */
@@ -2274,12 +2276,7 @@ public final class GUI {
         BufferedImage img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
         g.drawImage(chip, 0, 0, null);
-        
-        if (unit.getOwner().getColor() == Color.BLACK) {
-            g.setColor(Color.WHITE);
-        } else {
-            g.setColor(Color.BLACK);
-        }
+        g.setColor(getForegroundColor(unit.getOwner().getColor()));
         String occupationString;
         if (unit.getOwner() != freeColClient.getMyPlayer()
                 && unit.isNaval()) {
@@ -2292,6 +2289,21 @@ public final class GUI {
         g.drawString(occupationString, TEXT_OFFSET_X, TEXT_OFFSET_Y);
         
         return img;
+    }
+
+
+    private Color getForegroundColor(Color background) {
+        Color foreground = colorMap.get(background);
+        if (foreground == null) {
+            if (background.getRed() + background.getGreen() + background.getBlue() <
+                127 + 127 + 127) {
+                foreground = Color.WHITE;
+            } else {
+                foreground = Color.BLACK;
+            }
+            colorMap.put(background, foreground);
+        }
+        return foreground;
     }
     
     public void displayOccupationIndicator(Graphics g, Unit unit, int x, int y) {
