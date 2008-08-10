@@ -22,7 +22,9 @@ package net.sf.freecol.server.generator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -54,6 +56,7 @@ public class TerrainGenerator {
     private final Random random = new Random();
 
     private TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
+    private TileType lake = FreeCol.getSpecification().getTileType("model.tile.lake");
 
     private ArrayList<TileType> terrainTileTypes = null;
 
@@ -143,6 +146,7 @@ public class TerrainGenerator {
 	    if (mapHasLand) {
 		createMountains(map);
 		createRivers(map);
+                findLakes(map);
 	    }
         }
 
@@ -795,4 +799,62 @@ public class TerrainGenerator {
                         ", score value " + scoreValue + ").");
         }
     }
+
+
+    private void findLakes(Map map) {
+
+	Position p = null;
+
+        // Search for a reachable water tile on the vertical edge.
+        // No need to search on the horizental edges as they will
+        // be covered by the polar regions.
+        for (int x : new int[] {0, map.getWidth() - 1}) {
+            for (int y = 0; y < map.getHeight(); y++) {
+                Tile tile = map.getTile(x, y);
+                if (tile != null && tile.getType() != null && !tile.isLand()) {
+                    p = new Position(x, y);
+                    break;
+                }
+            }
+        }
+
+        if (p == null) {
+            // This should not happen!
+            logger.warning("Find lakes: unable to find entry point.");
+            return;        
+        }
+
+        // Find all reachable water tiles using a floodfill algorithm and BFS.
+	Queue<Position>q = new LinkedList<Position>();
+
+        boolean[][] visited = new boolean[map.getWidth()][map.getHeight()];
+        visited[p.getX()][p.getY()] = true;
+        do {
+            for (Direction direction : Direction.values()) {
+                Position n = Map.getAdjacent(p, direction);
+                if (map.getTile(n) != null && !map.getTile(n).isLand() &&
+                    !visited[n.getX()][n.getY()]) {
+                    visited[n.getX()][n.getY()] = true;
+                    q.add(n);
+                }
+            }
+
+            p = q.poll();
+	} while (p != null);
+
+        // Every water tile we did not reach is a lake. 
+        for (int y=0; y < map.getHeight(); y++) {
+            for (int x=0; x < map.getWidth(); x++) {
+                if (!visited[x][y]) {
+                    Tile tile = map.getTile(x, y);
+                    if (tile != null && !tile.isLand()) {
+                        tile.setType(lake);
+                    }
+                }
+            }
+        }      
+    }
+
+
+
 }
