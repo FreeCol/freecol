@@ -107,6 +107,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     private Region region;
 
     /**
+     * Whether this tile is connected to Europe.
+     */
+    private boolean connected = false;
+
+    /**
      * A constructor to use.
      * 
      * @param game The <code>Game</code> this <code>Tile</code> belongs to.
@@ -387,7 +392,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     // can build next to an indian settlement
                     value -= 10;
                 } else {
-                    if (!tile.isLand()) {
+                    if (!tile.isConnected()) {
                         nearbyTileIsOcean = true;
                     }
                     for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
@@ -643,6 +648,24 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public Map getMap() {
         return getGame().getMap();
+    }
+
+    /**
+     * Whether this tile is connected to Europe.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isConnected() {
+        return (connected || (type != null && type.isConnected()));
+    }
+
+    /**
+     * Set the <code>Connected</code> value.
+     *
+     * @param newConnected The new Connected value.
+     */
+    public void setConnected(final boolean newConnected) {
+        this.connected = newConnected;
     }
 
     /**
@@ -1523,6 +1546,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             out.writeAttribute("lostCityRumour", Boolean.toString(lostCity));
         }
 
+        if (connected && !type.isConnected()) {
+            out.writeAttribute("connected", Boolean.toString(true));
+        }
+
         if (owner != null) {
             if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
                 out.writeAttribute("owner", owner.getId());
@@ -1666,6 +1693,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(), false);
+        connected = getAttribute(in, "connected", false);
         owner = getFreeColGameObject(in, "owner", Player.class, null);
         region = getFreeColGameObject(in, "region", Region.class, null);
 
@@ -1791,6 +1819,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         pet.getTileItemInfo(tileItemContainer);
 
         pet.setLostCityRumour(lostCityRumour);
+        pet.setConnected(connected);
         pet.setOwner(owner);
         pet.setRegion(region);
 
@@ -1963,7 +1992,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         private Unit missionary = null;
 
         private boolean lostCityRumour;
-
+        private boolean connected = false;
 
         /**
          * Creates a new <code>PlayerExploredTile</code>.
@@ -2039,6 +2068,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         public boolean hasLostCityRumour() {
             return lostCityRumour;
+        }
+
+        public void setConnected(boolean connected) {
+            this.connected = connected;
+        }
+
+        public boolean isConnected() {
+            return connected;
         }
 
         public void setExplored(boolean explored) {
@@ -2154,7 +2191,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
                 out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
             }
-
+            out.writeAttribute("connected", Boolean.toString(connected));
             writeAttribute(out, "learnableSkill", skill);
             writeAttribute(out, "region", region);
             writeAttribute(out, "wantedGoods0", wantedGoods[0]);
@@ -2193,6 +2230,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             colonyStockadeLevel = getAttribute(in, "colonyStockadeLevel", 0);
             lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(),
                                           Tile.this.hasLostCityRumour());
+            connected = getAttribute(in, "connected", false);
 
             owner = getFreeColGameObject(in, "owner", Player.class, Tile.this.getOwner());
             region = getFreeColGameObject(in, "region", Region.class, null);

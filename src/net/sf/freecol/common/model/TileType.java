@@ -61,6 +61,11 @@ public final class TileType extends FreeColGameObjectType {
     private GoodsType secondaryGoods = null;
 
     /**
+     * Whether this TileType is connected to Europe.
+     */
+    private boolean connected;
+
+    /**
      * Describe production here.
      */
     private List<AbstractGoods> production;
@@ -99,6 +104,15 @@ public final class TileType extends FreeColGameObjectType {
 
     public boolean isWater() {
         return water;
+    }
+
+    /**
+     * Get the <code>Connected</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isConnected() {
+        return connected;
     }
 
     public boolean canSettle() {
@@ -206,6 +220,7 @@ public final class TileType extends FreeColGameObjectType {
         water = getAttribute(in, "is-water", false);
         canSettle = getAttribute(in, "can-settle", !water);
         canSailToEurope = getAttribute(in, "sail-to-europe", false);
+        connected = getAttribute(in, "is-connected", canSailToEurope);
         canHaveRiver = !(getAttribute(in, "no-river", water));
         attackBonus = 0;
         defenceBonus = 0;

@@ -125,6 +125,11 @@ public class River {
      */
     private java.util.Map<Position, River> riverMap;
 
+    /**
+     * Whether the river is connected to Europe.
+     */
+    private boolean connected = false;
+
 
     /**
      * Constructor.
@@ -356,6 +361,7 @@ public class River {
                                 waterSection.setBranch(lastDir.getReverseDirection(),
                                                        TileImprovement.SMALL_RIVER);
                             }
+                            connected = tile.isConnected();
                             drawToMap();
                         }
                         return true;
@@ -390,7 +396,6 @@ public class River {
                     container = new TileItemContainer(tile.getGame(), tile);
                     tile.setTileItemContainer(container);
                 }
-            
                 if (section.getSize() == TileImprovement.SMALL_RIVER || 
                     section.getSize() == TileImprovement.LARGE_RIVER) {
                     container.addRiver(section.getSize(), section.encodeStyle());
@@ -399,6 +404,9 @@ public class River {
                 } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
                     tile.setType(greatRiver);   // changing the type resets the improvements
                     container.addRiver(section.getSize(), section.encodeStyle());
+                    if (connected) {
+                        tile.setConnected(true);
+                    }
                     logger.fine("Added fjord (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 }
