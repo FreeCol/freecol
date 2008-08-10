@@ -124,10 +124,6 @@ public class TerrainGenerator {
                             container.copyFrom(importTile.getTileItemContainer(), importBonuses);
                             t.setTileItemContainer(container);
                         }
-                        if (!importBonuses) {
-                            // In which case, we may add a Bonus Resource
-                            perhapsAddBonus(t, landMap);
-                        }
                     } else {
                         t = createTile(game, x, y, landMap, latitude);
                     }
@@ -148,6 +144,17 @@ public class TerrainGenerator {
 		createMountains(map);
 		createRivers(map);
 	    }
+        }
+
+        // Add the bonuses only after the map is completed.
+        // Otherwise we risk creating resources on fields where they
+        // don't belong (like sugar in large rivers or tobaco on hills).
+	if (!importBonuses) {
+	    for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+		    perhapsAddBonus(tiles[x][y], landMap);
+                }
+            }
         }
     }
 
