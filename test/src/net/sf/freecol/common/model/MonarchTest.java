@@ -31,6 +31,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MonarchTest extends FreeColTestCase {
@@ -50,6 +52,46 @@ public class MonarchTest extends FreeColTestCase {
         } catch (XMLStreamException e) {
         }
 
+    }
+
+    public void testTaxActionChoices() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        // grace period has not yet expired
+        List<RandomChoice<MonarchAction>> choices = dutch.getMonarch().getActionChoices();
+        assertNull(choices);
+
+        game.getTurn().setNumber(100);
+        dutch.setTax(Monarch.MINIMUM_TAX_RATE / 2);
+        choices = dutch.getMonarch().getActionChoices();
+        assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX));
+        assertFalse(choicesContain(choices, MonarchAction.LOWER_TAX));
+
+        dutch.setTax(Monarch.MAXIMUM_TAX_RATE / 2);
+        choices = dutch.getMonarch().getActionChoices();
+        assertTrue(choicesContain(choices, MonarchAction.RAISE_TAX));
+        assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX));
+
+        dutch.setTax(Monarch.MAXIMUM_TAX_RATE + 2);
+        choices = dutch.getMonarch().getActionChoices();
+        assertFalse(choicesContain(choices, MonarchAction.RAISE_TAX));
+        assertTrue(choicesContain(choices, MonarchAction.LOWER_TAX));
+
+        dutch.setPlayerType(Player.PlayerType.REBEL);
+        choices = dutch.getMonarch().getActionChoices();
+        assertNull(choices);
+
+    }
+
+
+    private boolean choicesContain(List<RandomChoice<MonarchAction>> choices, MonarchAction action) {
+        for (RandomChoice<MonarchAction> choice : choices) {
+            if (choice.getObject() == action) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
