@@ -145,8 +145,8 @@ public class TerrainGenerator {
             createHighSeas(map);
 	    if (mapHasLand) {
 		createMountains(map);
-		createRivers(map);
                 findLakes(map);
+		createRivers(map);
 	    }
         }
 
