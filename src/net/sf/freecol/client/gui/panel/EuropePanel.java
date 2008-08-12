@@ -284,8 +284,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
 
         int[] widths = { 0, 315, margin, 103, margin, 198, margin, 0, 0 };
         int[] heights = {
-            0, // top margin
-            120, margin, // log
+            30, // top margin
             // sailing to America, sailing to Europe
             39, margin, // recruit button
             39, margin, // buy button
@@ -294,7 +293,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
             116, margin, // in port
             75, 39, margin, // cargo
             75, 39, // market
-            0 // bottom margin
+            120, margin // log
         };
 
         HIGLayout layout = new HIGLayout(widths, heights);
@@ -305,8 +304,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         setLayout(layout);
 
         int row = 2;
-        add(logScroll, higConst.rcwh(row, 2, 6, 1));
-        row += 2;
         add(toAmericaScroll, higConst.rcwh(row, 2, 1, 7));
         add(toEuropeScroll, higConst.rcwh(row, 4, 3, 7));
         add(recruitButton, higConst.rc(row, 8));
@@ -327,6 +324,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         add(marketScroll, higConst.rcwh(row, 2, 5, 2));
         row += 1;
         add(exitButton, higConst.rc(row, 8));
+        row += 2;
+        add(logScroll, higConst.rcwh(row, 2, 6, 1));
 
         setBorder(null);
 

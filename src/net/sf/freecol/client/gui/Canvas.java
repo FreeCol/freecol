@@ -2000,10 +2000,10 @@ public final class Canvas extends JDesktopPane {
         int width = f.getWidth();
         int height = f.getHeight();
         if (width > getWidth() - FRAME_EMPTY_SPACE) {
-            width = getWidth() - FRAME_EMPTY_SPACE;
+            width = Math.min(width, getWidth());
         }
         if (height > getHeight() - FRAME_EMPTY_SPACE) {
-            height = getHeight() - FRAME_EMPTY_SPACE;
+            height = Math.min(height, getHeight() - getMenuBarHeight());
         }
         f.setSize(width, height);
         addCentered(f, MODAL_LAYER);
