@@ -47,6 +47,8 @@ import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
@@ -2029,7 +2031,10 @@ public final class Canvas extends JDesktopPane {
      */
     public JInternalFrame addAsSimpleFrame(JComponent comp) {
         final JInternalFrame f = new JInternalFrame();
-        f.getContentPane().add(comp);
+        JScrollPane scrollPane =
+            new JScrollPane(comp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+                            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        f.getContentPane().add(scrollPane);
         f.pack();
         addCentered(f);
         f.setName(comp.getClass().getSimpleName());
