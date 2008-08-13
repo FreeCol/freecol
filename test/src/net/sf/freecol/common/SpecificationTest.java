@@ -19,12 +19,17 @@
 
 package net.sf.freecol.common;
 
+import java.util.List;
+
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.EuropeanNationType;
+import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.option.RangeOption;
 
@@ -159,6 +164,36 @@ public final class SpecificationTest extends TestCase {
     	modifier = blackSmith.getModifierSet("model.goods.tools").iterator().next();
     	assertEquals(Modifier.Type.MULTIPLICATIVE, modifier.getType());
     	assertEquals(2f, modifier.getValue());
+    }
+
+    public void testNations() {
+
+        Specification spec = Specification.getSpecification();
+
+        List<Nation> classicNations = spec.getClassicNations();
+        assertEquals(4, classicNations.size());
+        List<Nation> europeanNations = spec.getEuropeanNations();
+        assertEquals(8, europeanNations.size());
+        List<Nation> indianNations = spec.getIndianNations();
+        assertEquals(8, indianNations.size());
+        List<Nation> REFNations = spec.getREFNations();
+        assertEquals(REFNations.size(), europeanNations.size());
+
+    }
+
+    public void testNationTypes() {
+
+        Specification spec = Specification.getSpecification();
+
+        List<EuropeanNationType> classicNationTypes = spec.getClassicNationTypes();
+        assertEquals(4, classicNationTypes.size());
+        List<EuropeanNationType> europeanNationTypes = spec.getEuropeanNationTypes();
+        assertTrue(classicNationTypes.size() <= europeanNationTypes.size());
+        List<IndianNationType> indianNationTypes = spec.getIndianNationTypes();
+        assertEquals(8, indianNationTypes.size());
+        List<EuropeanNationType> REFNationTypes = spec.getREFNationTypes();
+        assertEquals(1, REFNationTypes.size());
+
     }
 
 }

@@ -336,9 +336,11 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
             cargo.add(newCargo);
         }
 
+        /*
         public void addCargo(int newCargoIndex) {
             cargo.add(FreeCol.getSpecification().getGoodsType(newCargoIndex));
         }
+        */
 
         public String toString() {
             Location l = getLocation();

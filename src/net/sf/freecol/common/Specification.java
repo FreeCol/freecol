@@ -87,6 +87,8 @@ public final class Specification {
 
     private final Map<String, OptionGroup> allOptionGroups;
 
+    private final Map<GoodsType, UnitType> experts;
+
     private final Set<String> abilityKeys;
 
     private final Set<String> modifierKeys;
@@ -94,8 +96,8 @@ public final class Specification {
     private final List<BuildingType> buildingTypeList;
 
     private final List<GoodsType> goodsTypeList;
-
     private final List<GoodsType> farmedGoodsTypeList;
+    private final List<GoodsType> foodGoodsTypeList;
     private final List<GoodsType> newWorldGoodsTypeList;
 
     private final List<ResourceType> resourceTypeList;
@@ -107,27 +109,38 @@ public final class Specification {
     private final List<ImprovementActionType> improvementActionTypeList;
 
     private final List<UnitType> unitTypeList;
+    private final List<UnitType> unitTypesTrainedInEurope;
+    private final List<UnitType> unitTypesPurchasedInEurope;
 
     private final List<FoundingFather> foundingFathers;
 
     private final List<Nation> nations;
+    private final List<Nation> europeanNations;
+    private final List<Nation> REFNations;
+    private final List<Nation> classicNations;
+    private final List<Nation> indianNations;
 
     private final List<NationType> nationTypes;
+    private final List<EuropeanNationType> europeanNationTypes;
+    private final List<EuropeanNationType> REFNationTypes;
+    private final List<EuropeanNationType> classicNationTypes;
+    private final List<IndianNationType> indianNationTypes;
 
     private final List<EquipmentType> equipmentTypes;
 
     private final List<DifficultyLevel> difficultyLevels;
 
+    private int storableTypes = 0;
 
     /**
      * Creates a new Specification object by loading it from the
      * specification.xml.
-     * 
+     *
      * This method is protected, since only one Specification object may exist.
      * This is due to static links from type {@link Goods} to the most important
      * GoodsTypes. If another specification object is created these links would
      * not work anymore for the previously created specification.
-     * 
+     *
      * To get hold of an Specification object use the static method
      * {@link #getSpecification()} which returns a singleton instance of the
      * Specification class.
@@ -138,32 +151,53 @@ public final class Specification {
         allTypes = new HashMap<String, FreeColGameObjectType>();
         allOptions = new HashMap<String, AbstractOption>();
         allOptionGroups = new HashMap<String, OptionGroup>();
+	experts = new HashMap<GoodsType, UnitType>();
+
         abilityKeys = new HashSet<String>();
         modifierKeys = new HashSet<String>();
+
         buildingTypeList = new ArrayList<BuildingType>();
+
         goodsTypeList = new ArrayList<GoodsType>();
+        foodGoodsTypeList = new ArrayList<GoodsType>();
+        farmedGoodsTypeList = new ArrayList<GoodsType>();
+        newWorldGoodsTypeList = new ArrayList<GoodsType>();
+
         resourceTypeList = new ArrayList<ResourceType>();
         tileTypeList = new ArrayList<TileType>();
         tileImprovementTypeList = new ArrayList<TileImprovementType>();
         improvementActionTypeList = new ArrayList<ImprovementActionType>();
+
         unitTypeList = new ArrayList<UnitType>();
+        unitTypesPurchasedInEurope = new ArrayList<UnitType>();
+        unitTypesTrainedInEurope = new ArrayList<UnitType>();
+
         foundingFathers = new ArrayList<FoundingFather>();
+
         nations = new ArrayList<Nation>();
+	europeanNations = new ArrayList<Nation>();
+	REFNations = new ArrayList<Nation>();
+	classicNations = new ArrayList<Nation>();
+	indianNations = new ArrayList<Nation>();
+
         nationTypes = new ArrayList<NationType>();
+        europeanNationTypes = new ArrayList<EuropeanNationType>();
+        REFNationTypes = new ArrayList<EuropeanNationType>();
+        classicNationTypes = new ArrayList<EuropeanNationType>();
+        indianNationTypes = new ArrayList<IndianNationType>();
+
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
-        farmedGoodsTypeList = new ArrayList<GoodsType>();
-        newWorldGoodsTypeList = new ArrayList<GoodsType>();
 
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
             xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 String childName = xsr.getLocalName();
+		logger.finest("Found child named " + childName);
 
                 if ("goods-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int goodsIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         GoodsType goodsType = new GoodsType(goodsIndex++);
@@ -173,14 +207,19 @@ public final class Specification {
                         if (goodsType.isFarmed()) {
                             farmedGoodsTypeList.add(goodsType);
                         }
+                        if (goodsType.isFoodType()) {
+                            foodGoodsTypeList.add(goodsType);
+                        }
                         if (goodsType.isNewWorldGoodsType()) {
                             newWorldGoodsTypeList.add(goodsType);
                         }
+			if (goodsType.isStorable()) {
+			    storableTypes++;
+			}
                     }
 
                 } else if ("building-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int buildingIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         BuildingType buildingType = new BuildingType(buildingIndex++);
@@ -191,7 +230,6 @@ public final class Specification {
 
                 } else if ("resource-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int resIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         ResourceType resourceType = new ResourceType(resIndex++);
@@ -202,7 +240,6 @@ public final class Specification {
 
                 } else if ("tile-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int tileIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         TileType tileType = new TileType(tileIndex++);
@@ -213,7 +250,6 @@ public final class Specification {
 
                 } else if ("tileimprovement-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int impIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
@@ -224,7 +260,6 @@ public final class Specification {
 
                 } else if ("improvementaction-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         ImprovementActionType impActionType = new ImprovementActionType();
                         impActionType.readFromXML(xsr, this);
@@ -234,18 +269,25 @@ public final class Specification {
 
                 } else if ("unit-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int unitIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         UnitType unitType = new UnitType(unitIndex++);
                         unitType.readFromXML(xsr, this);
                         allTypes.put(unitType.getId(), unitType);
                         unitTypeList.add(unitType);
+			experts.put(unitType.getExpertProduction(), unitType);
+
+			if (unitType.hasPrice()) {
+			    if (unitType.getSkill() > 0) {
+				unitTypesTrainedInEurope.add(unitType);
+			    } else if (!unitType.hasSkill()) {
+				unitTypesPurchasedInEurope.add(unitType);
+			    }
+			}
                     }
 
                 } else if ("founding-fathers".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int fatherIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         FoundingFather foundingFather = new FoundingFather(fatherIndex++);
@@ -256,34 +298,53 @@ public final class Specification {
 
                 } else if ("nation-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int nationIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         NationType nationType;
                         if ("european-nation-type".equals(xsr.getLocalName())) {
                             nationType = new EuropeanNationType(nationIndex++);
+			    nationType.readFromXML(xsr, this);
+			    if (nationType.isREF()) {
+				REFNationTypes.add((EuropeanNationType) nationType);
+			    } else {
+				europeanNationTypes.add((EuropeanNationType) nationType);
+			    }
                         } else {
                             nationType = new IndianNationType(nationIndex++);
+			    nationType.readFromXML(xsr, this);
+			    indianNationTypes.add((IndianNationType) nationType);
                         }
-                        nationType.readFromXML(xsr, this);
                         allTypes.put(nationType.getId(), nationType);
                         nationTypes.add(nationType);
+
                     }
 
                 } else if ("nations".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int nationIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         Nation nation = new Nation(nationIndex++);
                         nation.readFromXML(xsr, this);
                         allTypes.put(nation.getId(), nation);
                         nations.add(nation);
+
+			if (nation.getType().isEuropean()) {
+                            if (nation.getType().isREF()) {
+                                REFNations.add(nation);
+                            } else {
+                                europeanNations.add(nation);
+                            }
+                            if (nation.isClassic()) {
+                                classicNations.add(nation);
+                                classicNationTypes.add((EuropeanNationType) nation.getType());
+                            }
+			} else {
+			    indianNations.add(nation);
+			}
                     }
 
                 } else if ("equipment-types".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int equipmentIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         EquipmentType equipmentType = new EquipmentType(equipmentIndex++);
@@ -294,7 +355,6 @@ public final class Specification {
 
                 } else if ("difficultyLevels".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     int levelIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         DifficultyLevel level = new DifficultyLevel(levelIndex++);
@@ -305,7 +365,6 @@ public final class Specification {
 
                 } else if ("options".equals(childName)) {
 
-                    logger.finest("Found child named " + childName);
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         AbstractOption option = (AbstractOption) null;
                         String optionType = xsr.getLocalName();
@@ -357,10 +416,22 @@ public final class Specification {
     // ---------------------------------------------------------- retrieval
     // methods
 
+    /**
+     * Return a Set of all abilities defined by the specification.
+     * This is required to detect access to undefined abilities.
+     *
+     * @return all abilities defined by the specification.
+     */
     public Set<String> getAbilityKeys() {
         return abilityKeys;
     }
 
+    /**
+     * Return a Set of all modifiers defined by the specification.
+     * This is required to detect access to undefined modifiers.
+     *
+     * @return all modifiers defined by the specification.
+     */
     public Set<String> getModifierKeys() {
         return modifierKeys;
     }
@@ -369,7 +440,7 @@ public final class Specification {
      * Returns the <code>FreeColGameObjectType</code> with the given ID.
      * Throws an IllegalArgumentException if the ID is null, or if no such Type
      * can be retrieved.
-     * 
+     *
      * @param Id a <code>String</code> value
      * @return a <code>FreeColGameObjectType</code> value
      */
@@ -387,7 +458,7 @@ public final class Specification {
     /**
      * Returns the <code>AbstractOption</code> with the given ID. Throws an
      * IllegalArgumentException if the ID is null or unknown.
-     * 
+     *
      * @param Id a <code>String</code> value
      * @return an <code>AbstractOption</code> value
      */
@@ -405,7 +476,7 @@ public final class Specification {
     /**
      * Returns the <code>OptionGroup</code> with the given ID. Throws an
      * IllegalArgumentException if the ID is null or unknown.
-     * 
+     *
      * @param Id a <code>String</code> value
      * @return an <code>OptionGroup</code> value
      */
@@ -422,16 +493,16 @@ public final class Specification {
 
     /**
      * Adds an <code>OptionGroup</code> to the specification
-     * 
+     *
      * @param optionGroup <code>OptionGroup</code> to add
      */
     public void addOptionGroup(OptionGroup optionGroup) {
         // Add the option group
         allOptionGroups.put(optionGroup.getId(), optionGroup);
- 
+
         // Add the options of the group
         Iterator<Option> iter = optionGroup.iterator();
-        
+
         while(iter.hasNext()){
             Option option = iter.next();
             addAbstractOption((AbstractOption) option);
@@ -440,12 +511,12 @@ public final class Specification {
 
     /**
      * Adds an <code>AbstractOption</code> to the specification
-     * 
+     *
      * @param abstractOption <code>AbstractOption</code> to add
      */
     public void addAbstractOption(AbstractOption abstractOption) {
         // Add the option
-        allOptions.put(abstractOption.getId(), abstractOption); 
+        allOptions.put(abstractOption.getId(), abstractOption);
     }
 
 
@@ -453,7 +524,7 @@ public final class Specification {
      * Returns the <code>IntegerOption</code> with the given ID. Throws an
      * IllegalArgumentException if the ID is null, or if no such Type can be
      * retrieved.
-     * 
+     *
      * @param Id a <code>String</code> value
      * @return an <code>IntegerOption</code> value
      */
@@ -465,7 +536,7 @@ public final class Specification {
      * Returns the <code>RangeOption</code> with the given ID. Throws an
      * IllegalArgumentException if the ID is null, or if no such Type can be
      * retrieved.
-     * 
+     *
      * @param Id a <code>String</code> value
      * @return an <code>RangeOption</code> value
      */
@@ -477,7 +548,7 @@ public final class Specification {
      * Returns the <code>BooleanOption</code> with the given ID. Throws an
      * IllegalArgumentException if the ID is null, or if no such Type can be
      * retrieved.
-     * 
+     *
      * @param Id a <code>String</code> value
      * @return an <code>BooleanOption</code> value
      */
@@ -492,7 +563,7 @@ public final class Specification {
 
     /**
      * Describe <code>numberOfBuildingTypes</code> method here.
-     * 
+     *
      * @return an <code>int</code> value
      */
     public int numberOfBuildingTypes() {
@@ -501,7 +572,7 @@ public final class Specification {
 
     /**
      * Describe <code>getBuildingType</code> method here.
-     * 
+     *
      * @param buildingTypeIndex an <code>int</code> value
      * @return a <code>BuildingType</code> value
      */
@@ -520,7 +591,7 @@ public final class Specification {
 
     /**
      * Describe <code>numberOfGoodsTypes</code> method here.
-     * 
+     *
      * @return an <code>int</code> value
      */
     public int numberOfGoodsTypes() {
@@ -528,13 +599,7 @@ public final class Specification {
     }
 
     public int numberOfStoredGoodsTypes() {
-        int n = 0;
-        for (GoodsType g : goodsTypeList) {
-            if (g.isStorable()) {
-                n++;
-            }
-        }
-        return n;
+        return storableTypes;
     }
 
     public List<GoodsType> getFarmedGoodsTypeList() {
@@ -547,7 +612,7 @@ public final class Specification {
 
     /**
      * Describe <code>numberOfFarmedGoodsTypes</code> method here.
-     * 
+     *
      * @return an <code>int</code> value
      */
     public int numberOfFarmedGoodsTypes() {
@@ -556,7 +621,7 @@ public final class Specification {
 
     /**
      * Describe <code>getGoodsType</code> method here.
-     * 
+     *
      * @param goodsTypeIndex an <code>int</code> value
      * @return a <code>GoodsType</code> value
      */
@@ -566,7 +631,7 @@ public final class Specification {
 
     /**
      * Describe <code>getGoodsType</code> method here.
-     * 
+     *
      * @param id a <code>String</code> value
      * @return a <code>GoodsType</code> value
      */
@@ -575,34 +640,7 @@ public final class Specification {
     }
 
     public List<GoodsType> getGoodsFood() {
-        ArrayList<GoodsType> goods = new ArrayList<GoodsType>();
-        for (GoodsType g : goodsTypeList) {
-            if (g.isFoodType()) {
-                goods.add(g);
-            }
-        }
-        return goods;
-    }
-
-    /**
-     * Returns a list of GoodsTypes for which the given predicate obtains. For
-     * example, getMatchingGoodsTypes("isFarmed") returns a list of all
-     * GoodsTypes g for which g.isFarmed() returns true.
-     * 
-     * @param methodName the name of the method to invoke on the GoodsType
-     * @return a list of <code>GoodsType</code>s for which the given
-     *         predicate returns true
-     */
-    public List<GoodsType> getMatchingGoodsTypes(String methodName) throws Exception {
-        Method method = GoodsType.class.getDeclaredMethod(methodName);
-        method.setAccessible(true);
-        ArrayList<GoodsType> goodsTypes = new ArrayList<GoodsType>();
-        for (GoodsType goodsType : goodsTypeList) {
-            if ((Boolean) method.invoke(goodsType)) {
-                goodsTypes.add(goodsType);
-            }
-        }
-        return goodsTypes;
+        return foodGoodsTypeList;
     }
 
     // -- Resources --
@@ -612,10 +650,6 @@ public final class Specification {
 
     public int numberOfResourceTypes() {
         return resourceTypeList.size();
-    }
-
-    public ResourceType getResourceType(int index) {
-        return resourceTypeList.get(index);
     }
 
     public ResourceType getResourceType(String id) {
@@ -631,10 +665,6 @@ public final class Specification {
         return tileTypeList.size();
     }
 
-    public TileType getTileType(int index) {
-        return tileTypeList.get(index);
-    }
-
     public TileType getTileType(String id) {
         return (TileType) getType(id);
     }
@@ -644,10 +674,6 @@ public final class Specification {
         return tileImprovementTypeList;
     }
 
-    public TileImprovementType getTileImprovementType(int index) {
-        return tileImprovementTypeList.get(index);
-    }
-
     public TileImprovementType getTileImprovementType(String id) {
         return (TileImprovementType) getType(id);
     }
@@ -655,10 +681,6 @@ public final class Specification {
     // -- Improvement Actions --
     public List<ImprovementActionType> getImprovementActionTypeList() {
         return improvementActionTypeList;
-    }
-
-    public ImprovementActionType getImprovementActionType(int index) {
-        return improvementActionTypeList.get(index);
     }
 
     public ImprovementActionType getImprovementActionType(String id) {
@@ -674,34 +696,25 @@ public final class Specification {
         return unitTypeList.size();
     }
 
-    public UnitType getUnitType(int unitTypeIndex) {
-        return unitTypeList.get(unitTypeIndex);
-    }
-
     public UnitType getUnitType(String id) {
         return (UnitType) getType(id);
     }
 
     public UnitType getExpertForProducing(GoodsType goodsType) {
-        for (UnitType unitType : getUnitTypeList()) {
-            if (unitType.getExpertProduction() == goodsType) {
-                return unitType;
-            }
-        }
-        return null;
+	return experts.get(goodsType);
     }
 
     /**
      * Return the unit types which have any of the given abilities
-     * 
+     *
      * @param abilities The abilities for the search
      * @return a <code>List</code> of <code>UnitType</code>
      */
     public List<UnitType> getUnitTypesWithAbility(String... abilities) {
         ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
         for (UnitType unitType : getUnitTypeList()) {
-            for (int i = 0; i < abilities.length; i++) {
-                if (unitType.hasAbility(abilities[i])) {
+            for (String ability : abilities) {
+                if (unitType.hasAbility(ability)) {
                     unitTypes.add(unitType);
                     break;
                 }
@@ -714,26 +727,14 @@ public final class Specification {
      * Returns the unit types that can be trained in Europe.
      */
     public List<UnitType> getUnitTypesTrainedInEurope() {
-        List<UnitType> result = new ArrayList<UnitType>();
-        for (UnitType unitType : getUnitTypeList()) {
-            if (unitType.getSkill() > 0 && unitType.hasPrice()) {
-                result.add(unitType);
-            }
-        }
-        return result;
+        return unitTypesTrainedInEurope;
     }
 
     /**
      * Returns the unit types that can be purchased in Europe.
      */
     public List<UnitType> getUnitTypesPurchasedInEurope() {
-        List<UnitType> result = new ArrayList<UnitType>();
-        for (UnitType unitType : getUnitTypeList()) {
-            if (!unitType.hasSkill() && unitType.hasPrice()) {
-                result.add(unitType);
-            }
-        }
-        return result;
+        return unitTypesPurchasedInEurope;
     }
 
     // -- Founding Fathers --
@@ -744,10 +745,6 @@ public final class Specification {
 
     public int numberOfFoundingFathers() {
         return foundingFathers.size();
-    }
-
-    public FoundingFather getFoundingFather(int foundingFatherIndex) {
-        return foundingFathers.get(foundingFatherIndex);
     }
 
     public FoundingFather getFoundingFather(String id) {
@@ -761,51 +758,23 @@ public final class Specification {
     }
 
     public List<EuropeanNationType> getEuropeanNationTypes() {
-        List<EuropeanNationType> result = new ArrayList<EuropeanNationType>();
-        for (NationType nationType : nationTypes) {
-            if (nationType.isEuropean() && !nationType.isREF()) {
-                result.add((EuropeanNationType) nationType);
-            }
-        }
-        return result;
+	return europeanNationTypes;
     }
 
     public List<EuropeanNationType> getREFNationTypes() {
-        List<EuropeanNationType> result = new ArrayList<EuropeanNationType>();
-        for (NationType nationType : nationTypes) {
-            if (nationType.isEuropean() && nationType.isREF()) {
-                result.add((EuropeanNationType) nationType);
-            }
-        }
-        return result;
+        return REFNationTypes;
     }
 
     public List<IndianNationType> getIndianNationTypes() {
-        List<IndianNationType> result = new ArrayList<IndianNationType>();
-        for (NationType nationType : nationTypes) {
-            if (!nationType.isEuropean()) {
-                result.add((IndianNationType) nationType);
-            }
-        }
-        return result;
+        return indianNationTypes;
     }
 
     public List<EuropeanNationType> getClassicNationTypes() {
-        ArrayList<EuropeanNationType> result = new ArrayList<EuropeanNationType>();
-        for (Nation nation : nations) {
-            if (nation.isClassic()) {
-                result.add((EuropeanNationType) nation.getType());
-            }
-        }
-        return result;
+        return classicNationTypes;
     }
 
     public int numberOfNationTypes() {
         return nationTypes.size();
-    }
-
-    public NationType getNationType(int nationIndex) {
-        return nationTypes.get(nationIndex);
     }
 
     public NationType getNationType(String id) {
@@ -818,52 +787,24 @@ public final class Specification {
         return nations;
     }
 
-    public Nation getNation(int index) {
-        return nations.get(index);
-    }
-
     public Nation getNation(String id) {
         return (Nation) getType(id);
     }
 
     public List<Nation> getClassicNations() {
-        ArrayList<Nation> result = new ArrayList<Nation>();
-        for (Nation nation : nations) {
-            if (nation.isClassic()) {
-                result.add(nation);
-            }
-        }
-        return result;
+        return classicNations;
     }
 
     public List<Nation> getEuropeanNations() {
-        ArrayList<Nation> result = new ArrayList<Nation>();
-        for (Nation nation : nations) {
-            if (nation.isSelectable()) {
-                result.add(nation);
-            }
-        }
-        return result;
+        return europeanNations;
     }
 
     public List<Nation> getIndianNations() {
-        ArrayList<Nation> result = new ArrayList<Nation>();
-        for (Nation nation : nations) {
-            if (!nation.getType().isEuropean()) {
-                result.add(nation);
-            }
-        }
-        return result;
+        return indianNations;
     }
 
     public List<Nation> getREFNations() {
-        ArrayList<Nation> result = new ArrayList<Nation>();
-        for (Nation nation : nations) {
-            if (nation.getType().isREF()) {
-                result.add(nation);
-            }
-        }
-        return result;
+        return REFNations;
     }
 
     // -- EquipmentTypes --
@@ -902,7 +843,7 @@ public final class Specification {
 
     /**
      * Applies the difficulty level to the current specification.
-     * 
+     *
      * @param difficultyLevel difficulty level to apply
      */
     public void applyDifficultyLevel(int difficultyLevel) {
@@ -913,7 +854,7 @@ public final class Specification {
 
     /**
      * Loads the specification.
-     * 
+     *
      * @param is The stream to load the specification from.
      */
     public static void createSpecification(InputStream is) {

@@ -1250,9 +1250,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The normal potential of this tile to produce that amount of
      *         goods.
      */
+    /*
     public int potential(int goodsIndex) {
         return potential(FreeCol.getSpecification().getGoodsType(goodsIndex));
     }
+    */
 
     /**
      * Gets the maximum potential for producing the given type of goods. The

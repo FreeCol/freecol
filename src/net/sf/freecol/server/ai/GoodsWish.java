@@ -132,7 +132,7 @@ public class GoodsWish extends Wish {
          }
          out.writeAttribute("value", Integer.toString(value));
          
-         out.writeAttribute("goodsType", Integer.toString(goodsType.getIndex()));
+         out.writeAttribute("goodsType", goodsType.getId());
          
          out.writeEndElement();
      }
@@ -158,8 +158,7 @@ public class GoodsWish extends Wish {
          }
          value = Integer.parseInt(in.getAttributeValue(null, "value"));
          
-         int goodsTypeIndex = Integer.parseInt(in.getAttributeValue(null, "goodsType"));
-         goodsType = FreeCol.getSpecification().getGoodsType(goodsTypeIndex);
+         goodsType = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
          
          in.nextTag();
      }

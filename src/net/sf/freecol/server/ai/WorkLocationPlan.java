@@ -255,7 +255,7 @@ public class WorkLocationPlan {
 
         element.setAttribute("ID", workLocation.getId());
         element.setAttribute("priority", Integer.toString(priority));
-        element.setAttribute("goodsType", Integer.toString(goodsType.getIndex()));
+        element.setAttribute("goodsType", goodsType.getId());
 
         return element;
     }
@@ -270,7 +270,7 @@ public class WorkLocationPlan {
     public void readFromXMLElement(Element element) {
         workLocation = (WorkLocation) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
         priority = Integer.parseInt(element.getAttribute("priority"));
-        goodsType = FreeCol.getSpecification().getGoodsType(Integer.parseInt(element.getAttribute("goodsType")));
+        goodsType = FreeCol.getSpecification().getGoodsType(element.getAttribute("goodsType"));
     }
 
 

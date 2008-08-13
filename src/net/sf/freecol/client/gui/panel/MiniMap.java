@@ -414,7 +414,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
          * miniRectX/Y are the center of the rectangle.
          * Use miniRectWidth/Height / 2 to get the upper left corner.
          * x/yTiles are the number of tiles that fit on the large map */
-        TileType tileType = FreeCol.getSpecification().getTileType(0);
+        TileType tileType = FreeCol.getSpecification().getTileTypeList().get(0);
         int miniRectX = (freeColClient.getGUI().getFocus().getX() - xOffset) * tileSize;
         int miniRectY = (freeColClient.getGUI().getFocus().getY() - yOffset) * tileSize / 4;
         int miniRectWidth = (getParent().getWidth() / imageProvider.getTerrainImageWidth(tileType) + 1) * tileSize;

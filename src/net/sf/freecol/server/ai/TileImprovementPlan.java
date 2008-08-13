@@ -220,7 +220,7 @@ public class TileImprovementPlan extends AIObject {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getId());        
-        out.writeAttribute("type", Integer.toString(type.getIndex()));
+        out.writeAttribute("type", type.getId());
         out.writeAttribute("value", Integer.toString(value));
         if (pioneer != null) {
             out.writeAttribute("pioneer", pioneer.getId());
@@ -238,7 +238,7 @@ public class TileImprovementPlan extends AIObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-        type = FreeCol.getSpecification().getTileImprovementType(Integer.parseInt(in.getAttributeValue(null, "type")));
+        type = FreeCol.getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
         value = Integer.parseInt(in.getAttributeValue(null, "value"));
         
         final String pioneerStr = in.getAttributeValue(null, "pioneer");

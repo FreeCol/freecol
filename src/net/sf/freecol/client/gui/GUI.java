@@ -207,7 +207,7 @@ public final class GUI {
     public void setImageLibrary(ImageLibrary lib) {
         this.lib = lib;
         cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
-        TileType tileType = FreeCol.getSpecification().getTileType(0);
+        TileType tileType = FreeCol.getSpecification().getTileTypeList().get(0);
         tileHeight = lib.getTerrainImageHeight(tileType);
         tileWidth = lib.getTerrainImageWidth(tileType);
         updateMapDisplayVariables();

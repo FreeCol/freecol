@@ -112,7 +112,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     new RiverTransform(TileImprovement.SMALL_RIVER));
         buildButton(library.getRiverImage(20), Messages.message("majorRiver"),
                     new RiverTransform(TileImprovement.LARGE_RIVER));
-        buildButton(library.getBonusImage(FreeCol.getSpecification().getResourceType(0)),
+        buildButton(library.getBonusImage(FreeCol.getSpecification().getResourceTypeList().get(0)),
                     Messages.message("editor.resource"), new ResourceTransform());
         buildButton(library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
                     Messages.message("model.message.LOST_CITY_RUMOUR"), new LostCityRumourTransform());
