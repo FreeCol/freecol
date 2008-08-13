@@ -365,8 +365,12 @@ public class SoundPlayer {
         }
 
         private void updateVolume(FloatControl c, int volume) {
-            final float minGain = c.getMinimum();
-            final float gain = (volume / 100f) * (0 - minGain) + minGain;
+            // The gain (in decibels) and volume (in percents) are related via logarithm
+            // 100% volume = 0dB attenuation
+            // 50% volume = -6dB
+            // 10% volume = -20dB
+            // 1% volume = -40dB
+            final float gain = 20*(float)Math.log10(volume / 100d);
             c.setValue(gain);
         }
         
