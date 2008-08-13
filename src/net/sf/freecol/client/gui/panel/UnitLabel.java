@@ -55,20 +55,12 @@ import net.sf.freecol.common.model.Unit.UnitState;
  */
 public final class UnitLabel extends JLabel implements ActionListener {
 
-
-
     private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
-    public static final int ARM = 0, MOUNT = 1, TOOLS = 2, DRESS = 3,
-            CLEAR_SPECIALITY = 4, ACTIVATE_UNIT = 5, FORTIFY = 6, SENTRY = 7,
-            COLOPEDIA = 8, LEAVE_TOWN = 9;
+    public static enum UnitAction { ARM, MOUNT, TOOLS, DRESS, ASSIGN,
+            CLEAR_SPECIALITY, ACTIVATE_UNIT, FORTIFY, SENTRY,
+            COLOPEDIA, LEAVE_TOWN, WORK_TILE, WORK_BUILDING }
 
-    public static final int WORK_FARMING = 1000,
-        WORK_LASTFARMING = WORK_FARMING + FreeCol.getSpecification().numberOfGoodsTypes();
-    
-    public static final int WORK_AT_BUILDING = 2000,
-        WORK_AT_LASTBUILDING = WORK_AT_BUILDING + FreeCol.getSpecification().numberOfBuildingTypes();
-        
     private final Unit unit;
 
     private final Canvas parent;
@@ -289,59 +281,60 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        try {
-            if (command.startsWith("assign")) {
-                Unit teacher = (Unit) unit.getGame().getFreeColGameObject(command.substring(6));
-                inGameController.assignTeacher(unit, teacher);
-                Component uc = getParent();
-                while (uc != null) {
-                    if (uc instanceof ColonyPanel) {
-                        ((ColonyPanel) uc).reinitialize();
-                        break;
-                    }
-                    uc = uc.getParent();
-                }
-                return;
-            }
-            int intCommand = Integer.valueOf(command).intValue();
-            if (intCommand == ACTIVATE_UNIT) {
-                parent.getGUI().setActiveUnit(unit);
-            } else if (intCommand == FORTIFY) {
-                inGameController.changeState(unit, UnitState.FORTIFYING);
-            } else if (intCommand == SENTRY) {
-                inGameController.changeState(unit, UnitState.SENTRY);
-            } else if (intCommand == COLOPEDIA) {
-                getCanvas().showColopediaPanel(ColopediaPanel.PanelType.UNITS, unit.getType());
-            } else if (!unit.isCarrier()) {
-                switch (intCommand) {
-                case LEAVE_TOWN:
-                    inGameController.putOutsideColony(unit);
-                    break;
-                case CLEAR_SPECIALITY:
-                    inGameController.clearSpeciality(unit);
-                    break;
-                default:
-                    if (intCommand >= WORK_FARMING && intCommand <= WORK_LASTFARMING) {
-                        GoodsType goodsType = FreeCol.getSpecification().getGoodsType(intCommand - WORK_FARMING);
-                        // Move unit to best producing ColonyTile
-                        ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, goodsType);
-                        inGameController.work(unit, bestTile);
-                        // Change workType
-                        inGameController.changeWorkType(unit, goodsType);
-                    } else if (intCommand >= WORK_AT_BUILDING && intCommand <= WORK_AT_LASTBUILDING) {
-                        BuildingType buildingType = FreeCol.getSpecification().getBuildingType(intCommand - WORK_AT_BUILDING);
-                        Building building = unit.getColony().getBuilding(buildingType);
-                        inGameController.work(unit, building);
-                    } else {
-                        logger.warning("Invalid action");
-                    }
-                }
-                updateIcon();
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid action number");
-        }
+        String commandString = event.getActionCommand();
+	String arg = null;
+	int index = commandString.indexOf(':');
+	if (index > 0) {
+	    arg = commandString.substring(index + 1);
+	    commandString = commandString.substring(0, index);
+	}
+	UnitAction command = Enum.valueOf(UnitAction.class, commandString.toUpperCase());
+	switch(command) {
+	case ASSIGN:
+	    Unit teacher = (Unit) unit.getGame().getFreeColGameObject(arg);
+	    inGameController.assignTeacher(unit, teacher);
+	    Component uc = getParent();
+	    while (uc != null) {
+		if (uc instanceof ColonyPanel) {
+		    ((ColonyPanel) uc).reinitialize();
+		    break;
+		}
+		uc = uc.getParent();
+	    }
+	    break;
+	case WORK_TILE:
+	    GoodsType goodsType = FreeCol.getSpecification().getGoodsType(arg);
+	    // Move unit to best producing ColonyTile
+	    ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, goodsType);
+	    inGameController.work(unit, bestTile);
+	    // Change workType
+	    inGameController.changeWorkType(unit, goodsType);
+	    break;
+	case WORK_BUILDING:
+	    BuildingType buildingType = FreeCol.getSpecification().getBuildingType(arg);
+	    Building building = unit.getColony().getBuilding(buildingType);
+	    inGameController.work(unit, building);
+	    break;
+	case ACTIVATE_UNIT:
+	    parent.getGUI().setActiveUnit(unit);
+	    break;
+	case FORTIFY:
+	    inGameController.changeState(unit, UnitState.FORTIFYING);
+	    break;
+        case SENTRY:
+	    inGameController.changeState(unit, UnitState.SENTRY);
+	    break;
+        case COLOPEDIA:
+	    getCanvas().showColopediaPanel(ColopediaPanel.PanelType.UNITS, unit.getType());
+	    break;
+	case LEAVE_TOWN:
+	    inGameController.putOutsideColony(unit);
+	    break;
+	case CLEAR_SPECIALITY:
+	    inGameController.clearSpeciality(unit);
+	    break;
+	}
+	updateIcon();
     }
 
 

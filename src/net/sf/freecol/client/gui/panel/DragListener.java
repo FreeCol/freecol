@@ -35,6 +35,7 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
@@ -92,7 +93,7 @@ public final class DragListener extends MouseAdapter {
                 JMenuItem name = new JMenuItem(tempUnit.getName() + " (" +
                                                Messages.message("menuBar.colopedia") + ")", 
                                                imageLibrary.getScaledImageIcon(unitIcon, 0.66f));
-                name.setActionCommand(String.valueOf(UnitLabel.COLOPEDIA));
+                name.setActionCommand(UnitAction.COLOPEDIA.toString());
                 name.addActionListener(unitLabel);
                 menu.add(name);
                 menu.addSeparator();
@@ -114,8 +115,8 @@ public final class DragListener extends MouseAdapter {
                                                                       "%amount%",
                                                                       Integer.toString(maxpotential)),
                                                      imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
-                            menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_FARMING+goodsType.getIndex()));
-                            menuItem.addActionListener(unitLabel);
+                            menuItem.setActionCommand(UnitAction.WORK_TILE.toString() + ":" + goodsType.getId());
+			    menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
                         }
                     }
@@ -142,8 +143,8 @@ public final class DragListener extends MouseAdapter {
                                         menuItem.setForeground(FreeColPanel.LINK_COLOR);
                                     }
                                 }
-                                menuItem.setActionCommand(String.valueOf(UnitLabel.WORK_AT_BUILDING + 
-                                                                         building.getType().getIndex()));
+                                menuItem.setActionCommand(UnitAction.WORK_BUILDING.toString() + ":" +
+							  building.getType().getId());
                                 menuItem.addActionListener(unitLabel);
                                 menu.add(menuItem);
                             }
@@ -165,7 +166,7 @@ public final class DragListener extends MouseAdapter {
                                 teacher.getStudent() != tempUnit) {
                             menuItem = new JMenuItem(Messages.message("assignToTeacher"),
                                                      imageLibrary.getScaledImageIcon(imageLibrary.getUnitImageIcon(teacher), 0.5f));
-                            menuItem.setActionCommand("assign" + teacher.getId());
+                            menuItem.setActionCommand(UnitAction.ASSIGN.toString() + ":" + teacher.getId());
                             menuItem.addActionListener(unitLabel);
                             menu.add(menuItem);
                             separatorNeeded = true;
@@ -180,13 +181,13 @@ public final class DragListener extends MouseAdapter {
 
                 if (tempUnit.getColony() != null && !(tempUnit.getLocation() instanceof WorkLocation)) {
                     menuItem = new JMenuItem(Messages.message("activateUnit"));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.ACTIVATE_UNIT));
+                    menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
                     menuItem.addActionListener(unitLabel);
                     menuItem.setEnabled(true);
                     menu.add(menuItem);
 
                     menuItem = new JMenuItem(Messages.message("fortifyUnit"));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.FORTIFY));
+                    menuItem.setActionCommand(UnitAction.FORTIFY.toString());
                     menuItem.addActionListener(unitLabel);
                     menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
                             && !(tempUnit.getState() == UnitState.FORTIFIED ||
@@ -194,7 +195,7 @@ public final class DragListener extends MouseAdapter {
                     menu.add(menuItem);
 
                     menuItem = new JMenuItem(Messages.message("sentryUnit"));
-                    menuItem.setActionCommand(String.valueOf(UnitLabel.SENTRY));
+                    menuItem.setActionCommand(UnitAction.SENTRY.toString());
                     menuItem.addActionListener(unitLabel);
                     menuItem.setEnabled(tempUnit.getState() != UnitState.SENTRY);
                     menu.add(menuItem);
@@ -292,7 +293,7 @@ public final class DragListener extends MouseAdapter {
 
                     if (tempUnit.getLocation() instanceof WorkLocation) {
                         menuItem = new JMenuItem(Messages.message("leaveTown"));
-                        menuItem.setActionCommand(String.valueOf(UnitLabel.LEAVE_TOWN));
+                        menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
                         separatorNeeded = true;
@@ -305,7 +306,7 @@ public final class DragListener extends MouseAdapter {
 
                     if (tempUnit.getType().getDowngrade(UnitType.DowngradeType.CLEAR_SKILL) != null) {
                         menuItem = new JMenuItem(Messages.message("clearSpeciality"));
-                        menuItem.setActionCommand(String.valueOf(UnitLabel.CLEAR_SPECIALITY));
+                        menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
                         menuItem.addActionListener(unitLabel);
                         menu.add(menuItem);
                     }
