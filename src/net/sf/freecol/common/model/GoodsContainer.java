@@ -20,15 +20,18 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 
 import org.w3c.dom.Element;
 
@@ -41,11 +44,15 @@ public class GoodsContainer extends FreeColGameObject {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Location.class.getName());
 
+    public static final int CARGO_SIZE = 100;
+    public static final String STORED_GOODS_TAG = "storedGoods";
+    public static final String OLD_STORED_GOODS_TAG = "oldStoredGoods";
+
     /** The list of Goods stored in this <code>GoodsContainer</code>. */
-    private int[] storedGoods;
+    private Map<GoodsType, Integer> storedGoods = new HashMap<GoodsType, Integer>();
 
     /** The previous list of Goods stored in this <code>GoodsContainer</code>. */
-    private int[] oldStoredGoods;
+    private Map<GoodsType, Integer> oldStoredGoods = new HashMap<GoodsType, Integer>();
 
     /** The owner of this <code>GoodsContainer</code>. */
     private final Location parent;
@@ -60,13 +67,10 @@ public class GoodsContainer extends FreeColGameObject {
         super(game);
 
         if (parent == null) {
-            throw new IllegalStateException("Location of GoodsContainer must not be null!");
+            throw new IllegalArgumentException("Location of GoodsContainer must not be null!");
         }
 
         this.parent = parent;
-        int totalGoods = FreeCol.getSpecification().numberOfGoodsTypes();
-        storedGoods = new int[totalGoods];
-        oldStoredGoods = new int[totalGoods];
     }
 
     /**
@@ -84,7 +88,7 @@ public class GoodsContainer extends FreeColGameObject {
         super(game, in);
 
         if (parent == null) {
-            throw new IllegalStateException("Location of GoodsContainer must not be null!");
+            throw new IllegalArgumentException("Location of GoodsContainer must not be null!");
         }
 
         this.parent = parent;
@@ -105,7 +109,7 @@ public class GoodsContainer extends FreeColGameObject {
         super(game, e);
 
         if (parent == null) {
-            throw new IllegalStateException("Location of GoodsContainer must not be null!");
+            throw new IllegalArgumentException("Location of GoodsContainer must not be null!");
         }
 
         this.parent = parent;
@@ -126,12 +130,18 @@ public class GoodsContainer extends FreeColGameObject {
      * @param amount The type of amount to add.
      */
     public void addGoods(GoodsType type, int amount) {
-        int index = type.getIndex();
-        if (storedGoods[index] + amount < 0) {
-            throw new IllegalStateException("Operation would leave " + (storedGoods[index] - amount) + " goods of type " 
-                    + type.getName() + " (" + type + ") here. Location: " + parent);
-        }
-        storedGoods[index] += amount;
+	int newAmount = amount;
+	if (storedGoods.containsKey(type)) {
+	    newAmount += storedGoods.get(type).intValue();
+	}
+	if (newAmount < 0) {
+	    throw new IllegalStateException("Operation would leave " + (newAmount) + " goods of type " 
+					    + type.getName() + " in Location " + parent);
+	} else if (newAmount == 0) {
+	    storedGoods.remove(type);
+	} else {
+	    storedGoods.put(type, newAmount);
+	}
     }
     
     /**
@@ -154,15 +164,18 @@ public class GoodsContainer extends FreeColGameObject {
      * @return A Goods with the requested or available amount that has been removed
      */
     public Goods removeGoods(GoodsType type, int amount) {
-        int index = type.getIndex();
-        if (storedGoods[index] == 0) {
-            return null;
-        } else if (storedGoods[index] < amount) {
-            amount = storedGoods[index];
-        }
-        Goods g = new Goods(getGame(), parent, type, amount);
-        storedGoods[index] -= amount;
-        return g;
+	Integer oldAmount = storedGoods.get(type);
+	Goods removedGoods = null;
+	if (oldAmount != null) {
+	    if (oldAmount.intValue() < amount) {
+		removedGoods = new Goods(getGame(), parent, type, oldAmount.intValue());
+		storedGoods.remove(type);
+	    } else {
+		removedGoods = new Goods(getGame(), parent, type, amount);
+		storedGoods.put(type, oldAmount.intValue() - amount);
+	    }
+	}
+        return removedGoods;
     }
 
     /**
@@ -172,11 +185,14 @@ public class GoodsContainer extends FreeColGameObject {
      * @param amount The treshold.
      */
     public void removeAbove(int amount) {
-        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType g : goodsTypeList) {
-            if (g.isStorable() && !g.limitIgnored() && 
-                storedGoods[g.getIndex()] > amount) {
-                storedGoods[g.getIndex()] = amount;
+        for (GoodsType goodsType : storedGoods.keySet()) {
+            if (goodsType.isStorable() && !goodsType.limitIgnored() && 
+                storedGoods.get(goodsType) > amount) {
+		if (amount == 0) {
+		    storedGoods.remove(goodsType);
+		} else {
+		    storedGoods.put(goodsType, amount);
+		}
             }
         }
     }
@@ -186,9 +202,7 @@ public class GoodsContainer extends FreeColGameObject {
      * 
      */
     public void removeAll() {
-        for (int i=0; i<storedGoods.length; i++) {
-            storedGoods[i] = 0;
-        }
+	storedGoods.clear();
     }
 
     
@@ -202,10 +216,9 @@ public class GoodsContainer extends FreeColGameObject {
      * the given amount.
      */
     public boolean hasReachedCapacity(int amount) {
-        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType g : goodsTypeList) {
-            if (g.isStorable() && !g.limitIgnored() &&
-                storedGoods[g.getIndex()] >= amount) {
+        for (GoodsType goodsType : storedGoods.keySet()) {
+            if (goodsType.isStorable() && !goodsType.limitIgnored() && 
+                storedGoods.get(goodsType) > amount) {
                 return true;
             }
         }
@@ -228,26 +241,31 @@ public class GoodsContainer extends FreeColGameObject {
      * @return The amount of this type of Goods in this container.
      */
     public int getGoodsCount(GoodsType type) {
-        return storedGoods[type.getIndex()];
-    }
-    public int getGoodsCount(int goodsIndex) {
-        return storedGoods[goodsIndex];
+	if (storedGoods.containsKey(type)) {
+	    return storedGoods.get(type).intValue();
+	} else {
+	    return 0;
+	}
     }
 
+    public Goods getGoods(GoodsType goodsType) {
+        return new Goods(getGame(), parent, goodsType, getGoodsCount(goodsType));
+    }
+
+
     /**
-    * Gets the number of goods-packages. A goods package contain between 1-100.
+    * Gets the number of goods-packages. A goods package contain between 1-CARGO_SIZE.
     * @return The number of goods packages.
     */
     public int getGoodsCount() {
         int count = 0;
-        for (int i=0; i<storedGoods.length; i++) {
-            int j = 0;
-            while (storedGoods[i] - j > 0) {
-                count++;
-                j+=100;
+        for (Integer amount : storedGoods.values()) {
+	    if (amount % CARGO_SIZE == 0) {
+		count += amount/CARGO_SIZE;
+	    } else {
+		count += amount/CARGO_SIZE + 1;
             }
         }
-
         return count;
     }
 
@@ -255,7 +273,7 @@ public class GoodsContainer extends FreeColGameObject {
     /**
     * Gets an <code>Iterator</code> of every <code>Goods</code> in this
     * <code>GoodsContainer</code>. Each <code>Goods</code> have a maximum
-    * amount of 100.
+    * amount of CARGO_SIZE.
     *
     * @return The <code>Iterator</code>.
     * @see #getCompactGoods
@@ -267,7 +285,7 @@ public class GoodsContainer extends FreeColGameObject {
     /**
     * Returns an <code>ArrayList</code> containing all
     * <code>Goods</code> in this <code>GoodsContainer</code>. Each
-    * <code>Goods</code> has a maximum amount of 100.
+    * <code>Goods</code> has a maximum amount of CARGO_SIZE.
     *
     * @return The <code>ArrayList</code>.
     * @see #getGoodsIterator
@@ -275,12 +293,11 @@ public class GoodsContainer extends FreeColGameObject {
     public List<Goods> getGoods() {
         ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
-        for (int i=0; i<storedGoods.length; i++) {
-            int j = 0;
-            while (storedGoods[i] - j > 0) {
-                int a = (storedGoods[i] - j < 100) ? storedGoods[i] - j : 100;
-                totalGoods.add(new Goods(getGame(), parent, i, a));
-                j += a;
+        for (GoodsType goodsType : storedGoods.keySet()) {
+	    int amount = storedGoods.get(goodsType).intValue();
+            while (amount > 0) {
+		totalGoods.add(new Goods(getGame(), parent, goodsType, (amount >= CARGO_SIZE ? CARGO_SIZE : amount)));
+		amount -= CARGO_SIZE;
             }
         }
 
@@ -299,10 +316,8 @@ public class GoodsContainer extends FreeColGameObject {
     public List<Goods> getCompactGoods() {
         ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
-        for (int i=0; i<storedGoods.length; i++) {
-            if (storedGoods[i] > 0) {
-                totalGoods.add(new Goods(getGame(), parent, i, storedGoods[i]));
-            }
+        for (GoodsType goodsType : storedGoods.keySet()) {
+	    totalGoods.add(new Goods(getGame(), parent, goodsType, storedGoods.get(goodsType)));
         }
 
         return totalGoods;
@@ -319,36 +334,21 @@ public class GoodsContainer extends FreeColGameObject {
     public List<Goods> getFullGoods() {
         ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
-        for (int i=0; i<storedGoods.length; i++) {
-            totalGoods.add(new Goods(getGame(), parent, i, storedGoods[i]));
+        for (GoodsType goodsType : storedGoods.keySet()) {
+            totalGoods.add(new Goods(getGame(), parent, goodsType, storedGoods.get(goodsType)));
         }
 
         return totalGoods;
     }
 
     /**
-    * Gets the first <code>Goods</code> in this <code>GoodsContainer</code>.
-    * @return The <code>Goods</code>.
-    */
-    public Goods getFirstGoods() {
-        throw new UnsupportedOperationException();
-    }
-
-
-    /**
-    * Gets the last <code>Goods</code> in this <code>GoodsContainer</code>.
-    * @return The <code>Goods</code>.
-    */
-    public Goods getLastGoods() {
-        throw new UnsupportedOperationException();
-    }
-
-
-    /**
      * Prepares this <code>GoodsContainer</code> for a new turn.
      */
     public void saveState() {
-        System.arraycopy(storedGoods, 0, oldStoredGoods, 0, storedGoods.length);
+	oldStoredGoods.clear();
+	for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
+	    oldStoredGoods.put(entry.getKey(), new Integer(entry.getValue().intValue()));
+	}
     }
 
     /**
@@ -361,41 +361,42 @@ public class GoodsContainer extends FreeColGameObject {
         }
         Colony colony = (Colony) parent;
         int limit = colony.getWarehouseCapacity();
-        int adjustment = limit / 100;
+        int adjustment = limit / CARGO_SIZE;
 
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+        for (GoodsType goodsType : storedGoods.keySet()) {
             if (goodsType.limitIgnored() || !goodsType.isStorable()) {
                 continue;
             }
             ExportData exportData = colony.getExportData(goodsType);
-            int index = goodsType.getIndex();
             int low = exportData.getLowLevel() * adjustment;
             int high = exportData.getHighLevel() * adjustment;
-            if (storedGoods[index] > limit) {
+	    int amount = storedGoods.get(goodsType).intValue();
+	    int oldAmount = 0;
+	    if (oldStoredGoods.containsKey(goodsType)) {
+		oldAmount = oldStoredGoods.get(goodsType).intValue();
+	    }
+            if (amount > limit) {
                 // limit has been exceeded
-                int waste = storedGoods[index] - limit;
-                storedGoods[index] = limit;
+                int waste = amount - limit;
+                storedGoods.put(goodsType, limit);
                 addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
                                 "model.building.warehouseWaste",
                                 "%goods%", goodsType.getName(),
                                 "%waste%", String.valueOf(waste),
                                 "%colony%", colony.getName());
-            } else if (storedGoods[index] == limit && 
-                       oldStoredGoods[index] < limit) {
+            } else if (amount == limit && oldAmount < limit) {
                 // limit has been reached during this turn
                 addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
                                 "model.building.warehouseOverfull",
                                 "%goods%", goodsType.getName(),
                                 "%colony%", colony.getName());
-            } else if (storedGoods[index] > high &&
-                       oldStoredGoods[index] <= high) {
+            } else if (amount > high && oldAmount <= high) {
                 addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
                                 "model.building.warehouseFull",
                                 "%goods%", goodsType.getName(),
                                 "%level%", String.valueOf(high),
                                 "%colony%", colony.getName());
-            } else if (storedGoods[index] < low &&
-                       oldStoredGoods[index] >= low) {
+            } else if (amount < low && oldAmount >= low) {
                 addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
                                 "model.building.warehouseEmpty",
                                 "%goods%", goodsType.getName(),
@@ -434,8 +435,26 @@ public class GoodsContainer extends FreeColGameObject {
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute("ID", getId());
-        toArrayElement("storedGoods", storedGoods, out);
-        toArrayElement("oldStoredGoods", storedGoods, out);
+        if (!storedGoods.isEmpty()) {
+            out.writeStartElement(STORED_GOODS_TAG);
+            for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
+                out.writeStartElement(Goods.getXMLElementTagName());
+                out.writeAttribute("type", entry.getKey().getId());
+                out.writeAttribute("amount", entry.getValue().toString());
+                out.writeEndElement();
+            }
+            out.writeEndElement();
+        }
+        if (!oldStoredGoods.isEmpty()) {
+            out.writeStartElement(OLD_STORED_GOODS_TAG);
+            for (Map.Entry<GoodsType, Integer> entry : oldStoredGoods.entrySet()) {
+                out.writeStartElement(Goods.getXMLElementTagName());
+                out.writeAttribute("type", entry.getKey().getId());
+                out.writeAttribute("amount", entry.getValue().toString());
+                out.writeEndElement();
+            }
+            out.writeEndElement();
+        }
         out.writeEndElement();
     }
 
@@ -445,10 +464,28 @@ public class GoodsContainer extends FreeColGameObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-        
-        storedGoods = readFromArrayElement("storedGoods", in, new int[0]);
-        oldStoredGoods = readFromArrayElement("oldStoredGoods", in, new int[0]);
-        in.nextTag();
+
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+	    if (in.getLocalName().equals(STORED_GOODS_TAG)) {
+		while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+		    if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
+			GoodsType goodsType = Specification.getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
+			Integer amount = new Integer(in.getAttributeValue(null, "amount"));
+			storedGoods.put(goodsType, amount);
+		    }
+                    in.nextTag();
+		}
+	    } else if (in.getLocalName().equals(OLD_STORED_GOODS_TAG)) {
+		while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+		    if (in.getLocalName().equals(Goods.getXMLElementTagName())) {
+			GoodsType goodsType = Specification.getSpecification().getGoodsType(in.getAttributeValue(null, "type"));
+			Integer amount = new Integer(in.getAttributeValue(null, "amount"));
+			oldStoredGoods.put(goodsType, amount);
+		    }
+                    in.nextTag();
+		}
+	    }
+	}
     }
 
 
@@ -468,9 +505,8 @@ public class GoodsContainer extends FreeColGameObject {
     public String toString() {
         StringBuffer sb = new StringBuffer(200);
         sb.append("GoodsContainer with: ");
-        List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType g : goodsTypeList) {
-            sb.append(g.getName() + "=" + storedGoods[g.getIndex()] + ", ");
+        for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
+            sb.append(entry.getKey().getName() + "=" + entry.getValue() + ", ");
         }
         return sb.toString();
     }
