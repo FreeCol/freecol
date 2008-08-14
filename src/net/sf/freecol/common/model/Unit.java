@@ -3305,19 +3305,18 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Checks if a colonist can get promoted by experience.
      */
     private void checkExperiencePromotion() {
-        GoodsType goodsType = getWorkType();
-        if (goodsType == null) {
-            return;
-        }
-        
-        UnitType learnType = FreeCol.getSpecification().getExpertForProducing(goodsType);
-        if (learnType != null && unitType.canBeUpgraded(learnType, UpgradeType.EXPERIENCE)) {
-            logger.finest("About to call getRandom for experience");
+        UnitType learnType = FreeCol.getSpecification().getExpertForProducing(getWorkType());
+        if (learnType != null && learnType != unitType &&
+            unitType.canBeUpgraded(learnType, UpgradeType.EXPERIENCE)) {
             int random = getGame().getModelController().getRandom(getId() + "experience", 5000);
             if (random < Math.min(experience, 200)) {
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
                 setType(learnType);
+                if (getTeacher() != null) {
+                    getTeacher().setStudent(null);
+                    setTeacher(null);
+                }
                 addModelMessage(getColony(), ModelMessage.MessageType.UNIT_IMPROVED, this,
                                 "model.unit.experience",
                                 "%oldName%", oldName,
