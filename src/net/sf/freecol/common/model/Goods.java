@@ -96,18 +96,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      * Creates a new <code>Goods</code> instance.
      *
      * @param game a <code>Game</code> value
-     * @param location a <code>Location</code> value
-     * @param goodsIndex an <code>int</code> value
-     * @param amount an <code>int</code> value
-     */
-    public Goods(Game game, Location location, int goodsIndex, int amount) {
-        this(game, location, FreeCol.getSpecification().getGoodsType(goodsIndex), amount);
-    }
-
-    /**
-     * Creates a new <code>Goods</code> instance.
-     *
-     * @param game a <code>Game</code> value
      * @param in a <code>XMLStreamReader</code> value
      * @exception XMLStreamException if an error occurs
      */

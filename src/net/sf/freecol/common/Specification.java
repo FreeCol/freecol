@@ -622,16 +622,6 @@ public final class Specification {
     /**
      * Describe <code>getGoodsType</code> method here.
      *
-     * @param goodsTypeIndex an <code>int</code> value
-     * @return a <code>GoodsType</code> value
-     */
-    public GoodsType getGoodsType(int goodsTypeIndex) {
-        return goodsTypeList.get(goodsTypeIndex);
-    }
-
-    /**
-     * Describe <code>getGoodsType</code> method here.
-     *
      * @param id a <code>String</code> value
      * @return a <code>GoodsType</code> value
      */
