@@ -2298,6 +2298,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 setMovesLeft(getInitialMovesLeft());
             }
             hitpoints = unitType.getHitPoints();
+            if (getTeacher() != null && !canBeStudent(getTeacher())) {
+		getTeacher().setStudent(null);
+                setTeacher(null);
+            }
         } else {
             // ColonialRegulars only available after independence is declared
             logger.warning(newUnitType.getName() + " is not available to " + owner.getPlayerType() +
@@ -3313,10 +3317,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 logger.finest("About to change type of unit due to experience.");
                 String oldName = getName();
                 setType(learnType);
-                if (getTeacher() != null) {
-                    getTeacher().setStudent(null);
-                    setTeacher(null);
-                }
                 addModelMessage(getColony(), ModelMessage.MessageType.UNIT_IMPROVED, this,
                                 "model.unit.experience",
                                 "%oldName%", oldName,

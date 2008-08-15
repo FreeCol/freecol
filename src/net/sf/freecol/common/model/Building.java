@@ -554,8 +554,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             } else {
                 teacher.setTurnsOfTraining(0);
                 teacher.getStudent().train();
-                teacher.getStudent().setTeacher(null);
-                teacher.setStudent(null);
             }
         }
     }

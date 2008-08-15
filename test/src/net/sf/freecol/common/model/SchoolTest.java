@@ -633,6 +633,9 @@ public class SchoolTest extends FreeColTestCase {
         // outside the colony is still considered OK (same Tile)
         teacher1.putOutsideColony();
 
+        assertNull(teacher1.getStudent());
+        assertNull(teacher2.getStudent());
+
         // Passing a turn outside school does not reset training at this time
         school.newTurn();
         assertEquals(2, teacher1.getTurnsOfTraining());
@@ -677,15 +680,11 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(2, getUnitList(colony, masterCarpenterType).size());
         
         /**
-         * Since teacher2 was move back to school first, it is
-         * actually the first teacher in the unit list. Therefore
-         * teacher2 will get the new student (indentured servant), and
-         * teacher1 will get none.
+         * Since teacher1 can continue teaching his student, there
+         * is no reason to shuffle teachers.
          */
         school.newTurn();
-        assertEquals(0, teacher1.getTurnsOfTraining());
-        assertEquals(1, teacher2.getTurnsOfTraining());
-        assertEquals(indenturedServantType, teacher2.getStudent().getType());
+        assertEquals(indenturedServantType, teacher1.getStudent().getType());
 
     }
     
@@ -1017,6 +1016,43 @@ public class SchoolTest extends FreeColTestCase {
 
         trainForTurns(colony, freeColonistType.getEducationTurns(veteranSoldierType));
         assertEquals(veteranSoldierType, student.getType());
+
+        colony.dispose();
+    }
+
+    public void testConcurrentUpgrade() {
+        
+        Colony colony = getStandardColony(2);
+
+        Iterator<Unit> units = colony.getUnitIterator();
+
+        Unit lumber = units.next();
+        lumber.setType(expertLumberJackType);
+        Unit student = units.next();
+        student.setType(pettyCriminalType);
+
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        assertTrue(schoolType.hasAbility("model.ability.teach"));
+        assertTrue(colony.canTrain(lumber));
+
+        lumber.setLocation(school);
+        school.newTurn();
+        assertEquals(student, lumber.getStudent());
+
+        // lumber jack can teach indentured servant
+        student.setType(indenturedServantType);
+        assertEquals(student, lumber.getStudent());
+
+        // lumber jack can teach free colonist
+        student.setType(freeColonistType);
+        assertEquals(student, lumber.getStudent());
+
+        // lumber jack can not teach expert
+        student.setType(masterCarpenterType);
+        assertNull(lumber.getStudent());
+        assertNull(student.getTeacher());
 
         colony.dispose();
     }
