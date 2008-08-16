@@ -275,8 +275,9 @@ public final class Specification {
                         unitType.readFromXML(xsr, this);
                         allTypes.put(unitType.getId(), unitType);
                         unitTypeList.add(unitType);
-			experts.put(unitType.getExpertProduction(), unitType);
-
+                        if (unitType.getExpertProduction() != null) {
+                            experts.put(unitType.getExpertProduction(), unitType);
+                        }
 			if (unitType.hasPrice()) {
 			    if (unitType.getSkill() > 0) {
 				unitTypesTrainedInEurope.add(unitType);
