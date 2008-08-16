@@ -23,7 +23,9 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -203,4 +205,59 @@ public abstract class Feature extends FreeColObject {
         return (turn != null &&
                 (lastTurn != null && turn.getNumber() > lastTurn.getNumber()));
     }
+
+
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        if (getSource() != null) {
+            out.writeAttribute("source", getSource());
+        }
+        if (getFirstTurn() != null) {
+            out.writeAttribute("firstTurn", String.valueOf(getFirstTurn().getNumber()));
+        }
+        if (getLastTurn() != null) {
+            out.writeAttribute("lastTurn", String.valueOf(getLastTurn().getNumber()));
+        }
+    }
+
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        if (getScopes() != null) {
+            for (Scope scope : getScopes()) {
+                scope.toXMLImpl(out);
+            }
+        }
+    }
+
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        setSource(in.getAttributeValue(null, "source"));
+
+        String firstTurn = in.getAttributeValue(null, "firstTurn");
+        if (firstTurn != null) {
+            setFirstTurn(new Turn(Integer.parseInt(firstTurn)));
+        }
+
+        String lastTurn = in.getAttributeValue(null, "lastTurn");
+        if (lastTurn != null) {
+            setLastTurn(new Turn(Integer.parseInt(lastTurn)));
+        }
+    }
+
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            String childName = in.getLocalName();
+            if (Scope.getXMLElementTagName().equals(childName)) {
+                Scope scope = new Scope(in);
+                if (getScopes() == null) {
+                    setScopes(new ArrayList<Scope>());
+                }
+                getScopes().add(scope);
+            } else {
+                logger.finest("Parsing of " + childName + " is not implemented yet");
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
+                       !in.getLocalName().equals(childName)) {
+                    in.nextTag();
+                }
+            }
+        }        
+    }
+
 }

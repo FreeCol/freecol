@@ -111,76 +111,14 @@ public final class Ability extends Feature {
     // -- Serialization --
 
 
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
-        setSource(in.getAttributeValue(null, "source"));
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+	super.readAttributes(in);
         value = getAttribute(in, "value", true);
-
-        String firstTurn = in.getAttributeValue(null, "firstTurn");
-        if (firstTurn != null) {
-            setFirstTurn(new Turn(Integer.parseInt(firstTurn)));
-        }
-
-        String lastTurn = in.getAttributeValue(null, "lastTurn");
-        if (lastTurn != null) {
-            setLastTurn(new Turn(Integer.parseInt(lastTurn)));
-        }
-
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            if ("scope".equals(childName)) {
-                Scope scope = new Scope(in);
-                if (getScopes() == null) {
-                    setScopes(new ArrayList<Scope>());
-                }
-                getScopes().add(scope);
-            } else {
-                logger.finest("Parsing of " + childName + " is not implemented yet");
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                       !in.getLocalName().equals(childName)) {
-                    in.nextTag();
-                }
-            }
-        }        
-
     }
     
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
-    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("id", getId());
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+	super.writeAttributes(out);
         out.writeAttribute("value", String.valueOf(value));
-        if (getSource() != null) {
-            out.writeAttribute("source", getSource());
-        }
-
-        if (getFirstTurn() != null) {
-            out.writeAttribute("firstTurn", String.valueOf(getFirstTurn().getNumber()));
-        }
-        if (getLastTurn() != null) {
-            out.writeAttribute("lastTurn", String.valueOf(getLastTurn().getNumber()));
-        }
-
-        for (Scope scope : getScopes()) {
-            scope.toXMLImpl(out);
-        }
-
-        out.writeEndElement();
     }
 
     /**

@@ -61,6 +61,10 @@ public abstract class FreeColObject {
      */
     protected static final String ID_ATTRIBUTE = "ID";
 
+    // this is what we use for the specification
+    // TODO: standardize on this spelling
+    protected static final String ID_ATTRIBUTE_TAG = "id";
+
     /**
      * XML tag name for array elements.
      */
@@ -207,16 +211,6 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Makes an XML-representation of this object.
-     * 
-     * @param out The output stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    abstract protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
-
-    
-    /**
      * This method writes an XML-representation of this object to
      * the given stream. Only attributes visible to the given
      * <code>Player</code> will be added to that representation.
@@ -286,15 +280,6 @@ public abstract class FreeColObject {
         readFromXMLImpl(in);
     }
     
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
-     */
-    protected abstract void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException;
- 
-     
     /**
      * Reads an XML-representation of an array.
      * 
@@ -624,6 +609,45 @@ public abstract class FreeColObject {
     }
 
     
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+	readAttributes(in);
+	readChildren(in);
+    }
+
+    // TODO: make these abstract
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {};
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {};
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+	writeAttributes(out);
+	writeChildren(out);
+        out.writeEndElement();
+    }
+
+    // TODO: make these abstract
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {};
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {};
+
+
     //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------
     
     public void addPropertyChangeListener(PropertyChangeListener arg0) {
