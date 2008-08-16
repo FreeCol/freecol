@@ -102,9 +102,7 @@ public final class BuildingType extends BuildableType {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
-        
+    public void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
         if (hasAttribute(in, "upgradesFrom")) {
             upgradesFrom = specification.getBuildingType(in.getAttributeValue(null, "upgradesFrom"));
             upgradesFrom.upgradesTo = this;
@@ -112,6 +110,7 @@ public final class BuildingType extends BuildableType {
         } else {
             level = 1;
         }
+        setPopulationRequired(getAttribute(in, "required-population", 1));
 
         workPlaces = getAttribute(in, "workplaces", 0);
         basicProduction = getAttribute(in, "basicProduction", 0);
@@ -124,58 +123,12 @@ public final class BuildingType extends BuildableType {
         
         sequence = getAttribute(in, "sequence", 0);
 
+    }
+
+    public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            if (Ability.getXMLElementTagName().equals(childName)) {
-                Ability ability = new Ability(in);
-                if (ability.getSource() == null) {
-                    ability.setSource(getNameKey());
-                }
-                addAbility(ability); // Ability close the element
-                specification.getAbilityKeys().add(ability.getId());
-            } else if ("required-population".equals(childName)) {
-                setPopulationRequired(getAttribute(in, "value", 1));
-                in.nextTag(); // close this element
-            } else if ("required-ability".equals(childName)) {
-                String abilityId = in.getAttributeValue(null, "id");
-                boolean value = getAttribute(in, "value", true);
-                getAbilitiesRequired().put(abilityId, value);
-                in.nextTag(); // close this element
-                specification.getAbilityKeys().add(abilityId);
-            } else if ("required-goods".equals(childName)) {
-                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
-                int amount = getAttribute(in, "value", 0);
-                if (amount > 0) {
-                    type.setBuildingMaterial(true);
-                    AbstractGoods requiredGoods = new AbstractGoods(type, amount);
-                    if (getGoodsRequired() == null) {
-                        setGoodsRequired(new ArrayList<AbstractGoods>());
-                    }
-                    getGoodsRequired().add(requiredGoods);
-                }
-                in.nextTag(); // close this element
-            } else if (Modifier.getXMLElementTagName().equals(childName)) {
-                Modifier modifier = new Modifier(in);
-                if (modifier.getSource() == null) {
-                    modifier.setSource(getNameKey());
-                }
-                addModifier(modifier); // Modifier close the element
-                specification.getModifierKeys().add(modifier.getId());
-            } else {
-                logger.finest("Parsing of " + childName + " is not implemented yet");
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                        !in.getLocalName().equals(childName)) {
-                    in.nextTag();
-                }
-            }
+            super.readChild(in, specification);
         }
-
-        // sanity check: we should be on the closing tag
-        if (!in.getLocalName().equals(BuildingType.getXMLElementTagName())) {
-            logger.warning("Error parsing xml: expecting closing tag </" + BuildingType.getXMLElementTagName() + "> "+
-                           "found instead: " +in.getLocalName());
-        }
-
     }
     
     /**

@@ -603,9 +603,8 @@ public final class UnitType extends BuildableType {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification)
+    public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
         offence = getAttribute(in, "offence", DEFAULT_OFFENCE);
         defence = getAttribute(in, "defence", DEFAULT_DEFENCE);
         movement = Integer.parseInt(in.getAttributeValue(null, "movement"));
@@ -630,34 +629,12 @@ public final class UnitType extends BuildableType {
 
         expertProduction = specification.getType(in, "expert-production", GoodsType.class, null);
 
+    }
+
+    public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
-            if (Ability.getXMLElementTagName().equals(nodeName)) {
-                Ability ability = new Ability(in);
-                if (ability.getSource() == null) {
-                    ability.setSource(getNameKey());
-                }
-                addAbility(ability); // Ability close the element
-                specification.getAbilityKeys().add(ability.getId());
-            } else if ("required-ability".equals(nodeName)) {
-                String abilityId = in.getAttributeValue(null, "id");
-                boolean value = getAttribute(in, "value", true);
-                getAbilitiesRequired().put(abilityId, value);
-                in.nextTag(); // close this element
-                specification.getAbilityKeys().add(abilityId);
-            } else if ("required-goods".equals(nodeName)) {
-                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
-                int amount = getAttribute(in, "value", 0);
-                if (amount > 0) {
-                    type.setBuildingMaterial(true);
-                    AbstractGoods requiredGoods = new AbstractGoods(type, amount);
-                    if (getGoodsRequired() == null) {
-                        setGoodsRequired(new ArrayList<AbstractGoods>());
-                    }
-                    getGoodsRequired().add(requiredGoods);
-                }
-                in.nextTag(); // close this element
-            } else if ("upgrade".equals(nodeName)) {
+            if ("upgrade".equals(nodeName)) {
                 Upgrade upgrade = new Upgrade();
                 String educationUnit = in.getAttributeValue(null, "unit");
                 upgrade.turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
@@ -676,19 +653,8 @@ public final class UnitType extends BuildableType {
                 downgrade.asResultOf.put(DowngradeType.CAPTURE, getAttribute(in, "capture", false));
                 downgrades.put(educationUnit, downgrade);
                 in.nextTag(); // close this element
-            } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
-                Modifier modifier = new Modifier(in); // Modifier close the element
-                if (modifier.getSource() == null) {
-                    modifier.setSource(getNameKey());
-                }
-                addModifier(modifier);
-                specification.getModifierKeys().add(modifier.getId());
             } else {
-                logger.finest("Parsing of " + nodeName + " is not implemented yet");
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                        !in.getLocalName().equals(nodeName)) {
-                    in.nextTag();
-                }
+                super.readChild(in, specification);
             }
         }
     }

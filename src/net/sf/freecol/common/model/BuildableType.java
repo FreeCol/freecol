@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -127,8 +128,52 @@ public class BuildableType extends FreeColGameObjectType {
         // the class is basically abstract, except for BuildableType.NOTHING
     }
 
-    protected void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
-        // the class is basically abstract, except for BuildableType.NOTHING
+    protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        super.readFromXML(in, specification);
+
+    }
+
+    protected void readChild(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if (Ability.getXMLElementTagName().equals(childName)) {
+            Ability ability = new Ability(in);
+            if (ability.getSource() == null) {
+                ability.setSource(getNameKey());
+            }
+            addAbility(ability); // Ability close the element
+            specification.getAbilityKeys().add(ability.getId());
+        } else if ("required-ability".equals(childName)) {
+            String abilityId = in.getAttributeValue(null, "id");
+            boolean value = getAttribute(in, "value", true);
+            getAbilitiesRequired().put(abilityId, value);
+            in.nextTag(); // close this element
+            specification.getAbilityKeys().add(abilityId);
+        } else if ("required-goods".equals(childName)) {
+            GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
+            int amount = getAttribute(in, "value", 0);
+            if (amount > 0) {
+                type.setBuildingMaterial(true);
+                AbstractGoods requiredGoods = new AbstractGoods(type, amount);
+                if (getGoodsRequired() == null) {
+                    setGoodsRequired(new ArrayList<AbstractGoods>());
+                }
+                getGoodsRequired().add(requiredGoods);
+            }
+            in.nextTag(); // close this element
+        } else if (Modifier.getXMLElementTagName().equals(childName)) {
+            Modifier modifier = new Modifier(in);
+            if (modifier.getSource() == null) {
+                modifier.setSource(getNameKey());
+            }
+            addModifier(modifier); // Modifier close the element
+            specification.getModifierKeys().add(modifier.getId());
+        } else {
+            logger.finest("Parsing of " + childName + " is not implemented yet");
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
+                   !in.getLocalName().equals(childName)) {
+                in.nextTag();
+            }
+        }
     }
 
 }

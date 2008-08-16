@@ -46,7 +46,7 @@ public class LostCityRumour extends FreeColGameObjectType {
         // this class is really just an enum, but needs to inherit from FreeColGameObjectType
     }
 
-    protected void readFromXML(XMLStreamReader in, Specification specification)
+    public void readFromXML(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         // this class is really just an enum, but needs to inherit from FreeColGameObjectType
     }

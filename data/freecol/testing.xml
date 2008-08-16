@@ -29,7 +29,7 @@
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
     <goods-type id="model.goods.grain" art="goods/grain.png" is-farmed="true" storable="false"
-                stored.as="model.goods.food" is-food="true">
+                stored-as="model.goods.food" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
     <goods-type id="model.goods.fish" art="goods/fish.png" is-farmed="true" storable="false"
@@ -1026,25 +1026,26 @@
       <modifier id="model.goods.bells" type="additive" value="1"/>
     </building-type>
     <building-type id="model.building.CityHall" basicProduction="6" workplaces="3"
-                   produces="model.goods.bells" upgradesFrom="model.building.TownHall" sequence="1">
+                   produces="model.goods.bells" upgradesFrom="model.building.TownHall"
+                   required-population="6"  sequence="1">
       <modifier id="model.goods.bells" type="additive" value="1"/>
       <modifier id="model.goods.bells" type="percentage" value="25"/>
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="48"/>
-      <required-population value="6"/>
     </building-type>
     <building-type id="model.building.Capitol" basicProduction="6" workplaces="3"
-                   produces="model.goods.bells" upgradesFrom="model.building.CityHall" sequence="1">
+                   produces="model.goods.bells" upgradesFrom="model.building.CityHall"
+                   required-population="9" sequence="1">
       <modifier id="model.goods.bells" type="additive" value="1"/>
       <modifier id="model.goods.bells" type="percentage" value="50"/>
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="72"/>
-      <required-population value="9"/>
     </building-type>
     <building-type id="model.building.CarpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
     </building-type>
-    <building-type id="model.building.LumberMill"     basicProduction="6" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" upgradesFrom="model.building.CarpenterHouse" sequence="2">
-      <required-population value="3"/>
+    <building-type id="model.building.LumberMill"     basicProduction="6" workplaces="3" 
+                   consumes="model.goods.lumber" produces="model.goods.hammers"
+                   upgradesFrom="model.building.CarpenterHouse" required-population="3" sequence="2">
       <required-goods id="model.goods.hammers" value="52"/>
     </building-type>
     <building-type id="model.building.BlacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" sequence="3">
@@ -1053,10 +1054,11 @@
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.IronWorks"       basicProduction="6" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" upgradesFrom="model.building.BlacksmithShop" sequence="3">
+    <building-type id="model.building.IronWorks"       basicProduction="6" workplaces="3"
+                   consumes="model.goods.ore" produces="model.goods.tools"
+                   upgradesFrom="model.building.BlacksmithShop" required-population="8" sequence="3">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.tools" type="percentage" value="50"/> 
       <ability id="model.ability.expertsUseConnections" value="true"/>
@@ -1067,10 +1069,11 @@
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.CigarFactory"     basicProduction="6" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cigars" upgradesFrom="model.building.TobacconistShop" sequence="4">
+    <building-type id="model.building.CigarFactory"     basicProduction="6" workplaces="3"
+                   consumes="model.goods.tobacco" produces="model.goods.cigars"
+                   upgradesFrom="model.building.TobacconistShop" required-population="8" sequence="4">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.cigars" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
@@ -1081,10 +1084,10 @@
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.CordageFactory"     basicProduction="6" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cordage" upgradesFrom="model.building.CordageMakerShop" sequence="4">
+    <building-type id="model.building.CordageFactory"     basicProduction="6" workplaces="3" consumes="model.goods.tobacco" produces="model.goods.cordage" upgradesFrom="model.building.CordageMakerShop"
+                   required-population="8" sequence="4">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.cordage" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
@@ -1095,10 +1098,9 @@
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.TextileMill" basicProduction="6" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" upgradesFrom="model.building.WeaverShop" sequence="5">
+    <building-type id="model.building.TextileMill" basicProduction="6" workplaces="3" consumes="model.goods.cotton" produces="model.goods.cloth" upgradesFrom="model.building.WeaverShop" required-population="8" sequence="5">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.cloth" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
@@ -1109,10 +1111,9 @@
       <required-goods id="model.goods.hammers" value="64"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.RumFactory"     basicProduction="6" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" upgradesFrom="model.building.RumDistillery" sequence="6">
+    <building-type id="model.building.RumFactory"     basicProduction="6" workplaces="3" consumes="model.goods.sugar" produces="model.goods.rum" upgradesFrom="model.building.RumDistillery" required-population="8" sequence="6">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.rum" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
@@ -1123,45 +1124,40 @@
       <required-goods id="model.goods.hammers" value="56"/>
       <required-goods id="model.goods.tools" value="20"/>
     </building-type>
-    <building-type id="model.building.FurFactory"     basicProduction="6" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" upgradesFrom="model.building.FurTradingPost" sequence="7">
+    <building-type id="model.building.FurFactory"     basicProduction="6" workplaces="3" consumes="model.goods.furs" produces="model.goods.coats" upgradesFrom="model.building.FurTradingPost" required-population="6" sequence="7">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="6"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.coats" type="percentage" value="50"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
     </building-type>
-    <building-type id="model.building.Schoolhouse" workplaces="1" minSkill="1" maxSkill="1" sequence="8">
+    <building-type id="model.building.Schoolhouse" workplaces="1" minSkill="1" maxSkill="1"
+                   required-population="4" sequence="8">
       <required-goods id="model.goods.hammers" value="64"/>
-      <required-population value="4"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.College"     workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.Schoolhouse" sequence="8">
+    <building-type id="model.building.College"     workplaces="2" minSkill="1" maxSkill="2" upgradesFrom="model.building.Schoolhouse" required-population="8" sequence="8">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
-      <required-population value="8"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
-    <building-type id="model.building.University"  workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.College" sequence="8">
+    <building-type id="model.building.University"  workplaces="3" minSkill="1" maxSkill="3" upgradesFrom="model.building.College" required-population="10" sequence="8">
       <required-goods id="model.goods.hammers" value="200"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="10"/>
       <ability id="model.ability.teach" value="true"/>
     </building-type>
     <building-type id="model.building.Armory"   basicProduction="3" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" sequence="9">
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.buildArtillery" value="true"/>
     </building-type>
-    <building-type id="model.building.Magazine" basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.Armory" sequence="9">
+    <building-type id="model.building.Magazine" basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.Armory" required-population="8" sequence="9">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
-      <required-population value="8"/>
       <ability id="model.ability.buildArtillery" value="true"/>
     </building-type>
-    <building-type id="model.building.Arsenal"  basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.Magazine" sequence="9">
+    <building-type id="model.building.Arsenal"  basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.Magazine" required-population="8" sequence="9">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="8"/>
       <required-ability id="model.ability.buildFactory"/>
       <modifier id="model.goods.muskets" type="percentage" value="50"/>
       <ability id="model.ability.buildArtillery" value="true"/>
@@ -1170,35 +1166,32 @@
     <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.crosses" sequence="10">
       <modifier id="model.goods.crosses" type="additive" value="1"/>
     </building-type>
-    <building-type id="model.building.Church"    basicProduction="3" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.Chapel" sequence="10">
+    <building-type id="model.building.Church"    basicProduction="3" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.Chapel" required-population="3" sequence="10">
       <required-goods id="model.goods.hammers" value="64"/>
-      <required-population value="3"/>
       <modifier id="model.goods.crosses" type="additive" value="2"/>
       <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
-    <building-type id="model.building.Cathedral" basicProduction="6" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.Church" sequence="10">
+    <building-type id="model.building.Cathedral" basicProduction="6" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.Church" required-population="8" sequence="10">
       <required-goods id="model.goods.hammers" value="176"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="8"/>
       <modifier id="model.goods.crosses" type="additive" value="3"/>
       <ability id="model.ability.dressMissionary" value="true"/> <!-- maybe it will be changed with equipment implementation -->
     </building-type>
-    <building-type id="model.building.Stockade" workplaces="0" sequence="11">
+    <building-type id="model.building.Stockade" workplaces="0" required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="64"/>
-      <required-population value="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
     </building-type>
-    <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade" sequence="11">
+    <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade"
+                   required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="3"/>
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
       <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
-    <building-type id="model.building.Fortress" workplaces="0" upgradesFrom="model.building.Fort" sequence="12">
+    <building-type id="model.building.Fortress" workplaces="0" upgradesFrom="model.building.Fort"
+                   required-population="8" sequence="12">
       <required-goods id="model.goods.hammers" value="320"/>
       <required-goods id="model.goods.tools" value="200"/>
-      <required-population value="8"/>
       <modifier id="model.modifier.defence" type="percentage" value="200"/>
       <ability id="model.ability.bombardShips" value="true"/>
     </building-type>
@@ -1229,19 +1222,19 @@
       <required-goods id="model.goods.hammers" value="52"/>
       <ability id="model.ability.produceInWater" value="true"/>
     </building-type>
-    <building-type id="model.building.Drydock" workplaces="0" upgradesFrom="model.building.Docks" sequence="15">
+    <building-type id="model.building.Drydock" workplaces="0" upgradesFrom="model.building.Docks"
+                   required-population="4" sequence="15">
       <required-goods id="model.goods.hammers" value="80"/>
       <required-goods id="model.goods.tools" value="50"/>
-      <required-population value="4"/>
       <ability id="model.ability.produceInWater" value="true"/>
       <ability id="model.ability.repairUnits" value="true">
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
-    <building-type id="model.building.Shipyard" workplaces="0" upgradesFrom="model.building.Drydock" sequence="15">
+    <building-type id="model.building.Shipyard" workplaces="0" upgradesFrom="model.building.Drydock"
+                   required-population="8" sequence="15">
       <required-goods id="model.goods.hammers" value="240"/>
       <required-goods id="model.goods.tools" value="100"/>
-      <required-population value="8"/>
       <ability id="model.ability.produceInWater" value="true"/>
       <ability id="model.ability.repairUnits" value="true">
         <scope ability-id="model.ability.navalUnit"/>

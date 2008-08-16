@@ -99,7 +99,16 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         // currently, FreeColGameObjectTypes are not serialized
     };
 
-    protected abstract void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException;
+    public void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+	readAttributes(in, specification);
+	readChildren(in, specification);
+    }
+
+    // TODO: make these abstract
+    protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {};
+    protected void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {};
+
     
     /**
      * Use only for debugging purposes! A human-readable and localized name is
