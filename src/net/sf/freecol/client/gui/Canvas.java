@@ -2456,6 +2456,10 @@ public final class Canvas extends JDesktopPane {
         for (int i = 0; i < mouseMotionListeners.length; ++i) {
             removeMouseMotionListener(mouseMotionListeners[i]);
         }
+        
+        // change to default view mode
+        // Must be done before removing jMenuBar to prevent exception (crash)
+        getGUI().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
 
         if (jMenuBar != null) {
             remove(jMenuBar);
@@ -2465,8 +2469,6 @@ public final class Canvas extends JDesktopPane {
             remove(c, false);
         }
         
-        // change to default view mode
-        getGUI().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
     }
 
     /**

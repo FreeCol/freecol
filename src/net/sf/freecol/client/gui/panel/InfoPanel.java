@@ -358,48 +358,59 @@ public final class InfoPanel extends FreeColPanel {
             
             labelPanel.removeAll();
             if (tile != null) {
-                tileNameLabel.setText(tile.getName());
-                labelPanel.add(tileNameLabel, higConst.rc(1, 1));
-                StringBuilder text = new StringBuilder();
-                int row = 2;
-                for (TileImprovement tileImprovement : tile.getCompletedTileImprovements()) {
-                    text.append(tileImprovement.getType().getDescription());
-                    text.append(", ");
-                }
-                if (tile.getOwner() != null) {
-                    text.append(tile.getOwner().getNationAsString());
-                } else {
-                    int length = text.length();
-                    if (length > 2) {
-                        text.delete(length - 2, length);
+                if (tile.isExplored()) {
+                    tileNameLabel.setText(tile.getName());
+                    labelPanel.add(tileNameLabel, higConst.rc(1, 1));
+                    StringBuilder text = new StringBuilder();
+                    int row = 2;
+                    for (TileImprovement tileImprovement : tile.getCompletedTileImprovements()) {
+                        text.append(tileImprovement.getType().getDescription());
+                        text.append(", ");
                     }
-                }
+                    if (tile.getOwner() != null) {
+                        text.append(tile.getOwner().getNationAsString());
+                    } else {
+                        int length = text.length();
+                        if (length > 2) {
+                            text.delete(length - 2, length);
+                        }
+                    }
 
-                if (text.length() > 0) {
-                    plowOwnerLabel.setText(text.toString());
-                    labelPanel.add(plowOwnerLabel, higConst.rc(row, 1));
+                    if (text.length() > 0) {
+                        plowOwnerLabel.setText(text.toString());
+                        labelPanel.add(plowOwnerLabel, higConst.rc(row, 1));
+                        row++;
+                    }
+
+                    bonusLabel.setText(Messages.message("colopedia.terrain.defenseBonus") +
+                                       " " + tile.defenceBonus() + "%");
+                    labelPanel.add(bonusLabel, higConst.rc(row, 1));
                     row++;
-                }
 
-                bonusLabel.setText(Messages.message("colopedia.terrain.defenseBonus") +
-                        " " + tile.defenceBonus() + "%");
-                labelPanel.add(bonusLabel, higConst.rc(row, 1));
-                row++;
+                    movementLabel.setText(Messages.message("colopedia.terrain.movementCost") +
+                                          " " + String.valueOf(getMovementCost(tile)/3));
+                    labelPanel.add(movementLabel, higConst.rc(row, 1));
+                    row++;
 
-                movementLabel.setText(Messages.message("colopedia.terrain.movementCost") +
-                        " " + String.valueOf(getMovementCost(tile)/3));
-                labelPanel.add(movementLabel, higConst.rc(row, 1));
-                row++;
-
-                labelPanel.add(goodsPanel, higConst.rc(row, 1));
-                addProducedGoods(tile);
+                    labelPanel.add(goodsPanel, higConst.rc(row, 1));
+                    addProducedGoods(tile);
                 
-                int width = library.getTerrainImageWidth(tile.getType());
-                int height = library.getTerrainImageHeight(tile.getType());
-                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(),
-                                                      tile, 0, 0);
-                tileLabel.setIcon(new ImageIcon(image));
+                    int width = library.getTerrainImageWidth(tile.getType());
+                    int height = library.getTerrainImageHeight(tile.getType());
+                    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                    freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(),
+                                                          tile, 0, 0);
+                    tileLabel.setIcon(new ImageIcon(image));
+                } else {
+                    tileNameLabel.setText("Unexplored");
+                    labelPanel.add(tileNameLabel, higConst.rc(1, 1));
+                    int width = library.getTerrainImageWidth(tile.getType());
+                    int height = library.getTerrainImageHeight(tile.getType());
+                    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                    freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(),
+                                                          tile, 0, 0);
+                    tileLabel.setIcon(new ImageIcon(image));
+                }
             } else {
                 tileLabel.setIcon(null);
             }
