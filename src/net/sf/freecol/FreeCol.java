@@ -46,6 +46,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -421,16 +422,30 @@ public final class FreeCol {
      */
     public static Locale getLocale() { 
         XMLInputFactory xif = XMLInputFactory.newInstance();
-
         XMLStreamReader in = null;
         try {
             in = xif.createXMLStreamReader(new BufferedReader(new FileReader(getClientOptionsFile())));
             in.nextTag();
-            while (!ClientOptions.LANGUAGE.equals(in.getLocalName())) {
-                in.nextTag();
+            /** 
+             * The following code was contributed by armcode to fix
+             * bug #[ 2045521 ] "Exception in Freecol.log on starting
+             * game". I was never able to reproduce the bug, but the
+             * patch did no harm either.
+             */
+            for(int eventid = in.getEventType();eventid != XMLEvent.END_DOCUMENT; eventid = in.getEventType()) { 
+
+            	//TODO: Is checking for XMLEvent.ATTRIBUTE needed?
+            	if(eventid == XMLEvent.START_ELEMENT) {
+                	if (ClientOptions.LANGUAGE.equals(in.getAttributeValue(null, "id"))) {
+                		return LanguageOption.getLocale(in.getAttributeValue(null, "value")); 
+                	}
+            	}
+            	in.nextTag();
             }
-            Locale l = LanguageOption.getLocale(in.getAttributeValue(null, "value"));
-            return l;
+            //We don't have a language option in our file, it is either not there or the file is corrupt
+            logger.log(Level.WARNING, "Language setting not found in client options file.  Using default.");
+            return Locale.getDefault();
+            
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception while loading options.", e);
             return Locale.getDefault();
