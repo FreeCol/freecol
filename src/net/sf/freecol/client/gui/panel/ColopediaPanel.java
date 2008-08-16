@@ -1069,14 +1069,17 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
 
         JTextArea requires = getDefaultTextArea(requiresText.toString());
-        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.requires")), higConst
-                .rc(row, leftColumn, "tl"));
+        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.requires")), 
+                        higConst.rc(row, leftColumn, "tl"));
         detailPanel.add(requires, higConst.rc(row, rightColumn));
         row += 2;
 
         // Costs to build - Hammers & Tools
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.cost")), higConst.rc(row, leftColumn));
-        if (!buildingType.getGoodsRequired().isEmpty()) {
+        if (buildingType.getGoodsRequired().isEmpty()) {
+            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.autoBuilt")),
+                            higConst.rc(row, rightColumn, "l"));
+        } else {
             JPanel costs = new JPanel();
             costs.setOpaque(false);
             costs.setLayout(new FlowLayout(FlowLayout.LEFT));
