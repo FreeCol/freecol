@@ -264,9 +264,8 @@ public final class TileImprovementType extends FreeColGameObjectType
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification)
+    public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
         natural = getAttribute(in, "natural", false);
         addWorkTurns = getAttribute(in, "add-work-turns", 0);
         movementCost = getAttribute(in, "movement-cost", -1);
@@ -283,6 +282,11 @@ public final class TileImprovementType extends FreeColGameObjectType
         expendedAmount = getAttribute(in, "expended-amount", 0);
         deliverGoodsType = specification.getType(in, "deliver-goods-type", GoodsType.class, null);
         deliverAmount = getAttribute(in, "deliver-amount", 0);
+    }
+
+
+    public void readChildren(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
 
         allowedWorkers = new HashSet<String>();
         allowedTileTypes = new ArrayList<TileType>();
@@ -315,7 +319,6 @@ public final class TileImprovementType extends FreeColGameObjectType
                     }
                 }
                 in.nextTag(); // close this element
-
             } else if ("tile".equals(childName)) {
                 String tileId = in.getAttributeValue(null, "id");
                 if (getAttribute(in, "value", true)) {
@@ -324,11 +327,13 @@ public final class TileImprovementType extends FreeColGameObjectType
                     allowedTileTypes.remove(specification.getTileType(tileId));
                 }
                 in.nextTag(); // close this element
-
             } else if ("worker".equals(childName)) {
                 allowedWorkers.add(in.getAttributeValue(null, "id"));
                 in.nextTag(); // close this element
-
+            } else if ("change".equals(childName)) {
+                tileTypeChange.put(specification.getTileType(in.getAttributeValue(null, "from")),
+                                   specification.getTileType(in.getAttributeValue(null, "to")));
+                in.nextTag(); // close this element
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
@@ -336,13 +341,8 @@ public final class TileImprovementType extends FreeColGameObjectType
                 }
                 modifiers.put(modifier.getId(), modifier);
                 specification.getModifierKeys().add(modifier.getId());
-            } else if ("change".equals(childName)) {
-                tileTypeChange.put(specification.getTileType(in.getAttributeValue(null, "from")),
-                                   specification.getTileType(in.getAttributeValue(null, "to")));
-                in.nextTag(); // close this element
-
             } else {
-                throw new RuntimeException("unexpected: " + childName);
+                super.readChild(in, specification);
             }
         }
     }

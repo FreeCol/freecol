@@ -109,30 +109,20 @@ public class EuropeanNationType extends NationType {
         return startingUnits;
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification)
+    public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
         ref = getAttribute(in, "ref", false);
+    }
 
+    public void readChildren(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if (Ability.getXMLElementTagName().equals(childName)) {
-                Ability ability = new Ability(in);
-                if (ability.getSource() == null) {
-                    ability.setSource(getNameKey());
-                }
-                addAbility(ability);
-                specification.getAbilityKeys().add(ability.getId());
-            } else if (Modifier.getXMLElementTagName().equals(childName)) {
-                Modifier modifier = new Modifier(in); // Modifier close the element
-                if (modifier.getSource() == null) {
-                    modifier.setSource(this.getId());
-                }
-                addModifier(modifier);
-                specification.getModifierKeys().add(modifier.getId());
-            } else if ("unit".equals(childName)) {
+            if ("unit".equals(childName)) {
                 AbstractUnit unit = new AbstractUnit(in); // AbstractUnit closes element
                 startingUnits.add(unit);
+            } else {
+                super.readChild(in, specification);
             }
         }
     }

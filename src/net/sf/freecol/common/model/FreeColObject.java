@@ -38,6 +38,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -618,13 +619,23 @@ public abstract class FreeColObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        // TODO: get rid of compatibility code
+        if (getId() == null) {
+            setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        }
 	readAttributes(in);
 	readChildren(in);
     }
 
-    // TODO: make these abstract
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {};
-    protected void readChildren(XMLStreamReader in) throws XMLStreamException {};
+    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        // do nothing
+    }
+
+    protected void readChildren(XMLStreamReader in) throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            // do nothing
+        }
+    }
 
     /**
      * This method writes an XML-representation of this object to

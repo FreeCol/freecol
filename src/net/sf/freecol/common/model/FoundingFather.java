@@ -218,9 +218,8 @@ public class FoundingFather extends FreeColGameObjectType {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification)
+    public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
         String typeString = in.getAttributeValue(null, "type").toUpperCase();
         type = Enum.valueOf(FoundingFatherType.class, typeString);
 
@@ -228,30 +227,20 @@ public class FoundingFather extends FreeColGameObjectType {
         weight[2] = Integer.parseInt(in.getAttributeValue(null, "weight2"));
         weight[3] = Integer.parseInt(in.getAttributeValue(null, "weight3"));
 
+    }
+
+    public void readChildren(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if (Ability.getXMLElementTagName().equals(childName)) {
-                Ability ability = new Ability(in);
-                if (ability.getSource() == null) {
-                    ability.setSource(getNameKey());
-                }
-                addAbility(ability);
-                specification.getAbilityKeys().add(ability.getId());
-            } else if (Modifier.getXMLElementTagName().equals(childName)) {
-                Modifier modifier = new Modifier(in);
-                if (modifier.getSource() == null) {
-                    modifier.setSource(getNameKey());
-                }
-                addModifier(modifier); // close this element
-                specification.getModifierKeys().add(modifier.getId());
-            } else if ("event".equals(childName)) {
-                String eventId = in.getAttributeValue(null, "id");
+            if ("event".equals(childName)) {
+                String eventId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                 String value = in.getAttributeValue(null, "value");
                 events.put(eventId, value);
                 in.nextTag(); // close this element
             } else if ("nation".equals(childName) ||
                        "nation-type".equals(childName)) {
-                availableTo.add(in.getAttributeValue(null, "id"));
+                availableTo.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
                 in.nextTag();
             } else if ("unit".equals(childName)) {
                 AbstractUnit unit = new AbstractUnit(in); // AbstractUnit closes element
@@ -270,11 +259,7 @@ public class FoundingFather extends FreeColGameObjectType {
                 }
                 in.nextTag();
             } else {
-                logger.finest("Parsing of " + childName + " is not implemented yet");
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                        !in.getLocalName().equals(childName)) {
-                    in.nextTag();
-                }
+                super.readChild(in, specification);
             }
         }
 

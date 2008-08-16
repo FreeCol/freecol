@@ -125,12 +125,6 @@ public final class BuildingType extends BuildableType {
 
     }
 
-    public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            super.readChild(in, specification);
-        }
-    }
-    
     /**
      * Gets the tag name of the root element representing this object.
      * This method should be overwritten by any sub-class, preferably

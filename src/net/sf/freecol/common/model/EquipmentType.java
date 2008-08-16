@@ -201,65 +201,30 @@ public class EquipmentType extends BuildableType {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification)
+    public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
         maximumCount = getAttribute(in, "maximum-count", 1);
         combatLossPriority = getAttribute(in, "combat-loss-priority", 0);
         String roleString = getAttribute(in, "role", "default");
         role = Enum.valueOf(Role.class, roleString.toUpperCase());
+    }
 
+    public void readChildren(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
-            if (Ability.getXMLElementTagName().equals(nodeName)) {
-                Ability ability = new Ability(in);
-                if (ability.getSource() == null) {
-                    ability.setSource(getNameKey());
-                }
-                addAbility(ability);
-                specification.getAbilityKeys().add(ability.getId());
-            } else if ("required-ability".equals(nodeName)) {
-                String abilityId = in.getAttributeValue(null, "id");
-                boolean value = getAttribute(in, "value", true);
-                getUnitAbilitiesRequired().put(abilityId, value);
-                in.nextTag(); // close this element
-                specification.getAbilityKeys().add(abilityId);
-            } else if ("required-location-ability".equals(nodeName)) {
+            if ("required-location-ability".equals(nodeName)) {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
                 getLocationAbilitiesRequired().put(abilityId, value);
                 in.nextTag(); // close this element
                 specification.getAbilityKeys().add(abilityId);
-            } else if ("required-goods".equals(nodeName)) {
-                GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
-                int amount = getAttribute(in, "value", 0);
-                AbstractGoods requiredGoods = new AbstractGoods(type, amount);
-                if (getGoodsRequired() == null) {
-                    setGoodsRequired(new ArrayList<AbstractGoods>());
-                }
-                getGoodsRequired().add(requiredGoods);
-                in.nextTag(); // close this element
             } else if ("compatible-equipment".equals(nodeName)) {
                 String equipmentId = in.getAttributeValue(null, "id");
                 compatibleEquipment.add(equipmentId);
                 in.nextTag(); // close this element
-            } else if (Modifier.getXMLElementTagName().equals(nodeName)) {
-                Modifier modifier = new Modifier(in); // Modifier close the element
-                if (modifier.getSource() == null) {
-                    modifier.setSource(getNameKey());
-                }
-                addModifier(modifier);
-                specification.getModifierKeys().add(modifier.getId());
-                if (modifier.getId().equals(Modifier.OFFENCE) ||
-                    modifier.getId().equals(Modifier.DEFENCE)) {
-                    militaryEquipment = true;
-                }
             } else {
-                logger.finest("Parsing of " + nodeName + " is not implemented yet");
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                        !in.getLocalName().equals(nodeName)) {
-                    in.nextTag();
-                }
+                super.readChild(in, specification);
             }
         }
 

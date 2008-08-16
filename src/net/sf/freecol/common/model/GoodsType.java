@@ -315,13 +315,8 @@ public final class GoodsType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ API methods
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
-    public void readFromXML(XMLStreamReader in, Specification specification) 
+    public void readAttributes(XMLStreamReader in, Specification specification) 
         throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
         isFarmed = getAttribute(in, "is-farmed", false);
         isFood = getAttribute(in, "is-food", false);
         ignoreLimit = getAttribute(in, "ignore-limit", false);
@@ -338,13 +333,21 @@ public final class GoodsType extends FreeColGameObjectType {
 
         storable = getAttribute(in, "storable", true);
         storedAs = specification.getType(in, "stored-as", GoodsType.class, null);
+    }
+
+    public void readChildren(XMLStreamReader in, Specification specification) 
+        throws XMLStreamException {
 
         // Only expected child is 'market'
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            initialAmount = Integer.parseInt(in.getAttributeValue(null, "initial-amount"));
-            initialPrice = getAttribute(in, "initial-price", 1);
-            priceDiff = getAttribute(in, "price-difference", 1);
-            in.nextTag(); // close this element
+            if ("market".equals(in.getLocalName())) {
+                initialAmount = Integer.parseInt(in.getAttributeValue(null, "initial-amount"));
+                initialPrice = getAttribute(in, "initial-price", 1);
+                priceDiff = getAttribute(in, "price-difference", 1);
+                in.nextTag(); // close this element
+            } else {
+                super.readChild(in, specification);
+            }
         }
     }
 

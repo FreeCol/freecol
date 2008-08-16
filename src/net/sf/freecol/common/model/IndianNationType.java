@@ -220,9 +220,8 @@ public class IndianNationType extends NationType {
         return skills;
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification)
+    public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
 
         String valueString = in.getAttributeValue(null, "number-of-settlements").toUpperCase();
         numberOfSettlements = Enum.valueOf(SettlementNumber.class, valueString);
@@ -232,24 +231,13 @@ public class IndianNationType extends NationType {
 
         valueString = in.getAttributeValue(null, "type-of-settlement").toUpperCase();
         typeOfSettlement = Enum.valueOf(SettlementType.class, valueString);
+    }
 
+    public void readChildren(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
-            if (Ability.getXMLElementTagName().equals(childName)) {
-                Ability ability = new Ability(in);
-                if (ability.getSource() == null) {
-                    ability.setSource(getNameKey());
-                }
-                addAbility(ability); // Ability close the element
-                specification.getAbilityKeys().add(ability.getId());
-            } else if (Modifier.getXMLElementTagName().equals(childName)) {
-                Modifier modifier = new Modifier(in); // Modifier close the element
-                if (modifier.getSource() == null) {
-                    modifier.setSource(getNameKey());
-                }
-               addModifier(modifier);
-                specification.getModifierKeys().add(modifier.getId());
-            } else if ("skill".equals(childName)) {
+            if ("skill".equals(childName)) {
                 UnitType unitType = specification.getUnitType(in.getAttributeValue(null, "id"));
                 int probability = getAttribute(in, "probability", 0);
                 skills.add(new RandomChoice<UnitType>(unitType, probability));
@@ -257,6 +245,8 @@ public class IndianNationType extends NationType {
             } else if (Region.getXMLElementTagName().equals(childName)) {
                 regions.add(in.getAttributeValue(null, "id"));
                 in.nextTag(); // close this element
+            } else {
+                super.readChild(in, specification);
             }
         }
 

@@ -109,9 +109,8 @@ public final class ResourceType extends FreeColGameObjectType
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification)
+    public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
         art = in.getAttributeValue(null, "art");
         if (hasAttribute(in, "maximum-value")) {
             maxValue = Integer.parseInt(in.getAttributeValue(null, "maximum-value"));
@@ -120,8 +119,10 @@ public final class ResourceType extends FreeColGameObjectType
             maxValue = -1;
             minValue = -1;
         }
+    }
 
-        // Only expected child is 'production-bonus'
+    public void readChildren(XMLStreamReader in, Specification specification)
+            throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String childName = in.getLocalName();
             if (Modifier.getXMLElementTagName().equals(childName)) {
@@ -132,11 +133,7 @@ public final class ResourceType extends FreeColGameObjectType
                 modifiers.put(specification.getGoodsType(modifier.getId()), modifier);
                 specification.getModifierKeys().add(modifier.getId());
             } else {
-                logger.finest("Parsing of " + childName + " is not implemented yet");
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                       !in.getLocalName().equals(childName)) {
-                    in.nextTag();
-                }
+                super.readChild(in, specification);
             }
         }        
     }

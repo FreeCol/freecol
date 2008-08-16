@@ -135,14 +135,7 @@ public class BuildableType extends FreeColGameObjectType {
 
     protected void readChild(XMLStreamReader in, Specification specification) throws XMLStreamException {
         String childName = in.getLocalName();
-        if (Ability.getXMLElementTagName().equals(childName)) {
-            Ability ability = new Ability(in);
-            if (ability.getSource() == null) {
-                ability.setSource(getNameKey());
-            }
-            addAbility(ability); // Ability close the element
-            specification.getAbilityKeys().add(ability.getId());
-        } else if ("required-ability".equals(childName)) {
+        if ("required-ability".equals(childName)) {
             String abilityId = in.getAttributeValue(null, "id");
             boolean value = getAttribute(in, "value", true);
             getAbilitiesRequired().put(abilityId, value);
@@ -160,19 +153,8 @@ public class BuildableType extends FreeColGameObjectType {
                 getGoodsRequired().add(requiredGoods);
             }
             in.nextTag(); // close this element
-        } else if (Modifier.getXMLElementTagName().equals(childName)) {
-            Modifier modifier = new Modifier(in);
-            if (modifier.getSource() == null) {
-                modifier.setSource(getNameKey());
-            }
-            addModifier(modifier); // Modifier close the element
-            specification.getModifierKeys().add(modifier.getId());
         } else {
-            logger.finest("Parsing of " + childName + " is not implemented yet");
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
-                   !in.getLocalName().equals(childName)) {
-                in.nextTag();
-            }
+            super.readChild(in, specification);
         }
     }
 

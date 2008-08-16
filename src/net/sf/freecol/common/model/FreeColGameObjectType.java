@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.Set;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -99,16 +100,49 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         // currently, FreeColGameObjectTypes are not serialized
     };
 
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
+    }
+
     public void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
 	readAttributes(in, specification);
 	readChildren(in, specification);
     }
 
-    // TODO: make these abstract
+    // TODO: make this abstract
     protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {};
-    protected void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {};
 
+    public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            readChild(in, specification);
+        }
+    }
+    
+    protected void readChild(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        String childName = in.getLocalName();
+        if (Ability.getXMLElementTagName().equals(childName)) {
+            Ability ability = new Ability(in);
+            if (ability.getSource() == null) {
+                ability.setSource(getNameKey());
+            }
+            addAbility(ability); // Ability close the element
+            specification.getAbilityKeys().add(ability.getId());
+        } else if (Modifier.getXMLElementTagName().equals(childName)) {
+            Modifier modifier = new Modifier(in);
+            if (modifier.getSource() == null) {
+                modifier.setSource(getNameKey());
+            }
+            addModifier(modifier); // Modifier close the element
+            specification.getModifierKeys().add(modifier.getId());
+        } else {
+            logger.warning("Parsing of " + childName + " is not implemented yet");
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
+                   !in.getLocalName().equals(childName)) {
+                in.nextTag();
+            }
+        }
+    }
     
     /**
      * Use only for debugging purposes! A human-readable and localized name is

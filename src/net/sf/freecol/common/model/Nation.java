@@ -245,9 +245,8 @@ public class Nation extends FreeColGameObjectType {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
     }
 
-    public void readFromXML(XMLStreamReader in, Specification specification)
+    public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
-        setId(in.getAttributeValue(null, "id"));
         setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));
         type = specification.getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
@@ -256,7 +255,6 @@ public class Nation extends FreeColGameObjectType {
         coatOfArms = getAttribute(in, "coat-of-arms", "native.png");
         monarchArt = getAttribute(in, "monarch-art", "louis.png");
         anthem = in.getAttributeValue(null, "anthem");
-        in.nextTag();
    }
 
 
