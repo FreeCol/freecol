@@ -105,10 +105,6 @@ public final class ResourceType extends FreeColGameObjectType
 
     // ------------------------------------------------------------ API methods
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
     public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         art = in.getAttributeValue(null, "art");

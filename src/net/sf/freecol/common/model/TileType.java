@@ -207,10 +207,6 @@ public final class TileType extends FreeColGameObjectType {
 
     // ------------------------------------------------------------ API methods
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         basicMoveCost = Integer.parseInt(in.getAttributeValue(null, "basic-move-cost"));

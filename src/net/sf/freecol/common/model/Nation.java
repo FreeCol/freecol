@@ -241,10 +241,6 @@ public class Nation extends FreeColGameObjectType {
         return getName();
     }
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));

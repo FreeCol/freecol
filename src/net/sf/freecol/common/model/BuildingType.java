@@ -98,10 +98,6 @@ public final class BuildingType extends BuildableType {
         return this;
     }
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
     public void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
         if (hasAttribute(in, "upgradesFrom")) {
             upgradesFrom = specification.getBuildingType(in.getAttributeValue(null, "upgradesFrom"));

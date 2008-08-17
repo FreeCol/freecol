@@ -599,10 +599,6 @@ public final class UnitType extends BuildableType {
         }
     }
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
     public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
         offence = getAttribute(in, "offence", DEFAULT_OFFENCE);

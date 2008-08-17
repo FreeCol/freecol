@@ -57,27 +57,26 @@ public class DifficultyLevel extends FreeColGameObjectType {
         return levelOptions;
     }
     
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        throw new UnsupportedOperationException("Call 'readFromXML' instead.");
-    }
-
     public void readFromXML(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
 
         final String id = in.getAttributeValue(null, "id");
         
         if (id == null){
-            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() +
+                                         "> tag : no id attribute found.");
         }
 
         setId(in.getAttributeValue(null, "id"));
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String optionType = in.getLocalName();
-            if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
+            if (IntegerOption.getXMLElementTagName().equals(optionType) ||
+                "integer-option".equals(optionType)) {
                 IntegerOption option = new IntegerOption(in);
                 levelOptions.put(option.getId(), option);
-            } else if (BooleanOption.getXMLElementTagName().equals(optionType) || "boolean-option".equals(optionType)) {
+            } else if (BooleanOption.getXMLElementTagName().equals(optionType) ||
+                       "boolean-option".equals(optionType)) {
                 BooleanOption option = new BooleanOption(in);
                 levelOptions.put(option.getId(), option);
             } else {
