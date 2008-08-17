@@ -581,7 +581,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     private JButton getUnitButton(final UnitType unitType, Role role) {
-        JButton unitButton = getButton(unitType.getName(), library.getUnitImageIcon(unitType, role));
+        JButton unitButton = getButton(unitType.getName(), 
+                                       library.scaleIcon(library.getUnitImageIcon(unitType, role),
+                                                         0.66f));
         unitButton.setHorizontalAlignment(SwingConstants.LEFT);
         unitButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
@@ -1255,10 +1257,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             return;
         }
 
-        List<AbstractUnit> startingUnits = nationType.getStartingUnits();
         Set<Ability> abilities = nationType.getFeatureContainer().getAbilities();
         Set<Modifier> modifiers = nationType.getFeatureContainer().getModifiers();
-        int numberOfRows = 4 + abilities.size() + modifiers.size() + startingUnits.size();
+        int numberOfRows = 4 + abilities.size() + modifiers.size();
 
         int[] widths = { 0, 3 * margin, 0 };
         int[] heights = new int[numberOfRows * 2];
@@ -1279,16 +1280,19 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
 
         JLabel units = new JLabel(Messages.message("colopedia.nationType.units"));
-        detailPanel.add(units, higConst.rc(row, leftColumn));
-        if (startingUnits.isEmpty()) {
-            row += 2;
-        } else {
+        detailPanel.add(units, higConst.rc(row, leftColumn, "lt"));
+        List<AbstractUnit> startingUnits = nationType.getStartingUnits();
+        if (!startingUnits.isEmpty()) {
+            GridLayout gridLayout = new GridLayout(0, 2);
+            gridLayout.setHgap(10);
+            JPanel unitPanel = new JPanel(gridLayout);
+            unitPanel.setOpaque(false);
             for (AbstractUnit startingUnit : startingUnits) {
-                detailPanel.add(getUnitButton(startingUnit.getUnitType(), startingUnit.getRole()),
-                                higConst.rc(row, rightColumn, "r"));
-                row += 2;
+                unitPanel.add(getUnitButton(startingUnit.getUnitType(), startingUnit.getRole()));
             }
+            detailPanel.add(unitPanel, higConst.rc(row, rightColumn, "lt"));
         }
+        row += 2;
 
         JLabel abilityLabel = new JLabel(Messages.message("abilities"));
         detailPanel.add(abilityLabel, higConst.rc(row, leftColumn));
@@ -1297,7 +1301,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             String trueString = Messages.message("true");
             String falseString = Messages.message("false");
             for (Ability ability : abilities) {
-                detailPanel.add(new JLabel(ability.getName()), higConst.rc(row, leftColumn, "l"));
+                detailPanel.add(new JLabel("* " + ability.getName()), higConst.rc(row, leftColumn, "l"));
                 String value = ability.getValue() ? trueString : falseString;
                 detailPanel.add(new JLabel(value), higConst.rc(row, rightColumn, "r"));
                 row += 2;
@@ -1309,7 +1313,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
         if (!modifiers.isEmpty()) {
             for (Modifier modifier : modifiers) {
-                detailPanel.add(new JLabel(modifier.getName()), higConst.rc(row, leftColumn, "l"));
+                detailPanel.add(new JLabel("* " + modifier.getName()), higConst.rc(row, leftColumn, "l"));
                 detailPanel.add(new JLabel(getModifierAsString(modifier)),
                                 higConst.rc(row, rightColumn, "r"));
                 row += 2;
@@ -1386,7 +1390,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         row += 2;
 
         detailPanel.add(new JLabel(Messages.message("colopedia.nationType.skills")),
-                        higConst.rc(row, leftColumn));
+                        higConst.rc(row, leftColumn, "lt"));
         GridLayout gridLayout = new GridLayout(0, 2);
         gridLayout.setHgap(10);
         JPanel unitPanel = new JPanel(gridLayout);
@@ -1394,8 +1398,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         for (RandomChoice<UnitType> choice : skills) {
             unitPanel.add(getUnitButton(choice.getObject()));                          
         }
-        detailPanel.add(unitPanel,
-                        higConst.rc(row, rightColumn, "r"));
+        detailPanel.add(unitPanel, higConst.rc(row, rightColumn, "lt"));
         detailPanel.validate();
     }
 
