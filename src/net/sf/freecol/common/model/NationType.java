@@ -56,8 +56,4 @@ public abstract class NationType extends FreeColGameObjectType {
         return getName();
     }
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in, null);
-    }
-
 }

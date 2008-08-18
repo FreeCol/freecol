@@ -212,6 +212,7 @@ public class EquipmentType extends BuildableType {
                 String abilityId = in.getAttributeValue(null, "id");
                 boolean value = getAttribute(in, "value", true);
                 getLocationAbilitiesRequired().put(abilityId, value);
+                specification.addAbility(new Ability(abilityId, value));
                 in.nextTag(); // close this element
             } else if ("compatible-equipment".equals(nodeName)) {
                 String equipmentId = in.getAttributeValue(null, "id");
