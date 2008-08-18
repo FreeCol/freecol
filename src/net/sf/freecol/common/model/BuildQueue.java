@@ -20,8 +20,11 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.ListModel;
@@ -33,7 +36,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-//import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -74,7 +76,7 @@ public class BuildQueue extends FreeColObject implements ListModel {
         }
     }
 
-    public BuildQueue(BuildableType... buildableTypes) {
+    public BuildQueue(Iterable<BuildableType> buildableTypes) {
         for (BuildableType buildableType : buildableTypes) {
             model.add(buildableType);
             if (buildableType instanceof UnitType) {
@@ -172,24 +174,15 @@ public class BuildQueue extends FreeColObject implements ListModel {
             return true;
 	} else if (item instanceof UnitType && acceptsUnits()  ||
 		   item instanceof BuildingType && acceptsBuildings()) {
-	    int index = -1;
-            /*
-	    if (type == Type.MIXED) {
-		index = indexOf(item.getRequiredType(),
-				item.getRequiredLevel()) + 1;
-		if (preferredIndex > index) {
-		    index = preferredIndex;
-		}
-	    } else if (type == Type.BUILDINGS) {
-		index = findIndex(item.getRequiredType(),
-				  item.getRequiredLevel());
-	    }
-            */
-	    try {
-		model.add(index, item);
-	    } catch(Exception e) {
-		System.out.println(e);
-	    }
+	    int index = preferredIndex;
+            if (item instanceof BuildingType) {
+                int minimumIndex = findMinimumIndex((BuildingType) item) + 1;
+                if (minimumIndex > index) {
+                    index = minimumIndex;
+                }
+            }
+            model.add(index, item);
+
 	    if (item instanceof UnitType) {
 		units++;
 	    } else {
@@ -274,23 +267,19 @@ public class BuildQueue extends FreeColObject implements ListModel {
 
     /**
      * Finds a suitable index for inserting the given
-     * <code>BuildableType</code>.
+     * <code>BuildingType</code>.
      * @param newItem The item to be inserted.
      * @return A suitable index for inserting the given
      * <code>BuildableType</code>.
      */
-    /*
-    public int findIndex(int type, int level) {
-	for (int index = 0; index < model.size(); index++) {
-	    BuildableType item = model.get(index);
-	    if (type < item.getType() ||
-		type == item.getType() && level < item.getLevel()) {
-		return index;
-	    }
+    public int findMinimumIndex(BuildingType buildingType) {
+        BuildingType upgradeFrom = buildingType.getUpgradesFrom();
+        if (upgradeFrom == null) {
+            return 0;
+        } else {
+            return model.indexOf(upgradeFrom);                
 	}
-	return model.size();
     }
-    */
 
     /**
      * Returns <code>true</code> if all requirements of the
@@ -331,17 +320,26 @@ public class BuildQueue extends FreeColObject implements ListModel {
      * @return a <code>boolean</code> value
      */
     public boolean dependenciesSatisfiedBy(BuildQueue... queues) {
-        itemLoop: for (BuildableType item : model) {
+        Set<BuildableType> items = new HashSet<BuildableType>(model);
+        for (BuildQueue buildQueue : queues) {
+            items.addAll(buildQueue.model);
+        }
+        Set<Ability> abilities = new HashSet<Ability>();
+        for (BuildableType item : items) {
+            abilities.addAll(item.getFeatureContainer().getAbilities());
+        }
+
+        for (BuildableType item : model) {
             if (item instanceof BuildingType) {
-                if (hasBuildingType((BuildingType) item)) {
-                    continue itemLoop;
-                } else {
-                    for (BuildQueue buildQueue : queues) {
-                        if (buildQueue.hasBuildingType((BuildingType) item)) {
-                            continue itemLoop;
-                        }
-                    }
+                BuildingType upgradesFrom = ((BuildingType) item).getUpgradesFrom();
+                if (upgradesFrom != null && !items.contains(upgradesFrom)) {
                     return false;
+                }
+            } else if (item instanceof UnitType) {
+                for (Entry<String, Boolean> entry : ((UnitType) item).getAbilitiesRequired().entrySet()) {
+                    if (abilities.contains(entry.getKey()) != entry.getValue()) {
+                        return false;
+                    }
                 }
             }
         }

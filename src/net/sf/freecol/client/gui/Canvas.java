@@ -56,6 +56,7 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.BuildQueuePanel;
 import net.sf.freecol.client.gui.panel.ChatPanel;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
@@ -1680,6 +1681,13 @@ public final class Canvas extends JDesktopPane {
         colonyPanel.initialize(colony, freeColClient.getGame());
         addAsFrame(colonyPanel);
         colonyPanel.requestFocus();
+    }
+
+    public void showBuildQueuePanel(Colony colony) {
+        BuildQueuePanel buildQueuePanel = new BuildQueuePanel(this);
+        buildQueuePanel.initialize(colony);
+        addAsFrame(buildQueuePanel);
+        buildQueuePanel.requestFocus();
     }
 
     /**

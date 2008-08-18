@@ -24,6 +24,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -41,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -48,6 +50,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
@@ -66,6 +69,8 @@ public class BuildQueuePanel extends ReportPanel {
     private BuildQueue finished, current, units, buildings;
     private Colony colony; 
 
+    private GridLayout gridLayout = new GridLayout(0, 2);
+
     public BuildQueuePanel(Canvas parent) {
         super(parent, Messages.message("buildQueue"));
     }
@@ -75,20 +80,17 @@ public class BuildQueuePanel extends ReportPanel {
 
         reportPanel.removeAll();
 
-        current = new BuildQueue();
-        for (BuildableType buildableType : colony.getBuildQueue()) {
-            current.add(buildableType);
-        }
+        current = new BuildQueue(colony.getBuildQueue());
 
         finished = new BuildQueue();
         for (Building building : colony.getBuildings()) {
-            finished.add(building.getType());
+            finished.addUnchecked(building.getType());
         }
 
         units = new BuildQueue();
         for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
             if (!unitType.getGoodsRequired().isEmpty()) {
-                units.add(unitType);
+                units.addUnchecked(unitType);
             }
         }
 
@@ -99,23 +101,24 @@ public class BuildQueuePanel extends ReportPanel {
             }
         }
 
+        BuildQueueCellRenderer cellRenderer = new BuildQueueCellRenderer();
 	JList buildQueueList = new JList(current);
 	buildQueueList.setTransferHandler(buildQueueHandler);
 	buildQueueList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	buildQueueList.setDragEnabled(true);
-        buildQueueList.setCellRenderer(new BuildQueueCellRenderer());
+        buildQueueList.setCellRenderer(cellRenderer);
 
 	JList unitList = new JList(units);
 	unitList.setTransferHandler(buildQueueHandler);
 	unitList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	unitList.setDragEnabled(true);
-        unitList.setCellRenderer(new BuildQueueCellRenderer());
+        unitList.setCellRenderer(cellRenderer);
 
 	JList buildingList = new JList(buildings);
 	buildingList.setTransferHandler(buildQueueHandler);
 	buildingList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 	buildingList.setDragEnabled(true);
-        buildingList.setCellRenderer(new BuildQueueCellRenderer());
+        buildingList.setCellRenderer(cellRenderer);
 
         JScrollPane buildQueueView = new JScrollPane(buildQueueList);
         buildQueueView.setPreferredSize(new Dimension(240, 400));
@@ -142,11 +145,16 @@ public class BuildQueuePanel extends ReportPanel {
         reportPanel.add(unitPanel);
         reportPanel.add(buildingPanel);
         //setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+
+        gridLayout.setHgap(5);
+
     }
 
 
     private boolean hasBuildingType(Colony colony, BuildingType buildingType) {
-        if (colony.getBuilding(buildingType).getType() == buildingType) {
+        if (colony.getBuilding(buildingType) == null) {
+            return false;
+        } else if (colony.getBuilding(buildingType).getType() == buildingType) {
             return true;
         } else if (buildingType.getUpgradesTo() != null) {
             return hasBuildingType(colony, buildingType.getUpgradesTo());
@@ -168,8 +176,8 @@ public class BuildQueuePanel extends ReportPanel {
             getCanvas().getClient().getInGameController().setBuildQueue(colony, colony.getBuildQueue());
             getCanvas().getColonyPanel().updateBuildingBox();
             getCanvas().getColonyPanel().updateProgressLabel();
-            getCanvas().remove(this);
             */
+            getCanvas().remove(this);
         } else {
             logger.warning("Invalid ActionCommand: " + action);
         }
@@ -218,19 +226,13 @@ public class BuildQueuePanel extends ReportPanel {
 		return false;
 	    }
 
-            for (int index = 0 ; index < finished.size(); index++) {
-                System.out.println(finished.get(index).toString());
-            }
-
-
-            if (!buildQueue.dependenciesSatisfiedBy(new BuildQueue[] {targetQueue, finished})) {
+            if (!buildQueue.dependenciesSatisfiedBy(targetQueue, finished)) {
                 return false;
             }
 
 	    int preferredIndex = target.getSelectedIndex();
 
 	    if (source.equals(target)) {
-		System.out.println("source equals target");
 		if (targetQueue.getType() == BuildQueue.Type.MIXED) {
 		    // don't drop selection on itself
 		    if (indices != null && 
@@ -272,7 +274,6 @@ public class BuildQueuePanel extends ReportPanel {
 
 		// adjust indices if necessary
 		if (numberOfItems > 0) {
-		    System.out.println("adjusting indices");
 		    for (int i = 0; i < indices.length; i++) {
 			if (indices[i] > targetIndex) {
 			    indices[i] += numberOfItems;
@@ -399,8 +400,10 @@ public class BuildQueuePanel extends ReportPanel {
 
     class BuildQueueCellRenderer implements ListCellRenderer {
 
-        private final int[] widths = new int[] {83, 5, 0};
-        private final int[] heights = new int[] {15, 16, 16, 16, 15};
+        private final int[] widths = new int[] {0, 5, 0};
+        private final int[] heights = new int[] {83};
+
+        HIGLayout layout = new HIGLayout(widths, heights);
 
         public BuildQueueCellRenderer() {
         }
@@ -411,50 +414,40 @@ public class BuildQueuePanel extends ReportPanel {
                                                       boolean isSelected,
                                                       boolean cellHasFocus)
         {
+            BuildableType item = (BuildableType) value;
 
-            JPanel itemPanel = new JPanel(new HIGLayout(widths, heights));
+            JPanel itemPanel = new JPanel(layout);
             JLabel imageLabel = new JLabel();
             ImageLibrary library = getCanvas().getGUI().getImageLibrary();
             if (value instanceof UnitType) {
                 imageLabel = new JLabel(library.scaleIcon(library.getUnitImageIcon((UnitType) value), 0.66f));
-                itemPanel.add(imageLabel, higConst.rcwh(1, 1, 1, 5));
+                itemPanel.add(imageLabel, higConst.rc(1, 1));
             } else if (value instanceof BuildingType) {
-                BuildingType item = (BuildingType) value;
-                GoodsType outputType = item.getProducedGoodsType();
+                BuildingType building = (BuildingType) value;
+                GoodsType outputType = building.getProducedGoodsType();
                 if (outputType != null) {
                     JPanel goodsPanel = new JPanel();
                     Image goodsImage = library.getGoodsImage(outputType);
                     ImageIcon imageIcon = new ImageIcon(library.scaleImage(goodsImage, 0.66f));
-                    for (int gindex = 0; gindex < item.getLevel(); gindex++) {
+                    for (int gindex = 0; gindex < building.getLevel(); gindex++) {
                         goodsPanel.add(new JLabel(imageIcon));
                     }
                     if (isSelected) {
                         goodsPanel.setOpaque(false);
                     }
-                    itemPanel.add(goodsPanel, higConst.rcwh(2, 1, 1, 3));
+                    itemPanel.add(goodsPanel, higConst.rc(1, 1));
                 }
             }
-
-            JLabel textLabel = new JLabel(((BuildableType) value).getName());
-            itemPanel.add(textLabel, higConst.rc(2, 3));
-            /*
+            JPanel costs = new JPanel(gridLayout);
+            costs.setBorder(BorderFactory.createTitledBorder(item.getName()));
+            costs.setOpaque(false);
             for (AbstractGoods goodsRequired : item.getGoodsRequired()) {
-                costs.add(getGoodsButton(goodsRequired.getType(), goodsRequired.getAmount()));
+                Image goodsImage = library.getGoodsImage(goodsRequired.getType());
+                ImageIcon imageIcon = new ImageIcon(library.scaleImage(goodsImage, 0.66f));
+                costs.add(new JLabel(String.valueOf(goodsRequired.getAmount()),
+                                     imageIcon, SwingConstants.CENTER));
             }
-
-            if (item.getHammersRequired() > 0) {
-                JLabel hammerLabel = new JLabel(Messages.message("model.goods.Hammers") + ": " +
-                                                item.getHammersRequired());
-                hammerLabel.setForeground(Color.GRAY);
-                itemPanel.add(hammerLabel, higConst.rc(3, 3));
-            }
-            if (item.getToolsRequired() > 0) {
-                JLabel toolLabel = new JLabel(Messages.message("model.goods.Tools") + ": " +
-                                              item.getToolsRequired());
-                toolLabel.setForeground(Color.GRAY);
-                itemPanel.add(toolLabel, higConst.rc(4, 3));
-            }
-            */
+            itemPanel.add(costs, higConst.rc(1, 3));
             if (isSelected) {
                 itemPanel.setOpaque(false);
             }
