@@ -127,7 +127,7 @@ public final class ResourceType extends FreeColGameObjectType
                     modifier.setSource(getNameKey());
                 }
                 modifiers.put(specification.getGoodsType(modifier.getId()), modifier);
-                specification.getModifierKeys().add(modifier.getId());
+                specification.addModifier(modifier);
             } else {
                 super.readChild(in, specification);
             }

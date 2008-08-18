@@ -139,8 +139,8 @@ public class BuildableType extends FreeColGameObjectType {
             String abilityId = in.getAttributeValue(null, "id");
             boolean value = getAttribute(in, "value", true);
             getAbilitiesRequired().put(abilityId, value);
+            specification.addAbility(new Ability(abilityId, value));
             in.nextTag(); // close this element
-            specification.getAbilityKeys().add(abilityId);
         } else if ("required-goods".equals(childName)) {
             GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
             int amount = getAttribute(in, "value", 0);

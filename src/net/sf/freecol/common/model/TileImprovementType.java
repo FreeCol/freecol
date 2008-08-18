@@ -113,7 +113,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     }
 
     public boolean isWorkerTypeAllowed(UnitType unitType) {
-    	return allowedWorkers.isEmpty() || allowedWorkers.contains(unitType.getId());
+        return allowedWorkers.isEmpty() || allowedWorkers.contains(unitType.getId());
     }
 
     /**
@@ -311,7 +311,7 @@ public final class TileImprovementType extends FreeColGameObjectType
                                 allowedTileTypes.add(t);
                             }
                         }
-                		
+                                
                     }
                 }
                 in.nextTag(); // close this element
@@ -336,7 +336,7 @@ public final class TileImprovementType extends FreeColGameObjectType
                     modifier.setSource(getNameKey());
                 }
                 modifiers.put(modifier.getId(), modifier);
-                specification.getModifierKeys().add(modifier.getId());
+                specification.addModifier(modifier);
             } else {
                 super.readChild(in, specification);
             }

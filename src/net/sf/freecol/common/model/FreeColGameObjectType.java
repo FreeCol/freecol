@@ -106,8 +106,8 @@ public abstract class FreeColGameObjectType extends FreeColObject {
 
     public void readFromXML(XMLStreamReader in, Specification specification) throws XMLStreamException {
         setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
-	readAttributes(in, specification);
-	readChildren(in, specification);
+        readAttributes(in, specification);
+        readChildren(in, specification);
     }
 
     // TODO: make this abstract
@@ -127,14 +127,14 @@ public abstract class FreeColGameObjectType extends FreeColObject {
                 ability.setSource(getNameKey());
             }
             addAbility(ability); // Ability close the element
-            specification.getAbilityKeys().add(ability.getId());
+            specification.addAbility(ability);
         } else if (Modifier.getXMLElementTagName().equals(childName)) {
             Modifier modifier = new Modifier(in);
             if (modifier.getSource() == null) {
                 modifier.setSource(getNameKey());
             }
             addModifier(modifier); // Modifier close the element
-            specification.getModifierKeys().add(modifier.getId());
+            specification.addModifier(modifier);
         } else {
             logger.warning("Parsing of " + childName + " is not implemented yet");
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||

@@ -41,6 +41,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.action.ImprovementActionType;
+import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.EquipmentType;
@@ -50,6 +51,7 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.ResourceType;
@@ -89,9 +91,9 @@ public final class Specification {
 
     private final Map<GoodsType, UnitType> experts;
 
-    private final Set<String> abilityKeys;
+    private final Map<String, List<Ability>> allAbilities;
 
-    private final Set<String> modifierKeys;
+    private final Map<String, List<Modifier>> allModifiers;
 
     private final List<BuildingType> buildingTypeList;
 
@@ -151,10 +153,10 @@ public final class Specification {
         allTypes = new HashMap<String, FreeColGameObjectType>();
         allOptions = new HashMap<String, AbstractOption>();
         allOptionGroups = new HashMap<String, OptionGroup>();
-	experts = new HashMap<GoodsType, UnitType>();
+        experts = new HashMap<GoodsType, UnitType>();
 
-        abilityKeys = new HashSet<String>();
-        modifierKeys = new HashSet<String>();
+        allAbilities = new HashMap<String, List<Ability>>();
+        allModifiers = new HashMap<String, List<Modifier>>();
 
         buildingTypeList = new ArrayList<BuildingType>();
 
@@ -175,10 +177,10 @@ public final class Specification {
         foundingFathers = new ArrayList<FoundingFather>();
 
         nations = new ArrayList<Nation>();
-	europeanNations = new ArrayList<Nation>();
-	REFNations = new ArrayList<Nation>();
-	classicNations = new ArrayList<Nation>();
-	indianNations = new ArrayList<Nation>();
+        europeanNations = new ArrayList<Nation>();
+        REFNations = new ArrayList<Nation>();
+        classicNations = new ArrayList<Nation>();
+        indianNations = new ArrayList<Nation>();
 
         nationTypes = new ArrayList<NationType>();
         europeanNationTypes = new ArrayList<EuropeanNationType>();
@@ -194,7 +196,7 @@ public final class Specification {
             xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 String childName = xsr.getLocalName();
-		logger.finest("Found child named " + childName);
+                logger.finest("Found child named " + childName);
 
                 if ("goods-types".equals(childName)) {
 
@@ -213,9 +215,9 @@ public final class Specification {
                         if (goodsType.isNewWorldGoodsType()) {
                             newWorldGoodsTypeList.add(goodsType);
                         }
-			if (goodsType.isStorable()) {
-			    storableTypes++;
-			}
+                        if (goodsType.isStorable()) {
+                            storableTypes++;
+                        }
                     }
 
                 } else if ("building-types".equals(childName)) {
@@ -278,13 +280,13 @@ public final class Specification {
                         if (unitType.getExpertProduction() != null) {
                             experts.put(unitType.getExpertProduction(), unitType);
                         }
-			if (unitType.hasPrice()) {
-			    if (unitType.getSkill() > 0) {
-				unitTypesTrainedInEurope.add(unitType);
-			    } else if (!unitType.hasSkill()) {
-				unitTypesPurchasedInEurope.add(unitType);
-			    }
-			}
+                        if (unitType.hasPrice()) {
+                            if (unitType.getSkill() > 0) {
+                                unitTypesTrainedInEurope.add(unitType);
+                            } else if (!unitType.hasSkill()) {
+                                unitTypesPurchasedInEurope.add(unitType);
+                            }
+                        }
                     }
 
                 } else if ("founding-fathers".equals(childName)) {
@@ -304,16 +306,16 @@ public final class Specification {
                         NationType nationType;
                         if ("european-nation-type".equals(xsr.getLocalName())) {
                             nationType = new EuropeanNationType(nationIndex++);
-			    nationType.readFromXML(xsr, this);
-			    if (nationType.isREF()) {
-				REFNationTypes.add((EuropeanNationType) nationType);
-			    } else {
-				europeanNationTypes.add((EuropeanNationType) nationType);
-			    }
+                            nationType.readFromXML(xsr, this);
+                            if (nationType.isREF()) {
+                                REFNationTypes.add((EuropeanNationType) nationType);
+                            } else {
+                                europeanNationTypes.add((EuropeanNationType) nationType);
+                            }
                         } else {
                             nationType = new IndianNationType(nationIndex++);
-			    nationType.readFromXML(xsr, this);
-			    indianNationTypes.add((IndianNationType) nationType);
+                            nationType.readFromXML(xsr, this);
+                            indianNationTypes.add((IndianNationType) nationType);
                         }
                         allTypes.put(nationType.getId(), nationType);
                         nationTypes.add(nationType);
@@ -329,7 +331,7 @@ public final class Specification {
                         allTypes.put(nation.getId(), nation);
                         nations.add(nation);
 
-			if (nation.getType().isEuropean()) {
+                        if (nation.getType().isEuropean()) {
                             if (nation.getType().isREF()) {
                                 REFNations.add(nation);
                             } else {
@@ -339,9 +341,9 @@ public final class Specification {
                                 classicNations.add(nation);
                                 classicNationTypes.add((EuropeanNationType) nation.getType());
                             }
-			} else {
-			    indianNations.add(nation);
-			}
+                        } else {
+                            indianNations.add(nation);
+                        }
                     }
 
                 } else if ("equipment-types".equals(childName)) {
@@ -417,24 +419,38 @@ public final class Specification {
     // ---------------------------------------------------------- retrieval
     // methods
 
-    /**
-     * Return a Set of all abilities defined by the specification.
-     * This is required to detect access to undefined abilities.
-     *
-     * @return all abilities defined by the specification.
-     */
-    public Set<String> getAbilityKeys() {
-        return abilityKeys;
+    public void addAbility(Ability ability) {
+        String id = ability.getId();
+        if (!allAbilities.containsKey(id)) {
+            allAbilities.put(id, new ArrayList<Ability>());
+        }
+        allAbilities.get(id).add(ability);
     }
 
     /**
-     * Return a Set of all modifiers defined by the specification.
-     * This is required to detect access to undefined modifiers.
+     * Return a list of all Abilities with the given id.
      *
-     * @return all modifiers defined by the specification.
+     * @param id the ability id
      */
-    public Set<String> getModifierKeys() {
-        return modifierKeys;
+    public List<Ability> getAbilities(String id) {
+        return allAbilities.get(id);
+    }
+
+    public void addModifier(Modifier modifier) {
+        String id = modifier.getId();
+        if (!allModifiers.containsKey(id)) {
+            allModifiers.put(id, new ArrayList<Modifier>());
+        }
+        allModifiers.get(id).add(modifier);
+    }
+
+    /**
+     * Return a list of all Modifiers with the given id.
+     *
+     * @param id the modifier id
+     */
+    public List<Modifier> getModifiers(String id) {
+        return allModifiers.get(id);
     }
 
     /**
@@ -692,7 +708,7 @@ public final class Specification {
     }
 
     public UnitType getExpertForProducing(GoodsType goodsType) {
-	return experts.get(goodsType);
+        return experts.get(goodsType);
     }
 
     /**
@@ -749,7 +765,7 @@ public final class Specification {
     }
 
     public List<EuropeanNationType> getEuropeanNationTypes() {
-	return europeanNationTypes;
+        return europeanNationTypes;
     }
 
     public List<EuropeanNationType> getREFNationTypes() {

@@ -1057,15 +1057,16 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         for (Entry<String, Boolean> entry : buildingType.getAbilitiesRequired().entrySet()) {
             if (entry.getValue()) {
                 requiresText.append(Messages.message(entry.getKey() + ".name"));
-                for (FoundingFather father : Specification.getSpecification().getFoundingFathers()) {
-                    if (father.hasAbility(entry.getKey())) {
-                        // TODO: this assumes that a particular
-                        // ability is granted only by a FoundingFather
-                        requiresText.append(" ");
-                        requiresText.append(Messages.message("colopedia.abilityGrantedBy", "%father%", 
-                                                             father.getName()));
+                List<String> requiredTypes = new ArrayList<String>();
+                for (Ability ability : Specification.getSpecification().getAbilities(entry.getKey())) {
+                    if (ability.getValue() == entry.getValue() &&
+                        ability.getSource() != null) {
+                        requiredTypes.add(Messages.message(ability.getSource()));
                     }
                 }
+                requiresText.append(" ");
+                requiresText.append(Messages.message("colopedia.abilityGrantedBy", "%father%", 
+                                                     Utils.join(", ", requiredTypes)));
                 requiresText.append("\n");
             }
         }

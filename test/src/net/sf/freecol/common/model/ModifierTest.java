@@ -32,16 +32,16 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testAdditiveModifier() {
 
-        spec().getModifierKeys().add("test");
         Modifier modifier = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        spec().addModifier(modifier);
 
         assertEquals(4f, modifier.applyTo(1));
     }
 
     public void testMultiplicativeModifier() {
 
-        spec().getModifierKeys().add("test");
         Modifier modifier = new Modifier("test", 1.5f, Modifier.Type.MULTIPLICATIVE);
+        spec().addModifier(modifier);
 
         assertEquals(1 * 1.5f, modifier.applyTo(1));
         assertEquals(3 * 1.5f, modifier.applyTo(3));
@@ -49,8 +49,8 @@ public class ModifierTest extends FreeColTestCase {
 
     public void testPercentageModifier() {
 
-        spec().getModifierKeys().add("test");
         Modifier modifier = new Modifier("test", 50, Modifier.Type.PERCENTAGE);
+        spec().addModifier(modifier);
 
         assertEquals(150f, modifier.applyTo(100));
         assertEquals(4.5f, modifier.applyTo(3));

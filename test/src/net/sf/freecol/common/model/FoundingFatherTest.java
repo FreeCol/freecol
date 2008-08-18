@@ -43,15 +43,17 @@ public class FoundingFatherTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         FoundingFather father1 = new FoundingFather(111);
-        spec().getAbilityKeys().add("some.new.ability");
-        father1.addAbility(new Ability("some.new.ability"));
+        Ability ability = new Ability("some.new.ability");
+        spec().addAbility(ability);
+        father1.addAbility(ability);
         dutch.addFather(father1);
 
         assertTrue(dutch.hasAbility("some.new.ability"));
 
         FoundingFather father2 = new FoundingFather(112);
-        spec().getModifierKeys().add("some.new.modifier");
-        father2.addModifier(new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE));
+        Modifier modifier = new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE);
+        father2.addModifier(modifier);
+        spec().addModifier(modifier);
         dutch.addFather(father2);
 
         Set<Modifier> modifierSet = dutch.getFeatureContainer().getModifierSet("some.new.modifier");
