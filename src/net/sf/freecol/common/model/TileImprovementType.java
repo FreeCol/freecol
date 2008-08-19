@@ -333,7 +333,7 @@ public final class TileImprovementType extends FreeColGameObjectType
             } else if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
-                    modifier.setSource(getNameKey());
+                    modifier.setSource(this);
                 }
                 modifiers.put(modifier.getId(), modifier);
                 specification.addModifier(modifier);

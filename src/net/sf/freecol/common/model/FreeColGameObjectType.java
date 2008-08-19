@@ -124,14 +124,14 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         if (Ability.getXMLElementTagName().equals(childName)) {
             Ability ability = new Ability(in);
             if (ability.getSource() == null) {
-                ability.setSource(getNameKey());
+                ability.setSource(this);
             }
             addAbility(ability); // Ability close the element
             specification.addAbility(ability);
         } else if (Modifier.getXMLElementTagName().equals(childName)) {
             Modifier modifier = new Modifier(in);
             if (modifier.getSource() == null) {
-                modifier.setSource(getNameKey());
+                modifier.setSource(this);
             }
             addModifier(modifier); // Modifier close the element
             specification.addModifier(modifier);

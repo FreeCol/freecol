@@ -1273,15 +1273,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns the bell production bonus.
-     *
-     * @return The bell production bonus.
-     */
-    public int getBellsBonus() {
-        return (int) featureContainer.applyModifier(0f, "model.goods.bells", null, getGame().getTurn());
-    }
-
-    /**
      * Gets called when this player's turn has ended.
      */
     public void endTurn() {
@@ -2698,23 +2689,17 @@ public class Player extends FreeColGameObject implements Nameable {
     public void setTax(int amount) {
         if (amount != tax) {
             tax = amount;
-            if(featureContainer.hasAbility("model.ability.addTaxToBells")) {
-                Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
-                for (Modifier modifier : bellsBonus) {
-                    if ("model.ability.addTaxToBells".equals(modifier.getSource())) {
-                        modifier.setValue(amount);
-                        return;
-                    } else {
-                        FreeColGameObjectType type = FreeCol.getSpecification().getType(modifier.getSource());
-                        if (type != null && type.hasAbility("model.ability.addTaxToBells")) {
+            for (Ability ability : featureContainer.getAbilitySet("model.ability.addTaxToBells")) {
+                FreeColGameObjectType source = ability.getSource();
+                if (source != null) {
+                    Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
+                    for (Modifier modifier : bellsBonus) {
+                        if (source.equals(modifier.getSource())) {
                             modifier.setValue(amount);
                             return;
                         }
                     }
                 }
-                // found no matching modifier
-                featureContainer.addModifier(new Modifier("model.goods.bells", "model.ability.addTaxToBells",
-                                                          amount, Modifier.Type.ADDITIVE));
             }
         }
     }

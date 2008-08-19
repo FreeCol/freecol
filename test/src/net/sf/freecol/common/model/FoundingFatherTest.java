@@ -252,19 +252,40 @@ public class FoundingFatherTest extends FreeColTestCase {
     }
 
     public void testPaine() {
-        Colony colony = getStandardColony();
+        Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
+        GoodsType bells = spec().getGoodsType("model.goods.bells");
+        Building townHall = colony.getBuilding(spec().getBuildingType("model.building.TownHall"));
+        
+        Unit statesman1 = colony.getUnitList().get(0);
+        Unit statesman2 = colony.getUnitList().get(1);
+        Unit statesman3 = colony.getUnitList().get(2);
 
-        assertEquals(0, player.getBellsBonus());
+        statesman1.setType(spec().getUnitType("model.unit.elderStatesman"));
+        statesman1.setLocation(townHall);
+        assertEquals(6 + 1, townHall.getProductionOf(bells));
+
+        statesman2.setType(spec().getUnitType("model.unit.elderStatesman"));
+        statesman2.setLocation(townHall);
+        assertEquals(2 * 6 + 1, townHall.getProductionOf(bells));
+
+        statesman3.setType(spec().getUnitType("model.unit.elderStatesman"));
+        statesman3.setLocation(townHall);
+        assertEquals(3 * 6 + 1, townHall.getProductionOf(bells));
 
         player.setTax(20);
-        assertEquals(0, player.getBellsBonus());
+        assertEquals(3 * 6 + 1, townHall.getProductionOf(bells));
 
         FoundingFather paine = spec().getFoundingFather("model.foundingFather.thomasPaine");
         player.addFather(paine);
 
+        assertTrue(player.hasAbility("model.ability.addTaxToBells"));
+        assertFalse(player.getFeatureContainer().getModifierSet("model.goods.bells").isEmpty());
+                   
         player.setTax(30);
-        assertEquals(30, player.getBellsBonus());
+        int expected = Math.round(((float) (3 * 6 + 1) * 130) / 100);
+        assertEquals(expected, townHall.getProductionOf(bells));
+
 
     }
 }

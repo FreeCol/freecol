@@ -42,7 +42,8 @@ public final class Modifier extends Feature {
     public static final String OFFENCE = "model.modifier.offence";
     public static final String DEFENCE = "model.modifier.defence";
 
-    public static final String COLONY_GOODS_PARTY = "model.monarch.colonyGoodsParty";
+    public static final BonusOrPenalty COLONY_GOODS_PARTY =
+        new BonusOrPenalty("model.monarch.colonyGoodsParty");
 
     public static final float UNKNOWN = Float.MIN_VALUE;
 
@@ -89,11 +90,11 @@ public final class Modifier extends Feature {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param id a <code>String</code> value
-     * @param source a <code>String</code> value
+     * @param source a <code>FreeColGameObjectType</code> value
      * @param value an <code>float</code> value
      * @param type the Type of the modifier
      */
-    public Modifier(String id, String source, float value, Type type) {
+    public Modifier(String id, FreeColGameObjectType source, float value, Type type) {
         setId(id);
         setSource(source);
         setType(type);

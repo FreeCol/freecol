@@ -53,7 +53,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public static final int FOOD_CONSUMPTION = 2;
 
     public static final Modifier DEFENCE_MODIFIER =
-        new Modifier("model.modifier.defence", "modifiers.inSettlement", 
+        new Modifier("model.modifier.defence", new BonusOrPenalty("modifiers.inSettlement"), 
                      50, Modifier.Type.PERCENTAGE);
 
     /** The <code>Player</code> owning this <code>Settlement</code>. */

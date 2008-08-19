@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
@@ -126,14 +127,14 @@ public class PreCombatDialog extends FreeColDialog {
             higConst.rcwh(row, offenceLabelColumn, 3, 1));
         row += 2;
         for (Modifier modifier : offence) {
-            String source = modifier.getSource();
+            FreeColGameObjectType source = modifier.getSource();
+            String sourceName;
             if (source == null) {
-                source = "???";
+                sourceName = "???";
             } else {
-                source = Messages.message(source);
+                sourceName = source.getName();
             }
-            add(new JLabel(source),
-                higConst.rc(row, offenceLabelColumn));
+            add(new JLabel(sourceName), higConst.rc(row, offenceLabelColumn));
             String bonus = decimal.format(modifier.getValue());
             switch(modifier.getType()) {
             case ADDITIVE:
@@ -186,13 +187,14 @@ public class PreCombatDialog extends FreeColDialog {
         }
 
         for (Modifier modifier : defence) {
-            String source = modifier.getSource();
+            FreeColGameObjectType source = modifier.getSource();
+            String sourceString = null;
             if (source == null) {
-                source = "???";
+                sourceString = "???";
             } else {
-                source = Messages.message(source);
+                sourceString = Messages.message(source.getName());
             }
-            add(new JLabel(source),
+            add(new JLabel(sourceString),
                 higConst.rc(row, defenceLabelColumn));
             String bonus = decimal.format(modifier.getValue());
             if (modifier.getValue() == Modifier.UNKNOWN) {

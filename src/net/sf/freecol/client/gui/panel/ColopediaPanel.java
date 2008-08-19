@@ -1061,7 +1061,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                 for (Ability ability : Specification.getSpecification().getAbilities(entry.getKey())) {
                     if (ability.getValue() == entry.getValue() &&
                         ability.getSource() != null) {
-                        requiredTypes.add(Messages.message(ability.getSource()));
+                        requiredTypes.add(Messages.message(ability.getSource().getName()));
                     }
                 }
                 requiresText.append(" ");

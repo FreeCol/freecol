@@ -45,23 +45,43 @@ public class SimpleCombatModel implements CombatModel {
 
     private PseudoRandom random;
 
+    public static final BonusOrPenalty MOVEMENT_PENALTY_SOURCE = 
+        new BonusOrPenalty("modifiers.movementPenalty");
+    public static final BonusOrPenalty ARTILLERY_PENALTY_SOURCE =
+        new BonusOrPenalty("modifiers.artilleryPenalty");
+    public static final BonusOrPenalty ATTACK_BONUS_SOURCE =
+        new BonusOrPenalty("modifiers.attackBonus");
+    public static final BonusOrPenalty FORTIFICATION_BONUS_SOURCE =
+        new BonusOrPenalty("modifiers.fortified");
+    public static final BonusOrPenalty INDIAN_RAID_BONUS_SOURCE =
+        new BonusOrPenalty("modifiers.artilleryAgainstRaid");
+    public static final BonusOrPenalty BASE_OFFENCE_SOURCE =
+        new BonusOrPenalty("modifiers.baseOffence");
+    public static final BonusOrPenalty BASE_DEFENCE_SOURCE =
+        new BonusOrPenalty("modifiers.baseDefence");
+    public static final BonusOrPenalty CARGO_PENALTY_SOURCE = 
+        new BonusOrPenalty("modifiers.cargoPenalty");
+    public static final BonusOrPenalty AMBUSH_BONUS_SOURCE = 
+        new BonusOrPenalty("modifiers.ambushBonus");
+
+
     public static final Modifier SMALL_MOVEMENT_PENALTY =
-        new Modifier(Modifier.OFFENCE, "modifiers.movementPenalty",
+        new Modifier(Modifier.OFFENCE, MOVEMENT_PENALTY_SOURCE,
                      -33, Modifier.Type.PERCENTAGE);
     public static final Modifier BIG_MOVEMENT_PENALTY =
-        new Modifier(Modifier.OFFENCE, "modifiers.movementPenalty",
+        new Modifier(Modifier.OFFENCE, MOVEMENT_PENALTY_SOURCE,
                      -66, Modifier.Type.PERCENTAGE);
     public static final Modifier ARTILLERY_PENALTY =
-        new Modifier(Modifier.OFFENCE, "modifiers.artilleryPenalty",
+        new Modifier(Modifier.OFFENCE, ARTILLERY_PENALTY_SOURCE,
                      -75, Modifier.Type.PERCENTAGE);
     public static final Modifier ATTACK_BONUS =
-        new Modifier(Modifier.OFFENCE, "modifiers.attackBonus",
+        new Modifier(Modifier.OFFENCE, ATTACK_BONUS_SOURCE,
                      50, Modifier.Type.PERCENTAGE);
     public static final Modifier FORTIFICATION_BONUS =
-        new Modifier(Modifier.DEFENCE, "modifiers.fortified",
+        new Modifier(Modifier.DEFENCE, FORTIFICATION_BONUS_SOURCE,
                      50, Modifier.Type.PERCENTAGE);
     public static final Modifier INDIAN_RAID_BONUS =
-        new Modifier(Modifier.DEFENCE, "modifiers.artilleryAgainstRaid",
+        new Modifier(Modifier.DEFENCE, INDIAN_RAID_BONUS_SOURCE,
                      100, Modifier.Type.PERCENTAGE);
 
     public SimpleCombatModel(PseudoRandom pseudoRandom) {
@@ -209,8 +229,7 @@ public class SimpleCombatModel implements CombatModel {
     public Set<Modifier> getOffensiveModifiers(Unit attacker, Unit defender) {
         Set<Modifier> result = new LinkedHashSet<Modifier>();
 
-        result.add(new Modifier(Modifier.OFFENCE,
-                                "modifiers.baseOffence",
+        result.add(new Modifier(Modifier.OFFENCE, BASE_OFFENCE_SOURCE,
                                 attacker.getType().getOffence(),
                                 Modifier.Type.ADDITIVE));
 
@@ -225,8 +244,7 @@ public class SimpleCombatModel implements CombatModel {
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
-                result.add(new Modifier(Modifier.OFFENCE,
-                                        "modifiers.cargoPenalty",
+                result.add(new Modifier(Modifier.OFFENCE, CARGO_PENALTY_SOURCE,
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }
@@ -255,8 +273,7 @@ public class SimpleCombatModel implements CombatModel {
                      */
                     if (attacker.hasAbility("model.ability.ambushBonus") ||
                         defender.hasAbility("model.ability.ambushPenalty")) {
-                        result.add(new Modifier(Modifier.OFFENCE,
-                                                "modifiers.ambushBonus", 
+                        result.add(new Modifier(Modifier.OFFENCE, AMBUSH_BONUS_SOURCE,
                                                 defender.getTile().defenceBonus(),
                                                 Modifier.Type.PERCENTAGE));
                     }
@@ -332,8 +349,7 @@ public class SimpleCombatModel implements CombatModel {
             return result;
         }
 
-        result.add(new Modifier(Modifier.DEFENCE,
-                                "modifiers.baseDefence",
+        result.add(new Modifier(Modifier.DEFENCE, BASE_DEFENCE_SOURCE,
                                 defender.getType().getDefence(),
                                 Modifier.Type.ADDITIVE));
         result.addAll(defender.getType().getFeatureContainer()
@@ -345,8 +361,7 @@ public class SimpleCombatModel implements CombatModel {
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
-                result.add(new Modifier(Modifier.DEFENCE, 
-                                        "modifiers.cargoPenalty",
+                result.add(new Modifier(Modifier.DEFENCE, CARGO_PENALTY_SOURCE,
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }

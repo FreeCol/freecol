@@ -124,7 +124,7 @@ public final class ResourceType extends FreeColGameObjectType
             if (Modifier.getXMLElementTagName().equals(childName)) {
                 Modifier modifier = new Modifier(in);
                 if (modifier.getSource() == null) {
-                    modifier.setSource(getNameKey());
+                    modifier.setSource(this);
                 }
                 modifiers.put(specification.getGoodsType(modifier.getId()), modifier);
                 specification.addModifier(modifier);

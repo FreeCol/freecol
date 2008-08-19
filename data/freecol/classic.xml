@@ -1276,6 +1276,9 @@
     <founding-father id="model.foundingFather.thomasPaine" type="political"
                      weight1="1" weight2="2" weight3="8">
       <ability id="model.ability.addTaxToBells" value="true"/>
+      <!-- The value of the modifier is intentionally zero.
+           It will be set to the current tax. -->
+      <modifier id="model.goods.bells" type="percentage" value="0"/>
     </founding-father>
     <founding-father id="model.foundingFather.simonBolivar" type="political"
                      weight1="0" weight2="4" weight3="6">

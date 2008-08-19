@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
@@ -40,7 +41,7 @@ public abstract class Feature extends FreeColObject {
     /**
      * The category of this Feature, e.g. "offenseModifier".
      */
-    private String source;
+    private FreeColGameObjectType source;
 
     /**
      * The first Turn in which this Feature applies.
@@ -143,7 +144,7 @@ public abstract class Feature extends FreeColObject {
      *
      * @return a <code>String</code> value
      */
-    public final String getSource() {
+    public final FreeColGameObjectType getSource() {
         return source;
     }
 
@@ -152,7 +153,7 @@ public abstract class Feature extends FreeColObject {
      *
      * @param newSource The new Source value.
      */
-    public final void setSource(final String newSource) {
+    public final void setSource(final FreeColGameObjectType newSource) {
         this.source = newSource;
     }
 
@@ -209,7 +210,7 @@ public abstract class Feature extends FreeColObject {
 
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         if (getSource() != null) {
-            out.writeAttribute("source", getSource());
+            out.writeAttribute("source", getSource().getId());
         }
         if (getFirstTurn() != null) {
             out.writeAttribute("firstTurn", String.valueOf(getFirstTurn().getNumber()));
@@ -228,7 +229,12 @@ public abstract class Feature extends FreeColObject {
     }
 
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        setSource(in.getAttributeValue(null, "source"));
+        String sourceId = in.getAttributeValue(null, "source");
+        if (sourceId == null) {
+            setSource(null);
+        } else {
+            setSource(Specification.getSpecification().getType(sourceId));
+        }
 
         String firstTurn = in.getAttributeValue(null, "firstTurn");
         if (firstTurn != null) {

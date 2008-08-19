@@ -254,7 +254,7 @@ public final class TileType extends FreeColGameObjectType {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
                 int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
                 production.add(new AbstractGoods(type, amount));
-                addModifier(new Modifier(type.getId(), getId(), amount, Modifier.Type.ADDITIVE));
+                addModifier(new Modifier(type.getId(), this, amount, Modifier.Type.ADDITIVE));
                 in.nextTag(); // close this element
             } else if ("resource".equals(childName)) {
                 ResourceType type = specification.getResourceType(in.getAttributeValue(null, "type"));

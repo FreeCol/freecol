@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
  */
 public final class Ability extends Feature {
 
+    public static final String ADD_TAX_TO_BELLS = "model.ability.addTaxToBells";
+
     private boolean value = true;
 
     /**
@@ -62,10 +64,10 @@ public final class Ability extends Feature {
      * Creates a new <code>Ability</code> instance.
      *
      * @param id a <code>String</code> value
-     * @param source a <code>String</code> value
+     * @param source a <code>FreeColGameObjectType</code> value
      * @param value a <code>boolean</code> value
      */
-    public Ability(String id, String source, boolean value) {
+    public Ability(String id, FreeColGameObjectType source, boolean value) {
         setId(id);
         setSource(source);
         this.value = value;
