@@ -61,7 +61,13 @@ public class BuildQueue extends FreeColObject implements ListModel {
     private int units = 0;
     private int buildings = 0;
 
+    /**
+     * The Colony this BuildQueue belongs to.
+     */
+    private Colony colony;
+
     public BuildQueue() {
+        // empty constructor
     }
 
     public BuildQueue(Object[] values) {
@@ -98,6 +104,24 @@ public class BuildQueue extends FreeColObject implements ListModel {
 
     public BuildQueue(Type type) {
         this.type = type;
+    }
+
+    /**
+     * Get the <code>Colony</code> value.
+     *
+     * @return a <code>Colony</code> value
+     */
+    public final Colony getColony() {
+        return colony;
+    }
+
+    /**
+     * Set the <code>Colony</code> value.
+     *
+     * @param newColony The new Colony value.
+     */
+    public final void setColony(final Colony newColony) {
+        this.colony = newColony;
     }
 
     public Type getType() {
@@ -176,7 +200,12 @@ public class BuildQueue extends FreeColObject implements ListModel {
                    item instanceof BuildingType && acceptsBuildings()) {
             int index = preferredIndex;
             if (item instanceof BuildingType) {
-                int minimumIndex = findMinimumIndex((BuildingType) item) + 1;
+                int minimumIndex = findMinimumIndex((BuildingType) item);
+                if (minimumIndex > index) {
+                    index = minimumIndex;
+                }
+            } else if (item instanceof UnitType) {
+                int minimumIndex = findMinimumIndex((UnitType) item);
                 if (minimumIndex > index) {
                     index = minimumIndex;
                 }
@@ -266,49 +295,88 @@ public class BuildQueue extends FreeColObject implements ListModel {
     }
 
     /**
-     * Finds a suitable index for inserting the given
-     * <code>BuildingType</code>.
-     * @param newItem The item to be inserted.
-     * @return A suitable index for inserting the given
-     * <code>BuildableType</code>.
+     * Returns the smallest index for inserting the given BuildingType.
+     *
+     * @param buildingType a <code>BuildingType</code> value
+     * @return an <code>int</code> value
      */
     public int findMinimumIndex(BuildingType buildingType) {
         BuildingType upgradeFrom = buildingType.getUpgradesFrom();
         if (upgradeFrom == null) {
             return 0;
+        } else if (colony != null) {
+            Building building = colony.getBuilding(buildingType);
+            if (building != null && 
+                upgradeFrom.equals(building.getType())) {
+                return 0;
+            } else {
+                return -1;
+            }
         } else {
-            return model.indexOf(upgradeFrom);                
+            int index = model.indexOf(upgradeFrom);
+            if (index < 0) {
+                return index;
+            } else {
+                return index + 1;
+            }
         }
     }
 
+
     /**
-     * Returns <code>true</code> if all requirements of the
-     * <code>BuildQueue</code> given are satisfied by this build
-     * queue.
-     * @param buildQueue The build queue to check.
-     * @return Whether all requirements of the <code>BuildQueue</code>
-     * given are satisfied by this build queue.
+     * Returns the smallest index for inserting the given UnitType.
+     *
+     * @param unitType an <code>UnitType</code> value
+     * @return an <code>int</code> value
      */
-    /*
-    public boolean canAdd(BuildQueue buildQueue) {
-        Iterator iterator = buildQueue.iterator();
-        while (iterator.hasNext()) {
-            BuildableType item = (BuildableType) iterator.next();
-            if (item instanceof UnitType && !acceptsUnits()  ||
-                item.isBuilding() && !acceptsBuildings()) {
-                return false;
-            } else if (type == MIXED) {
-                int type = item.getRequiredType();
-                int level = item.getRequiredLevel();
-                if (!hasBuilding(type, level) &&
-                    !buildQueue.hasBuilding(type, level)) {
+    public int findMinimumIndex(UnitType unitType) {
+        if (unitType.getAbilitiesRequired().isEmpty()) {
+            return 0;
+        } else {
+            int index = -1;
+            loop: for (Entry<String, Boolean> entry : unitType.getAbilitiesRequired().entrySet()) {
+                if (colony.hasAbility(entry.getKey()) == entry.getValue()) {
+                    if (index < 0) {
+                        index = 0;
+                    }
+                } else if (definedOnlyByBuildingType(entry.getKey())) {
+                    for (int newIndex = 0; newIndex < model.size(); newIndex++) {
+                        BuildableType buildableType = model.get(newIndex);
+                        if (buildableType.hasAbility(entry.getKey()) == entry.getValue()) {
+                            if (index < newIndex) {
+                                index = newIndex;
+                                continue loop;
+                            }
+                        }
+                    }
+                    // none of the buildings has the required ability
+                    return -1;
+                }
+            }
+            if (index < 0) {
+                return index;
+            } else {
+                return index + 1;
+            }
+        }
+    }
+
+    public boolean definedOnlyByBuildingType(String id) {
+        List<Ability> definedAbilities = 
+            Specification.getSpecification().getAbilities(id);
+        if (definedAbilities != null) {
+            for (Ability ability : definedAbilities) {
+                if (ability.getSource() != null &&
+                    !(ability.getSource() instanceof BuildingType)) {
                     return false;
                 }
             }
+            return true;
+        } else {
+            return false;
         }
-        return true;
-    }
-    */
+    }        
+
 
     /**
      * Returns <code>true</code> if the <code>BuildQueue</code>s given
@@ -337,22 +405,10 @@ public class BuildQueue extends FreeColObject implements ListModel {
                     return false;
                 }
             } else if (item instanceof UnitType) {
-                loop: for (Entry<String, Boolean> entry : ((UnitType) item).getAbilitiesRequired().entrySet()) {
-                    List<Ability> definedAbilities = 
-                        Specification.getSpecification().getAbilities(entry.getKey());
-                    if (definedAbilities != null) {
-                        boolean definedOnlyByBuildingType = true;
-                        for (Ability ability : definedAbilities) {
-                            if (ability.getSource() != null &&
-                                !(ability.getSource() instanceof BuildingType)) {
-                                definedOnlyByBuildingType = false;
-                                break;
-                            }
-                        }
-                        if (definedOnlyByBuildingType && 
-                            featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
-                            return false;
-                        }
+                for (Entry<String, Boolean> entry : ((UnitType) item).getAbilitiesRequired().entrySet()) {
+                    if (definedOnlyByBuildingType(entry.getKey()) && 
+                        featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
+                        return false;
                     }
                 }
             }
