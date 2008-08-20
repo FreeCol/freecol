@@ -419,12 +419,28 @@ public final class Specification {
     // ---------------------------------------------------------- retrieval
     // methods
 
+    /**
+     * Registers an Ability as defined.
+     *
+     * @param ability an <code>Ability</code> value
+     */
     public void addAbility(Ability ability) {
         String id = ability.getId();
+        addAbility(id);
+        allAbilities.get(id).add(ability);
+    }
+
+    /**
+     * Registers an Ability's id as defined. This is useful for
+     * abilities that are required rather than provided by
+     * FreeColGameObjectTypes.
+     *
+     * @param id a <code>String</code> value
+     */
+    public void addAbility(String id) {
         if (!allAbilities.containsKey(id)) {
             allAbilities.put(id, new ArrayList<Ability>());
         }
-        allAbilities.get(id).add(ability);
     }
 
     /**
