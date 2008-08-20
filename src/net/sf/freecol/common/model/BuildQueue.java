@@ -35,7 +35,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 
 import org.w3c.dom.Element;
 
@@ -97,35 +97,35 @@ public class BuildQueue extends FreeColObject implements ListModel {
 
 
     public BuildQueue(Type type) {
-	this.type = type;
+        this.type = type;
     }
 
     public Type getType() {
-	return type;
+        return type;
     }
 
     public boolean acceptsUnits() {
-	return (type != Type.BUILDINGS);
+        return (type != Type.BUILDINGS);
     }
 
     public boolean acceptsBuildings() {
-	return (type != Type.UNITS);
+        return (type != Type.UNITS);
     }
 
     public boolean hasUnits() {
-	return (units > 0);
+        return (units > 0);
     }
 
     public boolean hasBuildings() {
-	return (buildings > 0);
+        return (buildings > 0);
     }
 
     public boolean ignoresPreferredIndex() {
-	return (type != Type.MIXED);
+        return (type != Type.MIXED);
     }
 
     public boolean isReadOnly() {
-	return (type == Type.UNITS);
+        return (type == Type.UNITS);
     }
 
     public boolean isEmpty() {
@@ -138,27 +138,27 @@ public class BuildQueue extends FreeColObject implements ListModel {
 
     // ListModel
     public int getSize() {
-	return model.size();
+        return model.size();
     }
 
     // Collection
     public int size() {
-	return model.size();
+        return model.size();
     }
 
     // ListModel
     public Object getElementAt(int index) {
-	return model.get(index);
+        return model.get(index);
     }
 
     // Collection
     public BuildableType get(int index) {
-	return model.get(index);
+        return model.get(index);
     }
 
     // Other methods
     public boolean add(BuildableType item) {
-	return add(model.size(), item);
+        return add(model.size(), item);
     }
 
     public boolean addUnchecked(BuildableType item) {
@@ -170,11 +170,11 @@ public class BuildQueue extends FreeColObject implements ListModel {
     }
 
     public boolean add(int preferredIndex, BuildableType item) {
-	if (type == Type.UNITS && item instanceof UnitType) {
+        if (type == Type.UNITS && item instanceof UnitType) {
             return true;
-	} else if (item instanceof UnitType && acceptsUnits()  ||
-		   item instanceof BuildingType && acceptsBuildings()) {
-	    int index = preferredIndex;
+        } else if (item instanceof UnitType && acceptsUnits()  ||
+                   item instanceof BuildingType && acceptsBuildings()) {
+            int index = preferredIndex;
             if (item instanceof BuildingType) {
                 int minimumIndex = findMinimumIndex((BuildingType) item) + 1;
                 if (minimumIndex > index) {
@@ -183,16 +183,16 @@ public class BuildQueue extends FreeColObject implements ListModel {
             }
             model.add(index, item);
 
-	    if (item instanceof UnitType) {
-		units++;
-	    } else {
-		buildings++;
-	    }
-	    fireContentsChanged(0, getSize());
-	    return true;
-	} else {
-	    return false;
-	}
+            if (item instanceof UnitType) {
+                units++;
+            } else {
+                buildings++;
+            }
+            fireContentsChanged(0, getSize());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void addAll(int preferredIndex, BuildQueue buildQueue) {
@@ -203,48 +203,48 @@ public class BuildQueue extends FreeColObject implements ListModel {
     }
 
     public void clear() {
-	model.clear();
-	units = 0;
-	buildings = 0;
-	fireContentsChanged(0, getSize());
+        model.clear();
+        units = 0;
+        buildings = 0;
+        fireContentsChanged(0, getSize());
     }
 
     public boolean contains(BuildableType item) {
-	return model.contains(item);
+        return model.contains(item);
     }
 
     public BuildableType firstItem() {
-	// Return the appropriate item
-	return model.get(0);
+        // Return the appropriate item
+        return model.get(0);
     }
 
     public Object lastItem() {
-	// Return the appropriate item
-	return model.get(model.size() - 1);
+        // Return the appropriate item
+        return model.get(model.size() - 1);
     }
 
     public boolean remove(BuildableType item) {
-	boolean removed = model.remove(item);
-	if (removed) {
-	    fireContentsChanged(0, getSize());
-	    if (item instanceof UnitType) {
-		units--;
-	    } else {
-		buildings--;
-	    }
-	}
-	return removed;   
+        boolean removed = model.remove(item);
+        if (removed) {
+            fireContentsChanged(0, getSize());
+            if (item instanceof UnitType) {
+                units--;
+            } else {
+                buildings--;
+            }
+        }
+        return removed;   
     }
 
     public void remove(int index) {
-	BuildableType item = model.get(index);
-	model.remove(index);
-	if (item instanceof UnitType) {
-	    units--;
-	} else {
-	    buildings--;
-	}
-	fireContentsChanged(0, getSize());
+        BuildableType item = model.get(index);
+        model.remove(index);
+        if (item instanceof UnitType) {
+            units--;
+        } else {
+            buildings--;
+        }
+        fireContentsChanged(0, getSize());
     }
 
     /**
@@ -278,7 +278,7 @@ public class BuildQueue extends FreeColObject implements ListModel {
             return 0;
         } else {
             return model.indexOf(upgradeFrom);                
-	}
+        }
     }
 
     /**
@@ -291,22 +291,22 @@ public class BuildQueue extends FreeColObject implements ListModel {
      */
     /*
     public boolean canAdd(BuildQueue buildQueue) {
-	Iterator iterator = buildQueue.iterator();
-	while (iterator.hasNext()) {
-	    BuildableType item = (BuildableType) iterator.next();
-	    if (item instanceof UnitType && !acceptsUnits()  ||
-		item.isBuilding() && !acceptsBuildings()) {
-		return false;
-	    } else if (type == MIXED) {
-		int type = item.getRequiredType();
-		int level = item.getRequiredLevel();
-		if (!hasBuilding(type, level) &&
-		    !buildQueue.hasBuilding(type, level)) {
-		    return false;
-		}
-	    }
-	}
-	return true;
+        Iterator iterator = buildQueue.iterator();
+        while (iterator.hasNext()) {
+            BuildableType item = (BuildableType) iterator.next();
+            if (item instanceof UnitType && !acceptsUnits()  ||
+                item.isBuilding() && !acceptsBuildings()) {
+                return false;
+            } else if (type == MIXED) {
+                int type = item.getRequiredType();
+                int level = item.getRequiredLevel();
+                if (!hasBuilding(type, level) &&
+                    !buildQueue.hasBuilding(type, level)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     */
 
@@ -324,9 +324,10 @@ public class BuildQueue extends FreeColObject implements ListModel {
         for (BuildQueue buildQueue : queues) {
             items.addAll(buildQueue.model);
         }
-        Set<Ability> abilities = new HashSet<Ability>();
+
+        FeatureContainer featureContainer = new FeatureContainer();
         for (BuildableType item : items) {
-            abilities.addAll(item.getFeatureContainer().getAbilities());
+            featureContainer.add(item.getFeatureContainer());
         }
 
         for (BuildableType item : model) {
@@ -336,9 +337,22 @@ public class BuildQueue extends FreeColObject implements ListModel {
                     return false;
                 }
             } else if (item instanceof UnitType) {
-                for (Entry<String, Boolean> entry : ((UnitType) item).getAbilitiesRequired().entrySet()) {
-                    if (abilities.contains(entry.getKey()) != entry.getValue()) {
-                        return false;
+                loop: for (Entry<String, Boolean> entry : ((UnitType) item).getAbilitiesRequired().entrySet()) {
+                    List<Ability> definedAbilities = 
+                        Specification.getSpecification().getAbilities(entry.getKey());
+                    if (definedAbilities != null) {
+                        boolean definedOnlyByBuildingType = true;
+                        for (Ability ability : definedAbilities) {
+                            if (ability.getSource() != null &&
+                                !(ability.getSource() instanceof BuildingType)) {
+                                definedOnlyByBuildingType = false;
+                                break;
+                            }
+                        }
+                        if (definedOnlyByBuildingType && 
+                            featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
+                            return false;
+                        }
                     }
                 }
             }
@@ -398,7 +412,7 @@ public class BuildQueue extends FreeColObject implements ListModel {
         type = Enum.valueOf(Type.class, in.getAttributeValue(null, "type"));
         int size = Integer.parseInt(in.getAttributeValue(null, "size"));
         for (int index = 0; index < size; index++) {
-            addUnchecked((BuildableType) FreeCol.getSpecification()
+            addUnchecked((BuildableType) Specification.getSpecification()
                          .getType(in.getAttributeValue(null, "element" + index)));
         }
     }
