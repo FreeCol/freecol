@@ -90,4 +90,27 @@ public class BuildQueueTest extends FreeColTestCase {
 
     }
 
+    public void testDependencies() {
+
+        BuildQueue queue1 = new BuildQueue();
+        BuildQueue queue2 = new BuildQueue();
+        BuildQueue queue3 = new BuildQueue();
+
+        queue1.add(textileMill);
+        queue2.add(weaverShop);
+        queue3.add(weaverHouse);
+
+        assertFalse(queue1.dependenciesSatisfiedBy(queue3));
+        assertTrue(queue1.dependenciesSatisfiedBy(queue2));
+        assertTrue(queue1.dependenciesSatisfiedBy(queue3, queue2));
+
+        queue1.add(artillery);
+        queue2.add(armory);
+
+        assertFalse(queue1.dependenciesSatisfiedBy(queue3));
+        assertTrue(queue1.dependenciesSatisfiedBy(queue2));
+        assertTrue(queue1.dependenciesSatisfiedBy(queue3, queue2));
+
+    }
+
 }

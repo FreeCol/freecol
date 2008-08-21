@@ -335,7 +335,8 @@ public class BuildQueue extends FreeColObject implements ListModel {
         } else {
             int index = -1;
             loop: for (Entry<String, Boolean> entry : unitType.getAbilitiesRequired().entrySet()) {
-                if (colony.hasAbility(entry.getKey()) == entry.getValue()) {
+                if (colony != null &&
+                    colony.hasAbility(entry.getKey()) == entry.getValue()) {
                     if (index < 0) {
                         index = 0;
                     }
@@ -360,6 +361,17 @@ public class BuildQueue extends FreeColObject implements ListModel {
             }
         }
     }
+
+    public int findMinimumIndex(BuildableType buildableType) {
+        if (buildableType instanceof BuildingType) {
+            return findMinimumIndex((BuildingType) buildableType);
+        } else if (buildableType instanceof UnitType) {
+            return findMinimumIndex((UnitType) buildableType);
+        } else {
+            return -1;
+        }
+    }
+
 
     public boolean definedOnlyByBuildingType(String id) {
         List<Ability> definedAbilities = 
@@ -475,10 +487,20 @@ public class BuildQueue extends FreeColObject implements ListModel {
 
 
     /**
-    * Gets the tag name of the root element representing this object.
-    * @return "buildQueue".
-    */
+     * Gets the tag name of the root element representing this object.
+     * @return "buildQueue".
+     */
     public static String getXMLElementTagName() {
         return "buildQueue";
     }
+
+    public String toString() {
+        String text = "";
+        for (BuildableType item : model) {
+            text += item.getName() + " ";
+        }
+        return text;
+    }
+
+
 }

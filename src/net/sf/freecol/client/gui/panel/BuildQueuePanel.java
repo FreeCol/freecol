@@ -87,14 +87,14 @@ public class BuildQueuePanel extends ReportPanel {
             finished.addUnchecked(building.getType());
         }
 
-        units = new BuildQueue();
+        units = new BuildQueue(BuildQueue.Type.UNITS);
         for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
             if (!unitType.getGoodsRequired().isEmpty()) {
                 units.addUnchecked(unitType);
             }
         }
 
-        buildings = new BuildQueue();
+        buildings = new BuildQueue(BuildQueue.Type.BUILDINGS);
         for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
             if (!hasBuildingType(colony, buildingType)) {
                 buildings.add(buildingType);
