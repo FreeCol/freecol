@@ -37,9 +37,14 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -170,6 +175,27 @@ public class FreeColPanel extends JPanel {
     public boolean isEditable() {
         return editable;
     }
+
+    public static JTextPane getDefaultTextPane() {
+        JTextPane textPane = new JTextPane();
+        textPane.setOpaque(false);
+        textPane.setEditable(false);
+
+        StyledDocument doc = textPane.getStyledDocument();
+        //Initialize some styles.
+        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        
+        Style regular = doc.addStyle("regular", def);
+        StyleConstants.setFontFamily(def, "Dialog");
+        StyleConstants.setBold(def, true);
+        StyleConstants.setFontSize(def, 12);
+
+        Style buttonStyle = doc.addStyle("button", regular);
+        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
+
+        return textPane;
+    }
+
 
     /**
      * Returns a text area with standard settings suitable for use in FreeCol

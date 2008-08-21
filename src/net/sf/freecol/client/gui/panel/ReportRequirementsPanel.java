@@ -99,12 +99,8 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         reportPanel.setLayout(new HIGLayout(new int[] {780}, new int[] {0}));
 
         //Create a text pane.
-        JTextPane textPane = new JTextPane();
-        textPane.setOpaque(false);
-        textPane.setEditable(false);
-
+        JTextPane textPane = getDefaultTextPane();
         StyledDocument doc = textPane.getStyledDocument();
-        defineStyles(doc);
 
         int numberUnitTypes = FreeCol.getSpecification().numberOfUnitTypes();
         int numberGoodsTypes = FreeCol.getSpecification().numberOfGoodsTypes();
@@ -320,21 +316,6 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         button.addActionListener(this);
         return button;
     }
-
-    private void defineStyles(StyledDocument doc) {
-
-        //Initialize some styles.
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-	
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Dialog");
-        StyleConstants.setBold(def, true);
-	StyleConstants.setFontSize(def, 12);
-
-        Style buttonStyle = doc.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
-    }
-
 
     /**
      * This function analyses an event and calls the right methods to take care
