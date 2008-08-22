@@ -165,6 +165,22 @@ public class GoodsTest extends FreeColTestCase {
         assertTrue(cotton.isFarmed());
         assertFalse(cloth.isFarmed());
     }
+    
+    public void testMilitaryGoods() {
+        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+        GoodsType crosses = FreeCol.getSpecification().getGoodsType("model.goods.crosses");
+        GoodsType cloth = FreeCol.getSpecification().getGoodsType("model.goods.cloth");
+        GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
+        GoodsType muskets = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horses = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        
+        assertFalse(bells.isMilitaryGoods());
+        assertFalse(crosses.isMilitaryGoods());
+        assertFalse(cloth.isMilitaryGoods());
+        assertFalse(cotton.isMilitaryGoods());
+        assertTrue(horses.isMilitaryGoods());
+        assertTrue(muskets.isMilitaryGoods());
+    }
 
     public void testSetGetLocation() {
         Game game = getStandardGame();
