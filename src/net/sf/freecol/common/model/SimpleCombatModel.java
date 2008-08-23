@@ -43,7 +43,11 @@ public class SimpleCombatModel implements CombatModel {
 
     private static final Logger logger = Logger.getLogger(SimpleCombatModel.class.getName());
 
-    private PseudoRandom random;
+    /**
+     * The maximum attack power of a Colony's fortifications against a
+     * naval unit.
+     */
+    public static final int MAXIMUM_BOMBARD_POWER = 48;
 
     public static final BonusOrPenalty MOVEMENT_PENALTY_SOURCE = 
         new BonusOrPenalty("modifiers.movementPenalty");
@@ -64,7 +68,6 @@ public class SimpleCombatModel implements CombatModel {
     public static final BonusOrPenalty AMBUSH_BONUS_SOURCE = 
         new BonusOrPenalty("modifiers.ambushBonus");
 
-
     public static final Modifier SMALL_MOVEMENT_PENALTY =
         new Modifier(Modifier.OFFENCE, MOVEMENT_PENALTY_SOURCE,
                      -33, Modifier.Type.PERCENTAGE);
@@ -84,6 +87,9 @@ public class SimpleCombatModel implements CombatModel {
         new Modifier(Modifier.DEFENCE, INDIAN_RAID_BONUS_SOURCE,
                      100, Modifier.Type.PERCENTAGE);
 
+    private PseudoRandom random;
+
+
     public SimpleCombatModel(PseudoRandom pseudoRandom) {
         this.random = pseudoRandom;
     }
@@ -100,6 +106,7 @@ public class SimpleCombatModel implements CombatModel {
         float attackPower = getOffencePower(attacker, defender);
         float defencePower = getDefencePower(attacker, defender);
         float victory = attackPower / (attackPower + defencePower);
+        int damage = 0;
 
         int r = random.nextInt(100);
         
@@ -107,9 +114,11 @@ public class SimpleCombatModel implements CombatModel {
         if (r <= victory * 20) {
             // 10% of the times winning:
             result = CombatResultType.GREAT_WIN;
+            damage = defender.getHitpoints();
         } else if (r <= 100 * victory) {
             // 90% of the times winning:
             result = CombatResultType.WIN;
+            damage = defender.getHitpoints() - 1;
         } else if (defender.isNaval()
                 && r <= (80 * victory) + 20) {
             // 20% of the times loosing:
@@ -117,28 +126,29 @@ public class SimpleCombatModel implements CombatModel {
         } else if (r <= (10 * victory) + 90) {
             // 70% of the times loosing:
             result = CombatResultType.LOSS;
+            damage = attacker.getHitpoints() - 1;
         } else {
             // 10% of the times loosing:
             result = CombatResultType.GREAT_LOSS;
+            damage = attacker.getHitpoints();
         }
         
         if (result.compareTo(CombatResultType.WIN) >= 0 &&
             defender.getTile().getSettlement() != null) {
             final boolean lastDefender;
             if (defender.getTile().getSettlement() instanceof Colony) {
-                lastDefender = !defender.isDefensiveUnit();
+                if (!defender.isDefensiveUnit()) {
+                    result = CombatResultType.DONE_SETTLEMENT;
+                }
             } else if (defender.getTile().getSettlement() instanceof IndianSettlement) {
-                final int defenders = defender.getTile().getUnitCount()
-                        + defender.getTile().getSettlement().getUnitCount();
-                lastDefender = (defenders <= 1);
+                if (defender.getTile().getUnitCount() + defender.getTile().getSettlement().getUnitCount() <= 1) {
+                    result = CombatResultType.DONE_SETTLEMENT;
+                }
             } else {
                 throw new IllegalStateException("Unknown Settlement.");
             }
-            if (lastDefender) {
-                result = CombatResultType.DONE_SETTLEMENT;
-            }
         }
-        return new CombatResult(result, 0);
+        return new CombatResult(result, damage);
     }
 
     /**
@@ -153,6 +163,7 @@ public class SimpleCombatModel implements CombatModel {
         float attackPower = getOffencePower(colony, defender);
         float defencePower = getDefencePower(colony, defender);
         float totalProbability = attackPower + defencePower;
+        int damage = 0;
         CombatResultType result = CombatResultType.EVADES;
         int r = random.nextInt(Math.round(totalProbability) + 1);
         if (r < attackPower) {
@@ -160,11 +171,13 @@ public class SimpleCombatModel implements CombatModel {
             int r2 = random.nextInt((diff < 3) ? 3 : diff);
             if (r2 == 0) {
                 result = CombatResultType.GREAT_WIN;
+                damage = defender.getHitpoints();
             } else {
                 result = CombatResultType.WIN;
+                damage = defender.getHitpoints() - 1;
             }
         }
-        return new CombatResult(result, 0);
+        return new CombatResult(result, damage);
     }
 
     /**
@@ -181,10 +194,10 @@ public class SimpleCombatModel implements CombatModel {
             for (Unit unit : colony.getTile().getUnitList()) {
                 if (unit.hasAbility("model.ability.bombard")) {
                     attackPower += unit.getType().getOffence();
+                    if (attackPower >= MAXIMUM_BOMBARD_POWER) {
+                        return MAXIMUM_BOMBARD_POWER;
+                    }
                 }
-            }
-            if (attackPower > 48) {
-                attackPower = 48;
             }
         }
         return attackPower;
@@ -761,17 +774,17 @@ public class SimpleCombatModel implements CombatModel {
      * @see #damageShip
      */
     private void damageAllShips(Colony colony, Unit attacker) {
-    	// a new list must be created as the first one may be changed
-    	//elsewhere in between loop calls
-    	List<Unit> navalUnitsOutsideColony = new ArrayList<Unit>();
+        // a new list must be created as the first one may be changed
+        //elsewhere in between loop calls
+        List<Unit> navalUnitsOutsideColony = new ArrayList<Unit>();
         for (Unit unit : colony.getTile().getUnitList()) {
             if (unit.isNaval()) {
-            	navalUnitsOutsideColony.add(unit);
+                navalUnitsOutsideColony.add(unit);
             }
         }
         
         for (Unit unit : navalUnitsOutsideColony)
-        	damageShip(unit, null, attacker);
+                damageShip(unit, null, attacker);
     }
 
     /**
