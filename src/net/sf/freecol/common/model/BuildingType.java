@@ -40,7 +40,8 @@ public final class BuildingType extends BuildableType {
   
     private int workPlaces, basicProduction, minSkill, maxSkill;
     private GoodsType consumes, produces;
-    
+
+    private Modifier productionModifier = null;
     private BuildingType upgradesFrom;
     private BuildingType upgradesTo;
     private int sequence;
@@ -98,6 +99,10 @@ public final class BuildingType extends BuildableType {
         return this;
     }
 
+    public Modifier getProductionModifier() {
+        return productionModifier;
+    }
+
     public void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
         if (hasAttribute(in, "upgradesFrom")) {
             upgradesFrom = specification.getBuildingType(in.getAttributeValue(null, "upgradesFrom"));
@@ -113,6 +118,11 @@ public final class BuildingType extends BuildableType {
 
         consumes = specification.getType(in, "consumes", GoodsType.class, null);
         produces = specification.getType(in, "produces", GoodsType.class, null);
+
+        if (produces != null && basicProduction > 0) {
+            productionModifier = new Modifier(produces.getId(), this, basicProduction,
+                                              Modifier.Type.ADDITIVE);
+        }
 
         minSkill = getAttribute(in, "minSkill", Integer.MIN_VALUE);
         maxSkill = getAttribute(in, "maxSkill", Integer.MAX_VALUE);

@@ -33,6 +33,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.UnitLabel.UnitAction;
@@ -40,6 +41,7 @@ import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
@@ -150,7 +152,17 @@ public final class DragListener extends MouseAdapter {
                             }
                         }
                     }
-                    
+
+                    if (tempUnit.getWorkTile() != null) {
+                        menuItem = new JMenuItem(Messages.message("showProduction"));
+                        menuItem.addActionListener(new ActionListener() {
+                                public void actionPerformed(ActionEvent event) {
+                                    Canvas canvas = unitLabel.getCanvas();
+                                    canvas.showSubPanel(new ColonyTileProductionPanel(canvas, tempUnit.getWorkTile(), tempUnit.getWorkType()));
+                                }
+                            });
+                        menu.add(menuItem);
+                    }
                     separatorNeeded = true;
                 }
 

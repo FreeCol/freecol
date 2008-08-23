@@ -1455,7 +1455,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     public String getModifierAsString(Modifier modifier) {
-        String bonus = String.valueOf(modifier.getValue());
+        String bonus = getModifierFormat().format(modifier.getValue());
         switch(modifier.getType()) {
         case ADDITIVE:
             if (modifier.getValue() > 0) {

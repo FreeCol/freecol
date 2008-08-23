@@ -44,7 +44,6 @@ import org.w3c.dom.Element;
 */
 public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownable {
 
-
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
     private Colony colony;
@@ -423,12 +422,12 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
     private void produceGoodsCenterTile() {
         
-    	GoodsType goodsFood = workTile.primaryGoods();
+        GoodsType goodsFood = workTile.primaryGoods();
         colony.addGoods(goodsFood, getProductionOf(goodsFood));
         
         GoodsType type2 = workTile.secondaryGoods();
         if (type2 != null)
-        	colony.addGoods(type2, getProductionOf(type2));
+                colony.addGoods(type2, getProductionOf(type2));
 
         if (unit != null) {
             getWorkTile().setOwningSettlement(getColony());
@@ -489,26 +488,26 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * @param goodsType a <code>GoodsType</code> value
      * @return an <code>int</code> value
      */
-    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
+    public Set<Modifier> getProductionModifiers(GoodsType goodsType) {
         if (goodsType == null) {
             throw new IllegalArgumentException("GoodsType must not be 'null'.");
         } else if (getUnit() == null) {
             if (isColonyCenterTile() &&
                 (goodsType.isFoodType() || 
                  goodsType.equals(workTile.secondaryGoods()))) {
-                return workTile.getProductionBonus(goodsType);
-            } else {
-                return null;
+                Set<Modifier> result = new HashSet<Modifier>();
+                result.addAll(workTile.getProductionBonus(goodsType));
+                result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
+                return result;
             }
         } else if (goodsType.equals(getUnit().getWorkType())) {
             Set<Modifier> result = new HashSet<Modifier>();
             result.addAll(workTile.getProductionBonus(goodsType));
             result.addAll(getUnit().getModifierSet(goodsType.getId()));
-            result.addAll(getColony().getModifierSet(goodsType.getId()));
+            //result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
             return result;
-        } else {
-            return Collections.emptySet();
         }
+        return Collections.emptySet();
     }
 
     /**

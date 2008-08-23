@@ -56,6 +56,9 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     public static final Ability HAS_PORT = new Ability("model.ability.hasPort");
 
+    public static final BonusOrPenalty SOL_MODIFIER_SOURCE = 
+        new BonusOrPenalty("modifiers.solModifier");
+
     /** The name of the colony. */
     private String name;
 
@@ -751,6 +754,11 @@ public final class Colony extends Settlement implements Location, Nameable {
      */
     public int getProductionBonus() {
         return productionBonus;
+    }
+
+    public Modifier getProductionModifier(GoodsType goodsType) {
+        return new Modifier(goodsType.getId(), SOL_MODIFIER_SOURCE,
+                            productionBonus, Modifier.Type.ADDITIVE);
     }
 
     /**

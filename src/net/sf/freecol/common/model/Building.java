@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -231,9 +233,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * attribute in BuildingType)
      */
     public void upgrade() {
-    	if (!canBuildNext()) {
+        if (!canBuildNext()) {
             throw new IllegalStateException("Cannot upgrade this building.");
-    	}
+        }
         setType(buildingType.getUpgradesTo());
     }
     
@@ -855,6 +857,29 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 productivity = 1;
         }
         return productivity;
+    }
+
+    /**
+     * Returns the maximum productivity of a unit working in this building.
+     *
+     * @return The maximum returns from this unit if in this <code>Building</code>,
+     *         assuming enough "input goods".
+     */
+    public Set<Modifier> getProductivityModifiers(Unit prodUnit) {
+        if (getGoodsOutputType() == null) {
+            return Collections.emptySet();
+        } else {
+            String outputId = getGoodsOutputType().getId();
+            Set<Modifier> result = new LinkedHashSet<Modifier>();
+            if (buildingType.getProductionModifier() != null) {
+                result.add(buildingType.getProductionModifier());
+            }
+            //result.addAll(buildingType.getFeatureContainer().getModifierSet(outputId));
+            result.addAll(prodUnit.getModifierSet(outputId));
+            //result.addAll(getColony().getFeatureContainer().getModifierSet(outputId));
+            result.add(colony.getProductionModifier(getGoodsOutputType()));
+            return result;
+        }
     }
 
     /**

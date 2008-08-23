@@ -23,12 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Font;
 
-import java.text.DecimalFormat;
-
-import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -51,16 +46,17 @@ import cz.autel.dmi.HIGLayout;
 
 public class PreCombatDialog extends FreeColDialog {
 
-    public PreCombatDialog(Unit attacker, Unit defender, Settlement settlement, Canvas parent) {
+    public static final Modifier BASE_DEFENCE_MODIFIER =
+        new Modifier("modifiers.baseDefence", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
 
-        DecimalFormat decimal = new DecimalFormat("0.00");
+    public PreCombatDialog(Unit attacker, Unit defender, Settlement settlement, Canvas parent) {
 
         CombatModel combatModel = attacker.getGame().getCombatModel();
         Set<Modifier> offence = sortModifiers(combatModel.getOffensiveModifiers(attacker, defender));
         Set<Modifier> defence;
         if (defender == null && settlement != null) {
             defence = new LinkedHashSet<Modifier>();
-            defence.add(new Modifier("modifiers.baseDefence", Modifier.UNKNOWN, Modifier.Type.ADDITIVE));
+            defence.add(BASE_DEFENCE_MODIFIER);
             defence.addAll(sortModifiers(settlement.getFeatureContainer()
                                          .getModifierSet("model.modifier.defence", attacker.getType())));
         } else {
@@ -135,7 +131,7 @@ public class PreCombatDialog extends FreeColDialog {
                 sourceName = source.getName();
             }
             add(new JLabel(sourceName), higConst.rc(row, offenceLabelColumn));
-            String bonus = decimal.format(modifier.getValue());
+            String bonus = getModifierFormat().format(modifier.getValue());
             switch(modifier.getType()) {
             case ADDITIVE:
                 if (modifier.getValue() > 0) {
@@ -196,7 +192,7 @@ public class PreCombatDialog extends FreeColDialog {
             }
             add(new JLabel(sourceString),
                 higConst.rc(row, defenceLabelColumn));
-            String bonus = decimal.format(modifier.getValue());
+            String bonus = getModifierFormat().format(modifier.getValue());
             if (modifier.getValue() == Modifier.UNKNOWN) {
                 bonus = "???";
             }
@@ -230,7 +226,7 @@ public class PreCombatDialog extends FreeColDialog {
         JLabel finalOffenceLabel = new JLabel(Messages.message("modifiers.finalResult"));
         finalOffenceLabel.setFont(bigFont);
         add(finalOffenceLabel, higConst.rc(row, offenceLabelColumn));
-        JLabel finalOffenceResult = new JLabel(decimal.format(offenceResult));
+        JLabel finalOffenceResult = new JLabel(getModifierFormat().format(offenceResult));
         finalOffenceResult.setFont(bigFont);
         add(finalOffenceResult, higConst.rc(row, offenceValueColumn, "r"));
 
@@ -239,7 +235,7 @@ public class PreCombatDialog extends FreeColDialog {
         finalDefenceLabel.setFont(bigFont);
         add(finalDefenceLabel,
             higConst.rc(row, defenceLabelColumn));
-        JLabel finalDefenceResult = new JLabel(decimal.format(defenceResult));
+        JLabel finalDefenceResult = new JLabel(getModifierFormat().format(defenceResult));
         if (defenceResult == Modifier.UNKNOWN) {
             finalDefenceResult.setText("???");
         }
@@ -253,23 +249,6 @@ public class PreCombatDialog extends FreeColDialog {
         add(buttonPanel, higConst.rcwh(heights.length, 1, widths.length, 1));
         setSize(getPreferredSize());
 
-    }
-
-
-    public Set<Modifier> sortModifiers(Set<Modifier> result) {
-        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
-            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
-        for (Modifier.Type type : Modifier.Type.values()) {
-            modifierMap.put(type, new ArrayList<Modifier>());
-        }
-        for (Modifier modifier : result) {
-            modifierMap.get(modifier.getType()).add(modifier);
-        }
-        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
-        for (Modifier.Type type : Modifier.Type.values()) {
-            sortedResult.addAll(modifierMap.get(type));
-        }
-        return sortedResult;
     }
 
 

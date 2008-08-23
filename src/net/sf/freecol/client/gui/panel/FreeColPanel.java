@@ -26,6 +26,12 @@ import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractButton;
@@ -48,6 +54,7 @@ import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.model.Modifier;
 import cz.autel.dmi.HIGConstraints;
 
 /**
@@ -61,6 +68,10 @@ public class FreeColPanel extends JPanel {
     protected static final HIGConstraints higConst = new HIGConstraints();
 
     private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
+
+    // The decimal format to use for Modifiers
+    private static final DecimalFormat modifierFormat = new DecimalFormat("0.00");
+
 
     /**
      * The canvas all panels belong to.
@@ -255,6 +266,26 @@ public class FreeColPanel extends JPanel {
 
         button.registerKeyboardAction(button.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, true)),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), JComponent.WHEN_FOCUSED);
+    }
+
+    public static final DecimalFormat getModifierFormat() {
+        return modifierFormat;
+    }
+
+    public Set<Modifier> sortModifiers(Set<Modifier> result) {
+        EnumMap<Modifier.Type, List<Modifier>> modifierMap =
+            new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);
+        for (Modifier.Type type : Modifier.Type.values()) {
+            modifierMap.put(type, new ArrayList<Modifier>());
+        }
+        for (Modifier modifier : result) {
+            modifierMap.get(modifier.getType()).add(modifier);
+        }
+        Set<Modifier> sortedResult = new LinkedHashSet<Modifier>();
+        for (Modifier.Type type : Modifier.Type.values()) {
+            sortedResult.addAll(modifierMap.get(type));
+        }
+        return sortedResult;
     }
 
 }

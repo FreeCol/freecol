@@ -484,6 +484,15 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays a <code>FreeColPanel</code>.
+     * 
+     */
+    public void showSubPanel(FreeColPanel panel) {
+        addAsFrame(panel);
+        panel.requestFocus();
+    }
+
+    /**
      * Displays the <code>ChatPanel</code>.
      * 
      * @see ChatPanel
