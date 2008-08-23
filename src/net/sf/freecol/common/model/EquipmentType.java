@@ -219,7 +219,14 @@ public class EquipmentType extends BuildableType {
                 compatibleEquipment.add(equipmentId);
                 in.nextTag(); // close this element
             } else {
-                super.readChild(in, specification);
+                FreeColObject object = super.readChild(in, specification);
+                if (object instanceof Modifier) {
+                    Modifier modifier = (Modifier) object;
+                    if (modifier.getId().equals(Modifier.OFFENCE) ||
+                        modifier.getId().equals(Modifier.DEFENCE)) {
+                        militaryEquipment = true;
+                    }
+                }
             }
         }
 

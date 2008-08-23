@@ -133,7 +133,8 @@ public class BuildableType extends FreeColGameObjectType {
 
     }
 
-    protected void readChild(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    protected FreeColObject readChild(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         String childName = in.getLocalName();
         if ("required-ability".equals(childName)) {
             String abilityId = in.getAttributeValue(null, "id");
@@ -141,20 +142,22 @@ public class BuildableType extends FreeColGameObjectType {
             getAbilitiesRequired().put(abilityId, value);
             specification.addAbility(abilityId);
             in.nextTag(); // close this element
+            return new Ability(abilityId, value);
         } else if ("required-goods".equals(childName)) {
             GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "id"));
             int amount = getAttribute(in, "value", 0);
+            AbstractGoods requiredGoods = new AbstractGoods(type, amount);
             if (amount > 0) {
                 type.setBuildingMaterial(true);
-                AbstractGoods requiredGoods = new AbstractGoods(type, amount);
                 if (getGoodsRequired() == null) {
                     setGoodsRequired(new ArrayList<AbstractGoods>());
                 }
                 getGoodsRequired().add(requiredGoods);
             }
             in.nextTag(); // close this element
+            return requiredGoods;
         } else {
-            super.readChild(in, specification);
+            return super.readChild(in, specification);
         }
     }
 

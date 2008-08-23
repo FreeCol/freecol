@@ -717,15 +717,16 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(name, higConst.rcwh(row, leftColumn, widths.length, 1));
         row += 2;
 
-        Map<GoodsType, Modifier> modifiers = type.getModifiers();
+        Set<Modifier> modifiers = type.getFeatureContainer().getModifiers();
 
         detailPanel.add(new JLabel(Messages.message("colopedia.resource.bonusProduction")),
                         higConst.rc(row, leftColumn));
         JPanel goodsPanel = new JPanel();
         goodsPanel.setOpaque(false);
-        for (Entry<GoodsType, Modifier> entry : modifiers.entrySet()) {
-            String text = getModifierAsString(entry.getValue());
-            JButton goodsButton = getGoodsButton(entry.getKey(), text);
+        for (Modifier modifier : modifiers) {
+            String text = getModifierAsString(modifier);
+            GoodsType goodsType = Specification.getSpecification().getGoodsType(modifier.getId());
+            JButton goodsButton = getGoodsButton(goodsType, text);
             goodsPanel.add(goodsButton);
         }
         detailPanel.add(goodsPanel, higConst.rc(row, rightColumn, "l"));

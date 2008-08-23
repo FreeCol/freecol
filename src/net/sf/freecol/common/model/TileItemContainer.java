@@ -266,7 +266,7 @@ public class TileItemContainer extends FreeColGameObject {
     public Set<Modifier> getProductionBonus(GoodsType goodsType) {
         Set<Modifier> result = new HashSet<Modifier>();
         for (TileImprovement improvement : improvements) {
-            result.add(improvement.getProductionBonus(goodsType));
+            result.add(improvement.getProductionModifier(goodsType));
         }
         return result;
     }

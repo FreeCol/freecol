@@ -1296,7 +1296,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 if (impType.isNatural() || !impType.isTileTypeAllowed(tileType)) {
                     continue;
                 } else if (impType.getBonus(goodsType) > 0) {
-                    potential = impType.getProductionBonus(goodsType).applyTo(potential);
+                    potential = impType.getProductionModifier(goodsType).applyTo(potential);
                 }
             }
             maxProduction = Math.max((int) potential, maxProduction);

@@ -132,7 +132,7 @@ public class Resource extends TileItem {
      * @param potential Potential of Tile + Improvements
      */
     public int getBonus(GoodsType goodsType, int potential) {
-        Modifier productionBonus = type.getProductionBonus(goodsType);
+        Modifier productionBonus = type.getProductionModifier(goodsType);
         if (productionBonus == null) {
             return potential;
         } else {

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Random;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -39,8 +40,6 @@ public final class ResourceType extends FreeColGameObjectType
     private int minValue;
     private int maxValue;
 
-    private Map<GoodsType, Modifier> modifiers = new HashMap<GoodsType, Modifier>();
-
     // ------------------------------------------------------------ constructors
 
     public ResourceType(int index) {
@@ -53,10 +52,6 @@ public final class ResourceType extends FreeColGameObjectType
         return art;
     }
 
-    public Map<GoodsType, Modifier> getModifiers() {
-        return modifiers;
-    }
-
     // TODO: remove this
     public int getRandomValue() {
         if (minValue == maxValue)
@@ -66,17 +61,26 @@ public final class ResourceType extends FreeColGameObjectType
         return (minValue + rand.nextInt(maxValue-minValue+1));
     }
 
-    public Modifier getProductionBonus(GoodsType goodsType) {
-        return modifiers.get(goodsType);
+    public Modifier getProductionModifier(GoodsType goodsType) {
+        Set<Modifier> modifierSet = featureContainer.getModifierSet(goodsType.getId());
+        if (modifierSet == null || modifierSet.isEmpty()) {
+            return null;
+        } else {
+            if (modifierSet.size() > 1) {
+                logger.warning("Only one Modifier for " + goodsType.getId() + " expected!");
+            }
+            return modifierSet.iterator().next();
+        }
     }
 
     public GoodsType getBestGoodsType() {
         GoodsType bestType = null;
         float bestValue = 0f;
-        for (Map.Entry<GoodsType, Modifier> entry : modifiers.entrySet()) {
-            float value = entry.getKey().getInitialSellPrice() * entry.getValue().applyTo(100);
+        for (Modifier modifier : featureContainer.getModifiers()) {
+            GoodsType goodsType = Specification.getSpecification().getGoodsType(modifier.getId());
+            float value = goodsType.getInitialSellPrice() * modifier.applyTo(100);
             if (bestType == null || value > bestValue) {
-                bestType = entry.getKey();
+                bestType = goodsType;
                 bestValue = value;
             }
         }
@@ -117,21 +121,4 @@ public final class ResourceType extends FreeColGameObjectType
         }
     }
 
-    public void readChildren(XMLStreamReader in, Specification specification)
-            throws XMLStreamException {
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            String childName = in.getLocalName();
-            if (Modifier.getXMLElementTagName().equals(childName)) {
-                Modifier modifier = new Modifier(in);
-                if (modifier.getSource() == null) {
-                    modifier.setSource(this);
-                }
-                modifiers.put(specification.getGoodsType(modifier.getId()), modifier);
-                specification.addModifier(modifier);
-            } else {
-                super.readChild(in, specification);
-            }
-        }        
-    }
-    
 }

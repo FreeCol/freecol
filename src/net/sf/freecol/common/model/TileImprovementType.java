@@ -54,7 +54,6 @@ public final class TileImprovementType extends FreeColGameObjectType
     private GoodsType deliverGoodsType;
     private int deliverAmount;
 
-    private Map<String, Modifier> modifiers = new HashMap<String, Modifier>();
     private Map<TileType, TileType> tileTypeChange = new HashMap<TileType, TileType>();
 
     private int movementCost;
@@ -173,7 +172,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     }
 
     public int getBonus(GoodsType goodsType) {
-        Modifier result = modifiers.get(goodsType.getId());
+        Modifier result = getProductionModifier(goodsType);
         if (result == null) {
             return 0;
         } else {
@@ -181,8 +180,16 @@ public final class TileImprovementType extends FreeColGameObjectType
         }
     }
 
-    public Modifier getProductionBonus(GoodsType goodsType) {
-        return modifiers.get(goodsType.getId());
+    public Modifier getProductionModifier(GoodsType goodsType) {
+        Set<Modifier> modifierSet = featureContainer.getModifierSet(goodsType.getId());
+        if (modifierSet == null || modifierSet.isEmpty()) {
+            return null;
+        } else {
+            if (modifierSet.size() > 1) {
+                logger.warning("Only one Modifier for " + goodsType.getId() + " expected!");
+            }
+            return modifierSet.iterator().next();
+        }
     }
 
     public TileType getChange(TileType tileType) {
@@ -218,7 +225,7 @@ public final class TileImprovementType extends FreeColGameObjectType
             }
         } else {
             // Calculate bonuses from TileImprovementType
-            for (Modifier modifier : modifiers.values()) {
+            for (Modifier modifier : featureContainer.getModifiers()) {
                 float change = modifier.applyTo(1);
                 if (modifier.getId().equals(goodsType.getId())) {
                     if (change < 1) {
@@ -286,7 +293,6 @@ public final class TileImprovementType extends FreeColGameObjectType
 
         allowedWorkers = new HashSet<String>();
         allowedTileTypes = new ArrayList<TileType>();
-        modifiers = new HashMap<String, Modifier>();
         tileTypeChange = new HashMap<TileType, TileType>();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -330,13 +336,6 @@ public final class TileImprovementType extends FreeColGameObjectType
                 tileTypeChange.put(specification.getTileType(in.getAttributeValue(null, "from")),
                                    specification.getTileType(in.getAttributeValue(null, "to")));
                 in.nextTag(); // close this element
-            } else if (Modifier.getXMLElementTagName().equals(childName)) {
-                Modifier modifier = new Modifier(in);
-                if (modifier.getSource() == null) {
-                    modifier.setSource(this);
-                }
-                modifiers.put(modifier.getId(), modifier);
-                specification.addModifier(modifier);
             } else {
                 super.readChild(in, specification);
             }

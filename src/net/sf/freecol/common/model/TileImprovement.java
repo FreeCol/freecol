@@ -240,11 +240,11 @@ public class TileImprovement extends TileItem implements Locatable, Named {
      * @param goodsType a <code>GoodsType</code> value
      * @return a <code>Modifier</code> value
      */
-    public Modifier getProductionBonus(GoodsType goodsType) {
+    public Modifier getProductionModifier(GoodsType goodsType) {
         if (!isComplete()) {
             return null;
         }
-        return type.getProductionBonus(goodsType);
+        return type.getProductionModifier(goodsType);
     }
 
     /**

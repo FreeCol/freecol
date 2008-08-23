@@ -119,7 +119,8 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         }
     }
     
-    protected void readChild(XMLStreamReader in, Specification specification) throws XMLStreamException {
+    protected FreeColObject readChild(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         String childName = in.getLocalName();
         if (Ability.getXMLElementTagName().equals(childName)) {
             Ability ability = new Ability(in);
@@ -128,6 +129,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
             }
             addAbility(ability); // Ability close the element
             specification.addAbility(ability);
+            return ability;
         } else if (Modifier.getXMLElementTagName().equals(childName)) {
             Modifier modifier = new Modifier(in);
             if (modifier.getSource() == null) {
@@ -135,12 +137,14 @@ public abstract class FreeColGameObjectType extends FreeColObject {
             }
             addModifier(modifier); // Modifier close the element
             specification.addModifier(modifier);
+            return modifier;
         } else {
             logger.warning("Parsing of " + childName + " is not implemented yet");
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT ||
                    !in.getLocalName().equals(childName)) {
                 in.nextTag();
             }
+            return null;
         }
     }
     
