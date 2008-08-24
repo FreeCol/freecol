@@ -54,6 +54,9 @@ public final class TilePopup extends JPopupMenu {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TilePopup.class.getName());
 
+    public static final int UNITS_IN_FIRST_MENU = 9;
+    public static final int UNITS_IN_OTHER_MENUS = 19;
+
     private final Canvas canvas;
     private final GUI gui;
 
@@ -102,16 +105,18 @@ public final class TilePopup extends JPopupMenu {
         }
 
         int unitCount = 0;
+        int maxUnits = UNITS_IN_FIRST_MENU;
         Container currentMenu = this;
         for (final Unit currentUnit : tile.getUnitList()) {
 
-            if (unitCount > 9) {
+            if (unitCount > maxUnits) {
                 JMenu more = new JMenu(Messages.message("more"));
                 more.setFont(more.getFont().deriveFont(Font.ITALIC));
                 more.setOpaque(false);
                 currentMenu.add(more);
                 currentMenu = more;
                 unitCount = 0;
+                maxUnits = UNITS_IN_OTHER_MENUS;
             }
 
             addUnit(currentMenu, currentUnit, !currentUnit.isUnderRepair(), false);
