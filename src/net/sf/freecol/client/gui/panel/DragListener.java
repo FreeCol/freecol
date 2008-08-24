@@ -447,9 +447,15 @@ public final class DragListener extends MouseAdapter {
         final InGameController inGameController = goodsLabel.getCanvas().getClient().getInGameController();
         ImageLibrary imageLibrary = goodsLabel.getCanvas().getGUI().getImageLibrary();
         JPopupMenu menu = new JPopupMenu("Cargo");
-        ImageIcon goodsIcon = imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f);
-        JMenuItem name = new JMenuItem(goods.getName(), goodsIcon);
-        name.setEnabled(false);
+        JMenuItem name = new JMenuItem(goods.getName() + " (" +
+                                       Messages.message("menuBar.colopedia") + ")", 
+                                       imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+        name.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.PanelType.GOODS,
+                                                              goods.getType());
+                }
+            });
         menu.add(name);
                 
         JMenuItem unload = new JMenuItem(Messages.message("unload"));
@@ -479,24 +485,6 @@ public final class DragListener extends MouseAdapter {
             });
         menu.add(dump);
                 
-        menu.addSeparator();
-                
-        Image colopediaIcon = ResourceManager.getImage("Colopedia.closedSection.image");
-        JMenuItem colopedia = new JMenuItem(Messages.message("menuBar.colopedia"), 
-                                            imageLibrary.getScaledImageIcon(colopediaIcon, 0.66f));
-        colopedia.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.PanelType.GOODS,
-                                                              goods.getType());
-                }
-            });
-        menu.add(colopedia);
-        /*
-         * if (parentPanel instanceof ColonyPanel) { Colony colony =
-         * ((ColonyPanel) parentPanel).getColony(); ((GoodsLabel)
-         * comp).getCanvas().showWarehouseDialog(colony);
-         * comp.repaint(); }
-         */
         return menu;
     }
 }
