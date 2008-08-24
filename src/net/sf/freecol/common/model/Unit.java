@@ -645,7 +645,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public int getTransportFee() {
         if (canCashInTreasureTrain()) {
             if (!isInEurope() && getOwner().getEurope() != null) {
-                float transportFee = getTreasureAmount() / 2;
                 return (int) getOwner().getFeatureContainer()
                     .applyModifier(getTreasureAmount() / 2f,
                                    "model.modifier.treasureTransportFee",
@@ -2299,7 +2298,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
             hitpoints = unitType.getHitPoints();
             if (getTeacher() != null && !canBeStudent(getTeacher())) {
-		getTeacher().setStudent(null);
+                getTeacher().setStudent(null);
                 setTeacher(null);
             }
         } else {
@@ -2878,6 +2877,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (workLeft > 0) {
             if (state == UnitState.IMPROVING) {
                 // Has the improvement been completed already? Do nothing.
+                // TODO: this is an invitation to cheat!
                 if (getWorkImprovement().isComplete()) {
                     setState(UnitState.ACTIVE);
                     return;
