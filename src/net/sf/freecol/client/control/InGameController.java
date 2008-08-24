@@ -2711,6 +2711,18 @@ public final class InGameController implements NetworkConstants {
         if (unit == null) {
             return;
         }
+        
+        if (unit.getState()==UnitState.IMPROVING) {
+            // Ask the user for confirmation, as this is a classic mistake.
+            // Canceling a pioneer terrain improvement is a waste of many turns
+            ModelMessage message = new ModelMessage(unit, ModelMessage.MessageType.WARNING, unit, 
+                    "model.unit.confirmCancelWork", "%turns%", new Integer(unit.getWorkLeft()).toString());
+            boolean cancelWork = freeColClient.getCanvas().showConfirmDialog(new ModelMessage[] {message}, "yes", "no");
+            if (!cancelWork) {
+                return;
+            }
+        }
+        
         /*
          * report to server, in order not to restore destination if it's
          * received in a update message
