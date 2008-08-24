@@ -1631,28 +1631,28 @@
             monarch-art="philip.png" coat-of-arms="russian.png" ref="model.nation.russionREF"/>
     <nation id="model.nation.inca" color="#f4f0c4"
             nation-type="model.nationType.inca"
-            coat-of-arms="native.png"/>
+            monarch-art="wahktageli.png" coat-of-arms="native.png"/>
     <nation id="model.nation.aztec" color="#c4a020"
             nation-type="model.nationType.aztec"
-            coat-of-arms="native.png"/>
+            monarch-art="wahktageli.png" coat-of-arms="native.png"/>
     <nation id="model.nation.arawak" color="#6888c0"
             nation-type="model.nationType.arawak"
-            coat-of-arms="native.png"/>
+            monarch-art="wahktageli.png" coat-of-arms="native.png"/>
     <nation id="model.nation.cherokee" color="#6c3c18"
             nation-type="model.nationType.cherokee"
-            coat-of-arms="native.png"/>
+            monarch-art="wahktageli.png" coat-of-arms="native.png"/>
     <nation id="model.nation.iroquois" color="#74a44c"
             nation-type="model.nationType.iroquois"
-            coat-of-arms="native.png"/>
+            monarch-art="wahktageli.png" coat-of-arms="native.png"/>
     <nation id="model.nation.sioux" color="#c0ac84"
             nation-type="model.nationType.sioux"
-            coat-of-arms="native.png"/>
+            monarch-art="wahktageli.png" coat-of-arms="native.png"/>
     <nation id="model.nation.apache" color="#900000"
             nation-type="model.nationType.apache"
-            coat-of-arms="native.png"/>
+            monarch-art="wahktageli.png" coat-of-arms="native.png"/>
     <nation id="model.nation.tupi" color="#045c04"
             nation-type="model.nationType.tupi"
-            coat-of-arms="native.png"/>
+            monarch-art="wahktageli.png" coat-of-arms="native.png"/>
     <nation id="model.nation.dutchREF" color="#ff9d3c"
             nation-type="model.nationType.ref"
             coat-of-arms="dutch-ref.png"/>
