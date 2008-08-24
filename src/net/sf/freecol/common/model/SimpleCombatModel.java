@@ -512,7 +512,7 @@ public class SimpleCombatModel implements CombatModel {
         case LOSS:
             if (attacker.isNaval()) {
                 Location repairLocation = attackingPlayer.getRepairLocation(attacker);
-                damageShip(attacker, null, attacker);
+                damageShip(attacker, null, defender);
                 attacker.addModelMessage(attacker, ModelMessage.MessageType.UNIT_DEMOTED,
                                          "model.unit.shipDamaged",
                                          "%unit%", attacker.getName(),
@@ -533,7 +533,7 @@ public class SimpleCombatModel implements CombatModel {
             break;
         case GREAT_LOSS:
             if (attacker.isNaval()) {
-                sinkShip(attacker, null, attacker);
+                sinkShip(attacker, null, defender);
                 attacker.addModelMessage(attacker, ModelMessage.MessageType.UNIT_LOST,
                                          "model.unit.shipSunk",
                                          "%unit%", attacker.getName(),

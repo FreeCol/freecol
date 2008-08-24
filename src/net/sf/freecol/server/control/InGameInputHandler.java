@@ -1354,7 +1354,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             List<Goods> goodsInUnit = unit.getGoodsContainer().getCompactGoods();
             for (Goods newGoods : goodsInUnit) {
-                int capturedGoods = newGoods.getAmount() - oldGoodsCounts.get(newGoods.getType().getId()).intValue();
+                Integer oldGoodsAmount = oldGoodsCounts.get(newGoods.getType().getId());
+                int capturedGoods = newGoods.getAmount() - (oldGoodsAmount!=null?oldGoodsAmount.intValue():0);
                 if (capturedGoods > 0) {
                     Element captured = reply.getOwnerDocument().createElement("capturedGoods");
                     captured.setAttribute("type", newGoods.getType().getId());
