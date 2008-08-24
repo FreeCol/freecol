@@ -874,10 +874,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             if (buildingType.getProductionModifier() != null) {
                 result.add(buildingType.getProductionModifier());
             }
-            //result.addAll(buildingType.getFeatureContainer().getModifierSet(outputId));
             result.addAll(prodUnit.getModifierSet(outputId));
-            //result.addAll(getColony().getFeatureContainer().getModifierSet(outputId));
-            result.add(colony.getProductionModifier(getGoodsOutputType()));
             return result;
         }
     }

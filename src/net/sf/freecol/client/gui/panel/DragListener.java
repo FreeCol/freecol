@@ -83,19 +83,26 @@ public final class DragListener extends MouseAdapter {
         // if (e.isPopupTrigger() && (comp instanceof UnitLabel)) {
         if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
             // Popup mustn't be shown when panel is not editable
-            if (!parentPanel.isEditable()) return;
-            JPopupMenu menu = null;
-            if (comp instanceof UnitLabel) {
-                menu = getUnitMenu((UnitLabel) comp);
-            } else if (comp instanceof GoodsLabel) {
-                menu = getGoodsMenu((GoodsLabel) comp);
-            } else if (comp instanceof MarketLabel) {
-                if (parentPanel instanceof EuropePanel) {
+            if (parentPanel.isEditable()) {
+                JPopupMenu menu = null;
+                if (comp instanceof UnitLabel) {
+                    menu = getUnitMenu((UnitLabel) comp);
+                } else if (comp instanceof GoodsLabel) {
+                    menu = getGoodsMenu((GoodsLabel) comp);
+                } else if (comp instanceof MarketLabel &&
+                           parentPanel instanceof EuropePanel) {
                     ((EuropePanel) parentPanel).payArrears(((MarketLabel) comp).getType());
                 }
-            }
-            if (menu != null && menu.getSubElements().length > 0) {
-                menu.show(comp, e.getX(), e.getY());
+                if (menu != null) {
+                    int elements = menu.getSubElements().length;
+                    if (elements > 0) {
+                        int lastIndex = menu.getComponentCount() - 1;
+                        if (menu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
+                            menu.remove(lastIndex);
+                        }
+                        menu.show(comp, e.getX(), e.getY());
+                    }
+                }
             }
         } else {
             TransferHandler handler = comp.getTransferHandler();
@@ -168,25 +175,6 @@ public final class DragListener extends MouseAdapter {
             }
         }
 
-        if (tempUnit.getTurnsOfTraining() > 0 && tempUnit.getStudent() != null) {
-            JMenuItem teaching = new JMenuItem(Messages.message("menuBar.teacher") +
-                                               ": " + tempUnit.getTurnsOfTraining() +
-                                               "/" + tempUnit.getNeededTurnsOfTraining());
-            teaching.setEnabled(false);
-            menu.add(teaching);
-        }
-        int experience = Math.min(tempUnit.getExperience(), 200);
-        if (experience > 0) {
-            UnitType workType = Specification.getSpecification()
-                .getExpertForProducing(tempUnit.getWorkType());
-            if (tempUnit.getType().canBeUpgraded(workType, UnitType.UpgradeType.EXPERIENCE)) {
-                JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
-                                                         ": " + experience + "/5000");
-                experienceItem.setEnabled(false);
-                menu.add(experienceItem);
-            }
-        }
-
         return menu;
     }
 
@@ -255,7 +243,18 @@ public final class DragListener extends MouseAdapter {
                 });
             menu.add(menuItem);
             separatorNeeded = true;
+        } else if (tempUnit.getWorkLocation() != null) {
+            JMenuItem menuItem = new JMenuItem(Messages.message("showProductivity"));
+            menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        Canvas canvas = unitLabel.getCanvas();
+                        canvas.showSubPanel(new BuildingProductionPanel(canvas, tempUnit));
+                    }
+                });
+            menu.add(menuItem);
+            separatorNeeded = true;
         }
+
         return separatorNeeded;
     }
     
@@ -275,6 +274,27 @@ public final class DragListener extends MouseAdapter {
                 separatorNeeded = true;
             }
         }
+        if (tempUnit.getTurnsOfTraining() > 0 && tempUnit.getStudent() != null) {
+            JMenuItem teaching = new JMenuItem(Messages.message("menuBar.teacher") +
+                                               ": " + tempUnit.getTurnsOfTraining() +
+                                               "/" + tempUnit.getNeededTurnsOfTraining());
+            teaching.setEnabled(false);
+            menu.add(teaching);
+            separatorNeeded = true;
+        }
+        int experience = Math.min(tempUnit.getExperience(), 200);
+        if (experience > 0) {
+            UnitType workType = Specification.getSpecification()
+                .getExpertForProducing(tempUnit.getWorkType());
+            if (tempUnit.getType().canBeUpgraded(workType, UnitType.UpgradeType.EXPERIENCE)) {
+                JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
+                                                         ": " + experience + "/5000");
+                experienceItem.setEnabled(false);
+                menu.add(experienceItem);
+                separatorNeeded = true;
+            }
+        }
+
         return separatorNeeded;
     }
 
