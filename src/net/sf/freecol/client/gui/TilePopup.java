@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -100,12 +101,25 @@ public final class TilePopup extends JPopupMenu {
             addSeparator();
         }
 
+        int unitCount = 0;
+        Container currentMenu = this;
         for (final Unit currentUnit : tile.getUnitList()) {
 
-            addUnit(currentUnit, !currentUnit.isUnderRepair(), false);
+            if (unitCount > 9) {
+                JMenu more = new JMenu(Messages.message("more"));
+                more.setFont(more.getFont().deriveFont(Font.ITALIC));
+                more.setOpaque(false);
+                currentMenu.add(more);
+                currentMenu = more;
+                unitCount = 0;
+            }
+
+            addUnit(currentMenu, currentUnit, !currentUnit.isUnderRepair(), false);
+            unitCount++;
 
             for (Unit unit : currentUnit.getUnitList()) {
-                addUnit(unit, true, true);
+                addUnit(currentMenu, unit, true, true);
+                unitCount++;
             }
 
             boolean hasGoods = false;
@@ -205,7 +219,7 @@ public final class TilePopup extends JPopupMenu {
      * @param indent Should be <code>true</code> if the text should be
      *      indented on the menu.
      */
-    private void addUnit(final Unit unit, boolean enabled, boolean indent) {
+    private void addUnit(Container menu, final Unit unit, boolean enabled, boolean indent) {
         String text;
         if(unit.getState() == UnitState.IMPROVING) {
             text = ((indent ? "    " : "") +
@@ -233,7 +247,7 @@ public final class TilePopup extends JPopupMenu {
         if (!enabled) {
             menuItem.setEnabled(false);
         }
-        add(menuItem);
+        menu.add(menuItem);
         hasAnItem = true;
     }
 
