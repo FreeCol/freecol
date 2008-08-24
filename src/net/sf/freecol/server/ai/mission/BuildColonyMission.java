@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
@@ -274,25 +275,35 @@ public class BuildColonyMission extends Mission {
      */
     public static Tile findColonyLocation(Unit unit) {
         Game game = unit.getGame();
-
-        if (unit.getTile() == null) {
+        
+        Tile startTile = null;
+        if (unit.getLocation() instanceof Unit) {
+            Unit carrier = (Unit) unit.getLocation();
+            startTile = carrier.getTile();
+        } else if (unit.getLocation() instanceof Europe) {
+            startTile = (Tile) unit.getEntryLocation();
+        } else {
+            startTile = unit.getTile();
+        }
+            
+        if (startTile == null) {
             return null;
         }
 
         Tile bestTile = null;
         int highestColonyValue = 0;
 
-        Iterator<Position> it = game.getMap().getFloodFillIterator(unit.getTile().getPosition());
+        Iterator<Position> it = game.getMap().getFloodFillIterator(startTile.getPosition());
         for (int i = 0; it.hasNext() && i < 500; i++) {
             Tile tile = game.getMap().getTile(it.next());
             if (tile.getColonyValue() > 0) {
-                if (tile != unit.getTile()) {
+                if (tile != startTile) {
                     PathNode path;
                     if (unit.getLocation() instanceof Unit) {
                         Unit carrier = (Unit) unit.getLocation();
-                        path = game.getMap().findPath(unit, carrier.getTile(), tile, carrier);
+                        path = game.getMap().findPath(unit, startTile, tile, carrier);
                     } else {
-                        path = game.getMap().findPath(unit, unit.getTile(), tile);
+                        path = game.getMap().findPath(unit, startTile, tile);
                     }
 
                     if (path != null) {

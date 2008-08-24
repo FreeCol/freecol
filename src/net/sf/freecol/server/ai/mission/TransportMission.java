@@ -502,15 +502,18 @@ public class TransportMission extends Mission {
          * be removed after a proper implementation has been created.
          */
         if (aiPlayer.hasFewColonies()) {
+            // since we are in Europe, use the carrier entry point to search for a good settlement spot.
+            Unit carrier = getUnit();
+            Tile colonyTile = BuildColonyMission.findColonyLocation(carrier);
+            int colonyValue = aiPlayer.getPlayer().getColonyValue(colonyTile);
             int space = getAvailableSpace();
-            while (space > 0) {
+            while (colonyTile!=null && space > 0) {
                 AIUnit newUnit = getCheapestUnitInEurope(connection);
                 if (newUnit != null) {
                     if (newUnit.getUnit().isColonist() && !newUnit.getUnit().isArmed()
                         && !newUnit.getUnit().isMounted() && newUnit.getUnit().getRole() != Role.PIONEER) {
-                        newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit));
-                        // FIXME: a BuildColonyMission with no target location causes NPE problems later on
-                        // We should perhaps assign the target location here?
+                        // send the colonist to build the new colony
+                        newUnit.setMission(new BuildColonyMission(getAIMain(), newUnit, colonyTile, colonyValue));
                     }
                     addToTransportList(newUnit);
                     space--;
