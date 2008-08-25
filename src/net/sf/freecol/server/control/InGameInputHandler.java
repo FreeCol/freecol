@@ -1925,7 +1925,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable("abc");
+        UnitType newRecruitable = player.generateRecruitable("abc" + getPseudoRandom().nextInt(10000));
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
         reply.setAttribute("newRecruitable", newRecruitable.getId());
@@ -1950,7 +1950,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             slot = (int) (Math.random() * 3);
         }
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable("xyzzy");
+        UnitType newRecruitable = player.generateRecruitable("xyzzy" + getPseudoRandom().nextInt(10000));
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
         if (!player.hasAbility("model.ability.selectRecruit")) {
