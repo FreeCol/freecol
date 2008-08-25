@@ -780,6 +780,9 @@ public class MapGenerator implements IMapGenerator {
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.treasureTrain");
                     Unit unit13 = new Unit(map.getGame(), colonyTile, player, unitType, UnitState.ACTIVE);
                     unit13.setTreasureAmount(10000);
+                    
+                    unitType = FreeCol.getSpecification().getUnitType("model.unit.wagonTrain");
+                    @SuppressWarnings("unused") Unit unit14 = new Unit(map.getGame(), colonyTile, player, unitType, UnitState.ACTIVE);
 
                     /* DEBUGGING LINES FOR AI (0.4.1):
                     for (int j=0; j<10; j++) {

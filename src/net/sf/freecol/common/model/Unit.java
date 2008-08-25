@@ -1382,7 +1382,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                         return MoveType.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
                     } else if (isOffensiveUnit()) {
                         return MoveType.ATTACK;
-                    } else if (indian.getLearnableSkill() != null || !indian.hasBeenVisited()) {
+                    } else if (isColonist() && (indian.getLearnableSkill() != null || !indian.hasBeenVisited())) {
                         return MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
                     } else {
                         return MoveType.ILLEGAL_MOVE;
