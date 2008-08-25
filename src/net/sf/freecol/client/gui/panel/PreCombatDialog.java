@@ -223,7 +223,7 @@ public class PreCombatDialog extends FreeColDialog {
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
 
         float offenceResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), offence);
-        JLabel finalOffenceLabel = new JLabel(Messages.message("modifiers.finalResult"));
+        JLabel finalOffenceLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
         finalOffenceLabel.setFont(bigFont);
         add(finalOffenceLabel, higConst.rc(row, offenceLabelColumn));
         JLabel finalOffenceResult = new JLabel(getModifierFormat().format(offenceResult));
@@ -231,7 +231,7 @@ public class PreCombatDialog extends FreeColDialog {
         add(finalOffenceResult, higConst.rc(row, offenceValueColumn, "r"));
 
         float defenceResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), defence);
-        JLabel finalDefenceLabel = new JLabel(Messages.message("modifiers.finalResult"));
+        JLabel finalDefenceLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
         finalDefenceLabel.setFont(bigFont);
         add(finalDefenceLabel,
             higConst.rc(row, defenceLabelColumn));
