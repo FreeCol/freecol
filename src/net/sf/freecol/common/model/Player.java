@@ -2164,12 +2164,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 for (int index = 0; index < 3; index++) {
                     UnitType recruitable = getEurope().getRecruitable(index);
                     if (featureContainer.hasAbility("model.ability.canNotRecruitUnit", recruitable)) {
-                        // this creates client/server
-                        // desynchronization, see bug report[ 2030153
-                        // ] Stateman becomes scout instead, this
-                        // should only happen on the server, and new
-                        // UnitTypes should be transmitted to the
-                        // client
                         getEurope().setRecruitable(index, generateRecruitable("newRecruits" + index));
                     }
                 }
