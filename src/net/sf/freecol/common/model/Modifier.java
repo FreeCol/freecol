@@ -271,7 +271,8 @@ public final class Modifier extends Feature {
     }
     
     public String toString() {
-        return getId() + " " + type + " " + value;
+        return getId() + (getSource() == null ? " " : " (" + getSource().getId() + ") ") +
+            type + " " + value;
     }
     
 }

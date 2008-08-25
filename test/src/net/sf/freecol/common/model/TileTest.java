@@ -20,6 +20,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
@@ -223,6 +225,77 @@ public class TileTest extends FreeColTestCase {
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
 
+    }
+
+    public void testProductionModifiers() throws Exception {
+
+        Colony colony = getStandardColony();
+        Game game = colony.getGame();
+        List<ColonyTile> colonyTiles = colony.getColonyTiles();
+
+        ColonyTile colonyTile1 = colonyTiles.get(0);
+        ColonyTile colonyTile2 = colonyTiles.get(1);
+
+        Tile tile1 = colonyTile1.getWorkTile();
+        Tile tile2 = colonyTile2.getWorkTile();
+
+        TileImprovementType roadType = spec().getTileImprovementType("model.improvement.Road");
+        TileImprovementType riverType = spec().getTileImprovementType("model.improvement.River");
+
+        TileImprovement road1 = new TileImprovement(game, tile1, roadType);
+        TileImprovement river1 = new TileImprovement(game, tile1, riverType);
+        road1.setTurnsToComplete(0);
+        assertTrue(road1.isComplete());
+        tile1.setTileItemContainer(new TileItemContainer(game, tile1));
+        tile1.getTileItemContainer().addTileItem(road1);
+        tile1.getTileItemContainer().addTileItem(river1);
+        assertTrue(tile1.hasRoad());
+        assertTrue(tile1.hasRiver());
+
+        TileImprovement road2 = new TileImprovement(game, tile2, roadType);
+        TileImprovement river2 = new TileImprovement(game, tile2, riverType);
+        road2.setTurnsToComplete(0);
+        assertTrue(road2.isComplete());
+        tile2.setTileItemContainer(new TileItemContainer(game, tile2));
+        tile2.getTileItemContainer().addTileItem(road2);
+        tile2.getTileItemContainer().addTileItem(river2);
+        assertTrue(tile2.hasRoad());
+        assertTrue(tile2.hasRiver());
+
+        tile1.setType(spec().getTileType("model.tile.savannah"));
+        assertTrue(tile1.hasRoad());
+        assertTrue(tile1.hasRiver());
+
+        tile2.setType(spec().getTileType("model.tile.hills"));
+        assertTrue(tile2.hasRoad());
+        assertFalse(tile2.hasRiver());
+
+        GoodsType sugar = spec().getGoodsType("model.goods.sugar");
+        GoodsType tobacco = spec().getGoodsType("model.goods.tobacco");
+        GoodsType lumber = spec().getGoodsType("model.goods.lumber");
+        GoodsType ore = spec().getGoodsType("model.goods.ore");
+
+        assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar), river1.getType()));
+        assertFalse(hasBonusFromSource(tile1.getProductionBonus(lumber), river1.getType()));
+        assertFalse(hasBonusFromSource(tile2.getProductionBonus(sugar), road2.getType()));
+        assertTrue(hasBonusFromSource(tile2.getProductionBonus(ore), road2.getType()));
+
+        ResourceType sugarResource = spec().getResourceType("model.resource.Sugar");
+        tile1.setResource(sugarResource);
+
+        assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar), savannah));
+        assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar), river1.getType()));
+        assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar), sugarResource));
+
+    }
+
+    private boolean hasBonusFromSource(Set<Modifier> modifierSet, FreeColGameObjectType source) {
+        for (Modifier modifier : modifierSet) {
+            if (source.equals(modifier.getSource())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
