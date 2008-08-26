@@ -1748,6 +1748,14 @@
       <booleanOption id="model.option.mapScrollOnDrag" defaultValue="true"/>
       <!-- Whether to display a compass rose or not. -->
       <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
+      <!-- Whether to display the map controls by default or not. -->
+      <booleanOption id="model.option.displayMapControls" defaultValue="true"/>
+      <!-- Whether to display the tile names by default or not. -->
+      <booleanOption id="model.option.displayTileNames" defaultValue="false"/>
+      <!-- Whether to display the tile owners by default or not. -->
+      <booleanOption id="model.option.displayTileOwners" defaultValue="false"/>
+      <!-- Whether to display regions by default or not. -->
+      <booleanOption id="model.option.displayRegion" defaultValue="false"/>
       <!-- Whether to display the grid by default or not. -->
       <booleanOption id="model.option.displayGrid" defaultValue="false"/>
       <!-- Used by GUI to sort colonies. -->

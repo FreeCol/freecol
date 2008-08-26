@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.KeyStroke;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
 /**
@@ -49,6 +50,7 @@ public class DisplayTileOwnersAction extends SelectableAction {
     DisplayTileOwnersAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.view.displayTileOwners", null, KeyStroke.getKeyStroke('W', Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
+        setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_TILE_OWNERS));
     }
 
     /**

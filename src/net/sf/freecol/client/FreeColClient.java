@@ -178,6 +178,10 @@ public final class FreeColClient {
         mapEditor = false;
         
         clientOptions = new ClientOptions();
+        if (FreeCol.getClientOptionsFile() != null
+                && FreeCol.getClientOptionsFile().exists()) {
+            clientOptions.load(FreeCol.getClientOptionsFile());
+        }
         actionManager = new ActionManager(this);
         if (!headless) {
             actionManager.initializeActions();
@@ -204,7 +208,6 @@ public final class FreeColClient {
         
         if (FreeCol.getClientOptionsFile() != null
                 && FreeCol.getClientOptionsFile().exists()) {
-            clientOptions.load(FreeCol.getClientOptionsFile());
             if (!headless) {
                 Option o = clientOptions.getObject(ClientOptions.LANGUAGE);
                 o.addPropertyChangeListener(new PropertyChangeListener() {

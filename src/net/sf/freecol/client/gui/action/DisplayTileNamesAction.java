@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.KeyStroke;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 
 /**
@@ -49,6 +50,7 @@ public class DisplayTileNamesAction extends SelectableAction {
     DisplayTileNamesAction(FreeColClient freeColClient) {
         super(freeColClient, "menuBar.view.displayTileNames", null, KeyStroke.getKeyStroke('D', Toolkit
                 .getDefaultToolkit().getMenuShortcutKeyMask()));
+        setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_TILE_NAMES));
     }
 
     /**

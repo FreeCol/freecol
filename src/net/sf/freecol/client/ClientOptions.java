@@ -106,6 +106,26 @@ public class ClientOptions extends OptionMap {
     public static final String DISPLAY_COMPASS_ROSE = "model.option.displayCompassRose";
 
     /**
+     * Whether to display the map controls or not.
+     */
+    public static final String DISPLAY_MAP_CONTROLS = "model.option.displayMapControls";
+
+    /**
+     * Whether to display the tile names or not.
+     */
+    public static final String DISPLAY_TILE_NAMES = "model.option.displayTileNames";
+
+    /**
+     * Whether to display the tile owners or not.
+     */
+    public static final String DISPLAY_TILE_OWNERS = "model.option.displayTileOwners";
+
+    /**
+     * Whether to display regions or not.
+     */
+    public static final String DISPLAY_REGION = "model.option.displayRegion";
+
+    /**
      * Whether to display the grid by default or not.
      */
     public static final String DISPLAY_GRID = "model.option.displayGrid";

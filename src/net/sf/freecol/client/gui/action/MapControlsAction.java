@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.KeyStroke;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.panel.MapControls;
 
@@ -53,7 +54,7 @@ public class MapControlsAction extends SelectableAction {
         super(freeColClient, "menuBar.view.mapControls", null, KeyStroke.getKeyStroke('M', Toolkit.getDefaultToolkit()
                 .getMenuShortcutKeyMask()));
 
-        setSelected(true);
+        setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_MAP_CONTROLS));
     }
 
     /**
