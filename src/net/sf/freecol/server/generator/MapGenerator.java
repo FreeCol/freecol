@@ -530,7 +530,8 @@ public class MapGenerator implements IMapGenerator {
             newTile.setOwner(player);
         }
 
-        for (int i = 0; i < (kind.ordinal() * 2) + 4; i++) {
+        int unitCount = (kind.ordinal() * 2) + 4;
+        for (int i = 0; i < unitCount; i++) {
             UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new Unit(map.getGame(), settlement, player, unitType, UnitState.ACTIVE,
                                  unitType.getDefaultEquipment());
@@ -542,6 +543,15 @@ public class MapGenerator implements IMapGenerator {
                 unit.setLocation(settlement);
             }
         }
+        
+        // START DEBUG:
+        if (FreeCol.isInDebugMode()) {
+            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (goodsType.isNewWorldGoodsType())
+                    settlement.addGoods(goodsType, 150);
+            }
+        }
+        // END DEBUG
         
         return settlement;
     }
@@ -783,6 +793,9 @@ public class MapGenerator implements IMapGenerator {
                     
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.wagonTrain");
                     @SuppressWarnings("unused") Unit unit14 = new Unit(map.getGame(), colonyTile, player, unitType, UnitState.ACTIVE);
+                    GoodsType cigarsType = FreeCol.getSpecification().getGoodsType("model.goods.cigars");
+                    Goods cigards = new Goods(map.getGame(), unit14, cigarsType, 5);
+                    unit14.add(cigards);
 
                     /* DEBUGGING LINES FOR AI (0.4.1):
                     for (int j=0; j<10; j++) {
