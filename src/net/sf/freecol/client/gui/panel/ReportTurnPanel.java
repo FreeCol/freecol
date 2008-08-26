@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -37,6 +36,8 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.TabSet;
+import javax.swing.text.TabStop;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
@@ -58,8 +59,6 @@ import cz.autel.dmi.HIGLayout;
  * This panel displays the Turn Report.
  */
 public final class ReportTurnPanel extends ReportPanel implements ActionListener {
-
-    private StyledDocument document;
 
     /**
      * The constructor that will add the items to this panel.
@@ -159,7 +158,9 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 reportPanel.add(label, higConst.rc(row, imageColumn, ""));
             }
 
-            final JTextPane textPane = getTextPane(message, getCanvas().getClient().getMyPlayer());
+            final JTextPane textPane = getDefaultTextPane();
+            insertMessage(textPane.getStyledDocument(), message, getCanvas().getClient().getMyPlayer());
+
             reportPanel.add(textPane, higConst.rc(row, textColumn));
             if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
@@ -192,7 +193,6 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
             }
             row += 2;
         }
-
     }
 
     private JComponent getHeadline(Object source) {
@@ -240,42 +240,18 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         return headline;
     }
 
-    //Create a text pane.
-    private JTextPane getTextPane(ModelMessage message, Player player) {
-        JTextPane textPane = new JTextPane();
-        textPane.setOpaque(false);
-        textPane.setEditable(false);
-
-        document = textPane.getStyledDocument();
-        //Initialize some styles.
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-        
-        Style regular = document.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Dialog");
-        StyleConstants.setBold(def, true);
-        StyleConstants.setFontSize(def, 12);
-
-        Style buttonStyle = document.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
-
-        insertMessage(message, player);
-        return textPane;
-    }
-
-
-
-    private void insertMessage(ModelMessage message, Player player) {
+    private void insertMessage(StyledDocument document, ModelMessage message, Player player) {
 
         try {
             String input = Messages.message(message.getId());
             int start = input.indexOf('%');
             if (start == -1) {
                 // no variables present
-                insertText(input.substring(0));
+                insertText(document, input.substring(0));
                 return;
             } else if (start > 0) {
                 // output any string before the first occurrence of '%'
-                insertText(input.substring(0, start));
+                insertText(document, input.substring(0, start));
             }
             int end;
 
@@ -287,14 +263,14 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                     if (var.equals("%colony%")) {
                         Colony colony = player.getColony(item[1]);
                         if (colony != null) {
-                            insertLinkButton(colony, item[1]);
+                            insertLinkButton(document, colony, item[1]);
                         } else if (message.getSource() instanceof Tile) {
-                            insertLinkButton(message.getSource(), item[1]);
+                            insertLinkButton(document, message.getSource(), item[1]);
                         } else {
-                            insertText(item[1]);
+                            insertText(document, item[1]);
                         }
                     } else if (var.equals("%europe%")) {
-                        insertLinkButton(player.getEurope(), player.getEurope().getName());
+                        insertLinkButton(document, player.getEurope(), player.getEurope().getName());
                     } else if (var.equals("%unit%") || var.equals("%newName%")) {
                         Tile tile = null;
                         if (message.getSource() instanceof Unit) {
@@ -303,26 +279,27 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                             tile = (Tile)message.getSource();
                         }
                         if (tile != null) {
-                            insertLinkButton(tile, item[1]);
+                            insertLinkButton(document, tile, item[1]);
                         } else {
-                            insertText(item[1]);
+                            insertText(document, item[1]);
                         }
                     } else {
-                        insertText(item[1]);
+                        insertText(document, item[1]);
                     }
                     start = end + 1;
                 } else {
                     // found no variable to replace: either a single '%', or
                     // some unnecessary variable
-                    insertText(input.substring(start, end));
+                    insertText(document, input.substring(start, end));
                     start = end;
                 }
             }
 
             // output any string after the last occurrence of '%'
             if (start < input.length()) {
-                insertText(input.substring(start));
+                insertText(document, input.substring(start));
             }
+
         } catch(Exception e) {
             logger.warning(e.toString());
         }
@@ -345,21 +322,16 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
         return null;
     }
 
-    private void insertText(String text) throws Exception {
+    private void insertText(StyledDocument document, String text) throws Exception {
         document.insertString(document.getLength(), text,
                               document.getStyle("regular"));
     }
 
 
-    private void insertLinkButton(FreeColGameObject object, String name) throws Exception {
-        JButton button = new JButton(name);
-        button.setMargin(new Insets(0,0,0,0));
-        button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
-        button.setAlignmentY(0.8f);
-        button.setBorder(BorderFactory.createEmptyBorder());
+    private void insertLinkButton(StyledDocument document, FreeColGameObject object, String name)
+        throws Exception {
+        JButton button = getLinkButton(name, null, object.getId());
         button.addActionListener(this);
-        button.setActionCommand(object.getId());
         StyleConstants.setComponent(document.getStyle("button"), button);
         document.insertString(document.getLength(), " ", document.getStyle("button"));
     }

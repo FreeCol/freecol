@@ -303,16 +303,10 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
     }
 
     private JButton createColonyButton(Colony colony, String info, boolean headline) {
-        JButton button = new JButton(colony.getName() + info);
+        JButton button = getLinkButton(colony.getName() + info, null, colony.getId());
         if (headline) {
             button.setFont(smallHeaderFont);
         }
-        button.setMargin(new Insets(0,0,0,0));
-        button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
-        button.setAlignmentY(0.8f);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setActionCommand(colony.getId());
         button.addActionListener(this);
         return button;
     }

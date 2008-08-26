@@ -197,15 +197,7 @@ public final class ReportColonyPanel extends ReportPanel implements ActionListen
     }
 
     private JButton createColonyButton(int index) {
-
-        JButton button = new JButton(colonies.get(index).getName());
-        button.setFont(smallHeaderFont);
-        button.setMargin(new Insets(0,0,0,0));
-        button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
-        button.setAlignmentY(0.8f);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setActionCommand(String.valueOf(index));
+        JButton button = getLinkButton(colonies.get(index).getName(), null, String.valueOf(index));
         button.addActionListener(this);
         return button;
     }

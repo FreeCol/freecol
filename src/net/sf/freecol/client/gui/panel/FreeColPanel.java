@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -37,6 +38,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -64,6 +66,8 @@ public class FreeColPanel extends JPanel {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
+
+    public static final Insets emptyMargin = new Insets(0,0,0,0);
 
     protected static final HIGConstraints higConst = new HIGConstraints();
 
@@ -204,6 +208,9 @@ public class FreeColPanel extends JPanel {
         Style buttonStyle = doc.addStyle("button", regular);
         StyleConstants.setForeground(buttonStyle, LINK_COLOR);
 
+        Style right = doc.addStyle("right", regular);
+        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
+
         return textPane;
     }
 
@@ -228,6 +235,18 @@ public class FreeColPanel extends JPanel {
         textArea.setSize(textArea.getPreferredSize());
         return textArea;
     }
+
+    public static JButton getLinkButton(String text, Icon icon, String action) {
+        JButton button = new JButton(text, icon);
+        button.setMargin(emptyMargin);
+        button.setOpaque(false);
+        button.setForeground(LINK_COLOR);
+        button.setAlignmentY(0.8f);
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setActionCommand(action);
+        return button;
+    }
+
 
     /**
      * Returns the default header for panels.

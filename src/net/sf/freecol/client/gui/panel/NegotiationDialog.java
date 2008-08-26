@@ -339,14 +339,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                     description = ((UnitTradeItem) item).getUnit().getName();
                 }
                 try {
-                    JButton button = new JButton(description);
-                    button.setMargin(new Insets(0,0,0,0));
-                    button.setOpaque(false);
-                    button.setForeground(LINK_COLOR);
-                    button.setAlignmentY(0.8f);
-                    button.setBorder(BorderFactory.createEmptyBorder());
+                    JButton button = getLinkButton(description, null, String.valueOf(index));
                     button.addActionListener(this);
-                    button.setActionCommand(String.valueOf(index));
                     StyleConstants.setComponent(document.getStyle("button"), button);
                     document.insertString(document.getLength(), " ", document.getStyle("button"));
                     if (index < items.size() - 1) {

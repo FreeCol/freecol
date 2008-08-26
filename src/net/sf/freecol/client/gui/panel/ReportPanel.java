@@ -54,7 +54,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected JLabel header;
 
-    private JButton ok;
+    protected JButton ok;
 
     protected JScrollPane scrollPane;
 

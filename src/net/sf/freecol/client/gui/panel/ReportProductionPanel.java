@@ -51,8 +51,6 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class ReportProductionPanel extends JPanel implements ActionListener {
 
-
-
     /** How many additional rows are defined. */
     private final int extraRows = 2;
 
@@ -328,15 +326,9 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
 
     private JButton createColonyButton(int index) {
-
-        JButton button = new JButton(colonies.get(index).getName());
-        button.setMargin(new Insets(0,0,0,0));
-        button.setOpaque(false);
-        button.setForeground(FreeColPanel.LINK_COLOR);
-        button.setAlignmentY(0.8f);
+        JButton button = FreeColPanel.getLinkButton(colonies.get(index).getName(), null, String.valueOf(index));
         button.setHorizontalAlignment(SwingConstants.LEADING);
         button.setBorder(FreeColPanel.LEFTCELLBORDER);
-        button.setActionCommand(String.valueOf(index));
         button.addActionListener(this);
         return button;
     }

@@ -405,13 +405,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         List<Unit> unitList = locations.get(location);
         if (!(unitList == null && ignoreEmptyLocations)) {
             if (makeButton) {
-                JButton locationButton = new JButton(location);
-                locationButton.setMargin(new Insets(0,0,0,0));
-                locationButton.setOpaque(false);
-                locationButton.setForeground(FreeColPanel.LINK_COLOR);
-                locationButton.setAlignmentY(0.8f);
-                locationButton.setBorder(BorderFactory.createEmptyBorder());
-                locationButton.setActionCommand(location);
+                JButton locationButton = FreeColPanel.getLinkButton(location, null, location);
                 locationButton.addActionListener(this);
                 add(locationButton, higConst.rc(row, labelColumn, "lt"));
             } else {

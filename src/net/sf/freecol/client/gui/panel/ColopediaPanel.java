@@ -560,12 +560,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     private JButton getButton(FreeColGameObjectType type, String text, ImageIcon icon) {
-        JButton button = new JButton(text == null ? type.getName() : text, icon);
-        button.setOpaque(false);
-        button.setForeground(LINK_COLOR);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setAlignmentY(0.8f);
-        button.setActionCommand(type.getId());
+        JButton button = getLinkButton(text == null ? type.getName() : text, icon, type.getId());
         button.addActionListener(this);
         return button;
     }
