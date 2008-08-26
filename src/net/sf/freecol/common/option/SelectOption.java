@@ -50,11 +50,7 @@ public class SelectOption extends AbstractOption {
 
     private boolean localizedLabels = false;
 
-    private Map<String, Integer> selectValues = new LinkedHashMap<String, Integer>();
-
-    // TODO : remove this field and corresponding methods when all rangeOption
-    // come from specification.xml
-    private String[] options;
+    private Map<Integer, String> selectValues = new LinkedHashMap<Integer, String>();
 
     /**
      * Creates a new <code>SelectOption</code>.
@@ -66,49 +62,6 @@ public class SelectOption extends AbstractOption {
         readFromXML(in);
     }
     
-    // TODO : remove constructor when all SelectOption come from specification.xml
-    /**
-     * Creates a new <code>SelectOption</code>.
-     *
-     * @deprecated
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
-     * @param optionGroup The OptionGroup this Option belongs to.
-     * @param options All possible values.
-     * @param defaultOption The index of the default value.
-     */
-    public SelectOption(String id, OptionGroup optionGroup, String[] options, int defaultOption) {
-        this(id, optionGroup, options, defaultOption, false);
-    }
-
-    // TODO : remove constructor when all SelectOption come from specification.xml
-    /**
-     * Creates a new <code>SelectOption</code>.
-     *
-     * @deprecated
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
-     * @param optionGroup The OptionGroup this Option belongs to.
-     * @param options All possible values.
-     * @param defaultOption The index of the default value.
-     * @param doNotLocalize Suppress the default localization of options.
-     */
-    public SelectOption(String id, OptionGroup optionGroup, String[] options, int defaultOption, boolean doNotLocalize) {
-        super(id, optionGroup);
-
-        if (doNotLocalize) {
-            this.options = options;
-        } else {
-            String[] localized = new String[options.length];
-            for (int i = 0; i < options.length; i++) {
-                localized[i] = Messages.message(getGroup() + "." + id + "." + options[i]);
-            }        
-            this.options = localized;
-        }
-        
-        this.value = defaultOption;
-    }
-
     /**
      * Gets the current value of this <code>SelectOption</code>.
      * @return The value.
@@ -132,19 +85,11 @@ public class SelectOption extends AbstractOption {
     }
 
     /**
-     * Gets the current options of this <code>SelectOption</code>.
-     * @return The options.
-     */
-    public String[] getOptions() {
-        return options;
-    }
-
-    /**
      * Gets the range values of this <code>RangeOption</code>.
      * 
      * @return The value.
      */
-    public Map<String, Integer> getSelectValues() {
+    public Map<Integer, String> getSelectValues() {
         return selectValues;
     }
     
@@ -237,15 +182,13 @@ public class SelectOption extends AbstractOption {
                     if (this.localizedLabels) {
                         label = Messages.message(label);
                     }
-                    selectValues.put(label, Integer.parseInt(selectValue));
+                    selectValues.put(Integer.parseInt(selectValue), label);
                 } else {
                     throw new XMLStreamException("Unknow child \"" + in.getLocalName() + "\" in a \""
                             + getXMLElementTagName() + "\".");
                 }
                 in.nextTag();
             }
-
-            options = selectValues.keySet().toArray(new String[] {});
         }
     }
 

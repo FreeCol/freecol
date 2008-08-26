@@ -35,6 +35,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
@@ -228,6 +229,9 @@ public class MapGeneratorTest extends FreeColTestCase {
     }
 
     public void testRegions() {
+        // Reset import file option value (set by previous tests)
+        ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+
         Game game = new Game(new MockModelController());
         IMapGenerator gen = new MapGenerator();
         try {

@@ -66,7 +66,7 @@ public final class SelectOptionUI extends JPanel implements OptionUpdater, Prope
         label.setToolTipText((description != null) ? description : name);
         add(label);
 
-        String[] strings = option.getOptions();
+        String[] strings = option.getSelectValues().values().toArray(new String[0]);
 
         comboBox = new JComboBox(strings);
         comboBox.setSelectedIndex(option.getValue());

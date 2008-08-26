@@ -29,6 +29,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -226,7 +227,6 @@ public class TerrainGenerator {
     private TileType getRandomLandTileType(int latitudePercent) {
         // decode options
         final int forestChance = getMapGeneratorOptions().getPercentageOfForests();
-        final int humidityPreference = getMapGeneratorOptions().getHumidity();
         final int temperaturePreference = getMapGeneratorOptions().getTemperature();
         
         // create the main list of TileTypes the first time, and reuse it afterwards
@@ -273,19 +273,7 @@ public class TerrainGenerator {
             localeTemperature = -20;
         
         // humidity calculation
-        int averageHumidity = 50;
-        if (humidityPreference==MapGeneratorOptions.HUMIDITY_VERY_DRY) {
-            averageHumidity = 25;
-        } else if (humidityPreference==MapGeneratorOptions.HUMIDITY_DRY) {
-            averageHumidity = 35;
-        } else if (humidityPreference==MapGeneratorOptions.HUMIDITY_NORMAL) {
-            averageHumidity = 40;
-        } else if (humidityPreference==MapGeneratorOptions.HUMIDITY_WET) {
-            averageHumidity = 55;
-        } else if (humidityPreference==MapGeneratorOptions.HUMIDITY_VERY_WET) {
-            averageHumidity = 60;
-        }
-        int localeHumidity = averageHumidity;
+        int localeHumidity = Specification.getSpecification().getRangeOption(MapGeneratorOptions.HUMIDITY).getValue();
         int humidityDeviation = 20; // +/- 20% randomization
         localeHumidity += random.nextInt(humidityDeviation*2) - humidityDeviation;
         if (localeHumidity<0) 

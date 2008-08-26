@@ -20,6 +20,7 @@
 package net.sf.freecol.server.ai.mission;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -27,6 +28,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
@@ -36,11 +38,15 @@ import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TransportMissionTest extends FreeColTestCase {
     
     public void testTransportMission() {
+        // Reset import file option value (set by previous tests)
+        ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
+        
         // start a server
         FreeColServer server = ServerTestHelper.startServer(false, true);
         

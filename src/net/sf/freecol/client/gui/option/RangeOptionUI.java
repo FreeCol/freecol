@@ -70,26 +70,16 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
         //label.setToolTipText((description != null) ? description : name);
         //add(label);
 
-        String[] strings = option.getOptions();
+        String[] strings = option.getRangeValues().values().toArray(new String[0]);
 
-        slider = new JSlider(JSlider.HORIZONTAL, 0, strings.length - 1, option.getValue());
+        slider = new JSlider(JSlider.HORIZONTAL, 0, strings.length - 1, option.getValueRank());
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
         for (int i = 0; i < strings.length; i++) {
             labels.put(new Integer(i), new JLabel(strings[i]));
         }
-        // TODO : Target RangeOption usage block when all comes from
-        // specification.xml
-        /*
-         * Map<String, Integer> rangeValues = option.getRangeValues(); Set<String>
-         * strings = rangeValues.keySet();
-         * 
-         * slider = new JSlider(JSlider.HORIZONTAL, 0, strings.size()-1,
-         * option.getValue()); Hashtable<Integer,JComponent> labels = new
-         * Hashtable<Integer,JComponent>(); for (String string : strings) {
-         * labels.put(rangeValues.get(string), new JLabel(string)); }
-         */
+
         slider.setLabelTable(labels);
-        slider.setValue(option.getValue());
+        slider.setValue(option.getValueRank());
         slider.setPaintLabels(true);
         slider.setMajorTickSpacing(1);
         slider.setExtent(0);
@@ -106,7 +96,7 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
                 if (option.isPreviewEnabled()) {
                     final int value = slider.getValue();
                     if (option.getValue() != value) {
-                        option.setValue(value);
+                        option.setValueRank(value);
                     }
                 }
             }
@@ -153,13 +143,13 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
      * Updates the value of the {@link Option} this object keeps.
      */
     public void updateOption() {
-        option.setValue(slider.getValue());
+        option.setValueRank(slider.getValue());
     }
 
     /**
      * Reset with the value from the option.
      */
     public void reset() {
-        slider.setValue(option.getValue());
+        slider.setValue(option.getValueRank());
     }
 }

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.option;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -46,13 +47,9 @@ public class RangeOption extends AbstractOption {
 
     private boolean localizedLabels = false;
 
-    private Map<String, Integer> rangeValues = new LinkedHashMap<String, Integer>();
+    private Map<Integer, String> rangeValues = new LinkedHashMap<Integer, String>();
 
-    // TODO : remove this field and corresponding methods when all rangeOption
-    // come from specification.xml
-    private String[] options;
-
-    /**
+     /**
      * Creates a new <code>RangeOption</code>.
      * 
      * @param in The <code>XMSStreamReader</code> to read the data from
@@ -60,44 +57,6 @@ public class RangeOption extends AbstractOption {
     public RangeOption(XMLStreamReader in) throws XMLStreamException {
         super(NO_ID);
         readFromXML(in);
-    }
-
-    // TODO : remove constructor when all RangeOption come from specification.xml
-    /**
-     * Creates a new <code>RangeOption</code>.
-     * 
-     * @deprecated
-     * @param id The identifier for this option. This is used when the object
-     *            should be found in an {@link OptionGroup}.
-     * @param optionGroup The OptionGroup this Option belongs to.
-     * @param options All possible values.
-     * @param defaultOption The index of the default value.
-     * @param doNotLocalize Suppress the default localization of options.
-     */
-    public RangeOption(String id, OptionGroup optionGroup, String[] options, int defaultOption, boolean doNotLocalize) {
-        super(id, optionGroup);
-
-        if (doNotLocalize) {
-            this.options = options;
-        } else {
-            String[] localized = new String[options.length];
-            for (int i = 0; i < options.length; i++) {
-                localized[i] = Messages.message(getGroup() + "." + getId() + "." + options[i]);
-            }
-            this.options = localized;
-        }
-
-        this.value = defaultOption;
-    }
-
-    /**
-     * Gets the current value of this <code>RangeOption</code>.
-     * 
-     * @deprecated
-     * @return The value.
-     */
-    public String[] getOptions() {
-        return options;
     }
 
     /**
@@ -110,11 +69,25 @@ public class RangeOption extends AbstractOption {
     }
 
     /**
+     * Gets the rank of the current selected value in the list of values of this <code>RangeOption</code>.
+     * 
+     * @return The value.
+     */
+    public int getValueRank() {
+        int rank = 0;
+        Iterator<Integer> iterator = rangeValues.keySet().iterator();
+        while(iterator.hasNext() && iterator.next() != value) {
+          rank++;   
+        }
+        return rank;
+    }
+
+    /**
      * Gets the range values of this <code>RangeOption</code>.
      * 
      * @return The value.
      */
-    public Map<String, Integer> getRangeValues() {
+    public Map<Integer, String> getRangeValues() {
         return rangeValues;
     }
 
@@ -133,6 +106,23 @@ public class RangeOption extends AbstractOption {
         isDefined = true;
     }
 
+    /**
+     * Sets the value through the rank in the list of values of this <code>RangeOption</code>.
+     * 
+     * @param rank The rank of the value to be set.
+     */
+    public void setValueRank(int rank) {
+        int curValue = Integer.MIN_VALUE;        
+        Iterator<Integer> iterator = rangeValues.keySet().iterator();
+        
+        while(rank >= 0) {
+          curValue = iterator.next();
+          rank--;   
+        }
+ 
+        setValue(curValue);
+    }
+    
     /**
      * Gets a <code>String</code> representation of the current value.
      * 
@@ -220,15 +210,13 @@ public class RangeOption extends AbstractOption {
                     if (this.localizedLabels) {
                         label = Messages.message(label);
                     }
-                    rangeValues.put(label, Integer.parseInt(rangeValue));
+                    rangeValues.put(Integer.parseInt(rangeValue), label);
                 } else {
                     throw new XMLStreamException("Unknow child \"" + in.getLocalName() + "\" in a \""
                             + getXMLElementTagName() + "\".");
                 }
                 in.nextTag();
             }
-
-            options = rangeValues.keySet().toArray(new String[] {});
         }
     }
 

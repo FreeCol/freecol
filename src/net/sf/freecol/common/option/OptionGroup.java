@@ -138,6 +138,8 @@ public class OptionGroup extends AbstractOption {
                 option = new SelectOption(in);
             } else if (LanguageOption.getXMLElementTagName().equals(optionType) || "language-option".equals(optionType)) {
                 option = new LanguageOption(in);
+            } else if (FileOption.getXMLElementTagName().equals(optionType) || "file-option".equals(optionType)) {
+                option = new FileOption(in);
             } else {
                 logger.finest("Parsing of " + optionType + " is not implemented yet");
                 in.nextTag();

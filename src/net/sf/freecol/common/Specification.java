@@ -383,6 +383,8 @@ public final class Specification {
                             option = new SelectOption(xsr);
                         } else if (LanguageOption.getXMLElementTagName().equals(optionType) || "language-option".equals(optionType)) {
                             option = new LanguageOption(xsr);
+                        } else if (FileOption.getXMLElementTagName().equals(optionType) || "file-option".equals(optionType)) {
+                            option = new FileOption(xsr);
                         } else {
                             logger.finest("Parsing of " + optionType + " is not implemented yet");
                             xsr.nextTag();

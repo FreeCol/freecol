@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.option;
 
 import java.io.File;
@@ -27,7 +26,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-
 /**
  * Represents an option for specifying a <code>File</code>.
  */
@@ -35,81 +33,56 @@ public class FileOption extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(FileOption.class.getName());
 
+    private File value = null;
 
-
-    private File value;
 
     /**
-     * Creates a new  <code>IntegerOption</code>.
-     * @param in The <code>XMLStreamReader</code> containing the data. 
+     * Creates a new <code>IntegerOption</code>.
+     * 
+     * @param in The <code>XMLStreamReader</code> containing the data.
      */
-     public FileOption(XMLStreamReader in) throws XMLStreamException {
-         super(NO_ID);
-         readFromXML(in);
-     }   
-
-    /**
-     * Creates a new <code>FileOption</code>.
-     *
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
-     */
-    public FileOption(String id) {
-        super(id);
+    public FileOption(XMLStreamReader in) throws XMLStreamException {
+        super(NO_ID);
+        readFromXML(in);
     }
-    
-    public FileOption(String id, OptionGroup optionGroup) {
-        super(id, optionGroup);
-    }
-    
-    /**
-     * Creates a new <code>FileOption</code>.
-     *
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
-     * @param value The default value of this <code>FileOption</code>.
-     */
-    public FileOption(String id, OptionGroup optionGroup, File value) {
-        super(id, optionGroup);
-        this.value = value;
-    }
-
 
     /**
      * Gets the current value of this <code>FileOption</code>.
-     * @return The value using <code>null</code> for marking
-     *      no value.
+     * 
+     * @return The value using <code>null</code> for marking no value.
      */
     public File getValue() {
         return value;
     }
 
-    
     /**
      * Sets the value of this <code>FileOption</code>.
+     * 
      * @param value The value to be set.
      */
     public void setValue(File value) {
         final File oldValue = this.value;
         this.value = value;
-        
+
         if (value != oldValue) {
             firePropertyChange("value", oldValue, value);
         }
+        isDefined = true;
     }
 
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *  
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     * 
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
-        out.writeStartElement(getId());
+        out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("id", getId());
         if (value != null) {
             out.writeAttribute("value", value.getAbsolutePath());
         }
@@ -119,21 +92,31 @@ public class FileOption extends AbstractOption {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     * 
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        final File oldValue = this.value;
-        
-        if (in.getAttributeValue(null, "value") != null
-                && !in.getAttributeValue(null, "value").equals("")){
-            value = new File(in.getAttributeValue(null, "value"));
+        final String id = in.getAttributeValue(null, "id");
+        if (id == null && getId().equals("NO_ID")){
+            throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
+        }
+
+        if(getId() == NO_ID) {
+            setId(id);
+        }
+        if (in.getAttributeValue(null, "value") != null && !in.getAttributeValue(null, "value").equals("")) {
+            setValue(new File(in.getAttributeValue(null, "value")));
         }
         in.nextTag();
-        
-        if (value != oldValue) {
-            firePropertyChange("value", oldValue, value);
-        }
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     * 
+     * @return "booleanOption".
+     */
+    public static String getXMLElementTagName() {
+        return "fileOption";
     }
 }

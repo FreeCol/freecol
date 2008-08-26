@@ -36,7 +36,6 @@ public class BooleanOption extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(BooleanOption.class.getName());
 
-
     private boolean value;
 
     /**
@@ -47,33 +46,6 @@ public class BooleanOption extends AbstractOption {
         super(NO_ID);
         readFromXML(in);
     }
-
-    /**
-     * Creates a new <code>BooleanOption</code>.
-     *
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
-     * @param defaultValue The default value of this option.
-     */
-    public BooleanOption(String id, boolean defaultValue) {
-        super(id);
-        this.value = defaultValue;
-    }
-
-    /**
-     * Creates a new <code>BooleanOption</code>.
-     *
-     * @param id The identifier for this option. This is used when the object should be
-     *           found in an {@link OptionGroup}.
-     * @param optionGroup the OptionGroup this option belongs to.
-     * @param defaultValue The default value of this option.
-     */
-    public BooleanOption(String id, OptionGroup optionGroup, boolean defaultValue) {
-        super(id, optionGroup);
-        this.value = defaultValue;
-    }
-
-
 
     /**
      * Gets the current value of this <code>BooleanOption</code>.

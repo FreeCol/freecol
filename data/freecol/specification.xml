@@ -19,7 +19,7 @@
  *
 -->
 <!-- $Revision$ -->
-<!-- specification version 0.5 -->
+<!-- specification version 0.6 -->
 <!-- in case of incompatible changes, please update version number and 
      create a new Relax NG schema for validation. -->
 <freecol-specification>
@@ -1849,6 +1849,106 @@
       <booleanOption id="model.option.autoloadEmigrants" defaultValue="false"/>
       <!-- If enabled: Automatically ends the turn when no units can be made active. -->
       <booleanOption id="model.option.autoEndTurn" defaultValue="true"/>
+    </optionGroup>
+    <optionGroup id="mapGeneratorOptions.import" >
+      <!-- Option for setting a file to be imported (map etc). -->
+      <fileOption id="model.option.importFile"/>
+      <!-- Option for using the terrain imported from a file. -->
+      <booleanOption id="model.option.importTerrain" defaultValue="true"/>
+      <!-- Option for using the bonuses imported from a file. -->
+      <booleanOption id="model.option.importBonuses" defaultValue="false"/>
+      <!-- Option for using the lost city rumours imported from a file. -->
+      <booleanOption id="model.option.importRumours" defaultValue="false"/>
+      <!-- Option for using the settlements imported from a file. -->
+      <booleanOption id="model.option.importSettlements" defaultValue="false"/>
+    </optionGroup>
+    <optionGroup id="mapGeneratorOptions.landGenerator" >
+      <!-- Option for setting the size of the map -->
+      <rangeOption id="model.option.mapSize" defaultValue="0" localizedLabels="true">
+        <rangeValue label="small" value="0"/>
+        <rangeValue label="medium" value="1"/>
+        <rangeValue label="large" value="2"/>
+        <rangeValue label="veryLarge" value="3"/>
+        <rangeValue label="huge" value="4"/>
+      </rangeOption>
+      <!-- Option for setting the land mass of the map -->
+      <rangeOption id="model.option.landMass" defaultValue="25" localizedLabels="true">
+        <rangeValue label="small" value="15"/>
+        <rangeValue label="medium" value="25"/>
+        <rangeValue label="large" value="30"/>
+        <rangeValue label="veryLarge" value="40"/>
+        <rangeValue label="huge" value="50"/>
+      </rangeOption>
+    </optionGroup>
+    <optionGroup id="mapGeneratorOptions.terrainGenerator" >
+      <!-- Option for setting the number of rivers on the map
+           The value indicates the number of land tile per river tile -->
+      <rangeOption id="model.option.riverNumber" defaultValue="10" localizedLabels="true">
+        <rangeValue label="small" value="20"/>
+        <rangeValue label="medium" value="10"/>
+        <rangeValue label="large" value="9"/>
+        <rangeValue label="veryLarge" value="8"/>
+        <rangeValue label="huge" value="7"/>
+      </rangeOption>
+      <!-- Option for setting the number of mountains on the map
+           The value indicates the number of land tile per mountain tile -->
+      <rangeOption id="model.option.mountainNumber" defaultValue="1" localizedLabels="true">
+        <rangeValue label="small" value="0"/>
+        <rangeValue label="medium" value="1"/>
+        <rangeValue label="large" value="2"/>
+        <rangeValue label="veryLarge" value="3"/>
+        <rangeValue label="huge" value="4"/>
+      </rangeOption>
+      <!-- Option for setting the number of rumours on the map
+           The value indicates the number of land tile per rumour tile -->
+      <rangeOption id="model.option.rumourNumber" defaultValue="35" localizedLabels="true">
+        <rangeValue label="small" value="50"/>
+        <rangeValue label="medium" value="35"/>
+        <rangeValue label="large" value="30"/>
+        <rangeValue label="veryLarge" value="25"/>
+        <rangeValue label="huge" value="20"/>
+      </rangeOption>
+      <!-- Option for setting the number of settlements on the map
+           The value indicates the number of land tile per sttlement tile -->
+      <rangeOption id="model.option.settlementNumber" defaultValue="14" localizedLabels="true">
+        <rangeValue label="small" value="20"/>
+        <rangeValue label="medium" value="14"/>
+        <rangeValue label="large" value="12"/>
+        <rangeValue label="veryLarge" value="10"/>
+        <rangeValue label="huge" value="8"/>
+      </rangeOption>
+      <!-- Option for setting the percentage of forests on the map -->
+      <rangeOption id="model.option.forestNumber" defaultValue="50" localizedLabels="true">
+        <rangeValue label="small" value="10"/>
+        <rangeValue label="medium" value="30"/>
+        <rangeValue label="large" value="50"/>
+        <rangeValue label="veryLarge" value="70"/>
+        <rangeValue label="huge" value="90"/>
+      </rangeOption>
+      <!-- Option for setting the percentage of bonus tiles on the map -->
+      <rangeOption id="model.option.bonusNumber" defaultValue="10" localizedLabels="true">
+        <rangeValue label="small" value="5"/>
+        <rangeValue label="medium" value="10"/>
+        <rangeValue label="large" value="13"/>
+        <rangeValue label="veryLarge" value="17"/>
+        <rangeValue label="huge" value="20"/>
+      </rangeOption>
+      <!-- Option for setting the humidity of the map -->
+      <rangeOption id="model.option.humidity" defaultValue="40" localizedLabels="true">
+        <rangeValue label="veryDry" value="25"/>
+        <rangeValue label="dry" value="35"/>
+        <rangeValue label="normal" value="40"/>
+        <rangeValue label="wet" value="55"/>
+        <rangeValue label="veryWet" value="60"/>
+      </rangeOption>
+      <!-- Option for setting the temperature of the map -->
+      <rangeOption id="model.option.temperature" defaultValue="2" localizedLabels="true">
+        <rangeValue label="cold" value="0"/>
+        <rangeValue label="chilly" value="1"/>
+        <rangeValue label="temperate" value="2"/>
+        <rangeValue label="warm" value="3"/>
+        <rangeValue label="hot" value="4"/>
+      </rangeOption>
     </optionGroup>
   </options>
 </freecol-specification>
