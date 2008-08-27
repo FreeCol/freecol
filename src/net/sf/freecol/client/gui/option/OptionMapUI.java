@@ -136,15 +136,15 @@ public final class OptionMapUI extends JPanel implements OptionUpdater {
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
-            } else if (o instanceof SelectOption) {
-                JComponent c = new SelectOptionUI((SelectOption) o, editable);
+            } else if (o instanceof RangeOption) {
+                JComponent c = new RangeOptionUI((RangeOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), c);
                 }
-            } else if (o instanceof RangeOption) {
-                JComponent c = new RangeOptionUI((RangeOption) o, editable);
+            } else if (o instanceof SelectOption) {
+                JComponent c = new SelectOptionUI((SelectOption) o, editable);
                 northPanel.add(c);
                 ou.add(c);
                 if (!o.getId().equals(Option.NO_ID)) {

@@ -145,16 +145,16 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), iou);
                 }
-            } else if (o instanceof SelectOption) {
-                final SelectOptionUI soi = new SelectOptionUI((SelectOption) o, editable);
+            } else if (o instanceof RangeOption) {
+                final RangeOptionUI soi = new RangeOptionUI((RangeOption) o, editable);
                 add(soi);
                 ou.add(soi);
                 buttonAdded = false;
                 if (!o.getId().equals(Option.NO_ID)) {
                     optionUIs.put(o.getId(), soi);
                 }
-            } else if (o instanceof RangeOption) {
-                final RangeOptionUI soi = new RangeOptionUI((RangeOption) o, editable);
+            } else if (o instanceof SelectOption) {
+                final SelectOptionUI soi = new SelectOptionUI((SelectOption) o, editable);
                 add(soi);
                 ou.add(soi);
                 buttonAdded = false;

@@ -184,8 +184,8 @@ public class MapGeneratorOptions extends OptionMap {
         add(spec.getOptionGroup("mapGeneratorOptions.import"));
 
         /* Add additional infos in the labels of map size and land mass options (but only once!) */
-        Map<Integer, String> mapSizeValues = spec.getRangeOption(MAP_SIZE).getRangeValues();
-        Map<Integer, String> landMassValues = spec.getRangeOption(LAND_MASS).getRangeValues();
+        Map<Integer, String> mapSizeValues = spec.getRangeOption(MAP_SIZE).getItemValues();
+        Map<Integer, String> landMassValues = spec.getRangeOption(LAND_MASS).getItemValues();
         if(!mapSizeValues.get(0).substring(0,1).equals("<")) {
             for (int index : mapSizeValues.keySet()) {
                 mapSizeValues.put(index, "<html><center>" + mapSizeValues.get(index) + "<br/>(" + getWidth(index)

@@ -137,7 +137,7 @@ public final class SpecificationTest extends TestCase {
       RangeOption diffOpt = (RangeOption) spec.getOption(GameOptions.DIFFICULTY);
 
       assertTrue(diffOpt.getValue() == 2);
-      assertTrue(diffOpt.getRangeValues().size() == 5);
+      assertTrue(diffOpt.getItemValues().size() == 5);
 
       spec.applyDifficultyLevel(2);
       assertTrue(spec.getIntegerOption("model.option.crossesIncrement").getValue() == 10);

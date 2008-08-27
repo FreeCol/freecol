@@ -31,26 +31,26 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
- * Represents an option where the valid choice is an integer and the
- * choices are represented by strings. In general, these strings are
- * localized by looking up the key of the choice, which consists of
- * the id of the AbstractObject followed by a "." followed by the
- * value of the option string. The automatic localization can be
- * suppressed with the doNotLocalize parameter, however. There are two
- * reasons to do this: either the option strings should not be
- * localized at all (because they are language names, for example), or
- * the option strings have already been localized (because they do not
- * use the default keys, for example).
+ * Represents an option where the valid choice is an integer and the choices are
+ * represented by strings. In general, these strings are localized by looking up
+ * the key of the choice, which consists of the id of the AbstractObject
+ * followed by a "." followed by the value of the option string. The automatic
+ * localization can be suppressed with the doNotLocalize parameter, however.
+ * There are two reasons to do this: either the option strings should not be
+ * localized at all (because they are language names, for example), or the
+ * option strings have already been localized (because they do not use the
+ * default keys, for example).
  */
 public class SelectOption extends AbstractOption {
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(SelectOption.class.getName());
-    
+
     private int value;
 
-    private boolean localizedLabels = false;
+    protected boolean localizedLabels = false;
 
-    private Map<Integer, String> selectValues = new LinkedHashMap<Integer, String>();
+    private Map<Integer, String> itemValues = new LinkedHashMap<Integer, String>();
+
 
     /**
      * Creates a new <code>SelectOption</code>.
@@ -61,23 +61,25 @@ public class SelectOption extends AbstractOption {
         super(NO_ID);
         readFromXML(in);
     }
-    
+
     /**
      * Gets the current value of this <code>SelectOption</code>.
+     * 
      * @return The value.
      */
     public int getValue() {
         return value;
     }
- 
+
     /**
      * Sets the value of this <code>SelectOption</code>.
+     * 
      * @param value The value to be set.
      */
     public void setValue(int value) {
         final int oldValue = this.value;
         this.value = value;
-        
+
         if (value != oldValue) {
             firePropertyChange("value", Integer.valueOf(oldValue), Integer.valueOf(value));
         }
@@ -89,17 +91,15 @@ public class SelectOption extends AbstractOption {
      * 
      * @return The value.
      */
-    public Map<Integer, String> getSelectValues() {
-        return selectValues;
+    public Map<Integer, String> getItemValues() {
+        return itemValues;
     }
-    
+
     /**
-     * Gets a <code>String</code> representation of the
-     * current value.
+     * Gets a <code>String</code> representation of the current value.
      * 
-     * This method can be overwritten by subclasses to allow
-     * a custom save value, since this method is used by
-     * {@link #toXML(XMLStreamWriter)}.
+     * This method can be overwritten by subclasses to allow a custom save
+     * value, since this method is used by {@link #toXML(XMLStreamWriter)}.
      * 
      * @return The String value of the Integer.
      * @see #setValue(String)
@@ -107,16 +107,16 @@ public class SelectOption extends AbstractOption {
     protected String getStringValue() {
         return Integer.toString(value);
     }
-    
+
     /**
-     * Converts the given <code>String</code> to an Integer
-     * and calls {@link #setValue(int)}. 
+     * Converts the given <code>String</code> to an Integer and calls
+     * {@link #setValue(int)}.
      * 
-     * <br><br>
+     * <br>
+     * <br>
      * 
-     * This method can be overwritten by subclasses to allow
-     * a custom save value, since this method is used by
-     * {@link #readFromXML(XMLStreamReader)}.
+     * This method can be overwritten by subclasses to allow a custom save
+     * value, since this method is used by {@link #readFromXML(XMLStreamReader)}.
      * 
      * @param value The String value of the Integer.
      * @see #getStringValue()
@@ -124,14 +124,14 @@ public class SelectOption extends AbstractOption {
     protected void setValue(String value) {
         setValue(Integer.parseInt(value));
     }
-    
+
     /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *  
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     * 
      * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // Start element:
@@ -142,12 +142,12 @@ public class SelectOption extends AbstractOption {
 
         out.writeEndElement();
     }
-    
+
     /**
      * Initialize this object from an XML-representation of this object.
+     * 
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if a problem was encountered
-     *      during parsing.
+     * @throws XMLStreamException if a problem was encountered during parsing.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         final String id = in.getAttributeValue(null, "id");
@@ -167,7 +167,7 @@ public class SelectOption extends AbstractOption {
                     + "> tag : no value nor default value found.");
         }
 
-        if(getId() == NO_ID) {
+        if (getId() == NO_ID) {
             setId(id);
         }
         if (value != null) {
@@ -176,29 +176,39 @@ public class SelectOption extends AbstractOption {
         } else {
             setValue(Integer.parseInt(defaultValue));
             while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName() == "selectValue") {
+                if (in.getLocalName() == getXMLItemElementTagName()) {
                     String label = in.getAttributeValue(null, "label");
-                    final String selectValue = in.getAttributeValue(null, "value");
+                    final String itemValue = in.getAttributeValue(null, "value");
                     if (this.localizedLabels) {
                         label = Messages.message(label);
                     }
-                    selectValues.put(Integer.parseInt(selectValue), label);
+                    itemValues.put(Integer.parseInt(itemValue), label);
                 } else {
-                    throw new XMLStreamException("Unknow child \"" + in.getLocalName() + "\" in a \""
-                            + getXMLElementTagName() + "\".");
+                    throw new XMLStreamException("Unknown child \"" + in.getLocalName() + "\" in a \""
+                            + getXMLElementTagName() + "\". ");
                 }
                 in.nextTag();
             }
         }
     }
 
-
     /**
      * Gets the tag name of the root element representing this object.
+     * 
      * @return "selectOption".
      */
     public static String getXMLElementTagName() {
         return "selectOption";
+    }
+    
+    /**
+     * Gets the tag name of the item element
+     * This method is not static to ensure proper overriding in <code>readFromXMLImpl</code>.
+     * 
+     * @return "selectValue".
+     */
+    public String getXMLItemElementTagName() {
+        return "selectValue";
     }
 
 }

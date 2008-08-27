@@ -70,7 +70,7 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
         //label.setToolTipText((description != null) ? description : name);
         //add(label);
 
-        String[] strings = option.getRangeValues().values().toArray(new String[0]);
+        String[] strings = option.getItemValues().values().toArray(new String[0]);
 
         slider = new JSlider(JSlider.HORIZONTAL, 0, strings.length - 1, option.getValueRank());
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
