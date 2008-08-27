@@ -242,6 +242,20 @@ public final class Modifier extends Feature {
 
 
     /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */    
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        writeAttributes(out);
+        out.writeEndElement();
+    }
+
+    /**
      * Returns the XML tag name for this element.
      *
      * @return a <code>String</code> value

@@ -113,6 +113,21 @@ public final class Ability extends Feature {
     // -- Serialization --
 
 
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     * 
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */    
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        writeAttributes(out);
+        out.writeEndElement();
+    }
+
     public void readAttributes(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
         value = getAttribute(in, "value", true);
