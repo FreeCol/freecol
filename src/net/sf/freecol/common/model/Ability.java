@@ -132,4 +132,9 @@ public final class Ability extends Feature {
         return "ability";
     }
 
+    public String toString() {
+        return getId() + (getSource() == null ? " " : " (" + getSource().getId() + ") ") +
+            " " + value;
+    }
+
 }

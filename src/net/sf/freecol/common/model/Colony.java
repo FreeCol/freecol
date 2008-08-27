@@ -1011,6 +1011,9 @@ public final class Colony extends Settlement implements Location, Nameable {
             return false;
         } else if (buildableType.getPopulationRequired() > getUnitCount()) {
             return false;
+        } else if (!(buildableType instanceof BuildingType ||
+                     featureContainer.hasAbility("model.ability.build", buildableType, getGame().getTurn()))) {
+            return false;
         } else {
             java.util.Map<String, Boolean> requiredAbilities = buildableType.getAbilitiesRequired();
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {

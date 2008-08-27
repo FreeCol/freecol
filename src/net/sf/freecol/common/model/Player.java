@@ -2503,7 +2503,6 @@ public class Player extends FreeColGameObject implements Nameable {
         int totalProbability = RandomChoice.getTotalProbability(recruitableUnits);
         int random = getGame().getModelController().getRandom(getId() + "newRecruitableUnit" + unique,
                                                               totalProbability);
-        System.out.println("Random is " + random);
         return RandomChoice.select(recruitableUnits, random);
     }
 
