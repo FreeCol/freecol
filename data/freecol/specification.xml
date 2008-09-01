@@ -959,6 +959,9 @@
     <building-type id="model.building.TownHall" basicProduction="3" workplaces="3"
                    produces="model.goods.bells" sequence="1">
       <modifier id="model.goods.bells" type="additive" value="1"/>
+      <ability id="model.ability.build">
+        <scope type="model.unit.wagonTrain"/>
+      </ability>
     </building-type>
     <building-type id="model.building.CarpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
     </building-type>
