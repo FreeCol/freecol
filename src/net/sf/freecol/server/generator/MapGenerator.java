@@ -530,7 +530,7 @@ public class MapGenerator implements IMapGenerator {
             newTile.setOwner(player);
         }
 
-        int unitCount = (kind.ordinal() * 2) + 4;
+        int unitCount = settlement.getGeneratedUnitCount();
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
             Unit unit = new Unit(map.getGame(), settlement, player, unitType, UnitState.ACTIVE,

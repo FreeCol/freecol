@@ -838,6 +838,31 @@ public class IndianSettlement extends Settlement {
     }
 
 
+    /**
+     * Provide some variation in unit count for different types of
+     * <code>IndianSettlement</code>.
+     * 
+     * @return The number of units to generate for this settlement.
+     */
+    public int getGeneratedUnitCount() {
+        int n;
+        switch (getTypeOfSettlement()) {
+        case INDIAN_CAMP:
+            n = 0;
+            break;
+        case INDIAN_VILLAGE:
+            n = 1;
+            break;
+        case AZTEC_CITY: case INCA_CITY:
+            n = 2;
+            break;
+        default:
+            throw new IllegalArgumentException("getTypeOfSettlement() out of range (" + getTypeOfSettlement() + ") in IndianSettlement.getGeneratedUnitCount()");
+        }
+        return 2 * n + 4;
+    }
+
+
     @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
