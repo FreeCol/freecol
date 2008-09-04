@@ -422,7 +422,12 @@ public class SoundPlayer {
                             written = line.write(data, 0, read);
                         }
                         if (System.currentTimeMillis() > ms) {
-                            c.setValue(c.getValue() - 1f);
+                            // decrease the gain toward minimum (-80dB) by 1dB
+                            float currentGain = c.getValue();
+                            float newGain = currentGain - 1f;
+                            if (newGain < c.getMinimum())
+                                newGain = c.getMinimum();
+                            c.setValue(newGain);
                             ms = System.currentTimeMillis() + FADE_UPDATE_MS;
                         }
                     }
