@@ -1308,7 +1308,6 @@
       <ability id="model.ability.canNotRecruitUnit" value="true">
         <scope type="model.unit.indenturedServant"/>
         <scope type="model.unit.pettyCriminal"/>
-        <scope type="model.unit.freeColonist"/>
       </ability>
       <event id="model.event.newRecruits"/>
     </founding-father>
