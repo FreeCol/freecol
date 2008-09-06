@@ -2515,10 +2515,41 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code>
      * @param improvementType a <code>TileImprovementType</code> value
      */
-    public void changeWorkType(Unit unit, TileImprovementType improvementType) {
+    public void changeWorkImprovementType(Unit unit, TileImprovementType improvementType) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
+        }
+        
+        if (!(unit.checkSetState(UnitState.IMPROVING))) {
+            return; // Don't bother (and don't log, this is not exceptional)
+        }
+
+        if (improvementType.getId().equals("model.improvement.Road") ||
+            improvementType.getId().equals("model.improvement.Plow") ||
+            improvementType.getId().equals("model.improvement.ClearForest")) {
+            // Buy the land from the Indians first?
+            int price = unit.getOwner().getLandPrice(unit.getTile());
+            if (price > 0) {
+                Player nation = unit.getTile().getOwner();
+                ChoiceItem ci = (ChoiceItem) freeColClient.getCanvas()
+                    .showChoiceDialog(Messages.message("indianLand.text",
+                                                       "%player%", nation.getName()),
+                                      Messages.message("indianLand.cancel"),
+                                      new ChoiceItem(Messages.message("indianLand.pay" ,"%amount%",
+                                                                      Integer.toString(price)), 1),
+                                      new ChoiceItem(Messages.message("indianLand.take"), 2));
+                if (ci == null) {
+                    return;
+                } else if (ci.getChoice() == 1) {
+                    if (price > freeColClient.getMyPlayer().getGold()) {
+                        freeColClient.getCanvas().errorMessage("notEnoughGold");
+                        return;
+                    }
+
+                    buyLand(unit.getTile());
+                }
+            }
         }
 
         Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");
@@ -2641,30 +2672,7 @@ public final class InGameController implements NetworkConstants {
         if (!(unit.checkSetState(state))) {
             return; // Don't bother (and don't log, this is not exceptional)
         }
-
-        if (state == UnitState.IMPROVING) {
-            int price = unit.getOwner().getLandPrice(unit.getTile());
-            if (price > 0) {
-                Player nation = unit.getTile().getOwner();
-                ChoiceItem ci = (ChoiceItem) canvas
-                    .showChoiceDialog(Messages.message("indianLand.text",
-                                                       "%player%", nation.getName()),
-                                      Messages.message("indianLand.cancel"),
-                                      new ChoiceItem(Messages.message("indianLand.pay" ,"%amount%",
-                                                                      Integer.toString(price)), 1),
-                                      new ChoiceItem(Messages.message("indianLand.take"), 2));
-                if (ci == null) {
-                    return;
-                } else if (ci.getChoice() == 1) {
-                    if (price > freeColClient.getMyPlayer().getGold()) {
-                        canvas.errorMessage("notEnoughGold");
-                        return;
-                    }
-
-                    buyLand(unit.getTile());
-                }
-            }
-        } else if (state == UnitState.FORTIFYING && unit.isOffensiveUnit() &&
+        if (state == UnitState.FORTIFYING && unit.isOffensiveUnit() &&
                 !unit.hasAbility("model.ability.piracy")) { // check if it's going to occupy a work tile
             Tile tile = unit.getTile();
             if (tile != null && tile.getOwningSettlement() != null) { // check stance with settlement's owner
