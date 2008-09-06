@@ -213,7 +213,9 @@ public final class ProductionLabel extends JComponent {
      */
     public void setProduction(final int newProduction) {
         this.production = newProduction;
-        setToolTipText(String.valueOf(production) + " " + goodsType.getName());
+        if (goodsType != null) { // goodsType is null for Schoolhouse
+            setToolTipText(String.valueOf(production) + " " + goodsType.getName());
+        }
     }
 
     /**
