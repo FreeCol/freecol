@@ -1860,7 +1860,7 @@ public class Player extends FreeColGameObject implements Nameable {
             tension.get(player).modify(addToTension);
         }
 
-        if (origin != null && isIndian() && origin.getOwner() == player) {
+        if (origin != null && isIndian() && origin.getOwner() == this) {
             for (Settlement settlement : settlements) {
                 if (settlement instanceof IndianSettlement && !origin.equals(settlement)) {
                     ((IndianSettlement) settlement).propagatedAlarm(player, addToTension);
