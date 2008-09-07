@@ -2144,7 +2144,11 @@ public class Player extends FreeColGameObject implements Nameable {
                 BuildingType type = FreeCol.getSpecification().getBuildingType(father.getEvents().get(event));
                 for (Colony colony : getColonies()) {
                     if (colony.canBuild(type)) {
-                        colony.addBuilding(colony.createBuilding(type));
+                        // Need to use a `special' taskID to avoid collision
+                        // with other building tasks that complete this turn.
+                        String taskIDplus = colony.getId() + "buildBuilding" + father.getId();
+                        Building building = getGame().getModelController().createBuilding(taskIDplus, colony, type);
+                        colony.addBuilding(building);
                     }
                 }
             } else if (event.equals("model.event.seeAllColonies")) {
