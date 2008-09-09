@@ -436,21 +436,25 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         }
 
         unit.getOwner().modifyGold(-price);
-        incrementTrainingPrice(unit, price);
+        incrementPrice(unit, price);
         unit.setLocation(this);
     }
 
-    private void incrementTrainingPrice(Unit unit, int price) {
-        IntegerOption increasingPriceOption;
-        
-        if(Specification.getSpecification().getBooleanOption("model.option.trainingPriceIncreasePerType").getValue()){
-            increasingPriceOption = Specification.getSpecification().getIntegerOption("model.option.trainingPriceIncrease." + unit.getType().getArt());
+    private void incrementPrice(Unit unit, int price) {
+        Specification spec = Specification.getSpecification();
+        String baseOption = "model.option.priceIncreasePerType";
+        String option;
+        int increase = 0;
+
+        option = (spec.getBooleanOption(baseOption).getValue()) 
+            ? "model.option.priceIncrease." + unit.getType().getArt()
+            : "model.option.priceIncrease";
+        try {
+            increase = spec.getIntegerOption(option).getValue();
+        } catch (IllegalArgumentException e) {
         }
-        else {
-            increasingPriceOption = Specification.getSpecification().getIntegerOption("model.option.trainingPriceIncrease");   
-        }
-        if(increasingPriceOption != null){
-            unitPrices.put(unit.getType(), new Integer(price + increasingPriceOption.getValue()));
+        if (increase != 0) {
+            unitPrices.put(unit.getType(), new Integer(price + increase));
         }
     }
 

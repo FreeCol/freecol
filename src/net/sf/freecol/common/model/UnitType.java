@@ -83,11 +83,6 @@ public final class UnitType extends BuildableType {
     private int price;
 
     /**
-     * Describe price here.
-     */
-    private int increasingPrice;
-
-    /**
      * Describe movement here.
      */
     private int movement;
@@ -383,24 +378,6 @@ public final class UnitType extends BuildableType {
     }
 
     /**
-     * Get the <code>IncreasingPrice</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getIncreasingPrice() {
-        return increasingPrice;
-    }
-
-    /**
-     * Set the <code>IncreasingPrice</code> value.
-     *
-     * @param newIncreasingPrice The new IncreasingPrice value.
-     */
-    public void setIncreasingPrice(final int newIncreasingPrice) {
-        this.increasingPrice = newIncreasingPrice;
-    }
-
-    /**
      * Get the <code>Movement</code> value.
      *
      * @return an <code>int</code> value
@@ -621,7 +598,6 @@ public final class UnitType extends BuildableType {
         setPopulationRequired(getAttribute(in, "population-required", 1));
 
         price = getAttribute(in, "price", UNDEFINED);
-        increasingPrice = getAttribute(in, "increasingPrice", UNDEFINED);
 
         expertProduction = specification.getType(in, "expert-production", GoodsType.class, null);
 

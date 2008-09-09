@@ -901,7 +901,7 @@
       <ability id="model.ability.piracy" value="true"/>
     </unit-type>
     <unit-type id="model.unit.artillery" art="artillery" offence="7"  defence="5" movement="3" lineOfSight="1"
-               price="500" increasingPrice="100" pathImage="wagon" scoreValue="2">
+               price="500" pathImage="wagon" scoreValue="2">
       <required-goods id="model.goods.hammers" value="192"/>
       <required-goods id="model.goods.tools" value="40"/>
       <ability id="model.ability.refUnit" value="true"/>
@@ -1632,10 +1632,8 @@
       <integerOption id="model.option.burnProbability" value="2"/>
       <integerOption id="model.option.recruitPriceIncrease" value="20"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.easy">
       <integerOption id="model.option.crossesIncrement" value="8"/>
@@ -1649,10 +1647,8 @@
       <integerOption id="model.option.burnProbability" value="4"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.medium">
       <integerOption id="model.option.crossesIncrement" value="10"/>
@@ -1666,10 +1662,8 @@
       <integerOption id="model.option.burnProbability" value="6"/>
       <integerOption id="model.option.recruitPriceIncrease" value="40"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.hard">
       <integerOption id="model.option.crossesIncrement" value="12"/>
@@ -1683,10 +1677,8 @@
       <integerOption id="model.option.burnProbability" value="8"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.veryHard">
       <integerOption id="model.option.crossesIncrement" value="14"/>
@@ -1700,10 +1692,8 @@
       <integerOption id="model.option.burnProbability" value="10"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
   </difficultyLevels>
   <options>
