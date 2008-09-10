@@ -360,7 +360,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     }
 
 
-    public void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
