@@ -39,7 +39,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -92,8 +91,6 @@ public final class GUI {
     private ImageLibrary lib;
     private TerrainCursor cursor;
     private ViewMode viewMode;
-
-    private java.util.Map<Color, Color> colorMap = new HashMap<Color, Color>();
 
     /** Indicates if the game has started, has nothing to do with whether or not the
         client is logged in. */
@@ -1400,11 +1397,7 @@ public final class GUI {
                 for (int cX=-1; cX <=1; cX++) {
                     for (int cY=-1; cY <=1; cY++) {
                         if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
-                            if (playerColor != Color.BLACK.getRGB()) {
-                                bi.setRGB(biX, biY, Color.BLACK.getRGB());
-                            } else {
-                                bi.setRGB(biX, biY, Color.WHITE.getRGB());
-                            }
+                            bi.setRGB(biX, biY, getStringBorderColor(color).getRGB());
                             continue;
                         }
                     }
@@ -1417,31 +1410,11 @@ public final class GUI {
 
     private BufferedImage createColonyNameImage(Graphics g, Colony colony,
                                                 int maxWidth, int preferredFontSize) {        
-        Color color = colony.getOwner().getColor();
-        String nameString = colony.getName();
-        Font nameFont = g.getFont();
-        FontMetrics nameFontMetrics = g.getFontMetrics(nameFont);
-        BufferedImage bi = null;
-
-        int fontSize = preferredFontSize;
-        do {
-            nameFont = nameFont.deriveFont(Font.BOLD, fontSize);            
-            nameFontMetrics = g.getFontMetrics(nameFont);
-            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4,
-                                   nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(),
-                                   BufferedImage.TYPE_INT_ARGB);
-            fontSize -= 2;
-        } while (bi.getWidth() > maxWidth);
-
-        Graphics2D big = bi.createGraphics();
-        Color col = getForegroundColor(color);
-        big.setColor(new Color(col.getRed(), col.getGreen(), col.getBlue(), 100));
-        big.fillRect(0, 0, bi.getWidth(), bi.getHeight());
-
-        big.setColor(color);
-        big.setFont(nameFont);
-        big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
-        return bi;
+        return createStringImage((Graphics2D) g,
+                colony.getName(),
+                colony.getOwner().getColor(),
+                maxWidth,
+                preferredFontSize);
     }
 
     /**
@@ -2325,17 +2298,33 @@ public final class GUI {
 
 
     private Color getForegroundColor(Color background) {
-        Color foreground = colorMap.get(background);
-        if (foreground == null) {
-            if (background.getRed() + background.getGreen() + background.getBlue() <
-                127 + 127 + 127) {
-                foreground = Color.WHITE;
-            } else {
-                foreground = Color.BLACK;
-            }
-            colorMap.put(background, foreground);
+        /*
+         * Our eyes have different sensitivity towards
+         * red, green and blue. We want a foreground
+         * color with the inverse brightness.
+         */
+        if (background.getRed() * 0.3
+                + background.getGreen() * 0.59
+                + background.getBlue() * 0.11 < 126) {
+            return Color.WHITE;
+        } else {
+            return Color.BLACK;
         }
-        return foreground;
+    }
+    
+    private Color getStringBorderColor(Color color) {
+        /*
+         * I think string border colors should be black
+         * unless the color of the string is
+         * really dark.
+         */
+        if (color.getRed() * 0.3
+                + color.getGreen() * 0.59
+                + color.getBlue() * 0.11 < 10) {
+            return Color.WHITE;
+        } else {
+            return Color.BLACK;
+        }
     }
     
     public void displayOccupationIndicator(Graphics g, Unit unit, int x, int y) {
