@@ -414,7 +414,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     /**
-     * Trains a unit in Europe.
+     * Train or purchase a unit in Europe.
      * 
      * @param unit The trained unit.
      * @exception IllegalArgumentException if <code>unit == null</code>.
@@ -436,11 +436,18 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         }
 
         unit.getOwner().modifyGold(-price);
-        incrementPrice(unit, price);
+        increasePrice(unit, price);
         unit.setLocation(this);
     }
 
-    private void incrementPrice(Unit unit, int price) {
+    /**
+     * Increases the price for a unit, if needed.  Applicable to both trained
+     * and purchased units.
+     *
+     * @param unit The unit, trained or purchased
+     * @param price The current price of the unit
+     */
+    private void increasePrice(Unit unit, int price) {
         Specification spec = Specification.getSpecification();
         String baseOption = "model.option.priceIncreasePerType";
         String option;
@@ -449,10 +456,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         option = (spec.getBooleanOption(baseOption).getValue()) 
             ? "model.option.priceIncrease." + unit.getType().getArt()
             : "model.option.priceIncrease";
-        try {
-            increase = spec.getIntegerOption(option).getValue();
-        } catch (IllegalArgumentException e) {
-        }
+        increase = (spec.hasOption(option)) 
+            ? spec.getIntegerOption(option).getValue()
+            : 0;
         if (increase != 0) {
             unitPrices.put(unit.getType(), new Integer(price + increase));
         }
