@@ -2343,6 +2343,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
     
     /**
+     * Determines whether this tile is adjacent to the specified tile.
+     * 
+     * @param tile A potentially adjacent <code>Tile</code>.
+     * @return <code>true</code> if the tile is adjacent to this tile
+     */
+    public boolean isAdjacent(Tile tile) {
+    	if (tile == null) {
+    		return false;
+    	}
+    	return (this.getDistanceTo(tile) == 1);
+    }
+    
+    /**
      * Returns a String representation of this Tile.
      * 
      * @return A String representation of this Tile.

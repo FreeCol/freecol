@@ -40,6 +40,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.CombatModel.CombatOdds;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.mission.TransportMission;
@@ -85,20 +87,37 @@ public final class TilePopup extends JPopupMenu {
 
         final Unit activeUnit = gui.getActiveUnit();
         if (activeUnit != null) {
-            //final Image gotoImage = (Image) UIManager.get("cursor.go.image");
-            //JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));
-            JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"));
-            gotoMenuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        if (activeUnit.getTile()!=tile) {
-                            // just checking we are not already at the destination
-                            freeColClient.getInGameController().setDestination(activeUnit, tile);
-                            if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                                freeColClient.getInGameController().moveToDestination(activeUnit);
-                            }
-                        }
-                    }
-                });
+        	JMenuItem gotoMenuItem;
+        	if (activeUnit.isOffensiveUnit() &&
+        			activeUnit.getTile().isAdjacent(tile) && 
+        			activeUnit.getMoveType(tile) == MoveType.ATTACK) {
+        	    CombatOdds combatOdds = activeUnit.getGame().getCombatModel().calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
+        	    
+        	    String victoryPercent;
+        	    //If attacking a settlement, the true odds are never known because units may be hidden within
+        	    if (tile.getSettlement() != null || combatOdds.win == CombatOdds.UNKNOWN_ODDS) {
+        	        victoryPercent = "??";
+        	    } else {
+        	        victoryPercent = Integer.toString((int)(combatOdds.win * 100));
+        	    }
+        	    gotoMenuItem = new JMenuItem(Messages.message("attackTileOdds", "%chance%", victoryPercent));
+        	} else {
+        		//final Image gotoImage = (Image) UIManager.get("cursor.go.image");
+        		//JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));
+        		gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"));
+        	}
+        	
+        	gotoMenuItem.addActionListener(new ActionListener() {
+    			public void actionPerformed(ActionEvent event) {
+    				if (activeUnit.getTile()!=tile) {
+    					// just checking we are not already at the destination
+    					freeColClient.getInGameController().setDestination(activeUnit, tile);
+    					if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+    						freeColClient.getInGameController().moveToDestination(activeUnit);
+    					}
+    				}
+    			}
+    		});
             add(gotoMenuItem);
             hasAnItem = true;
             addSeparator();

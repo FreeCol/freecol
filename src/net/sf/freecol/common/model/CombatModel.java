@@ -37,6 +37,33 @@ public interface CombatModel {
     }
 
     /**
+     * Odds a particular outcome will occur in combat.
+     * 
+     */
+    public class CombatOdds {
+        public static final float UNKNOWN_ODDS = -1.0f;
+        
+        public float win;
+        // public float evade;
+        // public float capture;
+        // public float demote;
+        // public float promote;
+        public CombatOdds(float win) {
+            this.win = win;
+        }
+    }
+
+
+    /**
+     * Calculates the chance of the outcomes of combat between the units.
+     * 
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending unit.
+     * @return A <code>CombatOdds</code> value.
+     */
+    public CombatOdds calculateCombatOdds(Unit attacker, Unit defender);
+
+    /**
      * Generates a result of an attack.
      * 
      * @param attacker The <code>Unit</code> attacking.
@@ -151,5 +178,3 @@ public interface CombatModel {
     public void bombard(Colony colony, Unit defender, CombatResult result);
 
 }
-
-

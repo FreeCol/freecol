@@ -89,6 +89,29 @@ public class SimpleCombatModel implements CombatModel {
 
     private PseudoRandom random;
 
+    /**
+     * Calculates the chance of the outcomes of combat between the units.
+     * Currently only calculates the chance of winning combat. 
+     * 
+     * @param attacker The attacking <code>Unit</code>. 
+     * @param defender The defending unit.
+     * @return A <code>CombatOdds</code> value.
+     */
+    public CombatOdds calculateCombatOdds(Unit attacker, Unit defender) {
+        if (attacker == null || defender == null) {
+            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);    
+        }
+        
+        float attackPower = getOffencePower(attacker, defender);
+        float defencePower = getDefencePower(attacker, defender);
+        if (attackPower == 0.0f && defencePower == 0.0f) {
+            return new CombatOdds(CombatOdds.UNKNOWN_ODDS);
+        }
+        
+        float victory = attackPower / (attackPower + defencePower);
+        
+        return new CombatOdds(victory);
+    }
 
     public SimpleCombatModel(PseudoRandom pseudoRandom) {
         this.random = pseudoRandom;
