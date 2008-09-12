@@ -38,7 +38,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -53,7 +52,6 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
@@ -618,64 +616,10 @@ public class AIPlayer extends AIObject {
      */
     private void secureSettlements() {
         logger.finest("Entering method secureSettlements");
-        Map map = player.getGame().getMap();
         if (!player.isEuropean()) {
             // Determines if we need to move a brave out of the settlement.
             for (IndianSettlement is : player.getIndianSettlements()) {
-                if (is.getUnitCount() > 2) {
-                    int defenders = is.getTile().getUnitCount();
-                    int threat = 0;
-                    int worstThreat = 0;
-                    Location bestTarget = null;
-                    Iterator<Position> positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
-                    while (positionIterator.hasNext()) {
-                        Tile t = map.getTile(positionIterator.next());
-                        if (t.getFirstUnit() != null) {
-                            Player enemy = t.getFirstUnit().getOwner();
-                            if (enemy == player) {
-                                defenders++;
-                            } else {
-                                Tension tension = player.getTension(enemy);
-                                if (tension != null) {
-                                    int value = tension.getValue();
-                                    if (value >= Tension.TENSION_ADD_MAJOR) {
-                                        threat += 2;
-                                        if (t.getUnitCount() * 2 > worstThreat) {
-                                            if (t.getSettlement() != null) {
-                                                bestTarget = t.getSettlement();
-                                            } else {
-                                                bestTarget = t.getFirstUnit();
-                                            }
-                                            worstThreat = t.getUnitCount() * 2;
-                                        }
-                                    } else if (value >= Tension.TENSION_ADD_MINOR) {
-                                        threat += 1;
-                                        if (t.getUnitCount() > worstThreat) {
-                                            if (t.getSettlement() != null) {
-                                                bestTarget = t.getSettlement();
-                                            } else {
-                                                bestTarget = t.getFirstUnit();
-                                            }
-                                            worstThreat = t.getUnitCount();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (threat > defenders) {
-                        Unit newDefender = is.getFirstUnit();
-                        newDefender.setState(UnitState.ACTIVE);
-                        newDefender.setLocation(is.getTile());
-                        AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
-                        if (bestTarget != null) {
-                            newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI,
-                                    bestTarget));
-                        } else {
-                            newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
-                        }
-                    }
-                }
+                secureIndianSettlement(is);
             }
             // This is the end of the native code.
             return;
@@ -685,235 +629,303 @@ public class AIPlayer extends AIObject {
             return;
         // Ok, we are a European player. Things are about to get fun.
         for (Colony colony : player.getColonies()) {
-            int olddefenders = 0;
-            int defenders = 0;
+            secureColony(colony);
+        }
+    }
+
+    /**
+     * Takes the necessary actions to secure an indian settlement
+     */
+    public void secureIndianSettlement(IndianSettlement is) {
+        Map map = player.getGame().getMap();
+        if (is.getUnitCount() > 2) {
+            int defenders = is.getTile().getUnitCount();
             int threat = 0;
             int worstThreat = 0;
             Location bestTarget = null;
-            Iterator<Unit> ui = colony.getTile().getUnitIterator();
-            while (ui.hasNext()) {
-                if ((ui.next()).isDefensiveUnit()) {
-                    defenders++;
-                }
-            }
-            Iterator<Position> positionIterator = map.getCircleIterator(colony.getTile().getPosition(), true, 5);
+            Iterator<Position> positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
             while (positionIterator.hasNext()) {
                 Tile t = map.getTile(positionIterator.next());
                 if (t.getFirstUnit() != null) {
-                    if (t.getFirstUnit().getOwner() == player) {
-                        Iterator<Unit> uit = t.getUnitIterator();
-                        while (uit.hasNext()) {
-                            if (uit.next().isOffensiveUnit()) {
-                                defenders++;
-                            }
-                        }
+                    Player enemy = t.getFirstUnit().getOwner();
+                    if (enemy == player) {
+                        defenders++;
                     } else {
-                        int thisThreat = 0;
-                        if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MAJOR) {
-                            Iterator<Unit> uit = t.getUnitIterator();
-                            while (uit.hasNext()) {
-                                if (uit.next().isOffensiveUnit()) {
-                                    thisThreat += 2;
+                        Tension tension = player.getTension(enemy);
+                        if (tension != null) {
+                            int value = tension.getValue();
+                            if (value >= Tension.TENSION_ADD_MAJOR) {
+                                threat += 2;
+                                if (t.getUnitCount() * 2 > worstThreat) {
+                                    if (t.getSettlement() != null) {
+                                        bestTarget = t.getSettlement();
+                                    } else {
+                                        bestTarget = t.getFirstUnit();
+                                    }
+                                    worstThreat = t.getUnitCount() * 2;
+                                }
+                            } else if (value >= Tension.TENSION_ADD_MINOR) {
+                                threat += 1;
+                                if (t.getUnitCount() > worstThreat) {
+                                    if (t.getSettlement() != null) {
+                                        bestTarget = t.getSettlement();
+                                    } else {
+                                        bestTarget = t.getFirstUnit();
+                                    }
+                                    worstThreat = t.getUnitCount();
                                 }
                             }
-                        } else if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MINOR) {
-                            Iterator<Unit> uit = t.getUnitIterator();
-                            while (uit.hasNext()) {
-                                if (uit.next().isOffensiveUnit()) {
-                                    thisThreat++;
-                                }
-                            }
-                        }
-                        threat += thisThreat;
-                        if (thisThreat > worstThreat) {
-                            if (t.getSettlement() != null) {
-                                bestTarget = t.getSettlement();
-                            } else {
-                                bestTarget = t.getFirstUnit();
-                            }
-                            worstThreat = thisThreat;
                         }
                     }
                 }
-            }
-            olddefenders = defenders;
-            if (colony.hasStockade()) {
-                defenders += (defenders * (colony.getStockade().getLevel()) / 2);
             }
             if (threat > defenders) {
-                // We're under attack! Man the stockade!
-                ArrayList<Unit> recruits = new ArrayList<Unit>();
-                ArrayList<Unit> others = new ArrayList<Unit>();
-                int inColonyCount = 0;
-                // Let's make some more soldiers, if we can.
-                // First, find some people we can recruit.
-                ui = colony.getUnitIterator();
-                while (ui.hasNext()) {
-                    Unit u = (ui.next());
-                    if (u.isOffensiveUnit()) {
-                        continue; // don't bother dealing with current
-                        // soldiers at the moment
-                    }
-                    if (u.getLocation() != colony.getTile()) {
-                        // If we are not on the tile we are in the colony.
-                        inColonyCount++;
-                    }
-                    if (u.hasAbility("model.ability.expertSoldier")) {
-                        recruits.add(u);
-                    } else if (u.hasAbility("model.ability.canBeEquipped")) {
-                        others.add(u);
-                    }
-                }
-                // ATTENTION: skill may be Integer.MIN_VALUE!
-                Collections.sort(others, new Comparator<Unit>() {
-                        public int compare(Unit unit1, Unit unit2) {
-                            if (unit1.getSkillLevel() < unit2.getSkillLevel()) {
-                                return -1;
-                            } else if (unit1.getSkillLevel() > unit2.getSkillLevel()) {
-                                return 1;
-                            } else {
-                                return 0;
-                            }
-                        }});
-                recruits.addAll(others);
-                // Don't overdo it - leave at least one person behind.
-                int recruitCount = threat - defenders;
-                if (recruitCount > recruits.size() - 1) {
-                    recruitCount = recruits.size() - 1;
-                }
-                if (recruitCount > inColonyCount - 1) {
-                    recruitCount = inColonyCount - 1;
-                }
-                // Actually go through and arm our people.
-                boolean needMuskets = false;
-                boolean needHorses = false;
-                ui = recruits.iterator();
-                while (ui.hasNext() && recruitCount > 0) {
-                    Unit u = (ui.next());
-                    if (!u.isArmed() && u.canBeEquippedWith(muskets)) {
-                        recruitCount--;
-                        Element equipUnitElement = Message.createNewRootElement("equipUnit");
-                        equipUnitElement.setAttribute("unit", u.getId());
-                        equipUnitElement.setAttribute("type", muskets.getId());
-                        equipUnitElement.setAttribute("amount", "1");
-                        u.equipWith(muskets);
-                        sendAndWaitSafely(equipUnitElement);
-                        Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
-                        putOutsideColonyElement.setAttribute("unit", u.getId());
-                        u.putOutsideColony();
-                        sendAndWaitSafely(putOutsideColonyElement);
-                        // Check if the unit can fortify before sending the order
-                        if (u.checkSetState(UnitState.FORTIFYING)) {
-                            Element changeStateElement = Message.createNewRootElement("changeState");
-                            changeStateElement.setAttribute("unit", u.getId());
-                            changeStateElement.setAttribute("state", UnitState.FORTIFYING.toString());
-                            sendAndWaitSafely(changeStateElement);
-                        }
-                        olddefenders++;
-                        if (!u.isMounted() && u.canBeEquippedWith(horses)) {
-                            equipUnitElement = Message.createNewRootElement("equipUnit");
-                            equipUnitElement.setAttribute("unit", u.getId());
-                            equipUnitElement.setAttribute("type", horses.getId());
-                            equipUnitElement.setAttribute("amount", "1");
-                            sendAndWaitSafely(equipUnitElement);
-                        } else {
-                            needHorses = true;
-                        }
-                    } else {
-                        needMuskets = true;
-                        break;
-                    }
-                }
-                AIColony ac = null;
-                if (needMuskets || needHorses) {
-                    Iterator<AIColony> aIterator = getAIColonyIterator();
-                    while (aIterator.hasNext()) {
-                        AIColony temp = aIterator.next();
-                        if (temp != null && temp.getColony() == colony) {
-                            ac = temp;
-                            break;
-                        }
-                    }
-                }
-                if (needMuskets && ac != null) {
-                    // Check and see if we have already made a GoodsWish for
-                    // here.
-                    Iterator<Wish> wishes = ac.getWishIterator();
-                    boolean made = false;
-                    while (wishes.hasNext()) {
-                        Wish w = wishes.next();
-                        if (!(w instanceof GoodsWish)) {
-                            continue;
-                        }
-                        GoodsWish gw = (GoodsWish) w;
-                        if (gw == null) {
-                            continue;
-                        }
-                        if (gw.getGoodsType() == Goods.MUSKETS) {
-                            made = true;
-                        }
-                    }
-                    if (made == false) {
-                        // Add a new GoodsWish onto the stack.
-                        ac
-                                .addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - olddefenders) * 50,
-                                        Goods.MUSKETS));
-                    }
-                }
-                if (needHorses && ac != null) {
-                    // Check and see if we have already made a GoodsWish for
-                    // here.
-                    Iterator<Wish> wishes = ac.getWishIterator();
-                    boolean made = false;
-                    while (wishes.hasNext()) {
-                        Wish w = wishes.next();
-                        if (!(w instanceof GoodsWish)) {
-                            continue;
-                        }
-                        GoodsWish gw = (GoodsWish) w;
-                        if (gw == null) {
-                            continue;
-                        }
-                        if (gw.getGoodsType() == Goods.HORSES) {
-                            made = true;
-                        }
-                    }
-                    if (made == false) {
-                        // Add a new GoodsWish onto the stack.
-                        ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - defenders) * 50, Goods.HORSES));
-                    }
-                }
-                defenders = olddefenders;
-                if (colony.hasStockade()) {
-                    defenders += (defenders * (colony.getStockade().getLevel()) / 2);
-                }
-            }
-            if (defenders > (threat * 2)) {
-                // We're so big and tough, we can go wipe out this threat.
-                // Pick someone to go make it happen.
-                Unit u = null;
-                Iterator<Unit> uit = colony.getUnitIterator();
-                while (uit.hasNext()) {
-                    Unit candidate = uit.next();
-                    if (candidate.isOffensiveUnit() && candidate.getState() == UnitState.FORTIFIED) {
-                        u = candidate;
-                        break;
-                    }
-                }
-                if (u != null) {
-                    u.setState(UnitState.ACTIVE);
-                    u.setLocation(colony.getTile());
-                    AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(u);
-                    if (bestTarget != null) {
-                        newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI, bestTarget));
-                    } else {
-                        newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
-                    }
+                Unit newDefender = is.getFirstUnit();
+                newDefender.setState(UnitState.ACTIVE);
+                newDefender.setLocation(is.getTile());
+                AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
+                if (bestTarget != null) {
+                    newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI,
+                            bestTarget));
+                } else {
+                    newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
                 }
             }
         }
     }
-
+        
+    /**
+     * Takes the necessary actions to secure a european colony
+     */
+    private void secureColony(Colony colony) {
+        Map map = player.getGame().getMap();
+        int olddefenders = 0;
+        int defenders = 0;
+        int threat = 0;
+        int worstThreat = 0;
+        Location bestTarget = null;
+        Iterator<Unit> ui = colony.getTile().getUnitIterator();
+        while (ui.hasNext()) {
+            if ((ui.next()).isDefensiveUnit()) {
+                defenders++;
+            }
+        }
+        Iterator<Position> positionIterator = map.getCircleIterator(colony.getTile().getPosition(), true, 5);
+        while (positionIterator.hasNext()) {
+            Tile t = map.getTile(positionIterator.next());
+            if (t.getFirstUnit() != null) {
+                if (t.getFirstUnit().getOwner() == player) {
+                    Iterator<Unit> uit = t.getUnitIterator();
+                    while (uit.hasNext()) {
+                        if (uit.next().isOffensiveUnit()) {
+                            defenders++;
+                        }
+                    }
+                } else {
+                    int thisThreat = 0;
+                    if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MAJOR) {
+                        Iterator<Unit> uit = t.getUnitIterator();
+                        while (uit.hasNext()) {
+                            if (uit.next().isOffensiveUnit()) {
+                                thisThreat += 2;
+                            }
+                        }
+                    } else if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MINOR) {
+                        Iterator<Unit> uit = t.getUnitIterator();
+                        while (uit.hasNext()) {
+                            if (uit.next().isOffensiveUnit()) {
+                                thisThreat++;
+                            }
+                        }
+                    }
+                    threat += thisThreat;
+                    if (thisThreat > worstThreat) {
+                        if (t.getSettlement() != null) {
+                            bestTarget = t.getSettlement();
+                        } else {
+                            bestTarget = t.getFirstUnit();
+                        }
+                        worstThreat = thisThreat;
+                    }
+                }
+            }
+        }
+        olddefenders = defenders;
+        if (colony.hasStockade()) {
+            defenders += (defenders * (colony.getStockade().getLevel()) / 2);
+        }
+        if (threat > defenders) {
+            // We're under attack! Man the stockade!
+            ArrayList<Unit> recruits = new ArrayList<Unit>();
+            ArrayList<Unit> others = new ArrayList<Unit>();
+            int inColonyCount = 0;
+            // Let's make some more soldiers, if we can.
+            // First, find some people we can recruit.
+            ui = colony.getUnitIterator();
+            while (ui.hasNext()) {
+                Unit u = (ui.next());
+                if (u.isOffensiveUnit()) {
+                    continue; // don't bother dealing with current
+                    // soldiers at the moment
+                }
+                if (u.getLocation() != colony.getTile()) {
+                    // If we are not on the tile we are in the colony.
+                    inColonyCount++;
+                }
+                if (u.hasAbility("model.ability.expertSoldier")) {
+                    recruits.add(u);
+                } else if (u.hasAbility("model.ability.canBeEquipped")) {
+                    others.add(u);
+                }
+            }
+            // ATTENTION: skill may be Integer.MIN_VALUE!
+            Collections.sort(others, new Comparator<Unit>() {
+                    public int compare(Unit unit1, Unit unit2) {
+                        if (unit1.getSkillLevel() < unit2.getSkillLevel()) {
+                            return -1;
+                        } else if (unit1.getSkillLevel() > unit2.getSkillLevel()) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }});
+            recruits.addAll(others);
+            // Don't overdo it - leave at least one person behind.
+            int recruitCount = threat - defenders;
+            if (recruitCount > recruits.size() - 1) {
+                recruitCount = recruits.size() - 1;
+            }
+            if (recruitCount > inColonyCount - 1) {
+                recruitCount = inColonyCount - 1;
+            }
+            // Actually go through and arm our people.
+            boolean needMuskets = false;
+            boolean needHorses = false;
+            ui = recruits.iterator();
+            while (ui.hasNext() && recruitCount > 0) {
+                Unit u = (ui.next());
+                if (!u.isArmed() && u.canBeEquippedWith(muskets)) {
+                    recruitCount--;
+                    Element equipUnitElement = Message.createNewRootElement("equipUnit");
+                    equipUnitElement.setAttribute("unit", u.getId());
+                    equipUnitElement.setAttribute("type", muskets.getId());
+                    equipUnitElement.setAttribute("amount", "1");
+                    u.equipWith(muskets);
+                    sendAndWaitSafely(equipUnitElement);
+                    Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
+                    putOutsideColonyElement.setAttribute("unit", u.getId());
+                    u.putOutsideColony();
+                    sendAndWaitSafely(putOutsideColonyElement);
+                    // Check if the unit can fortify before sending the order
+                    if (u.checkSetState(UnitState.FORTIFYING)) {
+                        Element changeStateElement = Message.createNewRootElement("changeState");
+                        changeStateElement.setAttribute("unit", u.getId());
+                        changeStateElement.setAttribute("state", UnitState.FORTIFYING.toString());
+                        sendAndWaitSafely(changeStateElement);
+                    }
+                    olddefenders++;
+                    if (!u.isMounted() && u.canBeEquippedWith(horses)) {
+                        equipUnitElement = Message.createNewRootElement("equipUnit");
+                        equipUnitElement.setAttribute("unit", u.getId());
+                        equipUnitElement.setAttribute("type", horses.getId());
+                        equipUnitElement.setAttribute("amount", "1");
+                        sendAndWaitSafely(equipUnitElement);
+                    } else {
+                        needHorses = true;
+                    }
+                } else {
+                    needMuskets = true;
+                    break;
+                }
+            }
+            AIColony ac = null;
+            if (needMuskets || needHorses) {
+                Iterator<AIColony> aIterator = getAIColonyIterator();
+                while (aIterator.hasNext()) {
+                    AIColony temp = aIterator.next();
+                    if (temp != null && temp.getColony() == colony) {
+                        ac = temp;
+                        break;
+                    }
+                }
+            }
+            if (needMuskets && ac != null) {
+                // Check and see if we have already made a GoodsWish for
+                // here.
+                Iterator<Wish> wishes = ac.getWishIterator();
+                boolean made = false;
+                while (wishes.hasNext()) {
+                    Wish w = wishes.next();
+                    if (!(w instanceof GoodsWish)) {
+                        continue;
+                    }
+                    GoodsWish gw = (GoodsWish) w;
+                    if (gw == null) {
+                        continue;
+                    }
+                    if (gw.getGoodsType() == Goods.MUSKETS) {
+                        made = true;
+                    }
+                }
+                if (made == false) {
+                    // Add a new GoodsWish onto the stack.
+                    ac
+                            .addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - olddefenders) * 50,
+                                    Goods.MUSKETS));
+                }
+            }
+            if (needHorses && ac != null) {
+                // Check and see if we have already made a GoodsWish for
+                // here.
+                Iterator<Wish> wishes = ac.getWishIterator();
+                boolean made = false;
+                while (wishes.hasNext()) {
+                    Wish w = wishes.next();
+                    if (!(w instanceof GoodsWish)) {
+                        continue;
+                    }
+                    GoodsWish gw = (GoodsWish) w;
+                    if (gw == null) {
+                        continue;
+                    }
+                    if (gw.getGoodsType() == Goods.HORSES) {
+                        made = true;
+                    }
+                }
+                if (made == false) {
+                    // Add a new GoodsWish onto the stack.
+                    ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - defenders) * 50, Goods.HORSES));
+                }
+            }
+            defenders = olddefenders;
+            if (colony.hasStockade()) {
+                defenders += (defenders * (colony.getStockade().getLevel()) / 2);
+            }
+        }
+        if (defenders > (threat * 2)) {
+            // We're so big and tough, we can go wipe out this threat.
+            // Pick someone to go make it happen.
+            Unit u = null;
+            Iterator<Unit> uit = colony.getUnitIterator();
+            while (uit.hasNext()) {
+                Unit candidate = uit.next();
+                if (candidate.isOffensiveUnit() && candidate.getState() == UnitState.FORTIFIED) {
+                    u = candidate;
+                    break;
+                }
+            }
+            if (u != null) {
+                u.setState(UnitState.ACTIVE);
+                u.setLocation(colony.getTile());
+                AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(u);
+                if (bestTarget != null) {
+                    newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI, bestTarget));
+                } else {
+                    newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
+                }
+            }
+        }
+    }
     /**
      * Send an element and ignore IO exceptions. This was used all over the
      * place, no better use a single method.
