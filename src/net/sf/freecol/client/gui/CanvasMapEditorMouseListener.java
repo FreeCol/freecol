@@ -161,12 +161,12 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
             return;
         }
         try {
-            if (gui.getDragPath() != null) {
+            if (gui.getGotoPath() != null) {
                 // A mouse drag has ended (see CanvasMouseMotionListener).
 
-                PathNode temp = gui.getDragPath();
+                PathNode temp = gui.getGotoPath();
 
-                gui.stopDrag();
+                gui.stopGoto();
 
                 // Move the unit:
                 Unit unit = gui.getActiveUnit();
@@ -174,8 +174,8 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
                 if (canvas.getClient().getGame().getCurrentPlayer() == canvas.getClient().getMyPlayer()) {
                     canvas.getClient().getInGameController().moveToDestination(unit);
                 }
-            } else if (gui.isDragStarted()) {
-                gui.stopDrag();
+            } else if (gui.isGotoStarted()) {
+                gui.stopGoto();
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mouseReleased!", ex);

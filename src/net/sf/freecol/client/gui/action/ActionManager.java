@@ -89,6 +89,7 @@ public class ActionManager extends OptionGroup {
         add(new ExecuteGotoOrdersAction(freeColClient));
         add(new FortifyAction(freeColClient));
         add(new GotoAction(freeColClient));
+        add(new GotoTileAction(freeColClient));
         // Initialize ImprovementActions
         for (ImprovementActionType ia : FreeCol.getSpecification().getImprovementActionTypeList()) {
             add(new ImprovementAction(freeColClient, ia));

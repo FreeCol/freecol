@@ -86,6 +86,31 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             scrollThread.stopScrolling();
             scrollThread = null;
         }
+         
+        if (gui.isGotoStarted()) {
+            if (gui.getActiveUnit() == null) {
+                gui.stopGoto();
+            }
+            
+            Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
+
+            if (p == null || !map.isValid(p)) {
+                return;
+            }
+        
+            Tile tile = map.getTile(p);
+            if (tile != null) {
+                if (lastTile != tile) {
+                    lastTile = tile;
+                    if (gui.getActiveUnit().getTile() != tile) {
+                        PathNode dragPath = gui.getActiveUnit().findPath(tile);
+                        gui.setGotoPath(dragPath);
+                    } else {
+                        gui.setGotoPath(null);
+                    }
+                } 
+            }
+        }
     }
 
     private void scroll(int x, int y) {
@@ -164,26 +189,26 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
 
         Tile tile = map.getTile(p);
         if (tile != null) {
-            if (gui.getActiveUnit() == null) {
-                gui.stopDrag();
-            } else if (gui.getActiveUnit().getTile() != tile) {
-                if (gui.isDragStarted()) {
+            if (gui.isGotoStarted()) {
+                if (gui.getActiveUnit() == null) {
+                    gui.stopGoto();
+                } else { 
                     if (lastTile != tile) {
                         lastTile = tile;
-                        PathNode dragPath = gui.getActiveUnit().findPath(tile);
-                        // ONLY FOR DEBUGGING: PathNode dragPath =
-                        // map.findPath(gui.getActiveUnit(),
-                        // gui.getActiveUnit().getTile(), tile, (Unit)
-                        // gui.getActiveUnit().getLocation());
-                        gui.setDragPath(dragPath);
+                        if (gui.getActiveUnit().getTile() != tile) {
+                            PathNode dragPath = gui.getActiveUnit().findPath(tile);
+                            // ONLY FOR DEBUGGING: PathNode dragPath =
+                            // map.findPath(gui.getActiveUnit(),
+                            // gui.getActiveUnit().getTile(), tile, (Unit)
+                            // gui.getActiveUnit().getLocation());
+                            gui.setGotoPath(dragPath);
+                        } else {
+                            gui.setGotoPath(null);
+                        }
                     }
                 }
             } else {
-                if (!gui.isDragStarted()) {
-                    gui.startDrag();
-                } else {
-                    gui.setDragPath(null);
-                }
+                gui.startGoto();
             }
         }
     }

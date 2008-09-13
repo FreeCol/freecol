@@ -104,8 +104,8 @@ public final class GUI {
 
     /** A path to be displayed on the map. */
     private PathNode currentPath;
-    private PathNode dragPath = null;
-    private boolean dragStarted = false;
+    private PathNode gotoPath = null;
+    private boolean gotoStarted = false;
 
     // Helper variables for displaying the map.
     private int tileHeight,
@@ -348,7 +348,7 @@ public final class GUI {
                 Unit unitInFront = getUnitInFront(gameData.getMap().getTile(selectedTile));
                 if (unitInFront != null) {
                     setActiveUnit(unitInFront);
-                    updateDragPathForActiveUnit();
+                    updateGotoPathForActiveUnit();
                 } else {
                     setFocus(selectedTile);
                 }
@@ -357,7 +357,7 @@ public final class GUI {
                 // Clear goto order when unit is already active
                 if (clearGoToOrders && activeUnit.getDestination() != null) {
                     freeColClient.getInGameController().clearGotoOrders(activeUnit);
-                    updateDragPathForActiveUnit();
+                    updateGotoPathForActiveUnit();
                 }
             }
         }
@@ -520,7 +520,7 @@ public final class GUI {
                 freeColClient.getInGameController().clearGotoOrders(activeUnit);
             }
         }
-        updateDragPathForActiveUnit();
+        updateGotoPathForActiveUnit();
 
         // The user activated a unit
         if(viewMode.getView() == ViewMode.VIEW_TERRAIN_MODE && activeUnit != null)
@@ -894,9 +894,9 @@ public final class GUI {
     }
 
     
-    private void displayDragPath(Graphics2D g, PathNode dragPath) {
-        if (dragPath != null) {
-            PathNode temp = dragPath;
+    private void displayGotoPath(Graphics2D g, PathNode gotoPath) {
+        if (gotoPath != null) {
+            PathNode temp = gotoPath;
             while (temp != null) {
                 Point p = getTilePosition(temp.getTile());
                 if (p != null) {
@@ -1153,11 +1153,11 @@ public final class GUI {
         /*
         PART 4
         ======
-        Display drag-and-drop path
+        Display goto path
         */
 
-        displayDragPath(g, currentPath);
-        displayDragPath(g, dragPath);
+        displayGotoPath(g, currentPath);
+        displayGotoPath(g, gotoPath);
         
         /*
         PART 5
@@ -2138,39 +2138,39 @@ public final class GUI {
 
 
     /**
-    * Stops any ongoing drag operation on the mapboard.
+    * Stops any ongoing goto operation on the mapboard.
     */
-    public void stopDrag() {
+    public void stopGoto() {
         freeColClient.getCanvas().setCursor(null);
-        setDragPath(null);
-        updateDragPathForActiveUnit();
-        dragStarted = false;
+        setGotoPath(null);
+        updateGotoPathForActiveUnit();
+        gotoStarted = false;
     }
 
 
     /**
-    * Starts a drag operation on the mapboard.
+    * Starts a goto operation on the mapboard.
     */
-    public void startDrag() {
+    public void startGoto() {
+        gotoStarted = true;
         freeColClient.getCanvas().setCursor((java.awt.Cursor) UIManager.get("cursor.go"));
-        setDragPath(null);
-        dragStarted = true;
+        setGotoPath(null);
     }
 
 
     /**
-     * Checks if there is currently a drag operation on the mapboard.
-     * @return <code>true</code> if a drag operation is in progress.
+     * Checks if there is currently a goto operation on the mapboard.
+     * @return <code>true</code> if a goto operation is in progress.
      */
-    public boolean isDragStarted() {
-        return dragStarted;
+    public boolean isGotoStarted() {
+        return gotoStarted;
     }
 
 
     /**
     * Sets the path of the active unit to display it.
     */
-    public void updateDragPathForActiveUnit() {
+    public void updateGotoPathForActiveUnit() {
         if (activeUnit == null || activeUnit.getDestination() == null) {
             currentPath = null;
         } else {
@@ -2187,12 +2187,11 @@ public final class GUI {
 
     /**
     * Sets the path to be drawn on the map.
-    * @param dragPath The path that should be drawn on the map
+    * @param gotoPath The path that should be drawn on the map
     *        or <code>null</code> if no path should be drawn.
     */
-    public void setDragPath(PathNode dragPath) {
-        //PathNode tempPath = this.dragPath;
-        this.dragPath = dragPath;
+    public void setGotoPath(PathNode gotoPath) {
+        this.gotoPath = gotoPath;
 
         freeColClient.getCanvas().refresh();
     }
@@ -2203,8 +2202,8 @@ public final class GUI {
     * @return The path that should be drawn on the map
     *        or <code>null</code> if no path should be drawn.
     */
-    public PathNode getDragPath() {
-        return dragPath;
+    public PathNode getGotoPath() {
+        return gotoPath;
     }
 
 

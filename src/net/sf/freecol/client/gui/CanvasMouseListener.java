@@ -99,6 +99,11 @@ public final class CanvasMouseListener implements MouseListener {
         }
         try {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
+                // Cancel goto if one is active
+                if (gui.isGotoStarted()) {
+                    gui.stopGoto();
+                }
+                
                 canvas.showTilePopup(gui.convertToMapCoordinates(e.getX(), e.getY()), e.getX(), e.getY());
             } else if (e.getButton() == MouseEvent.BUTTON2) {
                 Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
@@ -111,12 +116,25 @@ public final class CanvasMouseListener implements MouseListener {
                     Unit unit = gui.getActiveUnit();
                     if (unit != null && unit.getTile() != tile) {
                         PathNode dragPath = unit.findPath(tile);
-                        gui.startDrag();
-                        gui.setDragPath(dragPath);
+                        gui.startGoto();
+                        gui.setGotoPath(dragPath);
                     }
                 }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
-                gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()), true);
+                if (gui.isGotoStarted()) {
+                    PathNode path = gui.getGotoPath();
+                    if (path != null) {
+                        gui.stopGoto();
+                        // Move the unit:
+                        Unit unit = gui.getActiveUnit();
+                        canvas.getClient().getInGameController().setDestination(unit, path.getLastNode().getTile());
+                        if (canvas.getClient().getGame().getCurrentPlayer() == canvas.getClient().getMyPlayer()) {
+                            canvas.getClient().getInGameController().moveToDestination(unit);
+                        }
+                    }
+                } else {
+                    gui.setSelectedTile(gui.convertToMapCoordinates(e.getX(), e.getY()), true);
+                }
                 canvas.requestFocus();
             }
         } catch (Exception ex) {
@@ -131,12 +149,12 @@ public final class CanvasMouseListener implements MouseListener {
      */
     public void mouseReleased(MouseEvent e) {
         try {
-            if (gui.getDragPath() != null) {
+            if (gui.getGotoPath() != null) {
                 // A mouse drag has ended (see CanvasMouseMotionListener).
 
-                PathNode temp = gui.getDragPath();
+                PathNode temp = gui.getGotoPath();
 
-                gui.stopDrag();
+                gui.stopGoto();
 
                 // Move the unit:
                 Unit unit = gui.getActiveUnit();
@@ -144,8 +162,8 @@ public final class CanvasMouseListener implements MouseListener {
                 if (canvas.getClient().getGame().getCurrentPlayer() == canvas.getClient().getMyPlayer()) {
                     canvas.getClient().getInGameController().moveToDestination(unit);
                 }
-            } else if (gui.isDragStarted()) {
-                gui.stopDrag();
+            } else if (gui.isGotoStarted()) {
+                gui.stopGoto();
             }
         } catch (Exception ex) {
             logger.log(Level.WARNING, "Error in mouseReleased!", ex);

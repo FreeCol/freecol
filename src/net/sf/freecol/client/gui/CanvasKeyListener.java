@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.logging.Level;
@@ -26,6 +27,10 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
+import net.sf.freecol.client.gui.action.GotoTileAction;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Map.Direction;
 
 /**
@@ -60,8 +65,10 @@ public final class CanvasKeyListener implements KeyListener {
      * @param e The event that holds key-information.
      */
     public void keyPressed(KeyEvent e) {
-        if (parent.getGUI().isDragStarted()) {
-            parent.getGUI().stopDrag();
+        //Cancel any active goto operation when a key is pressed, unless the key is the Goto Tile action's key (let the action's own handler handle that)
+        if (parent.getGUI().isGotoStarted() && 
+                e.getKeyCode() != parent.getClient().getActionManager().getFreeColAction(GotoTileAction.id).getAccelerator().getKeyCode()) {
+            parent.getGUI().stopGoto();
         }
 
         if (e.isShiftDown() && e.isControlDown() && e.getKeyCode() == KeyEvent.VK_D) {
@@ -204,7 +211,7 @@ public final class CanvasKeyListener implements KeyListener {
      */
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-            parent.getGUI().setDragPath(null);
+            parent.getGUI().setGotoPath(null);
         }
     }
 
