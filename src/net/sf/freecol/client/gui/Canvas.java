@@ -1256,17 +1256,25 @@ public final class Canvas extends JDesktopPane {
         introText.append("\n\n");
         introText.append(Messages.message("missionarySettlement.question"));
 
+        ChoiceItem establish = new ChoiceItem(Messages.message("missionarySettlement.establish"),
+                MissionaryAction.ESTABLISH_MISSION);
+        ChoiceItem heresy = new ChoiceItem(Messages.message("missionarySettlement.heresy"),
+                MissionaryAction.DENOUNCE_HERESY);
+        ChoiceItem incite = new ChoiceItem(Messages.message("missionarySettlement.incite"),
+                MissionaryAction.INCITE_INDIANS);
+        ChoiceItem cancel = new ChoiceItem(Messages.message("cancel"),
+                MissionaryAction.CANCEL);
 
-        FreeColDialog missionaryDialog = FreeColDialog
-            .createChoiceDialog(introText.toString(), null,
-                                new ChoiceItem(Messages.message("missionarySettlement.establish"),
-                                               MissionaryAction.ESTABLISH_MISSION),
-                                new ChoiceItem(Messages.message("missionarySettlement.heresy"),
-                                               MissionaryAction.DENOUNCE_HERESY),
-                                new ChoiceItem(Messages.message("missionarySettlement.incite"),
-                                               MissionaryAction.INCITE_INDIANS),
-                                new ChoiceItem(Messages.message("cancel"),
-                                               MissionaryAction.CANCEL));
+        FreeColDialog missionaryDialog;
+        if (settlement.getMissionary() == null) {
+            // no missionary yet, we can establish a new religious mission
+            missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null,
+                    establish, incite, cancel);
+        } else {
+            // we can denounce it as heresy
+            missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null,
+                    heresy, incite, cancel);
+        }
 
         addAsFrame(missionaryDialog);
         missionaryDialog.requestFocus();
