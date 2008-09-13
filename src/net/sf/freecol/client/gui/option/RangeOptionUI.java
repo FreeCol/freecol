@@ -63,6 +63,7 @@ public final class RangeOptionUI extends JPanel implements OptionUpdater, Proper
         setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), 
                                                    option.getName()));
         this.option = option;
+        this.originalValue = option.getValue();
 
         String name = option.getName();
         String description = option.getShortDescription();
