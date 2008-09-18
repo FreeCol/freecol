@@ -875,7 +875,9 @@ public final class InGameController implements NetworkConstants {
         }
 
         boolean inEurope = unit.isInEurope();
-        boolean stopIsEurope = (stop.getLocation().getId() == freeColClient.getMyPlayer().getEurope().getId());
+        String europeId = (freeColClient.getMyPlayer().getEurope() == null) ? ""
+            : freeColClient.getMyPlayer().getEurope().getId();
+        boolean stopIsEurope = stop.getLocation().getId() == europeId;
         
         // ship has not arrived in europe yet
         if(stopIsEurope && !inEurope)
