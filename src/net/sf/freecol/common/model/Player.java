@@ -670,6 +670,13 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
         }
+        // Drop already-prepared messages with source==europe, such as
+        // price{Inc,Dec}reases
+        for (ModelMessage modelMessage : getModelMessages()) {              
+            if (modelMessage.getSource() == europe) {                       
+                modelMessages.remove(modelMessage);                         
+            }                                                               
+        }                                                                   
         europe.dispose();
         europe = null;
         monarch = null;
