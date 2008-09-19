@@ -2591,8 +2591,9 @@ public class Player extends FreeColGameObject implements Nameable {
             data = new MarketData(goodsType);
             getMarket().putMarketData(goodsType, data);
         }
-        data.setArrears(Specification.getSpecification().getIntegerOption("model.option.arrearsFactor").getValue()
-                * 100 * data.getPaidForSale());
+        Specification spec = Specification.getSpecification();
+        data.setArrears(spec.getIntegerOption("model.option.arrearsFactor").getValue()
+                        * data.getPaidForSale());
     }
 
     /**
