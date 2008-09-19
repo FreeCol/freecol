@@ -643,8 +643,8 @@ public class Player extends FreeColGameObject implements Nameable {
         ArrayList<String> unitNames = new ArrayList<String>();
         for (Unit unit : europe.getUnitList()) {
             unitNames.add(unit.getName());
-            unit.dispose();
         }
+        europe.disposeUnitList();
         if (!unitNames.isEmpty()) {
             addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, "model.player.independence.unitsSeized",
                     "%units%", Utils.join(", ", unitNames));

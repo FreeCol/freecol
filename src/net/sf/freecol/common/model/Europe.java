@@ -360,6 +360,17 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     /**
+     * Dispose of all units in this <code>Europe</code>.
+     */
+    public void disposeUnitList() {
+        while (!units.isEmpty()) {
+            Unit unit = units.remove(0);
+            unit.dispose();
+        }
+        units = null;
+    }
+
+    /**
      * Gets an <code>Iterator</code> of every <code>Unit</code> directly
      * located in this <code>Europe</code>. This does not include
      * <code>Unit</code>s on ships.
