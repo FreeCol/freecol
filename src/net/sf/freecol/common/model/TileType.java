@@ -192,6 +192,16 @@ public final class TileType extends FreeColGameObjectType {
         return result;
     }
 
+    /**
+     * Can this <code>TileType</code> contain a specified <code>ResourceType</code>?
+     *
+     * @param resourceType a <code>ResourceType</code> to test
+     * @return Whether this <code>TileType</code> contains the specified <code>ResourceType</code>
+     */
+    public boolean canHaveResourceType(ResourceType resourceType) {
+        return getResourceTypeList().contains(resourceType);
+    }
+
     public boolean withinRange(RangeType rangeType, int value) {
         switch (rangeType) {
         case HUMIDITY:
