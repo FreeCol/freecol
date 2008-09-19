@@ -2567,11 +2567,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getArrears(GoodsType type) {
         MarketData data = getMarket().getMarketData(type);
-        if (data == null) {
-            return Integer.MIN_VALUE;
-        } else {
-            return data.getArrears();
-        }
+        return (data == null) ? 0 : data.getArrears();
     }
 
     /**
