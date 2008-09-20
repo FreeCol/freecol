@@ -616,20 +616,19 @@ public class AIPlayer extends AIObject {
      */
     private void secureSettlements() {
         logger.finest("Entering method secureSettlements");
-        if (!player.isEuropean()) {
+        if (player.isEuropean()) {
+            // Temporarily deactive this feature:
+            // Ok, we are a European player. Things are about to get fun.
+            /*
+            for (Colony colony : player.getColonies()) {
+                secureColony(colony);
+            }
+            */
+        } else {
             // Determines if we need to move a brave out of the settlement.
             for (IndianSettlement is : player.getIndianSettlements()) {
                 secureIndianSettlement(is);
             }
-            // This is the end of the native code.
-            return;
-        }
-        // Temporarily deactive this feature:
-        if (1 == 1)
-            return;
-        // Ok, we are a European player. Things are about to get fun.
-        for (Colony colony : player.getColonies()) {
-            secureColony(colony);
         }
     }
 
@@ -637,58 +636,60 @@ public class AIPlayer extends AIObject {
      * Takes the necessary actions to secure an indian settlement
      */
     public void secureIndianSettlement(IndianSettlement is) {
-        Map map = player.getGame().getMap();
-        if (is.getUnitCount() > 2) {
-            int defenders = is.getTile().getUnitCount();
-            int threat = 0;
-            int worstThreat = 0;
-            Location bestTarget = null;
-            Iterator<Position> positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
-            while (positionIterator.hasNext()) {
-                Tile t = map.getTile(positionIterator.next());
-                if (t.getFirstUnit() != null) {
-                    Player enemy = t.getFirstUnit().getOwner();
-                    if (enemy == player) {
-                        defenders++;
-                    } else {
-                        Tension tension = player.getTension(enemy);
-                        if (tension != null) {
-                            int value = tension.getValue();
-                            if (value >= Tension.TENSION_ADD_MAJOR) {
-                                threat += 2;
-                                if (t.getUnitCount() * 2 > worstThreat) {
-                                    if (t.getSettlement() != null) {
-                                        bestTarget = t.getSettlement();
-                                    } else {
-                                        bestTarget = t.getFirstUnit();
+        if (is.getOwner().isAtWar()) {
+            Map map = player.getGame().getMap();
+            if (is.getUnitCount() > 2) {
+                int defenders = is.getTile().getUnitCount();
+                int threat = 0;
+                int worstThreat = 0;
+                Location bestTarget = null;
+                Iterator<Position> positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
+                while (positionIterator.hasNext()) {
+                    Tile t = map.getTile(positionIterator.next());
+                    if (t.getFirstUnit() != null) {
+                        Player enemy = t.getFirstUnit().getOwner();
+                        if (enemy == player) {
+                            defenders++;
+                        } else {
+                            Tension tension = player.getTension(enemy);
+                            if (tension != null) {
+                                int value = tension.getValue();
+                                if (value >= Tension.TENSION_ADD_MAJOR) {
+                                    threat += 2;
+                                    if (t.getUnitCount() * 2 > worstThreat) {
+                                        if (t.getSettlement() != null) {
+                                            bestTarget = t.getSettlement();
+                                        } else {
+                                            bestTarget = t.getFirstUnit();
+                                        }
+                                        worstThreat = t.getUnitCount() * 2;
                                     }
-                                    worstThreat = t.getUnitCount() * 2;
-                                }
-                            } else if (value >= Tension.TENSION_ADD_MINOR) {
-                                threat += 1;
-                                if (t.getUnitCount() > worstThreat) {
-                                    if (t.getSettlement() != null) {
-                                        bestTarget = t.getSettlement();
-                                    } else {
-                                        bestTarget = t.getFirstUnit();
+                                } else if (value >= Tension.TENSION_ADD_MINOR) {
+                                    threat += 1;
+                                    if (t.getUnitCount() > worstThreat) {
+                                        if (t.getSettlement() != null) {
+                                            bestTarget = t.getSettlement();
+                                        } else {
+                                            bestTarget = t.getFirstUnit();
+                                        }
+                                        worstThreat = t.getUnitCount();
                                     }
-                                    worstThreat = t.getUnitCount();
                                 }
                             }
                         }
                     }
                 }
-            }
-            if (threat > defenders) {
-                Unit newDefender = is.getFirstUnit();
-                newDefender.setState(UnitState.ACTIVE);
-                newDefender.setLocation(is.getTile());
-                AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
-                if (bestTarget != null) {
-                    newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI,
-                            bestTarget));
-                } else {
-                    newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
+                if (threat > defenders) {
+                    Unit newDefender = is.getFirstUnit();
+                    newDefender.setState(UnitState.ACTIVE);
+                    newDefender.setLocation(is.getTile());
+                    AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
+                    if (bestTarget != null) {
+                        newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI,
+                                                                               bestTarget));
+                    } else {
+                        newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
+                    }
                 }
             }
         }
