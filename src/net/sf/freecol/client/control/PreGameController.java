@@ -223,22 +223,28 @@ public final class PreGameController {
         Canvas canvas = freeColClient.getCanvas();
         GUI gui = freeColClient.getGUI();
 
-        canvas.closeMainPanel();
-        canvas.closeMenus();
+        if (!freeColClient.isHeadless()) {
+            canvas.closeMainPanel();
+            canvas.closeMenus();
         
-        // TODO: Nation specific intro-music:
-        freeColClient.playMusicOnce("england", SoundPlayer.STANDARD_DELAY);
+            // TODO: Nation specific intro-music:
+            freeColClient.playMusicOnce("england", SoundPlayer.STANDARD_DELAY);
+        }
 
         InGameController inGameController = freeColClient.getInGameController();
         InGameInputHandler inGameInputHandler = freeColClient.getInGameInputHandler();
 
         freeColClient.getClient().setMessageHandler(inGameInputHandler);
-        gui.setInGame(true);
 
-        freeColClient.getCanvas().setJMenuBar(new InGameMenuBar(freeColClient));
+        if (!freeColClient.isHeadless()) {
+            gui.setInGame(true);
+            freeColClient.getCanvas().setJMenuBar(new InGameMenuBar(freeColClient));
+        }
+
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
             Player player = freeColClient.getMyPlayer();
-            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, player, "tutorial.startGame"));
+            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, 
+                                                    player, "tutorial.startGame"));
         }
 
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();

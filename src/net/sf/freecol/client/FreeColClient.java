@@ -152,6 +152,11 @@ public final class FreeColClient {
     
     private Rectangle windowBounds;
 
+    /**
+     * Describe headless here.
+     */
+    private boolean headless;
+
 
     /**
      * Creates a new <code>FreeColClient</code>. Creates the control objects
@@ -169,7 +174,7 @@ public final class FreeColClient {
     public FreeColClient(boolean windowed, final Dimension innerWindowSize, 
                          ImageLibrary imageLibrary, MusicLibrary musicLibrary,
                          SfxLibrary sfxLibrary) {
-        boolean headless = "true".equals(System.getProperty("java.awt.headless", "false"));
+        headless = "true".equals(System.getProperty("java.awt.headless", "false"));
         this.windowed = windowed;
         this.imageLibrary = imageLibrary;
         this.musicLibrary = musicLibrary;
@@ -282,7 +287,25 @@ public final class FreeColClient {
         });
         gui.startCursorBlinking();
     }
-    
+
+    /**
+     * Get the <code>Headless</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isHeadless() {
+        return headless;
+    }
+
+    /**
+     * Set the <code>Headless</code> value.
+     *
+     * @param newHeadless The new Headless value.
+     */
+    public void setHeadless(final boolean newHeadless) {
+        this.headless = newHeadless;
+    }
+
     /**
      * Change the windowed mode.
      * @param windowed Use <code>true</code> for windowed mode

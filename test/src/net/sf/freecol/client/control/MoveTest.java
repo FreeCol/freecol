@@ -45,13 +45,17 @@ public class MoveTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Map map = getTestMap(plains);
         game.setMap(map);
-        Tile plain = map.getTile(5, 8);
-        map.getTile(5, 8).setExploredBy(dutch, true);
-        map.getTile(5, 7).setExploredBy(dutch, true);
+        client.setGame(game);
+        Tile plain1 = map.getTile(5, 8);
+        plain1.setExploredBy(dutch, true);
+        Tile plain2 = map.getTile(5, 7);
+        plain2.setExploredBy(dutch, true);
 
-        Unit hardyPioneer = new Unit(game, plain, dutch, spec().getUnitType("model.unit.hardyPioneer"), 
+        Unit hardyPioneer = new Unit(game, plain1, dutch, spec().getUnitType("model.unit.hardyPioneer"), 
                                      UnitState.ACTIVE);
 
+        client.getPreGameController().startGame();
+        assertEquals(map.getNeighbourOrNull(Direction.NE, plain1), plain2);
         client.getInGameController().move(hardyPioneer, Direction.NE);
     }
 
