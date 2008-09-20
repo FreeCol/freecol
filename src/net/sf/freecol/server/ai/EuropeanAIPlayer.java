@@ -81,7 +81,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      *      a single Man-of-War.
      */
     public boolean hasManOfWar() {
-        Iterator<Unit> it = player.getUnitIterator();
+        Iterator<Unit> it = getPlayer().getUnitIterator();
         while (it.hasNext()) {
             Unit unit = it.next();
             if ("model.unit.manOWar".equals(unit.getType().getId())) {
@@ -172,7 +172,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      */
     protected void giveNavalMissions() {
         logger.finest("Entering method giveNavalMissions");
-        if (!player.isEuropean()) {
+        if (!getPlayer().isEuropean()) {
             return;
         }
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
@@ -191,7 +191,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      */
     protected void rearrangeWorkersInColonies() {
         logger.finest("Entering method rearrangeWorkersInColonies");
-        if (!player.isEuropean()) {
+        if (!getPlayer().isEuropean()) {
             return;
         }
         Iterator<AIColony> ci = getAIColonyIterator();
@@ -225,9 +225,9 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
     protected void secureSettlements() {
         logger.finest("Entering method secureSettlements");
         // Temporarily deactive this feature:
-        // Ok, we are a European player. Things are about to get fun.
+        // Ok, we are a European getPlayer(). Things are about to get fun.
         /*
-          for (Colony colony : player.getColonies()) {
+          for (Colony colony : getPlayer().getColonies()) {
           secureColony(colony);
           }
         */
@@ -238,7 +238,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      * Takes the necessary actions to secure a european colony
      */
     protected void secureColony(Colony colony) {
-        Map map = player.getGame().getMap();
+        Map map = getPlayer().getGame().getMap();
         int olddefenders = 0;
         int defenders = 0;
         int threat = 0;
@@ -254,7 +254,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
         while (positionIterator.hasNext()) {
             Tile t = map.getTile(positionIterator.next());
             if (t.getFirstUnit() != null) {
-                if (t.getFirstUnit().getOwner() == player) {
+                if (t.getFirstUnit().getOwner() == getPlayer()) {
                     Iterator<Unit> uit = t.getUnitIterator();
                     while (uit.hasNext()) {
                         if (uit.next().isOffensiveUnit()) {
@@ -263,14 +263,14 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                     }
                 } else {
                     int thisThreat = 0;
-                    if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MAJOR) {
+                    if (getPlayer().getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MAJOR) {
                         Iterator<Unit> uit = t.getUnitIterator();
                         while (uit.hasNext()) {
                             if (uit.next().isOffensiveUnit()) {
                                 thisThreat += 2;
                             }
                         }
-                    } else if (player.getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MINOR) {
+                    } else if (getPlayer().getTension(t.getFirstUnit().getOwner()).getValue() >= Tension.TENSION_ADD_MINOR) {
                         Iterator<Unit> uit = t.getUnitIterator();
                         while (uit.hasNext()) {
                             if (uit.next().isOffensiveUnit()) {
@@ -538,7 +538,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
          * the "Tactic"-classes has been implemented.
          *
          */
-        if (player.isIndian()) {
+        if (getPlayer().isIndian()) {
             aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
             return;
         }
@@ -730,7 +730,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
         }
         int numberOfColonies = 0;
         int numberOfWorkers = 0;
-        for (Colony colony : player.getColonies()) {
+        for (Colony colony : getPlayer().getColonies()) {
             numberOfColonies++;
             numberOfWorkers += colony.getUnitCount();
         }
@@ -746,7 +746,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
      */
     protected void createTransportLists() {
         logger.finest("Entering method createTransportLists");
-        if (!player.isEuropean()) {
+        if (!getPlayer().isEuropean()) {
             return;
         }
         ArrayList<Transportable> transportables = new ArrayList<Transportable>();
@@ -875,17 +875,17 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
         Colony colony = (Colony) settlement;
         Player otherPlayer = unit.getOwner();
         // the client should have prevented this
-        if (player.getStance(otherPlayer) == Stance.WAR) {
+        if (getPlayer().getStance(otherPlayer) == Stance.WAR) {
             return NetworkConstants.NO_TRADE;
         }
         // don't pay for more than fits in the warehouse
         int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
         amount = Math.min(amount, goods.getAmount());
         // get a good price
-        Tension.Level tensionLevel = player.getTension(otherPlayer).getLevel();
+        Tension.Level tensionLevel = getPlayer().getTension(otherPlayer).getLevel();
         int percentage = (9 - tensionLevel.ordinal()) * 10;
         // what we could get for the goods in Europe (minus taxes)
-        int netProfits = ((100 - player.getTax()) * player.getMarket().getSalePrice(goods.getType(), amount)) / 100;
+        int netProfits = ((100 - getPlayer().getTax()) * getPlayer().getMarket().getSalePrice(goods.getType(), amount)) / 100;
         int price = (netProfits * percentage) / 100;
         return price;
     }
@@ -904,13 +904,13 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
 
     /**
      * Returns an iterator over all the <code>AIColony</code>s owned by this
-     * player.
+     * getPlayer().
      *
      * @return The <code>Iterator</code>.
      */
     public Iterator<AIColony> getAIColonyIterator() {
         ArrayList<AIColony> ac = new ArrayList<AIColony>();
-        for (Colony colony : player.getColonies()) {
+        for (Colony colony : getPlayer().getColonies()) {
             AIColony a = (AIColony) getAIMain().getAIObject(colony.getId());
             if (a != null) {
                 ac.add(a);

@@ -54,7 +54,7 @@ import org.w3c.dom.Element;
 /**
  *
  * Objects of this class contains AI-information for a single {@link Player} and
- * is used for controlling this player.
+ * is used for controlling this getPlayer().
  *
  * <br />
  * <br />
@@ -73,9 +73,9 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.fine("Entering AI code for: " + player.getNationAsString());
+        logger.fine("Entering AI code for: " + getPlayer().getNationAsString());
         sessionRegister.clear();
-        aiUnits.clear();
+        clearAIUnits();
         cheat();
         determineStances();
         rearrangeWorkersInColonies();
@@ -95,7 +95,7 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
         rearrangeWorkersInColonies();
         abortInvalidMissions();
         ensureCorrectMissions();
-        aiUnits.clear();
+        clearAIUnits();
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
         for (int i = 0; i < numberOfUnits; i++) {
             workerWishes.add(new ArrayList<Wish>());
         }
-        if (player.isEuropean()) {
+        if (getPlayer().isEuropean()) {
             Iterator<AIColony> aIterator = getAIColonyIterator();
             while (aIterator.hasNext()) {
                 Iterator<Wish> wIterator = aIterator.next().getWishIterator();
@@ -248,7 +248,7 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
                     Mission mission = new BuildColonyMission(getAIMain(),
                                                              aiUnit,
                                                              colonyTile,
-                                                             player.getColonyValue(colonyTile));
+                                                             getPlayer().getColonyValue(colonyTile));
                     aiUnit.setMission(mission);
 
                     boolean isUnitOnCarrier = aiUnit.getUnit().getLocation() instanceof Unit;
@@ -282,11 +282,11 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
         logger.finest("Entering method cheat");
         // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            player.resetArrears(goodsType);
+            getPlayer().resetArrears(goodsType);
         }
-        if (getAIMain().getFreeColServer().isSingleplayer() && player.isEuropean() && !player.isREF() && player.isAI()
-            && player.getPlayerType() == PlayerType.COLONIAL) {
-            Europe europe = player.getEurope();
+        if (getAIMain().getFreeColServer().isSingleplayer() && getPlayer().isAI()
+            && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
+            Europe europe = getPlayer().getEurope();
             List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypeList();
 
             if (getRandom().nextInt(10) == 1) {
@@ -303,13 +303,13 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
                 }
                 Unit unit = null;
                 if (unitToTrain != null) {
-                    player.modifyGold(price);
+                    getPlayer().modifyGold(price);
                     unit = this.trainAIUnitInEurope(unitToTrain).getUnit();
                 }
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
-                    player.modifyGold(player.getMarket().getBidPrice(Goods.MUSKETS, 50));
-                    player.modifyGold(player.getMarket().getBidPrice(Goods.HORSES, 50));
+                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.MUSKETS, 50));
+                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.HORSES, 50));
 
                     Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
                     clearSpecialityElement.setAttribute("unit", unit.getId());
@@ -346,7 +346,7 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
                         break;
                     }
                 }
-                player.modifyGold(europe.getUnitPrice(unitToPurchase));
+                getPlayer().modifyGold(europe.getUnitPrice(unitToPurchase));
                 this.trainAIUnitInEurope(unitToPurchase);
             }
         }
@@ -381,7 +381,7 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
      * @return <code>true</code> if the tax raise should be accepted.
      */
     public boolean acceptTax(int tax) {
-        Goods toBeDestroyed = player.getMostValuableGoods();
+        Goods toBeDestroyed = getPlayer().getMostValuableGoods();
         if (toBeDestroyed == null) {
             return false;
         }
@@ -406,12 +406,12 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
             List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
             for (GoodsType type : goodsTypes) {
                 if (type.isStorable()) {
-                    averageIncome += player.getIncomeAfterTaxes(type);
+                    averageIncome += getPlayer().getIncomeAfterTaxes(type);
                     numberOfGoods++;
                 }
             }
             averageIncome = averageIncome / numberOfGoods;
-            if (player.getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
+            if (getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
                 // this is a more valuable type of goods
                 return false;
             } else {

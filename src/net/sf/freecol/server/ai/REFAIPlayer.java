@@ -52,7 +52,7 @@ import org.w3c.dom.Element;
 /**
  *
  * Objects of this class contains AI-information for a single {@link Player} and
- * is used for controlling this player.
+ * is used for controlling this getPlayer().
  *
  * <br />
  * <br />
@@ -72,9 +72,9 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.fine("Entering AI code for: " + player.getNationAsString());
+        logger.fine("Entering AI code for: " + getPlayer().getNationAsString());
         sessionRegister.clear();
-        aiUnits.clear();
+        clearAIUnits();
         checkForREFDefeat();
         if (!isWorkForREF()) {
             return;
@@ -97,7 +97,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         rearrangeWorkersInColonies();
         abortInvalidMissions();
         ensureCorrectMissions();
-        aiUnits.clear();
+        clearAIUnits();
     }
 
     /**
@@ -112,7 +112,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
         for (int i = 0; i < numberOfUnits; i++) {
             workerWishes.add(new ArrayList<Wish>());
         }
-        if (player.isEuropean()) {
+        if (getPlayer().isEuropean()) {
             Iterator<AIColony> aIterator = getAIColonyIterator();
             while (aIterator.hasNext()) {
                 Iterator<Wish> wIterator = aIterator.next().getWishIterator();
@@ -250,7 +250,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                     Mission mission = new BuildColonyMission(getAIMain(),
                                                              aiUnit,
                                                              colonyTile,
-                                                             player.getColonyValue(colonyTile));
+                                                             getPlayer().getColonyValue(colonyTile));
                     aiUnit.setMission(mission);
 
                     boolean isUnitOnCarrier = aiUnit.getUnit().getLocation() instanceof Unit;
@@ -279,7 +279,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
     /**
      * Gets a list of the players this REF player is currently fighting.
-     * @return The list. Empty if this is not an REF player.
+     * @return The list. Empty if this is not an REF getPlayer().
      */
     private List<Player> getDominionsAtWar() {
         List<Player> dominions = new LinkedList<Player>();
@@ -303,7 +303,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
      */
     private int getNumberOfKingUnits() {
         int n = 0;
-        for (Unit unit : player.getUnits()) {
+        for (Unit unit : getPlayer().getUnits()) {
             if (unit.hasAbility("model.ability.refUnit")) {
                 n++;
             }

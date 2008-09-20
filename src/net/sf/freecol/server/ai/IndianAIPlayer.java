@@ -49,7 +49,7 @@ import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 /**
  *
  * Objects of this class contains AI-information for a single {@link Player} and
- * is used for controlling this player.
+ * is used for controlling this getPlayer().
  *
  * <br />
  * <br />
@@ -77,9 +77,9 @@ public class IndianAIPlayer extends NewAIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.fine("Entering AI code for: " + player.getNationAsString());
+        logger.fine("Entering AI code for: " + getPlayer().getNationAsString());
         sessionRegister.clear();
-        aiUnits.clear();
+        clearAIUnits();
         determineStances();
         abortInvalidAndOneTimeMissions();
         secureSettlements();
@@ -92,7 +92,7 @@ public class IndianAIPlayer extends NewAIPlayer {
         giveNormalMissions();
         doMissions();
         abortInvalidMissions();
-        aiUnits.clear();
+        clearAIUnits();
     }
 
     /**
@@ -136,7 +136,7 @@ public class IndianAIPlayer extends NewAIPlayer {
     private void secureSettlements() {
         logger.finest("Entering method secureSettlements");
         // Determines if we need to move a brave out of the settlement.
-        for (IndianSettlement is : player.getIndianSettlements()) {
+        for (IndianSettlement is : getPlayer().getIndianSettlements()) {
             secureIndianSettlement(is);
         }
     }
@@ -146,7 +146,7 @@ public class IndianAIPlayer extends NewAIPlayer {
      */
     public void secureIndianSettlement(IndianSettlement is) {
         if (is.getOwner().isAtWar()) {
-            Map map = player.getGame().getMap();
+            Map map = getPlayer().getGame().getMap();
             if (is.getUnitCount() > 2) {
                 int defenders = is.getTile().getUnitCount();
                 int threat = 0;
@@ -157,10 +157,10 @@ public class IndianAIPlayer extends NewAIPlayer {
                     Tile t = map.getTile(positionIterator.next());
                     if (t.getFirstUnit() != null) {
                         Player enemy = t.getFirstUnit().getOwner();
-                        if (enemy == player) {
+                        if (enemy == getPlayer()) {
                             defenders++;
                         } else {
-                            Tension tension = player.getTension(enemy);
+                            Tension tension = getPlayer().getTension(enemy);
                             if (tension != null) {
                                 int value = tension.getValue();
                                 if (value >= Tension.TENSION_ADD_MAJOR) {
@@ -209,10 +209,10 @@ public class IndianAIPlayer extends NewAIPlayer {
      */
     private void bringGifts() {
         logger.finest("Entering method bringGifts");
-        if (!player.isIndian()) {
+        if (!getPlayer().isIndian()) {
             return;
         }
-        for (IndianSettlement indianSettlement : player.getIndianSettlements()) {
+        for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
             // Do not bring gifts all the time:
             if (getRandom().nextInt(10) != 1) {
                 continue;
@@ -267,10 +267,10 @@ public class IndianAIPlayer extends NewAIPlayer {
      */
     private void demandTribute() {
         logger.finest("Entering method demandTribute");
-        if (!player.isIndian()) {
+        if (!getPlayer().isIndian()) {
             return;
         }
-        for (IndianSettlement indianSettlement : player.getIndianSettlements()) {
+        for (IndianSettlement indianSettlement : getPlayer().getIndianSettlements()) {
             // Do not demand goods all the time:
             if (getRandom().nextInt(10) != 1) {
                 continue;
@@ -364,8 +364,8 @@ public class IndianAIPlayer extends NewAIPlayer {
                 return price;
             }
         } else {
-            price = ((IndianSettlement) settlement).getPrice(goods) - player.getTension(unit.getOwner()).getValue();
-            price = Math.min(price, player.getGold() / 2);
+            price = ((IndianSettlement) settlement).getPrice(goods) - getPlayer().getTension(unit.getOwner()).getValue();
+            price = Math.min(price, getPlayer().getGold() / 2);
             if (price <= 0) {
                 return 0;
             }
@@ -373,7 +373,7 @@ public class IndianAIPlayer extends NewAIPlayer {
         }
         if (gold < 0 || price == gold) {
             return price;
-        } else if (gold > (player.getGold() * 3) / 4) {
+        } else if (gold > (getPlayer().getGold() * 3) / 4) {
             sessionRegister.put(goldKey, new Integer(-1));
             return NetworkConstants.NO_TRADE;
         } else if (gold > (price * 11) / 10) {

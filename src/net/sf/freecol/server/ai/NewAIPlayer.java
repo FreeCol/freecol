@@ -85,13 +85,13 @@ public abstract class NewAIPlayer extends AIObject {
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
      */
-    protected ServerPlayer player;
+    private ServerPlayer player;
 
     /** Temporary variable. */
-    protected ArrayList<AIUnit> aiUnits = new ArrayList<AIUnit>();
+    private ArrayList<AIUnit> aiUnits = new ArrayList<AIUnit>();
 
     /** Temporary variable. */
-    protected Connection debuggingConnection;
+    private Connection debuggingConnection;
 
     public NewAIPlayer() {
         super(null);
@@ -571,5 +571,9 @@ public abstract class NewAIPlayer extends AIObject {
                 }
             }
         }
+    }
+
+    protected void clearAIUnits() {
+        aiUnits.clear();
     }
 }
