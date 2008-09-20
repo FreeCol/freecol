@@ -66,14 +66,6 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
 
     private static final Logger logger = Logger.getLogger(ColonialAIPlayer.class.getName());
 
-
-    public static final int STRATEGY_NONE = 0, STRATEGY_TRADE = 1, STRATEGY_IMMIGRATION = 2, STRATEGY_COOPERATION = 3,
-        STRATEGY_CONQUEST = 4;
-
-    /** The strategy of this player. */
-    private int strategy = STRATEGY_NONE;
-
-
     /**
      *
      * Tells this <code>AIPlayer</code> to make decisions. The
@@ -82,23 +74,6 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
      */
     public void startWorking() {
         logger.fine("Entering AI code for: " + player.getNationAsString());
-        /** TODO: find some intelligent solution
-            switch (player.getNation()) {
-            case Player.DUTCH:
-            this.strategy = STRATEGY_TRADE;
-            break;
-            case Player.ENGLISH:
-            this.strategy = STRATEGY_IMMIGRATION;
-            break;
-            case Player.FRENCH:
-            this.strategy = STRATEGY_COOPERATION;
-            break;
-            case Player.SPANISH:
-            this.strategy = STRATEGY_CONQUEST;
-            break;
-            }
-        */
-        this.strategy = STRATEGY_TRADE;
         sessionRegister.clear();
         aiUnits.clear();
         cheat();
@@ -457,22 +432,11 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
      */
     public boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold) {
         // TODO: make a better choice
-        if (strategy == STRATEGY_CONQUEST) {
+        if (goods.getType().isMilitaryGoods()) {
             return false;
         } else {
             return true;
         }
     }
-
-    /**
-     * Returns the strategy of this <code>AIPlayer</code>.
-     *
-     * @return the strategy of this <code>AIPlayer</code>.
-     */
-    public int getStrategy() {
-        return strategy;
-    }
-
-
 
 }
