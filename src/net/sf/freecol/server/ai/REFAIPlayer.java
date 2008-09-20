@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 
@@ -109,7 +108,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
         int numberOfUnits = FreeCol.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
-        Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(numberOfUnits);
+        ArrayList<ArrayList<Wish>> workerWishes = new ArrayList<ArrayList<Wish>>(numberOfUnits);
         for (int i = 0; i < numberOfUnits; i++) {
             workerWishes.add(new ArrayList<Wish>());
         }

@@ -21,7 +21,6 @@ package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -104,7 +103,7 @@ public class IndianAIPlayer extends NewAIPlayer {
 
         int numberOfUnits = FreeCol.getSpecification().numberOfUnitTypes();
         // Create a datastructure for the worker wishes:
-        Vector<ArrayList<Wish>> workerWishes = new Vector<ArrayList<Wish>>(numberOfUnits);
+        ArrayList<ArrayList<Wish>> workerWishes = new ArrayList<ArrayList<Wish>>(numberOfUnits);
         for (int i = 0; i < numberOfUnits; i++) {
             workerWishes.add(new ArrayList<Wish>());
         }
