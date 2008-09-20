@@ -95,7 +95,7 @@ import org.w3c.dom.Element;
  */
 public final class FreeColServer {
 
-    private static Logger logger = Logger.getLogger(FreeColServer.class.getName());
+    private static final Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
@@ -109,17 +109,17 @@ public final class FreeColServer {
     private Server server;
 
     // Control:
-    private UserConnectionHandler userConnectionHandler;
+    private final UserConnectionHandler userConnectionHandler;
 
-    private PreGameController preGameController;
+    private final PreGameController preGameController;
 
-    private PreGameInputHandler preGameInputHandler;
+    private final PreGameInputHandler preGameInputHandler;
 
-    private InGameInputHandler inGameInputHandler;
+    private final InGameInputHandler inGameInputHandler;
 
-    private ServerModelController modelController;
+    private final ServerModelController modelController;
 
-    private InGameController inGameController;
+    private final InGameController inGameController;
 
     private Game game;
 
