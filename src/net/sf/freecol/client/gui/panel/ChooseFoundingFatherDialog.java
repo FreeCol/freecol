@@ -137,9 +137,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
         private JButton ok;
 
-        private JPanel p1;
-
-
         /**
          * Creates a <code>FoundingFatherPanel</code> for a given type of
          * founding fathers.
@@ -151,28 +148,48 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
             setLayout(new BorderLayout());
 
+            // header area to display the father name
             header = getDefaultHeader("");
-
             add(header, BorderLayout.NORTH);
 
-            p1 = new JPanel();
+            // content area with image and text
+            JPanel contentPanel = createContentPanel(type);
+            add(contentPanel, BorderLayout.CENTER);
+
+            // selection button at bottom
+            JPanel p3 = new JPanel(new BorderLayout());
+            p3.setOpaque(false);
+            p3.setBorder(new EmptyBorder(0, 160, 20, 160));
+            ok = new JButton(Messages.message("chooseThisFoundingFather"));
+            ok.addActionListener(chooseFoundingFatherDialog);
+            ok.setSize(ok.getPreferredSize());
+            enterPressesWhenFocused(ok);
+            p3.add(ok, BorderLayout.CENTER);
+            add(p3, BorderLayout.SOUTH);
+        }
+        
+        private JPanel createContentPanel(FoundingFatherType type) {
+            
+            JPanel p1 = new JPanel();
             p1.setLayout(new BorderLayout(20, 20));
             p1.setOpaque(false);
             p1.setBorder(new EmptyBorder(20, 20, 20, 20));
 
+            // the image on the top/left
             Image image = ResourceManager.getImage("FoundingFather." + type.toString().toLowerCase());
-
             JLabel imageLabel;
             if (image != null) {
                 imageLabel = new JLabel(new ImageIcon(image));
             } else {
                 imageLabel = new JLabel();
             }
-
-            p1.add(imageLabel, BorderLayout.WEST);
+            JPanel imagePanel = new JPanel(new BorderLayout());
+            imagePanel.add(imageLabel, BorderLayout.NORTH);
+            p1.add(imagePanel, BorderLayout.WEST);
 
             JPanel p2 = new JPanel(new BorderLayout());
             p2.setOpaque(false);
+            p1.add(p2, BorderLayout.CENTER);
 
             description = new JTextArea();
             description.setBorder(null);
@@ -182,7 +199,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             description.setWrapStyleWord(true);
             description.setFocusable(false);
             p2.add(description, BorderLayout.NORTH);
-
+    
             text = new JTextArea();
             text.setBorder(null);
             text.setOpaque(false);
@@ -191,19 +208,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             text.setWrapStyleWord(true);
             text.setFocusable(false);
             p2.add(text, BorderLayout.CENTER);
-
-            JPanel p3 = new JPanel(new BorderLayout());
-            p3.setOpaque(false);
-            p3.setBorder(new EmptyBorder(0, 160, 20, 160));
-            ok = new JButton(Messages.message("chooseThisFoundingFather"));
-            ok.addActionListener(chooseFoundingFatherDialog);
-            ok.setSize(ok.getPreferredSize());
-            enterPressesWhenFocused(ok);
-            p3.add(ok, BorderLayout.CENTER);
-
-            p1.add(p2, BorderLayout.CENTER);
-            add(p1, BorderLayout.CENTER);
-            add(p3, BorderLayout.SOUTH);
+            
+            return p1;
         }
 
         public void requestFocus() {
