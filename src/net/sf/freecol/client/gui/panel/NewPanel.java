@@ -150,7 +150,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         group.add(start);
         group.add(meta);
 
-        int numberOfRows = 11;
+        int numberOfRows = 13;
         int[] widths = {21, 0, margin, 0, margin, 0, margin, 0, 6*margin, 0};
         int[] heights = new int[2 * numberOfRows - 1];
         for (int index = 1; index < heights.length; index += 2) {
@@ -167,7 +167,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         add(single, higConst.rcwh(row, 1, 8, 1, "l"));
         row += 2;
         add(additionalNations, higConst.rcwh(row, 2, 3, 1, "l"));
-        add(selectAdvantages, higConst.rc(row, 10, "l"));
+        row += 2;
+        add(selectAdvantages, higConst.rcwh(row, 2, 3, 1, "l"));
         row += 2;
         add(singlePlayerNoLabel, higConst.rcwh(row, 2, 3, 1, "l"));
         add(singlePlayerNo, higConst.rc(row, 8));
