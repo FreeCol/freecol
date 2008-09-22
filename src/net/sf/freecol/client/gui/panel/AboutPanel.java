@@ -82,6 +82,7 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
         // Info panel
         JPanel infoPanel = new JPanel(new GridLayout(3, 1));
         this.add(infoPanel,BorderLayout.CENTER);
+        infoPanel.setBorder(new EmptyBorder(10, 10, 0, 10));
         // version and links
         JPanel table = new JPanel(new GridLayout(3, 2));
         infoPanel.add(table);
@@ -102,9 +103,12 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
         // license disclaimer
         String disclaimer = Messages.message("aboutPanel.legalDisclaimer");
         JTextArea textarea = new JTextArea();
+        textarea.setOpaque(false);
         textarea.setText(disclaimer);
         textarea.setLineWrap(true);
         textarea.setWrapStyleWord(true);
+        textarea.setEditable(false);
+        textarea.setFocusable(false);
         infoPanel.add(textarea);
         // copyright
         infoPanel.add(new JLabel(Messages.message("aboutPanel.copyright"),JLabel.CENTER),BorderLayout.CENTER);
