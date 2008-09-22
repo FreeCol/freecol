@@ -31,6 +31,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
@@ -156,7 +157,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             JPanel contentPanel = createContentPanel(type);
             add(contentPanel, BorderLayout.CENTER);
 
-            // selection button at bottom
+            // selection button at the bottom
             JPanel p3 = new JPanel(new BorderLayout());
             p3.setOpaque(false);
             p3.setBorder(new EmptyBorder(0, 160, 20, 160));
@@ -187,9 +188,20 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             imagePanel.add(imageLabel, BorderLayout.NORTH);
             p1.add(imagePanel, BorderLayout.WEST);
 
+            // text on the right side
             JPanel p2 = new JPanel(new BorderLayout());
             p2.setOpaque(false);
-            p1.add(p2, BorderLayout.CENTER);
+            // use a scroll panel if the text is too long in some languages
+            JScrollPane scrollPane = new JScrollPane(p2,
+                    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.getViewport().setOpaque(false);
+            scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
+            scrollPane.setOpaque(false);
+            scrollPane.setBorder(null);
+            p1.add(scrollPane, BorderLayout.CENTER);
+            // and control the overall window size, for the scroll panel to work
+            this.setPreferredSize(new Dimension(570,400));
 
             description = new JTextArea();
             description.setBorder(null);
@@ -199,7 +211,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             description.setWrapStyleWord(true);
             description.setFocusable(false);
             p2.add(description, BorderLayout.NORTH);
-    
+
             text = new JTextArea();
             text.setBorder(null);
             text.setOpaque(false);
@@ -214,10 +226,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
 
         public void requestFocus() {
             ok.requestFocus();
-        }
-
-        public Dimension getPreferredSize() {
-            return new Dimension(570, super.getPreferredSize().height);
         }
 
         /**
