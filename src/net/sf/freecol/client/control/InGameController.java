@@ -1304,6 +1304,10 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the Unit.
      */
     private void exploreLostCityRumour(Unit unit, Direction direction) {
+        
+        // center on the explorer
+        freeColClient.getGUI().setFocusImmediately(unit.getTile().getPosition());
+        
         if (freeColClient.getCanvas().showConfirmDialog("exploreLostCityRumour.text", "exploreLostCityRumour.yes",
                 "exploreLostCityRumour.no")) {
             reallyMove(unit, direction);

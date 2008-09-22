@@ -1040,6 +1040,9 @@ public final class InGameInputHandler extends InputHandler {
         }
         Tile tile = unit.getTile();
         tile.setLostCityRumour(false);
+        
+        // center on the explorer
+        freeColClient.getGUI().setFocusImmediately(tile.getPosition());
 
         Unit newUnit;
         NodeList unitList;
