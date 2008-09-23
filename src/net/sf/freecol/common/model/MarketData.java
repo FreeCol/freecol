@@ -71,11 +71,18 @@ public class MarketData extends FreeColObject {
     private int incomeAfterTaxes;
 
     /**
+     * Has this good been traded?
+     */
+    private boolean traded;
+
+    /**
      * Package constructor: This class is only supposed to be constructed
      * by {@link Market}.
      * 
      */
-    public MarketData() {}
+    public MarketData() {
+        traded = false;
+    }
     
     /**
      * Creates a new <code>MarketData</code> instance.
@@ -84,6 +91,7 @@ public class MarketData extends FreeColObject {
      */
     public MarketData(GoodsType goodsType) {
         setId(goodsType.getId());
+        traded = false;
     }
 
     /**
@@ -191,6 +199,7 @@ public class MarketData extends FreeColObject {
      * @param newSales The new Sales value.
      */
     public final void setSales(final int newSales) {
+        this.traded |= this.sales != newSales;
         this.sales = newSales;
     }
 
@@ -231,6 +240,15 @@ public class MarketData extends FreeColObject {
     }
 
     /**
+     * Has this good been traded?
+     *
+     * @return Whether this good has been traded
+     **/
+    public final boolean getTraded() {
+        return traded;
+    }
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      * 
@@ -254,7 +272,7 @@ public class MarketData extends FreeColObject {
         out.writeAttribute("sales", Integer.toString(sales));
         out.writeAttribute("incomeBeforeTaxes", Integer.toString(incomeBeforeTaxes));
         out.writeAttribute("incomeAfterTaxes", Integer.toString(incomeAfterTaxes));
-
+        out.writeAttribute("traded", Boolean.toString(traded));
         out.writeEndElement();
     }
 
@@ -269,7 +287,7 @@ public class MarketData extends FreeColObject {
         sales = Integer.parseInt(in.getAttributeValue(null, "sales"));
         incomeBeforeTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeBeforeTaxes"));
         incomeAfterTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeAfterTaxes"));
-    
+        traded = getAttribute(in, "traded", sales != 0);
         in.nextTag();
     }
 

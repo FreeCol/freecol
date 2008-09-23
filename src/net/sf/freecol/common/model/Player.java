@@ -2817,9 +2817,21 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Has a type of goods been traded?
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return Whether these goods have been traded.
+     */
+    public boolean hasTraded(GoodsType goodsType) {
+        MarketData data = getMarket().getMarketData(goodsType);
+        return data != null && data.getTraded();
+    }
+
+    /**
      * Returns the most valuable goods available in one of the player's
-     * colonies. The goods must not be boycotted, and the amount will not exceed
-     * 100.
+     * colonies for the purposes of choosing a threat-to-boycott.
+     * The goods must not currently be boycotted, the player must have traded in
+     * it, and the amount will not exceed 100.
      *
      * @return A goods object, or null.
      */
@@ -2832,7 +2844,8 @@ public class Player extends FreeColGameObject implements Nameable {
         for (Colony colony : getColonies()) {
             List<Goods> colonyGoods = colony.getCompactGoods();
             for (Goods currentGoods : colonyGoods) {
-                if (getArrears(currentGoods) == 0) {
+                if (getArrears(currentGoods) == 0
+                    && hasTraded(currentGoods.getType())) {
                     // never discard more than 100 units
                     if (currentGoods.getAmount() > 100) {
                         currentGoods.setAmount(100);
