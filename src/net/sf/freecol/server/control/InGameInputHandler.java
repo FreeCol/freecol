@@ -2370,11 +2370,22 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         Nation refNation = Specification.getSpecification().getNation(player.getNation().getRefId());
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
+        refPlayer.setEntryLocation(player.getEntryLocation());
         Element reply = Message.createNewRootElement("update");
         reply.appendChild(refPlayer.toXMLElement(null, reply.getOwnerDocument()));
+        List<Unit> navalUnits = new ArrayList<Unit>();
+        for (AbstractUnit unit : player.getMonarch().getNavalUnits()) {
+            for (int index = 0; index < unit.getNumber(); index++) {
+                Unit newUnit = new Unit(getGame(), refPlayer.getEurope(), refPlayer,
+                                        unit.getUnitType(), UnitState.TO_AMERICA);
+                navalUnits.add(newUnit);
+            }
+        }
+        List<Unit> safeNavalUnits = new ArrayList<Unit>(navalUnits);
         EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
         EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
-        for (AbstractUnit unit : player.getMonarch().getREF()) {
+        Iterator<Unit> unitIterator;
+        for (AbstractUnit unit : player.getMonarch().getLandUnits()) {
             EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
             switch(unit.getRole()) {
             case SOLDIER:
@@ -2388,8 +2399,22 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             for (int index = 0; index < unit.getNumber(); index++) {
                 Unit newUnit = new Unit(getGame(), refPlayer.getEurope(), refPlayer,
                                         unit.getUnitType(), UnitState.ACTIVE, equipment);
+                unitIterator = navalUnits.iterator();
+                while (unitIterator.hasNext()) {
+                    Unit carrier = unitIterator.next();
+                    if (newUnit.getSpaceTaken() < carrier.getSpaceLeft()) {
+                        newUnit.setLocation(carrier);
+                        if (carrier.getSpaceLeft() == 0) {
+                            unitIterator.remove();
+                        }
+                        break;
+                    }
+                }
                 reply.appendChild(newUnit.toXMLElement(null, reply.getOwnerDocument()));
             }
+        }
+        for (Unit unit : safeNavalUnits) {
+            reply.appendChild(unit.toXMLElement(null, reply.getOwnerDocument()));
         }
         player.declareIndependence();
         return reply;
