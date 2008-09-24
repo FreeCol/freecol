@@ -1895,7 +1895,7 @@
       </rangeOption>
       <!-- Option for setting the number of mountains on the map
            The value indicates the number of land tile per mountain tile -->
-      <rangeOption id="model.option.mountainNumber" defaultValue="1" localizedLabels="true">
+      <rangeOption id="model.option.mountainNumber" defaultValue="10" localizedLabels="true">
         <rangeValue label="small" value="20"/>
         <rangeValue label="medium" value="10"/>
         <rangeValue label="large" value="9"/>
