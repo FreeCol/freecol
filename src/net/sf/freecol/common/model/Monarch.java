@@ -277,14 +277,32 @@ public final class Monarch extends FreeColGameObject {
     }
 
     /**
-     * Returns a Set of all REF units.
+     * Returns a List of all REF units.
      *
-     * @return a Set of all REF units.
+     * @return a List of all REF units.
      */
     public List<AbstractUnit> getREF() {
         List<AbstractUnit> result = new ArrayList<AbstractUnit>(landUnits);
         result.addAll(navalUnits);
         return result;
+    }
+
+    /**
+     * Returns only the naval units.
+     *
+     * @return the naval units
+     */
+    public List<AbstractUnit> getNavalUnits() {
+        return navalUnits;
+    }
+
+    /**
+     * Returns only the land units.
+     *
+     * @return the land units
+     */
+    public List<AbstractUnit> getLandUnits() {
+        return landUnits;
     }
 
     /**
