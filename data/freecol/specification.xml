@@ -1896,11 +1896,11 @@
       <!-- Option for setting the number of mountains on the map
            The value indicates the number of land tile per mountain tile -->
       <rangeOption id="model.option.mountainNumber" defaultValue="1" localizedLabels="true">
-        <rangeValue label="small" value="0"/>
-        <rangeValue label="medium" value="1"/>
-        <rangeValue label="large" value="2"/>
-        <rangeValue label="veryLarge" value="3"/>
-        <rangeValue label="huge" value="4"/>
+        <rangeValue label="small" value="20"/>
+        <rangeValue label="medium" value="10"/>
+        <rangeValue label="large" value="9"/>
+        <rangeValue label="veryLarge" value="8"/>
+        <rangeValue label="huge" value="7"/>
       </rangeOption>
       <!-- Option for setting the number of rumours on the map
            The value indicates the number of land tile per rumour tile -->
