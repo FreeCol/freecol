@@ -66,10 +66,8 @@ import org.w3c.dom.Element;
  * @see net.sf.freecol.common.model.Colony Colony
  */
 public class BuildColonyMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(BuildColonyMission.class.getName());
-
-
-
 
     /** The <code>Tile</code> where the <code>Colony</code> should be built. */
     private Tile target;
@@ -180,7 +178,7 @@ public class BuildColonyMission extends Mission {
         }
 
         if (target == null || doNotGiveUp
-                && (colonyValue != getUnit().getOwner().getColonyValue(target) || target.getSettlement() != null)) {
+            && (colonyValue != getUnit().getOwner().getColonyValue(target) || target.getSettlement() != null)) {
             target = findColonyLocation(getUnit());
             if (target == null) {
                 doNotGiveUp = false;
@@ -274,6 +272,7 @@ public class BuildColonyMission extends Mission {
      *         <code>Unit</code>.
      */
     public static Tile findColonyLocation(Unit unit) {
+        
         Game game = unit.getGame();
         
         Tile startTile = null;
@@ -290,48 +289,63 @@ public class BuildColonyMission extends Mission {
             return null;
         }
 
+        /*
+         * If no suitable position is found within the first 500 spots
+         * the range gets increased until the whole map is searched.
+         */
+        
         Tile bestTile = null;
         int highestColonyValue = 0;
-
+        int maxNumberofTiles = 500;
+        int tileCounter = 0;
+        
         Iterator<Position> it = game.getMap().getFloodFillIterator(startTile.getPosition());
-        for (int i = 0; it.hasNext() && i < 500; i++) {
-            Tile tile = game.getMap().getTile(it.next());
-            if (tile.getColonyValue() > 0) {
-                if (tile != startTile) {
-                    PathNode path;
-                    if (unit.getLocation() instanceof Unit) {
-                        Unit carrier = (Unit) unit.getLocation();
-                        path = game.getMap().findPath(unit, startTile, tile, carrier);
-                    } else {
-                        path = game.getMap().findPath(unit, startTile, tile);
-                    }
-
-                    if (path != null) {
-                        int newColonyValue = 10000
+        
+        while (it.hasNext()){
+            for (; it.hasNext() && tileCounter < maxNumberofTiles; tileCounter++) {
+                Tile tile = game.getMap().getTile(it.next());
+                if (tile.getColonyValue() > 0) {
+                    if (tile != startTile) {
+                        PathNode path;
+                        if (unit.getLocation() instanceof Unit) {
+                            Unit carrier = (Unit) unit.getLocation();
+                            path = game.getMap().findPath(unit, startTile, tile, carrier);
+                        } else {
+                            path = game.getMap().findPath(unit, startTile, tile);
+                        }
+        
+                        if (path != null) {
+                            int newColonyValue = 10000
                                 + unit.getOwner().getColonyValue(tile)
                                 - path.getTotalTurns()
                                 * ((unit.getGame().getTurn().getNumber() < 10 && unit.getLocation() instanceof Unit) ? 25
-                                        : 4);
+                                   : 4);
+                            if (newColonyValue > highestColonyValue) {
+                                highestColonyValue = newColonyValue;
+                                bestTile = tile;
+                            }
+                        }
+                    } else {
+                        int newColonyValue = 10000 + unit.getOwner().getColonyValue(tile);
                         if (newColonyValue > highestColonyValue) {
                             highestColonyValue = newColonyValue;
                             bestTile = tile;
                         }
                     }
-                } else {
-                    int newColonyValue = 10000 + unit.getOwner().getColonyValue(tile);
-                    if (newColonyValue > highestColonyValue) {
-                        highestColonyValue = newColonyValue;
-                        bestTile = tile;
-                    }
                 }
+            }
+            if (bestTile != null && bestTile.getColonyValue() > 0) {
+                return bestTile;
+            } else {
+                        
+                // no good location found within search radius, increase range.
+                maxNumberofTiles *= 4;
             }
         }
 
-        if (bestTile != null && bestTile.getColonyValue() > 0) {
-            return bestTile;
-        } else {
-            return null;
-        }
+        // We have searched the complete map and not found a tile.
+        logger.info("Unit " + unit.getId() + "unsuccessfully searched for colony spot");
+        return null;
     }
 
     /**
@@ -348,8 +362,8 @@ public class BuildColonyMission extends Mission {
      */
     public boolean isValid() {
         return (!colonyBuilt && (doNotGiveUp || target != null
-                && target.getSettlement() == null
-                && colonyValue <= getUnit().getOwner().getColonyValue(target)));
+                                 && target.getSettlement() == null
+                                 && colonyValue <= getUnit().getOwner().getColonyValue(target)));
     }
 
     /**
