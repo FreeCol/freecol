@@ -256,7 +256,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         naval = unitType.hasAbility("model.ability.navalUnit");
         setLocation(location);
 
-        this.state = state;
+        this.state = UnitState.SKIPPED;
         workLeft = -1;
         workType = Goods.FOOD;
 
@@ -272,6 +272,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
         setRole();
+        setState(state);
 
         getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();
@@ -2604,23 +2605,29 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             doAssignedWork();
             return;
         case TO_EUROPE:
-            if (state == UnitState.ACTIVE && !(location instanceof Europe)) {
-                workLeft = TURNS_TO_SAIL;
-            } else if ((state == UnitState.TO_AMERICA) && (location instanceof Europe)) {
-                workLeft = TURNS_TO_SAIL + 1 - workLeft;
+            if (location instanceof Europe) {
+                logger.warning("setState(TO_EUROPE) when in Europe: " + getId());
+                state = SKIPPED;
+                return;
             }
-            workLeft = (int) getOwner().getFeatureContainer()
-                .applyModifier(workLeft,"model.modifier.sailHighSeas", unitType, getGame().getTurn());
+            workLeft = (state == UnitState.TO_AMERICA) 
+                ? TURNS_TO_SAIL + 1 - workLeft
+                : TURNS_TO_SAIL;
+            workLeft = (int) getOwner().getFeatureContainer().applyModifier(workLeft,
+                "model.modifier.sailHighSeas", unitType, getGame().getTurn());
             movesLeft = 0;
             break;
         case TO_AMERICA:
-            if ((state == UnitState.ACTIVE) && (location instanceof Europe)) {
-                workLeft = TURNS_TO_SAIL;
-            } else if ((state == UnitState.TO_EUROPE) && (location instanceof Europe)) {
-                workLeft = TURNS_TO_SAIL + 1 - workLeft;
+            if (!(location instanceof Europe)) {
+                logger.warning("setState(TO_AMERICA) when in America: " + getId());
+                state = SKIPPED;
+                return;
             }
-            workLeft = (int) getOwner().getFeatureContainer()
-                .applyModifier(workLeft,"model.modifier.sailHighSeas", unitType, getGame().getTurn());
+            workLeft = (state == UnitState.TO_EUROPE) 
+                ? TURNS_TO_SAIL + 1 - workLeft
+                : TURNS_TO_SAIL;
+            workLeft = (int) getOwner().getFeatureContainer().applyModifier(workLeft,
+                "model.modifier.sailHighSeas", unitType, getGame().getTurn());
             movesLeft = 0;
             break;
         case SKIPPED:
