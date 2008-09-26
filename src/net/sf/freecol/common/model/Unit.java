@@ -2607,7 +2607,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         case TO_EUROPE:
             if (location instanceof Europe) {
                 logger.warning("setState(TO_EUROPE) when in Europe: " + getId());
-                state = SKIPPED;
+                state = UnitState.SKIPPED;
                 return;
             }
             workLeft = (state == UnitState.TO_AMERICA) 
@@ -2620,7 +2620,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         case TO_AMERICA:
             if (!(location instanceof Europe)) {
                 logger.warning("setState(TO_AMERICA) when in America: " + getId());
-                state = SKIPPED;
+                state = UnitState.SKIPPED;
                 return;
             }
             workLeft = (state == UnitState.TO_EUROPE) 
