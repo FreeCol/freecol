@@ -2381,7 +2381,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 navalUnits.add(newUnit);
             }
         }
-        List<Unit> safeNavalUnits = new ArrayList<Unit>(navalUnits);
+        List<Unit> safeUnits = new ArrayList<Unit>(navalUnits);
         EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
         EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
         Iterator<Unit> unitIterator;
@@ -2410,10 +2410,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         break;
                     }
                 }
-                reply.appendChild(newUnit.toXMLElement(null, reply.getOwnerDocument()));
+                safeUnits.add(newUnit);
             }
         }
-        for (Unit unit : safeNavalUnits) {
+        for (Unit unit : safeUnits) {
             reply.appendChild(unit.toXMLElement(null, reply.getOwnerDocument()));
         }
         player.declareIndependence();
