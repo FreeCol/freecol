@@ -1244,19 +1244,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * The potential of this tile to produce a certain type of goods.
-     * 
-     * @param goodsIndex The index of the goods to check the potential for.
-     * @return The normal potential of this tile to produce that amount of
-     *         goods.
-     */
-    /*
-    public int potential(int goodsIndex) {
-        return potential(FreeCol.getSpecification().getGoodsType(goodsIndex));
-    }
-    */
-
-    /**
      * Gets the maximum potential for producing the given type of goods. The
      * maximum potential is the potential of a tile after the tile has been
      * plowed/built road on.
