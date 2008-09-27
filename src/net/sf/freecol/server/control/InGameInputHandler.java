@@ -2414,7 +2414,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         for (Unit unit : safeUnits) {
-            reply.appendChild(unit.toXMLElement(null, reply.getOwnerDocument()));
+            reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         }
         player.declareIndependence();
         return reply;

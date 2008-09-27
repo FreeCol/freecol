@@ -3412,7 +3412,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         out.writeAttribute("movesLeft", Integer.toString(movesLeft));
         out.writeAttribute("state", state.toString());
         out.writeAttribute("role", role.toString());
-        out.writeAttribute("workLeft", Integer.toString(workLeft));
         String ownerID = null;
         if (getOwner().equals(player) || !hasAbility("model.ability.piracy") || showAll) {
             ownerID = owner.getId();
@@ -3432,6 +3431,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             writeAttribute(out, "indianSettlement", indianSettlement);
+            out.writeAttribute("workLeft", Integer.toString(workLeft));
+        } else {
+            out.writeAttribute("workLeft", Integer.toString(-1));
         }
 
         if (entryLocation != null) {
