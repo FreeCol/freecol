@@ -1820,7 +1820,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return The <code>Iterator</code>.
      */
     public Iterator<Unit> getUnitIterator() {
-        return units.iterator();
+        return new ArrayList<Unit>(units).iterator();
     }
 
     public List<Unit> getUnitList() {
