@@ -2542,6 +2542,39 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Checks if a <code>Unit</code> can get the given state set.
+     * 
+     * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
+     *            FORTIFIED, ...}.
+     * @return 'true' if the Unit's state can be changed to the new value,
+     *         'false' otherwise.
+     */
+    public boolean checkSetState(UnitState s) {
+        switch (s) {
+        case ACTIVE:
+        case SENTRY:
+            return true;
+        case IN_COLONY:
+            return !isNaval();
+        case FORTIFIED:
+            return getState() == UnitState.FORTIFYING;
+        case IMPROVING:
+        case FORTIFYING:
+        case SKIPPED:
+            return (getMovesLeft() > 0);
+        case TO_EUROPE:
+            return isNaval() &&
+                ((location instanceof Europe) && (getState() == UnitState.TO_AMERICA)) ||
+                (getEntryLocation() == getLocation());
+        case TO_AMERICA:
+            return (location instanceof Europe && isNaval() && !isUnderRepair());
+        default:
+            logger.warning("Invalid unit state: " + s);
+            return false;
+        }
+    }
+
+    /**
      * Sets a new state for this unit and initializes the amount of work the
      * unit has left.
      * 
@@ -2606,11 +2639,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             doAssignedWork();
             return;
         case TO_EUROPE:
-            if (location instanceof Europe && state != UnitState.TO_AMERICA) {
-                logger.warning("setState(TO_EUROPE) when in Europe: " + getId());
-                state = UnitState.SKIPPED;
-                return;
-            }
             workLeft = (state == UnitState.TO_AMERICA) 
                 ? TURNS_TO_SAIL + 1 - workLeft
                 : TURNS_TO_SAIL;
@@ -2619,11 +2647,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             movesLeft = 0;
             break;
         case TO_AMERICA:
-            if (!(location instanceof Europe)) {
-                logger.warning("setState(TO_AMERICA) when in America: " + getId());
-                state = UnitState.SKIPPED;
-                return;
-            }
             workLeft = (state == UnitState.TO_EUROPE) 
                 ? TURNS_TO_SAIL + 1 - workLeft
                 : TURNS_TO_SAIL;
@@ -2730,40 +2753,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else {
             // Has improvement, check if worker can contribute to it
             return improvement.isWorkerAllowed(this);
-        }
-    }
-
-    /**
-     * Checks if a <code>Unit</code> can get the given state set.
-     * 
-     * @param s The new state for this Unit. Should be one of {UnitState.ACTIVE,
-     *            FORTIFIED, ...}.
-     * @return 'true' if the Unit's state can be changed to the new value,
-     *         'false' otherwise.
-     */
-    public boolean checkSetState(UnitState s) {
-        switch (s) {
-        case ACTIVE:
-            return true;
-        case IN_COLONY:
-            return !isNaval();
-        case FORTIFIED:
-            return getState() == UnitState.FORTIFYING;
-        case IMPROVING:
-        case FORTIFYING:
-        case SKIPPED:
-            return (getMovesLeft() > 0);
-        case SENTRY:
-            return true;
-        case TO_EUROPE:
-            return isNaval() &&
-                ((location instanceof Europe) && (getState() == UnitState.TO_AMERICA)) ||
-                (getEntryLocation() == getLocation());
-        case TO_AMERICA:
-            return (location instanceof Europe && isNaval() && !isUnderRepair());
-        default:
-            logger.warning("Invalid unit state: " + s);
-            return false;
         }
     }
 
