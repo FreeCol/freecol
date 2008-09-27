@@ -29,6 +29,14 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 
+/**
+ * The class <code>BonusOrPenalty</code> is used as the source of an
+ * <code>Ability</code> or <code>Modifier</code> that is defined by
+ * code rather than the Specification. See
+ * <code>SimpleCombatModel</code> for examples.
+ *
+ * @see SimpleCombatModel
+ */
 public class BonusOrPenalty extends FreeColGameObjectType {
 
     public BonusOrPenalty(String id) {
