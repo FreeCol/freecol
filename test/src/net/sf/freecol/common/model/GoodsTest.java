@@ -290,7 +290,7 @@ public class GoodsTest extends FreeColTestCase {
 
     }
 
-    public void testLoadOnto() {
+    public void testLoadOntoInColony() {
         Game game = getStandardGame();
         Map map = getTestMap(plainsType, true);
         game.setMap(map);
@@ -330,94 +330,99 @@ public class GoodsTest extends FreeColTestCase {
         cotton.loadOnto(wagonNotInColony);
         assertEquals(wagonNotInColony, cotton.getLocation());
 
-        {// Check with Europe
-            Europe europe = getGame().getPlayer("model.nation.dutch").getEurope();
-            Unit privateer1 = new Unit(getGame(), europe, getGame().getPlayer("model.nation.dutch"), privateerType,
-                    UnitState.ACTIVE);
-            Unit privateer2 = new Unit(getGame(), europe, getGame().getPlayer("model.nation.dutch"), privateerType,
-                    UnitState.ACTIVE);
+    }
 
-            // While source in Europe, target in Europe
-            cotton.setLocation(privateer1);
+    public void testLoadOntoInEurope() {
+        Game game = getStandardGame();
+        Map map = getTestMap(plainsType, true);
+        game.setMap(map);
+        Goods cotton = new Goods(getGame(), null, cottonType, 75);
+        Europe europe = getGame().getPlayer("model.nation.dutch").getEurope();
+        Unit privateer1 = new Unit(getGame(), europe, getGame().getPlayer("model.nation.dutch"), privateerType,
+                                   UnitState.ACTIVE);
+        Unit privateer2 = new Unit(getGame(), europe, getGame().getPlayer("model.nation.dutch"), privateerType,
+                                   UnitState.ACTIVE);
+
+        // While source in Europe, target in Europe
+        cotton.setLocation(privateer1);
+        cotton.loadOnto(privateer2);
+        assertEquals(privateer2, cotton.getLocation());
+
+        // While source moving from America, target in Europe
+        cotton.setLocation(privateer1);
+        assertEquals(europe, privateer1.getLocation());
+        privateer1.moveToAmerica();
+        try {
             cotton.loadOnto(privateer2);
-            assertEquals(privateer2, cotton.getLocation());
+            fail();
+        } catch (IllegalStateException e) {
+        }
 
-            // While source moving from America, target in Europe
-            cotton.setLocation(privateer1);
-            assertEquals(europe, privateer1.getLocation());
-            privateer1.moveToAmerica();
-            try {
-                cotton.loadOnto(privateer2);
-                fail();
-            } catch (IllegalStateException e) {
-            }
+        // While source moving to America, target in Europe
+        cotton.setLocation(privateer1);
+        privateer1.moveToEurope();
+        try {
+            cotton.loadOnto(privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
 
-            // While source moving to America, target in Europe
-            cotton.setLocation(privateer1);
-            privateer1.moveToEurope();
-            try {
-                cotton.loadOnto(privateer2);
-                fail();
-            } catch (IllegalStateException e) {
-            }
+        // While source in Europe, target moving to America
+        privateer1.setLocation(europe);
+        privateer2.moveToAmerica();
 
-            // While source in Europe, target moving to America
-            privateer1.setLocation(europe);
-            privateer2.moveToAmerica();
+        cotton.setLocation(privateer1);
+        try {
+            cotton.loadOnto(privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
 
-            cotton.setLocation(privateer1);
-            try {
-                cotton.loadOnto(privateer2);
-                fail();
-            } catch (IllegalStateException e) {
-            }
+        // While source moving to America, target moving to America
+        cotton.setLocation(privateer1);
+        privateer1.moveToAmerica();
+        try {
+            cotton.loadOnto(privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
 
-            // While source moving to America, target moving to America
-            cotton.setLocation(privateer1);
-            privateer1.moveToAmerica();
-            try {
-                cotton.loadOnto(privateer2);
-                fail();
-            } catch (IllegalStateException e) {
-            }
+        // While source moving from America, target moving to America
+        cotton.setLocation(privateer1);
+        privateer1.moveToEurope();
+        try {
+            cotton.loadOnto(privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
 
-            // While source moving from America, target moving to America
-            cotton.setLocation(privateer1);
-            privateer1.moveToEurope();
-            try {
-                cotton.loadOnto(privateer2);
-                fail();
-            } catch (IllegalStateException e) {
-            }
+        // While source in Europe, target moving from America
+        privateer1.setLocation(europe);
+        privateer2.moveToEurope();
 
-            // While source in Europe, target moving from America
-            privateer1.setLocation(europe);
-            privateer2.moveToEurope();
+        cotton.setLocation(privateer1);
+        try {
+            cotton.loadOnto(privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
 
-            cotton.setLocation(privateer1);
-            try {
-                cotton.loadOnto(privateer2);
-                fail();
-            } catch (IllegalStateException e) {
-            }
+        // While source moving to America, target moving from America
+        cotton.setLocation(privateer1);
+        privateer1.moveToAmerica();
+        try {
+            cotton.loadOnto(privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
 
-            // While source moving to America, target moving from America
-            cotton.setLocation(privateer1);
-            privateer1.moveToAmerica();
-            try {
-                cotton.loadOnto(privateer2);
-                fail();
-            } catch (IllegalStateException e) {
-            }
-
-            // While source moving from America, target moving from America
-            cotton.setLocation(privateer1);
-            privateer1.moveToEurope();
-            try {
-                cotton.loadOnto(privateer2);
-                fail();
-            } catch (IllegalStateException e) {
-            }
+        // While source moving from America, target moving from America
+        cotton.setLocation(privateer1);
+        privateer1.moveToEurope();
+        try {
+            cotton.loadOnto(privateer2);
+            fail();
+        } catch (IllegalStateException e) {
         }
     }
 

@@ -256,7 +256,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         naval = unitType.hasAbility("model.ability.navalUnit");
         setLocation(location);
 
-        this.state = UnitState.SKIPPED;
         workLeft = -1;
         workType = Goods.FOOD;
 
@@ -272,7 +271,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
         setRole();
-        setState(state);
+        setStateUnchecked(state);
 
         getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();
@@ -2555,15 +2554,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *            UnitState.FORTIFIED, ...}.
      */
     public void setState(UnitState s) {
-        // No need to do anything when the state is unchanged
         if (state == s) {
+            // No need to do anything when the state is unchanged
             return;
+        } else if (!checkSetState(s)) {
+            throw new IllegalStateException("Illegal UnitState transition: " + state + " -> " + s);
+        } else {
+            setStateUnchecked(s);
         }
+    }
 
-        if (!checkSetState(s)) {
-            throw new IllegalStateException("Illegal state: " + s);
-        }
-
+    private void setStateUnchecked(UnitState s) {
         // Cleanup the old UnitState, for example destroy the
         // TileImprovment being built by a pioneer.
         switch (state) {
@@ -2605,7 +2606,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             doAssignedWork();
             return;
         case TO_EUROPE:
-            if (location instanceof Europe) {
+            if (location instanceof Europe && state != UnitState.TO_AMERICA) {
                 logger.warning("setState(TO_EUROPE) when in Europe: " + getId());
                 state = UnitState.SKIPPED;
                 return;
