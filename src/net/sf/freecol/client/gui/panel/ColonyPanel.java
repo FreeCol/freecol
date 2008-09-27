@@ -847,6 +847,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 inGameController.unloadCargo(goods);
                 updateWarehouse();
                 updateCargoPanel();
+                updateCargoLabel();
                 getCargoPanel().revalidate();
                 refresh();
             }
@@ -855,6 +856,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 Unit newUnit = unitIterator.next();
                 inGameController.leaveShip(newUnit);
                 updateCargoPanel();
+                updateCargoLabel();
                 updateOutsideColonyPanel();
                 outsideColonyPanel.revalidate();
                 getCargoPanel().revalidate();
