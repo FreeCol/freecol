@@ -2601,7 +2601,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             gold = Integer.parseInt(element.getAttribute("gold"));
         }
         if (goods.getAmount() > 100) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Amount of goods exceeds 100: " + goods.getAmount());
         }
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
@@ -2672,17 +2672,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         Element reply = null;
         if (settlement instanceof IndianSettlement) { // offer goods to buy
-            Goods sellGoods[] = ((IndianSettlement) settlement).getSellGoods();
-            Element sellProposition = Message.createNewRootElement("sellProposition");
-            boolean offer = false;
-            for(Goods goodsToSell : sellGoods) {
-                if (goodsToSell != null) {
+            List<Goods> sellGoods = ((IndianSettlement) settlement).getSellGoods();
+            if (!sellGoods.isEmpty()) {
+                Element sellProposition = Message.createNewRootElement("sellProposition");
+                for (Goods goodsToSell : sellGoods) {
                     aiPlayer.registerSellGoods(goodsToSell);
                     sellProposition.appendChild(goodsToSell.toXMLElement(null, sellProposition.getOwnerDocument()));
-                    offer = true;
                 }
-            }
-            if (offer) {
                 reply = sellProposition;
             }
         }

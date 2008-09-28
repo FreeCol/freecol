@@ -1369,16 +1369,14 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
+        } else if (!unit.canCarryGoods()) {
+            throw new IllegalArgumentException("The unit has to be able to carry goods in order to trade!");
         }
+
 
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
         Client client = freeColClient.getClient();
-
-        if (!unit.isCarrier()) {
-            throw new IllegalArgumentException("The unit has to be a carrier in order to trade!");
-        }
-
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
         if (settlement == null) {
             throw new IllegalArgumentException("No settlement in given direction!");

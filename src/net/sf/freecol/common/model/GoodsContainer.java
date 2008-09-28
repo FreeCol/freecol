@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -316,8 +317,10 @@ public class GoodsContainer extends FreeColGameObject {
     public List<Goods> getCompactGoods() {
         ArrayList<Goods> totalGoods = new ArrayList<Goods>();
 
-        for (GoodsType goodsType : storedGoods.keySet()) {
-	    totalGoods.add(new Goods(getGame(), parent, goodsType, storedGoods.get(goodsType)));
+        for (Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
+            if (entry.getValue() > 0) {
+                totalGoods.add(new Goods(getGame(), parent, entry.getKey(), entry.getValue()));
+            }
         }
 
         return totalGoods;

@@ -892,7 +892,6 @@ public class IndianSettlement extends Settlement {
         if (type.isFoodType()) {
             potential = Math.min(potential, ownedUnits.size()*3);
         }
-        
         return potential;
     }
 
@@ -1348,7 +1347,7 @@ public class IndianSettlement extends Settlement {
     /**
      * Returns an array with goods to sell
      */
-    public Goods[] getSellGoods() {
+    public List<Goods> getSellGoods() {
         List<Goods> settlementGoods = getCompactGoods();
         for(Goods goods : settlementGoods) {
             if (goods.getAmount() > 100) {
@@ -1356,18 +1355,18 @@ public class IndianSettlement extends Settlement {
             }
         }
         Collections.sort(settlementGoods, exportGoodsComparator);
-        Goods sellGoods[] = {null, null, null};
-        
-        int i = 0;
-        for(Goods goods : settlementGoods) {
-            if (goods.getType().isNewWorldGoodsType()) {
-                sellGoods[i] = goods;
-                i++;
-                if (i == sellGoods.length) break;
+        for (Goods goods : settlementGoods) {
+            System.out.println(goods);
+        }
+        List<Goods> result = new ArrayList<Goods>();
+
+        for (Goods goods : settlementGoods) {
+            if (goods.getType().isNewWorldGoodsType() && goods.getAmount() > 0) {
+                result.add(goods);
             }
         }
         
-        return sellGoods;
+        return result;
     }
 
     /**

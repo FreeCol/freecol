@@ -94,7 +94,7 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         otherGoodsPanel.add(wantedGoodsLabels[1]);
         otherGoodsPanel.add(wantedGoodsLabels[2]);
         add(otherGoodsPanel, higConst.rc(8, 3));
-        add(okButton, higConst.rc(10, 3));
+        add(okButton, higConst.rcwh(10, 2, 2, 1));
     }
 
     public void requestFocus() {
