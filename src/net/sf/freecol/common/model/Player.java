@@ -799,7 +799,11 @@ public class Player extends FreeColGameObject implements Nameable {
         } while (getGame().getMap().getRegion(name) != null);
         if (name == null) {
             do {
-                name = Messages.message("model.region." + regionType.toString().toLowerCase()) + index;
+                String type = Messages.message("model.region." + regionType.toString().toLowerCase() + ".name");
+                name = Messages.message("model.region.default",
+                                        "%nation%", getNationAsString(),
+                                        "%type%", type,
+                                        "%index%", Integer.toString(index));
                 index++;
             } while (getGame().getMap().getRegion(name) != null);
         }
