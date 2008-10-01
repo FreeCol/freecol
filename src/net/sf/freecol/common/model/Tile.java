@@ -778,7 +778,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             Player otherPlayer = getOwner();
             if (otherPlayer != null) {
                 if (!otherPlayer.isEuropean()) {
-                    otherPlayer.modifyTension(player, Tension.TENSION_ADD_LAND_TAKEN);
+                    otherPlayer.modifyTension(player, Tension.TENSION_ADD_LAND_TAKEN,
+                                              (IndianSettlement) owningSettlement);
                 }
             } else {
                 logger.warning("Could not find player with nation: " + getOwner());
