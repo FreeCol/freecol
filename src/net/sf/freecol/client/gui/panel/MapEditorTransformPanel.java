@@ -217,7 +217,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (tile.getType().canHaveRiver()) {
                 TileItemContainer tic = tile.getTileItemContainer();
                 if (tic == null) {
-                    tile.setTileItemContainer(new TileItemContainer(tile.getGame(), tile));
+                    tic = new TileItemContainer(tile.getGame(), tile);
+                    tile.setTileItemContainer(tic);
                 }
                 int oldMagnitude = TileImprovement.NO_RIVER;
                 if (tic.hasRiver()) {
