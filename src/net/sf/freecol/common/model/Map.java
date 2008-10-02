@@ -469,6 +469,12 @@ public class Map extends FreeColGameObject {
                 if (newTile == null) {
                     continue;
                 }
+                
+                // If the new tile is the tile we just visited, skip it. We can use == because PathNode.getTile() 
+                // and getNeighborOrNull both return references to the actual Tile in tiles[][].
+                if (currentNode.previous != null && currentNode.previous.getTile() == newTile) {
+                    continue;
+                }
 
                 int cost = currentNode.getCost();
                 int movesLeft = currentNode.getMovesLeft();
@@ -814,6 +820,12 @@ public class Map extends FreeColGameObject {
                         .getTile());
 
                 if (newTile == null) {
+                    continue;
+                }
+                
+                // If the new tile is the tile we just visited, skip it. We can use == because PathNode.getTile() 
+                // and getNeighborOrNull both return references to the actual Tile in tiles[][].
+                if (currentNode.previous != null && currentNode.previous.getTile() == newTile) {
                     continue;
                 }
 
