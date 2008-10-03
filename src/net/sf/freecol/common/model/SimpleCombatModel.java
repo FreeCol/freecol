@@ -425,6 +425,8 @@ public class SimpleCombatModel implements CombatModel {
                             if (ability.appliesTo(equipment) && 
                                 settlement.canBuildEquipment(equipment)) {
                                 result.addAll(equipment.getModifierSet("model.modifier.defence"));
+                                /** Don't do this here. The method will be called in non-combat
+                                   situations.
                                 if (defender.getColony() != null) {
                                     defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT,
                                                              defender,
@@ -432,6 +434,7 @@ public class SimpleCombatModel implements CombatModel {
                                                              "%unit%", defender.getName(),
                                                              "%colony%", defender.getColony().getName());
                                 }
+                                */
                             }
                         }
                     }
