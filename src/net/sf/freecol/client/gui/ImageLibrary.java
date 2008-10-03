@@ -929,7 +929,9 @@ public final class ImageLibrary extends ImageProvider {
         } else {
             key = unexploredName;
         }
-        if ((x + y) % 2 == 0) {
+        if (( y % 8 <= 2) || ( (x+y) % 2 == 0 )) {
+            // the pattern is mostly visible on ocean tiles
+            // this is an attempt to break it up so it doesn't create big stripes or chess-board effect
             return terrain1.get(key).getImage();
         } else {
             return terrain2.get(key).getImage();
