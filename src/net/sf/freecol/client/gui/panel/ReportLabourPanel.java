@@ -493,10 +493,12 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 addRow(data, null, Messages.message("report.labour.sutdent"), createNonCountedLabel(studentCount), 0, row);
             } else {
                 Set<UnitType> resultOfTraining = new LinkedHashSet<UnitType>();
-                for (Unit teacher : colony.getTeachers()) {
-                    Unit student = teacher.getStudent();
-                    if (student != null && student.getType() == unitType) {
-                        resultOfTraining.add(Unit.getUnitTypeTeaching(teacher.getType(), student.getType()));
+                if (colony != null) {
+                    for (Unit teacher : colony.getTeachers()) {
+                        Unit student = teacher.getStudent();
+                        if (student != null && student.getType() == unitType) {
+                            resultOfTraining.add(Unit.getUnitTypeTeaching(teacher.getType(), student.getType()));
+                        }
                     }
                 }
 
