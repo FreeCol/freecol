@@ -188,7 +188,9 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
         }
 
         Tile tile = map.getTile(p);
-        if (tile != null) {
+        if (tile != null && 
+            (e.getModifiers() & MouseEvent.BUTTON1_MASK) == MouseEvent.BUTTON1_MASK) {
+            // only perform the goto for the left mouse button
             if (gui.isGotoStarted()) {
                 if (gui.getActiveUnit() == null) {
                     gui.stopGoto();
