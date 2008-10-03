@@ -633,10 +633,10 @@ public final class InGameController implements NetworkConstants {
             PathNode path = map.findPathToEurope(unit, unit.getTile());
             if (path != null) {
                 int turns = path.getTotalTurns();
-                destinations.add(new ChoiceItem(player.getEurope() + " (" + turns + ")", player.getEurope()));
+                destinations.add(new ChoiceItem(player.getEurope().getName() + " (" + turns + ")", player.getEurope()));
             } else if (unit.getTile() != null
                     && (unit.getTile().getType().canSailToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
-                destinations.add(new ChoiceItem(player.getEurope() + " (0)", player.getEurope()));
+                destinations.add(new ChoiceItem(player.getEurope().getName() + " (0)", player.getEurope()));
             }
         }
 
