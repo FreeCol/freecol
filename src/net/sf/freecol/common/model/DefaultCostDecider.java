@@ -65,6 +65,7 @@ public class DefaultCostDecider implements CostDecider {
         } else {
             int mc = unit.getMoveCost(oldTile, newTile, ml);
             MoveType moveType = unit.getMoveType(oldTile, newTile, ml);
+            Unit defender = newTile.getFirstUnit();
             
             if (newTile.getSettlement() != null
                     && newTile.getSettlement().getOwner() != unit.getOwner()) {
@@ -89,12 +90,12 @@ public class DefaultCostDecider implements CostDecider {
                         }
                         break;
                 }
-            } else if (newTile.getDefendingUnit(unit) != null
-                    && newTile.getDefendingUnit(unit).getOwner() != unit.getOwner()) {
+            } else if (defender != null && defender.getOwner() != unit.getOwner()) {
                 // A unit is blocking the path:                
                 if (moveType != MoveType.ATTACK || unit.getDestination() == null ||
-                        unit.getDestination().getTile() != newTile)
+                    unit.getDestination().getTile() != newTile) {
                     mc += Math.max(0, 20 - turns * 4);
+                }
             } else if (newTile.isLand() && newTile.getFirstUnit() != null &&
                     newTile.getFirstUnit().isNaval() &&
                     newTile.getFirstUnit().getOwner() != unit.getOwner()) {

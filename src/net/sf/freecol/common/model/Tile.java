@@ -493,7 +493,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * Gets the <code>Unit</code> that is currently defending this
      * <code>Tile</code>.
      * <p>If this tile has a settlement, the units inside the settlement 
-     * are also considered as potential defenders 
+     * are also considered as potential defenders.
+     * <p>As this method is quite expensive, it should not be used to test
+     * for the presence of enemy units.
      * 
      * @param attacker The target that would be attacking this tile.
      * @return The <code>Unit</code> that has been chosen to defend this

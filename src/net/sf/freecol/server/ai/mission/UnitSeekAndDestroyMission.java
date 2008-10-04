@@ -151,17 +151,24 @@ public class UnitSeekAndDestroyMission extends Mission {
             Direction direction = moveTowards(connection, pathToTarget);
             while (direction != null) {
                 Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-                if (unit.getMoveType(direction) == MoveType.ATTACK
-                        && (unit.getOwner().getStance(newTile.getDefendingUnit(unit).getOwner()) == Stance.WAR
-                                || ((Ownable) target).getOwner() == newTile.getDefendingUnit(unit).getOwner())) {
-                    Element element = Message.createNewRootElement("attack");
-                    element.setAttribute("unit", unit.getId());
-                    element.setAttribute("direction", direction.toString());
+                if (unit.getMoveType(direction) == MoveType.ATTACK) {
+                    Unit defender = newTile.getFirstUnit();
+                    if (defender == null) {
+                        logger.warning("MoveType is ATTACK, but no defender is present!");
+                    } else {
+                        Player enemy = defender.getOwner();
+                        if (unit.getOwner().getStance(enemy) == Stance.WAR ||
+                            ((Ownable) target).getOwner() == enemy) {
+                            Element element = Message.createNewRootElement("attack");
+                            element.setAttribute("unit", unit.getId());
+                            element.setAttribute("direction", direction.toString());
 
-                    try {
-                        connection.ask(element);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message!");
+                            try {
+                                connection.ask(element);
+                            } catch (IOException e) {
+                                logger.warning("Could not send message!");
+                            }
+                        }
                     }
                     break;
                 } else if (unit.getMoveType(direction) != MoveType.ATTACK                        

@@ -139,10 +139,10 @@ public class DefendSettlementMission extends Mission {
                 Tile t = map.getNeighbourOrNull(direction, unit.getTile());
                 if (t==null)
                     continue;
-                Unit defender = t.getDefendingUnit(unit);
+                Unit defender = t.getFirstUnit();
                 if (defender != null && defender.getOwner().getStance(unit.getOwner()) == Stance.WAR
-                        && unit.getMoveType(direction) == MoveType.ATTACK) {
-                    Unit enemyUnit = defender;
+                    && unit.getMoveType(direction) == MoveType.ATTACK) {
+                    Unit enemyUnit = t.getDefendingUnit(unit);
                     float enemyAttack = combatModel.getOffencePower(enemyUnit, unit);
                     float weAttack = combatModel.getOffencePower(unit, enemyUnit);
                     float enemyDefend = combatModel.getDefencePower(unit, enemyUnit);

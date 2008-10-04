@@ -1303,49 +1303,52 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             } else {
                 return MoveType.ILLEGAL_MOVE;
             }
-        } else if (target.isLand()) {
-            Settlement settlement = target.getSettlement();
-            if (settlement != null) {
-                if (settlement.getOwner() == getOwner()) {
-                    return MoveType.MOVE;
-                } else if (canTradeWith(settlement)) {
-                    return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+        } else {
+            Unit defender = target.getFirstUnit();
+            if (target.isLand()) {
+                Settlement settlement = target.getSettlement();
+                if (settlement != null) {
+                    if (settlement.getOwner() == getOwner()) {
+                        return MoveType.MOVE;
+                    } else if (canTradeWith(settlement)) {
+                        return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+                    } else {
+                        logger.fine("Trying to enter another player's settlement with " + getName());
+                        return MoveType.ILLEGAL_MOVE;
+                    }
+                } else if (defender != null && defender.getOwner() != getOwner()) {
+                    logger.fine("Trying to sail into tile occupied by enemy units with " + getName());
+                    return MoveType.ILLEGAL_MOVE;
                 } else {
-                    logger.fine("Trying to enter another player's settlement with " + getName());
+                    // Check for disembark.
+                    Iterator<Unit> unitIterator = getUnitIterator();
+
+                    while (unitIterator.hasNext()) {
+                        Unit u = unitIterator.next();
+                        if (u.getMovesLeft() > 0) {
+                            return MoveType.DISEMBARK;
+                        }
+                    }
+                    logger.fine("No units to disembark from " + getName());
                     return MoveType.ILLEGAL_MOVE;
                 }
-            } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
-                logger.fine("Trying to sail into tile occupied by enemy units with " + getName());
-                return MoveType.ILLEGAL_MOVE;
-            } else {
-                // Check for disembark.
-                Iterator<Unit> unitIterator = getUnitIterator();
-
-                while (unitIterator.hasNext()) {
-                    Unit u = unitIterator.next();
-                    if (u.getMovesLeft() > 0) {
-                        return MoveType.DISEMBARK;
-                    }
+            } else if (defender != null && defender.getOwner() != getOwner()) {
+                // enemy units at sea
+                if (isOffensiveUnit()) {
+                    return MoveType.ATTACK;
+                } else {
+                    return MoveType.ILLEGAL_MOVE;
                 }
-                logger.fine("No units to disembark from " + getName());
-                return MoveType.ILLEGAL_MOVE;
-            }
-        } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
-            // enemy units at sea
-            if (isOffensiveUnit()) {
-                return MoveType.ATTACK;
+            } else if (target.getType().canSailToEurope()) {
+                if (getOwner().canMoveToEurope()) {
+                    return MoveType.MOVE_HIGH_SEAS;
+                } else {
+                    return MoveType.MOVE;
+                }
             } else {
-                return MoveType.ILLEGAL_MOVE;
-            }
-        } else if (target.getType().canSailToEurope()) {
-            if (getOwner().canMoveToEurope()) {
-                return MoveType.MOVE_HIGH_SEAS;
-            } else {
+                // this must be ocean
                 return MoveType.MOVE;
             }
-        } else {
-            // this must be ocean
-            return MoveType.MOVE;
         }
     }
 
@@ -1368,6 +1371,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         if (target.isLand()) {
             Settlement settlement = target.getSettlement();
+            Unit defender = target.getFirstUnit();
             if (settlement != null) {
                 if (settlement.getOwner() == getOwner()) {
                     // our colony
@@ -1397,7 +1401,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                         return MoveType.ILLEGAL_MOVE;
                     }
                 }
-            } else if (target.getDefendingUnit(this) != null && target.getDefendingUnit(this).getOwner() != getOwner()) {
+            } else if (defender != null && defender.getOwner() != getOwner()) {
                 if (from.isLand()) {
                     if (isOffensiveUnit()) {
                         return MoveType.ATTACK;
