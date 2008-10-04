@@ -19,6 +19,8 @@
 
 package net.sf.freecol.server.generator;
 
+import java.awt.Rectangle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,15 +44,18 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.server.model.ServerRegion;
 import net.sf.freecol.common.util.RandomChoice;
 
+
 /**
  * Class for making a <code>Map</code> based upon a land map.
  */
 public class TerrainGenerator {
-
     private static final Logger logger = Logger.getLogger(TerrainGenerator.class.getName());
     
-    public static final int REGION_SCORE_VALUE = 10;
+    public static final int LAND_REGIONS_SCORE_VALUE = 1000;
+    public static final int LAND_REGION_MIN_SCORE = 5;
     public static final int PACIFIC_SCORE_VALUE = 100;
+
+    public static final int LAND_REGION_MAX_SIZE = 75;
 
     private final MapGeneratorOptions mapGeneratorOptions;
 
@@ -70,7 +75,7 @@ public class TerrainGenerator {
         this.mapGeneratorOptions = mapGeneratorOptions;
     }
 
-    
+
     /**
      * Creates a <code>Map</code> for the given <code>Game</code>.
      * 
@@ -87,7 +92,8 @@ public class TerrainGenerator {
     public void createMap(Game game, boolean[][] landMap) {
         createMap(game, null, landMap);
     }
-    
+
+
     /**
      * Creates a <code>Map</code> for the given <code>Game</code>.
      * 
@@ -105,7 +111,7 @@ public class TerrainGenerator {
     public void createMap(Game game, Game importGame, boolean[][] landMap) {
         final int width = landMap.length;
         final int height = landMap[0].length;
-        
+
         final boolean importTerrain = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
         final boolean importBonuses = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
 
@@ -142,29 +148,30 @@ public class TerrainGenerator {
         game.setMap(map);
 
         if (!importTerrain) {
-            createRegions(map);
+            createOceanRegions(map);
             createHighSeas(map);
-	    if (mapHasLand) {
-		createMountains(map);
+            if (mapHasLand) {
+                createMountains(map);
                 findLakes(map);
-		createRivers(map);
-	    }
+                createRivers(map);
+                createLandRegions(map);
+            }
         }
 
         // Add the bonuses only after the map is completed.
         // Otherwise we risk creating resources on fields where they
         // don't belong (like sugar in large rivers or tobaco on hills).
-	if (!importBonuses) {
-	    for (int y = 0; y < height; y++) {
+        if (!importBonuses) {
+            for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-		    perhapsAddBonus(tiles[x][y], landMap);
+                    perhapsAddBonus(tiles[x][y], landMap);
                 }
             }
         }
     }
 
+
     private Tile createTile(Game game, int x, int y, boolean[][] landMap, int latitude) {
-        
         Tile t;
         if (landMap[x][y]) {
             t = new Tile(game, getRandomLandTileType(latitude), x, y);
@@ -175,6 +182,7 @@ public class TerrainGenerator {
         
         return t;
     }
+
 
     /**
      * Adds a terrain bonus with a probability determined by the
@@ -207,7 +215,8 @@ public class TerrainGenerator {
             }
         }
     }
-    
+
+
     /**
      * Gets the <code>MapGeneratorOptions</code>.
      * @return The <code>MapGeneratorOptions</code> being used
@@ -216,6 +225,7 @@ public class TerrainGenerator {
     private MapGeneratorOptions getMapGeneratorOptions() {
         return mapGeneratorOptions;
     }
+
 
     /**
      * Gets a random land tile type based on the given percentage.
@@ -340,14 +350,12 @@ public class TerrainGenerator {
 
 
     /**
-     * Creates map regions in the given Map. At the moment, the land
-     * is divided into three by three regions, and the ocean into two
-     * by two regions.
+     * Creates ocean map regions in the given Map. At the moment, the ocean
+     * is divided into two by two regions.
      *
      * @param map a <code>Map</code> value
      */
-    private void createRegions(Map map) {
-
+    private void createOceanRegions(Map map) {
         Game game = map.getGame();
 
         ServerRegion pacific =
@@ -363,102 +371,29 @@ public class TerrainGenerator {
         ServerRegion southAtlantic =
             new ServerRegion(game, "model.region.southAtlantic", RegionType.OCEAN, atlantic);
 
-        ServerRegion center =
-            new ServerRegion(game, "model.region.center", RegionType.LAND);
-        ServerRegion north =
-            new ServerRegion(game, "model.region.north", RegionType.LAND);
-        ServerRegion south =
-            new ServerRegion(game, "model.region.south", RegionType.LAND);
-        ServerRegion east =
-            new ServerRegion(game, "model.region.east", RegionType.LAND);
-        ServerRegion west =
-            new ServerRegion(game, "model.region.west", RegionType.LAND);
-        ServerRegion northEast =
-            new ServerRegion(game, "model.region.northEast", RegionType.LAND);
-        ServerRegion northWest =
-            new ServerRegion(game, "model.region.northWest", RegionType.LAND);
-        ServerRegion southEast =
-            new ServerRegion(game, "model.region.southEast", RegionType.LAND);
-        ServerRegion southWest =
-            new ServerRegion(game, "model.region.southWest", RegionType.LAND);
-
-        ServerRegion arctic =
-            new ServerRegion(game, "model.region.arctic", RegionType.LAND);
-        ServerRegion antarctic =
-            new ServerRegion(game, "model.region.antarctic", RegionType.LAND);
-
         for (ServerRegion region : new ServerRegion[] { northPacific, southPacific,
-                                                        atlantic, northAtlantic, southAtlantic,
-                                                        northWest, north, northEast,
-                                                        west, center, east,
-                                                        southWest, south, southEast } ) {
-            if (region.getType() == RegionType.OCEAN) {
-                region.setPrediscovered(true);
-            } else {
-                region.setDiscoverable(true);
-                region.setScoreValue(REGION_SCORE_VALUE);
-            }
+                                                        atlantic, northAtlantic, southAtlantic } ) {
+            region.setPrediscovered(true);
             map.setRegion(region);
         }
+        
         map.setRegion(pacific);
         pacific.setDiscoverable(true);
         pacific.setScoreValue(PACIFIC_SCORE_VALUE);
-        map.setRegion(arctic);
-        arctic.setPrediscovered(true);
-        map.setRegion(antarctic);
-        antarctic.setPrediscovered(true);
 
-        int halfHeight = map.getHeight()/2;
-        int halfWidth = map.getWidth()/2;
-        int thirdHeight = map.getHeight()/3;
-        int twoThirdHeight = 2 * thirdHeight;
-        int thirdWidth = map.getWidth()/3;
-        int twoThirdWidth = 2 * thirdWidth;
-        int arcticHeight = LandGenerator.POLAR_HEIGHT;
-        int antarcticHeight = map.getHeight() - LandGenerator.POLAR_HEIGHT - 1;
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
                 if (map.isValid(x, y)) {
                     Tile tile = map.getTile(x, y);
-                    if (tile.isLand()) {
-                        if (y < arcticHeight) {
-                            arctic.addTile(tile);
-                        } else if (y < thirdHeight) {
-                            if (x < thirdWidth) {
-                                northWest.addTile(tile);
-                            } else if (x < twoThirdWidth) {
-                                north.addTile(tile);
-                            } else {
-                                northEast.addTile(tile);
-                            }
-                        } else if (y < twoThirdHeight) {
-                            if (x < thirdWidth) {
-                                west.addTile(tile);
-                            } else if (x < twoThirdWidth) {
-                                center.addTile(tile);
-                            } else {
-                                east.addTile(tile);
-                            }
-                        } else if (y < antarcticHeight) {
-                            if (x < thirdWidth) {
-                                southWest.addTile(tile);
-                            } else if (x < twoThirdWidth) {
-                                south.addTile(tile);
-                            } else {
-                                southEast.addTile(tile);
-                            }
-                        } else {
-                            antarctic.addTile(tile);
-                        }
-                    } else {
-                        if (y < halfHeight) {
-                            if (x < halfWidth) {
+                    if (!tile.isLand()) {
+                        if (isNorth(map.getHeight(),y)) {
+                            if (isWest(map.getWidth(),x)) {
                                 northPacific.addTile(tile);
                             } else {
                                 northAtlantic.addTile(tile);
                             }
                         } else {
-                            if (x < halfWidth) {
+                            if (isWest(map.getWidth(),x)) {
                                 southPacific.addTile(tile);
                             } else {
                                 southAtlantic.addTile(tile);
@@ -470,6 +405,236 @@ public class TerrainGenerator {
         }
     }
 
+
+    /**
+     * Creates land map regions in the given Map.
+     * First, the arctic/antarctic regions are defined, based on <code>LandGenerator.POLAR_HEIGHT</code>    
+     * For the remaining land tiles, one region per contiguous landmass is created.
+     * @param map a <code>Map</code> value
+     */
+    private void createLandRegions(Map map) {
+        Game game = map.getGame();
+
+        //Create arctic/antarctic regions first
+        ServerRegion arctic =
+            new ServerRegion(game, "model.region.arctic", RegionType.LAND);
+        ServerRegion antarctic =
+            new ServerRegion(game, "model.region.antarctic", RegionType.LAND);
+
+        map.setRegion(arctic);
+        arctic.setPrediscovered(true);
+        map.setRegion(antarctic);
+        antarctic.setPrediscovered(true);
+
+        int arcticHeight = LandGenerator.POLAR_HEIGHT;
+        int antarcticHeight = map.getHeight() - LandGenerator.POLAR_HEIGHT - 1;
+
+        for (int x = 0; x < map.getWidth(); x++) {
+            for (int y = 0; y < arcticHeight; y++) {
+                if (map.isValid(x, y)) {
+                    Tile tile = map.getTile(x, y);
+                    if (tile.isLand()) {
+                        arctic.addTile(tile);
+                    }
+                }
+            }
+            for (int y = antarcticHeight; y < map.getHeight(); y++) {
+                if (map.isValid(x, y)) {
+                    Tile tile = map.getTile(x, y);
+                    if (tile.isLand()) {
+                        antarctic.addTile(tile);
+                    }
+                }
+            }
+        }
+
+        //Then, create "geographic" land regions
+        //These regions are used by the MapGenerator to place Indian Settlements
+        //Note that these regions are "virtual", i.e. having a bounding box,
+        //but containing no tiles
+        int thirdWidth = map.getWidth()/3;
+        int twoThirdWidth = 2 * thirdWidth;
+        int thirdHeight = map.getHeight()/3;
+        int twoThirdHeight = 2 * thirdHeight;
+
+        ServerRegion northWest =
+            new ServerRegion(game, "model.region.northWest", RegionType.LAND);
+        northWest.setBounds(new Rectangle(0,0,thirdWidth,thirdHeight));
+        ServerRegion north =
+            new ServerRegion(game, "model.region.north", RegionType.LAND);
+        north.setBounds(new Rectangle(thirdWidth,0,thirdWidth,thirdHeight));
+        ServerRegion northEast =
+            new ServerRegion(game, "model.region.northEast", RegionType.LAND);            
+        northEast.setBounds(new Rectangle(twoThirdWidth,0,map.getWidth()-twoThirdWidth,thirdHeight));
+
+        ServerRegion west =
+            new ServerRegion(game, "model.region.west", RegionType.LAND);
+        west.setBounds(new Rectangle(0,thirdHeight,thirdWidth,thirdHeight));
+        ServerRegion center =
+            new ServerRegion(game, "model.region.center", RegionType.LAND);
+        center.setBounds(new Rectangle(thirdWidth,thirdHeight,thirdWidth,thirdHeight));
+        ServerRegion east =
+            new ServerRegion(game, "model.region.east", RegionType.LAND);
+        east.setBounds(new Rectangle(twoThirdWidth,thirdHeight,map.getWidth()-twoThirdWidth,thirdHeight));
+
+        ServerRegion southWest =
+            new ServerRegion(game, "model.region.southWest", RegionType.LAND);
+        southWest.setBounds(new Rectangle(0,twoThirdHeight,thirdWidth,map.getHeight()-twoThirdHeight));
+        ServerRegion south =
+            new ServerRegion(game, "model.region.south", RegionType.LAND);
+        south.setBounds(new Rectangle(thirdWidth,twoThirdHeight,thirdWidth,map.getHeight()-twoThirdHeight));
+        ServerRegion southEast =
+            new ServerRegion(game, "model.region.southEast", RegionType.LAND);
+        southEast.setBounds(new Rectangle(twoThirdWidth,twoThirdHeight,map.getWidth()-twoThirdWidth,map.getHeight()-twoThirdHeight));
+
+        for (ServerRegion region : new ServerRegion[] { northWest, north, northEast,
+                                                        west, center, east,
+                                                        southWest, south, southEast } ) {
+            region.setDiscoverable(false);
+            map.setRegion(region);
+        }
+
+        //last, create "explorable" land regions
+        int continents = 0;
+        boolean[][] landmap = new boolean[map.getWidth()][map.getHeight()];
+        int[][] continentmap = new int[map.getWidth()][map.getHeight()];
+
+        //initialize both maps
+        for (int x = 0; x < map.getWidth(); x++) {
+            for (int y = 0; y < map.getHeight(); y++) {
+                continentmap[x][y] = 0;
+                if (map.isValid(x, y)) {
+                    Tile tile = map.getTile(x, y);
+                    boolean isMountainRange = false;
+                    if (tile.getRegion() != null) {
+                        isMountainRange = (tile.getRegion().getType() == RegionType.MOUNTAIN);
+                    }
+                    if (tile.isLand()) {
+                        //exclude arctic/antarctic tiles and Mountain Ranges
+                        //Note: Great Rivers are excluded by tile.isLand()
+                        if ((y<arcticHeight) || (y>=antarcticHeight) || isMountainRange) {
+                            landmap[x][y] = false;
+                        } else {
+                            landmap[x][y] = true;
+                        }
+                    } else {
+                        landmap[x][y] = false;
+                    }
+                }
+            }
+        }
+
+        //floodfill, so that we end up with individual landmasses numbered in continentmap[][]
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                if (landmap[x][y]) { //found a new continent/island
+                    continents++;
+                    boolean[][] continent = floodFill(landmap,new Position(x,y));
+                    
+                    for (int yy = 0; yy < map.getHeight(); yy++) {
+                        for (int xx = 0; xx < map.getWidth(); xx++) {
+                            if (continent[xx][yy]) {
+                                continentmap[xx][yy] = continents;
+                                landmap[xx][yy] = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        logger.info("Number of individual landmasses is " + continents);
+
+        //get landmass sizes        
+        int[] continentsize = new int[continents+1];
+        int landsize = 0;
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                continentsize[continentmap[x][y]]++;
+                if (continentmap[x][y]>0) {
+                    landsize++;
+                }
+            }
+        }
+
+        //go through landmasses, split up those too big
+        int oldcontinents = continents;
+        for (int c = 1; c <= oldcontinents; c++) { //c starting at 1, c=0 is all water tiles
+            if (continentsize[c]>LAND_REGION_MAX_SIZE) {
+                boolean[][] splitcontinent = new boolean[map.getWidth()][map.getHeight()];
+                Position splitposition = new Position(0,0);
+                
+                for (int x = 0; x < map.getWidth(); x++) {
+                    for (int y = 0; y < map.getHeight(); y++) {
+                        if (continentmap[x][y]==c) {
+                            splitcontinent[x][y] = true;
+                            splitposition = new Position(x,y);
+                        } else {
+                            splitcontinent[x][y] = false;
+                        }
+                    }
+                }
+
+                while (continentsize[c]>LAND_REGION_MAX_SIZE) {
+                    int targetsize = LAND_REGION_MAX_SIZE;
+                    if (continentsize[c] < 2*LAND_REGION_MAX_SIZE) {
+                        targetsize = continentsize[c]/2;
+                    }
+                    continents++; //index of the new region in continentmap[][]
+
+                    boolean[][] newregion = floodFill(splitcontinent, splitposition, targetsize);
+                    for (int x = 0; x < map.getWidth(); x++) {
+                        for (int y = 0; y < map.getHeight(); y++) {
+                            if (newregion[x][y]) {
+                                continentmap[x][y] = continents;
+                                splitcontinent[x][y] = false;
+                                continentsize[c]--;
+                            }
+                            if (splitcontinent[x][y]) {
+                                splitposition = new Position(x,y);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        logger.info("Number of land regions being created: " + continents);
+        
+        //create ServerRegions for all continents
+        ServerRegion[] landregions = new ServerRegion[continents+1];
+        for (int c = 1; c <= continents; c++) { //c starting at 1, c=0 is all water tiles
+            landregions[c] =
+                new ServerRegion(map.getGame(), "model.region.land" + c, Region.RegionType.LAND);
+            landregions[c].setDiscoverable(true);
+            map.setRegion(landregions[c]);
+            //landregions[c].setName("Land "+c);
+        } 
+        
+        //add tiles to ServerRegions; also, get NEW landmass sizes
+        continentsize = new int[continents+1];
+        landsize = 0;
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                continentsize[continentmap[x][y]]++;
+                if (continentmap[x][y]>0) {
+                    landsize++;
+                    Tile tile = map.getTile(x, y);
+                    if (tile.isLand() && (tile.getRegion() == null)) {
+                        landregions[continentmap[x][y]].addTile(tile);
+                    }
+                }
+            }
+        }
+        
+        //set exploration points for land regions based on size
+        for (int c = 1; c <= continents; c++) { //c starting at 1, c=0 is all water tiles
+            int score = Math.max((int)(((float)continentsize[c]/landsize)*LAND_REGIONS_SCORE_VALUE), LAND_REGION_MIN_SCORE);
+            landregions[c].setScoreValue(score);
+            logger.info("Created land region (size " + continentsize[c] + 
+                        ", score value " + score + ").");
+        }
+    }
+
+
     /**
      * Places "high seas"-tiles on the border of the given map.
      * @param map The <code>Map</code> to create high seas on.
@@ -480,7 +645,8 @@ public class TerrainGenerator {
             getMapGeneratorOptions().getMaxDistToEdge()
         );
     }
-    
+
+
     /**
      * Places "high seas"-tiles on the border of the given map.
      * 
@@ -533,7 +699,7 @@ public class TerrainGenerator {
         // recompute the new high seas layout
         createHighSeas(map, distToLandFromHighSeas, maxDistanceToEdge);
     }
-    
+
 
     /**
      * Places "high seas"-tiles on the border of the given map.
@@ -584,6 +750,7 @@ public class TerrainGenerator {
             }
         }
     }
+
 
     /**
      * Creates mountain ranges on the given map.  The number and size
@@ -724,7 +891,8 @@ public class TerrainGenerator {
         }
         logger.info("Added " + counter + " random hills tiles.");
     }
-    
+
+
     /**
      * Creates rivers on the given map. The number of rivers depends
      * on the map size.
@@ -790,8 +958,16 @@ public class TerrainGenerator {
 
 
     private void findLakes(Map map) {
+        Game game = map.getGame();
 
-	Position p = null;
+        //Currently, all inland lakes belong to one prediscovered region
+        //TODO: Create separate, discoverable lake regions
+        ServerRegion inlandlakes =
+            new ServerRegion(game, "model.region.inlandlakes", RegionType.LAKE);
+        map.setRegion(inlandlakes);
+        inlandlakes.setPrediscovered(true);
+
+        Position p = null;
 
         // Search for a reachable water tile on the vertical edge.
         // No need to search on the horizental edges as they will
@@ -812,37 +988,71 @@ public class TerrainGenerator {
             return;        
         }
 
-        // Find all reachable water tiles using a floodfill algorithm and BFS.
-	Queue<Position>q = new LinkedList<Position>();
+        boolean[][] watermap = new boolean[map.getWidth()][map.getHeight()];
+        for (int y = 0; y < map.getHeight(); y++) {
+            for (int x = 0; x < map.getWidth(); x++) {
+                watermap[x][y] = !map.getTile(x,y).isLand();
+            }
+        }
+        
+        boolean[][] visited = floodFill(watermap,p);
 
-        boolean[][] visited = new boolean[map.getWidth()][map.getHeight()];
+        // Every water tile we did not reach is a lake. 
+        for (int y=0; y < map.getHeight(); y++) {
+            for (int x=0; x < map.getWidth(); x++) {
+                if (watermap[x][y] && !visited[x][y]) {
+                    Tile tile = map.getTile(x, y);
+                    if (tile != null) {
+                        tile.setType(lake);
+                        inlandlakes.addTile(tile);
+                    }
+                }
+            }
+        }
+    }
+    
+    private boolean isNorth(int height, int y) {
+        return y<(height/2);
+    }
+
+    private boolean isWest(int width, int x) {
+        return x<(width/2);
+    }
+    
+    /**
+     * Floodfills from a given <code>Position</code> p,
+     * based on connectivity information encoded in boolmap     
+     *
+     * @param boolmap The connectivity information for this floodfill
+     * @param p The starting position
+     * @param limit Limit to stop floodfill at     
+     * @return A boolean[][] of the same size as boolmap, where "true" means was floodfilled       
+     */
+    private boolean[][] floodFill(boolean[][] boolmap, Position p, int limit) {
+        // Starting from position p, find all tiles connected to it on boolmap
+        // using a floodfill algorithm and BFS.
+        Queue<Position>q = new LinkedList<Position>();
+
+        boolean[][] visited = new boolean[boolmap.length][boolmap[0].length];
         visited[p.getX()][p.getY()] = true;
+        limit--;
         do {
             for (Direction direction : Direction.values()) {
                 Position n = Map.getAdjacent(p, direction);
-                if (map.getTile(n) != null && !map.getTile(n).isLand() &&
-                    !visited[n.getX()][n.getY()]) {
+                if (Map.isValid(n,boolmap.length,boolmap[0].length) && boolmap[n.getX()][n.getY()] && !visited[n.getX()][n.getY()] && limit > 0) {
                     visited[n.getX()][n.getY()] = true;
+                    limit--;
                     q.add(n);
                 }
             }
 
             p = q.poll();
-	} while (p != null);
-
-        // Every water tile we did not reach is a lake. 
-        for (int y=0; y < map.getHeight(); y++) {
-            for (int x=0; x < map.getWidth(); x++) {
-                if (!visited[x][y]) {
-                    Tile tile = map.getTile(x, y);
-                    if (tile != null && !tile.isLand()) {
-                        tile.setType(lake);
-                    }
-                }
-            }
-        }      
+        } while ((p != null) && (limit > 0));
+        return visited;
     }
-
-
+    
+    private boolean[][] floodFill(boolean[][] boolmap, Position p) {
+        return floodFill (boolmap, p, java.lang.Integer.MAX_VALUE);
+    }
 
 }
