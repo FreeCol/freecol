@@ -1802,7 +1802,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                  " player '" + player.getName() + "' is 'null'. " + 
                                  player.canSee(this) + ", " + isExploredBy(player) + " ::: " + getPosition();
                 logger.warning(message);
-                throw new IllegalStateException(message);
+                //throw new IllegalStateException(message);
+                pet = new PlayerExploredTile(player, getTileItemContainer());
+                playerExploredTiles.put(player, pet);
             } else {
                 return;
             }
