@@ -292,7 +292,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
             39, margin, // unload button
             116, margin, // in port
             75, 39, margin, // cargo
-            75, 39, // market
+            75, 39, margin, // market
             120, margin // log
         };
 
