@@ -130,14 +130,12 @@ which a Java Virtual Machine compatible with Sun Java 5 or 6 is
 available. In practice, however, things are less clear cut.
 
 FreeCol is known to work with Sun's Java 5 and 6 (which you can get
-\href{http://java.sun.com/}{here}, but not with projects based on GNU
-Classpath or OpenJDK, as some font handling classes used by FreeCol
-have not yet been implemented. This is expected to change in the near
-future, however. FreeCol is known to run on recent versions of Windows
-and Linux, and on MacOSX to some extent. If you are using Linux, using
-Java 6 is recommended, as its font rendering is much better. If you
-are using FreeCol on a different platform, we would like to hear about
-it.
+\href{http://java.sun.com/}{here}. FreeCol also works with OpenJDK,
+although some problems and graphics glitches remain. FreeCol is known
+to run on recent versions of Windows and Linux, and on MacOSX to some
+extent. If you are using Linux, using Java 6 is recommended, as its
+font rendering is much better. If you are using FreeCol on a different
+platform, we would like to hear about it.
 
 FreeCol requires at least 128 MB memory and works best with a screen
 resolution of at least 1024x768 pixels. You can still use the game
@@ -714,6 +712,7 @@ orange shields. The letter indicates the current state of the unit:
 \item\verb$S$: the unit is a sentry (waiting for transport).
 \item\verb$W$: the unit is waiting for orders (skipped).
 \item\verb$0$: the unit has no moves left.
+\item\verb$#$: the unit's state is unknown (some enemy units).
 \end{itemize}
 
 If the unit is a foreign naval unit, the shield will display a number
@@ -746,7 +745,8 @@ use the following \hypertarget{keyboard shortcuts}{keyboard shortcuts}:
 \item\verb$d$: disband the active unit.
 \item\verb$e$: show the Europe panel.
 \item\verb$f$: fortify.
-\item\verb$g$: goto some destination.
+\item\verb$g$: goto some destination tile.
+\item\verb$h$: goto some colony (or Europe if a ship).
 \item\verb$p$: plow the current tile (requires 20 tools).
 \item\verb$r$: build a road on the current tile (requires 20 tools).
 \item\verb$s$: be a sentry (wait for something to happen).
