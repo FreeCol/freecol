@@ -1339,7 +1339,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 } else {
                     return MoveType.ILLEGAL_MOVE;
                 }
-            } else if (target.getType().canSailToEurope()) {
+            } else if (target.canMoveToEurope()) {
                 if (getOwner().canMoveToEurope()) {
                     return MoveType.MOVE_HIGH_SEAS;
                 } else {
@@ -1539,7 +1539,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
             // Clear the alreadyOnHighSea flag if we move onto a non-highsea
             // tile.
-            if (newTile.getType().canSailToEurope()) {
+            if (newTile.canMoveToEurope()) {
                 setAlreadyOnHighSea(true);
             } else {
                 setAlreadyOnHighSea(false);
@@ -2689,7 +2689,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else {
             for (int i = 0; i < surroundingTiles.size(); i++) {
                 Tile tile = surroundingTiles.get(i);
-                if (tile == null || tile.getType().canSailToEurope()) {
+                if (tile == null || tile.canMoveToEurope()) {
                     return true;
                 }
             }

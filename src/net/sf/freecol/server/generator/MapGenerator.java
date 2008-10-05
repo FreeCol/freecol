@@ -658,7 +658,7 @@ public class MapGenerator implements IMapGenerator {
             
             if (startAtSea) {
                 // move westward to find the limit between high seas and coastal waters
-                while (map.getTile(x - 1, y).getType().canSailToEurope()) {
+                while (map.getTile(x - 1, y).canMoveToEurope()) {
                     x--;
                 }
             }

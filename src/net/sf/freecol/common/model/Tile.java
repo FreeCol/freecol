@@ -112,6 +112,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     private boolean connected = false;
 
     /**
+     * Describe moveToEurope here.
+     */
+    private Boolean moveToEurope;
+
+    /**
      * A constructor to use.
      * 
      * @param game The <code>Game</code> this <code>Tile</code> belongs to.
@@ -452,7 +457,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     public boolean check(Unit u, PathNode pathNode) {
                         Map map = getGame().getMap();
                         TileType tileType = pathNode.getTile().getType();
-                        if (tileType!=null && tileType.canSailToEurope()) {
+                        if (canMoveToEurope()) {
                             goal = pathNode;
                             return true;
                         }
@@ -668,6 +673,30 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setConnected(final boolean newConnected) {
         this.connected = newConnected;
+    }
+
+    /**
+     * Get the <code>MoveToEurope</code> value.
+     *
+     * @return a <code>Boolean</code> value
+     */
+    public boolean canMoveToEurope() {
+        if (moveToEurope != null) {
+            return moveToEurope;
+        } else if (type == null) {
+            return false;
+        } else {
+            return type.hasAbility("model.ability.moveToEurope");
+        }
+    }
+
+    /**
+     * Set the <code>MoveToEurope</code> value.
+     *
+     * @param newMoveToEurope The new MoveToEurope value.
+     */
+    public void setMoveToEurope(final Boolean newMoveToEurope) {
+        this.moveToEurope = newMoveToEurope;
     }
 
     /**

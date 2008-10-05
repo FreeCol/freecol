@@ -667,7 +667,7 @@ public class TerrainGenerator {
         TileType ocean = null, highSeas = null;
         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
             if (t.isWater()) {
-                if (t.canSailToEurope()) {
+                if (t.hasAbility("model.ability.moveToEurope")) {
                     if (highSeas == null) {
                         highSeas = t;
                         if (ocean != null) {
@@ -722,7 +722,7 @@ public class TerrainGenerator {
         TileType highSeas = null;
         for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
             if (t.isWater()) {
-                if (t.canSailToEurope()) {
+                if (t.hasAbility("model.ability.moveToEurope")) {
                     highSeas = t;
                     break;
                 }

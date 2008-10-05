@@ -962,7 +962,7 @@ public class Map extends FreeColGameObject {
             public boolean check(Unit u, PathNode pathNode) {
                 Map map = u.getGame().getMap();
 
-                if (pathNode.getTile().getType().canSailToEurope()) {
+                if (pathNode.getTile().canMoveToEurope()) {
                     goal = pathNode;
                     return true;
                 }

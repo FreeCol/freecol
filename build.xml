@@ -588,6 +588,13 @@
             source="${java.target.version}" target="${java.target.version}" />
     </target>
 
+    <target name="validate" description="Validates the specification.">
+      <schemavalidate
+         noNamespaceFile="schema/specification-schema.xsd"
+         file="data/freecol/specification.xml">
+      </schemavalidate>
+    </target>
+
     <target name="print-manual"
             description="Creates the printable user guide.">
         <delete file="doc/FreeCol.ind" />

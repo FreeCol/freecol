@@ -42,7 +42,6 @@ public final class TileType extends FreeColGameObjectType {
     private boolean forest;
     private boolean water;
     private boolean canSettle;
-    private boolean canSailToEurope;
     private boolean canHaveRiver;
 
     private int basicMoveCost;
@@ -117,10 +116,6 @@ public final class TileType extends FreeColGameObjectType {
 
     public boolean canSettle() {
         return canSettle;
-    }
-
-    public boolean canSailToEurope() {
-        return canSailToEurope;
     }
 
     public boolean canHaveRiver() {
@@ -224,8 +219,7 @@ public final class TileType extends FreeColGameObjectType {
         forest = getAttribute(in, "is-forest", false);
         water = getAttribute(in, "is-water", false);
         canSettle = getAttribute(in, "can-settle", !water);
-        canSailToEurope = getAttribute(in, "sail-to-europe", false);
-        connected = getAttribute(in, "is-connected", canSailToEurope);
+        connected = getAttribute(in, "is-connected", false);
         canHaveRiver = !(getAttribute(in, "no-river", water));
         attackBonus = 0;
         defenceBonus = 0;
