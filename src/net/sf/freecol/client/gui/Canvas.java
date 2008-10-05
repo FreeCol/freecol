@@ -1822,12 +1822,12 @@ public final class Canvas extends JDesktopPane {
      * the current tile.
      */
     public int showRiverStylePanel() {
-	RiverStylePanel riverStylePanel = new RiverStylePanel(this);
-	addAsFrame(riverStylePanel);
-	riverStylePanel.requestFocus();
-	int response = riverStylePanel.getResponseInt();
-	remove(riverStylePanel);
-	return response;
+        RiverStylePanel riverStylePanel = new RiverStylePanel(this);
+        addAsFrame(riverStylePanel);
+        riverStylePanel.requestFocus();
+        int response = riverStylePanel.getResponseInt();
+        remove(riverStylePanel);
+        return response;
     }
 
     /**

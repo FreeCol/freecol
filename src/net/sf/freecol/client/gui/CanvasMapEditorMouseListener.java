@@ -119,20 +119,22 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
         try {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
                 Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
-		Tile tile = getMap().getTile(p);
-		if (tile != null && tile.hasRiver()) {
-		    TileImprovement river = tile.getRiver();
-		    int style = canvas.showRiverStylePanel();
-		    if (style == 0) {
-			tile.getTileItemContainer().removeTileItem(river);
-		    } else if (0 < style && style < ImageLibrary.RIVER_STYLES) {
-			river.setStyle(style);
-		    } else {
-			logger.warning("Unknown river style: " + style);
-		    }
-		} else {
-		    gui.setSelectedTile(p, true);
-		}
+                Tile tile = getMap().getTile(p);
+                if (tile != null && tile.hasRiver()) {
+                    TileImprovement river = tile.getRiver();
+                    int style = canvas.showRiverStylePanel();
+                    if (style == -1) {
+                        // user canceled
+                    } else if (style == 0) {
+                        tile.getTileItemContainer().removeTileItem(river);
+                    } else if (0 < style && style < ImageLibrary.RIVER_STYLES) {
+                        river.setStyle(style);
+                    } else {
+                        logger.warning("Unknown river style: " + style);
+                    }
+                } else {
+                    gui.setSelectedTile(p, true);
+                }
             } else if (e.getButton() == MouseEvent.BUTTON1) {
                 if (gui.getFocus() != null) {
                     Position p = gui.convertToMapCoordinates(e.getX(), e.getY());

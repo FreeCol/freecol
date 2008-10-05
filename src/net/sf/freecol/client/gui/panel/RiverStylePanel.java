@@ -19,16 +19,19 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
@@ -45,26 +48,35 @@ public final class RiverStylePanel extends FreeColDialog implements ActionListen
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStylePanel.class.getName());
     
+    private static final int CANCEL = -1;
+    private static final int DELETE = 0;
     /**
      * The constructor that will add the items to this panel. 
      * @param parent The parent of this panel.
      */
     public RiverStylePanel(Canvas parent) {
         super(parent);
-	setLayout(new GridLayout(9, 9));
+        setLayout(new BorderLayout());
         
         ImageLibrary library = parent.getGUI().getImageLibrary();
 
-	JButton deleteButton = new JButton(library.getScaledImageIcon(library.getMiscImageIcon(ImageLibrary.DELETE), 0.5f));
-	deleteButton.setActionCommand("0");
-	deleteButton.addActionListener(this);
-	add(deleteButton);
-	for (int index = 1; index < ImageLibrary.RIVER_STYLES; index++) {
-	    JButton riverButton = new JButton(library.getScaledImageIcon(library.getRiverImage(index), 0.5f));
-	    riverButton.setActionCommand(String.valueOf(index));
-	    riverButton.addActionListener(this);
-	    add(riverButton);
-	}
+        JPanel stylesPanel = new JPanel(new GridLayout(9, 9));
+        JButton deleteButton = new JButton(library.getScaledImageIcon(library.getMiscImageIcon(ImageLibrary.DELETE), 0.5f));
+        deleteButton.setActionCommand(String.valueOf(DELETE));
+        deleteButton.addActionListener(this);
+        stylesPanel.add(deleteButton);
+        for (int index = 1; index < ImageLibrary.RIVER_STYLES; index++) {
+            JButton riverButton = new JButton(library.getScaledImageIcon(library.getRiverImage(index), 0.5f));
+            riverButton.setActionCommand(String.valueOf(index));
+            riverButton.addActionListener(this);
+            stylesPanel.add(riverButton);
+        }
+        this.add(stylesPanel, BorderLayout.CENTER);
+        JButton cancelButton = new JButton(Messages.message("cancel"));
+        cancelButton.setActionCommand(String.valueOf(CANCEL));
+        cancelButton.addActionListener(this);
+        cancelButton.setMnemonic('C');
+        this.add(cancelButton, BorderLayout.SOUTH);
         setSize(getPreferredSize());
     }
 
@@ -76,8 +88,8 @@ public final class RiverStylePanel extends FreeColDialog implements ActionListen
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
-	int style = Integer.parseInt(event.getActionCommand());
-	setResponse(new Integer(style));
+        int style = Integer.parseInt(event.getActionCommand());
+        setResponse(new Integer(style));
     }
 
 }
