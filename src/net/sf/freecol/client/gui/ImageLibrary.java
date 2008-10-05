@@ -875,7 +875,7 @@ public final class ImageLibrary extends ImageProvider {
             BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
             g.drawImage(terrainImage, 0, 0, null);
-            g.drawImage(getOverlayImage(type, 0, 0), 0, 0, null);
+            g.drawImage(getOverlayImage(type, 0, 0), 0, -32, null);
             g.dispose();
             terrainImage = compositeImage;
         }
