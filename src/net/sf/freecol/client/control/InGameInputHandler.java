@@ -615,15 +615,21 @@ public final class InGameInputHandler extends InputHandler {
      * tree) that holds all the information.
      */
     private Element newConvert(Element element) {
-        Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colony"));
+        Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colonyTile"));
         Colony colony = tile.getColony();
         String nation = colony.getOwner().getNationAsString();
+        
+        Element unitElement = (Element) element.getFirstChild();
+        Unit convert = new Unit(getGame(), unitElement);
+        tile.add(convert);
+        
         ModelMessage message = new ModelMessage(colony,
                                                 "model.colony.newConvert",
                                                 new String[][] {
                                                     {"%nation%", nation},
                                                     {"%colony%", colony.getName()}},
                                                 ModelMessage.MessageType.UNIT_ADDED);
+
         getFreeColClient().getMyPlayer().addModelMessage(message);
         return null;
     }

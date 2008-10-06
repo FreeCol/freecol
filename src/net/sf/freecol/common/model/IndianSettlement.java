@@ -953,60 +953,35 @@ public class IndianSettlement extends Settlement {
         if (getUnitCount() > 0) {
             increaseAlarm();
         }
+        
+        updateWantedGoods();
+    }
 
+    public boolean checkForNewMissionnaryConvert() {
+        
         /* Increase convert progress and generate convert if needed. */
         if (missionary != null && getGame().getViewOwner() == null) {
             int increment = 8;
-
+    
             // Update increment if missionary is an expert.
             if (missionary.hasAbility("model.ability.expertMissionary")) {
                 increment = 13;
             }
-
+    
             // Increase increment if alarm level is high.
             increment += 2 * alarm.get(missionary.getOwner()).getValue() / 100;
             convertProgress += increment;
-
+    
             int extra = Math.max(0, 8-getUnitCount()*getUnitCount());
             extra *= extra;
             extra *= extra;
             
             if (convertProgress >= 100 + extra && getUnitCount() > 2) {
-                Tile targetTile = null;
-                Iterator<Position> ffi = getGame().getMap().getFloodFillIterator(getTile().getPosition());
-                while (ffi.hasNext()) {
-                    Tile t = getGame().getMap().getTile(ffi.next());
-                    if (getTile().getDistanceTo(t) > MAX_CONVERT_DISTANCE) {
-                        break;
-                    }
-                    if (t.getSettlement() != null && t.getSettlement().getOwner() == missionary.getOwner()) {
-                        targetTile = t;
-                        break;
-                    }
-                }
-
-                if (targetTile != null) {
-                    convertProgress = 0;
-                    
-                    List<UnitType> converts = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.convert");
-                    if (converts.size() > 0) {
-                        getUnitIterator().next().dispose();
-
-                        ModelController modelController = getGame().getModelController();
-                        int random = modelController.getRandom(getId() + "getNewConvertType", converts.size());
-                        Unit u = modelController.createUnit(getId() + "newTurn100missionary", targetTile,
-                                                            missionary.getOwner(), converts.get(random));
-                        addModelMessage(u, ModelMessage.MessageType.UNIT_ADDED, u,
-                                        "model.colony.newConvert",
-                                        "%nation%", getOwner().getNationAsString(),
-                                        "%colony%", targetTile.getColony().getName());
-                        logger.info("New convert created for " + missionary.getOwner().getName() + " with ID=" + u.getId());
-                    }
-                }
+                convertProgress = 0;
+                return true;
             }
         }
-        
-        updateWantedGoods();
+        return false;
     }
 
     // Create a new colonist if there is enough food:

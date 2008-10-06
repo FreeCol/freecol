@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -194,6 +195,55 @@ public final class InGameController extends Controller {
                 monarchAction(newPlayer);
             }
             bombardEnemyShips(newPlayer);
+        }
+        else if (newPlayer.isIndian()) {
+            
+            for (IndianSettlement indianSettlement: newPlayer.getIndianSettlements()) {
+                if (indianSettlement.checkForNewMissionnaryConvert()) {
+                    // an Indian brave gets converted by missionary
+                    Unit missionary = indianSettlement.getMissionary();
+                    ServerPlayer european = (ServerPlayer) missionary.getOwner();
+                    // search for a nearby colony
+                    Tile settlementTile = indianSettlement.getTile();
+                    Tile targetTile = null;
+                    Iterator<Position> ffi = getGame().getMap().getFloodFillIterator(settlementTile.getPosition());
+                    while (ffi.hasNext()) {
+                        Tile t = getGame().getMap().getTile(ffi.next());
+                        if (settlementTile.getDistanceTo(t) > IndianSettlement.MAX_CONVERT_DISTANCE) {
+                            break;
+                        }
+                        if (t.getSettlement() != null && t.getSettlement().getOwner() == european) {
+                            targetTile = t;
+                            break;
+                        }
+                    }
+        
+                    if (targetTile != null) {
+                        
+                        List<UnitType> converts = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.convert");
+                        if (converts.size() > 0) {
+                            // perform the conversion from brave to convert in the server
+                            Unit brave = indianSettlement.getUnitIterator().next();
+                            brave.dispose();
+                            ModelController modelController = getGame().getModelController();
+                            int random = modelController.getRandom(indianSettlement.getId() + "getNewConvertType", converts.size());
+                            UnitType unitType = converts.get(random);
+                            Unit unit = modelController.createUnit(indianSettlement.getId() + "newTurn100missionary", targetTile,
+                                    european, unitType);
+                            // and send update information to the client
+                            try {
+                                Element updateElement = Message.createNewRootElement("newConvert");
+                                updateElement.setAttribute("colonyTile", targetTile.getId());
+                                updateElement.appendChild(unit.toXMLElement(updateElement.getOwnerDocument()));
+                                european.getConnection().send(updateElement);
+                                logger.info("New convert created for " + european.getName() + " with ID=" + unit.getId());
+                            } catch (IOException e) {
+                                logger.warning("Could not send message to: " + european.getName());
+                            }
+                        }
+                    }
+                }
+            }
         }
         
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
