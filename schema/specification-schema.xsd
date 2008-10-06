@@ -87,7 +87,6 @@
         <xs:element ref="skirmish"/>
         <xs:element ref="resource"/>
         <xs:element ref="production"/>
-        <xs:element ref="modifier"/>
         <xs:element ref="ability"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
@@ -381,8 +380,6 @@
   <xs:element name="european-nation-type">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ability"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="modifier"/>
         <xs:choice minOccurs="0" maxOccurs="unbounded">
           <xs:element name="unit">
             <xs:complexType>
