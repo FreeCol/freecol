@@ -1127,7 +1127,7 @@ public final class Canvas extends JDesktopPane {
         text.append(" ");
         if (settlement.getLearnableSkill() != null) {
             text.append(Messages.message("scoutSettlement.skill", "%skill%",
-                                         settlement.getLearnableSkill().getName().toLowerCase()));
+                                         settlement.getLearnableSkill().getName()));
             text.append(" ");
         }
         text.append(Messages.message("scoutSettlement.trade",
