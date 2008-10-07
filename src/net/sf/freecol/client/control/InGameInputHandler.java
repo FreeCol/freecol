@@ -837,7 +837,7 @@ public final class InGameInputHandler extends InputHandler {
             player.changeRelationWithPlayer(enemy, Stance.WAR);
             player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
                                                     new String[][] {
-                                                        {"%nation%", enemy.getName()}},
+                                                        {"%nation%", enemy.getNationAsString()}},
                                                     ModelMessage.MessageType.WARNING));
             break;
         case SUPPORT_LAND:
