@@ -792,11 +792,12 @@ public class Player extends FreeColGameObject implements Nameable {
             index = newIndex.intValue();
         }
         do {
+            name = null;
             if (Messages.containsKey(prefix + Integer.toString(index))) {
                 name = Messages.message(prefix + Integer.toString(index));
                 index++;
             }
-        } while (getGame().getMap().getRegion(name) != null);
+        } while (name != null && getGame().getMap().getRegionByName(name) != null);
         if (name == null) {
             do {
                 String type = Messages.message("model.region." + regionType.toString().toLowerCase() + ".name");
@@ -805,7 +806,7 @@ public class Player extends FreeColGameObject implements Nameable {
                                         "%type%", type,
                                         "%index%", Integer.toString(index));
                 index++;
-            } while (getGame().getMap().getRegion(name) != null);
+            } while (getGame().getMap().getRegionByName(name) != null);
         }
         regionNameIndex.put(regionType, index);
         return name;
