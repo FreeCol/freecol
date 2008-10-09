@@ -1419,53 +1419,42 @@ public class AIPlayer extends AIObject {
         return Math.max(0, value);
     }
     
-    boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender){    	
-    	// Sanitation
-    	if(defender == null){
-    		return false;
-    	}
+    boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender) {
+        if (defender == null) { // Sanitation
+            return false;
+        }
     	
-    	// Needs to check if the unit is in a settlement -> attacker.getTile() == null
-    	boolean attackerInLand = true;
-    	if(attacker.getTile() != null)
-    		attackerInLand = attacker.getTile().isLand();
-    	
-    	boolean defenderInLand = true;
-    	if(defender.getTile() != null)
-    		defenderInLand = defender.getTile().isLand();
-    		
-    	// a naval unit cannot target a unit on land and vice-versa
-        if(attackerInLand != defenderInLand){
-        	return false; 
+        // A naval unit cannot attack a land unit and vice-versa
+        if (attacker.isNaval() != defender.isNaval()) {
+            return false;
         }
-        
-        // a naval unit cannot target a land unit and vice-versa
-        if(attacker.isNaval() != defender.isNaval()){
-        	return false;
+
+        if (attacker.isNaval()) { // Naval units can only fight at sea
+            if (attacker.getTile() == null || attacker.getTile().isLand()
+                || defender.getTile() == null || defender.getTile().isLand()) {
+                return false;
+            }
         }
-        
-    	Player attackerPlayer = attacker.getOwner();
-    	Player defenderPlayer = defender.getOwner();
-        
-        // cannot target own units
-        if(attackerPlayer == defenderPlayer){
-        	return false;
+
+        Player attackerPlayer = attacker.getOwner();
+        Player defenderPlayer = defender.getOwner();
+        if (attackerPlayer == defenderPlayer) { // Cannot attack own units
+            return false;
         }
-        
-        boolean notAtWar = attackerPlayer.getStance(defenderPlayer) != Stance.WAR;
-        // if european, can only attack units whose owners are at war
-        if(attackerPlayer.isEuropean() && notAtWar){
-        	return false;
+
+        boolean atWar = attackerPlayer.getStance(defenderPlayer) == Stance.WAR;
+        if (attackerPlayer.isEuropean()) {
+            // If european, do not attack if not at war
+            if (!atWar) {
+                return false;
+            }
+        } else if (attackerPlayer.isIndian()) {
+            // If indian, do not attack if not at war and not displeased
+            if (!atWar && attackerPlayer.getTension(defenderPlayer)
+                .getLevel().compareTo(Tension.Level.CONTENT) >= 0) {
+                return false;
+            }
         }
-     
-        // if indian, cannot attack if not at war or displeased
-        if(attackerPlayer.isIndian()){
-        	boolean inFriendlyMood = attackerPlayer.getTension(defenderPlayer).getLevel().compareTo(Tension.Level.CONTENT) >= 0;
-        	
-        	if(notAtWar && inFriendlyMood)
-            	return false;
-        }
-        
         return true;
     }
         
