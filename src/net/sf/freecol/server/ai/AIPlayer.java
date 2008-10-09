@@ -1491,7 +1491,7 @@ public class AIPlayer extends AIObject {
             aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
             return;
         }
-        Unit unit = aiUnit.getUnit();
+        final Unit unit = aiUnit.getUnit();
         Unit carrier = (unit.getLocation() instanceof Unit) ? (Unit) unit.getLocation() : null;
         Map map = unit.getGame().getMap();
         // Initialize variables:
@@ -1535,7 +1535,7 @@ public class AIPlayer extends AIObject {
             public boolean check(Unit u, PathNode pathNode) {
                 Tile t = pathNode.getTile();
                 if (t.getColony() != null && t.getColony().getOwner() == u.getOwner()) {
-                    int value = getDefendColonyMissionValue(u, t.getColony(), pathNode.getTurns());
+                    int value = getDefendColonyMissionValue(unit, t.getColony(), pathNode.getTurns());
                     if (value > 0 && value > bestValue) {
                         bestValue = value;
                         best = pathNode;
@@ -1601,10 +1601,10 @@ public class AIPlayer extends AIObject {
                 return true;
             }
 
-            public boolean check(Unit unit, PathNode pathNode) {
+            public boolean check(Unit u, PathNode pathNode) {
                 Tile newTile = pathNode.getTile();
                 Unit defender = newTile.getDefendingUnit(unit);
-                if (isTargetValidForSeekAndDestroy(unit,defender)) {
+                if (isTargetValidForSeekAndDestroy(unit, defender)) {
                     int value = getUnitSeekAndDestroyMissionValue(unit, pathNode.getTile(), pathNode.getTurns());
                     if (value > bestNewTargetValue) {
                         bestTarget = pathNode;
