@@ -436,11 +436,25 @@ public class UnitTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(6, 9);
         UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
+        UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
         UnitType farmerSkill = spec().getUnitType("model.unit.expertFarmer");
-        Unit missionary = new Unit(game, tile, dutch, missionaryType, UnitState.ACTIVE);
+        Colony colony = getStandardColony(3);
+        BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
+        Building church = colony.getBuilding(churchType);
+        church.upgrade();
+        Unit jesuit = new Unit(game, tile, dutch, missionaryType, UnitState.ACTIVE);
+        Unit colonist = new Unit(game, colony, dutch, colonistType, UnitState.ACTIVE);
+        // check abilities
+        assertFalse(colonist.hasAbility("model.ability.missionary"));
+        colonist.equipWith(spec().getEquipmentType("model.equipment.missionary"));
+        assertTrue(colonist.hasAbility("model.ability.missionary"));
+        assertFalse(colonist.hasAbility("model.ability.expertMissionary"));
+        assertTrue(jesuit.hasAbility("model.ability.missionary"));
+        assertTrue(jesuit.hasAbility("model.ability.expertMissionary"));
+        // check mission creation 
         IndianSettlement s = new IndianSettlement(game, sioux, tile, true, farmerSkill, true, null);
         // add the missionary
-        s.setMissionary(missionary);
+        s.setMissionary(jesuit);
         // remove the missionary (SimpleCombatModel.getConvert(...)
         s.setMissionary(null);
     }
