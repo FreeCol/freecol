@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.animation.UnitMoveAnimation;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
@@ -617,7 +618,7 @@ public final class InGameInputHandler extends InputHandler {
     private Element newConvert(Element element) {
         Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colonyTile"));
         Colony colony = tile.getColony();
-        String nation = colony.getOwner().getNationAsString();
+        String nation = Specification.getSpecification().getNation(element.getAttribute("nation")).getName();
         
         Element unitElement = (Element) element.getFirstChild();
         Unit convert = new Unit(getGame(), unitElement);

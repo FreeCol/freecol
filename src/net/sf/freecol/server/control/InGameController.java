@@ -224,6 +224,7 @@ public final class InGameController extends Controller {
                         if (converts.size() > 0) {
                             // perform the conversion from brave to convert in the server
                             Unit brave = indianSettlement.getUnitIterator().next();
+                            String nationId = brave.getOwner().getNationID();
                             brave.dispose();
                             ModelController modelController = getGame().getModelController();
                             int random = modelController.getRandom(indianSettlement.getId() + "getNewConvertType", converts.size());
@@ -233,6 +234,7 @@ public final class InGameController extends Controller {
                             // and send update information to the client
                             try {
                                 Element updateElement = Message.createNewRootElement("newConvert");
+                                updateElement.setAttribute("nation", nationId);
                                 updateElement.setAttribute("colonyTile", targetTile.getId());
                                 updateElement.appendChild(unit.toXMLElement(updateElement.getOwnerDocument()));
                                 european.getConnection().send(updateElement);
