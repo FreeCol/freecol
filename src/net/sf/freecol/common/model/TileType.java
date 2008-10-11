@@ -46,8 +46,6 @@ public final class TileType extends FreeColGameObjectType {
 
     private int basicMoveCost;
     private int basicWorkTurns;
-    private int attackBonus;
-    private int defenceBonus;
     
     public static enum RangeType { HUMIDITY, TEMPERATURE, ALTITUDE }
     
@@ -128,11 +126,6 @@ public final class TileType extends FreeColGameObjectType {
 
     public int getBasicWorkTurns() {
         return basicWorkTurns;
-    }
-
-    // this isn't actually used anywhere
-    public int getAttackBonus() {
-        return attackBonus;
     }
 
     public Set<Modifier> getDefenceBonus() {
@@ -221,8 +214,6 @@ public final class TileType extends FreeColGameObjectType {
         canSettle = getAttribute(in, "can-settle", !water);
         connected = getAttribute(in, "is-connected", false);
         canHaveRiver = !(getAttribute(in, "no-river", water));
-        attackBonus = 0;
-        defenceBonus = 0;
 
         if (!water && canSettle) {
             secondaryGoods = specification.getGoodsType(in.getAttributeValue(null, "secondary-goods"));
