@@ -539,9 +539,9 @@
       <upgrade unit="model.unit.elderStatesman" turnsToLearn="8"/>
       <upgrade unit="model.unit.masterCarpenter" turnsToLearn="4"/>
       <upgrade unit="model.unit.masterDistiller" turnsToLearn="6"/>
-      <upgrade unit="model.unit.masterWeaver" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterWeaver" turnsToLearn="6" learnFromNatives="true"/>
       <upgrade unit="model.unit.masterTobacconist" turnsToLearn="6"/>
-      <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6" learnFromNatives="true"/>
       <upgrade unit="model.unit.masterBlacksmith" turnsToLearn="6"/>
       <upgrade unit="model.unit.masterGunsmith" turnsToLearn="6"/>
       <upgrade unit="model.unit.seasonedScout" turnsToLearn="4" learnFromNatives="true" learnInLostCity="true"/>
