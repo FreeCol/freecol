@@ -36,7 +36,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class BuildingType extends BuildableType {
     
-    private int level, defenceBonus;
+    private int level;
   
     private int workPlaces, basicProduction, minSkill, maxSkill;
     private GoodsType consumes, produces;

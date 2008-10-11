@@ -382,8 +382,10 @@ public final class InfoPanel extends FreeColPanel {
                         row++;
                     }
 
+                    int defenceBonus = (int) tile.getType().getFeatureContainer()
+                        .applyModifier(100, "model.modifier.defence") - 100;
                     bonusLabel.setText(Messages.message("colopedia.terrain.defenseBonus") +
-                                       " " + tile.defenceBonus() + "%");
+                                       " " + defenceBonus + "%");
                     labelPanel.add(bonusLabel, higConst.rc(row, 1));
                     row++;
 

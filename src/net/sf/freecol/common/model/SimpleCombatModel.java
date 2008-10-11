@@ -309,9 +309,14 @@ public class SimpleCombatModel implements CombatModel {
                      */
                     if (attacker.hasAbility("model.ability.ambushBonus") ||
                         defender.hasAbility("model.ability.ambushPenalty")) {
-                        result.add(new Modifier(Modifier.OFFENCE, AMBUSH_BONUS_SOURCE,
-                                                defender.getTile().defenceBonus(),
-                                                Modifier.Type.PERCENTAGE));
+                        Set<Modifier> ambushModifiers = defender.getTile().getType()
+                            .getModifierSet(Modifier.DEFENCE);
+                        for (Modifier modifier : ambushModifiers) {
+                            Modifier ambushModifier = new Modifier(modifier);
+                            ambushModifier.setId(Modifier.OFFENCE);
+                            ambushModifier.setSource(AMBUSH_BONUS_SOURCE);
+                            result.add(ambushModifier);
+                        }
                     }
 
                     // 75% Artillery in the open penalty

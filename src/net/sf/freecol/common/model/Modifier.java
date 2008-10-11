@@ -104,6 +104,22 @@ public final class Modifier extends Feature {
     /**
      * Creates a new <code>Modifier</code> instance.
      *
+     * @param template a <code>Modifier</code> value
+     */
+    public Modifier(Modifier template) {
+        setId(template.getId());
+        setSource(template.getSource());
+        setType(template.getType());
+        setValue(template.getValue());
+        if (template.hasIncrement()) {
+            setIncrement(template.getIncrement(), template.getIncrementType(),
+                         template.getFirstTurn(), template.getLastTurn());
+        }
+    }
+
+    /**
+     * Creates a new <code>Modifier</code> instance.
+     *
      * @param element an <code>Element</code> value
      */
     public Modifier(Element element) {

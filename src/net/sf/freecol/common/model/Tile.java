@@ -1464,21 +1464,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * The defence/ambush bonus of this tile.
-     * <p>
-     * Note that the defence bonus is relative to the unit base strength,
-     * not to the cumulative strength.
-     * 
-     * @return The defence modifier (in percent) of this tile.
-     */
-    public int defenceBonus() {
-        if (type == null) {
-            return 0;
-        }
-        return (int) type.getFeatureContainer().applyModifier(0, "model.modifier.defence");
-    }
-
-    /**
      * This method is called only when a new turn is beginning. It will reduce the quantity of
      * the bonus <code>Resource</code> that is on the tile, if any and if applicable.
      * @see ResourceType
