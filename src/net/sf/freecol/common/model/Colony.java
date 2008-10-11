@@ -1598,6 +1598,9 @@ public final class Colony extends Settlement implements Location, Nameable {
      * @return The capacity of this <code>Colony</code>'s warehouse.
      */
     public int getWarehouseCapacity() {
+        /* This will return 0 unless additive modifiers are present.
+           This is intentional.
+         */
         return (int) featureContainer.applyModifier(0, "model.modifier.warehouseStorage",
                                                     null, getGame().getTurn());
     }

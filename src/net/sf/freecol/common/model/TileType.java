@@ -135,7 +135,8 @@ public final class TileType extends FreeColGameObjectType {
     /**
      * Returns the amount of goods of given GoodsType this TileType
      * can produce. This method applies the production bonus to
-     * <code>0f</code>.
+     * <code>0f</code>. Thus, it will always return <code>0</code>
+     * unless an additive modifier is present. This is intentional.
      *
      * @param goodsType a <code>GoodsType</code> value
      * @return an <code>int</code> value
