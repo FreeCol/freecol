@@ -2442,6 +2442,11 @@ public class Player extends FreeColGameObject implements Nameable {
         if (nationType != null) {
             featureContainer.add(nationType.getFeatureContainer());
         }
+        switch (playerType) {
+        case REBEL: case INDEPENDENT:
+            featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
+            break;
+        }
 
         tension = new HashMap<Player, Tension>();
         stance = new HashMap<String, Stance>();
