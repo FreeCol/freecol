@@ -248,4 +248,24 @@ public class MovementTest extends FreeColTestCase {
         
     }
 
+    public void testRemoveEquipment() {
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        tile1.setExploredBy(dutch, true);
+        Unit scout = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
+        scout.equipWith(horses, true);
+
+        // make sure unit has all moves left
+        scout.newTurn();
+        assertEquals(scout.getInitialMovesLeft(), scout.getMovesLeft());
+
+        scout.removeAllEquipment(true);
+        assertEquals(0, scout.getMovesLeft());
+        
+    }
+
 }
