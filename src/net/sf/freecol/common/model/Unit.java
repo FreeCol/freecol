@@ -2137,6 +2137,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
         if (!asResultOfCombat) {
+            setMovesLeft(0);
             if (getColony() != null) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
                     getColony().removeGoods(goods);

@@ -227,4 +227,25 @@ public class MovementTest extends FreeColTestCase {
 
     }
 
+    public void testEquipWith() {
+
+        Colony colony = getStandardColony(6);
+        BuildingType churchType = spec().getBuildingType("model.building.Chapel");
+        assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
+
+        Building church = colony.getBuilding(churchType);
+        church.upgrade();
+        assertTrue(colony.hasAbility("model.ability.dressMissionary"));
+
+        Iterator<Unit> units = colony.getUnitIterator();
+        Unit colonist = units.next();
+        // make sure the unit has all moves left
+        colonist.newTurn();
+        assertEquals(colonist.getInitialMovesLeft(), colonist.getMovesLeft());
+
+        colonist.equipWith(spec().getEquipmentType("model.equipment.missionary"));
+        assertEquals(0, colonist.getMovesLeft());
+        
+    }
+
 }
