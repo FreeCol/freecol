@@ -2159,7 +2159,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public void removeEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
         dumpEquipment(equipmentType, asResultOfCombat);
         equipment.remove(equipmentType);
-        setMovesLeft(0);
+        if (!asResultOfCombat) {
+            setMovesLeft(0);
+        }
         setRole();
     }
 
