@@ -93,16 +93,13 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
         continueButton.addActionListener(this);
         enterPressesWhenFocused(ok);
         enterPressesWhenFocused(continueButton);
-    }
-    
-    public void initialize() {
+
         buttonsBox.removeAll();
         if (parent.getClient().isSingleplayer()) {
             buttonsBox.add(continueButton);
             buttonsBox.add(Box.createGlue());
         }
         buttonsBox.add(ok);
-
         setSize(getPreferredSize());
     }
 
