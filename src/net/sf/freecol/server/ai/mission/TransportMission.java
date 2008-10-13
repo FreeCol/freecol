@@ -732,6 +732,9 @@ public class TransportMission extends Mission {
         if (!(getUnit().getLocation() instanceof Europe)) {
             throw new IllegalStateException("Carrier not in Europe");
         }
+        if (!player.canRecruitUnits()) {
+            return null;
+        }
 
         // Check if there are any units on the docks:
         Iterator<Unit> ui = europe.getUnitIterator();
