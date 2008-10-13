@@ -266,14 +266,14 @@ public class AIPlayer extends AIObject {
     }
     
     /**
-     * Gets the number of King's units.
+     * Gets the number of King's land units.
      * @return The number of units of type
      *      {@link Unit#KINGS_REGULAR} this player owns.
      */
-    private int getNumberOfKingUnits() {
+    private int getNumberOfKingLandUnits() {
         int n = 0;
         for (Unit unit : player.getUnits()) {
-            if (unit.hasAbility("model.ability.refUnit")) {
+            if (unit.hasAbility("model.ability.refUnit") && !unit.isNaval()) {
                 n++;
             }
         }
@@ -301,7 +301,7 @@ public class AIPlayer extends AIObject {
             return;
         }
         
-        if (hasManOfWar() && getNumberOfKingUnits() > 6) {
+        if (hasManOfWar() && getNumberOfKingLandUnits() > 6) {
             return;
         }
         
