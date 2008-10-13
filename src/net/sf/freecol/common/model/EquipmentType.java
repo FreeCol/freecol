@@ -29,7 +29,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.UnitType.Role;
 
 public class EquipmentType extends BuildableType {
 

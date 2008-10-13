@@ -84,8 +84,8 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertTrue(dutch.getUnits().isEmpty());
 
         List<AbstractUnit> units = new ArrayList<AbstractUnit>();
-        units.add(new AbstractUnit(colonistType, Unit.Role.DEFAULT, 1));
-        units.add(new AbstractUnit(statesmanType, Unit.Role.DEFAULT, 1));
+        units.add(new AbstractUnit(colonistType, UnitType.Role.DEFAULT, 1));
+        units.add(new AbstractUnit(statesmanType, UnitType.Role.DEFAULT, 1));
         FoundingFather father = new FoundingFather(111);
         father.setUnits(units);
 

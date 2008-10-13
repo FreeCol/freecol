@@ -47,6 +47,15 @@ public final class UnitType extends BuildableType {
 
     public static enum DowngradeType { CLEAR_SKILL, DEMOTION, CAPTURE }
 
+    /** The roles a Unit can have. */
+    public static enum Role {
+        DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
+    
+        public String getId() {
+            return toString().toLowerCase();
+        }
+    }
+
     /**
      * Describe offence here.
      */
@@ -126,6 +135,11 @@ public final class UnitType extends BuildableType {
      * The ID of the skill this UnitType teaches, mostly its own.
      */
     private String skillTaught;
+
+    /**
+     * The default role of this UnitType.
+     */
+    private Role role = Role.DEFAULT;
 
     /**
      * Describe education here.
@@ -466,6 +480,24 @@ public final class UnitType extends BuildableType {
      */
     public void setSkillTaught(final String newSkillTaught) {
         this.skillTaught = newSkillTaught;
+    }
+
+    /**
+     * Get the <code>Role</code> value.
+     *
+     * @return a <code>Role</code> value
+     */
+    public Role getRole() {
+        return role;
+    }
+
+    /**
+     * Set the <code>Role</code> value.
+     *
+     * @param newRole The new Role value.
+     */
+    public void setRole(final Role newRole) {
+        this.role = newRole;
     }
 
     /**

@@ -68,7 +68,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.UnitType.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;

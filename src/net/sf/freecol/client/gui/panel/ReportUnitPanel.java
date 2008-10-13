@@ -45,7 +45,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.UnitType.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 

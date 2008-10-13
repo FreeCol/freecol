@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitType.Role;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -126,11 +127,11 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     }
 
     private ImageIcon getUnitIcon(UnitType unit) {
-        Unit.Role role = Unit.Role.DEFAULT;
+        Role role = Role.DEFAULT;
         if (unit.hasAbility("model.ability.expertPioneer")) {
-            role = Unit.Role.PIONEER;
+            role = Role.PIONEER;
         } else if (unit.hasAbility("model.ability.expertMissionary")) {
-            role = Unit.Role.MISSIONARY;
+            role = Role.MISSIONARY;
         }
 
         return getLibrary().getUnitImageIcon(unit, role);

@@ -44,6 +44,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.UnitType.DowngradeType;
 import net.sf.freecol.common.model.UnitType.UpgradeType;
+import net.sf.freecol.common.model.UnitType.Role;
 import net.sf.freecol.common.util.EmptyIterator;
 import net.sf.freecol.common.util.Utils;
 
@@ -83,15 +84,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public static enum UnitState { ACTIVE, FORTIFIED, SENTRY, IN_COLONY, IMPROVING,
             TO_EUROPE, IN_EUROPE, TO_AMERICA, FORTIFYING, SKIPPED }
-
-    /** The roles a Unit can have. */
-    public static enum Role {
-        DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
-    
-        public String getId() {
-            return toString().toLowerCase();
-        }
-    }
 
     /**
      * A move type.

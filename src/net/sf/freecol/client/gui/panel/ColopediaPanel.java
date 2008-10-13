@@ -76,7 +76,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.UnitType.Role;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.RandomChoice;

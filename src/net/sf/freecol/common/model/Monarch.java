@@ -33,7 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.UnitType.Role;
 import net.sf.freecol.common.util.RandomChoice;
 
 import org.w3c.dom.Element;
