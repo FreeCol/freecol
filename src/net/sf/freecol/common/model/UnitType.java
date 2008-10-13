@@ -620,7 +620,9 @@ public final class UnitType extends BuildableType {
         spaceTaken = getAttribute(in, "spaceTaken", 1);
         maximumAttrition = getAttribute(in, "maximumAttrition", Integer.MAX_VALUE);
         skillTaught = getAttribute(in, "skillTaught", getId());
-        
+        String roleString = getAttribute(in, "role", "default");
+        role = Enum.valueOf(Role.class, roleString.toUpperCase());
+
         art = in.getAttributeValue(null, "art");
         pathImage = in.getAttributeValue(null, "pathImage");
 
