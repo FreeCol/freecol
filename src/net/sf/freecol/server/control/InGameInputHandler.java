@@ -2384,7 +2384,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         List<Unit> safeUnits = new ArrayList<Unit>(navalUnits);
         EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
         EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
-        Iterator<Unit> unitIterator;
+        Iterator<Unit> unitIterator = navalUnits.iterator();
         for (AbstractUnit unit : player.getMonarch().getLandUnits()) {
             EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
             switch(unit.getRole()) {
@@ -2399,18 +2399,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             for (int index = 0; index < unit.getNumber(); index++) {
                 Unit newUnit = new Unit(getGame(), refPlayer.getEurope(), refPlayer,
                                         unit.getUnitType(), UnitState.ACTIVE, equipment);
-                unitIterator = navalUnits.iterator();
-                while (unitIterator.hasNext()) {
+                while (newUnit != null) {
+                    if (!unitIterator.hasNext()) {
+                        unitIterator = navalUnits.iterator();
+                    }
                     Unit carrier = unitIterator.next();
                     if (newUnit.getSpaceTaken() < carrier.getSpaceLeft()) {
                         newUnit.setLocation(carrier);
-                        if (carrier.getSpaceLeft() == 0) {
-                            unitIterator.remove();
-                        }
-                        break;
+                        safeUnits.add(newUnit);
+                        newUnit = null;
                     }
                 }
-                safeUnits.add(newUnit);
             }
         }
         for (Unit unit : safeUnits) {
