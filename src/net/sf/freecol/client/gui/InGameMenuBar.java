@@ -24,6 +24,7 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
@@ -47,9 +48,10 @@ import net.sf.freecol.client.gui.action.ColopediaUnitAction;
 import net.sf.freecol.client.gui.action.DeclareIndependenceAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;
+import net.sf.freecol.client.gui.action.DisplayTileEmptyAction;
 import net.sf.freecol.client.gui.action.DisplayTileNamesAction;
 import net.sf.freecol.client.gui.action.DisplayTileOwnersAction;
-import net.sf.freecol.client.gui.action.DisplayRegionAction;
+import net.sf.freecol.client.gui.action.DisplayTileRegionsAction;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.action.EuropeAction;
 import net.sf.freecol.client.gui.action.ExecuteGotoOrdersAction;
@@ -217,12 +219,16 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setMnemonic(KeyEvent.VK_V);
 
         menu.add(getCheckBoxMenuItem(MapControlsAction.id));
-        menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.id));
-        menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.id));
-        menu.add(getCheckBoxMenuItem(DisplayRegionAction.id));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.id));
         menu.add(getMenuItem(ToggleViewModeAction.id));
         menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.id));
+
+        menu.addSeparator();
+        ButtonGroup group = new ButtonGroup();
+        menu.add(getRadioButtonMenuItem(DisplayTileEmptyAction.id, group));
+        menu.add(getRadioButtonMenuItem(DisplayTileNamesAction.id, group));
+        menu.add(getRadioButtonMenuItem(DisplayTileOwnersAction.id, group));
+        menu.add(getRadioButtonMenuItem(DisplayTileRegionsAction.id, group));
 
         menu.addSeparator();
         menu.add(getMenuItem(ZoomInAction.id));

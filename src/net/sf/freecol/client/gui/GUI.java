@@ -155,10 +155,8 @@ public final class GUI {
     MESSAGE_COUNT = 3,
     MESSAGE_AGE = 30000; // The amount of time before a message gets deleted (in milliseconds).
 
-    private boolean displayTileNames = false;
-    private boolean displayTileOwners = false;
-    private boolean displayRegion = false;
     private boolean displayGrid = false;
+    private int displayTileText = 0;
     private GeneralPath gridPath = null;
 
     // Debug variables:
@@ -195,10 +193,8 @@ public final class GUI {
         messages = new Vector<GUIMessage>(MESSAGE_COUNT);
         viewMode = new ViewMode(this);
         logger.info("Starting in Move Units View Mode");
-        displayTileNames = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_TILE_NAMES);
-        displayTileOwners = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_TILE_OWNERS);
-        displayRegion = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_REGION);
         displayGrid = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID);
+        displayTileText = freeColClient.getClientOptions().getDisplayTileText();
         blinkingMarqueeEnabled = true;
 
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
@@ -2046,72 +2042,82 @@ public final class GUI {
      * (in pixels).
      */
     private void displayOptionalValues(Graphics2D g, Map map, Tile tile, int x, int y) {
-        if (displayTileNames) {
-            String tileName = tile.getName();
-            g.setColor(Color.BLACK);
-            int b = getBreakingPoint(tileName);
-            if (b == -1) {
-                g.drawString(tileName, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
-                /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileName, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
-                */
-            } else {
-                g.drawString(tileName.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
-                g.drawString(tileName.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
-                /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileName.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
-                stringImage = createStringImage(g, tileName.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
-                */
+        switch (displayTileText) {
+        case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
+            break;
+        case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
+            if (tile.getName() != null) {
+                String tileName = tile.getName();
+                g.setColor(Color.BLACK);
+                int b = getBreakingPoint(tileName);
+                if (b == -1) {
+                    g.drawString(tileName, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileName, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
+                    */
+                } else {
+                    g.drawString(tileName.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                    g.drawString(tileName.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileName.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                       stringImage = createStringImage(g, tileName.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
+                    */
+                }
             }
-        }
-        
-        if (displayTileOwners && tile.getOwner() != null) {
-            String tileOwner = tile.getOwner().getNationAsString();
-            g.setColor(Color.BLACK);
-            int b = getBreakingPoint(tileOwner);
-            if (b == -1) {
-                g.drawString(tileOwner, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
-                /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
-                */
-            } else {
-                g.drawString(tileOwner.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
-                g.drawString(tileOwner.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
-                /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
-                stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
-                */
+            break;
+        case ClientOptions.DISPLAY_TILE_TEXT_OWNERS:
+            if (tile.getOwner() != null) {
+                String tileOwner = tile.getOwner().getNationAsString();
+                g.setColor(Color.BLACK);
+                int b = getBreakingPoint(tileOwner);
+                if (b == -1) {
+                    g.drawString(tileOwner, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
+                    */
+                } else {
+                    g.drawString(tileOwner.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                    g.drawString(tileOwner.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                       stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
+                    */
+                }
             }
-        }
-        
-        if (displayRegion && tile.getRegion() != null) {
-            String regionString = tile.getRegion().getDisplayName();
-            g.setColor(Color.BLACK);
-            int b = getBreakingPoint(regionString);
-            if (b == -1) {
-                g.drawString(regionString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
-                /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
-                */
-            } else {
-                g.drawString(regionString.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
-                g.drawString(regionString.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
-                /* Takes to much resources:
-                BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
-                stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
-                g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
-                */
+            break;
+        case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
+            if (tile.getRegion() != null) {
+                String regionString = tile.getRegion().getDisplayName();
+                g.setColor(Color.BLACK);
+                int b = getBreakingPoint(regionString);
+                if (b == -1) {
+                    g.drawString(regionString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
+                    */
+                } else {
+                    g.drawString(regionString.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                    g.drawString(regionString.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                       stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
+                    */
+                }
             }
+            break;
+        default:
+            logger.warning("displayTileText out of range");
+            break;
         }
-        
         
 
         /*
@@ -2208,41 +2214,22 @@ public final class GUI {
 
 
     /**
-    * If set to <i>true</i> then tile names are drawn on the map.
-    * @param displayTileNames <code>true</code> if the tile names
-    *       should be displayed and <code>false</code> otherwise.
-    */
-    public void setDisplayTileNames(boolean displayTileNames) {
-        this.displayTileNames = displayTileNames;
-    }
-
-
-    /**
-    * If set to <i>true</i> then tile owners are drawn on the map.
-    * @param displayTileOwners <code>true</code> if the tile owners
-    *       should be displayed and <code>false</code> otherwise.
-    */
-    public void setDisplayTileOwners(boolean displayTileOwners) {
-        this.displayTileOwners = displayTileOwners;
-    }
-
-    
-    /**
-     * If set to <i>true</i> then regions are drawn on the map.
-     * @param displayRegion <code>true</code> if the region
-     *       should be displayed and <code>false</code> otherwise.
-     */
-     public void setDisplayRegion(boolean displayRegion) {
-         this.displayRegion = displayRegion;
-     }
-
-    /**
     * If set to <i>true</i> then a grid is drawn on the map.
     * @param displayGrid <code>true</code> if the grid should be drawn
     *       on the map and <code>false</code> otherwise.
     */
     public void setDisplayGrid(boolean displayGrid) {
         this.displayGrid = displayGrid;
+    }
+
+
+    /**
+     * Set the type of text drawn in the tiles.
+     *
+     * @param tileTextType One of the <code>ClientOptions.DISPLAY_TILE_TEXT</code> values
+     */
+    public void setDisplayTileText(int tileTextType) {
+        this.displayTileText = tileTextType;
     }
 
 

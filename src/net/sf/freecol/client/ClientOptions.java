@@ -111,24 +111,16 @@ public class ClientOptions extends OptionMap {
     public static final String DISPLAY_MAP_CONTROLS = "model.option.displayMapControls";
 
     /**
-     * Whether to display the tile names or not.
-     */
-    public static final String DISPLAY_TILE_NAMES = "model.option.displayTileNames";
-
-    /**
-     * Whether to display the tile owners or not.
-     */
-    public static final String DISPLAY_TILE_OWNERS = "model.option.displayTileOwners";
-
-    /**
-     * Whether to display regions or not.
-     */
-    public static final String DISPLAY_REGION = "model.option.displayRegion";
-
-    /**
      * Whether to display the grid by default or not.
      */
     public static final String DISPLAY_GRID = "model.option.displayGrid";
+
+    /**
+     * What text to display in the tiles.
+     */
+    public static final String DISPLAY_TILE_TEXT = "model.option.displayTileText";
+
+    public static final int DISPLAY_TILE_TEXT_EMPTY = 0, DISPLAY_TILE_TEXT_NAMES = 1, DISPLAY_TILE_TEXT_OWNERS = 2, DISPLAY_TILE_TEXT_REGIONS = 3;
 
     /**
      * Animation speed for friendly units.
@@ -458,6 +450,15 @@ public class ClientOptions extends OptionMap {
         add(spec.getOptionGroup("clientOptions.savegames"));
         add(spec.getOptionGroup("clientOptions.warehouse"));
         add(spec.getOptionGroup("clientOptions.other"));
+    }
+
+    /**
+     * Return the client's preferred tile text type.
+     *
+     * @return A <code>DISPLAY_TILE_TEXT_</code> value
+     */
+    public int getDisplayTileText() {
+        return getInteger(DISPLAY_TILE_TEXT);
     }
 
     /**

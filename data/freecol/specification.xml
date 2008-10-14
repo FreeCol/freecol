@@ -1755,14 +1755,18 @@
       <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
       <!-- Whether to display the map controls by default or not. -->
       <booleanOption id="model.option.displayMapControls" defaultValue="true"/>
-      <!-- Whether to display the tile names by default or not. -->
-      <booleanOption id="model.option.displayTileNames" defaultValue="false"/>
-      <!-- Whether to display the tile owners by default or not. -->
-      <booleanOption id="model.option.displayTileOwners" defaultValue="false"/>
-      <!-- Whether to display regions by default or not. -->
-      <booleanOption id="model.option.displayRegion" defaultValue="false"/>
       <!-- Whether to display the grid by default or not. -->
       <booleanOption id="model.option.displayGrid" defaultValue="false"/>
+      <!-- Option for in tile text display -->
+      <selectOption id="model.option.displayTileText" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.gui.displayTileText.empty" value="0"/>
+        <!-- Whether to display the tile names. -->
+        <selectValue label="clientOptions.gui.displayTileText.names" value="1"/>
+        <!-- Whether to display the tile owners. -->
+        <selectValue label="clientOptions.gui.displayTileText.owners" value="2"/>
+        <!-- Whether to display the tile regions. -->
+        <selectValue label="clientOptions.gui.displayTileText.regions" value="3"/>
+      </selectOption>
       <!-- Used by GUI to sort colonies. -->
       <selectOption id="model.option.colonyComparator" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.colonyComparator.byName" value="0"/>

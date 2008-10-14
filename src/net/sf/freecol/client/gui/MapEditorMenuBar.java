@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui;
 import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JMenu;
 
 import net.sf.freecol.FreeCol;
@@ -38,9 +39,10 @@ import net.sf.freecol.client.gui.action.ColopediaTerrainAction;
 import net.sf.freecol.client.gui.action.ColopediaUnitAction;
 import net.sf.freecol.client.gui.action.DetermineHighSeasAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;
+import net.sf.freecol.client.gui.action.DisplayTileEmptyAction;
 import net.sf.freecol.client.gui.action.DisplayTileNamesAction;
 import net.sf.freecol.client.gui.action.DisplayTileOwnersAction;
-import net.sf.freecol.client.gui.action.DisplayRegionAction;
+import net.sf.freecol.client.gui.action.DisplayTileRegionsAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.action.NewAction;
 import net.sf.freecol.client.gui.action.NewEmptyMapAction;
@@ -140,11 +142,15 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.setMnemonic(KeyEvent.VK_V);
 
         menu.add(getCheckBoxMenuItem(MapControlsAction.id));
-        menu.add(getCheckBoxMenuItem(DisplayTileNamesAction.id));
-        menu.add(getCheckBoxMenuItem(DisplayTileOwnersAction.id));
-        menu.add(getCheckBoxMenuItem(DisplayRegionAction.id));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.id));
         menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.id));
+
+        menu.addSeparator();
+        ButtonGroup tileTextGroup = new ButtonGroup();
+        menu.add(getRadioButtonMenuItem(DisplayTileEmptyAction.id, tileTextGroup));
+        menu.add(getRadioButtonMenuItem(DisplayTileNamesAction.id, tileTextGroup));
+        menu.add(getRadioButtonMenuItem(DisplayTileOwnersAction.id, tileTextGroup));
+        menu.add(getRadioButtonMenuItem(DisplayTileRegionsAction.id, tileTextGroup));
 
         menu.addSeparator();
         menu.add(getMenuItem(ZoomInAction.id));

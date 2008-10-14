@@ -32,14 +32,14 @@ import net.sf.freecol.client.FreeColClient;
 /**
  * 
  */
-public class DisplayTileNamesAction extends SelectableAction {
+public class DisplayTileEmptyAction extends SelectableAction {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(DisplayTileNamesAction.class.getName());
+    private static final Logger logger = Logger.getLogger(DisplayTileEmptyAction.class.getName());
 
 
 
 
-    public static final String id = "displayTileNamesAction";
+    public static final String id = "displayTileEmptyAction";
 
 
     /**
@@ -47,11 +47,11 @@ public class DisplayTileNamesAction extends SelectableAction {
      * 
      * @param freeColClient The main controller object for the client.
      */
-    DisplayTileNamesAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.displayTileNames", null, 
-              KeyStroke.getKeyStroke('X', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+    DisplayTileEmptyAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.view.displayTileEmpty", null, 
+              KeyStroke.getKeyStroke('E', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         setSelected(freeColClient.getClientOptions().getDisplayTileText()
-                    == ClientOptions.DISPLAY_TILE_TEXT_NAMES);
+                    == ClientOptions.DISPLAY_TILE_TEXT_EMPTY);
     }
 
     /**
@@ -66,7 +66,7 @@ public class DisplayTileNamesAction extends SelectableAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "displayTileNamesAction"
+     * @return "displayTileEmptyAction"
      */
     public String getId() {
         return id;
@@ -79,7 +79,7 @@ public class DisplayTileNamesAction extends SelectableAction {
      */
     public void actionPerformed(ActionEvent e) {
         if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
-            freeColClient.getGUI().setDisplayTileText(ClientOptions.DISPLAY_TILE_TEXT_NAMES);
+            freeColClient.getGUI().setDisplayTileText(ClientOptions.DISPLAY_TILE_TEXT_EMPTY);
             freeColClient.getCanvas().refresh();
         }
     }

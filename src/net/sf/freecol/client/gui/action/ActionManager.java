@@ -81,9 +81,10 @@ public class ActionManager extends OptionGroup {
         add(new DetermineHighSeasAction(freeColClient));
         add(new DisbandUnitAction(freeColClient));
         add(new DisplayGridAction(freeColClient));
+        add(new DisplayTileEmptyAction(freeColClient));
         add(new DisplayTileNamesAction(freeColClient));
         add(new DisplayTileOwnersAction(freeColClient));
-        add(new DisplayRegionAction(freeColClient));
+        add(new DisplayTileRegionsAction(freeColClient));
         add(new EndTurnAction(freeColClient));
         add(new EuropeAction(freeColClient));
         add(new ExecuteGotoOrdersAction(freeColClient));

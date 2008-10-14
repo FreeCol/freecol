@@ -23,7 +23,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
@@ -32,14 +32,14 @@ import net.sf.freecol.client.FreeColClient;
 /**
  * 
  */
-public class DisplayRegionAction extends SelectableAction {
+public class DisplayTileRegionsAction extends SelectableAction {
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(DisplayRegionAction.class.getName());
+    private static final Logger logger = Logger.getLogger(DisplayTileRegionsAction.class.getName());
 
 
 
 
-    public static final String id = "displayRegionAction";
+    public static final String id = "displayTileRegionsAction";
 
 
     /**
@@ -47,10 +47,11 @@ public class DisplayRegionAction extends SelectableAction {
      * 
      * @param freeColClient The main controller object for the client.
      */
-    DisplayRegionAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.displayRegion", null, KeyStroke.getKeyStroke('O', Toolkit
-                .getDefaultToolkit().getMenuShortcutKeyMask()));
-        setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_REGION));
+    DisplayTileRegionsAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.view.displayTileRegions", null,
+              KeyStroke.getKeyStroke('Z', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        setSelected(freeColClient.getClientOptions().getDisplayTileText()
+                    == ClientOptions.DISPLAY_TILE_TEXT_REGIONS);
     }
 
     /**
@@ -77,7 +78,9 @@ public class DisplayRegionAction extends SelectableAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getGUI().setDisplayRegion(((JCheckBoxMenuItem) e.getSource()).isSelected());
-        freeColClient.getCanvas().refresh();
+        if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
+            freeColClient.getGUI().setDisplayTileText(ClientOptions.DISPLAY_TILE_TEXT_REGIONS);
+            freeColClient.getCanvas().refresh();
+        }
     }
 }

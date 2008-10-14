@@ -26,9 +26,11 @@ import java.awt.Shape;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 
@@ -204,6 +206,33 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
         return rtn;
     }
+
+    /**
+     * Creates a default FreeCol <code>JRadioButtonMenuItem</code>.
+     * 
+     * @param actionID The ID given to the
+     *      {@link ActionManager#getFreeColAction(String) action manager}.
+     * @param group The <code>ButtonGroup</code> to add this item to
+     * @return The menu item.
+     */
+    protected JRadioButtonMenuItem getRadioButtonMenuItem(String actionID,
+                                                          ButtonGroup group) {
+        JRadioButtonMenuItem rtn = null;
+        FreeColAction action = am.getFreeColAction(actionID);
+
+        if (action != null) {
+            rtn = new JRadioButtonMenuItem();
+            rtn.setAction(action);
+            rtn.setOpaque(false);
+
+            rtn.setSelected(((SelectableAction) am.getFreeColAction(actionID)).isSelected());
+            group.add(rtn);
+        } else {
+            logger.finest("Could not create menu item. [" + actionID + "] not found.");
+        }
+        return rtn;
+    }
+
 
     /**
      * Updates this <code>FreeColMenuBar</code>.

@@ -23,7 +23,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
@@ -48,9 +48,10 @@ public class DisplayTileOwnersAction extends SelectableAction {
      * @param freeColClient The main controller object for the client.
      */
     DisplayTileOwnersAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.displayTileOwners", null, KeyStroke.getKeyStroke('W', Toolkit
-                .getDefaultToolkit().getMenuShortcutKeyMask()));
-        setSelected(freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_TILE_OWNERS));
+        super(freeColClient, "menuBar.view.displayTileOwners", null, 
+              KeyStroke.getKeyStroke('Y', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        setSelected(freeColClient.getClientOptions().getDisplayTileText()
+                    == ClientOptions.DISPLAY_TILE_TEXT_OWNERS);
     }
 
     /**
@@ -77,7 +78,9 @@ public class DisplayTileOwnersAction extends SelectableAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getGUI().setDisplayTileOwners(((JCheckBoxMenuItem) e.getSource()).isSelected());
-        freeColClient.getCanvas().refresh();
+        if (((JRadioButtonMenuItem) e.getSource()).isSelected()) {
+            freeColClient.getGUI().setDisplayTileText(ClientOptions.DISPLAY_TILE_TEXT_OWNERS);
+            freeColClient.getCanvas().refresh();
+        }
     }
 }
