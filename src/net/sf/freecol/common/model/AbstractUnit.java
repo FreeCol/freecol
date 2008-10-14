@@ -28,7 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.UnitType.Role;
+import net.sf.freecol.common.model.Unit.Role;
 
 /**
  * Contains the information necessary to create a new unit.

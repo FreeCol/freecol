@@ -262,6 +262,7 @@
         <xs:element ref="downgrade"/>
         <xs:element ref="required-ability"/>
         <xs:element ref="required-goods"/>
+        <xs:element ref="default-equipment"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="offence" use="required" type="xs:nonNegativeInteger"/>
@@ -281,18 +282,6 @@
       <xs:attribute name="scoreValue" type="xs:int"/>
       <xs:attribute name="maximumAttrition" type="xs:nonNegativeInteger"/>
       <xs:attribute name="increasingPrice" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="role">
-        <xs:simpleType>
-          <xs:restriction base="xs:token">
-            <xs:enumeration value="default"/>
-            <xs:enumeration value="pioneer"/>
-            <xs:enumeration value="missionary"/>
-            <xs:enumeration value="soldier"/>
-            <xs:enumeration value="scout"/>
-            <xs:enumeration value="dragoon"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
     </xs:complexType>
   </xs:element>
   <xs:element name="building-types">
@@ -651,6 +640,11 @@
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:IDREF"/>
       <xs:attribute name="value" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="default-equipment">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:IDREF"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="upgrade">

@@ -37,7 +37,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.UnitType.Role;
+import net.sf.freecol.common.model.Unit.Role;
 
 import org.w3c.dom.Element;
 

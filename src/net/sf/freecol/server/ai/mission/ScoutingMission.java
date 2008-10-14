@@ -40,7 +40,6 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.UnitType.Role;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -130,11 +129,11 @@ public class ScoutingMission extends Mission {
             return;
         }
 
-        if (getUnit().getRole() != Role.SCOUT) {
+        if (getUnit().getRole() != Unit.Role.SCOUT) {
             if (getUnit().getColony() != null) {
                 AIColony colony = (AIColony) getAIMain().getAIObject(getUnit().getColony());
                 for (EquipmentType equipment : FreeCol.getSpecification().getEquipmentTypeList()) {
-                    if (equipment.getRole() == Role.SCOUT &&
+                    if (equipment.getRole() == Unit.Role.SCOUT &&
                         getUnit().canBeEquippedWith(equipment) && 
                         colony.canBuildEquipment(equipment)) {
                         Element equipUnitElement = Message.createNewRootElement("equipUnit");

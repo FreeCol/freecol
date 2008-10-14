@@ -50,7 +50,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType.Role;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGLayout;
 

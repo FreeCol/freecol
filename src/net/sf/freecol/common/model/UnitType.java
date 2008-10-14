@@ -17,9 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
-
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -46,15 +44,6 @@ public final class UnitType extends BuildableType {
             LOST_CITY, PROMOTION }
 
     public static enum DowngradeType { CLEAR_SKILL, DEMOTION, CAPTURE }
-
-    /** The roles a Unit can have. */
-    public static enum Role {
-        DEFAULT, PIONEER, MISSIONARY, SOLDIER, SCOUT, DRAGOON;
-    
-        public String getId() {
-            return toString().toLowerCase();
-        }
-    }
 
     /**
      * Describe offence here.
@@ -137,9 +126,9 @@ public final class UnitType extends BuildableType {
     private String skillTaught;
 
     /**
-     * The default role of this UnitType.
+     * Describe defaultEquipment here.
      */
-    private Role role = Role.DEFAULT;
+    private EquipmentType defaultEquipment;
 
     /**
      * Describe education here.
@@ -445,6 +434,36 @@ public final class UnitType extends BuildableType {
         this.expertProduction = newExpertProduction;
     }
 
+    /**
+     * Get the <code>DefaultEquipment</code> value.
+     *
+     * @return an <code>EquipmentType</code> value
+     */
+    public EquipmentType getDefaultEquipmentType() {
+        return defaultEquipment;
+    }
+
+    /**
+     * Set the <code>DefaultEquipment</code> value.
+     *
+     * @param newDefaultEquipment The new DefaultEquipment value.
+     */
+    public void setDefaultEquipmentType(final EquipmentType newDefaultEquipment) {
+        this.defaultEquipment = newDefaultEquipment;
+    }
+
+    public EquipmentType[] getDefaultEquipment() {
+        if (hasAbility("model.ability.canBeEquipped") && defaultEquipment != null) {
+            int count = defaultEquipment.getMaximumCount();
+            EquipmentType[] result = new EquipmentType[count];
+            for (int index = 0; index < count; index++) {
+                result[index] = defaultEquipment;
+            }
+            return result;
+        } else {
+            return EquipmentType.NO_EQUIPMENT;
+        }
+    }
 
     /**
      * Get the <code>PathImage</code> value.
@@ -480,24 +499,6 @@ public final class UnitType extends BuildableType {
      */
     public void setSkillTaught(final String newSkillTaught) {
         this.skillTaught = newSkillTaught;
-    }
-
-    /**
-     * Get the <code>Role</code> value.
-     *
-     * @return a <code>Role</code> value
-     */
-    public Role getRole() {
-        return role;
-    }
-
-    /**
-     * Set the <code>Role</code> value.
-     *
-     * @param newRole The new Role value.
-     */
-    public void setRole(final Role newRole) {
-        this.role = newRole;
     }
 
     /**
@@ -620,8 +621,6 @@ public final class UnitType extends BuildableType {
         spaceTaken = getAttribute(in, "spaceTaken", 1);
         maximumAttrition = getAttribute(in, "maximumAttrition", Integer.MAX_VALUE);
         skillTaught = getAttribute(in, "skillTaught", getId());
-        String roleString = getAttribute(in, "role", "default");
-        role = Enum.valueOf(Role.class, roleString.toUpperCase());
 
         art = in.getAttributeValue(null, "art");
         pathImage = in.getAttributeValue(null, "pathImage");
@@ -658,6 +657,12 @@ public final class UnitType extends BuildableType {
                 downgrade.asResultOf.put(DowngradeType.DEMOTION, getAttribute(in, "demotion", false));
                 downgrade.asResultOf.put(DowngradeType.CAPTURE, getAttribute(in, "capture", false));
                 downgrades.put(educationUnit, downgrade);
+                in.nextTag(); // close this element
+            } else if ("default-equipment".equals(nodeName)) {
+                String equipmentString = in.getAttributeValue(null, "id");
+                if (equipmentString != null) {
+                    defaultEquipment = specification.getEquipmentType(equipmentString);
+                }
                 in.nextTag(); // close this element
             } else {
                 super.readChild(in, specification);
@@ -705,29 +710,6 @@ public final class UnitType extends BuildableType {
         return Math.max(base, 1);
     }
 
-    public EquipmentType[] getDefaultEquipment() {
-        if (hasAbility("model.ability.canBeEquipped")) {
-            List<EquipmentType> equipment = new ArrayList<EquipmentType>();
-            if (hasAbility("model.ability.expertSoldier")) {
-                equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
-            }
-            if (hasAbility("model.ability.expertScout")) {
-                equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
-            }
-            if (hasAbility("model.ability.expertPioneer")) {
-                EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
-                for (int count = 0; count < tools.getMaximumCount(); count++) {
-                    equipment.add(tools);
-                }
-            }
-            if (hasAbility("model.ability.expertMissionary")) {
-                equipment.add(FreeCol.getSpecification().getEquipmentType("model.equipment.missionary"));
-            }
-            return equipment.toArray(EquipmentType.NO_EQUIPMENT);
-        } else {
-            return EquipmentType.NO_EQUIPMENT;
-        }
-    }
 
     
     private class Upgrade {
