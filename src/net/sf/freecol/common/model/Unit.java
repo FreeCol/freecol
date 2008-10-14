@@ -2350,6 +2350,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else if (canCarryTreasure()) {
             return Messages.message(getType().getId() + ".gold", "%gold%",
                                     String.valueOf(getTreasureAmount()));
+        } else if ((equipment == null || equipment.isEmpty()) &&
+                   getType().getDefaultEquipmentType() != null) {
+            return getName(getType(), getRole()) + " (" +
+                Messages.message(getType().getDefaultEquipmentType().getId() + ".none") + ")";
         } else {
             return getName(getType(), getRole());
         }
