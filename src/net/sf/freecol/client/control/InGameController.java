@@ -431,8 +431,9 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)) {
-            showColonyWarnings(tile, unit);
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS) &&
+            !showColonyWarnings(tile, unit)) {
+            return;
         }
 
         String name = freeColClient.getCanvas().showInputDialog("nameColony.text",
@@ -484,7 +485,7 @@ public final class InGameController implements NetworkConstants {
     }
 
 
-    private void showColonyWarnings(Tile tile, Unit unit) {
+    private boolean showColonyWarnings(Tile tile, Unit unit) {
         boolean landLocked = true;
         boolean ownedByEuropeans = false;
         boolean ownedBySelf = false;
@@ -581,11 +582,12 @@ public final class InGameController implements NetworkConstants {
             messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING, null, "buildColony.IndianLand"));
         }
 
-        if (!messages.isEmpty()) {
+        if (messages.isEmpty()) {
+            return true;
+        } else {
             ModelMessage[] modelMessages = messages.toArray(new ModelMessage[messages.size()]);
-            if (!freeColClient.getCanvas().showConfirmDialog(modelMessages, "buildColony.yes", "buildColony.no")) {
-                return;
-            }
+            return freeColClient.getCanvas().showConfirmDialog(modelMessages, "buildColony.yes",
+                                                               "buildColony.no");
         }
     }
 
