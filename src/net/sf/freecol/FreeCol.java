@@ -112,6 +112,7 @@ public final class FreeCol {
     private static FreeColClient freeColClient;
 
     private static boolean standAloneServer = false;
+    private static boolean publicServer = true;
     private static boolean inDebugMode = false;
 
     private static int serverPort;
@@ -171,6 +172,8 @@ public final class FreeCol {
         initLogging();
 
         Locale.setDefault(getLocale());
+        
+        // parse command line arguments
         handleArgs(args);
         
         if (javaCheck && !checkJavaVersion()) {
@@ -249,7 +252,7 @@ public final class FreeCol {
                     }
                 } else {
                     try {
-                        freeColServer = new FreeColServer(true, false, serverPort, serverName);
+                        freeColServer = new FreeColServer(publicServer, false, serverPort, serverName);
                     } catch (NoRouteToServerException e) {
                         removeSplash(splash);
                         System.out.println(Messages.message("server.noRouteToServer"));
@@ -714,6 +717,8 @@ public final class FreeCol {
                     System.out.println("The text after the \"--server\" option should be a valid port number.");
                     System.exit(1);
                 }
+            } else if (args[i].equals("--private")) {
+                publicServer = false;
             } else if (args[i].equals("--load-savegame")) {
                 i++;
                 if (i < args.length) {
@@ -839,6 +844,8 @@ public final class FreeCol {
         System.out.println("  runs FreeCol without sound");
         System.out.println("--server PORT");
         System.out.println("  starts a stand-alone server on the specifed port");
+        System.out.println("--private");
+        System.out.println("  starts a private server (not published to the metaserver)");
         System.out.println("--server-help");
         System.out.println("  displays a help screen for the more advanced server options");
         System.out.println("--splash[=SPLASH_IMAGE_FILE]");
