@@ -152,7 +152,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             while (direction != null) {
                 Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
                 if (unit.getMoveType(direction) == MoveType.ATTACK) {
-                    Unit defender = newTile.getFirstUnit();
+                    Unit defender = newTile.getDefendingUnit(unit);
                     if (defender == null) {
                         logger.warning("MoveType is ATTACK, but no defender is present!");
                     } else {
