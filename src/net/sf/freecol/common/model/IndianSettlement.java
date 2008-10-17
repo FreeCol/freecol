@@ -1036,7 +1036,7 @@ public class IndianSettlement extends Settlement {
                 // Land being used by another settlement:
                 if (tile.getOwningSettlement() != null) {
                     Player enemy = tile.getOwningSettlement().getOwner();
-                    if (enemy.isEuropean()) {
+                    if (enemy!=null && enemy.isEuropean()) {
                         extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + ALARM_TILE_IN_USE);
                     }
                 }
