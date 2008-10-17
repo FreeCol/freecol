@@ -27,6 +27,8 @@ import java.util.ListIterator;
 
 import javax.swing.ImageIcon;
 
+import net.sf.freecol.FreeCol;
+
 
 /**
  * Class for getting resources (images, audio etc).
@@ -74,7 +76,7 @@ public class ResourceManager {
      *      full screen size images.
      */
     public static void startBackgroundPreloading(final Dimension windowSize) {
-        preloadThread = new Thread() {
+        preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
             public void run() {
                 getImage("EuropeBackgroundImage", windowSize);
                 for (String key : mergedContainer.getResources().keySet()) {

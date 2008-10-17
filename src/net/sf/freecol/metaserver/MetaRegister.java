@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
@@ -116,7 +117,7 @@ public final class MetaRegister {
             // Check connection before adding the server:
             Connection mc = null;
             try {                
-                mc = new Connection(address, port, null);
+                mc = new Connection(address, port, null, FreeCol.METASERVER_THREAD);
                 Element element = Message.createNewRootElement("disconnect");
                 mc.send(element);
             } catch (IOException e) {

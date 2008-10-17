@@ -23,6 +23,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
+
 /**
  * The Worker Thread executes jobs one after another. The thread manages a queue
  * where new jobs can be enqueued. The jobs are processed synchronously by the
@@ -39,7 +41,7 @@ public final class Worker extends Thread {
     private static final Logger logger = Logger.getLogger(Worker.class.getName());
     
     public Worker() {
-        super("Worker");
+        super(FreeCol.CLIENT_THREAD+"Worker");
         jobList = new LinkedBlockingQueue<Runnable>();
         stopRunning = false;
     }

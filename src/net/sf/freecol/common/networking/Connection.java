@@ -75,6 +75,8 @@ public class Connection {
     private XMLStreamWriter xmlOut = null;
 
     private int currentQuestionID = -1;
+    
+    private String threadName;
 
 
     /**
@@ -98,8 +100,8 @@ public class Connection {
      *            received.
      * @throws IOException
      */
-    public Connection(String host, int port, MessageHandler messageHandler) throws IOException {
-        this(createSocket(host, port), messageHandler);
+    public Connection(String host, int port, MessageHandler messageHandler, String threadName) throws IOException {
+        this(createSocket(host, port), messageHandler, threadName);
     }
 
     /**
@@ -111,9 +113,10 @@ public class Connection {
      *            received.
      * @throws IOException
      */
-    public Connection(Socket socket, MessageHandler messageHandler) throws IOException {
+    public Connection(Socket socket, MessageHandler messageHandler, String threadName) throws IOException {
         this.messageHandler = messageHandler;
         this.socket = socket;
+        this.threadName = threadName;
         
         out = socket.getOutputStream();
         in = socket.getInputStream();
@@ -129,7 +132,7 @@ public class Connection {
         }
         xmlTransformer = myTransformer;
 
-        thread = new ReceivingThread(this, in);
+        thread = new ReceivingThread(this, in, threadName);
         thread.start();
     }
 
@@ -526,7 +529,7 @@ public class Connection {
                         }
                     }
                 };
-                t.setName("MessageHandler:" + t.getName());
+                t.setName(threadName+"MessageHandler:" + t.getName());
                 t.start();
             }
         } catch (Exception e) {

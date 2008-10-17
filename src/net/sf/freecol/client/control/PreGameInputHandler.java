@@ -353,7 +353,7 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
          * when map is still null. Wait in other thread in order not to block and
          * it can receive the map.
          */
-        new Thread() {
+        new Thread(FreeCol.CLIENT_THREAD+"Starting game") {
             public void run() {
                 while (getFreeColClient().getGame().getMap() == null) {
                     try {

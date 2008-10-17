@@ -174,9 +174,10 @@ public final class InGameController implements NetworkConstants {
         final Canvas canvas = freeColClient.getCanvas();
 
         canvas.showStatusPanel(Messages.message("status.savingGame"));
-        Thread t = new Thread() {
+        Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Game") {
             public void run() {
                 try {
+                    
                     freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getName());
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
@@ -82,7 +83,7 @@ public final class Server extends Thread {
      * @throws IOException if the public socket cannot be created.
      */
     public Server(FreeColServer freeColServer, int port) throws IOException {
-        super("Server");
+        super(FreeCol.SERVER_THREAD+"Server");
         this.freeColServer = freeColServer;
         this.port = port;
         //serverSocket = new ServerSocket(port, freeColServer.getMaximumPlayers());
@@ -116,7 +117,7 @@ public final class Server extends Thread {
 
                     logger.info("Got client connection from " + clientSocket.getInetAddress().toString());
                     //Connection connection = 
-                        new Connection(clientSocket, freeColServer.getUserConnectionHandler());
+                        new Connection(clientSocket, freeColServer.getUserConnectionHandler(), FreeCol.SERVER_THREAD);
                     //connections.put(clientSocket, connection);
                 } catch (IOException e) {
                     if (running) {

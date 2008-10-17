@@ -37,6 +37,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer;
 import javax.sound.sampled.SourceDataLine;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.AudioMixerOption.MixerWrapper;
@@ -302,7 +303,7 @@ public class SoundPlayer {
         * @param delay A delay before playing the sound (ms).
         */
         public SoundPlayerThread(Playlist playlist, boolean playContinues, int repeatMode, int pickMode, int delay) {
-            super(soundPlayerThreads, "soundPlayerThread");
+            super(soundPlayerThreads, FreeCol.CLIENT_THREAD+"SoundPlayer");
 
             this.playlist = playlist;
             this.playContinues = playContinues;

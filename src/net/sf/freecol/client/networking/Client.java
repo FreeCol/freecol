@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.MessageHandler;
 
@@ -60,7 +61,7 @@ public final class Client {
     public Client(String host, int port, MessageHandler handler) throws IOException {
         this.host = host;
         this.port = port;
-        c = new Connection(host, port, handler);
+        c = new Connection(host, port, handler, FreeCol.CLIENT_THREAD);
     }
 
 

@@ -423,7 +423,7 @@ public final class FreeColServer {
         }
         Connection mc;
         try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null, FreeCol.SERVER_THREAD);
         } catch (IOException e) {
             logger.warning("Could not connect to meta-server.");
             return;
@@ -476,7 +476,7 @@ public final class FreeColServer {
         }
         Connection mc;
         try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null, FreeCol.SERVER_THREAD);
         } catch (IOException e) {
             logger.warning("Could not connect to meta-server.");
             return;

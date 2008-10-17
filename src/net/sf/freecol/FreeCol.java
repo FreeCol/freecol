@@ -79,6 +79,10 @@ public final class FreeCol {
 
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
+    
+    public static final String CLIENT_THREAD = "FreeColClient:";
+    public static final String SERVER_THREAD = "FreeColServer:";
+    public static final String METASERVER_THREAD = "FreeColMetaServer:";
 
     /**
      * The space not being used in windowed mode.

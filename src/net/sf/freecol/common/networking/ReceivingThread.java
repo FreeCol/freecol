@@ -69,8 +69,8 @@ final class ReceivingThread extends Thread {
      *            <code>ReceivingThread</code> belongs to.
      * @param in The stream to read from.
      */
-    ReceivingThread(Connection connection, InputStream in) {
-        super("ReceivingThread - " + connection.toString());
+    ReceivingThread(Connection connection, InputStream in, String threadName) {
+        super(threadName + "ReceivingThread - " + connection.toString());
 
         this.connection = connection;
         this.in = new FreeColNetworkInputStream(in);

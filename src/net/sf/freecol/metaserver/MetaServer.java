@@ -30,6 +30,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.networking.Connection;
 
 /**
@@ -137,7 +138,7 @@ public final class MetaServer extends Thread {
             try {
                 clientSocket = serverSocket.accept();
                 logger.info("Got client connection from " + clientSocket.getInetAddress().toString());
-                Connection connection = new Connection(clientSocket, getNetworkHandler());
+                Connection connection = new Connection(clientSocket, getNetworkHandler(), FreeCol.METASERVER_THREAD);
                 connections.put(clientSocket, connection);
             } catch (IOException e) {
                 StringWriter sw = new StringWriter();

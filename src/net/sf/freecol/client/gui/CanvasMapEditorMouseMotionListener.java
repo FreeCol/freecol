@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -205,6 +206,7 @@ public final class CanvasMapEditorMouseMotionListener implements MouseMotionList
          * @param g The GUI that holds information such as screen resolution.
          */
         public ScrollThread(Map m, GUI g) {
+            super(FreeCol.CLIENT_THREAD+"Mouse scroller");
             map = m;
             gui = g;
             cont = true;

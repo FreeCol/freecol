@@ -584,7 +584,7 @@ public final class ConnectController {
     private List<String> getVacantPlayers(String host, int port) {
         Connection mc;
         try {
-            mc = new Connection(host, port, null);
+            mc = new Connection(host, port, null, FreeCol.CLIENT_THREAD);
         } catch (IOException e) {
             logger.warning("Could not connect to server.");
             return null;
@@ -630,7 +630,7 @@ public final class ConnectController {
 
         Connection mc;
         try {
-            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null);
+            mc = new Connection(FreeCol.META_SERVER_ADDRESS, FreeCol.META_SERVER_PORT, null, FreeCol.CLIENT_THREAD);
         } catch (IOException e) {
             logger.warning("Could not connect to meta-server.");
             canvas.errorMessage("metaServer.couldNotConnect");

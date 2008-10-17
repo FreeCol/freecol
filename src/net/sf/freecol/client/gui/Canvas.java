@@ -53,6 +53,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -269,7 +270,7 @@ public final class Canvas extends JDesktopPane {
 
         // TODO: move shutdown hook from GUI to (say) client!
         Runtime runtime = Runtime.getRuntime();
-        runtime.addShutdownHook(new Thread() {
+        runtime.addShutdownHook(new Thread(FreeCol.CLIENT_THREAD+"Quitting Game") {
             @Override
             public void run() {
                 freeColClient.getConnectController().quitGame(true);

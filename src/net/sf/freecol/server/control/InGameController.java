@@ -266,7 +266,7 @@ public final class InGameController extends Controller {
 
     private void chooseFoundingFather(ServerPlayer player) {
         final ServerPlayer nextPlayer = player;
-        Thread t = new Thread("foundingfather-thread") {
+        Thread t = new Thread(FreeCol.CLIENT_THREAD+"FoundingFather-thread") {
                 public void run() {
                     List<FoundingFather> randomFoundingFathers = getRandomFoundingFathers(nextPlayer);
                     boolean atLeastOneChoice = false;
