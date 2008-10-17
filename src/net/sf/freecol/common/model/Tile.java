@@ -1694,6 +1694,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 else if (typeStr.equals("9")) typeStr = "model.tile.arctic";
                 else if (typeStr.equals("10")) typeStr = "model.tile.ocean";
                 else if (typeStr.equals("11")) typeStr = "model.tile.highSeas";
+                final String riverString = in.getAttributeValue(null, "river");
+                if (riverString != null && !typeStr.equals("model.tile.ocean") &&
+                    !typeStr.equals("model.tile.highSeas")) {
+                    int riverType = Integer.parseInt(riverString);
+                    if (tileItemContainer == null) {
+                        tileItemContainer = new TileItemContainer(getGame(), this);
+                    }
+                    tileItemContainer.addRiver(1, riverType);
+                }
             }
             type = FreeCol.getSpecification().getTileType(typeStr);
         }
