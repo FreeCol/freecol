@@ -183,6 +183,12 @@ public final class Canvas extends JDesktopPane {
         INCITE_INDIANS
     }
 
+    public static enum BoycottAction {
+        CANCEL,
+        PAY_ARREARS,
+        DUMP_CARGO
+    }
+
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
 
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
@@ -1096,12 +1102,24 @@ public final class Canvas extends JDesktopPane {
      * @param europe an <code>Europe</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean showBoycottedGoodsDialog(Goods goods, Europe europe) {
-        FreeColDialog boycottedGoodsDialog = FreeColDialog.createBoycottedGoodsDialog(goods, europe);
+    public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
+        int arrears = europe.getOwner().getArrears(goods.getType());
+        FreeColDialog boycottedGoodsDialog = FreeColDialog
+            .createChoiceDialog(Messages.message("boycottedGoods.text", 
+                                                 "%goods%", goods.getName(), 
+                                                 "%europe%", europe.getName(),
+                                                 "%amount%", String.valueOf(arrears)),
+                                null,
+                                new ChoiceItem(Messages.message("boycottedGoods.payArrears"),
+                                               BoycottAction.PAY_ARREARS),
+                                new ChoiceItem(Messages.message("boycottedGoods.dumpGoods"),
+                                               BoycottAction.DUMP_CARGO),
+                                new ChoiceItem(Messages.message("cancel"),
+                                               BoycottAction.CANCEL));
         addAsFrame(boycottedGoodsDialog);
-        boolean response = boycottedGoodsDialog.getResponseBoolean();
+        ChoiceItem response = (ChoiceItem) boycottedGoodsDialog.getResponse();
         remove(boycottedGoodsDialog);
-        return response;
+        return (BoycottAction) response.getObject();
     }
 
     /**

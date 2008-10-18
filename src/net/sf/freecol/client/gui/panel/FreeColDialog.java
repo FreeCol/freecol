@@ -358,7 +358,7 @@ public class FreeColDialog extends FreeColPanel {
         
         enterPressesWhenFocused(firstButton);
 
-        choiceDialog.setLayout(new BorderLayout());
+        choiceDialog.setLayout(new BorderLayout(10, 10));
         JTextArea textArea = getDefaultTextArea(text);
 
         int height = textArea.getMinimumSize().height + cancelButton.getMinimumSize().height + 40;
@@ -532,63 +532,6 @@ public class FreeColDialog extends FreeColPanel {
 
         return confirmDialog;
     }
-
-    /**
-     * Creates a dialog that asks the user what to do with boycotted
-     * goods in Europe.
-     *
-     * @return The FreeColDialog that asks the question to the user.
-     */
-    public static FreeColDialog createBoycottedGoodsDialog(Goods goods, Europe europe) {
-        Player player = europe.getOwner();
-        int arrears = player.getArrears(goods.getType());
-        String mainText = Messages.message("boycottedGoods.text", 
-                                           "%goods%", goods.getName(), 
-                                           "%europe%", europe.getName(),
-                                           "%amount%", String.valueOf(arrears));
-
-        final JTextArea question = getDefaultTextArea(mainText);
-        final JButton payArrears = new JButton(Messages.message("boycottedGoods.payArrears")),
-            dumpGoods = new JButton(Messages.message("boycottedGoods.dumpGoods"));
-
-        final FreeColDialog boycottedGoodsDialog = new FreeColDialog() {
-            public void requestFocus() {
-                payArrears.requestFocus();
-            }
-        };
-
-        int[] widths = {0};
-        int[] heights = new int[5];
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = margin;
-        }
-        int textColumn = 1;
-
-        boycottedGoodsDialog.setLayout(new HIGLayout(widths, heights));
-
-        payArrears.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                boycottedGoodsDialog.setResponse(new Boolean(true));
-            }
-        });
-        dumpGoods.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                boycottedGoodsDialog.setResponse(new Boolean(false));
-            }
-        });
-
-        int row = 1;
-        boycottedGoodsDialog.add(question, higConst.rc(row, textColumn));
-        row += 2;
-        boycottedGoodsDialog.add(payArrears, higConst.rc(row, textColumn));
-        row += 2;
-        boycottedGoodsDialog.add(dumpGoods, higConst.rc(row, textColumn));
-
-        boycottedGoodsDialog.setSize(boycottedGoodsDialog.getPreferredSize());
-
-        return boycottedGoodsDialog;
-    }
-
 
     /**
     * Creates a dialog that asks the user which player he wants the indians to attack.

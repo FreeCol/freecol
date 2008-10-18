@@ -949,10 +949,17 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
                     Player player = freeColClient.getMyPlayer();
                     if (player.canTrade(goods)) {
                         inGameController.sellGoods(goods);
-                    } else if (parent.showBoycottedGoodsDialog(goods, europe)) {
-                        inGameController.payArrears(goods);
                     } else {
-                        inGameController.unloadCargo(goods);
+                        switch (parent.showBoycottedGoodsDialog(goods, europe)) {
+                        case PAY_ARREARS:
+                            inGameController.payArrears(goods);
+                            break;
+                        case DUMP_CARGO:
+                            inGameController.unloadCargo(goods);
+                            break;
+                        case CANCEL:
+                        default:
+                        }
                     }
                     europePanel.getCargoPanel().revalidate();
                     revalidate();
