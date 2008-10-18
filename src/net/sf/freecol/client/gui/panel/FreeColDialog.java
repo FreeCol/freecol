@@ -353,8 +353,7 @@ public class FreeColDialog extends FreeColPanel {
 
         choiceDialog.add(textArea, BorderLayout.NORTH);
 
-        int items = objects.length + (cancelText == null ? 0 : 1);
-        JPanel objectsPanel = new JPanel(new GridLayout(items, 1, 10, 10));
+        JPanel objectsPanel = new JPanel(new GridLayout(objects.length, 1, 10, 10));
         objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), 
                                                   new EmptyBorder(10, 20, 10, 20)));
 
@@ -390,7 +389,7 @@ public class FreeColDialog extends FreeColPanel {
                         choiceDialog.setResponse(null);
                     }
                 });
-            objectsPanel.add(cancelButton);
+            choiceDialog.add(cancelButton, BorderLayout.SOUTH);
             choiceDialog.setCancelComponent(cancelButton);
         }
         JScrollPane scrollPane = new JScrollPane(objectsPanel,
