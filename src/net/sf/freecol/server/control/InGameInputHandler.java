@@ -1031,54 +1031,128 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param player The <code>ServerPlayer</code> to send a message to.
      */
     private void exploreLostCityRumour(Unit unit, ServerPlayer player) {
-        Tile tile = unit.getTile();
-        // difficulty is in range 0-4, dx in range 2-6
-        // TODO: make this work with DifficultyLevel
-        int dx = Specification.getSpecification().getRangeOption("model.option.difficulty").getValue() + 2;
-        // seasoned scouts should be more successful
-        int bonus = 0;
-        if (unit.hasAbility("model.ability.expertScout") && 
-            unit.hasAbility("model.ability.scoutIndianSettlement")) {
-            bonus += 3;
-            dx--;
-        }
-        // dx is now in range 1-6
-        int max = 7; // maximum dx + 1
+        //TODO: Move this magic values to the specification file
         
+        //The following arrays contain percentage values for "good"
+        //and "bad" events when scouting with a non-expert at the various
+        //difficulty levels [0..4]
+        //exact values TODO, but generally "bad" should increase, "good" decrease
+        final int BAD_EVENT_PERCENTAGE[]  = { 11, 17, 23, 30, 37};
+        final int GOOD_EVENT_PERCENTAGE[] = { 75, 62, 48, 33, 17};
+        //remaining to 100, event "NOTHING":  14, 21, 29, 37, 46
+        
+        //The following arrays contain the modifiers applied when expert scout is at work
+        //exact values TODO; modifiers may look slightly "better" on harder levels
+        //since we're starting from a "worse" percentage
+        final int BAD_EVENT_MOD[]  = {-6, -7, -7, -8, -9};
+        final int GOOD_EVENT_MOD[] = {14, 15, 16, 18, 20};
+
+        Tile tile = unit.getTile();        
         Specification specification = FreeCol.getSpecification();
         List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
         List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
         List<UnitType> treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
+
+        //the scouting outcome is based on three factors: level, expert scout or not, DeSoto or not
+        int level = Specification.getSpecification().getRangeOption("model.option.difficulty").getValue();
+        boolean isExpertScout = unit.hasAbility("model.ability.expertScout") && 
+                                unit.hasAbility("model.ability.scoutIndianSettlement");
+        boolean hasDeSoto = player.hasAbility("model.ability.rumoursAlwaysPositive");
+
+        //based on that, we're going to calculate probabilites for neutral, bad and good events
+        int percentNeutral = 0;
+        int percentBad;
+        int percentGood;
         
-        /**
-         * The higher the difficulty, the more likely bad things are to happen.
-         */
-        List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
-        if (!player.hasAbility("model.ability.rumoursAlwaysPositive")) {
-            choices.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, dx * 2));
-            choices.add(new RandomChoice<RumourType>(RumourType.NOTHING, dx * 5));
-            // It should not be possible to find an indian burial
-            // ground outside Indian territory:
-            if (tile.getOwner() != null && !tile.getOwner().isEuropean()) {
-                choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, dx));
+        if (hasDeSoto) {
+            percentBad     = 0;
+            percentGood    = 100;
+        } else {
+            //First, get "basic" percentages
+            percentBad  = BAD_EVENT_PERCENTAGE[level];
+            percentGood = GOOD_EVENT_PERCENTAGE[level];
+        
+            //Second, apply ExpertScout bonus if necessary
+            if (isExpertScout) {
+                percentBad += BAD_EVENT_MOD[level];
+                percentGood += GOOD_EVENT_MOD[level];
+            }
+
+            //Third, get a value for the "neutral" percentage,
+            //unless the other values exceed 100 already
+            if (percentBad+percentGood<100) {
+                percentNeutral = 100-percentBad-percentGood;
             }
         }
-        // only these units can be promoted
-        if (!learntUnitTypes.isEmpty()) {
-            choices.add(new RandomChoice<RumourType>(RumourType.LEARN, (max - dx) * 3));
-        }
-        /**
-         * The higher the difficulty, the less likely good things are to happen.
-         */
-        choices.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF, (max - dx) * 3));
-        choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, (max - dx) + bonus / 2));
-        if (!newUnitTypes.isEmpty()) {
-            choices.add(new RandomChoice<RumourType>(RumourType.COLONIST, (max - dx) * 2));
-        }
-        if (!treasureUnitTypes.isEmpty()) {
-            choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, (max - dx) * 2 + bonus));
+
+        //Now, the individual events; each section should add up to 100
+        //The NEUTRAL
+        int eventNothing = 100;
+
+        //The BAD
+        int eventVanish = 100;
+        int eventBurialGround = 0;
+        //if the tile is native-owned, allow burial grounds rumour
+        if (tile.getOwner() != null && !tile.getOwner().isEuropean()) {
+            eventVanish = 75;
+            eventBurialGround = 25;
         }
 
+        //The GOOD
+        int eventLearn    = 30;
+        int eventTrinkets = 30;
+        int eventColonist = 20;
+        //or, if the unit can't learn
+        if (learntUnitTypes.isEmpty()) {
+            eventLearn    =  0;
+            eventTrinkets = 50;
+            eventColonist = 30;
+        }
+
+        //The SPECIAL
+        //TODO: Right now, these are considered "good" events that happen randomly
+        //Change this to have them appear a fixed (per specifications) amount of times throughout the game
+        int eventDorado   = 13;
+        int eventFountain =  7;
+
+        //Finally, apply the Good/Bad/Neutral modifiers from above,
+        //so that we end up with a ton of values, some of them zero,
+        //the sum of which should be 10000.
+        eventNothing      *= percentNeutral;
+        eventVanish       *= percentBad;
+        eventBurialGround *= percentBad;
+        eventLearn        *= percentGood;
+        eventTrinkets     *= percentGood;
+        eventColonist     *= percentGood;
+        eventDorado       *= percentGood;
+        eventFountain     *= percentGood;
+
+        //Add all possible events to a RandomChoice List
+        List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
+        if (eventNothing>0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.NOTHING, eventNothing));
+        }
+        if (eventVanish>0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, eventVanish));
+        }
+        if (eventBurialGround>0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, eventBurialGround));
+        }
+        if (eventLearn>0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.LEARN, eventLearn));
+        }
+        if (eventTrinkets>0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF, eventTrinkets));
+        }
+        if (eventColonist>0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.COLONIST, eventColonist));
+        }
+        if (eventFountain>0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
+        }
+        if (eventDorado>0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, eventDorado));
+        }
         RumourType rumour = RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
 
         Element rumourElement = Message.createNewRootElement("lostCityRumour");
@@ -1086,8 +1160,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         rumourElement.setAttribute("unit", unit.getId());
         Unit newUnit;
         int random;
-        // TODO: make this work with DifficultyLevel
-        dx = 10 - getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
+        int dx = 10 - level;
         switch (rumour) {
         case BURIAL_GROUND:
             Player indianPlayer = tile.getOwner();
