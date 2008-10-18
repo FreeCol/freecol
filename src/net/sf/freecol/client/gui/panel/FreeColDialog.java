@@ -335,12 +335,6 @@ public class FreeColDialog extends FreeColPanel {
             throw new IllegalArgumentException("Can not create choice dialog with 0 choices!");
         }
 
-        final JButton cancelButton = new JButton();
-        if (cancelText != null) {
-            cancelButton.setText(cancelText);
-            enterPressesWhenFocused(cancelButton);
-        }
-
         final JButton firstButton;
         firstButton = new JButton(objects[0].toString());
 
@@ -350,22 +344,17 @@ public class FreeColDialog extends FreeColPanel {
             }
         };
 
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                choiceDialog.setResponse(null);
-            }
-        });
-        
         enterPressesWhenFocused(firstButton);
 
         choiceDialog.setLayout(new BorderLayout(10, 10));
         JTextArea textArea = getDefaultTextArea(text);
 
-        int height = textArea.getMinimumSize().height + cancelButton.getMinimumSize().height + 40;
+        //int height = textArea.getMinimumSize().height + cancelButton.getMinimumSize().height + 40;
 
         choiceDialog.add(textArea, BorderLayout.NORTH);
 
-        JPanel objectsPanel = new JPanel(new GridLayout(objects.length + 1, 1, 10, 10));
+        int items = objects.length + (cancelText == null ? 0 : 1);
+        JPanel objectsPanel = new JPanel(new GridLayout(items, 1, 10, 10));
         objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), 
                                                   new EmptyBorder(10, 20, 10, 20)));
 
@@ -376,7 +365,7 @@ public class FreeColDialog extends FreeColPanel {
                 }
             });
         objectsPanel.add(firstButton);
-        height += firstButton.getMinimumSize().height;
+        //height += firstButton.getMinimumSize().height;
 
         for (int i = 1; i < objects.length; i++) {
             final Object object = objects[i];
@@ -388,10 +377,21 @@ public class FreeColDialog extends FreeColPanel {
             });
             enterPressesWhenFocused(objectButton);
             objectsPanel.add(objectButton);
-            height += objectButton.getMinimumSize().height;
+            //height += objectButton.getMinimumSize().height;
         }
         if (cancelText != null) {
+            final JButton cancelButton = new JButton();
+            if (cancelText != null) {
+                cancelButton.setText(cancelText);
+                enterPressesWhenFocused(cancelButton);
+            }
+            cancelButton.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        choiceDialog.setResponse(null);
+                    }
+                });
             objectsPanel.add(cancelButton);
+            choiceDialog.setCancelComponent(cancelButton);
         }
         JScrollPane scrollPane = new JScrollPane(objectsPanel,
                                                  JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -400,7 +400,6 @@ public class FreeColDialog extends FreeColPanel {
 
         //choiceDialog.setSize(width, height);
         choiceDialog.setSize(choiceDialog.getPreferredSize());
-        choiceDialog.setCancelComponent(cancelButton);
 
         return choiceDialog;
     }
