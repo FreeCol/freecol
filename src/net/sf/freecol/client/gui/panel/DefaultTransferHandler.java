@@ -303,6 +303,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                         return false;
                     }
                     label.getGoods().setAmount(amount);
+                } else if (label.getGoods().getAmount() > 100) {
+                    label.getGoods().setAmount(100);
                 }
 
                 if (!(comp instanceof ColonyPanel.WarehousePanel || 
