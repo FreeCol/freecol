@@ -27,6 +27,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Test for net.sf.freecol.server.ai");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(MissionAssignmentTest.class);
+		suite.addTestSuite(TensionTest.class);
 		//$JUnit-END$
 		suite.addTest(net.sf.freecol.server.ai.mission.AllTests.suite());
 		return suite;
