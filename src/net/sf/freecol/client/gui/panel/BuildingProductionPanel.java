@@ -54,11 +54,14 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
 
         parent = canvas;
 
+        Colony colony = unit.getColony();
         Building building = unit.getWorkLocation();
         GoodsType goodsType = building.getGoodsOutputType();
-        Set<Modifier> modifiers = sortModifiers(building.getProductivityModifiers(unit));
-        if (unit.getColony().getProductionBonus() != 0) {
-            modifiers.add(unit.getColony().getProductionModifier(goodsType));
+        Set<Modifier> basicModifiers = building.getProductivityModifiers(unit);
+        basicModifiers.addAll(unit.getColony().getModifierSet(goodsType.getId()));
+        Set<Modifier> modifiers = sortModifiers(basicModifiers);
+        if (colony.getProductionBonus() != 0) {
+            modifiers.add(colony.getProductionModifier(goodsType));
         }
 
         int numberOfModifiers = modifiers.size();
@@ -126,7 +129,8 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
 
-        float result = FeatureContainer.applyModifierSet(0, building.getGame().getTurn(), modifiers);
+        int result = (int) FeatureContainer.applyModifierSet(0, building.getGame().getTurn(), basicModifiers) +
+            colony.getProductionBonus();
         JLabel finalLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
         finalLabel.setFont(bigFont);
         add(finalLabel, higConst.rc(row, labelColumn));

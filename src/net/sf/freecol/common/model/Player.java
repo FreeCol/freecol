@@ -2134,6 +2134,12 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
 
+        for (Ability ability : father.getFeatureContainer().getAbilities()) {
+            if ("model.ability.addTaxToBells".equals(ability.getId())) {
+                updateAddTaxToBells();
+            }
+        }
+
         for (String event : father.getEvents().keySet()) {
             if (event.equals("model.event.resetNativeAlarm")) {
                 // reduce indian tension and alarm
@@ -2708,20 +2714,25 @@ public class Player extends FreeColGameObject implements Nameable {
     public void setTax(int amount) {
         if (amount != tax) {
             tax = amount;
-            for (Ability ability : featureContainer.getAbilitySet("model.ability.addTaxToBells")) {
-                FreeColGameObjectType source = ability.getSource();
-                if (source != null) {
-                    Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
-                    for (Modifier modifier : bellsBonus) {
-                        if (source.equals(modifier.getSource())) {
-                            modifier.setValue(amount);
-                            return;
-                        }
+            updateAddTaxToBells();
+        }
+    }
+
+    private void updateAddTaxToBells() {
+        Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
+        for (Ability ability : featureContainer.getAbilitySet("model.ability.addTaxToBells")) {
+            FreeColGameObjectType source = ability.getSource();
+            if (source != null) {
+                for (Modifier modifier : bellsBonus) {
+                    if (source.equals(modifier.getSource())) {
+                        modifier.setValue(tax);
+                        return;
                     }
                 }
             }
         }
     }
+
 
     /**
      * Returns the current sales.

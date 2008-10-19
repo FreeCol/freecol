@@ -55,7 +55,13 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
 
         parent = canvas;
 
-        Set<Modifier> modifiers = sortModifiers(colonyTile.getProductionModifiers(goodsType));
+        Colony colony = colonyTile.getColony();
+        Set<Modifier> basicModifiers = colonyTile.getProductionModifiers(goodsType);
+        basicModifiers.addAll(colony.getModifierSet(goodsType.getId()));
+        Set<Modifier> modifiers = sortModifiers(basicModifiers);
+        if (colony.getProductionBonus() != 0) {
+            modifiers.add(colony.getProductionModifier(goodsType));
+        }
 
         int numberOfModifiers = modifiers.size();
         int extraRows = 4; // title, icon, result, buttons
@@ -122,7 +128,8 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
 
-        float result = FeatureContainer.applyModifierSet(0, colonyTile.getGame().getTurn(), modifiers);
+        int result = (int) FeatureContainer.applyModifierSet(0, colonyTile.getGame().getTurn(), basicModifiers) + 
+            colony.getProductionBonus();
         JLabel finalLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
         finalLabel.setFont(bigFont);
         add(finalLabel, higConst.rc(row, labelColumn));
