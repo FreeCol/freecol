@@ -93,15 +93,18 @@ public class FreeColDataFile {
         }
         
         this.file = file;
+        this.openStreams = new LinkedList<InputStream>();
         
         if (file.isDirectory()) {
             this.jarFile = null;
-            this.openStreams = new LinkedList<InputStream>();
             this.jarDirectory = null;
             this.supportOldSavegames = null;
         } else {
             // START SUPPORT OLD SAVEGAMES
-            InputStream in = new BufferedInputStream(new FileInputStream(file));
+            FileInputStream fis = new FileInputStream(file);
+            this.openStreams.add(fis);
+            InputStream in = new BufferedInputStream(fis);
+            this.openStreams.add(in);
             in.mark(10);
             byte[] buf = new byte[5];
             in.read(buf, 0, 5);
@@ -109,7 +112,6 @@ public class FreeColDataFile {
             if ((new String(buf)).startsWith("PK")) {
                 // START KEEP
                 this.jarFile = new JarFile(file);
-                this.openStreams = null;
                 this.jarDirectory = file.getName().split("\\.")[0];
                 // END KEEP
                 this.supportOldSavegames = null;
@@ -119,7 +121,6 @@ public class FreeColDataFile {
                 }
                 this.supportOldSavegames = in;
                 this.jarFile = null;
-                this.openStreams = null;
                 this.jarDirectory = null;
             }
             // END SUPPORT OLD SAVEGAMES            
@@ -140,11 +141,17 @@ public class FreeColDataFile {
         if (supportOldSavegames != null) {
             return supportOldSavegames;
         } else if (file.isDirectory()) {
-            final InputStream fis = new BufferedInputStream(new FileInputStream(new File(file, filename)));
+            final FileInputStream fis = new FileInputStream(new File(file, filename));
             openStreams.add(fis);
-            return fis;
+            final InputStream bis = new BufferedInputStream(fis);
+            openStreams.add(bis);
+            return bis;
         } else {
-            return new BufferedInputStream(jarFile.getInputStream(jarFile.getJarEntry(jarDirectory + "/" + filename)));
+            final InputStream fis = jarFile.getInputStream(jarFile.getJarEntry(jarDirectory + "/" + filename));
+            openStreams.add(fis);
+            final InputStream bis = new BufferedInputStream(fis);
+            openStreams.add(bis);
+            return bis;
         }
     }
     
