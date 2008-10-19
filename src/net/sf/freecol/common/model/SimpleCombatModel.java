@@ -1068,6 +1068,7 @@ public class SimpleCombatModel implements CombatModel {
      */
     private void demote(Unit unit, Unit enemyUnit) {
         UnitType oldType = unit.getType();
+        Unit.Role oldRole = unit.getRole();
         String messageID = "model.unit.unitDemoted";
         String nation = unit.getOwner().getNationAsString();
         ModelMessage.MessageType messageType = ModelMessage.MessageType.UNIT_LOST;
@@ -1145,7 +1146,7 @@ public class SimpleCombatModel implements CombatModel {
 
         // TODO: this still doesn't work as intended
         unit.addModelMessage(source, messageType, unit, messageID,
-                             "%oldName%", oldType.getName(),
+                             "%oldName%", Unit.getName(oldType, oldRole),
                              "%unit%", newName,
                              "%nation%", nation,
                              "%enemyUnit%", enemyUnit.getName(),
