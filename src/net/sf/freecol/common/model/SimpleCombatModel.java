@@ -1069,6 +1069,7 @@ public class SimpleCombatModel implements CombatModel {
     private void demote(Unit unit, Unit enemyUnit) {
         UnitType oldType = unit.getType();
         Unit.Role oldRole = unit.getRole();
+        String locationName = unit.getTile().getLocationName();
         String messageID = "model.unit.unitDemoted";
         String nation = unit.getOwner().getNationAsString();
         ModelMessage.MessageType messageType = ModelMessage.MessageType.UNIT_LOST;
@@ -1150,7 +1151,8 @@ public class SimpleCombatModel implements CombatModel {
                              "%unit%", newName,
                              "%nation%", nation,
                              "%enemyUnit%", enemyUnit.getName(),
-                             "%enemyNation%", enemyUnit.getOwner().getNationAsString());
+                             "%enemyNation%", enemyUnit.getOwner().getNationAsString(),
+                             "%location%", locationName);
 
         if (unit.getOwner() != enemyUnit.getOwner()) {
             // unit unit hasn't been captured by enemyUnit, show message to
@@ -1160,11 +1162,12 @@ public class SimpleCombatModel implements CombatModel {
                 source = enemyUnit.getColony();
             }
             unit.addModelMessage(source, messageType, unit, messageID,
-                                 "%oldName%", oldType.getName(),
+                                 "%oldName%", Unit.getName(oldType, oldRole),
                                  "%unit%", newName,
                                  "%enemyUnit%", enemyUnit.getName(),
                                  "%nation%", nation,
-                                 "%enemyNation%", enemyUnit.getOwner().getNationAsString());
+                                 "%enemyNation%", enemyUnit.getOwner().getNationAsString(),
+                                 "%location%", locationName);
         }
     }
 
