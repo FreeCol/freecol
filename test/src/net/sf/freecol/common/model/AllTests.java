@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
     public static Test suite() {
-	TestSuite suite = new TestSuite("Test for net.sf.freecol.common");
+	TestSuite suite = new TestSuite("Test for net.sf.freecol.common.model");
 	//$JUnit-BEGIN$
 	suite.addTestSuite(AbstractUnitTest.class);
 	suite.addTestSuite(BuildingTest.class);

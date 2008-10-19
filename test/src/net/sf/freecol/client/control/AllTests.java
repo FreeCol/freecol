@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 public class AllTests {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite("Test for net.sf.freecol.server");
+        TestSuite suite = new TestSuite("Test for net.sf.freecol.client.control");
         //$JUnit-BEGIN$
         suite.addTestSuite(MoveTest.class);
         //$JUnit-END$
