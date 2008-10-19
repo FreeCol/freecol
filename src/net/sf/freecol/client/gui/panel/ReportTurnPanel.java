@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -32,15 +31,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
-import javax.swing.text.TabSet;
-import javax.swing.text.TabStop;
 
 import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -127,7 +121,7 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 row += 2;
             }
 
-            final JLabel label = new JLabel();
+            JComponent component = new JLabel();
             if (message.getDisplay() != null) {
 
                 // TODO: Scale icons relative to font size.
@@ -140,27 +134,32 @@ public final class ReportTurnPanel extends ReportPanel implements ActionListener
                 }
 
                 if (message.getDisplay() instanceof Colony) {
-                    final JButton button = new JButton();
+                    JButton button = new JButton();
                     button.setIcon(icon);
                     button.setActionCommand(((Colony) message.getDisplay()).getId());
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
-                    // button is not used ?
-                    label.setIcon(icon);
+                    component = button;
                 } else if (message.getDisplay() instanceof Unit) {
-                    label.setIcon(icon);
+                    JButton button = new JButton();
+                    button.setIcon(icon);
+                    button.setActionCommand(((Unit) message.getDisplay()).getLocation().getId());
+                    button.addActionListener(this);
+                    button.setBorder(BorderFactory.createEmptyBorder());
+                    component = button;
                 } else if (message.getDisplay() instanceof Player) {
-                    label.setIcon(icon);
+                    component = new JLabel(icon);
                 } else {
-                    label.setIcon(icon);
+                    component = new JLabel(icon);
                 }
 
-                reportPanel.add(label, higConst.rc(row, imageColumn, ""));
+                reportPanel.add(component, higConst.rc(row, imageColumn, ""));
             }
 
             final JTextPane textPane = getDefaultTextPane();
             insertMessage(textPane.getStyledDocument(), message, getCanvas().getClient().getMyPlayer());
 
+            final JComponent label = component;
             reportPanel.add(textPane, higConst.rc(row, textColumn));
             if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
