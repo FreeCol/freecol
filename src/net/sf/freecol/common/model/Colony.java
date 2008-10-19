@@ -1424,10 +1424,8 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
 
-        int bonus = 0;
         if (sonsOfLiberty == 100) {
             // there are no tories left
-            bonus = 2;
             if (oldSonsOfLiberty < 100) {
                 addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
                                 FreeCol.getSpecification().getGoodsType("model.goods.bells"),
@@ -1435,7 +1433,6 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         } else {
             if (sonsOfLiberty >= 50) {
-                bonus += 1;
                 if (oldSonsOfLiberty < 50) {
                     addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
                                     FreeCol.getSpecification().getGoodsType("model.goods.bells"),
@@ -1443,7 +1440,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                 }
             }
             if (tories > veryBadGovernment) {
-                bonus -= 2;
                 if (oldTories <= veryBadGovernment) {
                     // government has become very bad
                     addModelMessage(this, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
@@ -1451,7 +1447,6 @@ public final class Colony extends Settlement implements Location, Nameable {
                                     "model.colony.veryBadGovernment", "%colony%", getName());
                 }
             } else if (tories > badGovernment) {
-                bonus -= 1;
                 if (oldTories <= badGovernment) {
                     // government has become bad
                     addModelMessage(this, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY, 
@@ -1471,6 +1466,23 @@ public final class Colony extends Settlement implements Location, Nameable {
             }
         }
 
+    }
+
+
+    public void updateProductionBonus() {
+        final int veryBadGovernment = Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
+        final int badGovernment = Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue();
+        int bonus = 0;
+        if (sonsOfLiberty == 100) {
+            // there are no tories left
+            bonus = 2;
+        } else if (sonsOfLiberty >= 50) {
+            bonus = 1;
+        } else if (tories > veryBadGovernment) {
+            bonus = -2;
+        } else if (tories > badGovernment) {
+            bonus = -1;
+        }
         // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
         if (getOwner().isAI()) {
             productionBonus = Math.max(0, bonus);
@@ -1499,6 +1511,8 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         // TODO: make warehouse a building
         saveWarehouseState();
+
+        updateProductionBonus();
 
         addColonyTileProduction();
         updateFood();

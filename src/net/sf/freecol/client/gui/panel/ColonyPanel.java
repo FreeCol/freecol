@@ -582,11 +582,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     private void updateSoLLabel() {
         if (getColony() == null) {
             // Apparently this can happen
+            logger.warning("Colony panel has 'null' colony.");
             return;
         }
-        solLabel.setText(Messages.message("sonsOfLiberty") + ": " + getColony().getSoL() + "% ("
-                + getColony().getMembers() + "), " + Messages.message("tory") + ": " + getColony().getTory() + "% ("
-                + (getColony().getUnitCount() - getColony().getMembers()) + ")");
+        getColony().updateProductionBonus();
+        solLabel.setText(Messages.message("colonyPanel.solLabel",
+                                          "%solPercent%", Integer.toString(getColony().getSoL()),
+                                          "%solNumber%", Integer.toString(getColony().getMembers()),
+                                          "%toryPercent%", Integer.toString(getColony().getTory()),
+                                          "%toryNumber%", Integer.toString(getColony().getUnitCount() -
+                                                                           getColony().getMembers()),
+                                          "%bonus%", Integer.toString(getColony().getProductionBonus())));
     }
 
     public void updateNameBox() {
