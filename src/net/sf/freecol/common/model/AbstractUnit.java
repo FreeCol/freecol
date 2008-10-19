@@ -150,6 +150,10 @@ public class AbstractUnit extends FreeColObject {
     }
 
 
+    public String toString() {
+        return Integer.toString(number) + " " + getId() + " (" + role.toString() + ")";
+    }
+    
     /**
      * Initialize this object from an XML-representation of this object.
      *
@@ -180,7 +184,7 @@ public class AbstractUnit extends FreeColObject {
         out.writeAttribute("number", String.valueOf(number));
         out.writeEndElement();
     }
-    
+
     public static String getXMLElementTagName() {
         return "abstractUnit";
     }

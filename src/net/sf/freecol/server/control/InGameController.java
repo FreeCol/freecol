@@ -632,8 +632,10 @@ public final class InGameController extends Controller {
                             }
                             break;
                         case ADD_TO_REF:
+                            List<AbstractUnit> unitsToAdd = monarch.addToREF();
+                            monarch.addToREF(unitsToAdd);
                             Element additionElement = monarchActionElement.getOwnerDocument().createElement("addition");
-                            for (AbstractUnit unit : monarch.addToREF()) {
+                            for (AbstractUnit unit : unitsToAdd) {
                                 additionElement.appendChild(unit.toXMLElement(additionElement.getOwnerDocument()));
                             }
                             monarchActionElement.appendChild(additionElement);
