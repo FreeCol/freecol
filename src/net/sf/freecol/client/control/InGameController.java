@@ -2947,6 +2947,8 @@ public final class InGameController implements NetworkConstants {
         // The scout loses his moves because the skill data and
         // tradeable goods data is fetched from the server and the
         // moves are the price we have to pay to obtain that data.
+        // In case we want to attack the settlement, we backup movesLeft.
+        int movesLeft = unit.getMovesLeft();
         unit.setMovesLeft(0);
 
         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
@@ -2982,11 +2984,14 @@ public final class InGameController implements NetworkConstants {
             // The movesLeft has been set to 0 when the scout initiated its
             // action.If it wants to attack then it can and it will need some
             // moves to do it.
-            unit.setMovesLeft(1);
+            unit.setMovesLeft(movesLeft);
             client.sendAndWait(scoutMessage);
             // TODO: Check if this dialog is needed, one has just been displayed
             if (confirmPreCombat(unit, tile)) {
                 reallyAttack(unit, direction);
+            } else {
+                //The player chose to not attack, so the scout shouldn't get back his moves
+                unit.setMovesLeft(0);
             }
             return;
         case CANCEL:
