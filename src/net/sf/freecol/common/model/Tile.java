@@ -1647,9 +1647,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         } else {
             if (tileItemContainer != null) {
-                TileItemContainer emptyTileItemContainer = new TileItemContainer(getGame(), this);
-                emptyTileItemContainer.setFakeID(tileItemContainer.getId());
-                emptyTileItemContainer.toXML(out, player, showAll, toSavedGame);
+                TileItemContainer newTileItemContainer = null;
+                if (pet != null) {
+                    newTileItemContainer = new TileItemContainer(getGame(), this, pet);
+                } else {
+                    newTileItemContainer = new TileItemContainer(getGame(), this);                
+                }
+                newTileItemContainer.setFakeID(tileItemContainer.getId());
+                newTileItemContainer.toXML(out, player, showAll, toSavedGame);
             }
         }
 
@@ -2077,6 +2082,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         public TileImprovement getRiver() {
             return river;
+        }
+
+        public Resource getResource() {
+            return resource;
+        }
+
+        public List<TileImprovement> getImprovements() {
+            return improvements;
         }
 
         public void setLostCityRumour(boolean lostCityRumour) {

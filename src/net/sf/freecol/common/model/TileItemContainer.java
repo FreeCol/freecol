@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Tile.PlayerExploredTile;
 
 import org.w3c.dom.Element;
 
@@ -46,7 +47,7 @@ public class TileItemContainer extends FreeColGameObject {
     private static final Logger logger = Logger.getLogger(Location.class.getName());
 
     /** The list of TileItems stored in this <code>TileItemContainer</code>. */
-    private final List<TileImprovement> improvements = new ArrayList<TileImprovement>();
+    private List<TileImprovement> improvements = new ArrayList<TileImprovement>();
     private Resource resource = null;
 
     /** Quick Pointers */
@@ -72,6 +73,23 @@ public class TileItemContainer extends FreeColGameObject {
         }
 
         this.tile = tile;
+    }
+
+
+
+    public TileItemContainer(Game game, Tile tile, PlayerExploredTile pet) {
+        super(game);
+
+        if (tile == null) {
+            throw new IllegalArgumentException("Tile must not be 'null'.");
+        }
+
+        this.tile = tile;
+        
+        improvements = pet.getImprovements();
+        resource = pet.getResource();
+        road = pet.getRoad();
+        river = pet.getRiver();
     }
 
     /**
