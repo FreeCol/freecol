@@ -45,7 +45,7 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
     public static final int NONE = 0, FIXED = 1, SELECTABLE = 2;
 
     private static Vector<EuropeanNationType> europeans = 
-        new Vector<EuropeanNationType>(FreeCol.getSpecification().getClassicNationTypes());
+        new Vector<EuropeanNationType>(FreeCol.getSpecification().getEuropeanNationTypes());
     private static final JComboBox standardNationsComboBox = new JComboBox(europeans);
 
     private List<Player> players;

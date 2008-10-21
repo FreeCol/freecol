@@ -40,7 +40,7 @@ public final class AdvantageCellEditor extends DefaultCellEditor {
     * A standard constructor.
     */
     public AdvantageCellEditor() {
-        super(new JComboBox(new Vector<EuropeanNationType>(FreeCol.getSpecification().getClassicNationTypes())));
+        super(new JComboBox(new Vector<EuropeanNationType>(FreeCol.getSpecification().getEuropeanNationTypes())));
     }
     
     public Object getCellEditorValue() {
