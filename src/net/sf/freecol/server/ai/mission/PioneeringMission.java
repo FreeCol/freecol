@@ -33,6 +33,8 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -284,6 +286,7 @@ public class PioneeringMission extends Mission {
         
         if (tileImprovementPlan != null) {
             if (getUnit().getTile() != null) {
+                // move toward the target tile
                 if (getUnit().getTile() != tileImprovementPlan.getTarget()) {
                     PathNode pathToTarget = getUnit().findPath(tileImprovementPlan.getTarget());
                     if (pathToTarget != null) {
@@ -295,16 +298,49 @@ public class PioneeringMission extends Mission {
                         }
                     }
                 }
+                // are we there yet ?
                 if (getUnit().getTile() == tileImprovementPlan.getTarget()
-                        && getUnit().getState() != UnitState.IMPROVING
-                        && getUnit().checkSetState(UnitState.IMPROVING)) {
-                    Element changeStateElement = Message.createNewRootElement("changeState");
-                    changeStateElement.setAttribute("unit", getUnit().getId());
-                    changeStateElement.setAttribute("state", UnitState.IMPROVING.toString());
+                    && getUnit().getState() != UnitState.IMPROVING
+                    && getUnit().checkSetState(UnitState.IMPROVING)) {
+                    // start improving now
+                    int price = getUnit().getOwner().getLandPrice(getUnit().getTile());
+                    // Buy the land from the Indians first?
+                    if (price > 0) {
+                        // TODO: the AI should buy the land, to avoid indian wars
+                    }
+                    // ask to create the TileImprovement
+                    Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");
+                    changeWorkTypeElement.setAttribute("unit", getUnit().getId());
+                    changeWorkTypeElement.setAttribute("improvementType", tileImprovementPlan.getType().getId());
+                    Element reply = null;
                     try {
-                        connection.sendAndWait(changeStateElement);
+                        reply = connection.ask(changeWorkTypeElement);
                     } catch (IOException e) {
                         logger.warning("Could not send message!");
+                    }
+                    if (reply!=null && reply.getTagName().equals("workImprovementConfirmed")) {
+                        // get the TileItemContainer
+                        Element containerElement = (Element)reply.getElementsByTagName(TileItemContainer.getXMLElementTagName()).item(0);
+                        if (containerElement != null) {
+                            TileItemContainer container = (TileItemContainer) getGame().getFreeColGameObject(containerElement.getAttribute("ID"));
+                            if (container == null) {
+                                container = new TileItemContainer(getGame(), getUnit().getTile(), containerElement);
+                                getUnit().getTile().setTileItemContainer(container);
+                            } else {
+                                container.readFromXMLElement(containerElement);
+                            }
+                        }
+                        // get the TileImprovement
+                        Element improvementElement = (Element)reply.getElementsByTagName(TileImprovement.getXMLElementTagName()).item(0);
+                        if (improvementElement!=null) {
+                            TileImprovement improvement = (TileImprovement) getGame().getFreeColGameObject(improvementElement.getAttribute("ID"));
+                            if (improvement == null) {
+                                improvement = new TileImprovement(getGame(), improvementElement);
+                                getUnit().getTile().add(improvement);
+                            } else {
+                                improvement.readFromXMLElement(improvementElement);
+                            }
+                        }
                     }
                 }
             }
