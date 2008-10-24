@@ -1979,7 +1979,7 @@ public final class InGameController implements NetworkConstants {
                 logger.log(lr);
             }
 
-            // Get the convert:
+            // Get the convert
             Element convertElement = getChildElement(attackResultElement, "convert");
             Unit convert;
             if (convertElement != null) {
@@ -1995,7 +1995,9 @@ public final class InGameController implements NetworkConstants {
                 String nation = defender.getOwner().getNationAsString();
                 ModelMessage message = new ModelMessage(convert,
                                                 "model.unit.newConvertFromAttack",
-                                                new String[][] {{"%nation%", nation}},
+                                                new String[][] {
+                                                            {"%nation%", nation},
+                                                            {"%unit%", convert.getName()}},
                                                 ModelMessage.MessageType.UNIT_ADDED);
                 freeColClient.getMyPlayer().addModelMessage(message);
                 nextModelMessage();

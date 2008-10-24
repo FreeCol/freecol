@@ -1413,13 +1413,18 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         int oldUnits = unit.getTile().getUnitCount();
         unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold);
         
-        if (result.type.compareTo(CombatResultType.WIN) >= 0 && unit.getTile() != newTile &&
-                oldUnits < unit.getTile().getUnitCount()) {
-            // Unit won and didn't move, there are more units and last is a convert, send last one
+        if (result.type.compareTo(CombatResultType.WIN) >= 0 
+            && unit.getTile() != newTile
+            && oldUnits < unit.getTile().getUnitCount()) {
+            // If unit won, didn't move, there are more units,
+            // then if the last one is not European it must be a convert
+            // (not a combat captive), so send it
             Unit lastUnit = unit.getTile().getLastUnit();
-            Element convertElement = reply.getOwnerDocument().createElement("convert");
-            convertElement.appendChild(lastUnit.toXMLElement(unit.getOwner(), reply.getOwnerDocument()));
-            reply.appendChild(convertElement);
+            if (!lastUnit.getOwner().isEuropean()) {
+                Element convertElement = reply.getOwnerDocument().createElement("convert");
+                convertElement.appendChild(lastUnit.toXMLElement(unit.getOwner(), reply.getOwnerDocument()));
+                reply.appendChild(convertElement);
+            }
         }
         
         // Send capturedGoods if UNIT_HIDING is true because when it's
