@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.RangeOption;
 
 import junit.framework.TestCase;
@@ -131,7 +132,7 @@ public final class SpecificationTest extends TestCase {
       assertFalse(spec.getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
     }
 
-    // Check diffculty levels presence and values
+    // Check difficulty levels presence and values
     public void testDifficultyLevels() {
       Specification spec = Specification.getSpecification();
       RangeOption diffOpt = (RangeOption) spec.getOption(GameOptions.DIFFICULTY);
@@ -139,8 +140,21 @@ public final class SpecificationTest extends TestCase {
       assertTrue(diffOpt.getValue() == 2);
       assertTrue(diffOpt.getItemValues().size() == 5);
 
+      IntegerOption option = null;
+      try {
+          // should fail, because it is part of uninitialized server difficulty options
+          option = spec.getIntegerOption("model.option.crossesIncrement");
+          fail();
+      } catch (IllegalArgumentException e) {
+      }
+
+      // initializing server difficulty options
       spec.applyDifficultyLevel(2);
-      assertTrue(spec.getIntegerOption("model.option.crossesIncrement").getValue() == 10);
+      
+      // should succeed now
+      option = spec.getIntegerOption("model.option.crossesIncrement");
+      assertNotNull(option);
+      assertEquals(10, option.getValue());
     }
 
     public void testModifiers() {
