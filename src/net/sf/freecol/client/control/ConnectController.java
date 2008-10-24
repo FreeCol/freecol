@@ -46,8 +46,10 @@ import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -265,6 +267,11 @@ public final class ConnectController {
                 advantages = Integer.parseInt(in.getAttributeValue(null, "advantages"));
                 in.nextTag();
                 Game game = new Game(freeColClient.getModelController(), in, username);
+                
+                // this completes the client's view of the spec with options obtained from the server difficulty
+                // it should not be required in the client, to be removed later, when newTurn() only runs in the server
+                Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
+                
                 Player thisPlayer = game.getPlayerByName(username);
 
                 freeColClient.setGame(game);
