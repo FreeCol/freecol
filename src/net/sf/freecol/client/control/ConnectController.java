@@ -527,7 +527,9 @@ public final class ConnectController {
             logger.warning("Could not close connection!");
         }
 
-        freeColClient.getGUI().setInGame(false);
+        if (!freeColClient.isHeadless()) {
+            freeColClient.getGUI().setInGame(false);
+        }
         freeColClient.setGame(null);
         freeColClient.setMyPlayer(null);
         freeColClient.setClient(null);
