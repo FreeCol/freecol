@@ -607,11 +607,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             return;
         }
         nameBox.removeAllItems();
-        List<Settlement> settlements = getColony().getOwner().getSettlements();
+        List<Colony> settlements = getColony().getOwner().getColonies();
         sortColonies(settlements);
-        Iterator<Settlement> settlementIterator = settlements.iterator();
-        while (settlementIterator.hasNext()) {
-            nameBox.addItem(settlementIterator.next());
+        for (Colony colony : settlements) {
+            nameBox.addItem(colony);
         }
         nameBox.setSelectedItem(getColony());
 
@@ -620,13 +619,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void sortBuildings(List buildings) {
+    private void sortBuildings(List<Building> buildings) {
         Collections.sort(buildings, Building.getBuildingComparator());
     }
     
-    @SuppressWarnings("unchecked")
-    private void sortColonies(List colonies) {
+    private void sortColonies(List<Colony> colonies) {
         Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
     }
 
