@@ -624,12 +624,12 @@ public final class InGameInputHandler extends InputHandler {
         Unit convert = new Unit(getGame(), unitElement);
         tile.add(convert);
         
-        ModelMessage message = new ModelMessage(colony,
+        ModelMessage message = new ModelMessage(convert,
+                                                ModelMessage.MessageType.UNIT_ADDED,
+                                                convert,
                                                 "model.colony.newConvert",
-                                                new String[][] {
-                                                    {"%nation%", nation},
-                                                    {"%colony%", colony.getName()}},
-                                                ModelMessage.MessageType.UNIT_ADDED);
+                                                "%nation%", nation,
+                                                "%colony%", colony.getName());
 
         getFreeColClient().getMyPlayer().addModelMessage(message);
         return null;
