@@ -196,32 +196,10 @@ public final class FreeCol {
             return;
         }
         
-        try {
-            FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
-            try {
-                ResourceManager.setBaseMapping(baseData.getResourceMapping());
-            } finally {
-                baseData.close();
-            }
-        } catch (IOException e) {
+        if (!initializeResourceFolders()) {
             removeSplash(splash);
-            System.err.println("Could not find base data directory.");
             return;
         }
-        FreeColTcFile tcData;
-        try {
-            tcData = new FreeColTcFile(new File(dataFolder, tc));
-            try {
-                ResourceManager.setTcMapping(tcData.getResourceMapping());
-            } finally {
-                tcData.close();
-            }
-        } catch (IOException e) {
-            removeSplash(splash);
-            System.err.println("Could not load: " + tc);
-            return;
-        }
-        ResourceManager.update();
 
         if (standAloneServer) {
             logger.info("Starting stand-alone server.");
@@ -302,15 +280,6 @@ public final class FreeCol {
                 System.out.println("then run the game with a command-line parameter:");
                 System.out.println("");
                 printUsage();
-                return;
-            }
-
-            // This needs to be initialized before ImageLibrary
-            try {
-                Specification.createSpecification(tcData.getSpecificationInputStream());
-            } catch (IOException e) {
-                removeSplash(splash);
-                System.err.println("Could not load specification.xml for: " + tc);
                 return;
             }
 
@@ -581,6 +550,44 @@ public final class FreeCol {
      */
     public static File getAutosaveDirectory() {
         return saveDirectory;
+    }
+    
+    public static boolean initializeResourceFolders() {
+        
+        try {
+            FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
+            try {
+                ResourceManager.setBaseMapping(baseData.getResourceMapping());
+            } finally {
+                baseData.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Could not find base data directory.");
+            return false;
+        }
+        FreeColTcFile tcData;
+        try {
+            tcData = new FreeColTcFile(new File(dataFolder, tc));
+            try {
+                ResourceManager.setTcMapping(tcData.getResourceMapping());
+            } finally {
+                tcData.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Could not load: " + tc);
+            return false;
+        }
+        
+        // This needs to be initialized before ImageLibrary
+        try {
+            Specification.createSpecification(tcData.getSpecificationInputStream());
+        } catch (IOException e) {
+            System.err.println("Could not load specification.xml for: " + tc);
+            return false;
+        }
+
+        ResourceManager.update();
+        return true;
     }
 
     /**
