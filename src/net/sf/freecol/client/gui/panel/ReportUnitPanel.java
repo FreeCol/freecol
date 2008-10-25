@@ -195,10 +195,10 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
         // REF
         if (reportType != ReportType.CARGO) {
-            add(createREFPanel(), higConst.rcwh(row, labelColumn, widths.length, 1));
+            add(createREFPanel(), higConst.rc(row, unitColumn));
             row++;
         }
-        add(createUnitPanel(), higConst.rcwh(row, labelColumn, widths.length, 1));
+        add(createUnitPanel(), higConst.rc(row, unitColumn));
         row += 2;
 
         JButton detailButton = new JButton(Messages.message("details"));
