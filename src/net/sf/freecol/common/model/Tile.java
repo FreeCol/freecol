@@ -290,7 +290,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         + Messages.message("nearLocation","%location%", name) + ")";
                 }
             }
-            return getName();
+            if (region != null && region.getName() != null) {
+                return getName() + " (" + region.getName() + ")";
+            } else {
+                return getName();
+            }
         } else {
             return settlement.getLocationName();
         }
