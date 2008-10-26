@@ -216,7 +216,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
 
     // Model messages for this player
-    private final Set<ModelMessage> modelMessages = new HashSet<ModelMessage>();
+    private final List<ModelMessage> modelMessages = new ArrayList<ModelMessage>();                                                                            
 
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
@@ -496,7 +496,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return all ModelMessages for this player.
      */
-    public Collection<ModelMessage> getModelMessages() {
+    public List<ModelMessage> getModelMessages() {
         return modelMessages;
     }
 
