@@ -661,60 +661,60 @@ public abstract class FreeColObject {
 
     //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------
     
-    public void addPropertyChangeListener(PropertyChangeListener arg0) {
-        pcs.addPropertyChangeListener(arg0);
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
     }
 
-    public void addPropertyChangeListener(String arg0, PropertyChangeListener arg1) {
-        pcs.addPropertyChangeListener(arg0, arg1);
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(propertyName, listener);
     }
 
-    public void fireIndexedPropertyChange(String arg0, int arg1, boolean arg2, boolean arg3) {
-        pcs.fireIndexedPropertyChange(arg0, arg1, arg2, arg3);
+    public void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 
-    public void fireIndexedPropertyChange(String arg0, int arg1, int arg2, int arg3) {
-        pcs.fireIndexedPropertyChange(arg0, arg1, arg2, arg3);
+    public void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 
-    public void fireIndexedPropertyChange(String arg0, int arg1, Object arg2, Object arg3) {
-        pcs.fireIndexedPropertyChange(arg0, arg1, arg2, arg3);
+    public void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
+        pcs.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 
-    public void firePropertyChange(PropertyChangeEvent arg0) {
-        pcs.firePropertyChange(arg0);
+    public void firePropertyChange(PropertyChangeEvent event) {
+        pcs.firePropertyChange(event);
     }
 
-    public void firePropertyChange(String arg0, boolean arg1, boolean arg2) {
-        pcs.firePropertyChange(arg0, arg1, arg2);
+    public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 
-    public void firePropertyChange(String arg0, int arg1, int arg2) {
-        pcs.firePropertyChange(arg0, arg1, arg2);
+    public void firePropertyChange(String propertyName, int oldValue, int newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 
-    public void firePropertyChange(String arg0, Object arg1, Object arg2) {
-        pcs.firePropertyChange(arg0, arg1, arg2);
+    public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
 
     public PropertyChangeListener[] getPropertyChangeListeners() {
         return pcs.getPropertyChangeListeners();
     }
 
-    public PropertyChangeListener[] getPropertyChangeListeners(String arg0) {
-        return pcs.getPropertyChangeListeners(arg0);
+    public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
+        return pcs.getPropertyChangeListeners(propertyName);
     }
 
-    public boolean hasListeners(String arg0) {
-        return pcs.hasListeners(arg0);
+    public boolean hasListeners(String propertyName) {
+        return pcs.hasListeners(propertyName);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener arg0) {
-        pcs.removePropertyChangeListener(arg0);
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
     }
 
-    public void removePropertyChangeListener(String arg0, PropertyChangeListener arg1) {
-        pcs.removePropertyChangeListener(arg0, arg1);
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(propertyName, listener);
     }
 }
 
