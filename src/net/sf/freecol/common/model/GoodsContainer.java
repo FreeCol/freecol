@@ -48,6 +48,7 @@ public class GoodsContainer extends FreeColGameObject {
     public static final int CARGO_SIZE = 100;
     public static final String STORED_GOODS_TAG = "storedGoods";
     public static final String OLD_STORED_GOODS_TAG = "oldStoredGoods";
+    public static final String CARGO_CHANGE = "CARGO_CHANGE";
 
     /** The list of Goods stored in this <code>GoodsContainer</code>. */
     private Map<GoodsType, Integer> storedGoods = new HashMap<GoodsType, Integer>();
@@ -131,10 +132,9 @@ public class GoodsContainer extends FreeColGameObject {
      * @param amount The type of amount to add.
      */
     public void addGoods(GoodsType type, int amount) {
-	int newAmount = amount;
-	if (storedGoods.containsKey(type)) {
-	    newAmount += storedGoods.get(type).intValue();
-	}
+        int oldAmount = getGoodsCount(type);
+	int newAmount = oldAmount + amount;
+
 	if (newAmount < 0) {
 	    throw new IllegalStateException("Operation would leave " + (newAmount) + " goods of type " 
 					    + type.getName() + " in Location " + parent);
@@ -143,6 +143,8 @@ public class GoodsContainer extends FreeColGameObject {
 	} else {
 	    storedGoods.put(type, newAmount);
 	}
+        firePropertyChange(CARGO_CHANGE, new AbstractGoods(type, oldAmount),
+                           new AbstractGoods(type, newAmount));
     }
     
     /**
@@ -165,17 +167,18 @@ public class GoodsContainer extends FreeColGameObject {
      * @return A Goods with the requested or available amount that has been removed
      */
     public Goods removeGoods(GoodsType type, int amount) {
-	Integer oldAmount = storedGoods.get(type);
-	Goods removedGoods = null;
-	if (oldAmount != null) {
-	    if (oldAmount.intValue() < amount) {
-		removedGoods = new Goods(getGame(), parent, type, oldAmount.intValue());
-		storedGoods.remove(type);
-	    } else {
-		removedGoods = new Goods(getGame(), parent, type, amount);
-		storedGoods.put(type, oldAmount.intValue() - amount);
-	    }
+	int oldAmount = getGoodsCount(type);
+        int newAmount = oldAmount - amount;
+        Goods removedGoods;
+        if (oldAmount > 0) {
+            removedGoods = new Goods(getGame(), parent, type, amount);
+            storedGoods.put(type, newAmount);
+        } else {
+            removedGoods = new Goods(getGame(), parent, type, oldAmount);
+            storedGoods.remove(type);
 	}
+        firePropertyChange(CARGO_CHANGE, new AbstractGoods(type, oldAmount),
+                           new AbstractGoods(type, newAmount));
         return removedGoods;
     }
 
@@ -183,20 +186,27 @@ public class GoodsContainer extends FreeColGameObject {
      * Removes all goods above given amount, provided that the goods
      * are storable and do not ignore warehouse limits.
      * 
-     * @param amount The treshold.
+     * @param newAmount The treshold.
      */
-    public void removeAbove(int amount) {
+    public void removeAbove(int newAmount) {
         for (GoodsType goodsType : storedGoods.keySet()) {
             if (goodsType.isStorable() && !goodsType.limitIgnored() && 
-                storedGoods.get(goodsType) > amount) {
-		if (amount == 0) {
-		    storedGoods.remove(goodsType);
-		} else {
-		    storedGoods.put(goodsType, amount);
-		}
+                storedGoods.get(goodsType) > newAmount) {
+                setAmount(goodsType, newAmount);
             }
         }
     }
+
+    private void setAmount(GoodsType goodsType, int newAmount) {
+        int oldAmount = getGoodsCount(goodsType);
+        if (newAmount == 0) {
+            storedGoods.remove(goodsType);
+        } else {
+            storedGoods.put(goodsType, newAmount);
+        }
+        firePropertyChange(CARGO_CHANGE, new AbstractGoods(goodsType, oldAmount),
+                           new AbstractGoods(goodsType, newAmount));
+    }        
 
     /**
      * Removes all goods.
@@ -374,14 +384,11 @@ public class GoodsContainer extends FreeColGameObject {
             int low = exportData.getLowLevel() * adjustment;
             int high = exportData.getHighLevel() * adjustment;
 	    int amount = storedGoods.get(goodsType).intValue();
-	    int oldAmount = 0;
-	    if (oldStoredGoods.containsKey(goodsType)) {
-		oldAmount = oldStoredGoods.get(goodsType).intValue();
-	    }
+	    int oldAmount = getGoodsCount(goodsType);
             if (amount > limit) {
                 // limit has been exceeded
                 int waste = amount - limit;
-                storedGoods.put(goodsType, limit);
+                setAmount(goodsType, limit);
                 addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
                                 "model.building.warehouseWaste",
                                 "%goods%", goodsType.getName(),
