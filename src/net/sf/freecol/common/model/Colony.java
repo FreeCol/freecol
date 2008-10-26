@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +50,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public final class Colony extends Settlement implements Location, Nameable {
+public final class Colony extends Settlement implements Location, Nameable, PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
@@ -58,6 +61,13 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     public static final BonusOrPenalty SOL_MODIFIER_SOURCE = 
         new BonusOrPenalty("modifiers.solModifier");
+
+    public static enum ColonyChangeEvent {
+        POPULATION_CHANGE,
+        PRODUCTION_CHANGE,
+        BONUS_CHANGE,
+        WAREHOUSE_CHANGE
+    }
 
     /** The name of the colony. */
     private String name;
@@ -112,6 +122,7 @@ public final class Colony extends Settlement implements Location, Nameable {
     public Colony(Game game, Player owner, String name, Tile tile) {
         super(game, owner, tile);
         goodsContainer = new GoodsContainer(game, this);
+        goodsContainer.addPropertyChangeListener(GoodsContainer.CARGO_CHANGE, this);
         this.name = name;
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
@@ -212,21 +223,28 @@ public final class Colony extends Settlement implements Location, Nameable {
 
     /**
      * Updates SoL and builds Buildings that are free if possible.
+     *
+     * @param difference an <code>int</code> value
      */
-    public void updatePopulation() {
-        // this means we might get a building for free
-        for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
-            if (isFree(buildingType)) {
-                Building b = createBuilding(buildingType);
-                if (b!=null) {
-                    addBuilding(b);
+    public void updatePopulation(int difference) {
+        int population = getUnitCount();
+        if (population > 0) {
+            // this means we might get a building for free
+            for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+                if (isFree(buildingType)) {
+                    Building b = createBuilding(buildingType);
+                    if (b != null) {
+                        addBuilding(b);
+                    }
                 }
             }
-        }
-        getTile().updatePlayerExploredTiles();
-        if (getUnitCount() > 0) {
+            getTile().updatePlayerExploredTiles();
+
             updateSoL();
+            updateProductionBonus();
         }
+        firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(), 
+                           population - difference, population);
     }
 
     /**
@@ -299,7 +317,7 @@ public final class Colony extends Settlement implements Location, Nameable {
             exportDatum.setExported(false);
         }
         // Changing the owner might alter bonuses applied by founding fathers:
-        updatePopulation();
+        updatePopulation(0);
     }
 
     /**
@@ -456,13 +474,17 @@ public final class Colony extends Settlement implements Location, Nameable {
                 WorkLocation w = getVacantWorkLocationFor((Unit) locatable);
                 if (w == null) {
                     logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
+                    locatable.setLocation(getTile());
                 } else {
+                    int oldPopulation = getUnitCount();
                     locatable.setLocation(w);
+                    firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
+                                       oldPopulation, oldPopulation + 1);
+                    updatePopulation(1);
                 }
             } else {
                 locatable.setLocation(getTile());
             }
-            updatePopulation();
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods) locatable);
         } else {
@@ -481,8 +503,11 @@ public final class Colony extends Settlement implements Location, Nameable {
         if (locatable instanceof Unit) {
             for (WorkLocation w : getWorkLocations()) {
                 if (w.contains(locatable)) {
+                    int oldPopulation = getUnitCount();
                     w.remove(locatable);
-                    updatePopulation();
+                    firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
+                                       oldPopulation, oldPopulation - 1);
+                    updatePopulation(-1);
                     return;
                 }
             }
@@ -713,7 +738,7 @@ public final class Colony extends Settlement implements Location, Nameable {
      * Calculates the current SoL membership of the colony based on the number
      * of bells and colonists.
      */
-    private void updateSoL() {
+    public void updateSoL() {
         int units = getUnitCount();
         if (units <= 0) {
             return;
@@ -1469,27 +1494,30 @@ public final class Colony extends Settlement implements Location, Nameable {
     }
 
 
-    public void updateProductionBonus() {
-        final int veryBadGovernment = Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
-        final int badGovernment = Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue();
-        int bonus = 0;
+    private void updateProductionBonus() {
+        final int veryBadGovernment = Specification.getSpecification()
+            .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
+        final int badGovernment = Specification.getSpecification()
+            .getIntegerOption("model.option.badGovernmentLimit").getValue();
+        int newBonus = 0;
         if (sonsOfLiberty == 100) {
             // there are no tories left
-            bonus = 2;
+            newBonus = 2;
         } else if (sonsOfLiberty >= 50) {
-            bonus = 1;
+            newBonus = 1;
         } else if (tories > veryBadGovernment) {
-            bonus = -2;
+            newBonus = -2;
         } else if (tories > badGovernment) {
-            bonus = -1;
+            newBonus = -1;
         }
-        // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
         if (getOwner().isAI()) {
-            productionBonus = Math.max(0, bonus);
-        } else {
-            productionBonus = bonus;
+            // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
+            newBonus = Math.max(0, newBonus);
         }
 
+        int oldBonus = productionBonus;
+        productionBonus = newBonus;
+        firePropertyChange(ColonyChangeEvent.BONUS_CHANGE.toString(), oldBonus, newBonus);
     }
 
 
@@ -1511,8 +1539,6 @@ public final class Colony extends Settlement implements Location, Nameable {
 
         // TODO: make warehouse a building
         saveWarehouseState();
-
-        updateProductionBonus();
 
         addColonyTileProduction();
         updateFood();
@@ -1628,6 +1654,14 @@ public final class Colony extends Settlement implements Location, Nameable {
         }
         return null;
     }
+
+    public void propertyChange(PropertyChangeEvent event) {
+        if (GoodsContainer.CARGO_CHANGE.equals(event.getPropertyName())) {
+            firePropertyChange(ColonyChangeEvent.WAREHOUSE_CHANGE.toString(),
+                               event.getOldValue(), event.getNewValue());
+        }
+    }
+
 
     /**
      * Disposes this <code>Colony</code>. All <code>WorkLocation</code>s
@@ -1752,7 +1786,11 @@ public final class Colony extends Settlement implements Location, Nameable {
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (gc == null) {
+                    if (goodsContainer != null) {
+                        goodsContainer.removePropertyChangeListener(this);
+                    }
                     goodsContainer = new GoodsContainer(getGame(), this, in);
+                    goodsContainer.addPropertyChangeListener(GoodsContainer.CARGO_CHANGE, this);
                 } else {
                     goodsContainer.readFromXML(in);
                 }

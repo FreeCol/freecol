@@ -326,7 +326,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public void add(final Locatable locatable) {
         if (!canAdd(locatable)) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot add " + locatable + " to " + getName());
         } else if (!units.contains(locatable)) {
             if (units.equals(Collections.emptyList())) {
                 units = new ArrayList<Unit>();
@@ -350,7 +350,13 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             }
 
             units.add(unit);
-            getColony().updatePopulation();
+            // TOO: can we cheaply report the real change?
+            GoodsType output = getGoodsOutputType();
+            if (output != null) {
+                colony.firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
+                                          new AbstractGoods(output, 0),
+                                          new AbstractGoods(output, 1));
+            }
         }
     }
 
@@ -375,10 +381,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (locatable instanceof Unit) {
             if (units.remove(locatable)) {
                 ((Unit) locatable).setMovesLeft(0);
-                getColony().updatePopulation();
+                // TODO: can we cheaply report the real change?
+                GoodsType output = getGoodsOutputType();
+                if (output != null) {
+                    colony.firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
+                                              new AbstractGoods(output, 1),
+                                              new AbstractGoods(output, 0));
+                }
             }
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Can only add units to building.");
         }
     }
 

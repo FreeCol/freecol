@@ -1920,6 +1920,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public void setLocation(Location newLocation) {
 
         Colony oldColony = this.getColony();
+        Location oldLocation = location;
         
         if (location != null) {
             if (location instanceof ColonyTile){
@@ -1930,21 +1931,28 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             location.remove(this);
         }
 
-        // Units in WorkLocations get counted twice
-        if (location instanceof WorkLocation) {
-            if (!(newLocation instanceof WorkLocation)) {
-                getOwner().modifyScore(-getType().getScoreValue());
-            }
-        } else if (newLocation instanceof WorkLocation) {
-            getOwner().modifyScore(getType().getScoreValue());
-        }
-                
         location = newLocation;
 
         if (newLocation != null) {
             newLocation.add(this);
         }
 
+        // Units in WorkLocations get counted twice
+        if (oldLocation instanceof WorkLocation) {
+            if (!(newLocation instanceof WorkLocation)) {
+                getOwner().modifyScore(-getType().getScoreValue());
+                if (oldColony != null) {
+                    // this should always be the case, except possibly for unit tests
+                    int newPopulation = oldColony.getUnitCount();
+                    oldColony.updatePopulation(-1);
+                }
+            }
+        } else if (newLocation instanceof WorkLocation) {
+            getOwner().modifyScore(getType().getScoreValue());
+            int oldPopulation = newLocation.getColony().getUnitCount();
+            newLocation.getColony().updatePopulation(1);
+        }
+                
         // Reset training when changing/leaving colony
         if (!Utils.equals(oldColony, getColony())){
             setTurnsOfTraining(0);

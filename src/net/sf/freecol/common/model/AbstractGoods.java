@@ -136,4 +136,8 @@ public class AbstractGoods extends FreeColObject {
         return "abstractGoods";
     }
 
+    public String toString() {
+        return Integer.toString(amount) + " " + type.getName();
+    }
+
 }

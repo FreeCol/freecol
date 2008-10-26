@@ -307,8 +307,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
         setUnit(u);
         
-        getColony().updatePopulation();
-
         if (unit != null) {
             getWorkTile().setOwningSettlement(getColony());
         } else {
@@ -333,7 +331,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         getUnit().setMovesLeft(0);
         getWorkTile().setOwningSettlement(null);
         setUnit(null);
-        getColony().updatePopulation();
     }
 
     public List<Unit> getUnitList() {
