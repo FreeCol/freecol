@@ -38,6 +38,7 @@ public class AllTests {
 	suite.addTestSuite(FoundingFatherTest.class);
 	suite.addTestSuite(GameTest.class);
 	suite.addTestSuite(GoodsTest.class);
+	suite.addTestSuite(GoodsContainerTest.class);
 	suite.addTestSuite(IndianSettlementTest.class);
 	suite.addTestSuite(MapTest.class);
 	suite.addTestSuite(MarketTest.class);
