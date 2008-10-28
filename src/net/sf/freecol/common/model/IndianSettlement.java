@@ -1000,6 +1000,7 @@ public class IndianSettlement extends Settlement {
                     // I know that consumeGoods will produce gold, which is explained because children are always a gift
 
                     addOwnedUnit(u);    // New indians quickly go out of their city and start annoying.
+                    u.setIndianSettlement(this);
                     logger.info("New indian native created in " + getTile() + " with ID=" + u.getId());
                 }
             }
