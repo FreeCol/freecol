@@ -35,10 +35,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -77,7 +74,6 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -96,7 +92,8 @@ import cz.autel.dmi.HIGLayout;
  * This is a panel for the Colony display. It shows the units that are working
  * in the colony, the buildings and much more.
  */
-public final class ColonyPanel extends FreeColPanel implements ActionListener, PropertyChangeListener {
+public final class ColonyPanel extends FreeColPanel implements ActionListener {
+
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
 
@@ -175,10 +172,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
 
     private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
 
-    /**
-     * The GoodsTypes displayed on the ProductionPanel.
-     */
-    private List<GoodsType> specialGoods;
 
     /**
      * The constructor for the panel.
@@ -187,9 +180,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
      * @param freeColClient The main controller object for the client.
      */
     public ColonyPanel(Canvas parent, FreeColClient freeColClient) {
-
-        specialGoods = Arrays.asList(new GoodsType[] { Goods.FOOD, Goods.FISH, Goods.HORSES, Goods.BELLS, Goods.CROSSES });
-
         this.parent = parent;
         this.freeColClient = freeColClient;
         this.inGameController = freeColClient.getInGameController();
@@ -426,9 +416,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
      *            given <code>Colony</code>.
      */
     public void initialize(final Colony colony, Game game, Unit preSelectedUnit) {
-        if (this.colony != null) {
-            this.colony.removePropertyChangeListener(this);
-        }
         setColony(colony);
         this.game = game;
 
@@ -860,7 +847,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
             while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();
                 inGameController.unloadCargo(goods);
-                //updateWarehouse();
+                updateWarehouse();
                 updateCargoPanel();
                 updateCargoLabel();
                 getCargoPanel().revalidate();
@@ -894,7 +881,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
                 if (goods.getAmount() < 100 && colony.getGoodsCount(goods.getType()) > 0) {
                     int amount = Math.min(100 - goods.getAmount(), colony.getGoodsCount(goods.getType()));
                     inGameController.loadCargo(new Goods(goods.getGame(), colony, goods.getType(), amount), unit);
-                    //updateWarehouse();
+                    updateWarehouse();
                     updateCargoPanel();
                     getCargoPanel().revalidate();
                     refresh();
@@ -1027,8 +1014,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
      */
     private synchronized void setColony(Colony colony) {
         this.colony = colony;
-        editable = (colony.getOwner() == freeColClient.getMyPlayer());
-        colony.addPropertyChangeListener(this);
+        editable = colony.getOwner() == freeColClient.getMyPlayer();
     }
 
     /**
@@ -1040,32 +1026,36 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
         return game;
     }
 
-    public void propertyChange(PropertyChangeEvent event) {
-        ColonyChangeEvent changeEvent = Enum.valueOf(ColonyChangeEvent.class, event.getPropertyName());
-        switch(changeEvent) {
-        case WAREHOUSE_CHANGE:
+    /*
+    public void componentAdded(ContainerEvent event) {
+        if (event.getComponent() instanceof ColonyCargoPanel ||
+            event.getComponent() instanceof UnitLabel) {
+            updateCargoLabel();
+            updateCarrierButtons();
             updateWarehouse();
-            break;
-        case PRODUCTION_CHANGE:
-            GoodsType goodsType = ((AbstractGoods) event.getOldValue()).getType();
-            if (goodsType.isBuildingMaterial()) {
-                updateProgressLabel();
-            }
-            if (specialGoods.contains(goodsType)) {
-                updateProductionPanel();
-            }
-            break;
-        case POPULATION_CHANGE:
-            updateSoLLabel();
-            break;
-        case BONUS_CHANGE:
-            updateSoLLabel();
             updateProductionPanel();
-            updateBuildingsPanel();
-            //updateTilePanel();
-            break;
+            System.out.println("added component:");
+            //refresh();
         }
     }
+
+    public void componentRemoved(ContainerEvent event) {
+        if (event.getChild() instanceof UnitLabel) {
+            if (((UnitLabel) event.getChild()).getUnit().getTile().getSettlement() == null) {
+                closeColonyPanel();
+                return;
+            }
+            updateProductionPanel();
+            updateBuildingBox();
+            updateSoLLabel();
+            updateOutsideColonyPanel();
+        } else if (event.getChild() instanceof GoodsLabel) {
+            updateWarehouse();
+        }
+        updateCargoLabel();
+        updateCarrierButtons();
+    }
+    */
 
     public final class ColonyCargoPanel extends CargoPanel {
         public ColonyCargoPanel(Canvas parent) {
@@ -1075,11 +1065,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
         @Override
         public Component add(Component comp, boolean editState) {
             Component result = super.add(comp, editState);
-            /*
             if (editState && result != null && result instanceof UnitLabel) {
                 updateSoLLabel();
             }
-            */
             return result;
         }
 
@@ -1256,10 +1244,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
                         Unit unit = ((UnitLabel) comp).getUnit();
 
                         if (building.canAdd(unit)) {
-                            inGameController.work(unit, building);
                             oldParent.remove(comp);
+                            inGameController.work(unit, building);
                             updateBuildingBox();
-                            //updateWarehouse();
+                            updateWarehouse();
                         } else {
                             return null;
                         }
@@ -1274,10 +1262,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
                 refresh();
                 */
                 initialize();
-                //colonyPanel.updateSoLLabel();
+                colonyPanel.updateSoLLabel();
 
-                //updateProductionPanel();
-                //updateProductionLabel();
+                updateProductionPanel();
+                updateProductionLabel();
                 if (oldParent instanceof ASingleBuildingPanel) {
                     ((ASingleBuildingPanel) oldParent).updateProductionLabel();
                 } else if (oldParent instanceof TilePanel.ASingleTilePanel) {
@@ -1289,8 +1277,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
 
             public void remove(Component comp) {
                 super.remove(comp);
-                //updateProductionLabel();
-                initialize();
+                updateProductionLabel();
             }
         }
     }
@@ -1348,9 +1335,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
                     }
 
                     oldParent.remove(comp);
-                    //updateBuildingsPanel();
-                    //updateBuildingBox();
-                    //updateProductionPanel();
+                    updateBuildingsPanel();
+                    updateBuildingBox();
+                    updateProductionPanel();
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
                     return null;
@@ -1697,10 +1684,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener, P
 
                             updateDescriptionLabel((UnitLabel) comp, true);
 
-                            //updateBuildingBox();
-                            //updateWarehouse();
-                            //updateBuildingsPanel();
-                            //updateProductionPanel();
+                            updateBuildingBox();
+                            updateWarehouse();
+                            updateBuildingsPanel();
+                            updateProductionPanel();
 
                             ((UnitLabel) comp).setSmall(false);
 
