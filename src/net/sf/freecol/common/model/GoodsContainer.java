@@ -167,8 +167,8 @@ public class GoodsContainer extends FreeColGameObject {
      * @return A Goods with the requested or available amount that has been removed
      */
     public Goods removeGoods(GoodsType type, int amount) {
-	int oldAmount = getGoodsCount(type);
-        int newAmount = oldAmount - amount;
+        int oldAmount = getGoodsCount(type);
+        int newAmount = Math.max(0, oldAmount - amount);
         Goods removedGoods;
         if (oldAmount > 0) {
             removedGoods = new Goods(getGame(), parent, type, amount);
@@ -176,7 +176,7 @@ public class GoodsContainer extends FreeColGameObject {
         } else {
             removedGoods = new Goods(getGame(), parent, type, oldAmount);
             storedGoods.remove(type);
-	}
+        }
         firePropertyChange(CARGO_CHANGE, new AbstractGoods(type, oldAmount),
                            new AbstractGoods(type, newAmount));
         return removedGoods;
