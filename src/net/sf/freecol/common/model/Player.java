@@ -513,7 +513,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (message.hasBeenDisplayed()) {
                 continue;
             } else {
-                out.add(0, message);
+                out.add(message); // preserve message order
             }
         }
 

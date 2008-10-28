@@ -1367,25 +1367,30 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
                 opponentAttackElement.setAttribute("unit", unit.getId());
                 opponentAttackElement.setAttribute("defender", defender.getId());
-                if (!defender.isVisibleTo(enemyPlayer)) {
+                if (defender.getOwner() == enemyPlayer) {
+                    // always update the attacker, defender needs its location
+                    opponentAttackElement.setAttribute("update", "unit");
+                    opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
+                            opponentAttackElement.getOwnerDocument()));
+                } else if (!defender.isVisibleTo(enemyPlayer)) {
                     opponentAttackElement.setAttribute("update", "defender");
                     if (!enemyPlayer.canSee(defender.getTile())) {
                         enemyPlayer.setExplored(defender.getTile());
-                        opponentAttackElement.appendChild(defender.getTile().toXMLElement(enemyPlayer,
-                                opponentAttackElement.getOwnerDocument()));
+                        opponentAttackElement.appendChild(defender.getTile()
+                            .toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                     }
-                    opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer, opponentAttackElement
-                            .getOwnerDocument()));
+                    opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer,
+                            opponentAttackElement.getOwnerDocument()));
                 } else if (!unit.isVisibleTo(enemyPlayer)) {
                     opponentAttackElement.setAttribute("update", "unit");
-                    opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement
-                            .getOwnerDocument()));
+                    opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
+                            opponentAttackElement.getOwnerDocument()));
                 }
                 try {
                     enemyPlayer.getConnection().send(opponentAttackElement);
                 } catch (IOException e) {
-                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                            + enemyPlayer.getConnection());
+                    logger.warning("Could not send message to: " + enemyPlayer.getName()
+                                   + " with connection " + enemyPlayer.getConnection());
                 }
             }
         }

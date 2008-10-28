@@ -534,7 +534,7 @@ public class SimpleCombatModel implements CombatModel {
             if (attacker.isNaval()) {
                 damageShip(attacker, null, defender);
             } else {
-                demote(attacker, defender);
+                loseCombat(attacker, defender);
                 if (defendingPlayer.hasAbility("model.ability.automaticPromotion")) {
                     promote(defender);
                 }
@@ -544,7 +544,7 @@ public class SimpleCombatModel implements CombatModel {
             if (attacker.isNaval()) {
                 sinkShip(attacker, null, defender);
             } else {
-                demote(attacker, defender);
+                loseCombat(attacker, defender);
                 promote(defender);
             }
             break;
@@ -569,14 +569,14 @@ public class SimpleCombatModel implements CombatModel {
                        !defender.getColony().hasStockade()) {
                 pillageColony(attacker, defender.getColony());
             } else {
-                if (attacker.hasAbility("model.ability.automaticPromotion")) {
-                    promote(attacker);
-                }
                 if (!defender.isNaval()) {
-                    demote(defender, attacker);
+                    loseCombat(defender, attacker);
                     if (settlement instanceof IndianSettlement) {
                         getConvert(attacker, (IndianSettlement) settlement);
                     }
+                }
+                if (attacker.hasAbility("model.ability.automaticPromotion")) {
+                    promote(attacker);
                 }
             }
             break;
@@ -585,13 +585,13 @@ public class SimpleCombatModel implements CombatModel {
                 attacker.captureGoods(defender);
                 sinkShip(defender, null, attacker);
             } else {
-                promote(attacker);
                 if (!defender.isNaval()) {
-                    demote(defender, attacker);
+                    loseCombat(defender, attacker);
                     if (settlement instanceof IndianSettlement) {
                         getConvert(attacker, (IndianSettlement) settlement);
                     }
                 }
+                promote(attacker);
             }
             break;
         default:
@@ -1026,7 +1026,7 @@ public class SimpleCombatModel implements CombatModel {
                                            "%colony%", attackerColony.getName(),
                                            "%unit%", sinkingShip.getName(),
                                            "%nation%", nation);
-            sinkingShip.addModelMessage(sinkingShip, 
+            sinkingShip.addModelMessage(sinkingShip,
                                         ModelMessage.MessageType.COMBAT_RESULT,
                                         "model.unit.sinkShipByBombardment",
                                         "%colony%", attackerColony.getName(),
@@ -1040,7 +1040,7 @@ public class SimpleCombatModel implements CombatModel {
                                          "%unit%", attackerUnit.getName(),
                                          "%enemyUnit%", sinkingShip.getName(),
                                          "%enemyNation%", nation);
-            sinkingShip.addModelMessage(sinkingShip, 
+            sinkingShip.addModelMessage(sinkingShip,
                                         ModelMessage.MessageType.COMBAT_RESULT,
                                         "model.unit.shipSunk",
                                         "%unit%", sinkingShip.getName(),
@@ -1051,115 +1051,211 @@ public class SimpleCombatModel implements CombatModel {
     }
 
     /**
-     * Demotes a unit. A unit that can not be further demoted is
-     * captured or destroyed. The enemy may plunder equipment.
+     * Find the highest priority equipment carried by a unit, if any
      *
-     * @param unit a <code>Unit</code> value
-     * @param enemyUnit a <code>Unit</code> value
+     * @param victim a <code>Unit</code> that is about to lose equipment
+     * @return The highest priority <code>EquipmentType</code> carried by a unit,
+     * or null if none.
+     **/
+    private EquipmentType findEquipmentTypeToLose(Unit victim) {
+        EquipmentType toLose = null;
+        int combatLossPriority = 0;
+
+        for (EquipmentType equipmentType : victim.getEquipment()) {
+            if (equipmentType.getCombatLossPriority() > combatLossPriority) {
+                toLose = equipmentType;
+                combatLossPriority = equipmentType.getCombatLossPriority();
+            }
+        }
+        return toLose;
+    }
+
+    /**
+     * Lose a combat.  Units can be disarmed, demoted, captured or slaughtered.
+     * The enemy may plunder equipment.
+     *
+     * @param unit a <code>Unit</code> that has lost a combat
+     * @param enemyUnit a <code>Unit</code> that has won a combat
      */
-    private void demote(Unit unit, Unit enemyUnit) {
-        UnitType oldType = unit.getType();
-        Unit.Role oldRole = unit.getRole();
-        String locationName = unit.getTile().getLocationName();
-        String messageID = "model.unit.unitDemoted";
-        String nation = unit.getOwner().getNationAsString();
+    private void loseCombat(Unit unit, Unit enemyUnit) {
+        EquipmentType typeToLose;
+        UnitType downgrade;
 
-        if (unit.hasAbility("model.ability.canBeCaptured")) {
-            if (enemyUnit.hasAbility("model.ability.captureUnits")) {
-                unit.setLocation(enemyUnit.getTile());
-                unit.setOwner(enemyUnit.getOwner());
-                if (enemyUnit.isUndead()) {
-                    unit.setType(enemyUnit.getType());
-                } else {
-                    UnitType downgrade = unit.getType().getDowngrade(DowngradeType.CAPTURE);
-                    if (downgrade != null) {
-                        unit.setType(downgrade);
-                    }
-                }
-                messageID = Messages.getKey(oldType.getId() + ".captured",
-                                            "model.unit.unitCaptured");
-            } else {
-                messageID = Messages.getKey(oldType.getId() + ".destroyed", 
-                                            "model.unit.unitSlaughtered");
-                unit.dispose();
-            }
+        if ((typeToLose = findEquipmentTypeToLose(unit)) != null) {
+            disarmUnit(unit, typeToLose, enemyUnit);
+        } else if ((downgrade = unit.getType().getDowngrade(DowngradeType.DEMOTION))
+                   != null) {
+            demoteUnit(unit, downgrade, enemyUnit);
+        } else if (unit.hasAbility("model.ability.canBeCaptured")
+                   && enemyUnit.hasAbility("model.ability.captureUnits")) {
+            captureUnit(unit, enemyUnit);
         } else {
-            // unit has equipment that protects from capture, or will
-            // be downgraded
-            EquipmentType typeToLose = null;
-            int combatLossPriority = 0;
-            for (EquipmentType equipmentType : unit.getEquipment()) {
-                if (equipmentType.getCombatLossPriority() > combatLossPriority) {
-                    typeToLose = equipmentType;
-                    combatLossPriority = equipmentType.getCombatLossPriority();
-                }
-            }
-            if (typeToLose != null) {
-                // lose equipment as a result of combat
-                unit.removeEquipment(typeToLose, true);
-                if (unit.getEquipment().isEmpty()) {
-                    messageID = "model.unit.unitDemotedToUnarmed";
-                }
-                if (enemyUnit.hasAbility("model.ability.captureEquipment") &&
-                    enemyUnit.canBeEquippedWith(typeToLose)) {
-                    enemyUnit.equipWith(typeToLose, true);
-                    unit.addModelMessage(unit, ModelMessage.MessageType.COMBAT_RESULT,
-                                         "model.unit.equipmentCaptured",
-                                         "%nation%", enemyUnit.getOwner().getNationAsString(),
-                                         "%equipment%", typeToLose.getName());
-                    // TODO: fix this when the AI is smarter
-                    for (IndianSettlement settlement : enemyUnit.getOwner().getIndianSettlements()) {
-                        for (AbstractGoods goods : typeToLose.getGoodsRequired()) {
-                            settlement.addGoods(goods);
-                        }
-                    }
-                }
-            } else {
-                // be downgraded as a result of combat
-                UnitType downgrade = unit.getType().getDowngrade(DowngradeType.DEMOTION);
-                if (downgrade != null) {
-                    unit.setType(downgrade);
-                    messageID = Messages.getKey(oldType.getId() + ".demoted",
-                                                "model.unit.unitDemoted");
-                } else {
-                    messageID = Messages.getKey(oldType.getId() + ".destroyed",
-                                                "model.unit.unitSlaughtered");
-                    unit.dispose();
-                }
-            }
+            slaughterUnit(unit, enemyUnit);
         }
-        String newName = unit.getName();
-        FreeColGameObject source = unit;
-        if (unit.getColony() != null) {
-            source = unit.getColony();
-        }
+    }
 
-        // TODO: this still doesn't work as intended
-        unit.addModelMessage(source, ModelMessage.MessageType.COMBAT_RESULT,
-                             unit, messageID,
-                             "%oldName%", Unit.getName(oldType, oldRole),
-                             "%unit%", newName,
+    /**
+     * Capture a unit.
+     *
+     * @param unit a <code>Unit</code> to be captured
+     * @param enemyUnit a <code>Unit</code> that is capturing
+     */
+    private void captureUnit(Unit unit, Unit enemyUnit) {
+        String locationName = unit.getLocation().getLocationName();
+        Player loser = unit.getOwner();
+        String nation = loser.getNationAsString();
+        String oldName = unit.getName();
+        String enemyNation = enemyUnit.getOwner().getNationAsString();
+        String messageID = Messages.getKey(unit.getType().getId() + ".captured",
+                                           "model.unit.unitCaptured");
+
+        // unit is about to change sides, launch message now!
+        unit.addModelMessage(unit,
+                             ModelMessage.MessageType.COMBAT_RESULT,
+                             messageID,
                              "%nation%", nation,
+                             "%unit%", oldName,
+                             "%enemyNation%", enemyNation,
                              "%enemyUnit%", enemyUnit.getName(),
-                             "%enemyNation%", enemyUnit.getOwner().getNationAsString(),
                              "%location%", locationName);
-
-        if (unit.getOwner() != enemyUnit.getOwner()) {
-            // unit unit hasn't been captured by enemyUnit, show message to
-            // enemyUnit's owner
-            source = enemyUnit;
-            if (enemyUnit.getColony() != null) {
-                source = enemyUnit.getColony();
-            }
-            unit.addModelMessage(source, ModelMessage.MessageType.COMBAT_RESULT,
-                                 unit, messageID,
-                                 "%oldName%", Unit.getName(oldType, oldRole),
-                                 "%unit%", newName,
-                                 "%enemyUnit%", enemyUnit.getName(),
-                                 "%nation%", nation,
-                                 "%enemyNation%", enemyUnit.getOwner().getNationAsString(),
-                                 "%location%", locationName);
+        unit.setLocation(enemyUnit.getTile());
+        unit.setOwner(enemyUnit.getOwner());
+        if (enemyUnit.isUndead()) {
+            unit.setType(enemyUnit.getType());
+        } else {
+            UnitType downgrade = unit.getType().getDowngrade(DowngradeType.CAPTURE);
+            if (downgrade != null) unit.setType(downgrade);
         }
+        enemyUnit.addModelMessage(enemyUnit,
+                                  ModelMessage.MessageType.COMBAT_RESULT,
+                                  messageID,
+                                  "%nation%", nation,
+                                  "%unit%", oldName,
+                                  "%enemyNation%", enemyNation,
+                                  "%enemyUnit%", enemyUnit.getName(),
+                                  "%location%", locationName);
+    }
+
+    /**
+     * Demotes a unit.
+     *
+     * @param unit a <code>Unit</code> to demote
+     * @param downgrade the <code>UnitType</code> to downgrade the init to
+     * @param enemyUnit a <code>Unit</code> that caused the demotion
+     */
+    private void demoteUnit(Unit unit, UnitType downgrade, Unit enemyUnit) {
+        String locationName = unit.getLocation().getLocationName();
+        String nation = unit.getOwner().getNationAsString();
+        String oldName = unit.getName();
+        String enemyNation = enemyUnit.getOwner().getNationAsString();
+        String messageID = Messages.getKey(unit.getType().getId() + ".demoted",
+                                           "model.unit.unitDemoted");
+
+        unit.setType(downgrade);
+        enemyUnit.addModelMessage(enemyUnit,
+                                  ModelMessage.MessageType.COMBAT_RESULT,
+                                  messageID,
+                                  "%nation%", nation,
+                                  "%oldName%", oldName,
+                                  "%unit%", unit.getName(),
+                                  "%enemyNation%", enemyNation,
+                                  "%enemyUnit%", enemyUnit.getName(),
+                                  "%location%", locationName);
+        unit.addModelMessage(unit,
+                             ModelMessage.MessageType.COMBAT_RESULT,
+                             messageID,
+                             "%nation%", nation,
+                             "%oldName%", oldName,
+                             "%unit%", unit.getName(),
+                             "%enemyNation%", enemyNation,
+                             "%enemyUnit%", enemyUnit.getName(),
+                             "%location%", locationName);
+    }
+
+    /**
+     * Disarm a unit.
+     *
+     * @param unit a <code>Unit</code> to be disarmed
+     * @param typeToLose the <code>EquipmentType</code> to lose
+     * @param enemyUnit a <code>Unit</code> that is disarming
+     */
+    private void disarmUnit(Unit unit, EquipmentType typeToLose, Unit enemyUnit) {
+        String locationName = unit.getLocation().getLocationName();
+        String nation = unit.getOwner().getNationAsString();
+        String oldName = unit.getName();
+        String enemyNation = enemyUnit.getOwner().getNationAsString();
+        String messageID = Messages.getKey(unit.getType().getId() + ".demoted",
+                                           "model.unit.unitDemoted");
+
+        unit.removeEquipment(typeToLose, true);
+        if (unit.getEquipment().isEmpty()) {
+            messageID = "model.unit.unitDemotedToUnarmed";
+        }
+        enemyUnit.addModelMessage(enemyUnit,
+                                  ModelMessage.MessageType.COMBAT_RESULT,
+                                  messageID,
+                                  "%nation%", nation,
+                                  "%oldName%", oldName,
+                                  "%unit%", unit.getName(),
+                                  "%enemyNation%", enemyNation,
+                                  "%enemyUnit%", enemyUnit.getName(),
+                                  "%location%", locationName);
+        unit.addModelMessage(unit,
+                             ModelMessage.MessageType.COMBAT_RESULT,
+                             messageID,
+                             "%nation%", nation,
+                             "%oldName%", oldName,
+                             "%unit%", unit.getName(),
+                             "%enemyNation%", enemyNation,
+                             "%enemyUnit%", enemyUnit.getName(),
+                             "%location%", locationName);
+        if (enemyUnit.hasAbility("model.ability.captureEquipment")
+            && enemyUnit.canBeEquippedWith(typeToLose)) {
+            enemyUnit.equipWith(typeToLose, true);
+            unit.addModelMessage(unit,
+                                 ModelMessage.MessageType.COMBAT_RESULT,
+                                 "model.unit.equipmentCaptured",
+                                 "%nation%", enemyNation,
+                                 "%equipment%", typeToLose.getName());
+            // TODO: fix this when the AI is smarter
+            for (IndianSettlement settlement : enemyUnit.getOwner().getIndianSettlements()) {
+                for (AbstractGoods goods : typeToLose.getGoodsRequired()) {
+                    settlement.addGoods(goods);
+                }
+            }
+        }
+    }
+
+    /**
+     * Slaughter a unit.
+     *
+     * @param unit a <code>Unit</code> to slaughter
+     * @param enemyUnit a <code>Unit</code> that is slaughtering
+     */
+    private void slaughterUnit(Unit unit, Unit enemyUnit) {
+        String locationName = enemyUnit.getLocation().getLocationName();
+        String nation = unit.getOwner().getNationAsString();
+        String enemyNation = enemyUnit.getOwner().getNationAsString();
+        String messageID = Messages.getKey(unit.getType().getId() + ".destroyed",
+                                           "model.unit.unitSlaughtered");
+
+        enemyUnit.addModelMessage(enemyUnit,
+                                  ModelMessage.MessageType.COMBAT_RESULT,
+                                  messageID,
+                                  "%nation%", nation,
+                                  "%unit%", unit.getName(),
+                                  "%enemyNation%", enemyNation,
+                                  "%enemyUnit%", enemyUnit.getName(),
+                                  "%location%", locationName);
+        unit.addModelMessage(unit,
+                             ModelMessage.MessageType.COMBAT_RESULT,
+                             messageID,
+                             "%nation%", nation,
+                             "%unit%", unit.getName(),
+                             "%enemyNation%", enemyNation,
+                             "%enemyUnit%", enemyUnit.getName(),
+                             "%location%", locationName);
+        unit.dispose();
     }
 
     /**

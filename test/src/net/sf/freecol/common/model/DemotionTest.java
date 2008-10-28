@@ -48,7 +48,7 @@ public class DemotionTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -79,7 +79,7 @@ public class DemotionTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -113,7 +113,7 @@ public class DemotionTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -155,7 +155,7 @@ public class DemotionTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
@@ -212,7 +212,7 @@ public class DemotionTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
@@ -238,7 +238,7 @@ public class DemotionTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
         assertEquals(colonistType, veteranType.getDowngrade(DowngradeType.CAPTURE));
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -273,7 +273,7 @@ public class DemotionTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
-        Method method = SimpleCombatModel.class.getDeclaredMethod("demote", Unit.class, Unit.class);
+        Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
         assertEquals(damagedArtilleryType, artilleryType.getDowngrade(DowngradeType.DEMOTION));
         Player dutch = game.getPlayer("model.nation.dutch");
