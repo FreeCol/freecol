@@ -19,6 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -154,6 +155,12 @@ public final class DragListener extends MouseAdapter {
         menu.add(name);
         menu.addSeparator();
 
+        if (tempUnit.isCarrier()) {
+            if (addCarrierItems(unitLabel, menu)) {
+                menu.addSeparator();
+            }
+        }                
+
         if (tempUnit.getLocation().getTile() != null && 
             tempUnit.getLocation().getTile().getColony() != null) {
             if (addWorkItems(unitLabel, menu)) {
@@ -176,6 +183,29 @@ public final class DragListener extends MouseAdapter {
         }
 
         return menu;
+    }
+
+    private boolean addCarrierItems(final UnitLabel unitLabel, final JPopupMenu menu) {
+        final Unit tempUnit = unitLabel.getUnit();
+
+        if (tempUnit.getSpaceLeft() < tempUnit.getType().getSpace()) {
+            JMenuItem cargo = new JMenuItem(Messages.message("cargoOnCarrier"));
+            menu.add(cargo);
+
+            for (Unit passenger : tempUnit.getUnitList()) {
+                JMenuItem menuItem = new JMenuItem("    " + passenger.getName());
+                menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
+                menu.add(menuItem);
+            }
+            for (Goods goods : tempUnit.getGoodsList()) {
+                JMenuItem menuItem = new JMenuItem("    " + goods.toString());
+                menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
+                menu.add(menuItem);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private boolean addWorkItems(final UnitLabel unitLabel, final JPopupMenu menu) {
