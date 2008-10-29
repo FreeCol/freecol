@@ -83,6 +83,10 @@ public class MapGenerator implements IMapGenerator {
     
     private final LandGenerator landGenerator;
     private final TerrainGenerator terrainGenerator;
+    
+    // To avoid starting positions to be too close to the poles
+    // percentage indicating how much of the half map close to the pole cannot be spawned on
+    private static final float MIN_DISTANCE_FROM_POLE = 0.30f;
 
     
     /**
@@ -607,11 +611,16 @@ public class MapGenerator implements IMapGenerator {
     private void createEuropeanUnits(Map map, List<Player> players) {
         final int width = map.getWidth();
         final int height = map.getHeight();
+        final int poleDistance = (int)(MIN_DISTANCE_FROM_POLE*height/2);
 
         List<Player> europeanPlayers = new ArrayList<Player>();
         for (Player player : players) {
             if (player.isREF()) {
-                player.setEntryLocation(map.getTile(width - 2, random.nextInt(height - 20) + 10));
+                // eastern edge of the map
+                int x = width - 2;
+                // random latitude, not too close to the pole
+                int y = random.nextInt(height - 2*poleDistance) + poleDistance;
+                player.setEntryLocation(map.getTile(x, y));
                 continue;
             }
             if (player.isEuropean()) {
@@ -648,10 +657,10 @@ public class MapGenerator implements IMapGenerator {
             }
 
             // find an appropriate starting latitude
-            int x = width - 1;
+            int x = width - 1;  // eastern edge of map
             int y;
             do {
-                 y = random.nextInt(height - 20) + 10;
+                 y = random.nextInt(height - poleDistance*2) + poleDistance;
             } while (map.getTile(x, y).isLand() == startAtSea ||
                      isStartingPositionTooClose(map, y, startingPositions, startingYPositions));
             startingYPositions.add(new Integer(y));
@@ -823,9 +832,11 @@ public class MapGenerator implements IMapGenerator {
      */
     private boolean isStartingPositionTooClose(Map map, int proposedY, int startingPositions,
                                                  List<Integer> usedYPositions) {
-        int distance = (map.getHeight() / 2) / startingPositions;
+        final int poleDistance = (int)(MIN_DISTANCE_FROM_POLE*map.getHeight()/2);
+        final int spawnableRange = map.getHeight() - poleDistance*2;
+        final int minimumDistance = spawnableRange / (startingPositions * 2);
         for (Integer yPosition : usedYPositions) {
-            if (Math.abs(yPosition.intValue() - proposedY) < distance) {
+            if (Math.abs(yPosition.intValue() - proposedY) < minimumDistance) {
                 return true;
             }
         }
