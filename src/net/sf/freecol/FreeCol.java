@@ -525,11 +525,19 @@ public final class FreeCol {
     /**
      * Returns the directory where the savegames should be put.
      * @return The directory where the savegames should be put.
-    */
+     */
     public static File getSaveDirectory() {
         return saveDirectory;
     }
-    
+
+    /**
+     * Set the directory where the savegames should be put.
+     * @param saveDirectory a <code>File</code> value for the savegame directory
+     */
+    public static void setSaveDirectory(File saveDirectory) {
+        FreeCol.saveDirectory = saveDirectory;
+    }
+
     /**
      * Returns the data directory.
      * @return The directory where the data files are located.
@@ -734,13 +742,15 @@ public final class FreeCol {
                 i++;
                 if (i < args.length) {
                     savegameFile = new File(args[i]);
-                    setSaveDirectory(savegameFile.getParentFile());
-                    if (!savegameFile.exists() || !savegameFile.isFile()) {                        
+                    if (!savegameFile.exists() || !savegameFile.isFile()) {
                         savegameFile = new File(getSaveDirectory(), args[i]);
                         if (!savegameFile.exists() || !savegameFile.isFile()) {
-                            System.out.println("The given savegame file could not be found: " + args[i]);
+                            System.out.println("Could not find savegame file: "
+                                               + args[i]);
                             System.exit(1);
                         }
+                    } else {
+                        setSaveDirectory(savegameFile.getParentFile());
                     }
                 } else {
                     printUsage();
@@ -871,8 +881,4 @@ public final class FreeCol {
         System.out.println("  runs FreeCol in windowed mode instead of full screen mode");
         System.out.println();
     }
-
-	public static void setSaveDirectory(File saveDirectory) {
-		FreeCol.saveDirectory = saveDirectory;
-	}
 }
