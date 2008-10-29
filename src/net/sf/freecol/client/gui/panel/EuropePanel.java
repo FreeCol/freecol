@@ -27,7 +27,6 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
@@ -72,7 +71,7 @@ import cz.autel.dmi.HIGLayout;
  * This is a panel for the Europe display. It shows the ships in Europe and
  * allows the user to send them back.
  */
-public final class EuropePanel extends FreeColPanel implements ActionListener, ContainerListener {
+public final class EuropePanel extends FreeColPanel implements ActionListener {
 
     private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
 
@@ -224,7 +223,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         docksPanel.addMouseListener(releaseListener);
         marketPanel.addMouseListener(releaseListener);
         cargoPanel.addMouseListener(releaseListener);
-        cargoPanel.addContainerListener(this);
 
         toAmericaPanel.setLayout(new GridLayout(0, 2));
         toEuropePanel.setLayout(new GridLayout(0, 2));
@@ -417,7 +415,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
                 UnitLabel unitLabel = new UnitLabel(unit, parent);
                 unitLabel.setTransferHandler(defaultTransferHandler);
                 unitLabel.addMouseListener(pressListener);
-                unitLabel.addContainerListener(this);
                 inPortPanel.add(unitLabel);
             }
         }
@@ -426,16 +423,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
         inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
         if (!units.isEmpty()) {
             setSelectedUnit(units.get(units.size() - 1));
-        }
-    }
-
-    public void componentAdded(ContainerEvent event) {
-        refreshDocks();
-    }
-
-    public void componentRemoved(ContainerEvent event) {
-        if (event.getComponent() instanceof CargoPanel) {
-            refreshDocks();
         }
     }
 
@@ -892,6 +879,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener, C
                     return null;
                 }
             }
+
             Component c = add(comp);
             revalidate();
             europePanel.refresh();
