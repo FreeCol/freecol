@@ -760,19 +760,17 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public String getDefaultColonyName() {
         String prefix = nationID + ".newColonyName.";
-        String name = null;
-        do {
-            if (Messages.containsKey(prefix + Integer.toString(colonyNameIndex))) {
-                name = Messages.message(prefix + Integer.toString(colonyNameIndex));
-                colonyNameIndex++;
-            }
-        } while (getGame().getColony(name) != null);
-        if (name == null) {
-            do {
-                name = Messages.message("Colony") + colonyNameIndex;
-                colonyNameIndex++;
-            } while (getColony(name) != null);
+        String name;
+
+        while (Messages.containsKey(prefix + Integer.toString(colonyNameIndex))) {
+            name = Messages.message(prefix + Integer.toString(colonyNameIndex));
+            colonyNameIndex++;
+            if (getGame().getColony(name) == null) return name;
         }
+        do {
+            name = Messages.message("Colony") + colonyNameIndex;
+            colonyNameIndex++;
+        } while (getColony(name) != null);
         return name;
     }
 
