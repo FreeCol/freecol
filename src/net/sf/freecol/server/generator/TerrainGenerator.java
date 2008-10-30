@@ -505,14 +505,16 @@ public class TerrainGenerator {
                 continentmap[x][y] = 0;
                 if (map.isValid(x, y)) {
                     Tile tile = map.getTile(x, y);
-                    boolean isMountainRange = false;
-                    if (tile.getRegion() != null) {
-                        isMountainRange = (tile.getRegion().getType() == RegionType.MOUNTAIN);
+                    boolean ignoreTile = false;
+                    if (tile.getRegion() != null &&
+                        (tile.getRegion().getType() == RegionType.MOUNTAIN ||
+                         tile.getRegion().getType() == RegionType.RIVER)) {
+                        ignoreTile = true;
                     }
                     if (tile.isLand()) {
                         //exclude arctic/antarctic tiles and Mountain Ranges
                         //Note: Great Rivers are excluded by tile.isLand()
-                        if ((y<arcticHeight) || (y>=antarcticHeight) || isMountainRange) {
+                        if ((y<arcticHeight) || (y>=antarcticHeight) || ignoreTile) {
                             landmap[x][y] = false;
                         } else {
                             landmap[x][y] = true;
