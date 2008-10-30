@@ -932,7 +932,10 @@ public class IndianSettlement extends Settlement {
             }
         }
 
+        consumeGoods(Goods.FOOD, getFoodConsumption());
         /* Consume goods: TODO: make this more generic */
+        /* TODO: do we need this at all? At the moment, most Indian Settlements
+           consume more than they produce.
         consumeGoods(Goods.FOOD, getFoodConsumption());
         consumeGoods(Goods.RUM, 2 * workers);
         consumeGoods(Goods.TRADEGOODS, 2 * workers);
@@ -944,7 +947,7 @@ public class IndianSettlement extends Settlement {
         consumeGoods(Goods.CIGARS, workers);
         consumeGoods(Goods.COATS, workers);
         consumeGoods(Goods.CLOTH, workers);
-
+        */
         goodsContainer.removeAbove(500);
 
         checkForNewIndian();
@@ -1331,14 +1334,16 @@ public class IndianSettlement extends Settlement {
             }
         }
         Collections.sort(settlementGoods, exportGoodsComparator);
-        for (Goods goods : settlementGoods) {
-            System.out.println(goods);
-        }
-        List<Goods> result = new ArrayList<Goods>();
 
+        List<Goods> result = new ArrayList<Goods>();
+        int count = 0;
         for (Goods goods : settlementGoods) {
             if (goods.getType().isNewWorldGoodsType() && goods.getAmount() > 0) {
                 result.add(goods);
+                count++;
+                if (count > 2) {
+                    return result;
+                }
             }
         }
         
