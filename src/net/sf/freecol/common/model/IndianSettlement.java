@@ -932,22 +932,21 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        consumeGoods(Goods.FOOD, getFoodConsumption());
         /* Consume goods: TODO: make this more generic */
-        /* TODO: do we need this at all? At the moment, most Indian Settlements
-           consume more than they produce.
         consumeGoods(Goods.FOOD, getFoodConsumption());
         consumeGoods(Goods.RUM, 2 * workers);
         consumeGoods(Goods.TRADEGOODS, 2 * workers);
+        /* TODO: do we need this at all? At the moment, most Indian Settlements
+           consume more than they produce.
         for (GoodsType goodsType : FreeCol.getSpecification().getNewWorldGoodsTypeList()) {
             consumeGoods(goodsType, workers);
         }
+        */
         consumeGoods(Goods.ORE, workers);
         consumeGoods(Goods.SILVER, workers);
         consumeGoods(Goods.CIGARS, workers);
         consumeGoods(Goods.COATS, workers);
         consumeGoods(Goods.CLOTH, workers);
-        */
         goodsContainer.removeAbove(500);
 
         checkForNewIndian();
