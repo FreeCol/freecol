@@ -94,6 +94,7 @@ public final class ReportExplorationPanel extends ReportPanel implements ActionL
         }
 
         JPanel result = new JPanel(new HIGLayout(widths, heights));
+        result.setOpaque(false);
 
         // headline
         result.add(new JLabel(Messages.message("report.exploration.nameOfRegion")),
