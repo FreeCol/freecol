@@ -39,6 +39,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -47,12 +48,6 @@ import java.util.List;
  * This panel displays the Trade Report.
  */
 public final class ReportTradePanel extends ReportPanel implements ActionListener {
-
-
-    /**
-     * How many colums are defined per label.
-     */
-    private static final int columnsPerLabel = 1;
 
     /**
      * How many additional rows are defined.
@@ -66,9 +61,9 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
     private static final int extraColumns = 1; // labels
 
     /**
-     * How many columns are defined all together.
+     * Storable goods types.
      */
-    private static final int columns = columnsPerLabel * FreeCol.getSpecification().numberOfGoodsTypes() + extraColumns;
+    private List<GoodsType> storableGoods = new ArrayList<GoodsType>();
 
     /**
      * How wide the margins should be.
@@ -103,6 +98,12 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
 
         goodsHeader.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(goodsHeader);
+
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            if (goodsType.isStorable()) {
+                storableGoods.add(goodsType);
+            }
+        }
     }
 
     @Override
@@ -129,12 +130,13 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
         colonies = player.getColonies();
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
+        int columns = storableGoods.size() + extraColumns;
         int[] widths = new int[columns];
 
         //align the labels with the goodsHeader
         widths[0] = 170;
         for (int i = 1; i < columns; i++) {
-            widths[i] = 40;
+            widths[i] = 42;
         }
 
         int[] heights = new int[colonies.size() * 2 + extraRows + extraBottomRows];
@@ -168,10 +170,7 @@ public final class ReportTradePanel extends ReportPanel implements ActionListene
 
         JLabel currentLabel;
         int column = extraColumns;
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            if (!goodsType.isStorable()) {
-                continue;
-            }
+        for (GoodsType goodsType : storableGoods) {
             column++;
             int sales = player.getSales(goodsType);
             int beforeTaxes = player.getIncomeBeforeTaxes(goodsType);
