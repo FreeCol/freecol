@@ -621,7 +621,7 @@ public final class FreeColServer {
      * Creates a <code>XMLStreamReader</code> for reading the given file.
      * Compression is automatically detected.
      * 
-     * @param file The file to be read.
+     * @param fis The file to be read.
      * @return The <code>XMLStreamReader</code>.
      * @exception IOException if thrown while loading the game or if a
      *                <code>XMLStreamException</code> have been thrown by the

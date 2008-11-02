@@ -251,7 +251,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
      *
      * @param value
      * @param pocketCount
-     * @return
+     * @return distribution of {@code value}
      */
     private int[] distribute(int value, int pocketCount) {
         int[] pockets = new int[pocketCount];
@@ -316,8 +316,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
 
     /**
      * adds the header rows
-     *
-     * @return next row index
      */
     private void addHeader() {
         int row = 1;

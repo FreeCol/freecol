@@ -82,7 +82,6 @@ public class ImageResource extends Resource {
     /**
      * Returns the image using the specified scale.
      * 
-     * @param resource The name of the resource to return.
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.
@@ -94,9 +93,9 @@ public class ImageResource extends Resource {
     }
     
     /**
-     * Returns the image using the specified size.
+     * Returns the image using the specified dimension.
      * 
-     * @param size The size of the requested image. Rescaling
+     * @param d The dimension of the requested image. Rescaling
      *      will be performed if necessary.
      * @return The <code>Image</code>.
      */
@@ -151,7 +150,6 @@ public class ImageResource extends Resource {
     /**
      * Returns the image using the specified scale.
      * 
-     * @param resource The name of the resource to return.
      * @param scale The size of the requested image (with 1 being normal size,
      *      2 twice the size, 0.5 half the size etc). Rescaling
      *      will be performed unless using 1.

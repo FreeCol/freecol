@@ -504,12 +504,11 @@ public class MapGenerator implements IMapGenerator {
     /**
      * Builds a <code>IndianSettlement</code> at the given position.
      *
-     * @param tribe The tribe owning the new settlement.
+     * @param player The player owning the new settlement.
      * @param capital <code>true</code> if the settlement should be a
      *      {@link IndianSettlement#isCapital() capital}.
      * @param position The position to place the settlement.
      * @param map The map that should get a new settlement.
-     * @param players The list of the {@link Player players}.
      * @return The <code>IndianSettlement</code> just being placed
      *      on the map.
      */

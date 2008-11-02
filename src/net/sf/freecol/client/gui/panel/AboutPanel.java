@@ -61,8 +61,6 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
     * The constructor that will add the items to this panel.
     * 
     * @param parent The parent of this panel.
-    * @param freeColClient The main controller object for the
-    *       client.
     */
     public AboutPanel(Canvas parent) {
         this.parent = parent;

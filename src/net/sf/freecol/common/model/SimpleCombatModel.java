@@ -920,8 +920,8 @@ public class SimpleCombatModel implements CombatModel {
      * Evade a naval engagement.
      *
      * @param defender A naval unit that evades the attacker
-     * @param colony A colony that may have bombarded the defender
-     * @param attacker A unit that may have attacked the defender
+     * @param attackerColony A colony that may have bombarded the defender
+     * @param attackerUnit A unit that may have attacked the defender
      **/
     private void evade(Unit defender, Colony attackerColony, Unit attackerUnit) {
         String nation = defender.getOwner().getNationAsString();

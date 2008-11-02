@@ -533,7 +533,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given nation.
      * 
-     * @param foundingNation
+     * @param nation
      * @param parent
      */
     private void buildNationItem(Nation nation, DefaultMutableTreeNode parent) {
@@ -547,7 +547,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the button for the given nation type.
      * 
-     * @param foundingNation
+     * @param nationType
      * @param parent
      */
     private void buildNationTypeItem(NationType nationType, DefaultMutableTreeNode parent) {
@@ -1238,7 +1238,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given nation type.
      * 
-     * @param nation - the NationType
+     * @param nationType - the NationType
      */
     private void buildNationTypeDetail(NationType nationType) {
         if (nationType instanceof EuropeanNationType) {
@@ -1252,7 +1252,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given nation type.
      * 
-     * @param nation - the EuropeanNationType
+     * @param nationType - the EuropeanNationType
      */
     private void buildEuropeanNationTypeDetail(EuropeanNationType nationType) {
         detailPanel.removeAll();
@@ -1331,7 +1331,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     /**
      * Builds the details panel for the given nation type.
      * 
-     * @param nation - the IndianNationType
+     * @param nationType - the IndianNationType
      */
     private void buildIndianNationTypeDetail(IndianNationType nationType) {
         detailPanel.removeAll();
