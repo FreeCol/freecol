@@ -169,7 +169,7 @@ public class GoodsTradeItem extends TradeItem {
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        super.toXML(out);
+        super.toXMLImpl(out);
         out.writeAttribute("settlement", settlement.getId());
         this.goods.toXML(out);
         out.writeEndElement();

@@ -17,10 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
-
-
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;

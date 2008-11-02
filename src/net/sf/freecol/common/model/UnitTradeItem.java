@@ -17,10 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.common.model;
-
-
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -128,7 +125,7 @@ public class UnitTradeItem extends TradeItem {
      */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-        super.toXML(out);
+        super.toXMLImpl(out);
         out.writeAttribute("unit", this.unit.getId());
         out.writeEndElement();
     }
