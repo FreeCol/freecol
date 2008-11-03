@@ -1938,7 +1938,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component to this Canvas.
      * 
-     * @param comp The component to add to this ToEuropePanel.
+     * @param comp The component to add
      * @return The component argument.
      */
     @Override
@@ -1951,7 +1951,7 @@ public final class Canvas extends JDesktopPane {
      * Adds a component centered on this Canvas. Removes the statuspanel if
      * visible (and <code>comp != statusPanel</code>).
      * 
-     * @param comp The component to add to this ToEuropePanel.
+     * @param comp The component to add
      * @return The component argument.
      */
     public Component addCentered(Component comp) {

@@ -144,18 +144,21 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     }
 
     /**
-    * This function analyses an event and calls the right methods to take
+    * This function analyzes an event and calls the right methods to take
     * care of the user's requests.
     * @param event The incoming ActionEvent.
     */
     public void actionPerformed(ActionEvent event) {
         if (event.getActionCommand().equals(EDIT)) {
-            colorChooser.setColor(currentColor);
-
-            // Add the colorChooserPanel.
-            canvas.add(colorChooserPanel, JLayeredPane.PALETTE_LAYER);
-            parent.setEnabled(false);
-            // No repainting needed apparently.
+            if (!canvas.isAncestorOf(colorChooserPanel)) {
+                colorChooser.setColor(currentColor);
+    
+                // Add the colorChooserPanel.
+                canvas.addAsFrame(colorChooserPanel);
+                colorChooserPanel.requestFocus();
+                parent.setEnabled(false);
+                // No repainting needed apparently.
+            }
         }
         else if (event.getActionCommand().equals(OK)) {
             currentColor = colorChooser.getColor();
