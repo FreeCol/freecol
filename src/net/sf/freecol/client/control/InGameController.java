@@ -878,6 +878,7 @@ public final class InGameController implements NetworkConstants {
         Stop stop = unit.getCurrentStop();
         if (stop == null || stop.getLocation() == null) {
             freeColClient.getCanvas().showInformationMessage("traderoute.broken",
+                                                             "%name%",
                                                              unit.getTradeRoute().getName());
             return;
         }
