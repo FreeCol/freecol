@@ -62,10 +62,8 @@ import org.w3c.dom.NodeList;
  * Handles the network messages that arrives while in the game.
  */
 public final class AIInGameInputHandler implements MessageHandler, StreamedMessageHandler {
+
     private static final Logger logger = Logger.getLogger(AIInGameInputHandler.class.getName());
-
-
-
 
     /** The player for whom I work. */
     private final ServerPlayer serverPlayer;

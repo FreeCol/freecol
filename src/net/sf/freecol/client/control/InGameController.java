@@ -153,12 +153,12 @@ public final class InGameController implements NetworkConstants {
     public void saveGame() {
         final Canvas canvas = freeColClient.getCanvas();
         String fileName = freeColClient.getMyPlayer().getName() + "_" + freeColClient.getMyPlayer().getNationAsString()
-                + "_" + freeColClient.getGame().getTurn().toSaveGameString();
+            + "_" + freeColClient.getGame().getTurn().toSaveGameString();
         fileName = fileName.replaceAll(" ", "_");
         if (freeColClient.getMyPlayer().isAdmin() && freeColClient.getFreeColServer() != null) {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
             if (file != null) {
-            	FreeCol.setSaveDirectory(file.getParentFile());
+                FreeCol.setSaveDirectory(file.getParentFile());
                 saveGame(file);
             }
         }
@@ -174,25 +174,25 @@ public final class InGameController implements NetworkConstants {
 
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         Thread t = new Thread(FreeCol.CLIENT_THREAD+"Saving Game") {
-            public void run() {
-                try {
+                public void run() {
+                    try {
                     
-                    freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getName());
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            canvas.closeStatusPanel();
-                            canvas.requestFocusInWindow();
-                        }
-                    });
-                } catch (IOException e) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            canvas.errorMessage("couldNotSaveGame");
-                        }
-                    });
+                        freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getName());
+                        SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    canvas.closeStatusPanel();
+                                    canvas.requestFocusInWindow();
+                                }
+                            });
+                    } catch (IOException e) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                                public void run() {
+                                    canvas.errorMessage("couldNotSaveGame");
+                                }
+                            });
+                    }
                 }
-            }
-        };
+            };
         t.start();
     }
 
@@ -257,7 +257,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         if (!canvas.showConfirmDialog("declareIndependence.areYouSure.text", "declareIndependence.areYouSure.yes",
-                "declareIndependence.areYouSure.no")) {
+                                      "declareIndependence.areYouSure.no")) {
             return;
         }
 
@@ -309,7 +309,7 @@ public final class InGameController implements NetworkConstants {
                 final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);
                 if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
                     final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-'
-                            + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
+                        + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
                     File saveGameFile = new File(FreeCol.getAutosaveDirectory(), filename);
                     saveGame(saveGameFile);
                     int generations = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_GENERATIONS);
@@ -358,7 +358,7 @@ public final class InGameController implements NetworkConstants {
         String name = null;
         if (object instanceof Colony) {
             name = freeColClient.getCanvas().showInputDialog("renameColony.text", object.getName(), "renameColony.yes",
-                    "renameColony.no");
+                                                             "renameColony.no");
             if (name==null || name.length()==0) {
                 // user canceled 
                 return;
@@ -370,7 +370,7 @@ public final class InGameController implements NetworkConstants {
             }
         } else if (object instanceof Unit) {
             name = freeColClient.getCanvas().showInputDialog("renameUnit.text", object.getName(), "renameUnit.yes",
-                    "renameUnit.no");
+                                                             "renameUnit.no");
         } else {
             return;
         }
@@ -437,7 +437,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         String name = freeColClient.getCanvas().showInputDialog("nameColony.text",
-                freeColClient.getMyPlayer().getDefaultColonyName(), "nameColony.yes", "nameColony.no");
+                                                                freeColClient.getMyPlayer().getDefaultColonyName(), "nameColony.yes", "nameColony.no");
 
         if (name == null) { // The user canceled the action.
             return;
@@ -614,8 +614,8 @@ public final class InGameController implements NetworkConstants {
             //or no longer be on the map
             boolean alwaysCenter = freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER);
             if(alwaysCenter && unit != null && unit.getTile() != null){
-            	Position unitPosition = unit.getTile().getPosition();
-            	freeColClient.getGUI().setFocus(unitPosition);
+                Position unitPosition = unit.getTile().getPosition();
+                freeColClient.getGUI().setFocus(unitPosition);
             }
         } // else: nothing: There is no active unit that can be moved.
     }
@@ -637,7 +637,7 @@ public final class InGameController implements NetworkConstants {
                 int turns = path.getTotalTurns();
                 destinations.add(new ChoiceItem(player.getEurope().getName() + " (" + turns + ")", player.getEurope()));
             } else if (unit.getTile() != null
-                    && (unit.getTile().canMoveToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
+                       && (unit.getTile().canMoveToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
                 destinations.add(new ChoiceItem(player.getEurope().getName() + " (0)", player.getEurope()));
             }
         }
@@ -646,24 +646,24 @@ public final class InGameController implements NetworkConstants {
 
         // Search for destinations we can reach:
         map.search(unit, new GoalDecider() {
-            public PathNode getGoal() {
-                return null;
-            }
-
-            public boolean check(Unit u, PathNode p) {
-                if (p.getTile().getSettlement() != null && p.getTile().getSettlement().getOwner() == player
-                        && p.getTile().getSettlement() != inSettlement) {
-                    Settlement s = p.getTile().getSettlement();
-                    int turns = p.getTurns();
-                    destinations.add(new ChoiceItem(s.toString() + " (" + turns + ")", s));
+                public PathNode getGoal() {
+                    return null;
                 }
-                return false;
-            }
 
-            public boolean hasSubGoals() {
-                return false;
-            }
-        }, Integer.MAX_VALUE);
+                public boolean check(Unit u, PathNode p) {
+                    if (p.getTile().getSettlement() != null && p.getTile().getSettlement().getOwner() == player
+                        && p.getTile().getSettlement() != inSettlement) {
+                        Settlement s = p.getTile().getSettlement();
+                        int turns = p.getTurns();
+                        destinations.add(new ChoiceItem(s.toString() + " (" + turns + ")", s));
+                    }
+                    return false;
+                }
+
+                public boolean hasSubGoals() {
+                    return false;
+                }
+            }, Integer.MAX_VALUE);
 
         Canvas canvas = freeColClient.getCanvas();
         ChoiceItem choice = (ChoiceItem) canvas
@@ -683,7 +683,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (destination instanceof Europe && unit.getTile() != null
-                && (unit.getTile().canMoveToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
+            && (unit.getTile().canMoveToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
             moveToEurope(unit);
             nextActiveUnit();
         } else {
@@ -866,8 +866,8 @@ public final class InGameController implements NetworkConstants {
         }
         List<Unit> units = europe.getUnitList();
         for(Unit unit : units) {
-        	// Process units that have a trade route and 
-        	//are actually in Europe, not bound to/from
+            // Process units that have a trade route and 
+            //are actually in Europe, not bound to/from
             if (unit.getTradeRoute() != null && unit.isInEurope()) {
                 followTradeRoute(unit);
             }
@@ -876,51 +876,53 @@ public final class InGameController implements NetworkConstants {
     
     private void followTradeRoute(Unit unit) {
         Stop stop = unit.getCurrentStop();
-        if (stop == null) {
+        if (stop == null || stop.getLocation() == null) {
+            freeColClient.getCanvas().showInformationMessage("traderoute.broken",
+                                                             unit.getTradeRoute().getName());
             return;
         }
 
         boolean inEurope = unit.isInEurope();
-        String europeId = (freeColClient.getMyPlayer().getEurope() == null) ? ""
-            : freeColClient.getMyPlayer().getEurope().getId();
-        boolean stopIsEurope = stop.getLocation().getId() == europeId;
         
         // ship has not arrived in europe yet
-        if(stopIsEurope && !inEurope)
-        	return;
+        if (freeColClient.getMyPlayer().getEurope() == stop.getLocation() &&
+            !inEurope) {
+            return;
+        }
         
         // Unit was already in this location at the beginning of the turn
-    	// Allow loading
-    	if(unit.getInitialMovesLeft() == unit.getMovesLeft()){
-        	Stop oldStop = unit.getCurrentStop();
-        	
-        	if(inEurope)
-        		buyTradeGoodsFromEurope(unit);
-        	else
-        		loadTradeGoodsFromColony(unit);
-        	
-        	updateCurrentStop(unit);
-        	// It may happen that the unit may need to wait
-        	// (Not enough goods in warehouse to load yet)
-        	if(oldStop.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()){
-        		unit.setMovesLeft(0);
-        	}
+        // Allow loading
+        if (unit.getInitialMovesLeft() == unit.getMovesLeft()){
+            Stop oldStop = unit.getCurrentStop();
+                
+            if (inEurope) {
+                buyTradeGoodsFromEurope(unit);
+            } else {
+                loadTradeGoodsFromColony(unit);
+            }
+              
+            updateCurrentStop(unit);
+            // It may happen that the unit may need to wait
+            // (Not enough goods in warehouse to load yet)
+            if (oldStop.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()){
+                unit.setMovesLeft(0);
+            }
         } else {
-        	// Has only just arrived, unload and stop here,
-        	//no more moves allowed
-        	logger.info("Trade unit " + unit.getId() + " in route " + unit.getTradeRoute().getName() + " arrives at " + unit.getCurrentStop().getLocation().getLocationName());
-        	
-        	if(inEurope)
-        		sellTradeGoodsInEurope(unit);
-        	else
-        		unloadTradeGoodsToColony(unit);
-        	
-        	unit.setMovesLeft(0);
+            // Has only just arrived, unload and stop here,
+            //no more moves allowed
+            logger.info("Trade unit " + unit.getId() + " in route " + unit.getTradeRoute().getName() + " arrives at " + unit.getCurrentStop().getLocation().getLocationName());
+                
+            if (inEurope) {
+                sellTradeGoodsInEurope(unit);
+            } else {
+                unloadTradeGoodsToColony(unit);
+            }               
+            unit.setMovesLeft(0);
         }
     }
     
     private void loadTradeGoodsFromColony(Unit unit){
-    	Stop stop = unit.getCurrentStop();
+        Stop stop = unit.getCurrentStop();
         Location location = unit.getColony();
 
         logger.info("Trade unit " + unit.getId() + " loading in " + location.getLocationName());
@@ -937,10 +939,10 @@ public final class InGameController implements NetworkConstants {
         while (goodsIterator.hasNext()) {
             Goods goods = goodsIterator.next();
             if (goods.getAmount() < 100) {
-            	for (int index = 0; index < goodsTypesToLoad.size(); index++) {
-            		GoodsType goodsType = goodsTypesToLoad.get(index);
-            		ExportData exportData =   unit.getColony().getExportData(goodsType);
-            		if (goods.getType() == goodsType) {
+                for (int index = 0; index < goodsTypesToLoad.size(); index++) {
+                    GoodsType goodsType = goodsTypesToLoad.get(index);
+                    ExportData exportData =   unit.getColony().getExportData(goodsType);
+                    if (goods.getType() == goodsType) {
                         // complete goods until 100 units
                         // respect the lower limit for TradeRoute
                         int amountPresent = warehouse.getGoodsCount(goodsType) - exportData.getExportLevel();
@@ -955,35 +957,35 @@ public final class InGameController implements NetworkConstants {
                     goodsTypesToLoad.remove(index);
                     break;
                 }
-            }	
+            }   
         }
         
         // load rest of the cargo that should be on board
         //while space is available
         for (GoodsType goodsType : goodsTypesToLoad) {
-        	//  no more space left
-        	if (unit.getSpaceLeft() == 0) {
-        		break;
-        	}
-        	
+            //  no more space left
+            if (unit.getSpaceLeft() == 0) {
+                break;
+            }
+                
             // respect the lower limit for TradeRoute
-        	ExportData exportData =   unit.getColony().getExportData(goodsType);
-        	
+            ExportData exportData =   unit.getColony().getExportData(goodsType);
+                
             int amountPresent = warehouse.getGoodsCount(goodsType) - exportData.getExportLevel();
             
             if(amountPresent > 0){
-            	logger.finest("Automatically loading goods " + goodsType.getName());
-            	loadCargo(new Goods(freeColClient.getGame(), location, goodsType, Math.min(
-                            amountPresent, 100)), unit);
+                logger.finest("Automatically loading goods " + goodsType.getName());
+                loadCargo(new Goods(freeColClient.getGame(), location, goodsType, Math.min(
+                                                                                           amountPresent, 100)), unit);
             }
         }
-    	
+        
     }
     
     private void unloadTradeGoodsToColony(Unit unit){
-    	Stop stop = unit.getCurrentStop();
+        Stop stop = unit.getCurrentStop();
         Location location = unit.getColony();
-    	
+        
         logger.info("Trade unit " + unit.getId() + " unloading in " + location.getLocationName());
         
         GoodsContainer warehouse = location.getGoodsContainer();
@@ -999,36 +1001,36 @@ public final class InGameController implements NetworkConstants {
             boolean toKeep = false;
             
             for (int index = 0; index < goodsTypesToKeep.size(); index++) {
-            	
-            	GoodsType goodsType = goodsTypesToKeep.get(index);
-        		if (goods.getType() == goodsType) {
-            		// remove item: other items of the same type
-        			// may or may not be present
-        			goodsTypesToKeep.remove(index);
+                
+                GoodsType goodsType = goodsTypesToKeep.get(index);
+                if (goods.getType() == goodsType) {
+                    // remove item: other items of the same type
+                    // may or may not be present
+                    goodsTypesToKeep.remove(index);
                     toKeep = true;
                     break;
-        		}
+                }
             }
-        	
+                
             // Cargo should be kept
-        	if(toKeep)
-        		continue;
-        	
-        	// do not unload more than the warehouse can store
-        	int capacity = ((Colony) location).getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
-        	if (capacity < goods.getAmount() &&
-        			!freeColClient.getCanvas().showConfirmDialog(Messages.message("traderoute.warehouseCapacity",
+            if(toKeep)
+                continue;
+                
+            // do not unload more than the warehouse can store
+            int capacity = ((Colony) location).getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
+            if (capacity < goods.getAmount() &&
+                !freeColClient.getCanvas().showConfirmDialog(Messages.message("traderoute.warehouseCapacity",
                                                                               "%unit%", unit.getName(),
                                                                               "%colony%", ((Colony) location).getName(),
                                                                               "%amount%", String.valueOf(goods.getAmount() - capacity),
                                                                               "%goods%", goods.getName()),
                                                              "yes", "no")) {
-        		logger.finest("Automatically unloading " + capacity + " " + goods.getName());
-        		unloadCargo(new Goods(freeColClient.getGame(), unit, goods.getType(), capacity));
-        	} else {
-        		logger.finest("Automatically unloading " + goods.getAmount() + " " + goods.getName());
-        		unloadCargo(goods);
-        	}
+                logger.finest("Automatically unloading " + capacity + " " + goods.getName());
+                unloadCargo(new Goods(freeColClient.getGame(), unit, goods.getType(), capacity));
+            } else {
+                logger.finest("Automatically unloading " + goods.getAmount() + " " + goods.getName());
+                unloadCargo(goods);
+            }
         }
     }
     
@@ -1043,7 +1045,7 @@ public final class InGameController implements NetworkConstants {
             Goods goods = goodsIterator.next();
             boolean toKeep = false;
             for (int index = 0; index < goodsTypesToLoad.size(); index++) {
-            	GoodsType goodsType = goodsTypesToLoad.get(index);
+                GoodsType goodsType = goodsTypesToLoad.get(index);
                 if (goods.getType() == goodsType) {
                     // remove item: other items of the same type
                     // may or may not be present
@@ -1053,7 +1055,7 @@ public final class InGameController implements NetworkConstants {
                 }
             }
             if(toKeep)
-            	continue;
+                continue;
             
             // this type of goods was not in the cargo list
             logger.finest("Automatically unloading " + goods.getName());
@@ -1071,7 +1073,7 @@ public final class InGameController implements NetworkConstants {
         while (goodsIterator.hasNext()) {
             Goods goods = goodsIterator.next();
             for (int index = 0; index < goodsTypesToLoad.size(); index++) {
-            	GoodsType goodsType = goodsTypesToLoad.get(index);
+                GoodsType goodsType = goodsTypesToLoad.get(index);
                 if (goods.getType() == goodsType) {
                     if (goods.getAmount() < 100) {
                         logger.finest("Automatically loading goods " + goods.getName());
@@ -1198,11 +1200,11 @@ public final class InGameController implements NetworkConstants {
         nextModelMessage();
 
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                freeColClient.getActionManager().update();
-                freeColClient.getCanvas().updateJMenuBar();
-            }
-        });
+                public void run() {
+                    freeColClient.getActionManager().update();
+                    freeColClient.getCanvas().updateJMenuBar();
+                }
+            });
     }
 
 
@@ -1274,7 +1276,7 @@ public final class InGameController implements NetworkConstants {
     private void spy(Unit unit, Direction direction) {
         Game game = freeColClient.getGame();
         Colony colony = game.getMap().getNeighbourOrNull(direction,
-                unit.getTile()).getColony();
+                                                         unit.getTile()).getColony();
 
         Element spyElement = Message.createNewRootElement("spySettlement");
         spyElement.setAttribute("unit", unit.getId());
@@ -1311,7 +1313,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getGUI().setFocusImmediately(unit.getTile().getPosition());
         
         if (freeColClient.getCanvas().showConfirmDialog("exploreLostCityRumour.text", "exploreLostCityRumour.yes",
-                "exploreLostCityRumour.no")) {
+                                                        "exploreLostCityRumour.no")) {
             reallyMove(unit, direction);
         }
     }
@@ -1725,7 +1727,7 @@ public final class InGameController implements NetworkConstants {
 
         if (unit.getTile().isLand() && !unit.getOwner().isNewLandNamed()) {
             String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getNewLandName(),
-                    "newLand.yes", null);
+                                                        "newLand.yes", null);
             unit.getOwner().setNewLandName(newLandName);
             Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
             setNewLandNameElement.setAttribute("newLandName", newLandName);
@@ -1748,10 +1750,10 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (unit.getTile().getSettlement() != null && unit.isCarrier() && unit.getTradeRoute() == null
-                && (unit.getDestination() == null || unit.getDestination().getTile() == unit.getTile())) {
+            && (unit.getDestination() == null || unit.getDestination().getTile() == unit.getTile())) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
         } else if (unit.getMovesLeft() <= 0 || unit.isDisposed()) {
-        	nextActiveUnit(unit.getTile()); 
+            nextActiveUnit(unit.getTile()); 
         } 
 
         nextModelMessage();
@@ -1958,7 +1960,7 @@ public final class InGameController implements NetworkConstants {
             if (result == CombatResultType.DONE_SETTLEMENT) {
                 freeColClient.playSound(SoundEffect.CAPTURED_BY_ARTILLERY);
             } else if (defender.isNaval() && result == CombatResultType.GREAT_WIN 
-                    || unit.isNaval() && result == CombatResultType.GREAT_LOSS) {
+                       || unit.isNaval() && result == CombatResultType.GREAT_LOSS) {
                 freeColClient.playSound(SoundEffect.SUNK);
             } else if (unit.isNaval()) {
                 freeColClient.playSound(SoundEffect.ATTACK_NAVAL);
@@ -1993,11 +1995,11 @@ public final class InGameController implements NetworkConstants {
                 
                 String nation = defender.getOwner().getNationAsString();
                 ModelMessage message = new ModelMessage(convert,
-                                                "model.unit.newConvertFromAttack",
-                                                new String[][] {
+                                                        "model.unit.newConvertFromAttack",
+                                                        new String[][] {
                                                             {"%nation%", nation},
                                                             {"%unit%", convert.getName()}},
-                                                ModelMessage.MessageType.UNIT_ADDED);
+                                                        ModelMessage.MessageType.UNIT_ADDED);
                 freeColClient.getMyPlayer().addModelMessage(message);
                 nextModelMessage();
             }
@@ -2009,8 +2011,8 @@ public final class InGameController implements NetworkConstants {
             }
                 
             if (!defender.isDisposed()
-                    && ((result == CombatResultType.DONE_SETTLEMENT && unitElement != null)
-                            || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
+                && ((result == CombatResultType.DONE_SETTLEMENT && unitElement != null)
+                    || defender.getLocation() == null || !defender.isVisibleTo(freeColClient.getMyPlayer()))) {
                 defender.dispose();
             }
  
@@ -2243,7 +2245,7 @@ public final class InGameController implements NetworkConstants {
         Element loadCargoElement = Message.createNewRootElement("loadCargo");
         loadCargoElement.setAttribute("carrier", carrier.getId());
         loadCargoElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), loadCargoElement
-                .getOwnerDocument()));
+                                                        .getOwnerDocument()));
 
         goods.loadOnto(carrier);
 
@@ -2282,7 +2284,7 @@ public final class InGameController implements NetworkConstants {
 
         Element unloadCargoElement = Message.createNewRootElement("unloadCargo");
         unloadCargoElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), unloadCargoElement
-                .getOwnerDocument()));
+                                                          .getOwnerDocument()));
 
         if (!dump && goods.getLocation() instanceof Unit &&
             ((Unit) goods.getLocation()).getColony() != null) {
@@ -2317,7 +2319,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (carrier.getOwner() != myPlayer
-                || (carrier.getSpaceLeft() <= 0 && (carrier.getGoodsContainer().getGoodsCount(type) % 100 == 0))) {
+            || (carrier.getSpaceLeft() <= 0 && (carrier.getGoodsContainer().getGoodsCount(type) % 100 == 0))) {
             return;
         }
 
@@ -2363,7 +2365,7 @@ public final class InGameController implements NetworkConstants {
 
         Element sellGoodsElement = Message.createNewRootElement("sellGoods");
         sellGoodsElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), sellGoodsElement
-                .getOwnerDocument()));
+                                                        .getOwnerDocument()));
 
         player.getMarket().sell(goods, player);
         freeColClient.getCanvas().updateGoldLabel();
@@ -2447,7 +2449,7 @@ public final class InGameController implements NetworkConstants {
         client.sendAndWait(equipUnitElement);
 
         if (unit.getLocation() instanceof Colony || unit.getLocation() instanceof Building
-                || unit.getLocation() instanceof ColonyTile) {
+            || unit.getLocation() instanceof ColonyTile) {
             putOutsideColony(unit);
         } else if (carrier != null) {
             boardShip(unit, carrier);
@@ -2686,7 +2688,7 @@ public final class InGameController implements NetworkConstants {
             return; // Don't bother (and don't log, this is not exceptional)
         }
         if (state == UnitState.FORTIFYING && unit.isOffensiveUnit() &&
-                !unit.hasAbility("model.ability.piracy")) { // check if it's going to occupy a work tile
+            !unit.hasAbility("model.ability.piracy")) { // check if it's going to occupy a work tile
             Tile tile = unit.getTile();
             if (tile != null && tile.getOwningSettlement() != null) { // check stance with settlement's owner
                 Player myPlayer = unit.getOwner();
@@ -2737,7 +2739,7 @@ public final class InGameController implements NetworkConstants {
             // Ask the user for confirmation, as this is a classic mistake.
             // Canceling a pioneer terrain improvement is a waste of many turns
             ModelMessage message = new ModelMessage(unit, ModelMessage.MessageType.WARNING, unit, 
-                    "model.unit.confirmCancelWork", "%turns%", new Integer(unit.getWorkLeft()).toString());
+                                                    "model.unit.confirmCancelWork", "%turns%", new Integer(unit.getWorkLeft()).toString());
             boolean cancelWork = freeColClient.getCanvas().showConfirmDialog(new ModelMessage[] {message}, "yes", "no");
             if (!cancelWork) {
                 return;
@@ -2791,7 +2793,7 @@ public final class InGameController implements NetworkConstants {
         // getTile() == null : Unit in europe
 
         if (!unit.isAlreadyOnHighSea()
-                && (unit.getTile() == null || canvas.showConfirmDialog("highseas.text", "highseas.yes", "highseas.no"))) {
+            && (unit.getTile() == null || canvas.showConfirmDialog("highseas.text", "highseas.yes", "highseas.no"))) {
             moveToEurope(unit);
             nextActiveUnit();
         } else if (map.getNeighbourOrNull(direction, unit.getTile()) != null) {
@@ -2817,7 +2819,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
-                .getSettlement();
+            .getSettlement();
 
         if (settlement.getLearnableSkill() != null || !settlement.hasBeenVisited()) {
             unit.setMovesLeft(0);
@@ -2887,7 +2889,7 @@ public final class InGameController implements NetworkConstants {
 
         nextActiveUnit(unit.getTile());
     }
-   /**
+    /**
      * Ask for spy the foreign colony, negotiate with the foreign power
      * or attack the colony
      * 
@@ -2914,7 +2916,7 @@ public final class InGameController implements NetworkConstants {
             attack(unit, direction);
             break;
         case FOREIGN_COLONY_NEGOTIATE:
-             negotiate(unit, direction);
+            negotiate(unit, direction);
             break;
         case FOREIGN_COLONY_SPY:
             spy(unit, direction);
@@ -2925,7 +2927,7 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-   /**
+    /**
      * Moves the specified scout into an Indian settlement to speak with the
      * chief or demand a tribute etc. Of course, the scout won't physically get
      * into the village, it will just stay where it is.
@@ -3072,7 +3074,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
-                .getSettlement();
+            .getSettlement();
 
         List<Object> response = canvas.showUseMissionaryDialog(settlement);
         MissionaryAction action = (MissionaryAction) response.get(0);
@@ -3110,16 +3112,16 @@ public final class InGameController implements NetworkConstants {
             String[] data = new String [] {"%nation%",settlement.getOwner().getNationAsString() };
             
             if (success.equals("true")) {
-            	settlement.setMissionary(unit);
-            	
-            	missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
+                settlement.setMissionary(unit);
+                
+                missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
                 
                 canvas.showInformationMessage(missionResponse,settlement,data);
             }
             else{
-            	missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
-            	canvas.showInformationMessage(missionResponse,settlement,data);
-            	unit.dispose();
+                missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
+                canvas.showInformationMessage(missionResponse,settlement,data);
+                unit.dispose();
             }
             nextActiveUnit(); // At this point: unit.getTile() == null
             return;
@@ -3163,11 +3165,11 @@ public final class InGameController implements NetworkConstants {
                 inciteMessage.setAttribute("enemy", ((Player) response.get(1)).getId());
 
                 if (confirmed) {
-                	Player briber = unit.getOwner();
+                    Player briber = unit.getOwner();
                     Player indianNation = settlement.getOwner();
                     Player proposedEnemy = (Player) response.get(1);
-                	
-                	
+                        
+                        
                     briber.modifyGold(-amount);
 
                     // Maybe at this point we can keep track of the fact that
@@ -3471,7 +3473,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void assignTradeRoute(Unit unit) {
         assignTradeRoute(unit,
-                freeColClient.getCanvas().showTradeRouteDialog(unit.getTradeRoute()));
+                         freeColClient.getCanvas().showTradeRouteDialog(unit.getTradeRoute()));
     }
 
     public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
@@ -3697,7 +3699,7 @@ public final class InGameController implements NetworkConstants {
             }
             
             if (canAutoEndTurn && !endingTurn
-                    && freeColClient.getClientOptions().getBoolean(ClientOptions.AUTO_END_TURN)) {
+                && freeColClient.getClientOptions().getBoolean(ClientOptions.AUTO_END_TURN)) {
                 endTurn();
             }
         }
@@ -3782,18 +3784,18 @@ public final class InGameController implements NetworkConstants {
         final ModelMessage[] messages = messageList.toArray(new ModelMessage[0]);
 
         Runnable uiTask = new Runnable() {
-            public void run() {
-                Canvas canvas = freeColClient.getCanvas();
-                if (messageList.size() > 0) {
-                    if (allMessages || messageList.size() > 5) {
-                        canvas.addAsFrame(new ReportTurnPanel(canvas, messages));
-                    } else {
-                        canvas.showModelMessages(messages);
+                public void run() {
+                    Canvas canvas = freeColClient.getCanvas();
+                    if (messageList.size() > 0) {
+                        if (allMessages || messageList.size() > 5) {
+                            canvas.addAsFrame(new ReportTurnPanel(canvas, messages));
+                        } else {
+                            canvas.showModelMessages(messages);
+                        }
                     }
+                    freeColClient.getActionManager().update();
                 }
-                freeColClient.getActionManager().update();
-            }
-        };
+            };
         if (SwingUtilities.isEventDispatchThread()) {
             uiTask.run();
         } else {

@@ -47,7 +47,7 @@ public class RiverSection {
     /**
      * Base numbers used to encode/decode the river style
      */
-    private int[] base = {1, 3, 9, 27};
+    private static int[] base = {1, 3, 9, 27};
     
     /**
      * River magnitude (size) for each direction toward the edges of the tile

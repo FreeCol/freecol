@@ -337,9 +337,9 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         }
 
         /*
-        public void addCargo(int newCargoIndex) {
-            cargo.add(FreeCol.getSpecification().getGoodsType(newCargoIndex));
-        }
+          public void addCargo(int newCargoIndex) {
+          cargo.add(FreeCol.getSpecification().getGoodsType(newCargoIndex));
+          }
         */
 
         public String toString() {
@@ -361,7 +361,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
 
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -387,14 +387,14 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         
         Game game = getGame();
         if (game != null){
-        	if (ownerID.equals(Player.UNKNOWN_ENEMY)) {
-        		owner = game.getUnknownEnemy(); 
-        	} else {
-	            owner = (Player) getGame().getFreeColGameObject(ownerID);
-	            if (owner == null) {
-	                owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
-	            }
-	        }
+            if (ownerID.equals(Player.UNKNOWN_ENEMY)) {
+                owner = game.getUnknownEnemy(); 
+            } else {
+                owner = (Player) getGame().getFreeColGameObject(ownerID);
+                if (owner == null) {
+                    owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
+                }
+            }
         }
         
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
