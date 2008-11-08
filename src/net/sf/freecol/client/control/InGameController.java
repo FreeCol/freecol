@@ -726,21 +726,19 @@ public final class InGameController implements NetworkConstants {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
-
-        // Trade unit is at current stop
-        if (unit.getTradeRoute() != null &&
-            unit.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()) {
-            logger.info("Trade unit " + unit.getId() + " in route " + 
-                        unit.getTradeRoute().getName() + " is at " + 
-                        unit.getCurrentStop().getLocation().getLocationName());
-            followTradeRoute(unit);
-            return;
-        }
-        
         if (unit.getTradeRoute() != null) {
-            logger.info("Unit " + unit.getId() + " is a trade unit in route " +
-                        unit.getTradeRoute().getName() + ", going to " +
-                        unit.getCurrentStop().getLocation().getLocationName());
+            if (unit.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()) {
+                // Trade unit is at current stop
+                logger.info("Trade unit " + unit.getId() + " in route " + 
+                            unit.getTradeRoute().getName() + " is at " + 
+                            unit.getCurrentStop().getLocation().getLocationName());
+                followTradeRoute(unit);
+                return;
+            } else {
+                logger.info("Unit " + unit.getId() + " is a trade unit in route " +
+                            unit.getTradeRoute().getName() + ", going to " +
+                            unit.getCurrentStop().getLocation().getLocationName());
+            }
         } else {
             logger.info("Moving unit " + unit.getId() + " to position "
                         + unit.getDestination().getLocationName());
@@ -909,9 +907,10 @@ public final class InGameController implements NetworkConstants {
                 unit.setMovesLeft(0);
             }
         } else {
-            // Has only just arrived, unload and stop here,
-            //no more moves allowed
-            logger.info("Trade unit " + unit.getId() + " in route " + unit.getTradeRoute().getName() + " arrives at " + unit.getCurrentStop().getLocation().getLocationName());
+            // Has only just arrived, unload and stop here, no more
+            // moves allowed
+            logger.info("Trade unit " + unit.getId() + " in route " + unit.getTradeRoute().getName() +
+                        " arrives at " + unit.getCurrentStop().getLocation().getLocationName());
                 
             if (inEurope) {
                 sellTradeGoodsInEurope(unit);
@@ -950,7 +949,8 @@ public final class InGameController implements NetworkConstants {
                         if (amountPresent > 0) {
                             logger.finest("Automatically loading goods " + goods.getName());
                             int amountToLoad = Math.min(100 - goods.getAmount(), amountPresent);
-                            loadCargo(new Goods(freeColClient.getGame(), location, goods.getType(), amountToLoad), unit);
+                            loadCargo(new Goods(freeColClient.getGame(), location, goods.getType(),
+                                                amountToLoad), unit);
                         }
                     }
                     // remove item: other items of the same type
@@ -970,14 +970,16 @@ public final class InGameController implements NetworkConstants {
             }
                 
             // respect the lower limit for TradeRoute
-            ExportData exportData =   unit.getColony().getExportData(goodsType);
+            ExportData exportData = unit.getColony().getExportData(goodsType);
                 
             int amountPresent = warehouse.getGoodsCount(goodsType) - exportData.getExportLevel();
             
-            if(amountPresent > 0){
+            if (amountPresent > 0){
                 logger.finest("Automatically loading goods " + goodsType.getName());
-                loadCargo(new Goods(freeColClient.getGame(), location, goodsType, Math.min(
-                                                                                           amountPresent, 100)), unit);
+                loadCargo(new Goods(freeColClient.getGame(), location, goodsType,
+                                    Math.min(amountPresent, 100)), unit);
+            } else {
+                logger.finest("Can not load goods due to export settings.");
             }
         }
         
