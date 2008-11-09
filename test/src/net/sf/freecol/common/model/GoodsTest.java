@@ -24,7 +24,11 @@ import java.util.Locale;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.util.test.FreeColTestCase;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class GoodsTest extends FreeColTestCase {
 
@@ -480,4 +484,22 @@ public class GoodsTest extends FreeColTestCase {
         } catch (IllegalStateException e) {
         }
     }
+
+    public void testSerialize() {
+
+        Colony colony = getStandardColony();
+        Goods goods1 = new Goods(getGame(), colony, cottonType, 75);
+        Document document = Message.createNewDocument();
+        Element element = goods1.toXMLElement(null, document, true, true);
+
+        element.setAttribute("ID", "newID");
+        Goods goods2 = new Goods(colony.getGame(), element);
+
+        assertEquals(goods1.getGame(), goods2.getGame());
+        assertEquals(goods1.getLocation(), goods2.getLocation());
+        assertEquals(goods1.getType(), goods2.getType());
+        assertEquals(goods1.getAmount(), goods2.getAmount());
+
+    }
+
 }
