@@ -126,7 +126,7 @@ read the following paragraphs.
 
 FreeCol is written in Java. In order to run, it requires a Java
 Virtual Machine. In theory, FreeCol should run on any platform on
-which a Java Virtual Machine compatible with Sun Java 5 or 6 is
+which a Java Virtual Machine compatible with Sun Java 5 or higher is
 available. In practice, however, things are less clear cut.
 
 FreeCol is known to work with Sun's Java 5 and 6 (which you can get
@@ -710,6 +710,7 @@ orange shields. The letter indicates the current state of the unit:
 \item\verb$P$: the unit is plowing a tile.
 \item\verb$R$: the unit is building a road.
 \item\verb$S$: the unit is a sentry (waiting for transport).
+\item\verb$T$: the unit is following a trade route.
 \item\verb$W$: the unit is waiting for orders (skipped).
 \item\verb$0$: the unit has no moves left.
 \item\verb$#$: the unit's state is unknown (some enemy units).
@@ -1095,7 +1096,8 @@ these goods will be unloaded.
 Note that the ships and wagon trains will take the capacity and
 settings of the warehouses in your colonies into account. They will
 not unload cargo that would be wasted and they will only load goods
-that should not be kept in reserve.
+that should not be kept in reserve. This means that they may wait
+for a long time until a sufficient number of goods becomes available.
 
 As soon as a ship or wagon train reaches the last destination of the
 trade route, it will continue at the first destination.
@@ -1205,6 +1207,20 @@ your \hyperlink{Home Port}{Home Port}.
 As soon as \hyperlink{Hernando de Soto}{Hernando de Soto} has joined
 the \hyperlink{Continental Congress}{Continental Congress}, Lost City
 Rumours always yield positive results.
+
+
+\hypertarget{Exploration}{\subsection{Exploration}}
+
+The original Colonization game awarded exploration points only for the
+discovery of the Pacific Ocean. This is also the default behaviour for
+FreeCol. However, you may choose to play with exploration points, in
+which case you will be awarded exploration points for the discovery of
+a new region of the New World.
+
+A region may be either a large area of land, a mountain range, or a
+river valley. If you discover a region, you will be asked to name it,
+and you will be awarded a number of exploration points depending on
+the size of the region discovered.
 
 
 \hypertarget{Colonies}{\section{Colonies}}
@@ -1456,18 +1472,18 @@ Some buildings have an immediate effect. The
 your colony, and the \hyperlink{Dock}{Docks} enable your colonists to
 go fishing. The effects of these buildings can not be increased by
 workers. In the building box at the top right of the \hyperlink{colony
-panel}{colony panel}, these buildings are shown in parentheses (like
-this: ``(Stockade)'').
+panel}{colony panel}, these buildings are shown in parentheses, like
+this: ``(Stockade)''.
 
-Most buildings do nothing by themselves, but provide workers with a
-place to produce manufactured goods. The \hyperlink{Tobacconist's
-House}{Tobacconist's House}, for example, allows colonists to make
-\hyperlink{Cigars}{Cigars} from \hyperlink{Tobacco}{Tobacco}. Place
-one or more colonists in a building in order to convert raw materials
-to manufactured goods, which can be sold for higher prices. For each
-building, there are expert units that work more effectively than
-\hyperlink{Free Colonist}{Free Colonists}. Other units may work less
-effectively.
+Most buildings do nothing if they are unoccupied, but provide workers
+with a place to produce manufactured goods. The
+\hyperlink{Tobacconist's House}{Tobacconist's House}, for example,
+allows colonists to make \hyperlink{Cigars}{Cigars} from
+\hyperlink{Tobacco}{Tobacco}. Place one or more colonists in a
+building in order to convert raw materials to manufactured goods,
+which can be sold for higher prices. For each building, there are
+expert units that work more effectively than \hyperlink{Free
+  Colonist}{Free Colonists}. Other units may work less effectively.
 
 
 \hypertarget{Building Units and Buildings}{\subsection{Building Units 
@@ -1778,6 +1794,39 @@ each.
 %% \raisebox{-10mm}{\includegraphics{../data/images/units/Unit1.png}} & Master Farmer & 1 & 3 & 0 & 1\\
 %% \raisebox{-10mm}{\includegraphics{../data/images/units/Unit2.png}} & Expert Fisherman & 1 & 3 & 0 & 1\\
 %% \end{longtable}
+
+\hypertarget{Equipment}{\subsection{Equipment}}
+
+Most units can be equipped with tools, horses, muskets, or a
+bible. This equipment grants them certain abilities, which they do not
+possess without that equipment. Certain units are particularly skilled
+with that equipment, but without it they have no special abilities:
+
+\begin{itemize}
+\item Only a unit equipped with tools is able to build roads, plow
+  fields and cut down forests. Even the Hardy Pioneer is unable to do
+  so without suitable equipment.
+
+\item Only a unit equipped with horses is able to scout Indian
+  settlements and foreign colonies. Even the Seasoned Scout can't do
+  that without being mounted.
+
+\item Only a unit equipped with muskets is a soldier. Veteran Soldiers
+  are more effective than other units when equipped with muskets, but
+  without muskets they have no advantage.
+
+\item Only a unit equipped with a bible is commissioned as a
+  missionary and able to establish a mission in an Indian
+  settlement. Even the Jesuit Missionary is unable to do so without a
+  bible. If a Jesuit Missionary is equipped with tools, muskets or
+  horses, he loses his bible. If that happens, the Jesuit Missionary
+  carries his hat, rather than his bible in his hand.
+\end{itemize}
+
+Of course, units that do not represent people, such as ships, wagon
+trains and treasure trains, can not be equipped. The Indian Convert is
+another unit that can not be equipped.
+
 
 \hypertarget{Skills and Education}{\subsection{Skills and Education}}
 
@@ -2190,10 +2239,39 @@ captured. You do not need to destroy the fleet.
 
 At the declaration, colonies with strong support for the Sons of
 Liberty sometimes promote veteran soldiers at work there to
-\Unit{Colonial Regular} in preparation for the coming war.  In the
-future, the European enemies of your Monarch may support your effort
-if you generate a sufficient number of Liberty Bells after the War of
-Independence has begun.
+\hyperlink{Colonial Regular}{Colonial Regular} in preparation for the
+coming war.  In the future, the European enemies of your Monarch may
+support your effort if you generate a sufficient number of Liberty
+Bells after the War of Independence has begun.
+
+
+\hypertarget{Changing the Rules}{\section{Changing the Rules}}
+
+We would like to make FreeCol configurable, so that the game engine
+becomes capable of emulating many similar games. For this purpose,
+we have made many of the game's features configurable.
+
+At some point in the future, we will probably add a special rule set
+editor, but at the moment, your only option is to edit the file
+specification.xml directly. This file defines the abilities of units,
+founding fathers, buildings, terrain types, goods and equipment, for
+example.
+
+This is still work in progress, however, and we are particularly
+interested in hearing about problems caused by changes to the rule
+set. Some dialogs might be unable to display more types of goods than
+are currently defined, for example. Or other dialogs might not
+recognize your new Minuteman unit as an armed unit. Please help us
+improve FreeCol by telling us about such problems.
+
+If you have a working rule set that adds a new flavour to the game, we
+will gladly distribute it along with our default rule set. If you have
+ideas that can not currently be implemented, we will probably try to
+remove these limitations.
+
+If you try to modify the rule set, you are strongly encouraged to
+check whether the result is still valid. You can do this by validating
+the result with the command \verb$ant validate$.
 
 
 \hypertarget{Known bugs}{\section{Known bugs}}
