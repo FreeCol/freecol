@@ -72,6 +72,12 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     // The height of the separator row.
     private static final int separator = 12;
 
+    // The number of columns for military reports
+    private static final int militaryColumns = 9;
+
+    // The number of columns for naval and cargo reports
+    private static final int carrierColumns = 7;
+
     /** The type of a unit report. */
     public static enum ReportType { MILITARY, NAVAL, CARGO }
     
@@ -86,11 +92,9 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     private boolean ignoreEmptyLocations;
 
     /**
-     * The current HIGLayout row.
+     * Where to put the detailPanel.
      */
-    private int row = 1;
-
-    private int locationIndex = 0;
+    private int detailPanelRow;
 
     /**
      * The main data structure.
@@ -106,6 +110,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     private ArrayList<String> otherNames;
 
     private final ReportPanel reportPanel;
+    private final JPanel detailPanel = new JPanel();
 
     private final Player player;
 
@@ -116,13 +121,15 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     private HashMap<UnitType, Integer> dragoons = new HashMap<UnitType, Integer>();
     private HashMap<UnitType, Integer> others = new HashMap<UnitType, Integer>();
 
-    private static final UnitType defaultType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+    private static final UnitType defaultType =
+        FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
 
     /**
-     * Records the total cargo capacity of the fleet (currently
-     * unused).
+     * Records the total cargo capacity of the fleet (currently unused).
      */
     int capacity = 0;
+
+    private JButton detailButton;
 
     /**
      * The constructor that will add the items to this panel.
@@ -136,6 +143,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         this.reportPanel = reportPanel;
         player = parent.getClient().getMyPlayer();
         setOpaque(false);
+        detailPanel.setOpaque(false);
     }
 
     /**
@@ -159,78 +167,90 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         add(createUnitPanel(), higConst.rc(row, labelColumn));
         row += 2;
 
-        JButton detailButton = new JButton(Messages.message("details"));
+        detailButton = new JButton(Messages.message("details"));
         detailButton.setActionCommand("details");
         detailButton.addActionListener(this);
 
+        detailPanelRow = row;
         add(detailButton, higConst.rc(row, labelColumn, "tl"));
-    }
-
-    private void prepareData() {
-        locations = new HashMap<String, ArrayList<Unit>>();
-        colonies = player.getColonies();
-        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
-        colonyNames = new ArrayList<String>();
-        Iterator<Colony> colonyIterator = colonies.iterator();
-        String colonyName;
-        while (colonyIterator.hasNext()) {
-            colonyName = (colonyIterator.next()).getName();
-            colonyNames.add(colonyName);
-        }
-        otherNames = new ArrayList<String>();
     }
 
     private void showDetails() {
 
-        int rowsREF = (reportType == ReportType.CARGO ? 0 : 1);
-        int[] widths = new int[] { 0, 12, 0 };
-        int[] heights = new int[colonies.size() + otherNames.size() + extraRows + rowsREF];
-        heights[1 + rowsREF] = separator;
+        remove(detailButton);
+        detailPanel.removeAll();
 
-        // reset row
-        row = 1;
+        int[] widths;
+        int[] heights;
+        if (reportType == ReportType.MILITARY) {
+            int rows = 0;
+            for (ArrayList<Unit> units : locations.values()) {
+                if (units == null || units.isEmpty()) {
+                    if (!ignoreEmptyLocations) {
+                        rows++;
+                    }
+                } else {
+                    rows += units.size() / militaryColumns;
+                    if (units.size() % militaryColumns != 0) {
+                        rows++;
+                    }
+                }
+            }
 
-        removeAll();
-        setLayout(new HIGLayout(widths, heights));
+            widths = new int[2 + militaryColumns];
+            heights = new int[rows];
+        } else {
+            int rows = 0;
+            int cargoColumns = carrierColumns - 1;
+            for (ArrayList<Unit> units : locations.values()) {
+                if (units == null || units.isEmpty()) {
+                    if (!ignoreEmptyLocations) {
+                        rows++;
+                    }
+                } else {
+                    for (Unit unit : units) {
+                        int cargo = unit.getGoodsCount() + unit.getUnitCount();
+                        if (cargo == 0) {
+                            rows++;
+                        } else {
+                            rows += cargo / cargoColumns;
+                            if (cargo % cargoColumns != 0) {
+                                rows++;
+                            }
+                        }
+                    }
+                }
+            }
+            widths = new int[2 + carrierColumns];
+            heights = new int[rows];
+        }            
 
-        // REF
-        if (reportType != ReportType.CARGO) {
-            add(createREFPanel(), higConst.rc(row, unitColumn));
-            row++;
-        }
-        add(createUnitPanel(), higConst.rc(row, unitColumn));
-        row += 2;
+        widths[1] = separator; // margin
+        detailPanel.setLayout(new HIGLayout(widths, heights));
 
-        JButton detailButton = new JButton(Messages.message("details"));
-        detailButton.setActionCommand("details");
-        detailButton.addActionListener(this);
-        
-        // reset location index
-        locationIndex = 0;
-
+        int row = 1;
         // colonies first, sorted according to user preferences
-        Iterator<String> locationIterator = colonyNames.iterator();
-        while (locationIterator.hasNext()) {
-            handleLocation(locationIterator.next(), true);
+        for (String locationName : colonyNames) {
+            row = handleLocation(locationName, true, row);
         }
 
         // Europe next
         if (player.getEurope() != null) {
-            if (locations.get(player.getEurope().getLocationName()) != null) {
-                handleLocation(player.getEurope().getLocationName(), true);
+            String europeName = player.getEurope().getLocationName();
+            if (locations.get(europeName) != null) {
+                row = handleLocation(europeName, true, row);
             }
-            otherNames.remove(player.getEurope().getLocationName());
+            otherNames.remove(europeName);
         }
 
         // finally all other locations, sorted alphabetically
         Collections.sort(otherNames);
-        locationIterator = otherNames.iterator();
-        while (locationIterator.hasNext()) {
-            handleLocation(locationIterator.next(), false);
+        for (String locationName : otherNames) {
+            row = handleLocation(locationName, false, row);
         }
 
+        add(detailPanel, higConst.rc(detailPanelRow, labelColumn));
         revalidate();
-        //repaint();
     }
 
     private int getCount(HashMap<UnitType, Integer> hash, UnitType unitType) {
@@ -252,7 +272,15 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     }
 
     private void gatherData() {
-        prepareData();
+        locations = new HashMap<String, ArrayList<Unit>>();
+        colonies = player.getColonies();
+        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
+        colonyNames = new ArrayList<String>();
+        for (Colony colony : colonies) {
+            colonyNames.add(colony.getName());
+        }
+        otherNames = new ArrayList<String>();
+
         for (Unit unit : player.getUnits()) {
             switch(reportType) {
             case CARGO:
@@ -316,7 +344,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         Element refUnits = parent.getClient().getInGameController().getREFUnits();
         List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
         List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
-        if (refUnits!=null) {
+        if (refUnits != null) {
             NodeList childElements = refUnits.getChildNodes();
             for (int index = 0; index < childElements.getLength(); index++) {
                 AbstractUnit unit = new AbstractUnit();
@@ -331,12 +359,12 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
         JPanel refPanel = null;
         if (reportType == ReportType.NAVAL) {
-            refPanel = new JPanel(new GridLayout(1, 6));
+            refPanel = new JPanel(new GridLayout(1, navalUnits.size()));
             for (AbstractUnit unit : navalUnits) {
                 refPanel.add(createUnitTypeLabel(unit.getUnitType(), Role.DEFAULT, unit.getNumber()));
             }
         } else if (reportType == ReportType.MILITARY) {
-            refPanel = new JPanel(new GridLayout(1, 8));
+            refPanel = new JPanel(new GridLayout(1, landUnits.size()));
             for (AbstractUnit unit : landUnits) {
                 refPanel.add(createUnitTypeLabel(unit.getUnitType(), unit.getRole(), unit.getNumber()));
             }
@@ -350,13 +378,14 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     }
 
     private JPanel createUnitPanel() {
-        JPanel unitPanel = new JPanel(new GridLayout(0, 8));
+        JPanel unitPanel = new JPanel();
+        List<AbstractUnit> units = new ArrayList<AbstractUnit>();
         switch (reportType) {
         case CARGO:
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
                 if (unitType.isAvailableTo(player) && 
                     (unitType.canCarryUnits() || unitType.canCarryGoods())) {
-                    unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
+                    units.add(new AbstractUnit(unitType, Role.DEFAULT, getCount(others, unitType)));
                 }
             }
             break;
@@ -364,94 +393,125 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
                 if (unitType.isAvailableTo(player) &&
                     unitType.hasAbility("model.ability.navalUnit")) {
-                    unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)));
+                    units.add(new AbstractUnit(unitType, Role.DEFAULT, getCount(others, unitType)));
                 }
             }
             break;
         case MILITARY:
-            int otherCount = 0;
-            int dragoonCount = 0;
-            List<UnitType> unitTypes = new ArrayList<UnitType>();
+            List<AbstractUnit> dragoonUnits = new ArrayList<AbstractUnit>();
+            List<AbstractUnit> soldierUnits = new ArrayList<AbstractUnit>();
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
                 if (unitType.isAvailableTo(player) &&
                     !unitType.hasAbility("model.ability.navalUnit") && 
                     (unitType.hasAbility("model.ability.expertSoldier") ||
                      unitType.getOffence() > 0)) {
                     if (unitType.hasAbility("model.ability.canBeEquipped")) {
-                        unitPanel.add(createUnitTypeLabel(unitType, Role.DRAGOON, getCount(dragoons, unitType)),
-                                      otherCount + dragoonCount);
-                        dragoonCount++;
-                        unitPanel.add(createUnitTypeLabel(unitType, Role.SOLDIER, getCount(soldiers, unitType)), -1);
+                        dragoonUnits.add(new AbstractUnit(unitType, Role.DRAGOON, getCount(dragoons, unitType)));
+                        soldierUnits.add(new AbstractUnit(unitType, Role.SOLDIER, getCount(soldiers, unitType)));
                     } else {
-                        unitPanel.add(createUnitTypeLabel(unitType, Role.DEFAULT, getCount(others, unitType)),
-                                      otherCount);
-                        otherCount++;
+                        units.add(new AbstractUnit(unitType, Role.DEFAULT, getCount(others, unitType)));
                     }
                 }
             }
-            unitPanel.add(createUnitTypeLabel(defaultType, Role.DRAGOON, getCount(dragoons, defaultType)),
-                          otherCount + dragoonCount);
-            unitPanel.add(createUnitTypeLabel(defaultType, Role.SOLDIER, getCount(soldiers, defaultType)), -1);
+            dragoonUnits.add(new AbstractUnit(defaultType, Role.DRAGOON, getCount(dragoons, defaultType)));
+            soldierUnits.add(new AbstractUnit(defaultType, Role.SOLDIER, getCount(soldiers, defaultType)));
+            units.addAll(dragoonUnits);
+            units.addAll(soldierUnits);
         }
         if (unitPanel != null) {
             unitPanel.setOpaque(false);
             unitPanel.setBorder(BorderFactory.createTitledBorder(player.getNationAsString()));
+            unitPanel.setLayout(new GridLayout(1, units.size()));
+            for (AbstractUnit unit : units) {
+                unitPanel.add(createUnitTypeLabel(unit));
+            }
         }
         return unitPanel;
     }
 
 
-    private void handleLocation(String location, boolean makeButton) {
+    private int handleLocation(String location, boolean makeButton, int row) {
         List<Unit> unitList = locations.get(location);
         if (!(unitList == null && ignoreEmptyLocations)) {
             if (makeButton) {
                 JButton locationButton = FreeColPanel.getLinkButton(location, null, location);
                 locationButton.addActionListener(this);
-                add(locationButton, higConst.rc(row, labelColumn, "lt"));
+                detailPanel.add(locationButton, higConst.rc(row, labelColumn, "lt"));
             } else {
                 JLabel locationLabel = new JLabel(location);
-                add(locationLabel, higConst.rc(row, labelColumn));
+                detailPanel.add(locationLabel, higConst.rc(row, labelColumn));
             }
-            if (unitList != null) {
-                JPanel unitPanel = new JPanel();
-                if (reportType == ReportType.MILITARY) {
-                    unitPanel.setLayout(new GridLayout(0, 9));
-                } else {
-                    unitPanel.setLayout(new GridLayout(0, 7));
-                }
-                unitPanel.setOpaque(false);
+            if (unitList == null) {
+                row++;
+            } else {
                 Collections.sort(unitList, reportPanel.getUnitTypeComparator());
-                Iterator<Unit> unitIterator = unitList.iterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = unitIterator.next();
-                    UnitLabel unitLabel = new UnitLabel(unit, parent, true);
-                    if (unit.getDestination() != null) {
-                        unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText()
-                                + "<br>" + Messages.message("goingTo", "%location%",
-                                unit.getDestination().getLocationName()) + "</html>");
+                if (reportType == ReportType.MILITARY) {
+                    int column = unitColumn - 1;
+                    for (Unit unit : unitList) {
+                        UnitLabel unitLabel = new UnitLabel(unit, parent, true);
+                        if (unit.getDestination() != null) {
+                            String destination = unit.getDestination().getLocationName();
+                            unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" +
+                                                     Messages.message("goingTo", "%location%", destination) +
+                                                     "</html>");
+                        }
+                        if (column == 2 + militaryColumns) {
+                            column = unitColumn - 1;
+                            row++;
+                        } else {
+                            column++;
+                        }
+                        detailPanel.add(unitLabel, higConst.rc(row, column));
                     }
-                    // this is necessary because UnitLabel deselects carriers
-                    unitLabel.setSelected(true);
-                    unitPanel.add(unitLabel);
+                    row++;
+                } else {
+                    // one row for each unit
+                    int column = unitColumn;
+                    for (Unit unit : unitList) {
+                        UnitLabel unitLabel = new UnitLabel(unit, parent, true);
+                        if (unit.getDestination() != null) {
+                            String messageID = unit.isNaval() ? "sailingTo" : "goingTo";
+                            String destination = unit.getDestination().getLocationName();
+                            unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" + 
+                                                     Messages.message(messageID, "%location%",
+                                                                      destination) +
+                                                     "</html>");
+                        }
+                        // this is necessary because UnitLabel deselects carriers
+                        unitLabel.setSelected(true);
+                        detailPanel.add(unitLabel, higConst.rc(row, unitColumn));
                     
-                    Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-                    while (goodsIterator.hasNext()) {
-                        Goods goods = goodsIterator.next();
-                        GoodsLabel goodsLabel = new GoodsLabel(goods, reportPanel.getCanvas());
-                        unitPanel.add(goodsLabel, higConst.rc(row, 1));
-                    }
-                    List<Unit> loadedUnits = unit.getUnitList();
-                    for (Unit unitLoaded : loadedUnits) {
-                        UnitLabel unitLoadedLabel = new UnitLabel(unitLoaded,
-                                reportPanel.getCanvas(), true);
-                        unitPanel.add(unitLoadedLabel, higConst.rc(row, 1));
+                        for (Goods goods : unit.getGoodsList()) {
+                            GoodsLabel goodsLabel = new GoodsLabel(goods, reportPanel.getCanvas());
+                            if (column == 2 + carrierColumns) {
+                                column = unitColumn;
+                                row++;
+                            } else {
+                                column++;
+                            }
+                            detailPanel.add(goodsLabel, higConst.rc(row, column));
+                        }
+                        for (Unit unitLoaded : unit.getUnitList()) {
+                            UnitLabel unitLoadedLabel = new UnitLabel(unitLoaded,
+                                                                      reportPanel.getCanvas(), true);
+                            if (column == 2 + carrierColumns) {
+                                column = unitColumn + 1;
+                                row++;
+                            } else {
+                                column++;
+                            }
+                            detailPanel.add(unitLoadedLabel, higConst.rc(row, column));
+                        }
+                        row++;
                     }
                 }
-                add(unitPanel, higConst.rc(row, unitColumn, "l"));
             }
-            row++;
         }
-        locationIndex++;
+        return row;
+    }
+
+    private JLabel createUnitTypeLabel(AbstractUnit unit) {
+        return createUnitTypeLabel(unit.getUnitType(), unit.getRole(), unit.getNumber());
     }
 
     private JLabel createUnitTypeLabel(UnitType unitType, Role role, int count) {

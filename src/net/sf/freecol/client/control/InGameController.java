@@ -979,7 +979,7 @@ public final class InGameController implements NetworkConstants {
                 loadCargo(new Goods(freeColClient.getGame(), location, goodsType,
                                     Math.min(amountPresent, 100)), unit);
             } else {
-                logger.finest("Can not load goods due to export settings.");
+                logger.finest("Can not load " + goodsType.getName() + " due to export settings.");
             }
         }
         

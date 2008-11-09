@@ -62,7 +62,12 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     private static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
         public int compare(Unit unit1, Unit unit2) {
-            return unit2.getType().getIndex() - unit1.getType().getIndex();
+            int deltaType = unit2.getType().getIndex() - unit1.getType().getIndex();
+            if (deltaType == 0) {
+                return unit2.getRole().ordinal() - unit1.getRole().ordinal();
+            } else {
+                return deltaType;
+            }
         }
     };
 
