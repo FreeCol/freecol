@@ -230,6 +230,7 @@ public final class ImageLibrary extends ImageProvider {
         scaledLibrary.settlements = scaleImages(settlements, scalingFactor);
         //scaledLibrary.monarch = scaleImages(monarch);
         scaledLibrary.monarch = new HashMap<Nation, ImageIcon>(monarch);
+        scaledLibrary.coatOfArms = new HashMap<Nation, ImageIcon>(coatOfArms);
 
         scaledLibrary.terrain1 = scaleImages(terrain1, scalingFactor);
         scaledLibrary.terrain2 = scaleImages(terrain2, scalingFactor);
