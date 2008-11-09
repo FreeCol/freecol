@@ -61,10 +61,8 @@ import cz.autel.dmi.HIGLayout;
  * Allows the user to edit trade routes.
  */
 public final class TradeRouteInputDialog extends FreeColDialog implements ActionListener {
+
     private static final Logger logger = Logger.getLogger(TradeRouteInputDialog.class.getName());
-
-
-
 
     private static final int OK = 0, CANCEL = 1;
 
@@ -365,10 +363,12 @@ public final class TradeRouteInputDialog extends FreeColDialog implements Action
     public class GoodsPanel extends JPanel {
 
         public GoodsPanel() {
-            super(new GridLayout(4, 4, margin, margin));
+            super(new GridLayout(5, 5, margin, margin));
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-                CargoLabel label = new CargoLabel(goodsType);
-                add(label);
+                if (goodsType.isStorable()) {
+                    CargoLabel label = new CargoLabel(goodsType);
+                    add(label);
+                }
             }
             setOpaque(false);
             setBorder(BorderFactory.createTitledBorder(Messages.message("goods")));
