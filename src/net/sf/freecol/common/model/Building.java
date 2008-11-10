@@ -667,8 +667,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return 0;
         }
         int surplus = available;
+        // we need to take into consideration the residents consumption
         if (getGoodsInputType().isFoodType()) {
-            surplus -= colony.getFoodConsumption();
+            surplus -= colony.getFoodConsumptionByType(getGoodsInputType());
             if (surplus <= 0) {
                 return 0;
             }

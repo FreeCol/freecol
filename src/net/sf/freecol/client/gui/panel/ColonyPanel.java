@@ -744,10 +744,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         // The food that is used. If not enough food is produced, the
         // complete production.  Horses consume 1 food each, so they
         // need to be added to the used food.
-            
+        
+        //Fish should be consumed preferably, to allow surplus for production of horses
         final int usedFood = Math.min(humanFoodConsumption, foodProduction) + horsesProduced;
-        final int usedCorn = Math.min(usedFood, foodFarmsProduction);
-        final int usedFish = Math.max(usedFood - usedCorn, 0);
+        final int usedFish = colony.getFoodConsumptionByType(Goods.FISH);
+        final int usedCorn = Math.max(usedFood - usedFish, 0);
+        
         if( usedFish == 0 ) {
             productionPanel.add(new ProductionLabel(Goods.FOOD, usedFood, parent));
         } else {
