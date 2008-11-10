@@ -1480,7 +1480,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             int potential = getTileTypePotential(getType(), goodsType, null, getFishBonus())
                 + tileItemContainer.getImprovementBonusPotential(goodsType);
             if (resource.useQuantity(goodsType, potential) == 0) {
-                addModelMessage(this, ModelMessage.MessageType.WARNING,
+                addModelMessage(settlement, ModelMessage.MessageType.WARNING,
                                 "model.tile.resourceExhausted", 
                                 "%resource%", resource.getName(),
                                 "%colony%", ((Colony) settlement).getName());
