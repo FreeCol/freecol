@@ -1484,6 +1484,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                 "model.tile.resourceExhausted", 
                                 "%resource%", resource.getName(),
                                 "%colony%", ((Colony) settlement).getName());
+                tileItemContainer.clearResource();
+                updatePlayerExploredTiles();
             }
         }
     }
