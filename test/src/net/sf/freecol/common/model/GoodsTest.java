@@ -195,11 +195,11 @@ public class GoodsTest extends FreeColTestCase {
         GoodsType horses = FreeCol.getSpecification().getGoodsType("model.goods.horses");
         GoodsType hammers = FreeCol.getSpecification().getGoodsType("model.goods.hammers");
         GoodsType tools = FreeCol.getSpecification().getGoodsType("model.goods.tools");
+        GoodsType fish = FreeCol.getSpecification().getGoodsType("model.goods.fish");
+        GoodsType food = FreeCol.getSpecification().getGoodsType("model.goods.food");
+        GoodsType ore = FreeCol.getSpecification().getGoodsType("model.goods.ore");
+        GoodsType lumber = FreeCol.getSpecification().getGoodsType("model.goods.lumber");
         
-        assertFalse(bells.isBuildingMaterial());
-        assertFalse(crosses.isBuildingMaterial());
-        assertFalse(cloth.isBuildingMaterial());
-        assertFalse(cotton.isBuildingMaterial());
         // for EquipmentType horses
         assertTrue(horses.isBuildingMaterial());
         // for EquipmentType muskets
@@ -207,7 +207,31 @@ public class GoodsTest extends FreeColTestCase {
         // for buildings and units
         assertTrue(hammers.isBuildingMaterial());
         assertTrue(tools.isBuildingMaterial());
-    }
+        
+        // other goods not involved in construction, or not directly involved
+        assertFalse(bells.isBuildingMaterial());
+        assertFalse(crosses.isBuildingMaterial());
+        assertFalse(cloth.isBuildingMaterial());
+        assertFalse(cotton.isBuildingMaterial());
+        assertFalse(fish.isBuildingMaterial());
+        assertFalse(food.isBuildingMaterial());
+        assertFalse(ore.isBuildingMaterial());
+        assertFalse(lumber.isBuildingMaterial());
+        
+        // checking raw materials
+        assertTrue(ore.isRawBuildingMaterial());
+        assertTrue(lumber.isRawBuildingMaterial());
+        assertTrue(tools.isRawBuildingMaterial());  // ? why ?
+        assertTrue(food.isRawBuildingMaterial());   // ? why ?
+        assertFalse(fish.isRawBuildingMaterial());  // ? why not the same as food ?
+        assertFalse(horses.isRawBuildingMaterial());
+        assertFalse(muskets.isRawBuildingMaterial());
+        assertFalse(hammers.isRawBuildingMaterial());
+        assertFalse(bells.isRawBuildingMaterial());
+        assertFalse(crosses.isRawBuildingMaterial());
+        assertFalse(cloth.isRawBuildingMaterial());
+        assertFalse(cotton.isRawBuildingMaterial());
+   }
 
     public void testSetGetLocation() {
         Game game = getStandardGame();
