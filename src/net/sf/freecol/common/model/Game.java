@@ -871,7 +871,7 @@ public class Game extends FreeColGameObject {
         logger.info("Turn is now " + turn.toString());
 
         for (Player player : players) {
-            logger.finer("Calling newTurn for player " + player.getName());
+            logger.info("Calling newTurn for player " + player.getName());
             player.newTurn();
         }
 

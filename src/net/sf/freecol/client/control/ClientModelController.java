@@ -84,9 +84,9 @@ public class ClientModelController implements ModelController {
         getRandomElement.setAttribute("taskID", taskID);
         getRandomElement.setAttribute("n", Integer.toString(n));
 
-        logger.info("TaskID is " + taskID + " Waiting for the server to reply...");
+        //logger.info("TaskID is " + taskID + " Waiting for the server to reply...");
         Element reply = client.ask(getRandomElement);
-        logger.info("Reply received from server.");
+        //logger.info("Reply received from server.");
 
         if (!reply.getTagName().equals("getRandomConfirmed")) {
             logger.warning("Wrong tag name.");

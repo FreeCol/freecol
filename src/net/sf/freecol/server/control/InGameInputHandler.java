@@ -583,13 +583,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element getRandom(Connection connection, Element element) {
-        logger.info("Receiving \"getRandom\"-request.");
+        //logger.info("Receiving \"getRandom\"-request.");
         String taskID = element.getAttribute("taskID");
         int n = Integer.parseInt(element.getAttribute("n"));
         int result = getFreeColServer().getModelController().getRandom(taskID, n);
         Element reply = Message.createNewRootElement("getRandomConfirmed");
         reply.setAttribute("result", Integer.toString(result));
-        logger.info("Result: " + result);
+        //logger.info("Result: " + result);
         return reply;
     }
 
