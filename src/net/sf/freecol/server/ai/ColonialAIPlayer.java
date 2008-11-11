@@ -251,7 +251,7 @@ public abstract class ColonialAIPlayer extends EuropeanAIPlayer {
                                                              getPlayer().getColonyValue(colonyTile));
                     aiUnit.setMission(mission);
 
-                    boolean isUnitOnCarrier = aiUnit.getUnit().getLocation() instanceof Unit;
+                    boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier();
                     if (isUnitOnCarrier) {
                         AIUnit carrier = (AIUnit) getAIMain().getAIObject(
                                                                           (FreeColGameObject) aiUnit.getUnit().getLocation());

@@ -1105,7 +1105,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return 0;
         }
 
-        if (getLocation() instanceof Unit) {
+        if (isOnCarrier()) {
             Location dest = getDestination();
             setDestination(end);
             PathNode p = getGame().getMap().findPath(this, start, end, (Unit) getLocation());
@@ -1140,7 +1140,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 return 0;
             }
             final PathNode p;
-            if (getLocation() instanceof Unit) {
+            if (isOnCarrier()) {
                 final Unit carrier = (Unit) getLocation();
                 p = getGame().getMap().findPath(this, (Tile) carrier.getEntryLocation(), destination.getTile(), carrier);
             } else {
@@ -1627,7 +1627,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         setState(UnitState.ACTIVE);
     }
-
+    
+    /**
+     * Verifies if the unit is aboard a carrier
+     */
+    public boolean isOnCarrier(){
+    	return(this.getLocation() instanceof Unit);
+    }
+    
     /**
      * Sets the given state to all the units that si beeing carried.
      * 
@@ -1813,7 +1820,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             && player.canSee(getTile())
             && (getTile().getSettlement() == null || getTile().getSettlement().getOwner() == player || (!getGameOptions()
                                                                                                         .getBoolean(GameOptions.UNIT_HIDING) && getLocation() instanceof Tile))
-            && (!(getLocation() instanceof Unit) || ((Unit) getLocation()).getOwner() == player || !getGameOptions()
+            && (!isOnCarrier() || ((Unit) getLocation()).getOwner() == player || !getGameOptions()
                 .getBoolean(GameOptions.UNIT_HIDING));
     }
 

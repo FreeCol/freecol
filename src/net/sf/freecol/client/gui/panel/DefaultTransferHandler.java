@@ -170,14 +170,14 @@ public final class DefaultTransferHandler extends TransferHandler {
                   If not, assume that the user wished to drop the unit/cargo on the panel below.
                 */
                 if (((UnitLabel) comp).getUnit().isCarrier() && ((UnitLabel) comp).getParent() instanceof EuropePanel.InPortPanel) {
-                    if (data instanceof UnitLabel && ((UnitLabel) data).getUnit().getLocation() instanceof Unit
+                    if (data instanceof UnitLabel && ((UnitLabel) data).getUnit().isOnCarrier()
                             || data instanceof GoodsLabel && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
                         oldSelectedUnit = ((EuropePanel) parentPanel).getSelectedUnitLabel();
                     }
                     ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
                     comp = ((EuropePanel) parentPanel).getCargoPanel();
                 } else if (((UnitLabel) comp).getUnit().isCarrier() && ((UnitLabel) comp).getParent() instanceof ColonyPanel.InPortPanel) {
-                    if (data instanceof UnitLabel && ((UnitLabel) data).getUnit().getLocation() instanceof Unit
+                    if (data instanceof UnitLabel && ((UnitLabel) data).getUnit().isOnCarrier()
                             || data instanceof GoodsLabel && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
                         oldSelectedUnit = ((ColonyPanel) parentPanel).getSelectedUnitLabel();
                     }

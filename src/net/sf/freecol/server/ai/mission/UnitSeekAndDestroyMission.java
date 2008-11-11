@@ -130,7 +130,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         }
         
         PathNode pathToTarget = null;
-        if (unit.getLocation() instanceof Unit) {
+        if (unit.isOnCarrier()) {
             if (unit.getTile() == null) {
                 pathToTarget = null;
             } else {
@@ -284,7 +284,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         Tile dropTarget = target.getTile();
         if (getUnit().getTile() == null) {
             return dropTarget;
-        } else if (getUnit().getLocation() instanceof Unit) {
+        } else if (getUnit().isOnCarrier()) {
             PathNode p = getDisembarkPath(getUnit(), 
                     getUnit().getTile(), 
                     target.getTile(), 
@@ -294,7 +294,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             }
         }
         
-        if (getUnit().getLocation() instanceof Unit) {
+        if (getUnit().isOnCarrier()) {
             return dropTarget;
         } else if (getUnit().getLocation().getTile() == target) {
             return null;

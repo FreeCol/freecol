@@ -204,7 +204,7 @@ public class DefendSettlementMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */    
      public Tile getTransportDestination() {
-         if (getUnit().getLocation() instanceof Unit) {
+         if (getUnit().isOnCarrier()) {
              return settlement.getTile();
          } else if (getUnit().getLocation().getTile() == settlement.getTile()) {
              return null;

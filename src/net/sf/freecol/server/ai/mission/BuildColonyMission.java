@@ -227,14 +227,14 @@ public class BuildColonyMission extends Mission {
      */
     public Tile getTransportDestination() {
         if (target == null) {
-            if (getUnit().getLocation() instanceof Unit) {
+            if (getUnit().isOnCarrier()) {
                 return (Tile) ((Unit) getUnit().getLocation()).getEntryLocation();
             } else {
                 return (Tile) getUnit().getOwner().getEntryLocation();
             }
         }
 
-        if (getUnit().getLocation() instanceof Unit) {
+        if (getUnit().isOnCarrier()) {
             return target;
         } else if (getUnit().getLocation().getTile() == target) {
             return null;
@@ -276,7 +276,7 @@ public class BuildColonyMission extends Mission {
         Game game = unit.getGame();
         
         Tile startTile = null;
-        if (unit.getLocation() instanceof Unit) {
+        if (unit.isOnCarrier()) {
             Unit carrier = (Unit) unit.getLocation();
             startTile = carrier.getTile();
         } else if (unit.getLocation() instanceof Europe) {
@@ -307,7 +307,7 @@ public class BuildColonyMission extends Mission {
                 if (tile.getColonyValue() > 0) {
                     if (tile != startTile) {
                         PathNode path;
-                        if (unit.getLocation() instanceof Unit) {
+                        if (unit.isOnCarrier()) {
                             Unit carrier = (Unit) unit.getLocation();
                             path = game.getMap().findPath(unit, startTile, tile, carrier);
                         } else {
@@ -318,7 +318,7 @@ public class BuildColonyMission extends Mission {
                             int newColonyValue = 10000
                                 + unit.getOwner().getColonyValue(tile)
                                 - path.getTotalTurns()
-                                * ((unit.getGame().getTurn().getNumber() < 10 && unit.getLocation() instanceof Unit) ? 25
+                                * ((unit.getGame().getTurn().getNumber() < 10 && unit.isOnCarrier()) ? 25
                                    : 4);
                             if (newColonyValue > highestColonyValue) {
                                 highestColonyValue = newColonyValue;

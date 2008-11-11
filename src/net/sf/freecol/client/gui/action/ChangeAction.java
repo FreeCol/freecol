@@ -77,7 +77,7 @@ public class ChangeAction extends MapboardAction {
             if (unit.getTile() != null) {
                 if (unit.getColony() != null) {
                     putValue(NAME, Messages.message("menuBar.orders.enterColony"));
-                } else if (unit.getLocation() instanceof Unit) {
+                } else if (unit.isOnCarrier()) {
                     putValue(NAME, Messages.message("menuBar.orders.selectCarrier"));
                 } else {
                     putValue(NAME, Messages.message("menuBar.orders.nextUnitOnTile"));
@@ -125,7 +125,7 @@ public class ChangeAction extends MapboardAction {
 
         if (tile.getColony() != null) {
             getFreeColClient().getCanvas().showColonyPanel(tile.getColony());
-        } else if (unit.getLocation() instanceof Unit) {
+        } else if (unit.isOnCarrier()) {
             getFreeColClient().getGUI().setActiveUnit(((Unit) unit.getLocation()));
         } else {
             Iterator<Unit> unitIterator = tile.getUnitIterator();

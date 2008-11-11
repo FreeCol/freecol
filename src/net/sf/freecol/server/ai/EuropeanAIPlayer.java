@@ -543,7 +543,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
             return;
         }
         Unit unit = aiUnit.getUnit();
-        Unit carrier = (unit.getLocation() instanceof Unit) ? (Unit) unit.getLocation() : null;
+        Unit carrier = (unit.isOnCarrier()) ? (Unit) unit.getLocation() : null;
         Map map = unit.getGame().getMap();
         // Initialize variables:
         Ownable bestTarget = null; // The best target for a mission.
@@ -551,7 +551,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
         // Determine starting tile:
         Tile startTile = unit.getTile();
         if (startTile == null) {
-            if (unit.getLocation() instanceof Unit) {
+            if (unit.isOnCarrier()) {
                 startTile = (Tile) ((Unit) unit.getLocation()).getEntryLocation();
             } else {
                 startTile = (Tile) unit.getOwner().getEntryLocation();

@@ -165,7 +165,7 @@ public class WishRealizationMission extends Mission {
     * @return The destination for this <code>Transportable</code>.
     */    
     public Tile getTransportDestination() {
-        if (getUnit().getLocation() instanceof Unit) {
+        if (getUnit().isOnCarrier()) {
             return wish.getDestination().getTile();
         } else if (getUnit().getTile() == wish.getDestination().getTile()) {
             return null;
@@ -184,7 +184,7 @@ public class WishRealizationMission extends Mission {
     * @return The priority.
     */
     public int getTransportPriority() {
-        if (getUnit().getLocation() instanceof Unit) {
+        if (getUnit().isOnCarrier()) {
             return NORMAL_TRANSPORT_PRIORITY;
         } else if (getUnit().getLocation().getTile() == wish.getDestination().getTile()) {
             return 0;

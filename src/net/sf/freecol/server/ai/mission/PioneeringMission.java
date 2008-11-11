@@ -142,11 +142,11 @@ public class PioneeringMission extends Mission {
             return;
         }
         final AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
-        final Unit carrier = (getUnit().getLocation() instanceof Unit) ? (Unit) getUnit().getLocation() : null;
+        final Unit carrier = (getUnit().isOnCarrier()) ? (Unit) getUnit().getLocation() : null;
         
         final Tile startTile;
         if (getUnit().getTile() == null) {
-            if (getUnit().getLocation() instanceof Unit) {
+            if (getUnit().isOnCarrier()) {
                 startTile = (Tile) ((Unit) getUnit().getLocation()).getEntryLocation();
             } else {
                 startTile = (Tile) getUnit().getOwner().getEntryLocation();
@@ -362,7 +362,7 @@ public class PioneeringMission extends Mission {
         if (tileImprovementPlan == null) {
             return null;
         }
-        if (getUnit().getLocation() instanceof Unit) {
+        if (getUnit().isOnCarrier()) {
             return tileImprovementPlan.getTarget();
         } else if (getUnit().getTile() == tileImprovementPlan.getTarget()) {
             return null;

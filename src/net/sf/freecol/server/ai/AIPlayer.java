@@ -1132,7 +1132,7 @@ public class AIPlayer extends AIObject {
                 							player.getColonyValue(colonyTile));
                     aiUnit.setMission(mission);
                     
-                    boolean isUnitOnCarrier = aiUnit.getUnit().getLocation() instanceof Unit; 
+                    boolean isUnitOnCarrier = aiUnit.getUnit().isOnCarrier(); 
                     if (isUnitOnCarrier) {
                         AIUnit carrier = (AIUnit) getAIMain().getAIObject(
                                 (FreeColGameObject) aiUnit.getUnit().getLocation());
@@ -1319,7 +1319,7 @@ public class AIPlayer extends AIObject {
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
             if (aiUnit.hasMission() && aiUnit.getMission().isValid()
-                    && !(aiUnit.getUnit().getLocation() instanceof Unit)) {
+                    && !(aiUnit.getUnit().isOnCarrier())) {
                 try {
                     aiUnit.doMission(getConnection());
                 } catch (Exception e) {
@@ -1481,7 +1481,7 @@ public class AIPlayer extends AIObject {
             return;
         }
         final Unit unit = aiUnit.getUnit();
-        Unit carrier = (unit.getLocation() instanceof Unit) ? (Unit) unit.getLocation() : null;
+        Unit carrier = (unit.isOnCarrier()) ? (Unit) unit.getLocation() : null;
         Map map = unit.getGame().getMap();
         // Initialize variables:
         Ownable bestTarget = null; // The best target for a mission.
@@ -1489,7 +1489,7 @@ public class AIPlayer extends AIObject {
         // Determine starting tile:
         Tile startTile = unit.getTile();
         if (startTile == null) {
-            if (unit.getLocation() instanceof Unit) {
+            if (unit.isOnCarrier()) {
                 startTile = (Tile) ((Unit) unit.getLocation()).getEntryLocation();
             } else {
                 startTile = (Tile) unit.getOwner().getEntryLocation();

@@ -247,7 +247,7 @@ public class ScoutingMission extends Mission {
     private void updateTransportDestination() {
         if (getUnit().getTile() == null) {
             transportDestination = (Tile) getUnit().getOwner().getEntryLocation();
-        } else if (getUnit().getLocation() instanceof Unit) {
+        } else if (getUnit().isOnCarrier()) {
             GoalDecider destinationDecider = new GoalDecider() {
                 private PathNode best = null;
 
@@ -324,7 +324,7 @@ public class ScoutingMission extends Mission {
      * @return The destination for this <code>Transportable</code>.
      */
     public Tile getTransportDestination() {
-        if (getUnit().getLocation() instanceof Unit
+        if (getUnit().isOnCarrier()
                 || getUnit().getTile() == null) {
             if (transportDestination == null
                     || !transportDestination.isLand()) {

@@ -910,7 +910,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 freeColClient.getInGameController().nextModelMessage();
                 Unit activeUnit = parent.getGUI().getActiveUnit();
                 if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0
-                        || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.getLocation() instanceof Unit))) {
+                        || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.isOnCarrier()))) {
                     parent.getGUI().setActiveUnit(null);
                     freeColClient.getInGameController().nextActiveUnit();
                 }
@@ -1325,14 +1325,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     UnitLabel unitLabel = ((UnitLabel) comp);
                     Unit unit = unitLabel.getUnit();
 
-                    if (!(unit.getLocation() instanceof Unit)) {
+                    if (!unit.isOnCarrier()) {
                         inGameController.putOutsideColony(unit);
                     }
 
                     if (unit.getColony() == null) {
                         closeColonyPanel();
                         return null;
-                    } else if (!(unit.getLocation() instanceof Tile) && !(unit.getLocation() instanceof Unit)) {
+                    } else if (!(unit.getLocation() instanceof Tile) && !unit.isOnCarrier()) {
                         return null;
                     }
 

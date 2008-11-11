@@ -2416,7 +2416,7 @@ public final class InGameController implements NetworkConstants {
         Player myPlayer = freeColClient.getMyPlayer();
 
         Unit carrier = null;
-        if (unit.getLocation() instanceof Unit) {
+        if (unit.isOnCarrier()) {
             carrier = (Unit) unit.getLocation();
             leaveShip(unit);
         }

@@ -273,7 +273,7 @@ public abstract class NewAIPlayer extends AIObject {
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
             if (aiUnit.hasMission() && aiUnit.getMission().isValid()
-                && !(aiUnit.getUnit().getLocation() instanceof Unit)) {
+                && !(aiUnit.getUnit().isOnCarrier())) {
                 try {
                     aiUnit.doMission(getConnection());
                 } catch (Exception e) {
