@@ -178,6 +178,7 @@ public class DemotionTest extends FreeColTestCase {
         dragoon.equipWith(muskets, true);
         dragoon.equipWith(horses, true);
         Unit brave = new Unit(game, tile2, inca, braveType, UnitState.ACTIVE);
+        brave.setIndianSettlement(settlement1);
 
         method.invoke(combatModel, dragoon, brave);
         assertEquals(colonistType, dragoon.getType());
@@ -187,9 +188,8 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(muskets, dragoon.getEquipment().get(0));
         assertEquals(1, brave.getEquipment().size());
         assertEquals(horses, brave.getEquipment().get(0));
-        // destined to vanish when AI gets smarter
         assertEquals(50, settlement1.getGoodsCount(Goods.HORSES));
-        assertEquals(50, settlement2.getGoodsCount(Goods.HORSES));
+        assertEquals(0, settlement2.getGoodsCount(Goods.HORSES));
 
         method.invoke(combatModel, dragoon, brave);
         assertEquals(colonistType, dragoon.getType());
@@ -199,9 +199,8 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(2, brave.getEquipment().size());
         assertEquals(horses, brave.getEquipment().get(0));
         assertEquals(muskets, brave.getEquipment().get(1));
-        // destined to vanish when AI gets smarter
         assertEquals(50, settlement1.getGoodsCount(Goods.MUSKETS));
-        assertEquals(50, settlement2.getGoodsCount(Goods.MUSKETS));
+        assertEquals(0, settlement2.getGoodsCount(Goods.MUSKETS));
 
         method.invoke(combatModel, dragoon, brave);
         assertTrue(dragoon.isDisposed());

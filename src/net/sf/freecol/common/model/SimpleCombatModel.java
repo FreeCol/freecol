@@ -1211,14 +1211,15 @@ public class SimpleCombatModel implements CombatModel {
                              "%location%", locationName);
         if (enemyUnit.hasAbility("model.ability.captureEquipment")
             && enemyUnit.canBeEquippedWith(typeToLose)) {
+            IndianSettlement settlement = enemyUnit.getIndianSettlement();
+
             enemyUnit.equipWith(typeToLose, true);
             unit.addModelMessage(unit,
                                  ModelMessage.MessageType.COMBAT_RESULT,
                                  "model.unit.equipmentCaptured",
                                  "%nation%", enemyNation,
                                  "%equipment%", typeToLose.getName());
-            // TODO: fix this when the AI is smarter
-            for (IndianSettlement settlement : enemyUnit.getOwner().getIndianSettlements()) {
+            if (settlement != null) {
                 for (AbstractGoods goods : typeToLose.getGoodsRequired()) {
                     settlement.addGoods(goods);
                 }
