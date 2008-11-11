@@ -1658,7 +1658,7 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
         // Remember current SoL and tories for check changes at the next turn
         oldSonsOfLiberty = sonsOfLiberty;
         oldTories = tories;
-
+        updateProductionBonus();
     }
 
     /**
