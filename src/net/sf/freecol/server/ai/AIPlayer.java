@@ -1652,6 +1652,20 @@ public class AIPlayer extends AIObject {
         }
         return tileImprovements.iterator();
     }
+    
+    /**
+     * Remove a <code>TileImprovementPlan</code> from the list
+     */
+    public void removeTileImprovementPlan(TileImprovementPlan plan){
+    	Iterator<AIColony> colonyIter = getAIColonyIterator();
+        while (colonyIter.hasNext()) {
+            AIColony colony = colonyIter.next();
+            if(colony.removeTileImprovementPlan(plan)){
+            	return;
+            }
+        }
+        logger.warning("Not found given TileImprovementPlan to remove");
+    }
 
     /**
      * This is a temporary method which are used for forcing the computer

@@ -138,11 +138,19 @@ public class PioneeringMission extends Mission {
     }
 
     private void updateTileImprovementPlan() {
-        if (tileImprovementPlan != null) {
+        if (tileImprovementPlan != null && tileImprovementPlan.getTarget() != null) {
             return;
-        }
+        }    
+        
         final AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
         final Unit carrier = (getUnit().isOnCarrier()) ? (Unit) getUnit().getLocation() : null;
+        
+        // invalid tileImprovementPlan, remove and get a new valid one
+        if (tileImprovementPlan != null && tileImprovementPlan.getTarget() == null) {
+        	logger.warning("Found invalid TileImprovementPlan, removing it and assigning a new one");
+        	aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
+        	tileImprovementPlan.dispose();
+        }
         
         final Tile startTile;
         if (getUnit().getTile() == null) {
@@ -161,6 +169,14 @@ public class PioneeringMission extends Mission {
         while (tiIterator.hasNext()) {
             TileImprovementPlan ti = tiIterator.next();
             if (ti.getPioneer() == null) {
+            	// invalid tileImprovementPlan, remove and get a new valid one
+                if (ti.getTarget() == null) {
+                	logger.warning("Found invalid TileImprovementPlan, removing it and finding a new one");
+                	aiPlayer.removeTileImprovementPlan(ti);
+                	ti.dispose();
+                	continue;
+                }
+            	
                 PathNode path = null;
                 int value;
                 if (startTile != ti.getTarget()) {

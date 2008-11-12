@@ -304,7 +304,15 @@ public class AIColony extends AIObject {
     public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
         return TileImprovementPlans.iterator();
     }
-
+    
+    /**
+     * Removes a <code>TileImprovementPlan</code> from the list
+     * @return True if it was successfully deleted, false otherwise 
+     */
+    public boolean removeTileImprovementPlan(TileImprovementPlan plan){
+    	return TileImprovementPlans.remove(plan);
+    }
+    
     /**
      * Creates the wishes for the <code>Colony</code>.
      */
