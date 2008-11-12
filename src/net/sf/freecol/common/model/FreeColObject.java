@@ -181,7 +181,8 @@ public abstract class FreeColObject {
      * @return An XML-representation of this object.
      */    
     public Element toXMLElement(Document document) {
-        return toXMLElement(null, document, false, false);
+    	// since the player is null, showAll must be true
+        return toXMLElement(null, document, true, false);
     }
 
 

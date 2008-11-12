@@ -236,7 +236,7 @@ public final class InGameController extends Controller {
                                 Element updateElement = Message.createNewRootElement("newConvert");
                                 updateElement.setAttribute("nation", nationId);
                                 updateElement.setAttribute("colonyTile", targetTile.getId());
-                                updateElement.appendChild(unit.toXMLElement(updateElement.getOwnerDocument()));
+                                updateElement.appendChild(unit.toXMLElement(european,updateElement.getOwnerDocument()));
                                 european.getConnection().send(updateElement);
                                 logger.info("New convert created for " + european.getName() + " with ID=" + unit.getId());
                             } catch (IOException e) {
@@ -636,7 +636,7 @@ public final class InGameController extends Controller {
                             monarch.addToREF(unitsToAdd);
                             Element additionElement = monarchActionElement.getOwnerDocument().createElement("addition");
                             for (AbstractUnit unit : unitsToAdd) {
-                                additionElement.appendChild(unit.toXMLElement(additionElement.getOwnerDocument()));
+                                additionElement.appendChild(unit.toXMLElement(nextPlayer,additionElement.getOwnerDocument()));
                             }
                             monarchActionElement.appendChild(additionElement);
                             try {

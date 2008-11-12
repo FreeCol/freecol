@@ -2623,7 +2623,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         Element reply = Message.createNewRootElement("REFUnits");
         for (AbstractUnit unit : units) {
-            reply.appendChild(unit.toXMLElement(reply.getOwnerDocument()));
+            reply.appendChild(unit.toXMLElement(player,reply.getOwnerDocument()));
         }
         return reply;
     }
