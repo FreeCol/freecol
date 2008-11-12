@@ -561,7 +561,9 @@ public class IndianSettlement extends Settlement {
     @Override
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            units.remove((Unit) locatable);
+            if (!units.remove((Unit) locatable)) {
+                logger.warning("Failed to remove unit " + ((Unit)locatable).getId() + " from IndianSettlement");
+            }
         } else if (locatable instanceof Goods) {
             goodsContainer.removeGoods((Goods)locatable);
         } else {
@@ -1092,19 +1094,9 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     public void dispose() {
-        while (ownedUnits.size() > 0) {
-            ownedUnits.remove(0).setIndianSettlement(null);
-        }
-        for (Unit unit : units) {
+        for (Unit unit : units) { // unit.dispose cleans up ownedUnits
             unit.dispose();
         }
-
-        Tile settlementTile = getTile();     
-        
-        Map map = getGame().getMap();
-        Position position = settlementTile.getPosition();
-        Iterator<Position> circleIterator = map.getCircleIterator(position, true, getRadius());
-        
         super.dispose();
     }
 
@@ -1116,17 +1108,6 @@ public class IndianSettlement extends Settlement {
      */
     public void createGoodsContainer() {
         goodsContainer = new GoodsContainer(getGame(), this);
-    }
-
-    private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        if (!units.isEmpty()) {
-            out.writeStartElement(UNITS_TAG_NAME);
-            for (Unit unit : units) {
-                unit.toXML(out, player, showAll, toSavedGame);
-            }
-            out.writeEndElement();
-        }
     }
 
     /**
@@ -1194,7 +1175,13 @@ public class IndianSettlement extends Settlement {
         }
 
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
-            unitsToXML(out, player, showAll, toSavedGame);
+            if (!units.isEmpty()) {
+                out.writeStartElement(UNITS_TAG_NAME);
+                for (Unit unit : units) {
+                    unit.toXML(out, player, showAll, toSavedGame);
+                }
+                out.writeEndElement();
+            }
             goodsContainer.toXML(out, player, showAll, toSavedGame);
             for (Unit unit : ownedUnits) {
                 out.writeStartElement(OWNED_UNITS_TAG_NAME);
@@ -1285,7 +1272,12 @@ public class IndianSettlement extends Settlement {
                 units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        units.add(updateFreeColGameObject(in, Unit.class));
+                        Unit unit = updateFreeColGameObject(in, Unit.class);
+                        if (unit.getLocation() != this) {
+                            logger.warning("fixing unit location");
+                            unit.setLocation(this);
+                        }
+                        units.add(unit);
                     }
                 }
             } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
