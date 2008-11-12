@@ -134,7 +134,7 @@ public class UnitWanderHostileMission extends Mission {
                 moveButDontAttack(connection, direction);
             } else {
                 logger.finest("Unit " + unit.getId() + ": No target found - entering settlement.");
-                unit.getIndianSettlement().add(unit);
+                unit.setLocation(unit.getIndianSettlement());
             }
         } else {
             // Just make a random move if no target can be found.
