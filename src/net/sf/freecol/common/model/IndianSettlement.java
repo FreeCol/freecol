@@ -1094,7 +1094,10 @@ public class IndianSettlement extends Settlement {
      */
     @Override
     public void dispose() {
-        for (Unit unit : units) { // unit.dispose cleans up ownedUnits
+        while (ownedUnits.size() > 0) {
+            ownedUnits.remove(0).setIndianSettlement(null);
+        }
+        for (Unit unit : units) {
             unit.dispose();
         }
         super.dispose();
