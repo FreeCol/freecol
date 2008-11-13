@@ -540,10 +540,15 @@ public class IndianSettlement extends Settlement {
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
             if (!units.contains(locatable)) {
+                Unit indian = (Unit)locatable;
                 if (units.equals(Collections.emptyList())) {
                     units = new ArrayList<Unit>();
                 }
-                units.add((Unit) locatable);
+                units.add(indian);
+                if (indian.getIndianSettlement() == null) {
+                    // Adopt homeless Indians
+                    indian.setIndianSettlement(this);
+                }
             }
         } else if (locatable instanceof Goods) {
             goodsContainer.addGoods((Goods)locatable);
