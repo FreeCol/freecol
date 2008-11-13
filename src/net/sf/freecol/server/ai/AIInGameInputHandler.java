@@ -237,7 +237,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         final List<FoundingFather> possibleFoundingFathers = new ArrayList<FoundingFather>();
         for (FoundingFatherType type : FoundingFatherType.values()) {
             String id = element.getAttribute(type.toString());
-            if (id != null) {
+            if (id != null && id != "") {
                 possibleFoundingFathers.add(FreeCol.getSpecification().getFoundingFather(id));
             }
         }
