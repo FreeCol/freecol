@@ -646,14 +646,7 @@ public abstract class FreeColObject {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-	writeAttributes(out);
-	writeChildren(out);
-        out.writeEndElement();
-    }
+    abstract protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
 
     // TODO: make these abstract
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {};
