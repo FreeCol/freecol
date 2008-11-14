@@ -83,6 +83,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -485,6 +486,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             if (!unit.isCarrier()) {
                 outsideColonyPanel.add(unitLabel, false);
             } else {
+                TradeRoute tradeRoute;
+                if ((tradeRoute = unit.getTradeRoute()) != null) {
+                    unitLabel.setDescriptionLabel(unit.getName() + " ("
+                                                  + tradeRoute.getName() + ")");
+                }
                 inPortPanel.add(unitLabel);
                 lastCarrier = unitLabel;
                 if (unit == preSelectedUnit) {
