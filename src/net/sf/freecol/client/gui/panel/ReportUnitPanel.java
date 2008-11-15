@@ -456,7 +456,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                                                      "</html>");
                         }
                         if (column == 2 + militaryColumns) {
-                            column = unitColumn - 1;
+                            column = unitColumn;
                             row++;
                         } else {
                             column++;
