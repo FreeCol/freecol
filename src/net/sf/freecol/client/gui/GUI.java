@@ -1652,28 +1652,36 @@ public final class GUI {
                     continue;
                 }
 
-                if (tile.getType() == borderingTile.getType() ||
-                    (tile.isLand() && !borderingTile.isLand())) {
-                    // Equal tiles and sea tiles have no effect
+                if (tile.getType() == borderingTile.getType()) {
+                    // Equal tiles, no need to draw border
                     continue;
                 }
-
-                if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
+                else if (tile.isLand() && !borderingTile.isLand()) {
+                    // The beach borders are drawn on the side of water tiles only
+                    continue;
+                }
+                else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
                     // If there is a Coast image (eg. beach) defined, use it, otherwise skip
                     if (borderingTile.getType().getArtCoast() != null) {
                         g.drawImage(lib.getCoastImage(borderingTile.getType(), direction,
                                                         tile.getX(), tile.getY()),
                                                         x, y, null);
                     }
+                    // Draw the grass from the neighboring tile, spilling over on the side of this tile
                     g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
                                                     tile.getX(), tile.getY()),
                                                     x, y, null);
-                } else if (tile.isExplored() && borderingTile.isExplored() &&
-                        borderingTile.getType().getIndex() < tile.getType().getIndex()) {
-                    // Draw land terrain with bordering land type
-                    g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
-                                                    tile.getX(), tile.getY()),
-                                                    x, y, null);
+                } else if (tile.isExplored() && borderingTile.isExplored()) {
+                    if (tile.getType().getArtBasic().equals(borderingTile.getType().getArtBasic())) {
+                        // Do not draw limit between tile that share same graphics (ocean & great river)
+                        continue;
+                    }
+                    else if (borderingTile.getType().getIndex() < tile.getType().getIndex()) {
+                        // Draw land terrain with bordering land type, or ocean/high seas limit
+                        g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
+                                                        tile.getX(), tile.getY()),
+                                                        x, y, null);
+                    }
                 }
             }
         }
