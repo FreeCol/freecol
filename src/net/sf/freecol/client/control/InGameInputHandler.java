@@ -853,7 +853,7 @@ public final class InGameInputHandler extends InputHandler {
                 } else {
                     newUnit.readFromXMLElement(unitElement);
                 }
-                //player.getEurope().add(newUnit);
+                player.getEurope().add(newUnit);
             }
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
