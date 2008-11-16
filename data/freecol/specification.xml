@@ -1390,7 +1390,7 @@
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
     <european-nation-type id="model.nationType.naval">
-      <modifier id="model.modifier.movementBonus" type="additive" value="1">
+      <modifier id="model.modifier.movementBonus" type="additive" value="3">
         <scope ability-id="model.ability.navalUnit"/>
       </modifier>
       <unit id="model.unit.freeColonist" role="pioneer"/>
