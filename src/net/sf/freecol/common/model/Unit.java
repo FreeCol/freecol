@@ -1813,15 +1813,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         given <code>Player</code>.
      */
     public boolean isVisibleTo(Player player) {
-        if (player == getOwner()) {
-            return true;
-        }
-        return getTile() != null
-            && player.canSee(getTile())
-            && (getTile().getSettlement() == null || getTile().getSettlement().getOwner() == player || (!getGameOptions()
-                                                                                                        .getBoolean(GameOptions.UNIT_HIDING) && getLocation() instanceof Tile))
-            && (!isOnCarrier() || ((Unit) getLocation()).getOwner() == player || !getGameOptions()
-                .getBoolean(GameOptions.UNIT_HIDING));
+        return player == getOwner()
+            || (getTile() != null
+                && player.canSee(getTile())
+                && (getTile().getSettlement() == null
+                    || getTile().getSettlement().getOwner() == player
+                    || (!getGameOptions().getBoolean(GameOptions.UNIT_HIDING)
+                        && getLocation() instanceof Tile))
+                && (!isOnCarrier() || ((Unit) getLocation()).getOwner() == player
+                    || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING)));
     }
 
     /**
