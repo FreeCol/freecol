@@ -101,10 +101,7 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
     public void initialize() {
 
         int[] widths = new int[] { 0 };
-        int[] heights = new int[9];
-        for (int index = 0; index < 4; index++) {
-            heights[2 * index + 1] = margin;
-        }
+        int[] heights = new int[] { 0, 3 * margin, 0, margin, 0, margin, 0, margin, 0 };
         setLayout(new HIGLayout(widths, heights));
 
         int row = 1;
