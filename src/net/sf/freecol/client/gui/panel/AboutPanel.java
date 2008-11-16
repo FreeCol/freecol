@@ -152,43 +152,50 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
      * This class could also be moved from AboutPanel if needed somewhere else. 
      */
     public class URLMouseListener implements MouseListener {
-    	private String url;
-    	public URLMouseListener(String url) {
-    		this.url = url;
-    	}
-    	public void mouseEntered(MouseEvent e) {
-    	}
-    	public void mouseExited(MouseEvent e) {
-    	}
-    	public void mousePressed(MouseEvent e) {
-    	}
-    	public void mouseReleased(MouseEvent e) {
-    	}
+        private String url;
+        public URLMouseListener(String url) {
+        	this.url = url;
+        }
+        public void mouseEntered(MouseEvent e) {
+        }
+        public void mouseExited(MouseEvent e) {
+        }
+        public void mousePressed(MouseEvent e) {
+        }
+        public void mouseReleased(MouseEvent e) {
+        }
         public void mouseClicked(MouseEvent e) {
-        	if (e.getButton()==MouseEvent.BUTTON1) {
-        		// left click
-        		openBrowserURL();
-        	}
+            if (e.getButton()==MouseEvent.BUTTON1) {
+                // left click
+                openBrowserURL();
+            }
         }
         public void openBrowserURL() {
-        	String os = System.getProperty("os.name");
-        	String cmd;
-            if (os!=null && os.startsWith("Windows")) {
-            	// On windows, there is a notion of default browser
-            	// this will start IE or mozilla, as per default browser settings
-            	cmd = "rundll32 url.dll,FileProtocolHandler "+url;
+            String os = System.getProperty("os.name");
+            String[] cmd = null;
+            if (os==null) {
+                // error, the operating system could not be determined
+                return;
+            } else if (os.toLowerCase().contains("mac")) {
+                // Apple Macintosh, Safari is the main browser
+                cmd = new String[] { "open" , "-a", "Safari", url };
+            } else if (os.toLowerCase().contains("windows")) {
+                // Microsoft Windows, use the default browser
+                cmd = new String[] { "rundll32.exe", "url.dll,FileProtocolHandler", url};
+            } else if (os.toLowerCase().contains("linux")) {
+                // GNU Linux, the script /usr/bin/htmlview calls the default browser
+                cmd = new String[] {"htmlview", url};
             } else {
-            	// On Unix, Linux, there's no such thing as a default browser
-            	// TODO: should we just call an arbitrary browser like this?
-            	//cmd = "netscape -remote openURL(" + url + ")";
-            	cmd = "firefox " + url;
+                // Unix, ...
+                // TODO: should we just call an arbitrary browser like this?
+                //cmd = new String[] { "netscape",  "-remote", "openURL(" + url + ")"};
+                cmd = new String[] { "firefox", url};
             }
             try {
-            	Runtime.getRuntime().exec(cmd);
+                Runtime.getRuntime().exec(cmd);
             } catch(IOException x) {
-            	// couldn't start browser
+                // couldn't start browser
             }
         }
-        
     }
 }
