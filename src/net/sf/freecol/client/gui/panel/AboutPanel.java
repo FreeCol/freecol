@@ -183,8 +183,8 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
                 // Microsoft Windows, use the default browser
                 cmd = new String[] { "rundll32.exe", "url.dll,FileProtocolHandler", url};
             } else if (os.toLowerCase().contains("linux")) {
-                // GNU Linux, the script /usr/bin/htmlview calls the default browser
-                cmd = new String[] {"htmlview", url};
+                // GNU Linux, use xdg-utils to launch the default browser (portland.freedesktop.org)
+                cmd = new String[] {"xdg-open", url};
             } else {
                 // Unix, ...
                 // TODO: should we just call an arbitrary browser like this?
