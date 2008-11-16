@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GameOptions;
@@ -749,90 +750,115 @@ public final class InGameController extends Controller {
     }
 
     private void bombardEnemyShips(ServerPlayer currentPlayer) {
-        logger.finest("Entering method bombardEnemyShips.");
+        logger.info("Entering method bombardEnemyShips.");
         Map map = getFreeColServer().getGame().getMap();
         CombatModel combatModel = getFreeColServer().getGame().getCombatModel();
         for (Settlement settlement : currentPlayer.getSettlements()) {
             Colony colony = (Colony) settlement;
-            logger.finest("Colony is " + colony.getName());
-            if (colony.hasAbility("model.ability.bombardShips") && !colony.isLandLocked()) {
-                logger.finest("Colony has harbour and fort.");
+            if (colony.canBombardEnemyShip()){
+                logger.info("Colony " + colony.getName() + " can bombard enemy ships.");
                 Position colonyPosition = colony.getTile().getPosition();
                 for (Direction direction : Direction.values()) {
                     Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
-                    if (!tile.isLand()) {
-                        Iterator<Unit> unitIterator = tile.getUnitIterator();
-                        while (unitIterator.hasNext()) {
-                            Unit unit = unitIterator.next();
-                            float attackPower = combatModel.getOffencePower(colony, unit);
-                            Player player = unit.getOwner();
-                            if (player != currentPlayer
-                                && (currentPlayer.getStance(player) == Stance.WAR ||
-                                    unit.hasAbility("model.ability.piracy"))) {
-                                logger.finest("Found enemy unit " + unit.getOwner().getNationAsString() + " "
-                                              + unit.getName());
-                                // generate bombardment result
-                                CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
-
-                                // Inform the players (other then the player
-                                // attacking) about the attack:
-                                int plunderGold = -1;
-                                Iterator<Player> enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
-                                while (enemyPlayerIterator.hasNext()) {
-                                    ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-
-                                    if (// currentPlayer.equals(enemyPlayer) ||
-                                        enemyPlayer.getConnection() == null) {
-                                        continue;
-                                    }
-
-                                    Element opponentAttackElement = Message.createNewRootElement("opponentAttack");
-                                    if (unit.isVisibleTo(enemyPlayer)) {
-                                        opponentAttackElement.setAttribute("direction", direction.toString());
-                                        opponentAttackElement.setAttribute("result", result.toString());
-                                        opponentAttackElement .setAttribute("plunderGold",
-                                                                            Integer.toString(plunderGold));
-                                        opponentAttackElement.setAttribute("colony", colony.getId());
-                                        opponentAttackElement.setAttribute("defender", unit.getId());
-
-                                        if (!enemyPlayer.canSee(colony.getTile())) {
-                                            opponentAttackElement.setAttribute("update", "tile");
-                                            enemyPlayer.setExplored(colony.getTile());
-                                            opponentAttackElement.appendChild(colony.getTile().toXMLElement(
-                                                                                                            enemyPlayer, opponentAttackElement.getOwnerDocument()));
-                                        }
-
-                                        try {
-                                            enemyPlayer.getConnection().send(opponentAttackElement);
-                                        } catch (IOException e) {
-                                            logger.warning("Could not send message to: " + enemyPlayer.getName()
-                                                           + " with connection " + enemyPlayer.getConnection());
-                                        }
-                                    }
-                                }
-
-                                // Create the reply for the attacking player:
-                                /*
-                                 * Element bombardElement =
-                                 * Message.createNewRootElement("bombardResult");
-                                 * bombardElement.setAttribute("result",
-                                 * Integer.toString(result));
-                                 * bombardElement.setAttribute("colony",
-                                 * colony.getId());
-                                 * 
-                                 * if (!unit.isVisibleTo(player)) {
-                                 * bombardElement.appendChild(unit.toXMLElement(player,
-                                 * bombardElement.getOwnerDocument())); }
-                                 * colony.bombard(unit, result); try {
-                                 * currentPlayer.getConnection().send(bombardElement); }
-                                 * catch (IOException e) { logger.warning("Could
-                                 * not send message to: " +
-                                 * currentPlayer.getName() + " with connection " +
-                                 * currentPlayer.getConnection()); }
-                                 */
-                            }
-                        }
+                    
+                    // ignore land tiles and borders
+                    if(tile == null || tile.isLand()){
+                    	continue;
                     }
+                    
+                    // Go through the units in the tile
+                    Iterator<Unit> unitIterator = tile.getUnitIterator();
+                    while (unitIterator.hasNext()) {
+                    	Unit unit = unitIterator.next();
+                    	Player player = unit.getOwner();
+                    
+                    	// ignore own units
+                    	if(player == currentPlayer){
+                    		continue;
+                    	}
+                    	
+                    	// ignore friendly units
+                    	if(currentPlayer.getStance(player) != Stance.WAR &&
+            					!unit.hasAbility("model.ability.piracy")){
+                    		continue;
+                    	}
+
+                    	logger.info("Found enemy unit " + unit.getOwner().getNationAsString() + " "
+                    			+ unit.getName());
+                    	// generate bombardment result
+                    	CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
+
+                    	// Inform the players (other then the player
+                    	// attacking) about the attack:
+                    	int plunderGold = -1;
+                    	Iterator<Player> enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
+                    	while (enemyPlayerIterator.hasNext()) {
+                    		ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+                    		if (//currentPlayer.equals(enemyPlayer) ||
+                    				enemyPlayer.getConnection() == null) {
+                    			continue;
+                    		}
+                    		
+                    		// unit not visible to player, move to next player
+                    		if(!unit.isVisibleTo(enemyPlayer)){
+                    			continue;
+                    		}
+                    		
+                    		Element opponentAttackElement = Message.createNewRootElement("opponentAttack");                    		
+                    		opponentAttackElement.setAttribute("direction", direction.toString());
+                    		opponentAttackElement.setAttribute("result", result.type.toString());
+                    		opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
+                    	    opponentAttackElement.setAttribute("colony", colony.getId());
+                    		opponentAttackElement.setAttribute("defender", unit.getId());
+                    		opponentAttackElement.setAttribute("damage", String.valueOf(result.damage));
+
+                    		// Ship has been damaged, add repair location
+                    		if(enemyPlayer == player && result.type == CombatModel.CombatResultType.LOSS){
+                    			Location repairLocation = player.getRepairLocation(unit);
+                    			if(repairLocation != null){
+                    				opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
+                    			}
+                    		}
+                    		
+                    		// Every player who witness the confrontation needs to know about the attacker
+                    		if (!enemyPlayer.canSee(colony.getTile())) {
+                    			opponentAttackElement.setAttribute("update", "tile");
+                    			enemyPlayer.setExplored(colony.getTile());
+                    			opponentAttackElement.appendChild(colony.getTile().toXMLElement(
+                    					enemyPlayer, opponentAttackElement.getOwnerDocument()));
+                    		}
+
+                    		// Send response
+                    		try {
+                    			enemyPlayer.getConnection().send(opponentAttackElement);
+                    		} catch (IOException e) {
+                    			logger.warning("Could not send message to: " + enemyPlayer.getName()
+                    					+ " with connection " + enemyPlayer.getConnection());
+                    		}
+                    	}
+
+                    	// Create the reply for the attacking player:
+                    	/*
+                    	 * Element bombardElement =
+                    	 * Message.createNewRootElement("bombardResult");
+                    	 * bombardElement.setAttribute("result",
+                    	 * Integer.toString(result));
+                    	 * bombardElement.setAttribute("colony",
+                    	 * colony.getId());
+                    	 * 
+                    	 * if (!unit.isVisibleTo(player)) {
+                    	 * bombardElement.appendChild(unit.toXMLElement(player,
+                    	 * bombardElement.getOwnerDocument())); }
+                    	 * colony.bombard(unit, result); try {
+                    	 * currentPlayer.getConnection().send(bombardElement); }
+                    	 * catch (IOException e) { logger.warning("Could
+                    	 * not send message to: " +
+                    	 * currentPlayer.getName() + " with connection " +
+                    	 * currentPlayer.getConnection()); }
+                    	 */
+                    }
+
                 }
             }
         }

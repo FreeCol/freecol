@@ -368,7 +368,7 @@ public final class InGameInputHandler extends InputHandler {
      *            XML tree) that holds all the information.
      */
     private Element opponentAttack(Element opponentAttackElement) {
-        Unit unit = (Unit) getGame().getFreeColGameObject(opponentAttackElement.getAttribute("unit"));
+        Unit unit = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("unit"));
         Colony colony = (Colony) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("colony"));
         Unit defender = (Unit) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defender"));
 
@@ -433,7 +433,7 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (colony != null) {
-            unit.getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage));
+            getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage));
         } else {            
             unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold);
             if (!unit.isDisposed() &&

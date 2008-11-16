@@ -1929,5 +1929,21 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
     public FeatureContainer getFeatureContainer() {
         return featureContainer;
     }
-
+    
+    /**
+     * Verify if colony has the conditions to bombard an
+     * enemy ship adjacent to it
+     * @return true if it can, false otherwise
+     */
+    public boolean canBombardEnemyShip(){
+    	// only sea-side colonies can bombard
+    	if(isLandLocked()){
+    		return false;
+    	}
+    	// does not have the buildings that give such abilities
+    	if(!hasAbility("model.ability.bombardShips")){
+    		return false;
+    	}
+    	return true;
+    }
 }
