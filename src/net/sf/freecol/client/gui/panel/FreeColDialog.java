@@ -80,7 +80,7 @@ public class FreeColDialog extends FreeColPanel {
     // Stores the response from the user:
     private Object response = null;
 
-    // Wether or not the user have made the choice.
+    // Whether or not the user have made the choice.
     private boolean responseGiven = false;
 
     /**
@@ -129,7 +129,7 @@ public class FreeColDialog extends FreeColPanel {
                     AWTEvent event = theQueue.getNextEvent();
                     Object src = event.getSource();
 
-                    // Block 'MouseEvent' beeing sent to other components:
+                    // Block 'MouseEvent' being sent to other components:
                     /*
                     if (event instanceof MouseEvent) {
                         MouseEvent me = (MouseEvent) event;
@@ -689,6 +689,7 @@ public class FreeColDialog extends FreeColPanel {
             fileChooser.setFileFilter(fileFilters[0]);
             fileChooser.setAcceptAllFileFilterUsed(false);
         }
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String actionCommand = event.getActionCommand();
@@ -733,6 +734,7 @@ public class FreeColDialog extends FreeColPanel {
             fileChooser.setFileFilter(fileFilters[0]);
             fileChooser.setAcceptAllFileFilterUsed(false);
         }
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 String actionCommand = event.getActionCommand();
