@@ -92,6 +92,7 @@
             source="${java.target.version}"
             target="${java.target.version}">
           <!-- <compilerarg value="-Xlint"/> -->
+          <compilerarg value="-g"/>
         </javac>
     </target>
 

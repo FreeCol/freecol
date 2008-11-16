@@ -264,6 +264,7 @@ public final class InGameInputHandler extends InputHandler {
 
             final Tile toTile = map.getNeighbourOrNull(direction, fromTile);
             if (toTile==null) {
+                logger.warning("Destination tile is null!");
                 // TODO: find out why this can happen
             } else {
                 final String key = (getFreeColClient().getMyPlayer() == unit.getOwner()) ?

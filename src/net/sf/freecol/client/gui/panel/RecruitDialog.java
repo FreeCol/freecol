@@ -32,6 +32,8 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
 import cz.autel.dmi.HIGLayout;
@@ -40,8 +42,6 @@ import cz.autel.dmi.HIGLayout;
  * The panel that allows a user to recruit people in Europe.
  */
 public final class RecruitDialog extends FreeColDialog implements ActionListener {
-
-
 
     private static Logger logger = Logger.getLogger(RecruitDialog.class.getName());
 
@@ -116,10 +116,25 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
         int recruitPrice = 0;
         Player player = freeColClient.getMyPlayer();
         if ((freeColClient.getGame() != null) && (player != null)) {
+
+            int production = 0;
+            for (Colony colony : player.getColonies()) {
+                production += colony.getProductionOf(Goods.CROSSES);
+            }
+            int turns = 100;
+            if (production > 0) {
+                int crossesRequired = (player.getCrossesRequired() - player.getCrosses());
+                turns = crossesRequired / production;
+                if (crossesRequired % production > 0) {
+                    turns++;
+                }
+            }
             ImageLibrary library = getCanvas().getGUI().getImageLibrary();
             recruitPrice = player.getRecruitPrice();
 
-            question.setText(Messages.message("recruitDialog.clickOn", "%money%", String.valueOf(recruitPrice)));
+            question.setText(Messages.message("recruitDialog.clickOn",
+                                              "%money%", String.valueOf(recruitPrice),
+                                              "%number%", String.valueOf(turns)));
 
             for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
                 UnitType unitType = player.getEurope().getRecruitable(index);
