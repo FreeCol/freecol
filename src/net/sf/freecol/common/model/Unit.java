@@ -1621,6 +1621,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             setLocation(l);
         } else if (getTile().getSettlement() != null) {
             setLocation(getTile());
+            if (canCarryTreasure() && canCashInTreasureTrain()) {
+                cashInTreasureTrain();
+            }
         } else {
             throw new IllegalStateException("A unit may only leave a ship while in a harbour.");
         }
