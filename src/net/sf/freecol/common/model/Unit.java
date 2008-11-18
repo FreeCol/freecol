@@ -2740,6 +2740,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         setState(UnitState.TO_EUROPE);
         setLocation(getOwner().getEurope());
 
+        logger.info("Unit " + this.getId() + " moving to Europe");
+        
         // Clear the alreadyOnHighSea flag:
         alreadyOnHighSea = false;
     }
@@ -2756,6 +2758,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         setState(UnitState.TO_AMERICA);
 
+        logger.info("Unit " + getId() + " moving to America");
+        
         // Clear the alreadyOnHighSea flag:
         alreadyOnHighSea = false;
     }
@@ -2936,6 +2940,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
                 switch (state) {
                 case TO_EUROPE:
+                	logger.info("Unit " + getId() + " arrives in Europe");
                         // trade unit arrives in Europe
                         if(this.getTradeRoute() != null){
                                 setMovesLeft(0);
@@ -2955,6 +2960,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     }
                     break;
                 case TO_AMERICA:
+                	logger.info("Unit " + getId() + " arrives in America");
                     getGame().getModelController().setToVacantEntryLocation(this);
                     setState(UnitState.ACTIVE);
                     break;
