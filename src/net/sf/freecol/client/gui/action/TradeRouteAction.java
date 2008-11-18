@@ -17,33 +17,31 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
+import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 
-
 /**
-* An action for editing trade routes.
-*/
+ * An action for editing trade routes.
+ */
 public class TradeRouteAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TradeRouteAction.class.getName());
 
-
     public static final String id = "tradeRouteAction";
+
 
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
     TradeRouteAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.tradeRoutes", null, KeyEvent.VK_NUMBER_SIGN);
+        super(freeColClient, "menuBar.view.tradeRoutes", null, KeyStroke.getKeyStroke('T', 0));
     }
     
     

@@ -30,11 +30,9 @@ import net.sf.freecol.client.FreeColClient;
  * An action for clearing the active unit's orders.
  */
 public class ClearOrdersAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ClearOrdersAction.class.getName());
-
-
-
 
     public static final String id = "clearOrdersAction";
 
@@ -45,7 +43,7 @@ public class ClearOrdersAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     ClearOrdersAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.clearOrders", null, KeyStroke.getKeyStroke('L', 0));
+        super(freeColClient, "menuBar.orders.clearOrders", null, KeyStroke.getKeyStroke('Z', 0));
     }
 
     /**

@@ -33,15 +33,12 @@ import net.sf.freecol.common.option.OptionGroup;
  * Stores the actions.
  */
 public class ActionManager extends OptionGroup {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ActionManager.class.getName());
 
-
-
-
     @SuppressWarnings("unused")
     private FreeColClient freeColClient;
-
 
     /**
      * Creates a new <code>ActionManager</code>.
@@ -95,6 +92,7 @@ public class ActionManager extends OptionGroup {
         for (ImprovementActionType ia : FreeCol.getSpecification().getImprovementActionTypeList()) {
             add(new ImprovementAction(freeColClient, ia));
         }
+        add(new LoadAction(freeColClient));
         add(new MapControlsAction(freeColClient));
         add(new MiniMapChangeBackgroundAction(freeColClient));
         add(new MiniMapZoomInAction(freeColClient));

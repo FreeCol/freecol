@@ -199,8 +199,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         SwingUtilities.replaceUIInputMap(unloadButton, JComponent.WHEN_IN_FOCUSED_WINDOW, unloadInputMap);
 
         InputMap fillInputMap = new ComponentInputMap(fillButton);
-        fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0, false), "pressed");
-        fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0, true), "released");
+        fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, false), "pressed");
+        fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, true), "released");
         SwingUtilities.replaceUIInputMap(fillButton, JComponent.WHEN_IN_FOCUSED_WINDOW, fillInputMap);
 
         productionPanel = new JPanel();
@@ -841,7 +841,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 logger.warning("Invalid action");
             }
         } catch (NumberFormatException e) {
-            logger.warning("Invalid action number");
+            logger.warning("Invalid action number: " + command);
         }
     }
 

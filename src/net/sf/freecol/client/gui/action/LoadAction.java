@@ -28,30 +28,31 @@ import javax.swing.KeyStroke;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.panel.MapControls;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
 
 /**
- * An action for unloading the currently selected unit.
+ * An action for filling the holds of the currently selected unit.
  */
-public class UnloadAction extends MapboardAction {
+public class LoadAction extends MapboardAction {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(UnloadAction.class.getName());
+    private static final Logger logger = Logger.getLogger(LoadAction.class.getName());
 
-    public static final String id = "unloadAction";
+    public static final String id = "loadAction";
 
     /**
      * Creates this action.
      * @param freeColClient The main controller object for the client.
      */
-    public UnloadAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.unload", null, KeyStroke.getKeyStroke('U', 0));
+    public LoadAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.orders.load", null, KeyStroke.getKeyStroke('L', 0));
     }
 
     /**
     * Returns the id of this <code>Option</code>.
-    * @return "unloadAction"
+    * @return "loadAction"
     */
     public String getId() {
         return id;
@@ -67,7 +68,9 @@ public class UnloadAction extends MapboardAction {
             GUI gui = getFreeColClient().getGUI();
             if (gui != null) {
                 Unit unit = getFreeColClient().getGUI().getActiveUnit();
-                return (unit != null && unit.isCarrier() && unit.getGoodsCount() > 0);
+                return (unit != null && unit.isCarrier()
+                        && unit.getGoodsCount() > 0
+                        && unit.getColony() != null);
             }
         }
         return false;
@@ -80,38 +83,18 @@ public class UnloadAction extends MapboardAction {
     public void actionPerformed(ActionEvent e) {
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
         if (unit != null) {
-            if (!unit.isInEurope() && unit.getColony() == null) {
-                if (getFreeColClient().getCanvas().showConfirmDialog("dumpAllCargo", "yes", "no")) {
-                    unloadAllCargo(unit);
-                    MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id)).getMapControls();
-                    if (controls != null) {
-                        controls.update();
+            Colony colony = unit.getColony();
+            if (colony != null) {
+                Iterator<Goods> goodsIterator = unit.getGoodsIterator();
+                while (goodsIterator.hasNext()) {
+                    Goods goods = goodsIterator.next();
+                    if (goods.getAmount() < 100 && colony.getGoodsCount(goods.getType()) > 0) {
+                        int amount = Math.min(100 - goods.getAmount(), colony.getGoodsCount(goods.getType()));
+                        Goods newGoods = new Goods(goods.getGame(), colony, goods.getType(), amount);
+                        getFreeColClient().getInGameController().loadCargo(newGoods, unit);
                     }
                 }
-            } else {
-                unloadAllCargo(unit);
-                unloadAllUnits(unit);
-                MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id)).getMapControls();
-                if (controls != null) {
-                    controls.update();
-                }
             }
-        }
-    }
-
-    private void unloadAllUnits(Unit unit) {
-        Iterator<Unit> unitIterator = unit.getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit newUnit = unitIterator.next();
-            getFreeColClient().getInGameController().leaveShip(newUnit);
-        }
-    }
-
-    private void unloadAllCargo(Unit unit) {
-        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-        while (goodsIterator.hasNext()) {
-            Goods goods = goodsIterator.next();
-            getFreeColClient().getInGameController().unloadCargo(goods);
         }
     }
 

@@ -59,6 +59,7 @@ import net.sf.freecol.client.gui.action.FortifyAction;
 import net.sf.freecol.client.gui.action.GotoAction;
 import net.sf.freecol.client.gui.action.GotoTileAction;
 import net.sf.freecol.client.gui.action.ImprovementActionType;
+import net.sf.freecol.client.gui.action.LoadAction;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.action.NewAction;
 import net.sf.freecol.client.gui.action.OpenAction;
@@ -104,11 +105,9 @@ import net.sf.freecol.client.gui.menu.DebugMenu;
  * @see MapEditorMenuBar
  */
 public class InGameMenuBar extends FreeColMenuBar {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(InGameMenuBar.class.getName());
-
-
-
 
     public static final int UNIT_ORDER_WAIT = 0;
 
@@ -119,11 +118,7 @@ public class InGameMenuBar extends FreeColMenuBar {
     public static final int UNIT_ORDER_CLEAR_ORDERS = 3;
 
     public static final int UNIT_ORDER_BUILD_COL = 5;
-/*
-    public static final int UNIT_ORDER_PLOW = 6;
 
-    public static final int UNIT_ORDER_BUILD_ROAD = 7;
-*/
     public static final int UNIT_ORDER_SKIP = 9;
 
     public static final int UNIT_ORDER_DISBAND = 11;
@@ -248,11 +243,14 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setOpaque(false);
         menu.setMnemonic(KeyEvent.VK_O);
 
-        menu.add(getMenuItem(WaitAction.id));
         menu.add(getMenuItem(SentryAction.id));
         menu.add(getMenuItem(FortifyAction.id));
+
+        menu.addSeparator();
+
         menu.add(getMenuItem(GotoAction.id));
         menu.add(getMenuItem(GotoTileAction.id));
+        menu.add(getMenuItem(ExecuteGotoOrdersAction.id));
         menu.add(getMenuItem(AssignTradeRouteAction.id));
 
         menu.addSeparator();
@@ -262,21 +260,21 @@ public class InGameMenuBar extends FreeColMenuBar {
         for (ImprovementActionType iaType : FreeCol.getSpecification().getImprovementActionTypeList()) {
             menu.add(getMenuItem(iaType.getId()));
         }
-        /*  Depreciated
-        menu.add(getMenuItem(PlowAction.id));
-        menu.add(getMenuItem(BuildRoadAction.id));
-        */
+
+        menu.addSeparator();
+
+        menu.add(getMenuItem(LoadAction.id));
         menu.add(getMenuItem(UnloadAction.id));
 
         menu.addSeparator();
 
-        menu.add(getMenuItem(ExecuteGotoOrdersAction.id));
+        menu.add(getMenuItem(WaitAction.id));
         menu.add(getMenuItem(SkipUnitAction.id));
         menu.add(getMenuItem(ChangeAction.id));
-        menu.add(getMenuItem(ClearOrdersAction.id));
-
+ 
         menu.addSeparator();
 
+        menu.add(getMenuItem(ClearOrdersAction.id));
         menu.add(getMenuItem(RenameAction.id));
         menu.add(getMenuItem(DisbandUnitAction.id));
 
@@ -340,10 +338,10 @@ public class InGameMenuBar extends FreeColMenuBar {
         super.paintComponent(g);
 
         String displayString = Messages.message("menuBar.statusLine",
-                "%gold%", Integer.toString(freeColClient.getMyPlayer().getGold()),
-                "%tax%", Integer.toString(freeColClient.getMyPlayer().getTax()),
-                "%score%", Integer.toString(freeColClient.getMyPlayer().getScore()),
-                "%year%", freeColClient.getGame().getTurn().toString());
+                                                "%gold%", Integer.toString(freeColClient.getMyPlayer().getGold()),
+                                                "%tax%", Integer.toString(freeColClient.getMyPlayer().getTax()),
+                                                "%score%", Integer.toString(freeColClient.getMyPlayer().getScore()),
+                                                "%year%", freeColClient.getGame().getTurn().toString());
         Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
         int y = 15 + getInsets().top;
         g.drawString(displayString, getWidth() - 10 - (int) displayStringBounds.getWidth(), y);

@@ -30,11 +30,9 @@ import net.sf.freecol.client.FreeColClient;
  * An action for renameing the active unit.
  */
 public class RenameAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RenameAction.class.getName());
-
-
-
 
     public static final String id = "renameAction";
 
@@ -45,7 +43,7 @@ public class RenameAction extends MapboardAction {
      * @param freeColClient The main controller object for the client.
      */
     RenameAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.orders.rename", null, KeyStroke.getKeyStroke('X', 0));
+        super(freeColClient, "menuBar.orders.rename", null, KeyStroke.getKeyStroke('N', 0));
     }
 
     /**
