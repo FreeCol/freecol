@@ -1356,6 +1356,22 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             // 10% of their gold
             plunderGold = newTile.getSettlement().getOwner().getGold() / 10;
         }
+        
+        // Gets repair location if necessary
+        Location repairLocation = null;
+        Unit loser = null;
+        Player loserOwner = null;
+        if(result.type == CombatResultType.GREAT_WIN){
+        	loser = defender;
+        }
+        if(result.type == CombatResultType.GREAT_LOSS){
+        	loser = unit;
+        }
+        if(loser != null && loser.isNaval()){
+        	loserOwner = loser.getOwner();
+        	repairLocation = loserOwner.getRepairLocation(loser);
+        }
+        
         // Inform the players (other then the player attacking) about
         // the attack:
         for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
@@ -1367,9 +1383,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
                 opponentAttackElement.setAttribute("unit", unit.getId());
                 opponentAttackElement.setAttribute("defender", defender.getId());
-                if (defender.getOwner() == enemyPlayer) {
+                
+                if (defender != null && defender.getOwner() == enemyPlayer) {
+                	// Naval battle, defender lost, needs repair location
+                	if(repairLocation != null && loserOwner == defender.getOwner()){
+                		opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
+                	}
                     // always update the attacker, defender needs its location
-                    opponentAttackElement.setAttribute("update", "unit");
+                	opponentAttackElement.setAttribute("update", "unit");
                     opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
                             opponentAttackElement.getOwnerDocument()));
                 } else if (!defender.isVisibleTo(enemyPlayer)) {
@@ -1400,6 +1421,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         reply.setAttribute("damage", String.valueOf(result.damage));
         reply.setAttribute("plunderGold", Integer.toString(plunderGold));
         
+        // Naval battle, attacker lost, needs repair location
+        if(repairLocation != null && player == loserOwner){
+        	reply.setAttribute("repairIn", repairLocation.getId());
+        }
+        
         if (result.type == CombatResultType.DONE_SETTLEMENT && newTile.getColony() != null) {
             // If a colony will been won, send an updated tile:
             reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
@@ -1416,7 +1442,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         int oldUnits = unit.getTile().getUnitCount();
-        unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold);
+        unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold, repairLocation);
         
         if (result.type.compareTo(CombatResultType.WIN) >= 0 
             && unit.getTile() != newTile

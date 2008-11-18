@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -375,7 +376,8 @@ public final class InGameInputHandler extends InputHandler {
         CombatResultType result = Enum.valueOf(CombatResultType.class, opponentAttackElement.getAttribute("result"));
         int damage = Integer.parseInt(opponentAttackElement.getAttribute("damage"));
         int plunderGold = Integer.parseInt(opponentAttackElement.getAttribute("plunderGold"));
-
+        Location repairLocation = (Location) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("repairIn"));
+        
         if (opponentAttackElement.hasAttribute("update")) {
             String updateAttribute = opponentAttackElement.getAttribute("update");
             if (updateAttribute.equals("unit")) {
@@ -433,9 +435,9 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         if (colony != null) {
-            getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage));
+            getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage), repairLocation);
         } else {            
-            unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold);
+            unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold, repairLocation);
             if (!unit.isDisposed() &&
                 (unit.getLocation() == null ||
                  !unit.isVisibleTo(getFreeColClient().getMyPlayer()))) {

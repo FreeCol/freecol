@@ -33,28 +33,28 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.ModelController;
-import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
-import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Monarch.MonarchAction;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -756,7 +756,7 @@ public final class InGameController extends Controller {
         for (Settlement settlement : currentPlayer.getSettlements()) {
             Colony colony = (Colony) settlement;
             if (colony.canBombardEnemyShip()){
-                logger.info("Colony " + colony.getName() + " can bombard enemy ships.");
+                logger.fine("Colony " + colony.getName() + " can bombard enemy ships.");
                 Position colonyPosition = colony.getTile().getPosition();
                 for (Direction direction : Direction.values()) {
                     Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
@@ -767,7 +767,9 @@ public final class InGameController extends Controller {
                     }
                     
                     // Go through the units in the tile
-                    Iterator<Unit> unitIterator = tile.getUnitIterator();
+                    // a new list must be created, since the original may be changed while iterating
+                    List<Unit> unitList = new ArrayList<Unit>(tile.getUnitList());
+                    Iterator<Unit> unitIterator = unitList.iterator();
                     while (unitIterator.hasNext()) {
                     	Unit unit = unitIterator.next();
                     	Player player = unit.getOwner();
@@ -783,10 +785,18 @@ public final class InGameController extends Controller {
                     		continue;
                     	}
 
-                    	logger.info("Found enemy unit " + unit.getOwner().getNationAsString() + " "
-                    			+ unit.getName());
+                    	logger.info(colony.getName() + " found enemy unit to bombard: " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
                     	// generate bombardment result
                     	CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
+
+                    	// ship was damaged, get repair location
+                    	Location repairLocation = null;
+                    	if(result.type == CombatModel.CombatResultType.WIN){
+                			repairLocation = player.getRepairLocation(unit);
+                    	}
+                			
+                    	// update server data
+                    	getGame().getCombatModel().bombard(colony, unit, result, repairLocation);
 
                     	// Inform the players (other then the player
                     	// attacking) about the attack:
@@ -813,12 +823,9 @@ public final class InGameController extends Controller {
                     		opponentAttackElement.setAttribute("defender", unit.getId());
                     		opponentAttackElement.setAttribute("damage", String.valueOf(result.damage));
 
-                    		// Ship has been damaged, add repair location
-                    		if(enemyPlayer == player && result.type == CombatModel.CombatResultType.LOSS){
-                    			Location repairLocation = player.getRepairLocation(unit);
-                    			if(repairLocation != null){
-                    				opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
-                    			}
+                    		// Add repair location to defending player
+                    		if(enemyPlayer == player && repairLocation != null){
+                    			opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
                     		}
                     		
                     		// Every player who witness the confrontation needs to know about the attacker
@@ -828,7 +835,15 @@ public final class InGameController extends Controller {
                     			opponentAttackElement.appendChild(colony.getTile().toXMLElement(
                     					enemyPlayer, opponentAttackElement.getOwnerDocument()));
                     		}
-
+                    		
+                    		// update players view of the unit
+                    		// defending player updates own unit
+                    		if(enemyPlayer != player && enemyPlayer.canSee(unit.getTile())){ 
+                    			opponentAttackElement.setAttribute("update", "unit");
+                    			opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
+                                    opponentAttackElement.getOwnerDocument()));
+                    		}
+                    		
                     		// Send response
                     		try {
                     			enemyPlayer.getConnection().send(opponentAttackElement);

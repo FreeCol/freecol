@@ -2459,8 +2459,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Sends this <code>Unit</code> to the closest <code>Location</code> it
      * can get repaired.
      */
-    public void sendToRepairLocation() {
-        Location l = getOwner().getRepairLocation(this);
+    public void sendToRepairLocation(Location l) {
         setLocation(l);
         setState(UnitState.ACTIVE);
         setMovesLeft(0);

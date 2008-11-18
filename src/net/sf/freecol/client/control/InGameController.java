@@ -1926,7 +1926,8 @@ public final class InGameController implements NetworkConstants {
             CombatResultType result = Enum.valueOf(CombatResultType.class, attackResultElement.getAttribute("result"));
             int damage = Integer.parseInt(attackResultElement.getAttribute("damage"));
             int plunderGold = Integer.parseInt(attackResultElement.getAttribute("plunderGold"));
-
+            Location repairLocation = (Location) game.getFreeColGameObjectSafely(attackResultElement.getAttribute("repairIn"));
+            
             // If a successful attack against a colony, we need to update the
             // tile:
             Element utElement = getChildElement(attackResultElement, Tile.getXMLElementTagName());
@@ -1978,7 +1979,7 @@ public final class InGameController implements NetworkConstants {
             }
 
             try {
-                game.getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold);
+                game.getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold, repairLocation);
             } catch (Exception e) {
                 // Ignore the exception (the update further down will fix any
                 // problems).

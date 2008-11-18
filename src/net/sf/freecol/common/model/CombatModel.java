@@ -166,7 +166,7 @@ public interface CombatModel {
      * @param result The result of the attack.
      * @param plunderGold an <code>int</code> value
      */
-    public void attack(Unit attacker, Unit defender, CombatResult result, int plunderGold);
+    public void attack(Unit attacker, Unit defender, CombatResult result, int plunderGold, Location repairLocation);
 
     /**
      * Bombard a unit with the given outcome.
@@ -175,6 +175,6 @@ public interface CombatModel {
      * @param defender The <code>Unit</code> defending against bombardment.
      * @param result The result of the bombardment.
      */
-    public void bombard(Colony colony, Unit defender, CombatResult result);
+    public void bombard(Colony colony, Unit defender, CombatResult result, Location repairLocation);
 
 }

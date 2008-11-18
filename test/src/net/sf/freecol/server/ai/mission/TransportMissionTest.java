@@ -99,7 +99,7 @@ public class TransportMissionTest extends FreeColTestCase {
         //Simulate the combat
         CombatModel combatModel = game.getCombatModel();
         CombatModel.CombatResult combatResult = new CombatModel.CombatResult(CombatModel.CombatResultType.WIN,galleon.getHitpoints());
-        combatModel.attack(privateer, galleon, combatResult , 0);
+        combatModel.attack(privateer, galleon, combatResult , 0, player1.getEurope());
 
         // Verify that the outcome of the combat is  a return to Europe for repairs
         // and also invalidation of the transport mission as side effect
