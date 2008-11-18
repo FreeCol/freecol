@@ -221,9 +221,9 @@ public class GoodsTest extends FreeColTestCase {
         // checking raw materials
         assertTrue(ore.isRawBuildingMaterial());
         assertTrue(lumber.isRawBuildingMaterial());
-        assertTrue(tools.isRawBuildingMaterial());  // ? why ?
-        assertTrue(food.isRawBuildingMaterial());   // ? why ?
-        assertFalse(fish.isRawBuildingMaterial());  // ? why not the same as food ?
+        assertFalse(tools.isRawBuildingMaterial());
+        assertTrue(food.isRawBuildingMaterial());
+        assertFalse(fish.isRawBuildingMaterial());
         assertFalse(horses.isRawBuildingMaterial());
         assertFalse(muskets.isRawBuildingMaterial());
         assertFalse(hammers.isRawBuildingMaterial());
