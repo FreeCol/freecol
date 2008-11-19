@@ -588,7 +588,10 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             goodsBox.removeAllItems();
             Iterator<Goods> goodsIterator = allGoods.iterator();
             while (goodsIterator.hasNext()) {
-                goodsBox.addItem(goodsIterator.next());
+            	Goods goods = goodsIterator.next();
+            	if(goods.getType().isStorable()){
+            		goodsBox.addItem(goods);
+            	}
             }
             for(ActionListener al : listeners) {
                 goodsBox.addActionListener(al);
