@@ -252,21 +252,30 @@ public final class InGameInputHandler extends InputHandler {
             // The unit moving should be already visible
             final Unit unit = (Unit) getGame().getFreeColGameObjectSafely(opponentMoveElement.getAttribute("unit"));
             if (unit == null) {
+                /*
                 logger.warning("Could not find the 'unit' in 'opponentMove'. Unit ID: "
                         + opponentMoveElement.getAttribute("unit"));
                 return null;
+                */
+                throw new IllegalStateException("Could not find the 'unit' in 'opponentMove'. Unit ID: "
+                                                + opponentMoveElement.getAttribute("unit"));
             }
             
             final Tile fromTile = (Tile) getGame().getFreeColGameObjectSafely(opponentMoveElement.getAttribute("fromTile"));
             if (fromTile == null) {
+                /*
                 logger.warning("Ignoring opponentMove, unit " + unit.getId() + " has no tile!");
                 return null;
+                */
+                throw new IllegalStateException("Ignoring opponentMove, unit " + unit.getId()
+                                                + " has no tile!");
             }
 
             final Tile toTile = map.getNeighbourOrNull(direction, fromTile);
             if (toTile==null) {
-                logger.warning("Destination tile is null!");
+                // logger.warning("Destination tile is null!");
                 // TODO: find out why this can happen
+                throw new IllegalStateException("Destination tile is null!");
             } else {
                 final String key = (getFreeColClient().getMyPlayer() == unit.getOwner()) ?
                         ClientOptions.MOVE_ANIMATION_SPEED
@@ -294,7 +303,6 @@ public final class InGameInputHandler extends InputHandler {
 
             Element unitElement = Message.getChildElement(opponentMoveElement, Unit.getXMLElementTagName());
             if (unitElement == null) {
-                logger.warning("unitElement == null");
                 throw new NullPointerException("unitElement == null");
             }
             Unit u = (Unit) getGame().getFreeColGameObjectSafely(unitElement.getAttribute("ID"));
@@ -326,10 +334,13 @@ public final class InGameInputHandler extends InputHandler {
             }
 
             if (getGame().getFreeColGameObject(tileID) == null) {
+                /*
                 logger.warning("Could not find tile with id: " + tileID);
                 unit.setLocation(null);
                 // Can't go on without the tile
                 return null;
+                */
+                throw new IllegalStateException("Could not find tile with id: " + tileID);
             }
             
             final Tile newTile = (Tile) getGame().getFreeColGameObject(tileID);
