@@ -932,7 +932,7 @@ public final class InGameInputHandler extends InputHandler {
          */
 
         first.setStance(second, stance);
-
+        
         if (stance == Stance.WAR) {
             if (player.equals(second)) {
                 player.addModelMessage(new ModelMessage(first, "model.diplomacy.war.declared",
@@ -948,6 +948,9 @@ public final class InGameInputHandler extends InputHandler {
             }
         }
 
+        if(second.getStance(first) != stance){
+        	second.setStance(first, stance);
+        }
         return null;
     }
 
