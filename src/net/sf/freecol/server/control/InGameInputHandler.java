@@ -1359,17 +1359,29 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         // Gets repair location if necessary
         Location repairLocation = null;
-        Unit loser = null;
         Player loserOwner = null;
-        if(result.type == CombatResultType.GREAT_WIN){
-        	loser = defender;
-        }
-        if(result.type == CombatResultType.GREAT_LOSS){
-        	loser = unit;
-        }
-        if(loser != null && loser.isNaval()){
-        	loserOwner = loser.getOwner();
-        	repairLocation = loserOwner.getRepairLocation(loser);
+        switch (result.type) {
+        case WIN:
+            if (defender.isNaval()) {
+                loserOwner = defender.getOwner();
+                repairLocation = loserOwner.getRepairLocation(defender);
+            }
+            break;
+        case DONE_SETTLEMENT:
+            for (Unit victim : newTile.getUnitList()) {
+                if (victim.isNaval()) {
+                    loserOwner = victim.getOwner();
+                    repairLocation = loserOwner.getRepairLocation(victim);
+                    break;
+                }
+            }
+            break;
+        case LOSS:
+            if (unit.isNaval()) {
+                loserOwner = player;
+                repairLocation = loserOwner.getRepairLocation(unit);
+            }
+            break;
         }
         
         // Inform the players (other then the player attacking) about
