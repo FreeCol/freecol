@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.server.control;
 
 import java.util.ArrayList;
@@ -33,7 +32,9 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
@@ -49,49 +50,45 @@ import org.w3c.dom.Element;
 
 
 /**
-* The control object that is responsible for setting parameters
-* and starting a new game. {@link PreGameInputHandler} is used
-* to receive and handle network messages from the clients.
-*
-* <br><br>
-*
-* The game enters the state {@link FreeColServer#IN_GAME}, when
-* the {@link #startGame} has successfully been invoked.
-*
-* @see InGameInputHandler
-*/
+ * The control object that is responsible for setting parameters
+ * and starting a new game. {@link PreGameInputHandler} is used
+ * to receive and handle network messages from the clients.
+ *
+ * <br><br>
+ *
+ * The game enters the state {@link FreeColServer#IN_GAME}, when
+ * the {@link #startGame} has successfully been invoked.
+ *
+ * @see InGameInputHandler
+ */
 public final class PreGameController extends Controller {
+
     private static final Logger logger = Logger.getLogger(PreGameController.class.getName());
 
-
-
     /**
-    * The constructor to use.
-    * @param freeColServer The main server object.
-    */
+     * The constructor to use.
+     * @param freeColServer The main server object.
+     */
     public PreGameController(FreeColServer freeColServer) {
         super(freeColServer);
     }
 
-
-
-
     /**
-    * Updates and starts the game.
-    *
-    * <br><br>
-    *
-    * This method performs these tasks in the given order:
-    *
-    * <br>
-    *
-    * <ol>
-    *   <li>Generates the map.
-    *   <li>Sends updated game information to the clients.
-    *   <li>Changes the game state to {@link FreeColServer#IN_GAME}.
-    *   <li>Sends the "startGame"-message to the clients.
-    * </ol>
-    */
+     * Updates and starts the game.
+     *
+     * <br><br>
+     *
+     * This method performs these tasks in the given order:
+     *
+     * <br>
+     *
+     * <ol>
+     *   <li>Generates the map.
+     *   <li>Sends updated game information to the clients.
+     *   <li>Changes the game state to {@link FreeColServer#IN_GAME}.
+     *   <li>Sends the "startGame"-message to the clients.
+     * </ol>
+     */
     public void startGame() throws FreeColException{
         FreeColServer freeColServer = getFreeColServer();
 
@@ -125,7 +122,7 @@ public final class PreGameController extends Controller {
         Map map = game.getMap();
         
         // Inform the clients:
-        setMap(map);
+        setMapAndMarket(map);
         
         
         // Start the game:
@@ -136,7 +133,7 @@ public final class PreGameController extends Controller {
         
         Element startGameElement = Message.createNewRootElement("startGame");
         freeColServer.getServer().sendToAll(startGameElement);
-        freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());        
+        freeColServer.getServer().setMessageHandlerToAllConnections(freeColServer.getInGameInputHandler());
     }
     
     /**
@@ -145,7 +142,7 @@ public final class PreGameController extends Controller {
      *
      * @param map The new <code>Map</code> to be set.
      */
-    public void setMap(Map map) {
+    public void setMapAndMarket(Map map) {
         Game game = getFreeColServer().getGame();
 
         Iterator<Player> playerIterator = game.getPlayerIterator();
@@ -154,6 +151,16 @@ public final class PreGameController extends Controller {
             
             if (player.isEuropean() && !player.isREF()) {
                 player.modifyGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
+                Market market = player.getMarket();
+                for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                    if (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) {
+                        int increase = getPseudoRandom().nextInt(3);
+                        if (increase > 0) {
+                            int newPrice = goodsType.getInitialSellPrice() + increase;
+                            market.getMarketData(goodsType).setInitialPrice(newPrice);
+                        }
+                    }
+                }
             }
             if (player.isAI()) {
                 continue;

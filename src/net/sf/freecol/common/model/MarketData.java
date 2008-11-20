@@ -51,6 +51,11 @@ public class MarketData extends FreeColObject {
     private int oldPrice;
 
     /**
+     * Describe initialPrice here.
+     */
+    private int initialPrice;
+
+    /**
      * Describe arrears here.
      */
     private int arrears;
@@ -74,6 +79,7 @@ public class MarketData extends FreeColObject {
      * Has this good been traded?
      */
     private boolean traded;
+
 
     /**
      * Package constructor: This class is only supposed to be constructed
@@ -164,6 +170,24 @@ public class MarketData extends FreeColObject {
      */
     public final void setOldPrice(final int newOldPrice) {
         this.oldPrice = newOldPrice;
+    }
+
+    /**
+     * Get the <code>InitialPrice</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getInitialPrice() {
+        return initialPrice;
+    }
+
+    /**
+     * Set the <code>InitialPrice</code> value.
+     *
+     * @param newInitialPrice The new InitialPrice value.
+     */
+    public final void setInitialPrice(final int newInitialPrice) {
+        this.initialPrice = newInitialPrice;
     }
 
     /**
@@ -268,6 +292,7 @@ public class MarketData extends FreeColObject {
 
         out.writeAttribute("ID", getId());
         out.writeAttribute("amount", Integer.toString(amountInMarket));
+        out.writeAttribute("initialPrice", Integer.toString(initialPrice));
         out.writeAttribute("arrears", Integer.toString(arrears));
         out.writeAttribute("sales", Integer.toString(sales));
         out.writeAttribute("incomeBeforeTaxes", Integer.toString(incomeBeforeTaxes));
@@ -283,6 +308,7 @@ public class MarketData extends FreeColObject {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
         amountInMarket = Integer.parseInt(in.getAttributeValue(null, "amount"));
+        initialPrice = Integer.parseInt(in.getAttributeValue(null, "initialPrice"));
         arrears = Integer.parseInt(in.getAttributeValue(null, "arrears"));
         sales = Integer.parseInt(in.getAttributeValue(null, "sales"));
         incomeBeforeTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeBeforeTaxes"));

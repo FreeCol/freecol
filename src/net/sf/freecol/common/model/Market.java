@@ -77,6 +77,7 @@ public final class Market extends FreeColGameObject implements Ownable {
                 data.setPaidForSale(goodsType.getInitialSellPrice());
                 data.setCostToBuy(goodsType.getInitialBuyPrice());
                 data.setOldPrice(goodsType.getInitialBuyPrice());
+                data.setInitialPrice(goodsType.getInitialSellPrice());
             }
             marketData.put(goodsType, data);
         }
@@ -408,7 +409,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         MarketData data = marketData.get(goodsType);
         if (data != null) {
             data.setOldPrice(data.getCostToBuy());
-            int newPrice = Math.round(goodsType.getInitialAmount() * goodsType.getInitialSellPrice() /
+            int newPrice = Math.round(goodsType.getInitialAmount() * data.getInitialPrice() /
                                       (float) data.getAmountInMarket());
             if (newPrice + goodsType.getPriceDifference() > MAXIMUM_PRICE) {
                 data.setCostToBuy(MAXIMUM_PRICE);

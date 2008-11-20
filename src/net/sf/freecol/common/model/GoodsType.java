@@ -131,6 +131,10 @@ public final class GoodsType extends FreeColGameObjectType {
         return newWorldGoods;
     }
 
+    public boolean isNewWorldLuxuryType() {
+        return (madeFrom != null && madeFrom.isNewWorldGoodsType());
+    }
+
     public boolean isStorable() {
         return storable;
     }

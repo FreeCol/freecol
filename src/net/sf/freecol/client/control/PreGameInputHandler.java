@@ -85,8 +85,6 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
                 reply = removePlayer(element);
             } else if (type.equals("updateGameOptions")) {
                 reply = updateGameOptions(element);
-            } else if (type.equals("updateMarket")) {
-                reply = updateMarket(element);
             } else if (type.equals("updateMapGeneratorOptions")) {
                 reply = updateMapGeneratorOptions(element);
             } else if (type.equals("chat")) {
@@ -176,26 +174,6 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
         getFreeColClient().getGame().removePlayer(player);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
-        return null;
-    }
-
-    /**
-     * Handles an "updateMarket"-message.
-     * 
-     * @param updateElement The element (root element in a DOM-parsed XML tree)
-     *            that holds all the information.
-     * @return The reply.
-     */
-    public Element updateMarket(Element updateElement) {
-        Game game = getFreeColClient().getGame();
-        NodeList nodeList = updateElement.getChildNodes();
-        Element element = (Element) nodeList.item(0);
-        Market market = (Market) game.getFreeColGameObjectSafely(element.getAttribute("ID"));
-        if (market != null) {
-            market.readFromXMLElement(element);
-        } else {
-            logger.warning("Could not find 'Market' with ID: " + element.getAttribute("ID"));
-        }
         return null;
     }
 
