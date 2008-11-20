@@ -66,7 +66,7 @@
       <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.tradeGoods" art="goods/tradeGoods.png" is-farmed="false" trade-goods="true">
-      <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
+      <market initial-amount="3000"  initial-price="1"  price-difference="2"/>
     </goods-type>
     <goods-type id="model.goods.tools" art="goods/tools.png" is-farmed="false" made-from="model.goods.ore">
       <market initial-amount="500"   initial-price="1"  price-difference="2"/>
