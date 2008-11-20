@@ -131,7 +131,9 @@ public class ClientModelController implements ModelController {
 
         Element unitElement = (Element) reply.getElementsByTagName(Unit.getXMLElementTagName()).item(0);
         Unit unit = new Unit(freeColClient.getGame(), unitElement);
-        unit.setLocation(unit.getLocation());
+        // unit is not really at location yet, set it carefully
+        unit.setLocationNoUpdate(null);
+        unit.setLocation(location);
 
         return unit;
     }
