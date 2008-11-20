@@ -156,7 +156,6 @@ public class GoodsTradeItem extends TradeItem {
                 this.goods = new Goods(getGame(), in);
             }
         }
-        in.nextTag();
     }
 
     /**
