@@ -24,6 +24,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.Specification;
+
 /**
  * Objects of this class hold the market data for a particular type of
  * good.
@@ -308,7 +310,12 @@ public class MarketData extends FreeColObject {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
         amountInMarket = Integer.parseInt(in.getAttributeValue(null, "amount"));
-        initialPrice = Integer.parseInt(in.getAttributeValue(null, "initialPrice"));
+        initialPrice = getAttribute(in, "initialPrice", -1);
+        // support for older savegames
+        if (initialPrice < 0) {
+            initialPrice = Specification.getSpecification().getGoodsType(getId())
+                .getInitialSellPrice();
+        }
         arrears = Integer.parseInt(in.getAttributeValue(null, "arrears"));
         sales = Integer.parseInt(in.getAttributeValue(null, "sales"));
         incomeBeforeTaxes = Integer.parseInt(in.getAttributeValue(null, "incomeBeforeTaxes"));
