@@ -1076,6 +1076,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             if (editState && result != null && result instanceof UnitLabel) {
                 updateSoLLabel();
             }
+            updateCargoLabel();
             return result;
         }
 

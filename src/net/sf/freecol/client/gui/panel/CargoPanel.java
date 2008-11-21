@@ -175,21 +175,23 @@ public class CargoPanel extends FreeColPanel {
                 add(label);
             }
         }
-
         updateTitle();
     }
 
     private void updateTitle() {
-        if (border != null) {
-            if (carrier == null) {
-                border.setTitle(Messages.message("cargoOnCarrier"));
-            } else {
-                int spaceLeft = carrier.getSpaceLeft();
-                border.setTitle(Messages.message("cargoOnCarrierLong", 
-                                                 "%name%", carrier.getName(),
-                                                 "%space%", String.valueOf(spaceLeft)));
-            }
-        }
+    	// sanitation
+    	if (border == null) {
+    		return;
+    	}
+    	
+    	if (carrier == null) {
+    		border.setTitle(Messages.message("cargoOnCarrier"));
+    	} else {
+    		int spaceLeft = carrier.getSpaceLeft();
+    		border.setTitle(Messages.message("cargoOnCarrierLong", 
+    				"%name%", carrier.getName(),
+    				"%space%", String.valueOf(spaceLeft)));
+    	}
     }
 
     public boolean isActive() {
@@ -212,62 +214,63 @@ public class CargoPanel extends FreeColPanel {
     public Component add(Component comp, boolean editState) {
         if (carrier == null) {
             return null;
-        } else if (editState) {
-            InGameController inGameController = getCanvas().getClient().getInGameController();
-            if (comp instanceof UnitLabel) {
-                Container oldParent = comp.getParent();
-                Unit unit = ((UnitLabel) comp).getUnit();
-                if (carrier.canAdd(unit)) {
-                    ((UnitLabel) comp).setSmall(false);
-                    if (inGameController.boardShip(unit, carrier)) {
-                        if (oldParent != null) {
-                            oldParent.remove(comp);
-                            oldParent.repaint();
-                        }
-                        add(comp);
-                        updateTitle();
-                        return comp;
-                    }
-                }
-            } else if (comp instanceof GoodsLabel) {
-                Goods goods = ((GoodsLabel) comp).getGoods();
+        }
+        
+        if (editState) {
+        	InGameController inGameController = getCanvas().getClient().getInGameController();
+        	if (comp instanceof UnitLabel) {
+        		Container oldParent = comp.getParent();
+        		Unit unit = ((UnitLabel) comp).getUnit();
+        		if (carrier.canAdd(unit)) {
+        			((UnitLabel) comp).setSmall(false);
+        			if (inGameController.boardShip(unit, carrier)) {
+        				if (oldParent != null) {
+        					oldParent.remove(comp);
+        					oldParent.repaint();
+        				}
+        				add(comp);
+        				updateTitle();
+        				return comp;
+        			}
+        		}
+        	} else if (comp instanceof GoodsLabel) {
+        		Goods goods = ((GoodsLabel) comp).getGoods();
 
-                int spaceLeft = carrier.getSpaceLeft();
-                int loadableAmount = carrier.getLoadableAmount(goods.getType());
-                if (loadableAmount == 0) {
-                    return null;
-                } else if (loadableAmount > goods.getAmount()) {
-                    loadableAmount = goods.getAmount();
-                }
-                Goods goodsToAdd = new Goods(goods.getGame(), goods.getLocation(), goods.getType(), loadableAmount);
-                goods.setAmount(goods.getAmount() - loadableAmount);
-                inGameController.loadCargo(goodsToAdd, carrier);
-                initialize();
-                Container oldParent = comp.getParent();
-                if (oldParent instanceof ColonyPanel.WarehousePanel) {
-                    ((ColonyPanel.WarehousePanel) oldParent).initialize();
-                } else {
-                    oldParent.remove(comp);
-                }
-                return comp;
-            } else if (comp instanceof MarketLabel) {
-                MarketLabel label = (MarketLabel) comp;
-                Player player = carrier.getOwner();
-                if (player.canTrade(label.getType())) {
-                    inGameController.buyGoods(label.getType(), label.getAmount(), carrier);
-                    inGameController.nextModelMessage();
-                    initialize();
-                    updateTitle();
-                    return comp;
-                } else {
-                    inGameController.payArrears(label.getType());
-                    return null;
-                }
-            } else {
-                return null;
-            }
+        		int loadableAmount = carrier.getLoadableAmount(goods.getType());
+        		if (loadableAmount == 0) {
+        			return null;
+        		} else if (loadableAmount > goods.getAmount()) {
+        			loadableAmount = goods.getAmount();
+        		}
+        		Goods goodsToAdd = new Goods(goods.getGame(), goods.getLocation(), goods.getType(), loadableAmount);
+        		goods.setAmount(goods.getAmount() - loadableAmount);
+        		inGameController.loadCargo(goodsToAdd, carrier);
+        		initialize();
+        		Container oldParent = comp.getParent();
+        		if (oldParent instanceof ColonyPanel.WarehousePanel) {
+        			((ColonyPanel.WarehousePanel) oldParent).initialize();
+        		} else {
+        			oldParent.remove(comp);
+        		}
+        		return comp;
+        	} else if (comp instanceof MarketLabel) {
+        		MarketLabel label = (MarketLabel) comp;
+        		Player player = carrier.getOwner();
+        		if (player.canTrade(label.getType())) {
+        			inGameController.buyGoods(label.getType(), label.getAmount(), carrier);
+        			inGameController.nextModelMessage();
+        			initialize();
+        			updateTitle();
+        			return comp;
+        		} else {
+        			inGameController.payArrears(label.getType());
+        			return null;
+        		}
+        	} else {
+        		return null;
+        	}
         } else {
-            super.add(comp);
+        	super.add(comp);
         }
 
         return null;
