@@ -161,15 +161,7 @@ public abstract class Mission extends AIObject {
                 break;
             thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
 
-            Element moveElement = Message.createNewRootElement("move");
-            moveElement.setAttribute("unit", unit.getId());
-            moveElement.setAttribute("direction", direction.toString());
-
-            try {
-                connection.sendAndWait(moveElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"move\"-message!");
-            }
+            move(connection, direction);
         }
     }
 
