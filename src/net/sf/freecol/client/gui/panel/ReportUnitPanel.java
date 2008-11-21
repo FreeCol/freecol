@@ -182,48 +182,34 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
         int[] widths;
         int[] heights;
-        if (reportType == ReportType.MILITARY) {
-            int rows = 0;
-            for (ArrayList<Unit> units : locations.values()) {
-                if (units == null || units.isEmpty()) {
-                    if (!ignoreEmptyLocations) {
-                        rows++;
-                    }
-                } else {
-                    rows += units.size() / militaryColumns;
-                    if (units.size() % militaryColumns != 0) {
-                        rows++;
-                    }
+        int rows = 0;
+        for (ArrayList<Unit> units : locations.values()) {
+            if (units == null || units.isEmpty()) {
+                if (!ignoreEmptyLocations) {
+                    rows++;
                 }
-            }
-
-            widths = new int[2 + militaryColumns];
-            heights = new int[rows];
-        } else {
-            int rows = 0;
-            int cargoColumns = carrierColumns - 1;
-            for (ArrayList<Unit> units : locations.values()) {
-                if (units == null || units.isEmpty()) {
-                    if (!ignoreEmptyLocations) {
+            } else if (reportType == ReportType.MILITARY) {
+                rows += units.size() / militaryColumns;
+                if (units.size() % militaryColumns != 0) {
+                    rows++;
+                }
+            } else {
+                int cargoColumns = carrierColumns - 1;
+                for (Unit unit : units) {
+                    int cargo = unit.getGoodsCount() + unit.getUnitCount();
+                    if (cargo == 0) {
                         rows++;
-                    }
-                } else {
-                    for (Unit unit : units) {
-                        int cargo = unit.getGoodsCount() + unit.getUnitCount();
-                        if (cargo == 0) {
+                    } else {
+                        rows += cargo / cargoColumns;
+                        if (cargo % cargoColumns != 0) {
                             rows++;
-                        } else {
-                            rows += cargo / cargoColumns;
-                            if (cargo % cargoColumns != 0) {
-                                rows++;
-                            }
                         }
                     }
                 }
             }
-            widths = new int[2 + carrierColumns];
-            heights = new int[rows];
-        }            
+        }
+        widths = new int[2 + (reportType == ReportType.MILITARY ? militaryColumns : carrierColumns)];
+        heights = new int[rows];
 
         widths[1] = separator; // margin
         detailPanel.setLayout(new HIGLayout(widths, heights));
@@ -237,9 +223,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         // Europe next
         if (player.getEurope() != null) {
             String europeName = player.getEurope().getLocationName();
-            if (locations.get(europeName) != null) {
-                row = handleLocation(europeName, true, row);
-            }
+            row = handleLocation(europeName, true, row);
             otherNames.remove(europeName);
         }
 
@@ -432,7 +416,9 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
     private int handleLocation(String location, boolean makeButton, int row) {
         List<Unit> unitList = locations.get(location);
-        if (!(unitList == null && ignoreEmptyLocations)) {
+        if ((unitList == null || unitList.isEmpty()) && ignoreEmptyLocations) {
+            return row;
+        } else {
             if (makeButton) {
                 JButton locationButton = FreeColPanel.getLinkButton(location, null, location);
                 locationButton.addActionListener(this);
@@ -441,9 +427,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                 JLabel locationLabel = new JLabel(location);
                 detailPanel.add(locationLabel, higConst.rc(row, labelColumn));
             }
-            if (unitList == null) {
-                row++;
-            } else {
+            if (unitList != null) {
                 Collections.sort(unitList, reportPanel.getUnitTypeComparator());
                 if (reportType == ReportType.MILITARY) {
                     int column = unitColumn - 1;
@@ -463,7 +447,6 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                         }
                         detailPanel.add(unitLabel, higConst.rc(row, column));
                     }
-                    row++;
                 } else {
                     // one row for each unit
                     int column = unitColumn;
@@ -484,7 +467,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                         for (Goods goods : unit.getGoodsList()) {
                             GoodsLabel goodsLabel = new GoodsLabel(goods, reportPanel.getCanvas());
                             if (column == 2 + carrierColumns) {
-                                column = unitColumn;
+                                column = unitColumn + 1;
                                 row++;
                             } else {
                                 column++;
@@ -502,12 +485,11 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                             }
                             detailPanel.add(unitLoadedLabel, higConst.rc(row, column));
                         }
-                        row++;
                     }
                 }
             }
+            return row + 1;
         }
-        return row;
     }
 
     private JLabel createUnitTypeLabel(AbstractUnit unit) {
