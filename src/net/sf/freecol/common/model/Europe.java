@@ -251,8 +251,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         unit.getOwner().reduceCrosses();
 
         if (!unit.getOwner().hasAbility("model.ability.selectRecruit")) {
-            addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit, "model.europe.emigrate", "%unit%", unit
-                    .getName());
+            addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit, "model.europe.emigrate",
+                            "%europe%", getName(),
+                            "%unit%", unit.getName());
         }
         // In case William Brewster is in the congress we don't need
         // to show a message to the user because he has already been
