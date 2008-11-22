@@ -229,8 +229,42 @@ public class DiplomaticTrade extends FreeColObject {
         }
         return null;
     }
-
-
+    
+    /**
+     * Returns a list of goods given by <code>Player</code>
+     *
+     * @return a list of <code>Goods</code> offered by the player, empty if none given
+     */
+    public List<Goods> getGoodsGivenBy(Player player){
+    	List<Goods> goodsList = new ArrayList<Goods>();
+    	Iterator<TradeItem> itemIterator = items.iterator();
+        while (itemIterator.hasNext()) {
+            TradeItem item = itemIterator.next();
+            if (item instanceof GoodsTradeItem && player == item.getSource()) {
+            	goodsList.add(((GoodsTradeItem) item).getGoods());
+            }
+        }
+        return goodsList;
+    }
+    
+    /**
+     * Returns a list of colonies given by <code>Player</code>
+     *
+     * @return a list of <code>Colony</code> offered by the player, empty if none given
+     */
+    public List<Colony> getColoniesGivenBy(Player player){
+    	List<Colony> colonyList = new ArrayList<Colony>();
+    	Iterator<TradeItem> itemIterator = items.iterator();
+        while (itemIterator.hasNext()) {
+            TradeItem item = itemIterator.next();
+            if (item instanceof ColonyTradeItem && player == item.getSource()) {
+            	colonyList.add(((ColonyTradeItem) item).getColony());
+            }
+        }
+        return colonyList;
+    }
+    
+    
     /**
      * Calls the <code>makeTrade</code> method of all TradeItems.
      *

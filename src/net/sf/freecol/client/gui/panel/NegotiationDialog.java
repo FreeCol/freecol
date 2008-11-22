@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -295,8 +296,26 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
     	goldOffer.setAvailableGold(player.getGold());
     	
     	if(unit.isCarrier()){
+        	Iterator<Goods> goodsInAgreement = agreement.getGoodsGivenBy(player).iterator();
+        	List<Goods> goodsAvail = new ArrayList<Goods>();
+        	goodsAvail.addAll(unit.getGoodsContainer().getGoods());
+        	
+        	//remove the ones already on the table
+        	while(goodsInAgreement.hasNext()){
+        		Goods goods = goodsInAgreement.next();
+        		for(int i=0;i<goodsAvail.size();i++){
+        			Goods goodAvail = goodsAvail.get(i);
+        			if(goodAvail.getType() == goods.getType() &&
+        			    goodAvail.getAmount() == goods.getAmount()){
+        					// this good is already on the agreement, remove it
+        					goodsAvail.remove(i);
+        					break;
+        			}
+        		}
+        	}
+        	
     		// Update the list of goods available to add to agreement
-    		goodsOffer.updateGoodsBox(unit.getGoodsContainer().getGoods());
+    		goodsOffer.updateGoodsBox(goodsAvail);
     	} else{
         	// Update the list of colonies available to add to agreement
         	colonyOffer.updateColonyBox();
@@ -319,8 +338,26 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         goldDemand.setAvailableGold(foreignGold);
         
         if(unit.isCarrier()){
+        	Iterator<Goods> goodsInAgreement = agreement.getGoodsGivenBy(otherPlayer).iterator();
+        	List<Goods> goodsAvail = new ArrayList<Goods>();
+        	goodsAvail.addAll(settlement.getGoodsContainer().getGoods());
+        	
+        	//remove the ones already on the table
+        	while(goodsInAgreement.hasNext()){
+        		Goods goods = goodsInAgreement.next();
+        		for(int i=0;i<goodsAvail.size();i++){
+        			Goods goodAvail = goodsAvail.get(i);
+        			if(goodAvail.getType() == goods.getType() &&
+        			    goodAvail.getAmount() == goods.getAmount()){
+        					// this good is already on the agreement, remove it
+        					goodsAvail.remove(i);
+        					break;
+        			}
+        		}
+        	}
+        	
         	// Update the list of goods available to add to agreement
-        	goodsDemand.updateGoodsBox(settlement.getGoodsContainer().getGoods());
+        	goodsDemand.updateGoodsBox(goodsAvail);
         }
         else{
         	// Update the list of colonies available to add to agreement
@@ -503,7 +540,8 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         private JButton addButton;
         private Player player;
         private NegotiationDialog negotiationDialog;
-
+        private JLabel textLabel;
+        
         /**
          * Creates a new <code>ColonyTradeItemPanel</code> instance.
          *
@@ -522,17 +560,17 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             setLayout(new HIGLayout(new int[] {0}, new int[] {0, 0, 0}));
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            add(new JLabel(Messages.message("tradeItem.colony")),
-                higConst.rc(1, 1));
-            add(colonyBox, higConst.rc(2, 1));
-            add(addButton, higConst.rc(3, 1));
+            this.textLabel = new JLabel(Messages.message("tradeItem.colony"));
+            add(this.textLabel, higConst.rc(1, 1));
+            add(colonyBox,  higConst.rc(2, 1));
+            add(addButton,  higConst.rc(3, 1));
             
         }
-
+        
         private void updateColonyBox() {
 
             if (!player.isEuropean()) {
-                return;
+        		return;
             }
 
             // Remove all action listeners, so the update has no effect (except
@@ -542,15 +580,40 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                 colonyBox.removeActionListener(al);
             }
             colonyBox.removeAllItems();
-            List<Colony> colonies = player.getColonies();
-            Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
-            Iterator<Colony> colonyIterator = colonies.iterator();
-            while (colonyIterator.hasNext()) {
-                colonyBox.addItem(colonyIterator.next());
-            }
-            for(ActionListener al : listeners) {
-                colonyBox.addActionListener(al);
-            }
+        	
+            Iterator<Colony> coloniesInAgreement = agreement.getColoniesGivenBy(player).iterator();
+        	List<Colony> coloniesAvail = new ArrayList<Colony>();
+        	coloniesAvail.addAll(player.getColonies());
+        	
+        	//remove the ones already on the table
+        	while(coloniesInAgreement.hasNext()){
+        		Colony colony = coloniesInAgreement.next();
+        		for(int i=0;i<coloniesAvail.size();i++){
+        			Colony colonyAvail = coloniesAvail.get(i);
+        			if(colonyAvail == colony){
+        					// this good is already on the agreement, remove it
+        					coloniesAvail.remove(i);
+        					break;
+        			}
+        		}
+        	}
+            
+        	if(coloniesAvail.isEmpty()){
+        		addButton.setEnabled(false);
+        		colonyBox.setEnabled(false);
+        	}
+        	else{
+        		Collections.sort(coloniesAvail, freeColClient.getClientOptions().getColonyComparator());
+        		Iterator<Colony> colonyIterator = coloniesAvail.iterator();
+        		while (colonyIterator.hasNext()) {
+        			colonyBox.addItem(colonyIterator.next());
+        		}
+        		for(ActionListener al : listeners) {
+        			colonyBox.addActionListener(al);
+        		}
+        		addButton.setEnabled(true);
+        		colonyBox.setEnabled(true);
+        	}
         }
 
         /**
@@ -563,7 +626,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             String command = event.getActionCommand();
             if (command.equals("add")) {
                 negotiationDialog.addColonyTradeItem(player, (Colony) colonyBox.getSelectedItem());
-                updateSummary();
+                updateDialog();
             }
 
         }
@@ -591,7 +654,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             addButton.addActionListener(this);
             addButton.setActionCommand("add");
             goodsBox = new JComboBox();
-            label = new JLabel(Messages.message("tradeItem.goods"));
+            this.label = new JLabel(Messages.message("tradeItem.goods"));
 
             updateGoodsBox(allGoods);
 
@@ -626,11 +689,11 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
                     goodsBox.addActionListener(al);
                 }
             	
-                label.setEnabled(true);
+            	this.label.setEnabled(true);
                 addButton.setEnabled(true);
                 goodsBox.setEnabled(true);
             } else{
-                label.setEnabled(false);
+            	this.label.setEnabled(false);
                 addButton.setEnabled(false);
                 goodsBox.setEnabled(false);
             }            
@@ -646,7 +709,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             String command = event.getActionCommand();
             if (command.equals("add")) {
                 negotiationDialog.addGoodsTradeItem(player, (Goods) goodsBox.getSelectedItem());
-                updateSummary();
+                updateDialog();
             }
 
         }
@@ -779,7 +842,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
             if (command.equals("add")) {
                 int amount = ((Integer) spinner.getValue()).intValue();
                 negotiationDialog.addGoldTradeItem(player, amount);
-                updateSummary();
+                updateDialog();
             }
 
         }
