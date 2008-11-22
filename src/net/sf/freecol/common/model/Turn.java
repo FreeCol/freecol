@@ -24,8 +24,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 
 /**
-* Represents a given turn in the game.
-*/
+ * Represents a given turn in the game.
+ */
 public class Turn {
 
     public static final int STARTING_YEAR = 1492;
@@ -39,40 +39,40 @@ public class Turn {
 
     
     /**
-    * Increases the turn number by one.
-    */
+     * Increases the turn number by one.
+     */
     public void increase() {
         turn++;
     }
 
 
     /**
-    * Gets the turn number.
-    * @return The number of turns.
-    */
+     * Gets the turn number.
+     * @return The number of turns.
+     */
     public int getNumber() {
         return turn;
     }
 
     
     /**
-    * Sets the turn number.
-    * @param turn The number of turns.
-    */
+     * Sets the turn number.
+     * @param turn The number of turns.
+     */
     public void setNumber(int turn) {
         this.turn = turn;
     }
 
     
     /**
-    * Gets the age.
-    * 
-    * @return The age:
-    *       <br>
-    *       <br>1 - if before {@link #SEASON_YEAR}
-    *       <br>2 - if between 1600 and 1700.
-    *       <br>3 - if after 1700.
-    */
+     * Gets the age.
+     * 
+     * @return The age:
+     *       <br>
+     *       <br>1 - if before {@link #SEASON_YEAR}
+     *       <br>2 - if between 1600 and 1700.
+     *       <br>3 - if after 1700.
+     */
     public int getAge() {
         if (getYear() < SEASON_YEAR) {
             return 1;
@@ -85,8 +85,8 @@ public class Turn {
 
 
     /**
-    * Checks if this turn is equal to another turn.
-    */
+     * Checks if this turn is equal to another turn.
+     */
     public boolean equals(Object o) {
 
         if ( ! (o instanceof Turn) ) { return false; }
@@ -96,11 +96,11 @@ public class Turn {
 
     
     /**
-    * Gets the year this turn is in.
-    * @return The calculated year based on the turn
-    *       number.
-    */
-    public int getYear() {
+     * Gets the year the given turn is in.
+     * @return The calculated year based on the turn
+     *       number.
+     */
+    public static int getYear(int turn) {
         if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
             return STARTING_YEAR + turn - 1;
         }
@@ -111,26 +111,46 @@ public class Turn {
 
 
     /**
-    * Returns a string representation of this turn.
-    * @return A string with the format: "<i>[season] year</i>".
-    *         Examples: "Spring 1602", "1503"...
-    */
+     * Gets the year this turn is in.
+     * @return The calculated year based on the turn
+     *       number.
+     */
+    public int getYear() {
+        return getYear(turn);
+    }
+
+
+    /**
+     * Returns a string representation of this turn.
+     * @return A string with the format: "<i>[season] year</i>".
+     *         Examples: "Spring 1602", "1503"...
+     */
     public String toString() {
+        return toString(turn);
+    }
+
+
+    /**
+     * Returns a string representation of the given turn.
+     * @return A string with the format: "<i>[season] year</i>".
+     *         Examples: "Spring 1602", "1503"...
+     */
+    public static String toString(int turn) {
         if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
             return Integer.toString(STARTING_YEAR + turn - 1);
         }
 
         int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
         return ((c%2==0) ? Messages.message("spring") : Messages.message("autumn"))
-                + " " + Integer.toString(SEASON_YEAR + c/2 - 1);
+            + " " + Integer.toString(SEASON_YEAR + c/2 - 1);
     }
 
     /**
-    * Returns a string representation of this turn suitable for
-    * savegame files.
-    * @return A string with the format: "<i>[season] year</i>".
-    *         Examples: "1602_1_Spring", "1503"...
-    */
+     * Returns a string representation of this turn suitable for
+     * savegame files.
+     * @return A string with the format: "<i>[season] year</i>".
+     *         Examples: "1602_1_Spring", "1503"...
+     */
     public String toSaveGameString() {
         if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
             return Integer.toString(STARTING_YEAR + turn - 1);

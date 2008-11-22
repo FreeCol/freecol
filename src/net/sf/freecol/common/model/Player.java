@@ -226,6 +226,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private FeatureContainer featureContainer = new FeatureContainer();
 
+    /**
+     * Describe history here.
+     */
+    private List<HistoryEvent> history = new ArrayList<HistoryEvent>();
+
 
     /**
      *
@@ -1905,6 +1910,24 @@ public class Player extends FreeColGameObject implements Nameable {
         }
     }
 
+    /**
+     * Get the <code>History</code> value.
+     *
+     * @return a <code>List<HistoryEvent></code> value
+     */
+    public final List<HistoryEvent> getHistory() {
+        return history;
+    }
+
+    /**
+     * Set the <code>History</code> value.
+     *
+     * @param newHistory The new History value.
+     */
+    public final void setHistory(final List<HistoryEvent> newHistory) {
+        this.history = newHistory;
+    }
+
     private static int getNearbyColonyBonus(Player owner, Tile tile) {
         Game game = tile.getGame();
         Map map = game.getMap();
@@ -2106,8 +2129,13 @@ public class Player extends FreeColGameObject implements Nameable {
 
         allFathers.add(father);
 
-        addModelMessage(this, ModelMessage.MessageType.DEFAULT, "model.player.foundingFatherJoinedCongress",
-                "%foundingFather%", father.getName(), "%description%", father.getDescription());
+        addModelMessage(this, ModelMessage.MessageType.DEFAULT,
+                        "model.player.foundingFatherJoinedCongress",
+                        "%foundingFather%", father.getName(),
+                        "%description%", father.getDescription());
+        history.add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                     HistoryEvent.Type.FOUNDING_FATHER,
+                                     "%father%", father.getName()));
         featureContainer.add(father.getFeatureContainer());
 
         List<AbstractUnit> units = father.getUnits();
@@ -2294,219 +2322,6 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
         getGame().getModelController().exploreTiles(this, tiles);
-    }
-
-    /**
-     * This method writes an XML-representation of this object to the given
-     * stream. <br>
-     * <br>
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     *
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getId());
-        out.writeAttribute("index", String.valueOf(index));
-        out.writeAttribute("username", name);
-        out.writeAttribute("nationID", nationID);
-        if (nationType != null) {
-            out.writeAttribute("nationType", nationType.getId());
-        }
-        out.writeAttribute("color", Integer.toString(color.getRGB()));
-        out.writeAttribute("admin", Boolean.toString(admin));
-        out.writeAttribute("ready", Boolean.toString(ready));
-        out.writeAttribute("dead", Boolean.toString(dead));
-        out.writeAttribute("playerType", playerType.toString());
-        out.writeAttribute("ai", Boolean.toString(ai));
-        out.writeAttribute("tax", Integer.toString(tax));
-        out.writeAttribute("numberOfSettlements", Integer.toString(numberOfSettlements));
-
-        if (getGame().isClientTrusted() || showAll || equals(player)) {
-            out.writeAttribute("gold", Integer.toString(gold));
-            out.writeAttribute("crosses", Integer.toString(crosses));
-            out.writeAttribute("bells", Integer.toString(bells));
-            if (currentFather != null) {
-                out.writeAttribute("currentFather", currentFather.getId());
-            }
-            out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
-            out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
-            out.writeAttribute("oldSoL", Integer.toString(oldSoL));
-            out.writeAttribute("score", Integer.toString(score));
-        } else {
-            out.writeAttribute("gold", Integer.toString(-1));
-            out.writeAttribute("crosses", Integer.toString(-1));
-            out.writeAttribute("bells", Integer.toString(-1));
-            out.writeAttribute("crossesRequired", Integer.toString(-1));
-        }
-        if (newLandName != null) {
-            out.writeAttribute("newLandName", newLandName);
-        }
-        if (entryLocation != null) {
-            out.writeAttribute("entryLocation", entryLocation.getId());
-        }
-        // attributes end here
-
-        for (Entry<Player, Tension> entry : tension.entrySet()) {
-            out.writeStartElement(TENSION_TAG);
-            out.writeAttribute("player", entry.getKey().getId());
-            out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
-            out.writeEndElement();
-        }
-
-        for (Entry<String, Stance> entry : stance.entrySet()) {
-            out.writeStartElement(STANCE_TAG);
-            out.writeAttribute("player", entry.getKey());
-            out.writeAttribute("value", entry.getValue().toString());
-            out.writeEndElement();
-        }
-
-        for (TradeRoute route : getTradeRoutes()) {
-            route.toXML(out, this);
-        }
-        if (market != null) {
-            market.toXML(out, player, showAll, toSavedGame);
-        }
-
-        if (getGame().isClientTrusted() || showAll || equals(player)) {
-            out.writeStartElement(FOUNDING_FATHER_TAG);
-            out.writeAttribute(ARRAY_SIZE, Integer.toString(allFathers.size()));
-            int index = 0;
-            for (FoundingFather father : allFathers) {
-                out.writeAttribute("x" + Integer.toString(index), father.getId());
-                index++;
-            }
-            out.writeEndElement();
-
-            if (europe != null) {
-                europe.toXML(out, player, showAll, toSavedGame);
-            }
-            if (monarch != null) {
-                monarch.toXML(out, player, showAll, toSavedGame);
-            }
-        }
-
-        out.writeEndElement();
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     *
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, "ID"));
-        index = Integer.parseInt(in.getAttributeValue(null, "index"));
-        name = in.getAttributeValue(null, "username");
-        nationID = in.getAttributeValue(null, "nationID");
-        if (!name.equals(UNKNOWN_ENEMY)) {
-            nationType = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
-        }
-        color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
-        admin = getAttribute(in, "admin", false);
-        gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
-        crosses = Integer.parseInt(in.getAttributeValue(null, "crosses"));
-        bells = Integer.parseInt(in.getAttributeValue(null, "bells"));
-        oldSoL = getAttribute(in, "oldSoL", 0);
-        score = getAttribute(in, "score", 0);
-        ready = getAttribute(in, "ready", false);
-        ai = getAttribute(in, "ai", false);
-        dead = getAttribute(in, "dead", false);
-        tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
-        numberOfSettlements = getAttribute(in, "numberOfSettlements", 0);
-        playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
-        currentFather = FreeCol.getSpecification().getType(in, "currentFather", FoundingFather.class, null);
-        crossesRequired = getAttribute(in, "crossesRequired", 12);
-        newLandName = getAttribute(in, "newLandName", null);
-
-        attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
-        final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
-        if (entryLocationStr != null) {
-            entryLocation = (Location) getGame().getFreeColGameObject(entryLocationStr);
-            if (entryLocation == null) {
-                entryLocation = new Tile(getGame(), entryLocationStr);
-            }
-        }
-
-        featureContainer = new FeatureContainer();
-        if (nationType != null) {
-            featureContainer.add(nationType.getFeatureContainer());
-        }
-        switch (playerType) {
-        case REBEL: case INDEPENDENT:
-            featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
-            break;
-        }
-
-        tension = new HashMap<Player, Tension>();
-        stance = new HashMap<String, Stance>();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(TENSION_TAG)) {
-                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                tension.put(player, new Tension(getAttribute(in, "value", 0)));
-                in.nextTag(); // close element
-            } else if (in.getLocalName().equals(FOUNDING_FATHER_TAG)) {
-                int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
-                for (int index = 0; index < length; index++) {
-                    String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                    FoundingFather father = FreeCol.getSpecification().getFoundingFather(fatherId);
-                    allFathers.add(father);
-                    // add only features, no other effects
-                    featureContainer.add(father.getFeatureContainer());
-                }
-                in.nextTag();
-            } else if (in.getLocalName().equals(STANCE_TAG)) {
-            	String playerId = in.getAttributeValue(null, "player");
-                stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
-                in.nextTag(); // close element
-            } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
-                europe = updateFreeColGameObject(in, Europe.class);
-            } else if (in.getLocalName().equals(Monarch.getXMLElementTagName())) {
-                monarch = updateFreeColGameObject(in, Monarch.class);
-            } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
-                TradeRoute route = new TradeRoute(getGame(), in);
-                getTradeRoutes().add(route);
-            } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
-                market = updateFreeColGameObject(in, Market.class);
-            } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
-                in.nextTag();
-            }
-        }
-
-        // sanity check: we should be on the closing tag
-        if (!in.getLocalName().equals(Player.getXMLElementTagName())) {
-            logger.warning("Error parsing xml: expecting closing tag </" + Player.getXMLElementTagName() + "> "
-                    + "found instead: " + in.getLocalName());
-        }
-
-        if (market == null) {
-            market = new Market(getGame(), this);
-        }
-        invalidateCanSeeTiles();
-    }
-
-    /**
-     * Gets the tag name of the root element representing this object.
-     *
-     * @return "player"
-     */
-    public static String getXMLElementTagName() {
-        return "player";
     }
 
     /**
@@ -3039,5 +2854,229 @@ public class Player extends FreeColGameObject implements Nameable {
             return units.iterator();
         }
     }
+
+    /**
+     * This method writes an XML-representation of this object to the given
+     * stream. <br>
+     * <br>
+     * Only attributes visible to the given <code>Player</code> will be added
+     * to that representation if <code>showAll</code> is set to
+     * <code>false</code>.
+     *
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation should be
+     *            made for, or <code>null</code> if
+     *            <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> will be
+     *            added to the representation if <code>showAll</code> is set
+     *            to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that is only
+     *            needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+            throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute("ID", getId());
+        out.writeAttribute("index", String.valueOf(index));
+        out.writeAttribute("username", name);
+        out.writeAttribute("nationID", nationID);
+        if (nationType != null) {
+            out.writeAttribute("nationType", nationType.getId());
+        }
+        out.writeAttribute("color", Integer.toString(color.getRGB()));
+        out.writeAttribute("admin", Boolean.toString(admin));
+        out.writeAttribute("ready", Boolean.toString(ready));
+        out.writeAttribute("dead", Boolean.toString(dead));
+        out.writeAttribute("playerType", playerType.toString());
+        out.writeAttribute("ai", Boolean.toString(ai));
+        out.writeAttribute("tax", Integer.toString(tax));
+        out.writeAttribute("numberOfSettlements", Integer.toString(numberOfSettlements));
+
+        if (getGame().isClientTrusted() || showAll || equals(player)) {
+            out.writeAttribute("gold", Integer.toString(gold));
+            out.writeAttribute("crosses", Integer.toString(crosses));
+            out.writeAttribute("bells", Integer.toString(bells));
+            if (currentFather != null) {
+                out.writeAttribute("currentFather", currentFather.getId());
+            }
+            out.writeAttribute("crossesRequired", Integer.toString(crossesRequired));
+            out.writeAttribute("attackedByPrivateers", Boolean.toString(attackedByPrivateers));
+            out.writeAttribute("oldSoL", Integer.toString(oldSoL));
+            out.writeAttribute("score", Integer.toString(score));
+        } else {
+            out.writeAttribute("gold", Integer.toString(-1));
+            out.writeAttribute("crosses", Integer.toString(-1));
+            out.writeAttribute("bells", Integer.toString(-1));
+            out.writeAttribute("crossesRequired", Integer.toString(-1));
+        }
+        if (newLandName != null) {
+            out.writeAttribute("newLandName", newLandName);
+        }
+        if (entryLocation != null) {
+            out.writeAttribute("entryLocation", entryLocation.getId());
+        }
+        // attributes end here
+
+        for (Entry<Player, Tension> entry : tension.entrySet()) {
+            out.writeStartElement(TENSION_TAG);
+            out.writeAttribute("player", entry.getKey().getId());
+            out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
+            out.writeEndElement();
+        }
+
+        for (Entry<String, Stance> entry : stance.entrySet()) {
+            out.writeStartElement(STANCE_TAG);
+            out.writeAttribute("player", entry.getKey());
+            out.writeAttribute("value", entry.getValue().toString());
+            out.writeEndElement();
+        }
+
+        for (HistoryEvent event : history) {
+            event.toXML(out, this);
+        }
+
+        for (TradeRoute route : getTradeRoutes()) {
+            route.toXML(out, this);
+        }
+
+        if (market != null) {
+            market.toXML(out, player, showAll, toSavedGame);
+        }
+
+        if (getGame().isClientTrusted() || showAll || equals(player)) {
+            out.writeStartElement(FOUNDING_FATHER_TAG);
+            out.writeAttribute(ARRAY_SIZE, Integer.toString(allFathers.size()));
+            int index = 0;
+            for (FoundingFather father : allFathers) {
+                out.writeAttribute("x" + Integer.toString(index), father.getId());
+                index++;
+            }
+            out.writeEndElement();
+
+            if (europe != null) {
+                europe.toXML(out, player, showAll, toSavedGame);
+            }
+            if (monarch != null) {
+                monarch.toXML(out, player, showAll, toSavedGame);
+            }
+        }
+
+        out.writeEndElement();
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setId(in.getAttributeValue(null, "ID"));
+        index = Integer.parseInt(in.getAttributeValue(null, "index"));
+        name = in.getAttributeValue(null, "username");
+        nationID = in.getAttributeValue(null, "nationID");
+        if (!name.equals(UNKNOWN_ENEMY)) {
+            nationType = FreeCol.getSpecification().getNationType(in.getAttributeValue(null, "nationType"));
+        }
+        color = new Color(Integer.parseInt(in.getAttributeValue(null, "color")));
+        admin = getAttribute(in, "admin", false);
+        gold = Integer.parseInt(in.getAttributeValue(null, "gold"));
+        crosses = Integer.parseInt(in.getAttributeValue(null, "crosses"));
+        bells = Integer.parseInt(in.getAttributeValue(null, "bells"));
+        oldSoL = getAttribute(in, "oldSoL", 0);
+        score = getAttribute(in, "score", 0);
+        ready = getAttribute(in, "ready", false);
+        ai = getAttribute(in, "ai", false);
+        dead = getAttribute(in, "dead", false);
+        tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
+        numberOfSettlements = getAttribute(in, "numberOfSettlements", 0);
+        playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
+        currentFather = FreeCol.getSpecification().getType(in, "currentFather", FoundingFather.class, null);
+        crossesRequired = getAttribute(in, "crossesRequired", 12);
+        newLandName = getAttribute(in, "newLandName", null);
+
+        attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
+        final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
+        if (entryLocationStr != null) {
+            entryLocation = (Location) getGame().getFreeColGameObject(entryLocationStr);
+            if (entryLocation == null) {
+                entryLocation = new Tile(getGame(), entryLocationStr);
+            }
+        }
+
+        featureContainer = new FeatureContainer();
+        if (nationType != null) {
+            featureContainer.add(nationType.getFeatureContainer());
+        }
+        switch (playerType) {
+        case REBEL:
+        case INDEPENDENT:
+            featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
+            break;
+        }
+
+        tension = new HashMap<Player, Tension>();
+        stance = new HashMap<String, Stance>();
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(TENSION_TAG)) {
+                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+                tension.put(player, new Tension(getAttribute(in, "value", 0)));
+                in.nextTag(); // close element
+            } else if (in.getLocalName().equals(FOUNDING_FATHER_TAG)) {
+                int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
+                for (int index = 0; index < length; index++) {
+                    String fatherId = in.getAttributeValue(null, "x" + String.valueOf(index));
+                    FoundingFather father = FreeCol.getSpecification().getFoundingFather(fatherId);
+                    allFathers.add(father);
+                    // add only features, no other effects
+                    featureContainer.add(father.getFeatureContainer());
+                }
+                in.nextTag();
+            } else if (in.getLocalName().equals(STANCE_TAG)) {
+            	String playerId = in.getAttributeValue(null, "player");
+                stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
+                in.nextTag(); // close element
+            } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
+                europe = updateFreeColGameObject(in, Europe.class);
+            } else if (in.getLocalName().equals(Monarch.getXMLElementTagName())) {
+                monarch = updateFreeColGameObject(in, Monarch.class);
+            } else if (in.getLocalName().equals(HistoryEvent.getXMLElementTagName())) {
+                HistoryEvent event = new HistoryEvent();
+                event.readFromXMLImpl(in);
+                getHistory().add(event);
+            } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
+                TradeRoute route = new TradeRoute(getGame(), in);
+                getTradeRoutes().add(route);
+            } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
+                market = updateFreeColGameObject(in, Market.class);
+            } else {
+                logger.warning("Unknown tag: " + in.getLocalName() + " loading player");
+                in.nextTag();
+            }
+        }
+
+        // sanity check: we should be on the closing tag
+        if (!in.getLocalName().equals(Player.getXMLElementTagName())) {
+            logger.warning("Error parsing xml: expecting closing tag </" + Player.getXMLElementTagName() + "> "
+                    + "found instead: " + in.getLocalName());
+        }
+
+        if (market == null) {
+            market = new Market(getGame(), this);
+        }
+        invalidateCanSeeTiles();
+    }
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "player"
+     */
+    public static String getXMLElementTagName() {
+        return "player";
+    }
+
 
 }

@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -1699,17 +1700,51 @@ public final class InGameController implements NetworkConstants {
         // rumours
         unit.move(direction);
 
+        if (unit.getTile().isLand() && !unit.getOwner().isNewLandNamed()) {
+            String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getNewLandName(),
+                                                        "newLand.yes", null);
+            unit.getOwner().setNewLandName(newLandName);
+            Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
+            setNewLandNameElement.setAttribute("newLandName", newLandName);
+            client.sendAndWait(setNewLandNameElement);
+            canvas.showEventDialog(EventPanel.FIRST_LANDING);
+            unit.getOwner().getHistory()
+                .add(new HistoryEvent(unit.getGame().getTurn().getNumber(),
+                                      HistoryEvent.Type.DISCOVER_NEW_WORLD,
+                                      "%name%", newLandName));
+            
+            final Player player = freeColClient.getMyPlayer();
+            final BuildColonyAction bca = (BuildColonyAction) freeColClient.getActionManager()
+                .getFreeColAction(BuildColonyAction.id);
+            final KeyStroke keyStroke = bca.getAccelerator();
+            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, player,
+                                                    "tutorial.buildColony", 
+                                                    "%build_colony_key%",
+                                                    FreeColActionUI.getHumanKeyStrokeText(keyStroke),
+                                                    "%build_colony_menu_item%",
+                                                    Messages.message("unit.state.7"),
+                                                    "%orders_menu_item%",
+                                                    Messages.message("menuBar.orders")));
+            nextModelMessage();
+        }
+
         Region region = unit.getTile().getDiscoverableRegion();
         if (region != null) {
+            String name = null;
             if (region.isPacific()) {
+                name = Messages.message("model.region.pacific");
                 canvas.showInformationMessage("model.region.pacific.discover");
             } else if (unit.getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {
                 String defaultName = unit.getOwner().getDefaultRegionName(region.getType());
-                String name = freeColClient.getCanvas().showInputDialog("nameRegion.text", defaultName,
-                                                                        "ok", "cancel", 
-                                                                        "%name%", region.getDisplayName());
+                name = freeColClient.getCanvas().showInputDialog("nameRegion.text", defaultName,
+                                                                 "ok", "cancel", 
+                                                                 "%name%", region.getDisplayName());
                 moveElement.setAttribute("regionName", name);
             }
+            freeColClient.getMyPlayer().getHistory()
+                .add(new HistoryEvent(freeColClient.getGame().getTurn().getNumber(),
+                                      HistoryEvent.Type.DISCOVER_REGION,
+                                      "%region%", name));
         }
 
         // reply is an "update" Element
@@ -1730,30 +1765,6 @@ public final class InGameController implements NetworkConstants {
         // before move
         if (!unit.isDisposed()) {
             unit.setLocation(unit.getTile());
-        }
-
-        if (unit.getTile().isLand() && !unit.getOwner().isNewLandNamed()) {
-            String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getNewLandName(),
-                                                        "newLand.yes", null);
-            unit.getOwner().setNewLandName(newLandName);
-            Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
-            setNewLandNameElement.setAttribute("newLandName", newLandName);
-            client.sendAndWait(setNewLandNameElement);
-            canvas.showEventDialog(EventPanel.FIRST_LANDING);
-            
-            final Player player = freeColClient.getMyPlayer();
-            final BuildColonyAction bca = (BuildColonyAction) freeColClient.getActionManager()
-                .getFreeColAction(BuildColonyAction.id);
-            final KeyStroke keyStroke = bca.getAccelerator();
-            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, player,
-                                                    "tutorial.buildColony", 
-                                                    "%build_colony_key%",
-                                                    FreeColActionUI.getHumanKeyStrokeText(keyStroke),
-                                                    "%build_colony_menu_item%",
-                                                    Messages.message("unit.state.7"),
-                                                    "%orders_menu_item%",
-                                                    Messages.message("menuBar.orders")));
-            nextModelMessage();
         }
 
         if (unit.getTile().getSettlement() != null && unit.isCarrier() && unit.getTradeRoute() == null

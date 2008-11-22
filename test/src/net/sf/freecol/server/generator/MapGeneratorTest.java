@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.RangeOption;
@@ -253,7 +254,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         assertEquals(pacific, southPacific.getParent());
         assertEquals(pacific, southPacific.getDiscoverableRegion());
 
-        pacific.discover(new Player(game, "id"), null, "someName");
+        pacific.discover(new Player(game, "id"), new Turn(1), "someName");
 
         assertFalse(pacific.isDiscoverable());
         assertNull(pacific.getDiscoverableRegion());

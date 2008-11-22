@@ -45,6 +45,7 @@ import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -1068,7 +1069,7 @@ public final class InGameInputHandler extends InputHandler {
         // center on the explorer
         freeColClient.getGUI().setFocusImmediately(tile.getPosition());
 
-        Unit newUnit;
+        Unit newUnit = null;
         NodeList unitList;
         ModelMessage m;
         switch (type) {
@@ -1112,8 +1113,6 @@ public final class InGameInputHandler extends InputHandler {
             break;
         case TREASURE:
             String treasure = element.getAttribute("amount");
-            m = new ModelMessage(unit, "lostCityRumour.TreasureTrain", new String[][] { { "%money%", treasure } },
-                    ModelMessage.MessageType.LOST_CITY_RUMOUR);
             unitList = element.getChildNodes();
             for (int i = 0; i < unitList.getLength(); i++) {
                 Element unitElement = (Element) unitList.item(i);
@@ -1125,6 +1124,12 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 tile.add(newUnit);
             }
+            m = new ModelMessage(unit, ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                 newUnit, "lostCityRumour.TreasureTrain",
+                                 "%money%", treasure);
+            player.getHistory().add(new HistoryEvent(player.getGame().getTurn().getNumber(),
+                                                     HistoryEvent.Type.CITY_OF_GOLD,
+                                                     "%treasure%", String.valueOf(treasure)));
             break;
         case FOUNTAIN_OF_YOUTH:
             if (player.getEurope() == null) {

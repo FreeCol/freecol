@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
@@ -526,6 +527,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     private Element setNewLandName(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         player.setNewLandName(element.getAttribute("newLandName"));
+        player.getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                                 HistoryEvent.Type.DISCOVER_NEW_WORLD,
+                                                 "%name%", player.getNewLandName()));
         // TODO: Send name to all other players.
         return null;
     }
@@ -1193,6 +1197,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             newUnit.setTreasureAmount(treasure);
             rumourElement.setAttribute("amount", Integer.toString(treasure));
             rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
+            player.getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                                     HistoryEvent.Type.CITY_OF_GOLD,
+                                                     "%treasure%", String.valueOf(treasure)));
             break;
         case FOUNTAIN_OF_YOUTH:
             if (player.getEurope() != null) {

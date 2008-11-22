@@ -2820,6 +2820,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         getTile().setSettlement(colony);
         setLocation(colony);
         setMovesLeft(0);
+        owner.getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                                HistoryEvent.Type.FOUND_COLONY,
+                                                "%colony%", colony.getName()));
     }
 
     /**
