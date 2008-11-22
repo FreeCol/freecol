@@ -183,7 +183,12 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         int[] widths;
         int[] heights;
         int rows = 0;
-        for (ArrayList<Unit> units : locations.values()) {
+        ArrayList<String> allNames = new ArrayList<String>();
+        allNames.addAll(colonyNames);
+        allNames.addAll(otherNames);
+        ArrayList<Unit> units;
+        for (String name : allNames) {
+            units = locations.get(name);
             if (units == null || units.isEmpty()) {
                 if (!ignoreEmptyLocations) {
                     rows++;
@@ -264,6 +269,9 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             colonyNames.add(colony.getName());
         }
         otherNames = new ArrayList<String>();
+        if (player.getEurope() != null) {
+            otherNames.add(player.getEurope().getLocationName());
+        }
 
         for (Unit unit : player.getUnits()) {
             switch(reportType) {
