@@ -1226,7 +1226,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"
                      weight1="2" weight2="10" weight3="10">
-      <modifier id="model.modifier.movementBonus" type="additive" value="1">
+      <modifier id="model.modifier.movementBonus" type="additive" value="3">
         <scope ability-id="model.ability.navalUnit" ability-value="true"/>
       </modifier>
       <modifier id="model.modifier.sailHighSeas" type="additive" value="-1">
