@@ -869,6 +869,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             logger.warning("Ability prevents abandoning colony.");
             return null;
         }
+        colony.getOwner().getHistory()
+            .add(new HistoryEvent(colony.getGame().getTurn().getNumber(),
+                                  HistoryEvent.Type.ABANDON_COLONY,
+                                  "%colony%", colony.getName()));
+
         Tile tile = colony.getTile();
         // TODO: modify/abort trade routes?
         colony.dispose();

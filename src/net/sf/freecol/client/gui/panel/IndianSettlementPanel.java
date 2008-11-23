@@ -43,9 +43,7 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class IndianSettlementPanel extends FreeColDialog implements ActionListener {
 
-
-
-    private static final Logger logger = Logger.getLogger(EventPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(IndianSettlementPanel.class.getName());
 
     private final FreeColClient freeColClient;
 

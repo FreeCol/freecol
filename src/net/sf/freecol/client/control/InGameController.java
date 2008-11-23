@@ -3950,6 +3950,10 @@ public final class InGameController implements NetworkConstants {
 
         Element abandonColony = Message.createNewRootElement("abandonColony");
         abandonColony.setAttribute("colony", colony.getId());
+        colony.getOwner().getHistory()
+            .add(new HistoryEvent(colony.getGame().getTurn().getNumber(),
+                                  HistoryEvent.Type.ABANDON_COLONY,
+                                  "%colony%", colony.getName()));
 
         colony.dispose();
         client.sendAndWait(abandonColony);

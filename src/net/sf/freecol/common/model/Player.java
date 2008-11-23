@@ -935,6 +935,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
         if (contacted && !hasContacted(player)) {
             stance.put(player.getId(), Stance.PEACE);
+            history.add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                         HistoryEvent.Type.MEET_NATION,
+                                         "%nation%", player.getNationAsString()));
 
             if (isEuropean() && !isAI()) {
                 boolean contactedIndians = false;

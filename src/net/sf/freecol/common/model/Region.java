@@ -190,7 +190,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @return a <code>String</code> value
      */
     public String getDisplayName() {
-        if (prediscovered) {
+        if (prediscovered || isPacific()) {
             return Messages.message(nameKey);
         } else if (name == null) {
             return Messages.message("model.region." + type.toString().toLowerCase() + ".unknown");
