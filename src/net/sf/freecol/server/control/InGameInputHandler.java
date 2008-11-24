@@ -509,7 +509,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
             if (unit.isVisibleTo(enemyPlayer)) {
                 try {
-                    enemyPlayer.getConnection().send(removeElement);
+                    enemyPlayer.getConnection().sendAndWait(removeElement);
                 } catch (IOException e) {
                     logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
                                    + enemyPlayer.getConnection());
@@ -917,7 +917,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     opponentMoveElement.setAttribute("fromTile", unit.getTile().getId());
                     opponentMoveElement.setAttribute("direction", direction.toString());
                     opponentMoveElement.setAttribute("unit", unit.getId());
-                    enemyPlayer.getConnection().send(opponentMoveElement);
+                    enemyPlayer.getConnection().sendAndWait(opponentMoveElement);
                 } else if (enemyPlayer.canSee(newTile)
                         && (newTile.getSettlement() == null || 
                             !getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING))) {
@@ -933,7 +933,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         opponentMoveElement.appendChild(location.toXMLElement(enemyPlayer, opponentMoveElement
                                 .getOwnerDocument()));
                     }
-                    enemyPlayer.getConnection().send(opponentMoveElement);
+                    enemyPlayer.getConnection().sendAndWait(opponentMoveElement);
                 }
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
@@ -1236,7 +1236,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 try {
                     Element rumourUpdate = Message.createNewRootElement("update");
                     rumourUpdate.appendChild(tile.toXMLElement(updatePlayer, rumourUpdate.getOwnerDocument()));
-                    updatePlayer.getConnection().send(rumourUpdate);
+                    updatePlayer.getConnection().sendAndWait(rumourUpdate);
                 } catch (IOException e) {
                     logger.warning("Could not send update message to: " + updatePlayer.getName() + " with connection "
                                    + updatePlayer.getConnection());
@@ -1436,7 +1436,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                             opponentAttackElement.getOwnerDocument()));
                 }
                 try {
-                    enemyPlayer.getConnection().send(opponentAttackElement);
+                    enemyPlayer.getConnection().sendAndWait(opponentAttackElement);
                 } catch (IOException e) {
                     logger.warning("Could not send message to: " + enemyPlayer.getName()
                                    + " with connection " + enemyPlayer.getConnection());
@@ -2962,7 +2962,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             deliverGiftElement.setAttribute("settlement", settlement.getId());
             deliverGiftElement.appendChild(goods.toXMLElement(receiver, deliverGiftElement.getOwnerDocument()));
             try {
-                receiver.getConnection().send(deliverGiftElement);
+                receiver.getConnection().sendAndWait(deliverGiftElement);
             } catch (IOException e) {
                 logger.warning("Could not send \"deliverGift\"-message!");
             }
@@ -3109,7 +3109,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 if (enemyPlayer.canSee(newTile)) {
                     Element updateElement = Message.createNewRootElement("update");
                     updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                    enemyPlayer.getConnection().send(updateElement);
+                    enemyPlayer.getConnection().sendAndWait(updateElement);
                 }
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "

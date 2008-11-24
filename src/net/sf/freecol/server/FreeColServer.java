@@ -327,7 +327,7 @@ public final class FreeColServer {
                         .getOwnerDocument()));
                 updateElement.appendChild(p.toXMLElement(p, updateElement.getOwnerDocument()));
                 try {
-                    p.getConnection().send(updateElement);
+                    p.getConnection().sendAndWait(updateElement);
                 } catch (IOException e) {
                     logger.warning("Could not send update");
                 }
@@ -1074,7 +1074,7 @@ public final class FreeColServer {
                 if (enemyPlayer.canSee(newTile)) {
                     Element updateElement = Message.createNewRootElement("update");
                     updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                    enemyPlayer.getConnection().send(updateElement);
+                    enemyPlayer.getConnection().sendAndWait(updateElement);
                 }
             } catch (IOException e) {
                 logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "

@@ -144,7 +144,7 @@ public final class Server extends Thread {
             Connection connection = connectionIterator.next();
             if (connection != exceptConnection) {
                 try {
-                    connection.send(element);
+                    connection.sendAndWait(element);
                 } catch (IOException e) {
                     logger.warning("Exception while attempting to send to " + connection);
                 }
