@@ -28,6 +28,7 @@ package net.sf.freecol.common.networking;
 public class NetworkReplyObject {
     
     private Object response = null;
+    private boolean responseGiven = false;
     private int networkReplyId;
     private boolean streamed;
     
@@ -68,8 +69,8 @@ public class NetworkReplyObject {
         if (response == null) {
             throw new NullPointerException();
         }
-
         this.response = response;
+        this.responseGiven = true;
         notify();
     }
     
@@ -94,10 +95,20 @@ public class NetworkReplyObject {
     public synchronized Object getResponse() {
         if (response == null) {
             try {
-                wait();
+                while (!responseGiven) {
+                    wait();
+                }
             } catch (InterruptedException ie) {}
         }
 
        return response;
+    }
+
+    /**
+     * Interrupts any thread waiting for a response.
+     */
+    public synchronized void interrupt() {
+        responseGiven = true;
+        notify();
     }
 }

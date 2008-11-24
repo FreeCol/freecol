@@ -128,28 +128,32 @@ final class ReceivingThread extends Thread {
     public void run() {
         int timesFailed = 0;
 
-        while (shouldRun()) {
-            try {
-                listen();
-                timesFailed = 0;
-            } catch (XMLStreamException e) {
-                timesFailed++;
-                // warnOf(e);
-                if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
-                    disconnect();
-                }
-            } catch (SAXException e) {
-                timesFailed++;
-                // warnOf(e);
-                if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
-                    disconnect();
-                }
-            } catch (IOException e) {
-                // warnOf(e);
-                if (shouldRun) {
-                    disconnect();
+        try {
+            while (shouldRun()) {
+                try {
+                    listen();
+                    timesFailed = 0;
+                } catch (XMLStreamException e) {
+                    timesFailed++;
+                    // warnOf(e);
+                    if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
+                        disconnect();
+                    }
+                } catch (SAXException e) {
+                    timesFailed++;
+                    // warnOf(e);
+                    if (shouldRun && timesFailed > MAXIMUM_RETRIES) {
+                        disconnect();
+                    }
+                } catch (IOException e) {
+                    // warnOf(e);
+                    if (shouldRun) {
+                        disconnect();
+                    }
                 }
             }
+        } finally {
+            askToStop();
         }
     }
 
@@ -261,6 +265,9 @@ final class ReceivingThread extends Thread {
      */
     synchronized void askToStop() {
         shouldRun = false;
+        for (NetworkReplyObject o : threadsWaitingForNetworkReply.values()) {
+            o.interrupt();
+        }
     }
 
     private void disconnect() {
