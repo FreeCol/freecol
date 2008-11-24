@@ -55,6 +55,7 @@ public class IndianSettlement extends Settlement {
     public static final int ALARM_RADIUS = 2;
     public static final int ALARM_TILE_IN_USE = 2;
     public static final int ALARM_NEW_MISSIONARY = -100;
+    public static final int MAX_HORSES_PER_TURN = 2;
 
     public static final String UNITS_TAG_NAME = "units";
     public static final String OWNED_UNITS_TAG_NAME = "ownedUnits";
@@ -963,6 +964,8 @@ public class IndianSettlement extends Settlement {
             increaseAlarm();
         }
         
+        breedHorses();
+         
         updateWantedGoods();
     }
 
@@ -1117,6 +1120,32 @@ public class IndianSettlement extends Settlement {
     public void createGoodsContainer() {
         goodsContainer = new GoodsContainer(getGame(), this);
     }
+    
+    /**
+     * If horses are available and enough food is produced, increase horses
+     */
+    private void breedHorses() {
+    	GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+    	GoodsType reqGoodsType = horsesType.getRawMaterial();
+    	
+    	// Not enough horses to breed
+    	if(getGoodsCount(horsesType) < horsesType.getBreedingNumber()){
+    		return;
+    	}
+    	
+    	int foodProdAvail = getProductionOf(reqGoodsType) - getFoodConsumptionByType(reqGoodsType);
+    	
+    	// no food production available for breeding
+    	if(foodProdAvail <= 0){
+    		return;
+    	}
+    	
+    	int horsesThisTurn = Math.min(IndianSettlement.MAX_HORSES_PER_TURN, foodProdAvail);
+    	
+    	addGoods(horsesType, horsesThisTurn);
+    }
+    
+    
 
     /**
      * This method writes an XML-representation of this object to
