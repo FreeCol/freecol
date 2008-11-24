@@ -280,15 +280,19 @@
             <fileset dir="${freecol.release.dir}/source" includes="${freecol.name}/**"/>
         </zip>
     </target>
+    
+    <target name="executeIzpack">
+        <condition property="beginExtraPacks" value="" else="&lt;!--">
+            <istrue value="${includeExtraPacks}" />
+        </condition>
+        <condition property="endExtraPacks" value="" else="--&gt;">
+            <istrue value="${includeExtraPacks}" />
+        </condition>
+        <condition property="sourcesIncluded" value="-with-sources" else="">
+            <istrue value="${includeExtraPacks}" />
+        </condition>
 
-    <target name="javaInstallerBundle" unless="skip.dist.installer" description="Builds a platform independent installer"
-			depends="initDist,prepareWinFiles,prepareManual,prepareBaseFiles,prepareSourceFiles">
-	    <taskdef name="izpack"
-                classname="com.izforge.izpack.ant.IzPackTask"
-                classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
-        />
-
-        <izpack output="${freecol.release.dir}/${freecol.release.name}-installer.jar"
+        <izpack output="${freecol.release.dir}/${freecol.release.name}-installer${sourcesIncluded}.jar"
                 installerType="standard" 
                 basedir="${freecol.release.dir}/"
                 izpackdir="${freecol.build.dir}">
@@ -362,16 +366,28 @@
                             <description>This pack includes the game manual.</description>
                             <fileset dir="manual/@{freecol.name}" targetdir="$INSTALL_PATH"/>
                         </pack>
-                        <!--
+                        @{beginExtraPacks}
                         <pack id="SourceCode" name="Source Code" required="no" preselected="no">
                             <description>The source code used for building this distribution. These files are intended for developers and give no extra functionality to normal users.</description>
                             <fileset dir="source/@{freecol.name}" targetdir="$INSTALL_PATH"/>
                         </pack>
-                        -->
+                        @{endExtraPacks}
                     </packs>
                 </installation>
             ]]></config>
         </izpack>
+    </target>
+
+    <target name="javaInstallerBundle" unless="skip.dist.installer" description="Builds a platform independent installer"
+            depends="initDist,prepareWinFiles,prepareManual,prepareBaseFiles,prepareSourceFiles">
+        <taskdef name="izpack"
+                classname="com.izforge.izpack.ant.IzPackTask"
+                classpath="${freecol.build.dir}/jars/standalone-compiler.jar"
+        />
+        <antcall target="executeIzpack" />
+        <antcall target="executeIzpack">
+            <param name="includeExtraPacks" value="true" />
+        </antcall>
     </target>
 
     <target name="winInstallerBundle" unless="skip.dist.installer" description="Builds a windows installer"
