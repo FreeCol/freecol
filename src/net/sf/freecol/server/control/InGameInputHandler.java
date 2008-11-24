@@ -1354,14 +1354,17 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         CombatResult result;
         int plunderGold = -1;
         Unit defender = newTile.getDefendingUnit(unit);
+        Player defendingPlayer = null;
         if (defender == null) {
             if (newTile.getSettlement() != null) {
+                defendingPlayer = newTile.getSettlement().getOwner();
                 result = new CombatResult(CombatResultType.DONE_SETTLEMENT, 0);
             } else {
                 throw new IllegalStateException("Nothing to attack in direction " + direction + " from unit with ID "
                         + unitID);
             }
         } else {
+            defendingPlayer = defender.getOwner();
             result = unit.getGame().getCombatModel().generateAttackResult(unit, defender); 
         }
         if (result.type == CombatResultType.DONE_SETTLEMENT) {
@@ -1371,11 +1374,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         // Gets repair location if necessary
         Location repairLocation = null;
+        
         Player loserOwner = null;
         switch (result.type) {
         case WIN:
             if (defender.isNaval()) {
-                loserOwner = defender.getOwner();
+                loserOwner = defendingPlayer;
                 repairLocation = loserOwner.getRepairLocation(defender);
             }
             break;
@@ -1458,6 +1462,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
         }
         
+        // Destroyed settlement was an indian capital, indians surrender
+        // add capital burned flag
+        boolean isIndianCapitalBurned=false;
+        if(result.type == CombatResultType.DONE_SETTLEMENT && 
+        		newTile.getSettlement() instanceof IndianSettlement &&
+        		((IndianSettlement) newTile.getSettlement()).isCapital()) {
+        	isIndianCapitalBurned = true;
+        	reply.setAttribute("indianCapitalBurned", Boolean.toString(isIndianCapitalBurned));
+        }
+        
         Hashtable<String, Integer> oldGoodsCounts = new Hashtable<String, Integer>();
         if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
             List<Goods> goodsInUnit = unit.getGoodsContainer().getFullGoods();
@@ -1466,7 +1480,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         int oldUnits = unit.getTile().getUnitCount();
+        
+        // update server info
         unit.getGame().getCombatModel().attack(unit, defender, result, plunderGold, repairLocation);
+        if(isIndianCapitalBurned){
+        	defendingPlayer.surrenderTo(player);
+        }
         
         if (result.type.compareTo(CombatResultType.WIN) >= 0 
             && unit.getTile() != newTile

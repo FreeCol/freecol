@@ -52,7 +52,8 @@ public class Tension {
      * Constants for describing alarm levels.
      */
     public static enum Level { 
-        HAPPY(100), 
+        HAPPY(100),
+        SURRENDED(300),
         CONTENT(600), 
         DISPLEASED(700),
         ANGRY(800), 

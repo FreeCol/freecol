@@ -2039,6 +2039,22 @@ public final class InGameController implements NetworkConstants {
             if (updateElement != null) {
                 freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
             }
+            
+            // settlement was indian capital, indians surrender
+            if(attackResultElement.getAttribute("indianCapitalBurned") != ""){
+            	Player indianPlayer = defender.getOwner();
+            	indianPlayer.surrenderTo(freeColClient.getMyPlayer());
+            	//show message
+            	ModelMessage message = new ModelMessage(indianPlayer,
+                         "indianSettlement.capitalBurned",
+                         new String[][] {
+                             {"%nation%", indianPlayer.getNationAsString()}},
+                         ModelMessage.MessageType.COMBAT_RESULT);
+            	freeColClient.getMyPlayer().addModelMessage(message);
+            	nextModelMessage();
+            }
+            
+            
             if (unit.getMovesLeft() <= 0) {
                 nextActiveUnit(unit.getTile());
             }

@@ -1912,6 +1912,20 @@ public class Player extends FreeColGameObject implements Nameable {
             return tension.get(player);
         }
     }
+    
+    /**
+     * Indian player surrenders
+     * @param player The <code>Player</code> he surrenders to.
+     * 
+     */
+    public void surrenderTo(Player player) {
+    	if(!isIndian()){
+    		logger.warning("Only indians should surrender");
+    		return;
+    	}
+    	changeRelationWithPlayer(player, Stance.PEACE);
+    	getTension(player).setLevel(Tension.Level.SURRENDED);
+    }
 
     /**
      * Get the <code>History</code> value.
