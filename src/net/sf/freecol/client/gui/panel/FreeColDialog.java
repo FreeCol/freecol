@@ -289,7 +289,7 @@ public class FreeColDialog extends FreeColPanel {
 
         HIGLayout layout = new HIGLayout(widths, heights);
         JPanel textPanel = new JPanel(layout);
-        informationDialog.setLayout(new BorderLayout());
+        informationDialog.setLayout(new BorderLayout(10, 10));
 
         theButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
