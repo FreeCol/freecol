@@ -3178,6 +3178,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                             "%unit%", newName,
                             "%colony%", colony.getName());
         }
+        this.setTurnsOfTraining(0);
+        setState(UnitState.ACTIVE);
+        setMovesLeft(0);
     }
 
     /**
