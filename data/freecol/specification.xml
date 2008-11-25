@@ -1726,7 +1726,7 @@
     <optionGroup id="gameOptions.victoryConditions">
       <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
       <booleanOption id="model.option.victoryDefeatREF" defaultValue="true"/>
-      <!-- Victory condition: Should a player who first defeats all * other european players win the game? -->
+      <!-- Victory condition: Should a player who first defeats all other european players win the game? -->
       <booleanOption id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
       <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
       <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>

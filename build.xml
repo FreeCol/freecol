@@ -606,9 +606,15 @@
     </target>
 
     <target name="validate" description="Validates the specification.">
+      <echo message="Validating specification.xml."/>
       <schemavalidate
          noNamespaceFile="schema/specification-schema.xsd"
          file="data/freecol/specification.xml">
+      </schemavalidate>
+      <echo message="Validating classic.xml."/>
+      <schemavalidate
+         noNamespaceFile="schema/specification-schema.xsd"
+         file="data/freecol/classic.xml">
       </schemavalidate>
     </target>
 
