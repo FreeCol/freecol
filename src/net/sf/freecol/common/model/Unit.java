@@ -1313,11 +1313,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     } else if (canTradeWith(settlement)) {
                         return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
                     } else {
-                        logger.fine("Trying to enter another player's settlement with " + getName());
+                        logger.finest("Trying to enter another player's settlement with " + getName());
                         return MoveType.ILLEGAL_MOVE;
                     }
                 } else if (defender != null && defender.getOwner() != getOwner()) {
-                    logger.fine("Trying to sail into tile occupied by enemy units with " + getName());
+                    logger.finest("Trying to sail into tile occupied by enemy units with " + getName());
                     return MoveType.ILLEGAL_MOVE;
                 } else {
                     // Check for disembark.
@@ -1329,7 +1329,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                             return MoveType.DISEMBARK;
                         }
                     }
-                    logger.fine("No units to disembark from " + getName());
+                    logger.finest("No units to disembark from " + getName());
                     return MoveType.ILLEGAL_MOVE;
                 }
             } else if (defender != null && defender.getOwner() != getOwner()) {
@@ -1365,7 +1365,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     private MoveType getLandMoveType(Tile from, Tile target, int ml) {
         if (target == null) {
             // only naval units are allowed to do this
-            logger.fine("Trying to enter null tile with land unit " + getName());
+            logger.finest("Trying to enter null tile with land unit " + getName());
             return MoveType.ILLEGAL_MOVE;
         }
 
@@ -1397,7 +1397,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     } else if (isOffensiveUnit()) {
                         return MoveType.ATTACK;
                     } else {
-                        logger.fine("Trying to enter foreign colony with " + getName());
+                        logger.finest("Trying to enter foreign colony with " + getName());
                         return MoveType.ILLEGAL_MOVE;
                     }
                 }
@@ -1406,14 +1406,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     if (isOffensiveUnit()) {
                         return MoveType.ATTACK;
                     } else {
-                        logger.fine("Trying to attack with civilian " + getName());
+                        logger.finest("Trying to attack with civilian " + getName());
                         return MoveType.ILLEGAL_MOVE;
                     }
                 } else {
                     /*
                      * Note that attacking a settlement from a ship is allowed.
                      */
-                    logger.fine("Attempting marine assault with " + getName());
+                    logger.finest("Attempting marine assault with " + getName());
                     return MoveType.ILLEGAL_MOVE;
                 }
             } else if (target.getFirstUnit() != null && target.getFirstUnit().isNaval()
@@ -1430,7 +1430,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         } else {
             // check for embarkation
             if (target.getFirstUnit() == null || target.getFirstUnit().getOwner() != getOwner()) {
-                logger.fine("Trying to embark on tile occupied by foreign units with " + getName());
+                logger.finest("Trying to embark on tile occupied by foreign units with " + getName());
                 return MoveType.ILLEGAL_MOVE;
             } else {
                 for (Unit u : target.getUnitList()) {
@@ -1438,7 +1438,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                         return MoveType.EMBARK;
                     }
                 }
-                logger.fine("Trying to board full vessel with " + getName());
+                logger.finest("Trying to board full vessel with " + getName());
                 return MoveType.ILLEGAL_MOVE;
             }
         }
