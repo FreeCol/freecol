@@ -2527,6 +2527,45 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Get detailed occupation indicator
+     *
+     * @return The detailed occupation indicator string.
+     */
+    public String getDetailedOccupationIndicator() {
+        switch (state) {
+        case ACTIVE:
+            if (getMovesLeft() != 0) break;
+            return (isUnderRepair())
+                ? Messages.message("model.unit.occupation.underRepair")
+                    + ": " + Integer.toString(getTurnsForRepair())
+                : Messages.message("model.unit.occupation.activeNoMovesLeft");
+        case IMPROVING:
+            if (workImprovement == null) break;
+            return workImprovement.getOccupationString()
+                + ": " + Integer.toString(getWorkLeft());
+        case FORTIFIED:
+        case SENTRY:
+        case IN_COLONY:
+        case TO_EUROPE:
+        case IN_EUROPE:
+        case TO_AMERICA:
+        case FORTIFYING:
+        case SKIPPED:
+            break;
+        }
+        if (getDestination() != null) {
+            TradeRoute tradeRoute = getTradeRoute();
+
+            return (tradeRoute == null)
+                ? Messages.message("model.unit.occupation.goingSomewhere")
+                : Messages.message("model.unit.occupation.inTradeRoute")
+                    + ": " + tradeRoute.getName();
+        }
+        return Messages.message("model.unit.occupation."
+                                + state.toString().toLowerCase());
+    }
+
+    /**
      * Gets the state of this <code>Unit</code>.
      * 
      * @return The state of this <code>Unit</code>.

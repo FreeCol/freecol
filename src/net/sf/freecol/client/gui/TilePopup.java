@@ -244,21 +244,13 @@ public final class TilePopup extends JPopupMenu {
      *      indented on the menu.
      */
     private void addUnit(Container menu, final Unit unit, boolean enabled, boolean indent) {
-        String text;
-        if(unit.getState() == UnitState.IMPROVING) {
-            text = ((indent ? "    " : "") +
-                    Messages.message("model.unit.nationUnit",
-                                     "%nation%", unit.getOwner().getNationAsString(),
-                                     "%unit%", unit.getName()) +
-                    " ( " + unit.getOccupationIndicator() + ": " + unit.getWorkLeft() +  " turns )");
-
-        } else {
-            text = ((indent ? "    " : "") +
-                    Messages.message("model.unit.nationUnit",
-                                     "%nation%", unit.getOwner().getNationAsString(),
-                                     "%unit%", unit.getName()) +
-                    " ( " + unit.getOccupationIndicator() + " )");
-        }
+        String occ = unit.getDetailedOccupationIndicator();
+        if (occ.length() > 0) occ = " (" + occ + ")";
+        String text = (indent ? "    " : "")
+            + Messages.message("model.unit.nationUnit",
+                               "%nation%", unit.getOwner().getNationAsString(),
+                               "%unit%", unit.getName())
+            + occ;
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
