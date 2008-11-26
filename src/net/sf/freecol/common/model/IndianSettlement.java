@@ -62,7 +62,7 @@ public class IndianSettlement extends Settlement {
     public static final String ALARM_TAG_NAME = "alarm";
     public static final String MISSIONARY_TAG_NAME = "missionary";
     public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
-
+    
     /** The amount of goods a brave can produce a single turn. */
     //private static final int WORK_AMOUNT = 5;
 
@@ -667,50 +667,60 @@ public class IndianSettlement extends Settlement {
     public int getPrice(GoodsType type, int amount) {
         int returnPrice = 0;
 
+    	GoodsType armsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+    	GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+    	EquipmentType armsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
+    	EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
+    	
+    	int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
+    	int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
+        int musketsCurrAvail = getGoodsCount(armsType);
+        int horsesCurrAvail = getGoodsCount(horsesType);
+        
         if (amount > 100) {
             throw new IllegalArgumentException();
         }
 
-        if (type == Goods.MUSKETS) {
+        if (type == armsType) {
             int need = 0;
-            int supply = getGoodsCount(Goods.MUSKETS);
+            int supply = musketsCurrAvail;
             for (int i=0; i<ownedUnits.size(); i++) {
-                need += Unit.MUSKETS_TO_ARM_INDIAN;
+                need += musketsToArmIndian;
                 if (ownedUnits.get(i).isArmed()) {
-                    supply += Unit.MUSKETS_TO_ARM_INDIAN;
+                    supply += musketsToArmIndian;
                 }
             }
 
-            int sets = ((getGoodsCount(Goods.MUSKETS) + amount) / Unit.MUSKETS_TO_ARM_INDIAN)
-                - (getGoodsCount(Goods.MUSKETS) / Unit.MUSKETS_TO_ARM_INDIAN);
-            int startPrice = (19+getPriceAddition()) - (supply / Unit.MUSKETS_TO_ARM_INDIAN);
+            int sets = ((musketsCurrAvail + amount) / musketsToArmIndian)
+                - (musketsCurrAvail / musketsToArmIndian);
+            int startPrice = (19+getPriceAddition()) - (supply / musketsToArmIndian);
             for (int i=0; i<sets; i++) {
-                if ((startPrice-i) < 8 && (need > supply || getGoodsCount(Goods.MUSKETS) < Unit.MUSKETS_TO_ARM_INDIAN * 2)) {
+                if ((startPrice-i) < 8 && (need > supply || musketsCurrAvail < musketsToArmIndian)) {
                     startPrice = 8+i;
                 }
-                returnPrice += Unit.MUSKETS_TO_ARM_INDIAN * (startPrice-i);
+                returnPrice += musketsToArmIndian * (startPrice-i);
             }
-        } else if (type == Goods.HORSES) {
+        } else if (type == horsesType) {
             int need = 0;
-            int supply = getGoodsCount(Goods.HORSES);
+            int supply = horsesCurrAvail;
             for (int i=0; i<ownedUnits.size(); i++) {
-                need += Unit.HORSES_TO_MOUNT_INDIAN;
+                need += horsesToMountIndian;
                 if (ownedUnits.get(i).isMounted()) {
-                    supply += Unit.HORSES_TO_MOUNT_INDIAN;
+                    supply += horsesToMountIndian;
                 }
             }
 
-            int sets = (getGoodsCount(Goods.HORSES) + amount) / Unit.HORSES_TO_MOUNT_INDIAN
-                - (getGoodsCount(Goods.HORSES) / Unit.HORSES_TO_MOUNT_INDIAN);
-            int startPrice = (24+getPriceAddition()) - (supply/Unit.HORSES_TO_MOUNT_INDIAN);
+            int sets = (horsesCurrAvail + amount) / horsesToMountIndian
+                - (horsesCurrAvail / horsesToMountIndian);
+            int startPrice = (24+getPriceAddition()) - (supply/horsesToMountIndian);
 
             for (int i=0; i<sets; i++) {
                 if ((startPrice-(i*4)) < 4 &&
                     (need > supply ||
-                     getGoodsCount(Goods.HORSES) < Unit.HORSES_TO_MOUNT_INDIAN * 2)) {
+                    		horsesCurrAvail < horsesToMountIndian * 2)) {
                     startPrice = 4+(i*4);
                 }
-                returnPrice += Unit.HORSES_TO_MOUNT_INDIAN * (startPrice-(i*4));
+                returnPrice += horsesToMountIndian * (startPrice-(i*4));
             }
         } else if (type.isFarmed()) {
             returnPrice = 0;
@@ -1095,7 +1105,51 @@ public class IndianSettlement extends Settlement {
             goodsContainer.removeGoods(type, amount);
         }
     }
+    /**
+     * Equips braves with horses and muskets.
+     * Keeps some for the settlement defense
+     */
+    public void equipBraves() {
+    	GoodsType armsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+    	GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+    	EquipmentType armsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
+    	EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
+    	
+    	int musketsToArmIndian = armsEqType.getAmountRequiredOf(armsType);
+    	int horsesToMountIndian = horsesEqType.getAmountRequiredOf(horsesType);
+    	
+    	int armsAvail = getGoodsCount(armsType);
+    	int horsesAvail = getGoodsCount(horsesType);
+    	
+    	for(Unit brave : getUnitList()){
+    		logger.info("Muskets available=" + getGoodsCount(armsType));
+    		if(armsAvail < musketsToArmIndian){
+    			break;
+    		}
+    		if(brave.isArmed()){
+    			continue;
+    		}
+    		logger.info("Equiping brave with muskets");
+    		brave.equipWith(armsEqType);
+    		if(!brave.isArmed()){
+    			logger.warning("Brave has NOT been armed");
+    		}	
+    		armsAvail = getGoodsCount(armsType);
+    	}
 
+    	for(Unit brave : getUnitList()){	
+    		if(horsesAvail < horsesToMountIndian){
+    			break;
+    		}
+    		if(brave.isMounted()){
+    			continue;
+    		}
+    		logger.info("Equiping brave with horses");
+    		brave.equipWith(horsesEqType);
+    		horsesAvail = getGoodsCount(horsesType);
+    	}
+    }
+    
     /**
      * Disposes this settlement and removes its claims to adjacent
      * tiles.

@@ -68,9 +68,6 @@ public final class InGameController extends Controller {
 
     private static Logger logger = Logger.getLogger(InGameController.class.getName());
 
-    protected static EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
-    protected static EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
-
     public int debugOnlyAITurns = 0;
 
     /**
@@ -718,7 +715,20 @@ public final class InGameController extends Controller {
     }
 
     private void createUnits(List<AbstractUnit> units, Element element, ServerPlayer nextPlayer) {
-        EquipmentType[] soldier = new EquipmentType[] { muskets };
+        String musketsTypeStr = null;
+        String horsesTypeStr = null;
+    	if(nextPlayer.isIndian()){
+    		musketsTypeStr = "model.equipment.indian.muskets";
+            horsesTypeStr = "model.equipment.indian.horses";
+        } else {
+    		musketsTypeStr = "model.equipment.muskets";
+            horsesTypeStr = "model.equipment.horses";
+        }
+    	
+    	final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType(musketsTypeStr);
+        final EquipmentType horses = FreeCol.getSpecification().getEquipmentType(horsesTypeStr);
+    	
+    	EquipmentType[] soldier = new EquipmentType[] { muskets };
         EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
         for (AbstractUnit unit : units) {
             EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;

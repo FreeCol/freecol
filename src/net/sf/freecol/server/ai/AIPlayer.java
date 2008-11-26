@@ -101,8 +101,6 @@ import org.w3c.dom.Element;
 public class AIPlayer extends AIObject {
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
-    protected static EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
-    protected static EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
     protected static EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
 
     private static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
@@ -628,6 +626,7 @@ public class AIPlayer extends AIObject {
             // Determines if we need to move a brave out of the settlement.
             for (IndianSettlement is : player.getIndianSettlements()) {
                 secureIndianSettlement(is);
+                is.equipBraves();
             }
         }
     }
@@ -699,6 +698,9 @@ public class AIPlayer extends AIObject {
      * Takes the necessary actions to secure a european colony
      */
     private void secureColony(Colony colony) {
+    	final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+        final EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+    	
         Map map = player.getGame().getMap();
         int olddefenders = 0;
         int defenders = 0;

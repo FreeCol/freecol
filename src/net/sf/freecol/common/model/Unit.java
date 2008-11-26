@@ -103,8 +103,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             ENTER_INDIAN_VILLAGE_WITH_MISSIONARY, ENTER_FOREIGN_COLONY_WITH_SCOUT,
             ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS, EXPLORE_LOST_CITY_RUMOUR, ILLEGAL_MOVE }
 
-    public static final int MUSKETS_TO_ARM_INDIAN = 25, HORSES_TO_MOUNT_INDIAN = 25;
-
     private UnitType unitType;
 
     private boolean naval;
@@ -2142,7 +2140,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         if (!(asResultOfCombat || 
               (getColony() != null && getColony().canBuildEquipment(equipmentType)) ||
-              (isInEurope() && getOwner().getEurope().canBuildEquipment(equipmentType)))) {
+              (isInEurope() && getOwner().getEurope().canBuildEquipment(equipmentType)) ||
+              (getIndianSettlement() != null))) {
             logger.fine("Unable to build equipment " + equipmentType.getName());
             return;
         }
@@ -2158,11 +2157,21 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             setMovesLeft(0);
             if (getColony() != null) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
+                	if(getColony().getGoodsCount(goods.getType()) < goods.getAmount()){
+                            throw new IllegalStateException("Not enough goods to equip");
+                	}
                     getColony().removeGoods(goods);
                 }
             } else if (isInEurope()) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
                     getOwner().getMarket().buy(goods.getType(), goods.getAmount(), getOwner());
+                }
+            } else if(getIndianSettlement() != null) {
+            	for (AbstractGoods goods : equipmentType.getGoodsRequired()) {            		
+                	if(getIndianSettlement().getGoodsCount(goods.getType()) < goods.getAmount()){
+                        throw new IllegalStateException("Not enough goods to equip");
+                	}
+            		getIndianSettlement().removeGoods(goods);
                 }
             }
         }
@@ -2349,10 +2358,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     // TODO: make these go away, if possible, private if not
     public boolean isArmed() {
+    	if(getOwner().isIndian()){
+    		return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets"));
+    	}
         return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
     }
 
     public boolean isMounted() {
+    	if(getOwner().isIndian()){
+    		return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses"));
+    	}
         return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
     }
 
@@ -3769,5 +3784,4 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return unitType.getPathImage();
         }
     }
-
 }

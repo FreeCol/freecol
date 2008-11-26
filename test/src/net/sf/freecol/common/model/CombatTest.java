@@ -52,6 +52,8 @@ public class CombatTest extends FreeColTestCase {
 
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+    EquipmentType indianMuskets = spec().getEquipmentType("model.equipment.indian.muskets");
+    EquipmentType indianHorses = spec().getEquipmentType("model.equipment.indian.horses");
     EquipmentType[] dragoonEquipment = new EquipmentType[] { horses, muskets };
 
     public void testColonistAttackedByVeteran() throws Exception {
@@ -388,8 +390,11 @@ public class CombatTest extends FreeColTestCase {
 
         Unit colonist = colony.getUnitIterator().next();
         Unit defender = new Unit(getGame(), colony.getTile(), dutch, veteranType, UnitState.ACTIVE, horses, muskets);
-        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, horses, muskets);
+        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, indianHorses, indianMuskets);
 
+        assertTrue(attacker.isMounted());
+        assertTrue(inca.isIndian());
+        
         // defender should lose horses
         assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
         combatModel.attack(attacker, defender, victory, 0, null);
@@ -491,7 +496,7 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExploredBy(inca, true);
 
         Unit colonist = colony.getUnitIterator().next();
-        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, horses, muskets);
+        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, indianHorses, indianMuskets);
 
         assertEquals(colonist, colony.getDefendingUnit(attacker));
 
@@ -543,10 +548,10 @@ public class CombatTest extends FreeColTestCase {
         }
 
         Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(attacker, defender);
-        for (Modifier defenceModifier : muskets.getModifierSet("model.modifier.defence")) {
+        for (Modifier defenceModifier : indianMuskets.getModifierSet("model.modifier.defence")) {
             assertTrue(defenceModifiers.contains(defenceModifier));
         }
-        for (Modifier defenceModifier : horses.getModifierSet("model.modifier.defence")) {
+        for (Modifier defenceModifier : indianHorses.getModifierSet("model.modifier.defence")) {
             assertTrue(defenceModifiers.contains(defenceModifier));
         }
     }

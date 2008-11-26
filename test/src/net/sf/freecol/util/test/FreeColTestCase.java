@@ -398,7 +398,6 @@ public class FreeColTestCase extends TestCase {
     		}
     		
     		// settlement tile no set, get default
-    		// indianPlayer not set, get default
     		if(settlementTile == null){
     			settlementTile = game.getMap().getTile(5, 8);
     			if(settlementTile == null){

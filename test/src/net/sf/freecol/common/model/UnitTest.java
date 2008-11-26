@@ -612,6 +612,89 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Brave wasnt removed from player unit list",indianPlayer.getUnit(brave.getId()) == null);
     }
     
+    public void testEquipIndian() {
+		GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+        EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
+        EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
+        
+        Game game = getStandardGame();
+        Map map = getEmptyMap();
+        game.setMap(map);
+        
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.build();
+        
+        int horsesReqPerUnit = horsesEqType.getAmountRequiredOf(horsesType);
+        int musketsReqPerUnit = musketsEqType.getAmountRequiredOf(musketsType);        
+        
+        // Setup
+        camp.addGoods(horsesType,horsesReqPerUnit);
+        camp.addGoods(musketsType,musketsReqPerUnit);
+     
+        assertEquals("Initial number of horses in Indian camp not as expected",horsesReqPerUnit,camp.getGoodsCount(horsesType));
+        assertEquals("Initial number of muskets in Indian camp not as expected",musketsReqPerUnit,camp.getGoodsCount(musketsType));
+
+        Unit brave = camp.getUnitList().get(0);
+        
+        assertTrue("Brave should not be mounted",!brave.isMounted());
+        assertTrue("Brave should not be armed",!brave.isArmed());
+        
+        // Execute
+        brave.equipWith(musketsEqType);
+        brave.equipWith(horsesEqType);
+        
+        // Verify results
+        assertTrue("Brave should be mounted",brave.isMounted());
+        assertTrue("Brave should be armed",brave.isArmed());
+        assertEquals("No muskets should remain in camp",0,camp.getGoodsCount(musketsType));
+        assertEquals("No horses should remain in camp",0,camp.getGoodsCount(horsesType));
+    }
+
+    public void testEquipIndianNotEnoughReqGoods() {
+		GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+        EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
+        EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
+        
+        Game game = getStandardGame();
+        Map map = getEmptyMap();
+        game.setMap(map);
+        
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.build();
+        
+        int horsesAvail = horsesEqType.getAmountRequiredOf(horsesType) / 2;
+        int musketsAvail = musketsEqType.getAmountRequiredOf(musketsType) / 2;        
+        
+        // Setup
+        camp.addGoods(horsesType,horsesAvail);
+        camp.addGoods(musketsType,musketsAvail);
+     
+        assertEquals("Initial number of horses in Indian camp not as expected",horsesAvail,camp.getGoodsCount(horsesType));
+        assertEquals("Initial number of muskets in Indian camp not as expected",musketsAvail,camp.getGoodsCount(musketsType));
+
+        Unit brave = camp.getUnitList().get(0);
+        assertTrue("Inicial brave should not be mounted",!brave.isMounted());
+        assertTrue("Inicial brave should not be armed",!brave.isArmed());
+        
+        // Execute and verify
+        try{
+        	brave.equipWith(musketsEqType);
+        	fail("Exception not thrown when trying to arm unit without enough required goods");
+        } catch(IllegalStateException e){}
+        assertTrue("Final brave should not be armed",!brave.isArmed());
+        assertEquals("The muskets should not have been touched",musketsAvail,camp.getGoodsCount(musketsType));
+        
+        try{
+        	brave.equipWith(horsesEqType);
+        	fail("Exception not thrown when trying to mount unit without enough required goods");
+        } catch(IllegalStateException e){}
+        assertTrue("Final brave should not be mounted",!brave.isMounted());
+        assertEquals("The horses should not have been touched",horsesAvail,camp.getGoodsCount(horsesType));
+    }
+    
+    
     public void testUnitAvailability() {
         Game game = getStandardGame();
         

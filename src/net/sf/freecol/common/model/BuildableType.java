@@ -89,6 +89,18 @@ public class BuildableType extends FreeColGameObjectType {
     }
 
     /**
+     * Get amount required of given <code>GoodsType</code>
+     */
+    public final int getAmountRequiredOf(GoodsType type){
+    	for(AbstractGoods goods : this.goodsRequired){
+    		if(goods.getType() == type){
+    			return goods.getAmount();
+    		}
+    	}
+    	return 0;
+    }
+    
+    /**
      * Set the <code>GoodsRequired</code> value.
      *
      * @param newGoodsRequired The new GoodsRequired value.

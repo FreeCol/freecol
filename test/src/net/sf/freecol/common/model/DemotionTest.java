@@ -43,6 +43,8 @@ public class DemotionTest extends FreeColTestCase {
 
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+    EquipmentType indianMuskets = spec().getEquipmentType("model.equipment.indian.muskets");
+    EquipmentType indianHorses = spec().getEquipmentType("model.equipment.indian.horses");
 
     public void testColonistDemotedBySoldier() throws Exception {
 
@@ -189,7 +191,7 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(1, dragoon.getEquipment().size());
         assertEquals(muskets, dragoon.getEquipment().get(0));
         assertEquals(1, brave.getEquipment().size());
-        assertEquals(horses, brave.getEquipment().get(0));
+        assertEquals(indianHorses, brave.getEquipment().get(0));
         assertEquals(50, settlement1.getGoodsCount(Goods.HORSES));
         assertEquals(0, settlement2.getGoodsCount(Goods.HORSES));
 
@@ -199,8 +201,8 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(tile1, dragoon.getTile());
         assertTrue(dragoon.getEquipment().isEmpty());
         assertEquals(2, brave.getEquipment().size());
-        assertEquals(horses, brave.getEquipment().get(0));
-        assertEquals(muskets, brave.getEquipment().get(1));
+        assertEquals(indianHorses, brave.getEquipment().get(0));
+        assertEquals(indianMuskets, brave.getEquipment().get(1));
         assertEquals(50, settlement1.getGoodsCount(Goods.MUSKETS));
         assertEquals(0, settlement2.getGoodsCount(Goods.MUSKETS));
 

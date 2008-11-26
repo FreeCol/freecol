@@ -435,7 +435,6 @@ public class SimpleCombatModel implements CombatModel {
             // a stock-piled musket if attacked, so the bonus should be applied
             // for unarmed colonists inside colonies where there are muskets
             // available. Indians can also pick up equipment.
-            EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
             if (!defender.isArmed() &&
                 (defender.getLocation() instanceof WorkLocation ||
                  defender.getLocation() instanceof IndianSettlement) &&
@@ -1235,11 +1234,35 @@ public class SimpleCombatModel implements CombatModel {
                              "%enemyNation%", enemyNation,
                              "%enemyUnit%", enemyUnit.getName(),
                              "%location%", locationName);
+        
+        // we may need to change the equipment type if:
+        //    - the attacker is an indian and the defender is not, or vice-versa
+        //  and
+        //    - the equipment is muskets or horses
+        
+        EquipmentType newEquipType = typeToLose;
+        if(!unit.getOwner().isIndian() && enemyUnit.getOwner().isIndian()){
+        	if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.horses")){
+        		newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
+        	}
+        	if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.muskets")){
+        		newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
+        	}
+        }
+        if(unit.getOwner().isIndian() && !enemyUnit.getOwner().isIndian()){
+        	if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses")){
+        		newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+        	}
+        	if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets")){
+        		newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+        	}
+        }
+        
         if (enemyUnit.hasAbility("model.ability.captureEquipment")
-            && enemyUnit.canBeEquippedWith(typeToLose)) {
+            && enemyUnit.canBeEquippedWith(newEquipType)) {
             IndianSettlement settlement = enemyUnit.getIndianSettlement();
 
-            enemyUnit.equipWith(typeToLose, true);
+            enemyUnit.equipWith(newEquipType, true);
             unit.addModelMessage(unit,
                                  ModelMessage.MessageType.COMBAT_RESULT,
                                  "model.unit.equipmentCaptured",

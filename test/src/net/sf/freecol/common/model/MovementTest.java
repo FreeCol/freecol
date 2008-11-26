@@ -37,7 +37,9 @@ public class MovementTest extends FreeColTestCase {
 
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
-
+    EquipmentType indianHorses = spec().getEquipmentType("model.equipment.indian.horses");
+    EquipmentType indianMuskets = spec().getEquipmentType("model.equipment.indian.muskets");
+    
     public void testMoveFromPlainsToPlains() throws Exception {
 
         Game game = getStandardGame();
@@ -184,9 +186,9 @@ public class MovementTest extends FreeColTestCase {
 
         Unit brave = new Unit(game, tile3, french, braveType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-        brave.equipWith(horses, true);
+        brave.equipWith(indianHorses, true);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-        brave.equipWith(muskets, true);
+        brave.equipWith(indianMuskets, true);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
 
     }
@@ -221,9 +223,9 @@ public class MovementTest extends FreeColTestCase {
 
         Unit brave = new Unit(game, tile3, french, braveType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-        brave.equipWith(horses, true);
+        brave.equipWith(indianHorses, true);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
-        brave.equipWith(muskets, true);
+        brave.equipWith(indianMuskets, true);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
 
     }
