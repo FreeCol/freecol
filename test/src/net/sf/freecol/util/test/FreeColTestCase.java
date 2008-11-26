@@ -30,6 +30,7 @@ import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -297,4 +298,93 @@ public class FreeColTestCase extends TestCase {
         return colony;
     }
 
+    public static class IndianSettlementBuilder{
+    	
+    	// Required parameter
+    	private final Game game;
+    	
+    	private Player indianPlayer = null;
+    	private String defaultIndianPlayer = "model.nation.tupi";
+    	private int initialBravesInCamp = 1;
+    	private Tile settlementTile = null;
+    	private String skillTaught = "model.unit.masterCottonPlanter";
+    	private boolean isCapital = false;
+        private boolean isVisited = false;
+        private Unit residentMissionary = null;
+    	
+    	public IndianSettlementBuilder(Game game){
+    		this.game = game;
+    	}
+    	
+    	public IndianSettlementBuilder player(Player player){
+    		this.indianPlayer = player;
+    		
+			if(indianPlayer == null || !game.getPlayers().contains(player)){
+				throw new IllegalArgumentException("Indian player not in game");
+			}
+    		
+    		return this;
+    	}
+    	
+    	public IndianSettlementBuilder initialBravesInCamp(int nBraves){
+    		if(nBraves <= 0){
+    			throw new IllegalArgumentException("Number of braves must be positive");
+    		}
+    		this.initialBravesInCamp = nBraves;
+    		return this;
+    	}
+    	
+    	public IndianSettlementBuilder settlementTile(Tile tile){
+    		Tile tileOnMap = this.game.getMap().getTile(tile.getPosition());
+    		if(tile != tileOnMap){
+    			throw new IllegalArgumentException("Given tile not on map");
+    		}
+    		this.settlementTile = tile;
+    		return this;
+    	}
+    	
+    	public IndianSettlement build(){
+    		UnitType skillToTeach = FreeCol.getSpecification().getUnitType(skillTaught);
+    		UnitType indianBraveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+    		
+    		// indianPlayer not set, get default
+    		if(indianPlayer == null){
+    			indianPlayer = game.getPlayer(defaultIndianPlayer);
+    			if(indianPlayer == null){
+    				throw new IllegalArgumentException("Default Indian player " + defaultIndianPlayer + " not in game");
+    			}
+    		}
+    		
+    		// settlement tile no set, get default
+    		// indianPlayer not set, get default
+    		if(settlementTile == null){
+    			settlementTile = game.getMap().getTile(5, 8);
+    			if(settlementTile == null){
+    				throw new IllegalArgumentException("Default tile not in game");
+    			}
+    		}
+    		
+    		IndianSettlement camp = new IndianSettlement(game,indianPlayer,settlementTile,isCapital,skillToTeach,isVisited,residentMissionary);
+            
+    		// Add braves
+            for(int i=0; i < initialBravesInCamp; i++){
+            	Unit brave = new Unit(game, camp, indianPlayer, indianBraveType, UnitState.ACTIVE,
+                    indianBraveType.getDefaultEquipment());
+            	camp.addOwnedUnit(brave);
+            }
+            
+            return camp;
+    	}
+    	
+    	public IndianSettlementBuilder reset() {
+        	indianPlayer = null;
+        	initialBravesInCamp = 1;
+        	settlementTile = null;
+        	isCapital = false;
+            isVisited = false;
+            residentMissionary = null;
+            
+            return this;
+    	}
+    }
 }
