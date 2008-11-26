@@ -51,7 +51,8 @@ public class TradeRouteAction extends MapboardAction {
      * @return <code>true</code> if there is an active unit.
      */
     protected boolean shouldBeEnabled() { 
-        return true;
+        return super.shouldBeEnabled() 
+            && getFreeColClient().getMyPlayer() != null;
     }
     
     /**
