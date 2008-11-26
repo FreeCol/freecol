@@ -1437,7 +1437,7 @@
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
         <scope type="model.equipment.indian.muskets"/>
-        <scope type="model.equipment.indian..horses"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.west" />
