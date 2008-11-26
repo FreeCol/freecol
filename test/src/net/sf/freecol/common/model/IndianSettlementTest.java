@@ -53,16 +53,14 @@ public class IndianSettlementTest extends FreeColTestCase {
 	public void testDeathByStarvation(){
 		Game game = getStandardGame();
 
-        Player indianPlayer = game.getPlayer("model.nation.tupi");
-
         TileType desertType = FreeCol.getSpecification().getTileType("model.tile.desert");
         Map map = getTestMap(desertType);
         game.setMap(map);
         
         int initialBravesInCamp = 3;
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp1 = builder.player(indianPlayer).initialBravesInCamp(initialBravesInCamp).build();
-        IndianSettlement camp2 = builder.reset().player(indianPlayer).build();
+        IndianSettlement camp1 = builder.initialBravesInCamp(initialBravesInCamp).build();
+        IndianSettlement camp2 = builder.reset().build();
         
         //////////////////////
         // Simulate that only the center tile is owned by camp 1
@@ -154,16 +152,14 @@ public class IndianSettlementTest extends FreeColTestCase {
 		
 		Game game = getStandardGame();
 
-        Player indianPlayer = game.getPlayer("model.nation.tupi");
-
         TileType desertType = FreeCol.getSpecification().getTileType("model.tile.desert");
         Map map = getTestMap(desertType);
         game.setMap(map);
         
         int initialBravesInCamp = 3;
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp1 = builder.player(indianPlayer).initialBravesInCamp(initialBravesInCamp).build();
-        IndianSettlement camp2 = builder.reset().player(indianPlayer).build();
+        IndianSettlement camp1 = builder.initialBravesInCamp(initialBravesInCamp).build();
+        IndianSettlement camp2 = builder.reset().build();
         
         //////////////////////
         // Simulate that only the center tile is owned by camp 1
