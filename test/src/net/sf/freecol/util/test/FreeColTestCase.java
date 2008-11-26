@@ -20,12 +20,10 @@
 package net.sf.freecol.util.test;
 
 import java.util.Locale;
-import java.util.Vector;
 
 import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -37,9 +35,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * The base class for all FreeCol tests. Contains useful methods used by the
@@ -303,17 +300,33 @@ public class FreeColTestCase extends TestCase {
     	// Required parameter
     	private final Game game;
     	
-    	private Player indianPlayer = null;
-    	private String defaultIndianPlayer = "model.nation.tupi";
-    	private int initialBravesInCamp = 1;
-    	private Tile settlementTile = null;
-    	private String skillTaught = "model.unit.masterCottonPlanter";
-    	private boolean isCapital = false;
-        private boolean isVisited = false;
-        private Unit residentMissionary = null;
+    	private Player indianPlayer;
+    	private final String defaultIndianPlayer = "model.nation.tupi";
+    	private String skillTaught;
+    	private int initialBravesInCamp;
+    	private Tile settlementTile;
+    	
+    	private boolean isCapital;
+        private boolean isVisited;
+        private Unit residentMissionary;
     	
     	public IndianSettlementBuilder(Game game){
     		this.game = game;
+    		setStartingParams();
+    	}
+    	
+    	private void setStartingParams(){
+    		// Some params can only be set in build(), because the default values 
+    		//may not be valid for the game set
+    		// However, the tester himself may set them to valid values later, 
+    		//so they are set to null for now
+    		indianPlayer = null;
+        	initialBravesInCamp = 1;
+        	settlementTile = null;
+        	skillTaught = "model.unit.masterCottonPlanter";
+        	isCapital = false;
+            isVisited = false;
+            residentMissionary = null;
     	}
     	
     	public IndianSettlementBuilder player(Player player){
@@ -343,8 +356,37 @@ public class FreeColTestCase extends TestCase {
     		return this;
     	}
     	
+    	public IndianSettlementBuilder capital(boolean isCapital){
+    		this.isCapital = isCapital;
+    		
+    		return this;
+    	}
+    	
+    	public IndianSettlementBuilder visited(boolean isVisited){
+    		this.isVisited = isVisited;
+    		
+    		return this;
+    	}
+    	
+    	public IndianSettlementBuilder missionary(Unit missionary){
+    		this.residentMissionary = missionary;
+    		
+    		return this;
+    	}
+    	
+    	public IndianSettlementBuilder skillToTeach(String skill){
+    		this.skillTaught = skill;
+    		
+    		return this;
+    	}
+    	
     	public IndianSettlement build(){
-    		UnitType skillToTeach = FreeCol.getSpecification().getUnitType(skillTaught);
+    		UnitType skillToTeach = null;
+    		
+    		if(skillTaught != null){
+    			skillToTeach = FreeCol.getSpecification().getUnitType(skillTaught);
+    		}
+    			
     		UnitType indianBraveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
     		
     		// indianPlayer not set, get default
@@ -377,14 +419,9 @@ public class FreeColTestCase extends TestCase {
     	}
     	
     	public IndianSettlementBuilder reset() {
-        	indianPlayer = null;
-        	initialBravesInCamp = 1;
-        	settlementTile = null;
-        	isCapital = false;
-            isVisited = false;
-            residentMissionary = null;
-            
-            return this;
+    		setStartingParams();
+    		
+    		return this;
     	}
     }
 }

@@ -232,8 +232,10 @@ public class FoundingFatherTest extends FreeColTestCase {
         Tile colonyCenterTile = colony.getTile();
         Tile disputedTile = getGame().getMap().getNeighbourOrNull(Direction.N, colonyCenterTile);
         Tile settlementTile = getGame().getMap().getNeighbourOrNull(Direction.NE, colonyCenterTile);
-        IndianSettlement indianSettlement = 
-            new IndianSettlement(getGame(), iroquois, settlementTile, false, null, false, null);
+        
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(getGame());
+        IndianSettlement indianSettlement = builder.player(iroquois).settlementTile(settlementTile).skillToTeach(null).build();
+        
         disputedTile.setOwner(iroquois);
         disputedTile.setOwningSettlement(indianSettlement);
 

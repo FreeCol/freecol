@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.Iterator;
-import java.util.Set;
 
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -209,7 +208,9 @@ public class MovementTest extends FreeColTestCase {
         tile1.setExploredBy(iroquois, true);
         tile3.setExploredBy(iroquois, true);
 
-        IndianSettlement settlement = new IndianSettlement(game, inca, tile1, false, null, false, null);
+        // Build settlement
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        builder.player(inca).settlementTile(tile1).skillToTeach(null).build();
 
         Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST, colonist.getMoveType(tile1));

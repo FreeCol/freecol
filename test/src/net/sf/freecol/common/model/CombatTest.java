@@ -529,7 +529,10 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(inca, true);
 
-        IndianSettlement settlement = new IndianSettlement(game, inca, tile1, true, null, false, null);
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement settlement = builder.player(inca).settlementTile(tile1).skillToTeach(null).capital(true).build();
+        
+        //IndianSettlement settlement = new IndianSettlement(game, inca, tile1, true, null, false, null);
         Unit defender = new Unit(game, settlement, inca, braveType, UnitState.ACTIVE);
         Unit attacker = new Unit(game, tile2, dutch, colonistType, UnitState.ACTIVE, horses, muskets);
 

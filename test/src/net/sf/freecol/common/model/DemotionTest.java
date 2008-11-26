@@ -169,10 +169,12 @@ public class DemotionTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(inca, true);
 
-        IndianSettlement settlement1 = new IndianSettlement(game, inca, map.getTile(1, 1),
-                                                            true, null, false, null);
-        IndianSettlement settlement2 = new IndianSettlement(game, inca, map.getTile(8, 8),
-                                                            false, null, false, null);
+        // build indian settlements
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        builder.player(inca).settlementTile(map.getTile(1, 1)).capital(true).skillToTeach(null);
+        IndianSettlement settlement1 = builder.build();
+        builder.reset().player(inca).settlementTile(map.getTile(8, 8)).skillToTeach(null);
+        IndianSettlement settlement2 = builder.build();
 
         Unit dragoon = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
         dragoon.equipWith(muskets, true);

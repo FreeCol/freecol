@@ -85,7 +85,10 @@ public class TensionTest extends FreeColTestCase {
         
         // create an Indian settlement
         Tile tile = map.getTile(6, 9);
-        IndianSettlement settlement = new IndianSettlement(game, indian, tile, true, null, false, null);
+        
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement settlement = builder.player(indian).settlementTile(tile).skillToTeach(null).capital(true).build();
+        
         tile.setOwningSettlement(settlement);
         Iterator<Position> circleIterator = map.getCircleIterator(tile.getPosition(), true, settlement.getRadius());
         while (circleIterator.hasNext()) {
