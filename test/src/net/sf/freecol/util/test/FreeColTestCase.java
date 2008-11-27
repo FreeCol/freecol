@@ -117,16 +117,6 @@ public class FreeColTestCase extends TestCase {
         return game;
     }
 
-    /**
-     * Returns an empty Map object, i.e. one that does not yet contain
-     * any tiles.
-     *
-     * @return a <code>Map</code> value
-     */
-    public static Map getEmptyMap() {
-        return new Map(getGame(), getTestTiles(game, 30, 64, plainsType));
-    }
-
     public static Tile[][] getTestTiles(Game game, int width, int height, TileType tileType) {
         Tile[][] tiles = new Tile[width][height];
 
@@ -149,7 +139,11 @@ public class FreeColTestCase extends TestCase {
      * @return The map created as described above.
      */
     public static Map getTestMap() {
-        return getTestMap(plainsType, false);
+    	TileType tileType = plainsType;
+    	int width = 20;
+    	int height = 15;
+    	boolean explored = false;
+    	return getTestMap(tileType, width, height, explored);
     }
 
     /**
@@ -164,7 +158,10 @@ public class FreeColTestCase extends TestCase {
      * @return The map created as described above.
      */
     public static Map getTestMap(TileType tileType) {
-        return getTestMap(tileType, false);
+    	int width = 20;
+    	int height = 15;
+    	boolean explored = false;
+    	return getTestMap(tileType, width, height, explored);
     }
     
     /**
@@ -181,7 +178,30 @@ public class FreeColTestCase extends TestCase {
      * @return The map created as described above.
      */
     public static Map getTestMap(TileType tileType, boolean explored) {
-        Map m = new Map(getGame(), getTestTiles(getGame(), 20, 15, tileType));
+    	int width = 20;
+    	int height = 15;
+    	return getTestMap(tileType, width, height, explored);
+    }
+    
+    /**
+     * Creates a standardized map on which all fields have the same given type.
+     * 
+     * Uses the getGame() method to access the currently running game.
+     * 
+     * Does not call Game.setMap(Map) with the returned map.
+     * 
+     * @param type The type of land with which to initialize the map.
+     * 
+     * @param width The width of the map
+     * 
+     * @param height The height of the map
+     * 
+     * @param explored Set to true if you want all the tiles on the map to have been explored by all players.
+     * 
+     * @return The map created as described above.
+     */
+    public static Map getTestMap(TileType tileType, int width, int height, boolean explored) {
+        Map m = new Map(getGame(), getTestTiles(getGame(), width, height, tileType));
         if (explored) {
             for (Player player : getGame().getPlayers()) {
                 for (Tile tile : m.getAllTiles()) {

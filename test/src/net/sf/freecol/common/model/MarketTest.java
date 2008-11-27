@@ -56,7 +56,7 @@ public class MarketTest extends FreeColTestCase {
     public void testMarketRecovery() {
                 
         Game g = getStandardGame();
-        g.setMap(getEmptyMap());
+        g.setMap(getTestMap());
 
         Player p = g.getPlayer("model.nation.dutch");
 

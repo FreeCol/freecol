@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.Vector;
 
-import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -33,7 +32,7 @@ public class GameTest extends FreeColTestCase {
 
         Game game = new Game(new MockModelController());
         
-        game.setMap(getEmptyMap());
+        game.setMap(getTestMap());
 
         game.addPlayer(new Player(game, "TestPlayer", false, FreeCol.getSpecification().getNation("model.nation.dutch")));
 

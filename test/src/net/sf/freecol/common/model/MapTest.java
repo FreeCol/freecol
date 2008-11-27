@@ -36,10 +36,10 @@ public class MapTest extends FreeColTestCase {
     public void testMapGameInt() throws FreeColException {
 
         Game game = getStandardGame();
-        Map m = getEmptyMap();
+        Map m = getTestMap();
 
-        assertEquals(30, m.getWidth());
-        assertEquals(64, m.getHeight());
+        assertEquals(20, m.getWidth());
+        assertEquals(15, m.getHeight());
 
     }
 

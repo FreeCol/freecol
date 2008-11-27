@@ -30,7 +30,7 @@ public class IndianSettlementTest extends FreeColTestCase {
 	
 	public void testFoodConsumption(){
 		Game game = getStandardGame();
-        Map map = getEmptyMap();
+        Map map = getTestMap();
         game.setMap(map);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -93,7 +93,7 @@ public class IndianSettlementTest extends FreeColTestCase {
         GoodsType foodType = FreeCol.getSpecification().getGoodsType("model.goods.food");
         
 		Game game = getStandardGame();
-        Map map = getEmptyMap();
+        Map map = getTestMap();
         game.setMap(map);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -128,7 +128,7 @@ public class IndianSettlementTest extends FreeColTestCase {
         GoodsType foodType = FreeCol.getSpecification().getGoodsType("model.goods.food");
         
 		Game game = getStandardGame();
-        Map map = getEmptyMap();
+        Map map = getTestMap();
         game.setMap(map);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -191,7 +191,7 @@ public class IndianSettlementTest extends FreeColTestCase {
         GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
         
 		Game game = getStandardGame();
-        Map map = getEmptyMap();
+        Map map = getTestMap();
         game.setMap(map);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -251,7 +251,7 @@ public class IndianSettlementTest extends FreeColTestCase {
         GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
         
 		Game game = getStandardGame();
-        Map map = getEmptyMap();
+        Map map = getTestMap();
         game.setMap(map);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);

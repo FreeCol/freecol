@@ -581,7 +581,7 @@ public class UnitTest extends FreeColTestCase {
 
     public void testIndianDies() {
         Game game = getStandardGame();
-        Map map = getEmptyMap();
+        Map map = getTestMap();
         game.setMap(map);
     	 
         Player indianPlayer = game.getPlayer("model.nation.sioux");
@@ -619,7 +619,7 @@ public class UnitTest extends FreeColTestCase {
         EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
         
         Game game = getStandardGame();
-        Map map = getEmptyMap();
+        Map map = getTestMap();
         game.setMap(map);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
@@ -658,7 +658,7 @@ public class UnitTest extends FreeColTestCase {
         EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
         
         Game game = getStandardGame();
-        Map map = getEmptyMap();
+        Map map = getTestMap();
         game.setMap(map);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
