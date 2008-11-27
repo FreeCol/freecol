@@ -437,7 +437,7 @@ public class UnitTest extends FreeColTestCase {
         Tile tile = map.getTile(6, 9);
         UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
         UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-        UnitType farmerSkill = spec().getUnitType("model.unit.expertFarmer");
+        
         Colony colony = getStandardColony(3);
         BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
         Building church = colony.getBuilding(churchType);
@@ -451,12 +451,16 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(colonist.hasAbility("model.ability.expertMissionary"));
         assertTrue(jesuit.hasAbility("model.ability.missionary"));
         assertTrue(jesuit.hasAbility("model.ability.expertMissionary"));
-        // check mission creation 
-        IndianSettlement s = new IndianSettlement(game, sioux, tile, true, farmerSkill, true, null);
+        // check mission creation
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement s = builder.player(sioux).settlementTile(tile).capital(true).visited(true).build();
+        //IndianSettlement s = new IndianSettlement(game, sioux, tile, true, farmerSkill, true, null);
         // add the missionary
         s.setMissionary(jesuit);
-        // remove the missionary (SimpleCombatModel.getConvert(...)
+        assertTrue("No missionary set",s.getMissionary() != null);
+        assertEquals("Wrong missionary set", s.getMissionary(), jesuit);
         s.setMissionary(null);
+        assertTrue("Missionary not removed",s.getMissionary() == null);
     }
     
     public void testLineOfSight() {
@@ -586,29 +590,22 @@ public class UnitTest extends FreeColTestCase {
     	 
         Player indianPlayer = game.getPlayer("model.nation.sioux");
 
-        //////////////////////
-        // Setting test settlement and brave
-        Tile settlementTile = map.getTile(5, 8);
-        UnitType skillToTeach = FreeCol.getSpecification().getUnitType("model.unit.masterCottonPlanter");
-        boolean isCapital = false;
-        boolean isVisited = false;
-        Unit residentMissionary = null;
-        IndianSettlement camp = new IndianSettlement(game, indianPlayer, settlementTile, isCapital,
-                                                     skillToTeach, isVisited, residentMissionary);
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.build();
          
         UnitType indianBraveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
         Unit brave = new Unit(game, camp, indianPlayer, indianBraveType, UnitState.ACTIVE,
                               indianBraveType.getDefaultEquipment());
         camp.addOwnedUnit(brave);
          
-        assertEquals("Brave wasnt added to camp",1, camp.getUnitCount());
+        assertEquals("Brave wasnt added to camp",2, camp.getUnitCount());
         assertFalse("Brave wasnt added to player unit list",indianPlayer.getUnit(brave.getId()) == null);
          
         // unit dies
         brave.dispose();
         
         assertTrue("Brave wasnt disposed properly",brave.isDisposed());
-        assertEquals("Brave wasnt removed from camp",0, camp.getUnitCount());
+        assertEquals("Brave wasnt removed from camp",1, camp.getUnitCount());
         assertTrue("Brave wasnt removed from player unit list",indianPlayer.getUnit(brave.getId()) == null);
     }
     
