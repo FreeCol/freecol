@@ -454,7 +454,7 @@ public class UnitTest extends FreeColTestCase {
         // check mission creation
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement s = builder.player(sioux).settlementTile(tile).capital(true).visited(true).build();
-        //IndianSettlement s = new IndianSettlement(game, sioux, tile, true, farmerSkill, true, null);
+       
         // add the missionary
         s.setMissionary(jesuit);
         assertTrue("No missionary set",s.getMissionary() != null);
