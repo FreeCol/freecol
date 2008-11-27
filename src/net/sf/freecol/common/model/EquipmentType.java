@@ -56,11 +56,6 @@ public class EquipmentType extends BuildableType {
      * Describe militaryEquipment here.
      */
     private boolean militaryEquipment;
-
-    /**
-     * Stores the abilities required of a unit to be equipped.
-     */
-    private HashMap<String, Boolean> requiredUnitAbilities = new HashMap<String, Boolean>();
     
     /**
      * Stores the abilities required of the location where the unit is
@@ -149,7 +144,7 @@ public class EquipmentType extends BuildableType {
      * @return the abilities required by this Type.
      */
     public Map<String, Boolean> getUnitAbilitiesRequired() {
-        return requiredUnitAbilities;
+        return getAbilitiesRequired();
     }
 
     /**

@@ -19,22 +19,25 @@
 
 package net.sf.freecol.common;
 
+import java.util.Hashtable;
 import java.util.List;
-
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.EuropeanNationType;
-import net.sf.freecol.common.model.IndianNationType;
-import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.RangeOption;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import junit.framework.TestCase;
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.BuildingType;
+import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.EuropeanNationType;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.IndianNationType;
+import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
+import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.RangeOption;
 
 public final class SpecificationTest extends TestCase {
 
@@ -60,6 +63,7 @@ public final class SpecificationTest extends TestCase {
 
         UnitType colonist = spec.getUnitType("model.unit.freeColonist");
         assertTrue(colonist.hasAbility("model.ability.foundColony"));
+        assertFalse(colonist.hasAbility("model.ability.bornInIndianSettlement"));
         assertTrue(colonist.isRecruitable());
         assertFalse(colonist.hasAbility("model.ability.navalUnit"));
         assertFalse(colonist.hasAbility("model.ability.carryGoods"));
@@ -76,6 +80,7 @@ public final class SpecificationTest extends TestCase {
 
         UnitType brave = spec.getUnitType("model.unit.brave");
         assertFalse(brave.hasAbility("model.ability.foundColony"));
+        assertTrue(brave.hasAbility("model.ability.bornInIndianSettlement"));
         assertFalse(brave.isRecruitable());
         assertFalse(brave.hasAbility("model.ability.navalUnit"));
         assertTrue(brave.hasAbility("model.ability.carryGoods"));
@@ -208,6 +213,54 @@ public final class SpecificationTest extends TestCase {
         List<EuropeanNationType> REFNationTypes = spec.getREFNationTypes();
         assertEquals(1, REFNationTypes.size());
 
+    }
+    
+    public void testReqAbilitiesForEquipmentTypes() {
+    	String equipmentTypeStr;
+    	Map<String,Boolean> abilitiesReq, expectAbilities;
+    	Specification spec = Specification.getSpecification();
+
+        Map<String,Map<String,Boolean>> eqTypesAbilities = new Hashtable<String,Map<String,Boolean>>();
+        
+        // Abilities
+        equipmentTypeStr = "model.equipment.horses";
+        expectAbilities = new Hashtable<String,Boolean>();
+        expectAbilities.put("model.ability.canBeEquipped", true);
+        expectAbilities.put("model.ability.bornInIndianSettlement", false);
+        eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
+        
+        equipmentTypeStr = "model.equipment.muskets";
+        expectAbilities = new Hashtable<String,Boolean>();
+        expectAbilities.put("model.ability.canBeEquipped", true);
+        expectAbilities.put("model.ability.bornInIndianSettlement", false);
+        eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
+        
+        equipmentTypeStr = "model.equipment.indian.horses";
+        expectAbilities = new Hashtable<String,Boolean>();
+        expectAbilities.put("model.ability.canBeEquipped", true);
+        expectAbilities.put("model.ability.bornInIndianSettlement", true);
+        eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
+        
+        equipmentTypeStr = "model.equipment.indian.muskets";
+        expectAbilities = new Hashtable<String,Boolean>();
+        expectAbilities.put("model.ability.canBeEquipped", true);
+        expectAbilities.put("model.ability.bornInIndianSettlement", true);
+        eqTypesAbilities.put(equipmentTypeStr, expectAbilities);
+        
+        // Verify
+        for (Entry<String, Map<String, Boolean>> entry : eqTypesAbilities.entrySet()){
+        	equipmentTypeStr = entry.getKey();
+        	expectAbilities = entry.getValue();
+
+        	EquipmentType equipmentType = FreeCol.getSpecification().getEquipmentType(equipmentTypeStr);
+            abilitiesReq = equipmentType.getAbilitiesRequired();
+        	for (Entry<String, Boolean> ability : expectAbilities.entrySet()) {
+        		String key = ability.getKey();
+        		boolean hasAbility = abilitiesReq.containsKey(key);
+        		assertTrue(equipmentTypeStr + " missing req. ability " + key,hasAbility);
+        		assertEquals(equipmentTypeStr + " has wrong value for req. ability " + key,abilitiesReq.get(key),ability.getValue());
+        	}
+        }
     }
 
 }

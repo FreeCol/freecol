@@ -395,6 +395,7 @@
       <ability id="model.ability.scoutForeignColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
       <compatible-equipment id="model.equipment.muskets"/>
     </equipment-type>
@@ -406,6 +407,7 @@
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
     </equipment-type>
@@ -420,13 +422,14 @@
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-location-ability id="model.ability.dressMissionary" value="true"/>
     </equipment-type>
-	    <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
+	<equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
       <required-goods id="model.goods.horses" value="25"/>
       <compatible-equipment id="model.equipment.indian.muskets"/>
     </equipment-type>
@@ -435,6 +438,7 @@
       <modifier id="model.modifier.offence" type="additive" value="2"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
       <required-goods id="model.goods.muskets" value="25"/>
       <compatible-equipment id="model.equipment.indian.horses"/>
     </equipment-type>

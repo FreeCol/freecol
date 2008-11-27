@@ -614,6 +614,8 @@ public class UnitTest extends FreeColTestCase {
         GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
         EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
         EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
+        EquipmentType horsesWrongEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+        EquipmentType musketsWrongEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
         
         Game game = getStandardGame();
         Map map = getTestMap();
@@ -636,7 +638,11 @@ public class UnitTest extends FreeColTestCase {
         
         assertTrue("Brave should not be mounted",!brave.isMounted());
         assertTrue("Brave should not be armed",!brave.isArmed());
-        
+        assertTrue("Indian should be able to be armed",brave.canBeEquippedWith(musketsEqType));
+        assertFalse("Indian should not be able to equip with " + musketsWrongEqType,brave.canBeEquippedWith(musketsWrongEqType));
+        assertTrue("Indian should be able to be mounted",brave.canBeEquippedWith(horsesEqType));
+        assertFalse("Indian should not be able to equip with " + horsesWrongEqType,brave.canBeEquippedWith(horsesWrongEqType));        
+
         // Execute
         brave.equipWith(musketsEqType);
         brave.equipWith(horsesEqType);
