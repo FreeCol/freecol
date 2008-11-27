@@ -294,7 +294,7 @@ public class FreeColTestCase extends TestCase {
         // TODO not sure if this is correct
         Player dutch = game.getPlayer("model.nation.dutch");
 
-        Map map = getTestMap(FreeCol.getSpecification().getTileType("model.tile.plains"), true);
+        Map map = game.getMap();
         game.setMap(map);
 
         Tile tile = map.getTile(tileX, tileY);

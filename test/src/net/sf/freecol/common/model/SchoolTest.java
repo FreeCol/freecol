@@ -90,6 +90,8 @@ public class SchoolTest extends FreeColTestCase {
      * 
      */
     public void testExpertTeaching() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getStandardColony(4);
 
@@ -108,7 +110,7 @@ public class SchoolTest extends FreeColTestCase {
         ore.setType(expertOreMinerType);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addBuilding(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(game, colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
         assertTrue(schoolType.hasAbility("model.ability.teach"));
         assertTrue(colony.canTrain(ore));
@@ -120,7 +122,9 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testCollege() {
-        
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(8);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -132,7 +136,7 @@ public class SchoolTest extends FreeColTestCase {
         blackSmith.setType(masterBlacksmithType);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addBuilding(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(game, colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
         school.upgrade();
 
@@ -143,7 +147,9 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testUniversity() {
-        
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(10);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -155,7 +161,7 @@ public class SchoolTest extends FreeColTestCase {
         elder.setType(elderStatesmanType);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addBuilding(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(game, colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
         school.upgrade();
         school.upgrade();
@@ -192,7 +198,9 @@ public class SchoolTest extends FreeColTestCase {
      * sorted out first.
      */
     public void testTrackerBug1616384() {
-        
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(8);
 
         // Setting the stage...
@@ -272,6 +280,8 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testTwoTeachersSimple() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getStandardColony(10);
 
@@ -302,7 +312,7 @@ public class SchoolTest extends FreeColTestCase {
         ore.setType(expertOreMinerType);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addBuilding(new Building(getGame(), colony, schoolType));
+        colony.addBuilding(new Building(game, colony, schoolType));
         Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
         school.upgrade();
         school.upgrade();
@@ -366,6 +376,8 @@ public class SchoolTest extends FreeColTestCase {
      * If there are two teachers, but just one colonist to be taught.
      */
     public void testSingleGuyTwoTeachers() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
 
@@ -401,6 +413,8 @@ public class SchoolTest extends FreeColTestCase {
      * taught, this should not mean any speed up.
      */
     public void testTwoTeachersOfSameKind() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -431,6 +445,8 @@ public class SchoolTest extends FreeColTestCase {
      * 
      */
     public void testSingleGuyTwoTeachers2() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -482,6 +498,8 @@ public class SchoolTest extends FreeColTestCase {
      * Test that an petty criminal becomes an indentured servant
      */
     public void testTeachPettyCriminals() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -509,7 +527,9 @@ public class SchoolTest extends FreeColTestCase {
      * taught, but on the teacher.
      */
     public void testTeachPettyCriminalsByMaster() {
-        
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
         
@@ -534,6 +554,8 @@ public class SchoolTest extends FreeColTestCase {
      * 
      */
     public void testTeachIndenturedServants() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -560,6 +582,9 @@ public class SchoolTest extends FreeColTestCase {
      * there to simplify gameplay.
      */
     public void testTeacherStoresProgress() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony outsideColony = getStandardColony(1, 10, 8);
         Iterator<Unit> outsideUnits = outsideColony.getUnitIterator();
         Unit outsider = outsideUnits.next();
@@ -595,6 +620,8 @@ public class SchoolTest extends FreeColTestCase {
      * Moving a teacher inside the colony should not reset its training.
      */
     public void testMoveTeacherInside() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -689,6 +716,8 @@ public class SchoolTest extends FreeColTestCase {
     }
     
     public void testCaseTwoTeachersWithDifferentExp(){
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -729,6 +758,8 @@ public class SchoolTest extends FreeColTestCase {
      * Moving a teacher outside the colony should reset its training.
      */
     public void testMoveTeacherOutside() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony outsideColony = getStandardColony(1, 10, 8);
         Iterator<Unit> outsideUnits = outsideColony.getUnitIterator();
@@ -813,6 +844,8 @@ public class SchoolTest extends FreeColTestCase {
      * Sons of Liberty should not influence teaching.
      */
     public void testSonsOfLiberty() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -840,6 +873,8 @@ public class SchoolTest extends FreeColTestCase {
      * Should not save progress but start all over.
      */
     public void testPartTraining() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -881,6 +916,8 @@ public class SchoolTest extends FreeColTestCase {
      * 
      */
     public void testTeachingOrder() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -944,6 +981,8 @@ public class SchoolTest extends FreeColTestCase {
      * learn a skill at the same time.
      */
     public void testTeachingDoublePromotion() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
@@ -994,6 +1033,8 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testColonialRegular() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getStandardColony(10);
         Player owner = colony.getOwner();
@@ -1021,7 +1062,9 @@ public class SchoolTest extends FreeColTestCase {
     }
 
     public void testConcurrentUpgrade() {
-        
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(2);
 
         Iterator<Unit> units = colony.getUnitIterator();

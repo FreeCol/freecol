@@ -25,6 +25,8 @@ public class SoLTest extends FreeColTestCase {
 
 
     public void testSoL() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getStandardColony(7);
         for (int i = 1; i <= 100; i++) {

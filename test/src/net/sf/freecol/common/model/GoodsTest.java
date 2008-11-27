@@ -510,9 +510,11 @@ public class GoodsTest extends FreeColTestCase {
     }
 
     public void testSerialize() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getStandardColony();
-        Goods goods1 = new Goods(getGame(), colony, cottonType, 75);
+        Goods goods1 = new Goods(game, colony, cottonType, 75);
         Document document = Message.createNewDocument();
         Element element = goods1.toXMLElement(null, document, true, true);
 

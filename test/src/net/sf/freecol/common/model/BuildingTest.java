@@ -37,6 +37,8 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class BuildingTest extends FreeColTestCase {
 
     public void testCanBuildNext() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
     	
     	Colony colony = getStandardColony();
 
@@ -71,6 +73,8 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testInitialColony() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getStandardColony();
 
@@ -89,6 +93,9 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testChurch() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(6);
         BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
         assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
@@ -104,6 +111,8 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testCanAddToBuilding() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
     	
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
@@ -141,7 +150,6 @@ public class BuildingTest extends FreeColTestCase {
      * TODO: make this more generic.
      */
     public void testCanAddToSchool(){
-
         UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
         UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
         UnitType pettyCriminalType = spec().getUnitType("model.unit.pettyCriminal");
@@ -151,6 +159,9 @@ public class BuildingTest extends FreeColTestCase {
         UnitType elderStatesmanType = spec().getUnitType("model.unit.elderStatesman");
         UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
 
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+        
         Colony colony = getStandardColony(10);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -266,7 +277,9 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testSerialize() {
-
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
 
@@ -305,7 +318,9 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testCottonClothProduction() {
-
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(2);
         List<Unit> units = colony.getUnitList();
         Unit colonist = units.get(0);
@@ -343,7 +358,9 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testAutoProduction() {
-
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(1);
         List<Unit> units = colony.getUnitList();
         GoodsType foodType = spec().getGoodsType("model.goods.food");
@@ -375,6 +392,8 @@ public class BuildingTest extends FreeColTestCase {
     }
 
     public void testTownhallProduction() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getStandardColony(6);
         Unit unit = colony.getRandomUnit();

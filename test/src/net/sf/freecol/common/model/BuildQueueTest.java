@@ -55,6 +55,8 @@ public class BuildQueueTest extends FreeColTestCase {
     }
 
     public void testQueueWithColony() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getStandardColony();
         assertNotNull(colony.getBuilding(weaverHouse));
@@ -72,6 +74,8 @@ public class BuildQueueTest extends FreeColTestCase {
     }
 
     public void testUnitQueue() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getStandardColony();
         BuildQueue queue = new BuildQueue();
@@ -87,7 +91,6 @@ public class BuildQueueTest extends FreeColTestCase {
 
         queue.add(shipyard);
         assertEquals(2, queue.findMinimumIndex(caravel));
-
     }
 
     public void testDependencies() {

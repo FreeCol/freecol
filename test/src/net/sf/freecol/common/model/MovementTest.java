@@ -154,13 +154,14 @@ public class MovementTest extends FreeColTestCase {
     }
 
     public void testScoutColony() {
-        
-        Game game = getStandardGame();
+    	Game game = getGame();
+    	Map map = getTestMap(plainsType,true);
+    	game.setMap(map);
+    	
         Player french = game.getPlayer("model.nation.french");
         Player dutch = game.getPlayer("model.nation.dutch");
         Player iroquois = game.getPlayer("model.nation.iroquois");
-        Map map = getTestMap(plains);
-        game.setMap(map);
+        
         Tile tile1 = map.getTile(5, 8);
         Tile tile2 = map.getTile(4, 8);
         Tile tile3 = map.getTile(6, 8);
@@ -173,8 +174,8 @@ public class MovementTest extends FreeColTestCase {
         tile1.setExploredBy(iroquois, true);
         tile3.setExploredBy(iroquois, true);
 
-        Colony colony = getStandardColony(1, 5, 8);
-        tile1.setSettlement(colony);
+        Colony colony = getStandardColony();
+
         assertEquals(tile1.getColony(), colony);
 
         Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
@@ -231,7 +232,9 @@ public class MovementTest extends FreeColTestCase {
     }
 
     public void testEquipWith() {
-
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony(6);
         BuildingType churchType = spec().getBuildingType("model.building.Chapel");
         assertFalse(churchType.hasAbility("model.ability.dressMissionary"));

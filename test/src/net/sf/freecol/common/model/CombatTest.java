@@ -304,10 +304,11 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testAttackColonyWithVeteran() {
-
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        Colony colony = getStandardColony(1, 5, 8);
+    	Game game = getGame();
+    	Map map = getTestMap(plainsType,true);
+    	game.setMap(map);
+    	
+        Colony colony = getStandardColony();
 
         SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -375,9 +376,10 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testAttackColonyWithBrave() {
-
-        Game game = getStandardGame();
-        Map map = getTestMap();
+    	Game game = getGame();
+    	Map map = getTestMap(plainsType,true);
+    	game.setMap(map);
+    	
         Colony colony = getStandardColony(1, 5, 8);
 
         SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
@@ -445,10 +447,11 @@ public class CombatTest extends FreeColTestCase {
     }
 
     public void testDefendColonyWithScout() {
-
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        Colony colony = getStandardColony(1, 5, 8);
+    	Game game = getGame();
+    	Map map = getTestMap(plainsType,true);
+    	game.setMap(map);
+    	
+        Colony colony = getStandardColony();
 
         SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -482,10 +485,11 @@ public class CombatTest extends FreeColTestCase {
 
 
     public void testDefendColonyWithRevere() {
-
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        Colony colony = getStandardColony(1, 5, 8);
+    	Game game = getGame();
+    	Map map = getTestMap(plainsType,true);
+    	game.setMap(map);
+    	
+        Colony colony = getStandardColony();
 
         SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
         Player dutch = game.getPlayer("model.nation.dutch");

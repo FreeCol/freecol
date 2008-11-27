@@ -28,7 +28,6 @@ import net.sf.freecol.common.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TileTest extends FreeColTestCase {
-
     TileType plains = spec().getTileType("model.tile.plains");
     TileType desert = spec().getTileType("model.tile.desert");
     TileType grassland = spec().getTileType("model.tile.grassland");
@@ -228,9 +227,11 @@ public class TileTest extends FreeColTestCase {
     }
 
     public void testProductionModifiers() throws Exception {
-
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
         Colony colony = getStandardColony();
-        Game game = colony.getGame();
+        
         List<ColonyTile> colonyTiles = colony.getColonyTiles();
 
         ColonyTile colonyTile1 = colonyTiles.get(0);
