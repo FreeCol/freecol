@@ -272,7 +272,7 @@
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <production goods-type="model.goods.food"       value="3"/>
-      <production goods-type="model.goods.tobacco"    value="1"/>
+      <production goods-type="model.goods.sugar"      value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
       <resource   type="model.resource.Lumber"        probability="100"/>
