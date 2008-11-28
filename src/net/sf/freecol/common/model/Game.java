@@ -839,12 +839,14 @@ public class Game extends FreeColGameObject {
      */
     @SuppressWarnings("unchecked")
     public boolean checkIntegrity() {
+    	List<String> brokenObjects = new ArrayList<String>();
         boolean ok = true;
         Iterator<FreeColGameObject> iterator = ((HashMap<String, FreeColGameObject>) freeColGameObjects.clone())
             .values().iterator();
         while (iterator.hasNext()) {
             FreeColGameObject fgo = iterator.next();
             if (fgo.isUninitialized()) {
+            	brokenObjects.add(fgo.getId());
                 logger.warning("Uinitialized object: " + fgo.getId() + " (" + fgo.getClass() + ")");
                 ok = false;
             }
@@ -853,8 +855,25 @@ public class Game extends FreeColGameObject {
             logger.info("Game integrity ok.");
         } else {
             logger.warning("Game integrity test failed.");
+            fixIntegrity(brokenObjects);
         }
         return ok;
+    }
+    
+    /**
+     * Try to fix integrity problems
+     */
+    private boolean fixIntegrity(List<String> list){
+    	// try to update Units who may have missing info
+    	for(Player player : this.getPlayers()){
+    		for(Unit unit : player.getUnits()){
+    			if(unit.getOwner() == null){
+    				logger.warning("Fixing " + unit.getId() + ": owner missing");
+    				unit.setOwner(player);
+    			}
+    		}
+    	}
+    	return false;
     }
 
     /**
@@ -874,7 +893,6 @@ public class Game extends FreeColGameObject {
             logger.info("Calling newTurn for player " + player.getName());
             player.newTurn();
         }
-
     }
 
     /**

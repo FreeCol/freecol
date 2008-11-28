@@ -2300,6 +2300,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void setOwner(Player owner) {
         Player oldOwner = this.owner;
+        
+        if(oldOwner == null){
+        	logger.warning("Unit " + getId() + " had no previous owner");
+        	this.owner = owner;
+        	return;
+        }
+        
         oldOwner.removeUnit(this);
         oldOwner.modifyScore(-getType().getScoreValue());
         owner.setUnit(this);
