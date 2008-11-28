@@ -1924,7 +1924,7 @@ public class Player extends FreeColGameObject implements Nameable {
     		return;
     	}
     	changeRelationWithPlayer(player, Stance.PEACE);
-    	getTension(player).setLevel(Tension.Level.SURRENDED);
+    	getTension(player).setValue(Tension.SURRENDED);
     }
 
     /**

@@ -53,7 +53,6 @@ public class Tension {
      */
     public static enum Level { 
         HAPPY(100),
-        SURRENDED(300),
         CONTENT(600), 
         DISPLEASED(700),
         ANGRY(800), 
@@ -69,7 +68,8 @@ public class Tension {
             return limit;
         }
     }
-
+    
+    static int SURRENDED = (Level.CONTENT.limit + Level.HAPPY.limit) / 2;
     private int value;
 
     /**
