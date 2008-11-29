@@ -182,13 +182,12 @@ public class PlayerTest extends FreeColTestCase {
         Player french = game.getPlayer("model.nation.french");
         
         int initialTensionValue = 500;
-        Tension initialTension = new Tension(initialTensionValue);
         
         // setup
         dutch.setStance(french, Stance.PEACE);
         french.setStance(dutch, Stance.PEACE);
-        dutch.setTension(french, initialTension);
-        french.setTension(dutch, initialTension);
+        dutch.setTension(french, new Tension(initialTensionValue));
+        french.setTension(dutch, new Tension(initialTensionValue));
         
         // verify initial conditions
         int initialDutchTension = dutch.getTension(french).getValue();
@@ -214,20 +213,15 @@ public class PlayerTest extends FreeColTestCase {
         assertTrue(errMsg,french.getStance(dutch) == Stance.WAR);
         
         int currDutchTension = dutch.getTension(french).getValue();
-        //TODO: verify result, compare with testTension(), for now verify only one result
-        //int currFrenchTension = french.getTension(dutch).getValue();
-        
+        int currFrenchTension = french.getTension(dutch).getValue();
         
         int expectedDutchTension = Math.min(1000,initialDutchTension + Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
-        //TODO: verify result, compare with testTension(), for now verify only one result
-        //int expectedFrenchTension = initialFrenchTension;
-        
+        int expectedFrenchTension = initialFrenchTension;
         
         errMsg = "Wrong dutch tension";
         assertEquals(errMsg, expectedDutchTension, currDutchTension);
-        //TODO: verify result, compare with testTension(), for now verify only one result
-        //errMsg = "Wrong french tension";
-        //assertEquals(errMsg, expectedFrenchTension, currFrenchTension);
+        errMsg = "Wrong french tension";
+        assertEquals(errMsg, expectedFrenchTension, currFrenchTension);
     }
     
     public void testTension(){
@@ -240,10 +234,8 @@ public class PlayerTest extends FreeColTestCase {
         int initialTension = 500;
         int change = 250;
 
-        
-        Tension newTension = new Tension(initialTension);
-        dutch.setTension(french, newTension);
-        french.setTension(dutch, newTension);
+        dutch.setTension(french, new Tension(initialTension));
+        french.setTension(dutch, new Tension(initialTension));
         
         dutch.modifyTension(french, change);
 

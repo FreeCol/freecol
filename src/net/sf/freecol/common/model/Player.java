@@ -2116,12 +2116,17 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player.getStance(this) != newStance) {
             getGame().getModelController().setStance(this, player, newStance);
             player.setStance(this, newStance);
-           
-            if (oldStance == Stance.PEACE && newStance == Stance.WAR) {
-                player.modifyTension(this, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
-            } else if (oldStance == Stance.CEASE_FIRE && newStance == Stance.WAR) {
-                player.modifyTension(this, Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE);
+        
+            if(newStance == Stance.WAR){
+            	switch(oldStance){
+            		case PEACE:
+            			modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE;
+            			break;
+            		case CEASE_FIRE:
+            			modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE;
+            	}
             }
+            player.modifyTension(this, modifier);
         }
     }
 

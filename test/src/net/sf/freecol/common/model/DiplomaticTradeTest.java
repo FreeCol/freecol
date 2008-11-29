@@ -32,9 +32,9 @@ public class DiplomaticTradeTest extends FreeColTestCase {
         
         // Setup
         dutch.setStance(french, stance);
-        dutch.setTension(french, tension);
+        dutch.setTension(french, new Tension(tension.getValue()));
         french.setStance(dutch, stance);
-        french.setTension(dutch, tension);
+        french.setTension(dutch, new Tension(tension.getValue()));
         
         // Verify initial conditions
         Tension.Level expectedTension = tension.getLevel();
