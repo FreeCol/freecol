@@ -174,23 +174,85 @@ public class PlayerTest extends FreeColTestCase {
         */
     }
 
-    public void testDeclarationOfWar(){
+    public void testDeclarationOfWarFromPeace(){
     	String errMsg = "";
     	Game game = getStandardGame();
         
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         
-        errMsg ="The Dutch cant be at war with the French";
-        assertFalse(errMsg,dutch.getStance(french) == Stance.WAR);
-        errMsg ="The French cant be at war with the Dutch";
-        assertFalse(errMsg,french.getStance(dutch) == Stance.WAR);
+        int initialTensionValue = 500;
+        Tension initialTension = new Tension(initialTensionValue);
         
+        // setup
+        dutch.setStance(french, Stance.PEACE);
+        french.setStance(dutch, Stance.PEACE);
+        dutch.setTension(french, initialTension);
+        french.setTension(dutch, initialTension);
+        
+        // verify initial conditions
+        int initialDutchTension = dutch.getTension(french).getValue();
+        int initialFrenchTension = french.getTension(dutch).getValue();
+        
+        errMsg ="The Dutch must be at peace with the French";
+        assertEquals(errMsg,Stance.PEACE,dutch.getStance(french));
+        errMsg ="The French must be at peace with the Dutch";
+        assertEquals(errMsg,Stance.PEACE,french.getStance(dutch));
+        errMsg = "Wrong initial dutch tension";
+        assertEquals(errMsg, initialTensionValue, initialDutchTension);
+        errMsg = "Wrong initial french tension";
+        assertEquals(errMsg, initialTensionValue, initialFrenchTension);
+        
+        // execute
+        // French declare war
         french.changeRelationWithPlayer(dutch, Stance.WAR);
         
+        // verify results
         errMsg ="The Dutch should be at war with the French";
         assertTrue(errMsg,dutch.getStance(french) == Stance.WAR);
         errMsg ="The French should be at war with the Dutch";
         assertTrue(errMsg,french.getStance(dutch) == Stance.WAR);
+        
+        int currDutchTension = dutch.getTension(french).getValue();
+        //TODO: verify result, compare with testTension(), for now verify only one result
+        //int currFrenchTension = french.getTension(dutch).getValue();
+        
+        
+        int expectedDutchTension = Math.min(1000,initialDutchTension + Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
+        //TODO: verify result, compare with testTension(), for now verify only one result
+        //int expectedFrenchTension = initialFrenchTension;
+        
+        
+        errMsg = "Wrong dutch tension";
+        assertEquals(errMsg, expectedDutchTension, currDutchTension);
+        //TODO: verify result, compare with testTension(), for now verify only one result
+        //errMsg = "Wrong french tension";
+        //assertEquals(errMsg, expectedFrenchTension, currFrenchTension);
+    }
+    
+    public void testTension(){
+    	String errMsg = "";
+    	Game game = getStandardGame();
+        
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+
+        int initialTension = 500;
+        int change = 250;
+
+        
+        Tension newTension = new Tension(initialTension);
+        dutch.setTension(french, newTension);
+        french.setTension(dutch, newTension);
+        
+        dutch.modifyTension(french, change);
+
+        int expectedDutchTension = initialTension + change;
+        int expectedFrenchTension = initialTension;
+        
+        errMsg = "Dutch tension value should have changed";
+        assertEquals(errMsg, expectedDutchTension, dutch.getTension(french).getValue());
+        errMsg = "French tension value should have remained the same";
+        assertEquals(errMsg, expectedFrenchTension ,french.getTension(dutch).getValue());
     }
 }

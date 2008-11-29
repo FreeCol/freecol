@@ -35,6 +35,7 @@ public class AllTests {
 	suite.addTestSuite(ContactTest.class);
 	suite.addTestSuite(DefaultCostDeciderTest.class);
 	suite.addTestSuite(DemotionTest.class);
+	suite.addTestSuite(DiplomaticTradeTest.class);
 	suite.addTestSuite(FoundingFatherTest.class);
 	suite.addTestSuite(GameTest.class);
 	suite.addTestSuite(GoodsTest.class);

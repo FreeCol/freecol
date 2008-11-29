@@ -2082,20 +2082,46 @@ public class Player extends FreeColGameObject implements Nameable {
         	throw new IllegalStateException("Cease fire can only be declared when at war.");
         }
         stance.put(player.getId(), newStance);
-
-        if (oldStance == Stance.PEACE && newStance == Stance.WAR) {
-            modifyTension(player, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
-        } else if (oldStance == Stance.CEASE_FIRE && newStance == Stance.WAR) {
-            modifyTension(player, Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE);
-        }
     }
 
     public void changeRelationWithPlayer(Player player,Stance newStance){
+    	Stance oldStance = getStance(player);
+    	
+    	// Sanitation
+    	if(newStance == oldStance){
+    		return;
+    	}
+    	
+    	// Set stance
     	setStance(player, newStance);
+    	
+    	// Update tension
+    	int modifier = 0;
+    	switch(newStance){
+    		case PEACE:
+    			if(oldStance == Stance.WAR){
+    				modifier = Tension.CEASE_FIRE_MODIFIER + Tension.PEACE_TREATY_MODIFIER;
+    			}
+    			if(oldStance == Stance.CEASE_FIRE){
+    				modifier = Tension.PEACE_TREATY_MODIFIER;
+    			}
+    			break;
+    		case CEASE_FIRE:
+    			if(oldStance == Stance.WAR){
+    				modifier = Tension.CEASE_FIRE_MODIFIER;
+    			}
+    	}
+    	modifyTension(player,modifier);
     	
         if (player.getStance(this) != newStance) {
             getGame().getModelController().setStance(this, player, newStance);
             player.setStance(this, newStance);
+           
+            if (oldStance == Stance.PEACE && newStance == Stance.WAR) {
+                player.modifyTension(this, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
+            } else if (oldStance == Stance.CEASE_FIRE && newStance == Stance.WAR) {
+                player.modifyTension(this, Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE);
+            }
         }
     }
 

@@ -48,6 +48,15 @@ public class Tension {
     /** Tension modification to be used when war is declared from a cease fire. */
     public static final int TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE = 750;
     
+    /** Tension modification to be used when a peace treaty is signed. */
+    public static final int PEACE_TREATY_MODIFIER = -250;
+
+    /** Tension modification to be used when a cease-fire treaty is signed. */
+    public static final int CEASE_FIRE_MODIFIER = -250;
+    
+    /** Tension modification to be used when an alliance treaty is signed. */
+    public static final int ALLIANCE_MODIFIER = -500;
+    
     /** 
      * Constants for describing alarm levels.
      */
