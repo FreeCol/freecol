@@ -272,7 +272,7 @@
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <production goods-type="model.goods.food"       value="3"/>
-      <production goods-type="model.goods.tobacco"    value="1"/>
+      <production goods-type="model.goods.sugar"      value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
       <resource   type="model.resource.Lumber"        probability="100"/>
@@ -395,6 +395,7 @@
       <ability id="model.ability.scoutForeignColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
       <compatible-equipment id="model.equipment.muskets"/>
     </equipment-type>
@@ -406,6 +407,7 @@
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
     </equipment-type>
@@ -419,6 +421,26 @@
       <ability id="model.ability.missionary" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-location-ability id="model.ability.dressMissionary" value="true"/>
+    </equipment-type>
+	<equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="1"/>
+      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <required-goods id="model.goods.horses" value="25"/>
+      <compatible-equipment id="model.equipment.indian.muskets"/>
+    </equipment-type>
+    <equipment-type id="model.equipment.indian.muskets" combat-loss-priority="10" role="soldier">
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="2"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <required-goods id="model.goods.muskets" value="25"/>
+      <compatible-equipment id="model.equipment.indian.horses"/>
     </equipment-type>
   </equipment-types>
 
@@ -1400,8 +1422,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.west" />
@@ -1415,8 +1437,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.northWest" />
@@ -1431,8 +1453,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.southEast" />
@@ -1444,8 +1466,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.east" />
@@ -1462,8 +1484,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.northEast" />
@@ -1480,8 +1502,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.north" />
@@ -1496,8 +1518,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.southWest" />
@@ -1513,8 +1535,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.center" />

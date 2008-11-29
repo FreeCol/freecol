@@ -201,7 +201,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog implements A
             scrollPane.setBorder(null);
             p1.add(scrollPane, BorderLayout.CENTER);
             // and control the overall window size, for the scroll panel to work
-            this.setPreferredSize(new Dimension(570,400));
+            this.setPreferredSize(new Dimension(570, 400));
 
             description = new JTextArea();
             description.setBorder(null);

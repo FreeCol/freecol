@@ -616,6 +616,11 @@
          noNamespaceFile="schema/specification-schema.xsd"
          file="data/freecol/classic.xml">
       </schemavalidate>
+      <echo message="Validating testing.xml."/>
+      <schemavalidate
+         noNamespaceFile="schema/specification-schema.xsd"
+         file="data/freecol/testing.xml">
+      </schemavalidate>
     </target>
 
     <target name="print-manual"
@@ -694,5 +699,10 @@
         </fileset>
       </pmd>
     </target>
+
+    <target name="prepare-commit"
+            description="Rebuild from scratch and run all tests."
+            depends="clean,package,validate,testall"/>
+
 
 </project>

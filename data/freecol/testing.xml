@@ -289,7 +289,7 @@
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
       <gen humidityMin="25" humidityMax="70" temperatureMin="30" temperatureMax="40" altitudeMin="1" altitudeMax="1"/>
       <production goods-type="model.goods.grain"       value="3"/>
-      <production goods-type="model.goods.tobacco"    value="1"/>
+      <production goods-type="model.goods.sugar"      value="1"/>
       <production goods-type="model.goods.furs"       value="2"/>
       <production goods-type="model.goods.lumber"     value="4"/>
       <resource   type="model.resource.Lumber"        probability="100"/>
@@ -374,10 +374,13 @@
       <production goods-type="model.goods.fish"       value="2"/>
       <resource   type="model.resource.Fish"          probability="100"/>
     </tile-type>
-    <tile-type    id="model.tile.highSeas"          basic-move-cost="3" basic-work-turns="4" is-water="true" sail-to-europe="true" is-connected="true">
+    <tile-type    id="model.tile.highSeas"          basic-move-cost="3" basic-work-turns="4"
+                  is-water="true" is-connected="true">
       <art basic="terrain/highSeas/" minimap-color="#0000cc"/>
       <gen humidityMin="0" humidityMax="100" temperatureMin="-20" temperatureMax="40" altitudeMin="-3" altitudeMax="-2"/>
       <production goods-type="model.goods.fish"       value="4"/>
+      <ability id="model.ability.moveToEurope"/>
+
     </tile-type>
     <tile-type    id="model.tile.greatRiver" basic-move-cost="3" basic-work-turns="4" is-water="true">
       <art basic="terrain/ocean/" minimap-color="#0000ff"/>
@@ -410,6 +413,7 @@
       <ability id="model.ability.scoutForeignColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
       <compatible-equipment id="model.equipment.muskets"/>
     </equipment-type>
@@ -421,6 +425,7 @@
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
     </equipment-type>
@@ -434,6 +439,26 @@
       <ability id="model.ability.missionary" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-location-ability id="model.ability.dressMissionary" value="true"/>
+    </equipment-type>
+	<equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="1"/>
+      <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
+      <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <required-goods id="model.goods.horses" value="25"/>
+      <compatible-equipment id="model.equipment.indian.muskets"/>
+    </equipment-type>
+    <equipment-type id="model.equipment.indian.muskets" combat-loss-priority="10" role="soldier">
+      <modifier id="model.modifier.defence" type="additive" value="1"/>
+      <modifier id="model.modifier.offence" type="additive" value="2"/>
+      <ability id="model.ability.canBeCaptured" value="false"/>
+      <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <required-goods id="model.goods.muskets" value="25"/>
+      <compatible-equipment id="model.equipment.indian.horses"/>
     </equipment-type>
   </equipment-types>
 
@@ -554,9 +579,9 @@
       <upgrade unit="model.unit.elderStatesman" turnsToLearn="8"/>
       <upgrade unit="model.unit.masterCarpenter" turnsToLearn="4"/>
       <upgrade unit="model.unit.masterDistiller" turnsToLearn="6"/>
-      <upgrade unit="model.unit.masterWeaver" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterWeaver" turnsToLearn="6" learnFromNatives="true"/>
       <upgrade unit="model.unit.masterTobacconist" turnsToLearn="6"/>
-      <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6"/>
+      <upgrade unit="model.unit.masterFurTrader" turnsToLearn="6" learnFromNatives="true"/>
       <upgrade unit="model.unit.masterBlacksmith" turnsToLearn="6"/>
       <upgrade unit="model.unit.masterGunsmith" turnsToLearn="6"/>
       <upgrade unit="model.unit.seasonedScout" turnsToLearn="4" learnFromNatives="true" learnInLostCity="true"/>
@@ -756,6 +781,7 @@
     </unit-type>
     <unit-type id="model.unit.seasonedScout" art="seasonedScout" offence="0"  defence="1" movement="3" lineOfSight="1"               
                skill="1" recruitProbability="1" scoreValue="4" pathImage="foot">
+      <default-equipment id="model.equipment.horses"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -764,6 +790,7 @@
     </unit-type>
     <unit-type id="model.unit.hardyPioneer" art="hardyPioneer" offence="0"  defence="1" movement="3" lineOfSight="1" price="1100" 
                skill="1" recruitProbability="1" scoreValue="4" pathImage="foot">
+      <default-equipment id="model.equipment.tools"/>
       <downgrade unit="model.unit.freeColonist"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -773,6 +800,7 @@
     <unit-type id="model.unit.veteranSoldier" art="veteranSoldier" offence="0"  defence="1"
                movement="3" lineOfSight="1" price="2000"
                skill="2" recruitProbability="1" scoreValue="5" pathImage="foot">
+      <default-equipment id="model.equipment.muskets"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
@@ -785,6 +813,7 @@
     </unit-type>
     <unit-type id="model.unit.jesuitMissionary" art="jesuitMissionary" offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
                skill="3" recruitProbability="1" scoreValue="5" pathImage="foot">
+      <default-equipment id="model.equipment.missionary"/>
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -1049,6 +1078,10 @@
       <required-goods id="model.goods.hammers" value="52"/>
     </building-type>
     <building-type id="model.building.BlacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" sequence="3">
+      <ability id="model.ability.build">
+        <scope type="model.equipment.tools"/>
+        <scope type="model.equipment.muskets"/>
+      </ability>
     </building-type>
     <building-type id="model.building.BlacksmithShop"  basicProduction="6" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" upgradesFrom="model.building.BlacksmithHouse" sequence="3">
       <required-goods id="model.goods.hammers" value="64"/>
@@ -1148,12 +1181,16 @@
     </building-type>
     <building-type id="model.building.Armory"   basicProduction="3" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" sequence="9">
       <required-goods id="model.goods.hammers" value="52"/>
-      <ability id="model.ability.buildArtillery" value="true"/>
+      <ability id="model.ability.build">
+        <scope type="model.unit.artillery"/>
+      </ability>
     </building-type>
     <building-type id="model.building.Magazine" basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.Armory" required-population="8" sequence="9">
       <required-goods id="model.goods.hammers" value="120"/>
       <required-goods id="model.goods.tools" value="50"/>
-      <ability id="model.ability.buildArtillery" value="true"/>
+      <ability id="model.ability.build">
+        <scope type="model.unit.artillery"/>
+      </ability>
     </building-type>
     <building-type id="model.building.Arsenal"  basicProduction="6" workplaces="3" consumes="model.goods.tools" produces="model.goods.muskets" upgradesFrom="model.building.Magazine" required-population="8" sequence="9">
       <required-goods id="model.goods.hammers" value="240"/>
@@ -1162,9 +1199,15 @@
       <modifier id="model.goods.muskets" type="percentage" value="50"/>
       <ability id="model.ability.buildArtillery" value="true"/>
       <ability id="model.ability.expertsUseConnections" value="true"/>
+      <ability id="model.ability.build">
+        <scope type="model.unit.artillery"/>
+      </ability>
     </building-type>
     <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.crosses" sequence="10">
       <modifier id="model.goods.crosses" type="additive" value="1"/>
+      <ability id="model.ability.build">
+        <scope type="model.equipment.missionary"/>
+      </ability>
     </building-type>
     <building-type id="model.building.Church"    basicProduction="3" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.Chapel" required-population="3" sequence="10">
       <required-goods id="model.goods.hammers" value="64"/>
@@ -1180,6 +1223,8 @@
     <building-type id="model.building.Stockade" workplaces="0" required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
+      <!-- ability needs to be added to prevent missing keys. -->
+      <ability id="model.ability.preventAbandonColony" value="false"/>
     </building-type>
     <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade"
                    required-population="3" sequence="11">
@@ -1211,6 +1256,9 @@
                    produces="model.goods.horses" sequence="14">
       <modifier id="model.goods.horses" type="percentage" value="-50"/>
       <ability id="model.ability.autoProduction" value="true" />
+      <ability id="model.ability.build">
+        <scope type="model.equipment.horses"/>
+      </ability>
     </building-type>
     <building-type id="model.building.Stables" workplaces="0" consumes="model.goods.grain"
                    produces="model.goods.horses" upgradesFrom="model.building.Country" sequence="14">
@@ -1239,7 +1287,20 @@
       <ability id="model.ability.repairUnits" value="true">
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
-      <ability id="model.ability.buildShips" value="true"/>
+      <ability id="model.ability.build">
+        <scope ability-id="model.ability.navalUnit"/>
+      </ability>
+    </building-type>
+    <building-type id="model.building.PrintingPress" workplaces="0" sequence="16">
+      <required-goods id="model.goods.hammers" value="52"/>
+      <required-goods id="model.goods.tools" value="20"/>
+      <modifier id="model.goods.bells" type="percentage" value="50"/>
+    </building-type>
+    <building-type id="model.building.Newspaper" workplaces="0" upgradesFrom="model.building.PrintingPress"
+                   required-population="4" sequence="16">
+      <required-goods id="model.goods.hammers" value="120"/>
+      <required-goods id="model.goods.tools" value="50"/>
+      <modifier id="model.goods.bells" type="percentage" value="100"/>
     </building-type>
     <building-type id="model.building.CustomHouse" workplaces="0" sequence="17">
       <required-goods id="model.goods.hammers" value="160"/>
@@ -1482,8 +1543,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.west" />
@@ -1497,8 +1558,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.northWest" />
@@ -1513,8 +1574,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.southEast" />
@@ -1526,8 +1587,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.east" />
@@ -1544,8 +1605,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.northEast" />
@@ -1562,8 +1623,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.north" />
@@ -1578,8 +1639,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.southWest" />
@@ -1595,8 +1656,8 @@
       <ability id="model.ability.ambushBonus" value="true"/>
       <ability id="model.ability.foundColony" value="false"/>
       <ability id="model.ability.automaticEquipment" value="true">
-        <scope type="model.equipment.muskets"/>
-        <scope type="model.equipment.horses"/>
+        <scope type="model.equipment.indian.muskets"/>
+        <scope type="model.equipment.indian.horses"/>
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.center" />
@@ -1702,10 +1763,8 @@
       <integerOption id="model.option.burnProbability" value="2"/>
       <integerOption id="model.option.recruitPriceIncrease" value="20"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.easy">
       <integerOption id="model.option.crossesIncrement" value="8"/>
@@ -1719,10 +1778,8 @@
       <integerOption id="model.option.burnProbability" value="4"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.medium">
       <integerOption id="model.option.crossesIncrement" value="10"/>
@@ -1736,10 +1793,8 @@
       <integerOption id="model.option.burnProbability" value="6"/>
       <integerOption id="model.option.recruitPriceIncrease" value="40"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.hard">
       <integerOption id="model.option.crossesIncrement" value="12"/>
@@ -1753,10 +1808,8 @@
       <integerOption id="model.option.burnProbability" value="8"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.veryHard">
       <integerOption id="model.option.crossesIncrement" value="14"/>
@@ -1770,10 +1823,8 @@
       <integerOption id="model.option.burnProbability" value="10"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
-      <booleanOption id="model.option.purchasePriceIncreasePerType" value="true"/>
-      <booleanOption id="model.option.trainingPriceIncreasePerType" value="false"/>
-      <integerOption id="model.option.purchasePriceIncrease.Artillery" value="100"/>
-      <integerOption id="model.option.trainingPriceIncrease" value="0"/>
+      <booleanOption id="model.option.priceIncreasePerType" value="true"/>
+      <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
   </difficultyLevels>
   <options>
@@ -1800,7 +1851,7 @@
     <optionGroup id="gameOptions.victoryConditions">
       <!-- Victory condition: Should the player who first defeats the Royal Expeditionary Force win the game? -->
       <booleanOption id="model.option.victoryDefeatREF" defaultValue="true"/>
-      <!-- Victory condition: Should a player who first defeats all * other european players win the game? -->
+      <!-- Victory condition: Should a player who first defeats all other european players win the game? -->
       <booleanOption id="model.option.victoryDefeatEuropeans" defaultValue="true"/>
       <!-- Victory condition: Should a player who first defeats all other human players win the game? -->
       <booleanOption id="model.option.victoryDefeatHumans" defaultValue="false"/>
@@ -1831,8 +1882,20 @@
       <booleanOption id="model.option.mapScrollOnDrag" defaultValue="true"/>
       <!-- Whether to display a compass rose or not. -->
       <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
+      <!-- Whether to display the map controls by default or not. -->
+      <booleanOption id="model.option.displayMapControls" defaultValue="true"/>
       <!-- Whether to display the grid by default or not. -->
       <booleanOption id="model.option.displayGrid" defaultValue="false"/>
+      <!-- Option for in tile text display -->
+      <selectOption id="model.option.displayTileText" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.gui.displayTileText.empty" value="0"/>
+        <!-- Whether to display the tile names. -->
+        <selectValue label="clientOptions.gui.displayTileText.names" value="1"/>
+        <!-- Whether to display the tile owners. -->
+        <selectValue label="clientOptions.gui.displayTileText.owners" value="2"/>
+        <!-- Whether to display the tile regions. -->
+        <selectValue label="clientOptions.gui.displayTileText.regions" value="3"/>
+      </selectOption>
       <!-- Used by GUI to sort colonies. -->
       <selectOption id="model.option.colonyComparator" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.colonyComparator.byName" value="0"/>
@@ -1967,12 +2030,12 @@
       </rangeOption>
       <!-- Option for setting the number of mountains on the map
            The value indicates the number of land tile per mountain tile -->
-      <rangeOption id="model.option.mountainNumber" defaultValue="1" localizedLabels="true">
-        <rangeValue label="small" value="0"/>
-        <rangeValue label="medium" value="1"/>
-        <rangeValue label="large" value="2"/>
-        <rangeValue label="veryLarge" value="3"/>
-        <rangeValue label="huge" value="4"/>
+      <rangeOption id="model.option.mountainNumber" defaultValue="10" localizedLabels="true">
+        <rangeValue label="small" value="20"/>
+        <rangeValue label="medium" value="10"/>
+        <rangeValue label="large" value="9"/>
+        <rangeValue label="veryLarge" value="8"/>
+        <rangeValue label="huge" value="7"/>
       </rangeOption>
       <!-- Option for setting the number of rumours on the map
            The value indicates the number of land tile per rumour tile -->
