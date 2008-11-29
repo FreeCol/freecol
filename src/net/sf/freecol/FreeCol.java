@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol;
 
 import java.awt.Dimension;
@@ -68,14 +67,13 @@ import net.sf.freecol.server.FreeColServer;
 
 
 /**
-* This class is responsible for handling the command-line arguments
-* and starting either the stand-alone server or the client-GUI.
-*
-* @see net.sf.freecol.client.FreeColClient FreeColClient
-* @see net.sf.freecol.server.FreeColServer FreeColServer
-*/
+ * This class is responsible for handling the command-line arguments
+ * and starting either the stand-alone server or the client-GUI.
+ *
+ * @see net.sf.freecol.client.FreeColClient FreeColClient
+ * @see net.sf.freecol.server.FreeColServer FreeColServer
+ */
 public final class FreeCol {
-    
 
     public static final String  META_SERVER_ADDRESS = "meta.freecol.org";
     public static final int     META_SERVER_PORT = 3540;
@@ -183,8 +181,8 @@ public final class FreeCol {
         if (javaCheck && !checkJavaVersion()) {
             removeSplash(splash);
             System.err.println("Java version " + MIN_JDK_VERSION +
-                            " or better is recommended in order to run FreeCol." +
-                            " Use --no-java-check to skip this check.");
+                               " or better is recommended in order to run FreeCol." +
+                               " Use --no-java-check to skip this check.");
             return;
         }
 
@@ -245,10 +243,10 @@ public final class FreeCol {
 
                 Runtime runtime = Runtime.getRuntime();
                 runtime.addShutdownHook(new Thread() {
-                    public void run() {
-                        freeColServer.getController().shutdown();
-                    }
-                });
+                        public void run() {
+                            freeColServer.getController().shutdown();
+                        }
+                    });
             } catch (IOException e) {
                 removeSplash(splash);
                 System.err.println("Error while loading server: " + e);
@@ -283,7 +281,9 @@ public final class FreeCol {
                 return;
             }
 
-            // TODO: don't use same datafolder for both images and music because the images are best kept inside the .JAR file.
+            // TODO: don't use same datafolder for both images and
+            // music because the images are best kept inside the .JAR
+            // file.
 
             logger.info("Now starting to load images.");
 
@@ -323,10 +323,10 @@ public final class FreeCol {
                 final FreeColClient theFreeColClient = freeColClient;
                 final File theSavegameFile = savegameFile;
                 SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        theFreeColClient.getConnectController().loadGame(theSavegameFile);
-                    }
-                });
+                        public void run() {
+                            theFreeColClient.getConnectController().loadGame(theSavegameFile);
+                        }
+                    });
             }
         }
         
@@ -384,10 +384,10 @@ public final class FreeCol {
             e.printStackTrace();
         }
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-            public void uncaughtException(Thread thread, Throwable e) {
-                baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
-            }
-        });
+                public void uncaughtException(Thread thread, Throwable e) {
+                    baseLogger.log(Level.WARNING, "Uncaught exception from thread: " + thread, e);
+                }
+            });
     }
     
     /**
@@ -410,13 +410,13 @@ public final class FreeCol {
              */
             for(int eventid = in.getEventType();eventid != XMLEvent.END_DOCUMENT; eventid = in.getEventType()) { 
 
-            	//TODO: Is checking for XMLEvent.ATTRIBUTE needed?
-            	if(eventid == XMLEvent.START_ELEMENT) {
-                	if (ClientOptions.LANGUAGE.equals(in.getAttributeValue(null, "id"))) {
-                		return LanguageOption.getLocale(in.getAttributeValue(null, "value")); 
-                	}
-            	}
-            	in.nextTag();
+                //TODO: Is checking for XMLEvent.ATTRIBUTE needed?
+                if(eventid == XMLEvent.START_ELEMENT) {
+                    if (ClientOptions.LANGUAGE.equals(in.getAttributeValue(null, "id"))) {
+                        return LanguageOption.getLocale(in.getAttributeValue(null, "value")); 
+                    }
+                }
+                in.nextTag();
             }
             //We don't have a language option in our file, it is either not there or the file is corrupt
             logger.log(Level.WARNING, "Language setting not found in client options file.  Using default.");
@@ -599,11 +599,11 @@ public final class FreeCol {
     }
 
     /**
-    * Ensure that the Java version is good enough. JDK 1.4 or better is
-    * required.
-    *
-    * @return true if Java version is at least 1.4.0.
-    */
+     * Ensure that the Java version is good enough. JDK 1.4 or better is
+     * required.
+     *
+     * @return true if Java version is at least 1.5.0.
+     */
     private static boolean checkJavaVersion() {
         // Must use string comparison because some JVM's provide
         // versions like "1.4.1"
@@ -782,11 +782,11 @@ public final class FreeCol {
 
 
     /**
-    * Gets the current version of game.
-    *
-    * @return The current version of the game using the format "x.y.z",
-    *         where "x" is major, "y" is minor and "z" is revision.
-    */
+     * Gets the current version of game.
+     *
+     * @return The current version of the game using the format "x.y.z",
+     *         where "x" is major, "y" is minor and "z" is revision.
+     */
     public static String getVersion() {
         return FREECOL_VERSION;
     }
@@ -801,29 +801,29 @@ public final class FreeCol {
     }
 
     /**
-    * Checks if the program is in "Debug mode".
-    * @return <code>true</code> if the program is in debug
-    *       mode and <code>false</code> otherwise.
-    */
+     * Checks if the program is in "Debug mode".
+     * @return <code>true</code> if the program is in debug
+     *       mode and <code>false</code> otherwise.
+     */
     public static boolean isInDebugMode() {
         return inDebugMode;
     }
 
     
     /**
-    * Sets the "debug mode" to be active or not.
-    * @param debug Should be <code>true</code> in order
-    *       to active debug mode and <code>false</code>
-    *       otherwise.
-    */
+     * Sets the "debug mode" to be active or not.
+     * @param debug Should be <code>true</code> in order
+     *       to active debug mode and <code>false</code>
+     *       otherwise.
+     */
     public static void setInDebugMode(boolean debug) {
         inDebugMode = debug;
     }
 
 
     /**
-    * Prints the command-line usage for the server options.
-    */
+     * Prints the command-line usage for the server options.
+     */
     private static void printServerUsage() {
         System.out.println("Usage: java -Xmx512M -jar FreeCol.jar --server PORT [OPTIONS]");
         System.out.println("");
@@ -841,9 +841,9 @@ public final class FreeCol {
 
 
     /**
-    * Prints the command-line usage (the 'help' for command-line
-    * arguments).
-    */
+     * Prints the command-line usage (the 'help' for command-line
+     * arguments).
+     */
     private static void printUsage() {
         System.out.println("Usage: java -Xmx512M -jar FreeCol.jar [OPTIONS]");
         System.out.println("");
