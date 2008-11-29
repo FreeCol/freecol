@@ -299,4 +299,26 @@ public class TileTest extends FreeColTestCase {
         return false;
     }
 
+
+    public void testColonyImprovements() throws Exception {
+
+        Game game = getStandardGame();
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        Colony colony = new Colony(game, dutch, "testColony", tile1);
+        Unit soldier = new Unit(game, tile1, dutch, spec().getUnitType("model.unit.veteranSoldier"),
+                                Unit.UnitState.ACTIVE);
+        soldier.buildColony(colony);
+
+        assertTrue(colony.getTile().getTileItemContainer().hasRoad());
+
+        colony.dispose();
+
+        assertFalse(colony.getTile().getTileItemContainer().hasRoad());
+
+    }
+
 }

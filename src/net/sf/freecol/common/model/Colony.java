@@ -1672,6 +1672,8 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
         for (WorkLocation workLocation : getWorkLocations()) {
             ((FreeColGameObject) workLocation).dispose();
         }
+        TileItemContainer container = getTile().getTileItemContainer();
+        container.removeTileItem(container.getRoad());
         super.dispose();
     }
 
