@@ -1741,10 +1741,12 @@ public final class InGameController implements NetworkConstants {
                                                                  "%name%", region.getDisplayName());
                 moveElement.setAttribute("regionName", name);
             }
-            freeColClient.getMyPlayer().getHistory()
-                .add(new HistoryEvent(freeColClient.getGame().getTurn().getNumber(),
+            if (name != null) {
+                freeColClient.getMyPlayer().getHistory()
+                    .add(new HistoryEvent(freeColClient.getGame().getTurn().getNumber(),
                                       HistoryEvent.Type.DISCOVER_REGION,
                                       "%region%", name));
+            }
         }
 
         // reply is an "update" Element
