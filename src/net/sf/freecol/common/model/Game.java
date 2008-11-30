@@ -98,7 +98,12 @@ public class Game extends FreeColGameObject {
     private final static LostCityRumour lostCityRumour = new LostCityRumour();
 
     /**
-     * Describe combatModel here.
+     * The combat model this game uses. At the moment, the only combat
+     * model available is the SimpleCombatModel, which strives to
+     * implement the combat model of the original game. However, it is
+     * anticipated that other, more complex combat models will be
+     * implemented in future. As soon as that happens, we will also
+     * have to make the combat model selectable.
      */
     private CombatModel combatModel;
 
@@ -159,12 +164,12 @@ public class Game extends FreeColGameObject {
 
         canGiveID = true;
 
-        for (int i = 0; i < fcgos.length; i++) {
-            fcgos[i].setGame(this);
-            fcgos[i].updateID();
+        for (FreeColGameObject object : fcgos) {
+            object.setGame(this);
+            object.updateID();
 
-            if (fcgos[i] instanceof Player) {
-                players.add((Player) fcgos[i]);
+            if (object instanceof Player) {
+                players.add((Player) object);
             }
         }
 
@@ -452,7 +457,6 @@ public class Game extends FreeColGameObject {
 
         FreeColGameObject old = freeColGameObjects.put(id, freeColGameObject);
         if (old != null) {
-            logger.warning("Replacing FreeColGameObject: " + old.getClass() + " with " + freeColGameObject.getClass());
             throw new IllegalArgumentException("Replacing FreeColGameObject: " + old.getClass() + " with "
                                                + freeColGameObject.getClass());
         }
@@ -652,11 +656,8 @@ public class Game extends FreeColGameObject {
      *         number of turns by one.
      */
     public boolean isNextPlayerInNewTurn() {
-        return (players.indexOf(currentPlayer) > players.indexOf(getNextPlayer()) || currentPlayer == getNextPlayer());
-        /*
-         * int index = players.indexOf(currentPlayer) + 1; return index >=
-         * players.size();
-         */
+        return (players.indexOf(currentPlayer) > players.indexOf(getNextPlayer())
+                || currentPlayer == getNextPlayer());
     }
 
     /**
@@ -666,10 +667,10 @@ public class Game extends FreeColGameObject {
      *         <code>Game</code>.
      */
     public Player getFirstPlayer() {
-        if (players.size() > 0) {
-            return players.get(0);
-        } else {
+        if (players.isEmpty()) {
             return null;
+        } else {
+            return players.get(0);
         }
     }
 
@@ -712,16 +713,12 @@ public class Game extends FreeColGameObject {
      *         otherwise.
      */
     public boolean playerNameInUse(String username) {
-        Iterator<Player> playerIterator = getPlayerIterator();
-
-        while (playerIterator.hasNext()) {
-            Player player = playerIterator.next();
-
+        
+        for (Player player : players) {
             if (player.getName().equals(username)) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -756,11 +753,7 @@ public class Game extends FreeColGameObject {
      */
     public List<Player> getEuropeanPlayers() {
         List<Player> europeans = new ArrayList<Player>();
-        Iterator<Player> playerIterator = getPlayerIterator();
-
-        while (playerIterator.hasNext()) {
-            Player player = playerIterator.next();
-
+        for (Player player : players) {
             if (player.isEuropean()) {
                 europeans.add(player);
             }
@@ -814,16 +807,11 @@ public class Game extends FreeColGameObject {
      *         otherwise.
      */
     public boolean isAllPlayersReadyToLaunch() {
-        Iterator<Player> playerIterator = getPlayerIterator();
-
-        while (playerIterator.hasNext()) {
-            Player player = playerIterator.next();
-
+        for (Player player : players) {
             if (!player.isReady()) {
                 return false;
             }
         }
-
         return true;
     }
 
