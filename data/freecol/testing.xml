@@ -1309,11 +1309,11 @@
   <founding-fathers>
     <founding-father id="model.foundingFather.adamSmith" type="trade"
                      weight1="2" weight2="8" weight3="6">
-      <modifier id="model.ability.grain" type="additive" value="2"/>
+      <ability id="model.ability.buildFactory" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.johnnyAppleseed" type="trade"
                      weight1="2" weight2="8" weight3="6">
-      <ability id="model.ability.buildFactory" value="true"/>
+      <modifier id="model.ability.grain" type="additive" value="2"/>
     </founding-father>
     <founding-father id="model.foundingFather.jacobFugger" type="trade"
                      weight1="0" weight2="5" weight3="8">
