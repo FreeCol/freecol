@@ -1291,17 +1291,6 @@
         <scope ability-id="model.ability.navalUnit"/>
       </ability>
     </building-type>
-    <building-type id="model.building.PrintingPress" workplaces="0" sequence="16">
-      <required-goods id="model.goods.hammers" value="52"/>
-      <required-goods id="model.goods.tools" value="20"/>
-      <modifier id="model.goods.bells" type="percentage" value="50"/>
-    </building-type>
-    <building-type id="model.building.Newspaper" workplaces="0" upgradesFrom="model.building.PrintingPress"
-                   required-population="4" sequence="16">
-      <required-goods id="model.goods.hammers" value="120"/>
-      <required-goods id="model.goods.tools" value="50"/>
-      <modifier id="model.goods.bells" type="percentage" value="100"/>
-    </building-type>
     <building-type id="model.building.CustomHouse" workplaces="0" sequence="17">
       <required-goods id="model.goods.hammers" value="160"/>
       <required-goods id="model.goods.tools" value="50"/>
