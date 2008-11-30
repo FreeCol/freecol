@@ -32,6 +32,7 @@ import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.server.ServerTestHelper;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -42,29 +43,31 @@ public class ClientTestHelper {
     public static final int port = 3541;
     public static final String username = "test";
 
-    public static FreeColClient startClient() {
+    public static FreeColClient startClient(FreeColServer freeColServer) {
 
         try {
+            FreeCol.initializeResourceFolders();
             ImageLibrary imageLibrary = new ImageLibrary();
             FreeColClient client = new FreeColClient(false, null, imageLibrary, null, null);
             ConnectController connectController = client.getConnectController();
-            FreeColServer freeColServer = new FreeColServer(false, true, port, null, 4, 0, false);
             client.setFreeColServer(freeColServer);
             client.setSingleplayer(true);
+            client.setHeadless(true);
             boolean loggedIn = connectController.login(username, "127.0.0.1", port);
             assertTrue(loggedIn);
             client.getPreGameController().setReady(true);
             //client.getClientOptions().putOption(new RangeOption(ClientOptions.ANIMATION_SPEED, 0));
             //assertEquals(0, client.getClientOptions().getInt(ClientOptions.ANIMATION_SPEED));
             return client;
-        } catch (NoRouteToServerException e) {
-            fail("Illegal state: An exception occured that can only appear in public multiplayer games.");
-        } catch (IOException e) {
-            fail("server.couldNotStart");
         } catch(FreeColException e) {
             fail("Failed to create ImageLibrary.");
         }
         return null;
+    }
+    
+    public static void stopClient(FreeColClient client) {
+        
+        client.getConnectController().quitGame(false);
     }
 
 }

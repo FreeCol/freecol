@@ -19,9 +19,6 @@
 
 package net.sf.freecol.client.control;
 
-import java.io.File;
-import java.io.IOException;
-
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.ClientTestHelper;
 import net.sf.freecol.common.model.Game;
@@ -32,31 +29,45 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MoveTest extends FreeColTestCase {
 
-    TileType plains = spec().getTileType("model.tile.plains");
-
     public void testSimpleMove() {
-        FreeColClient client = ClientTestHelper.startClient();
 
-        Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Map map = getTestMap(plains);
-        game.setMap(map);
-        client.setGame(game);
-        Tile plain1 = map.getTile(5, 8);
-        plain1.setExploredBy(dutch, true);
-        Tile plain2 = map.getTile(5, 7);
-        plain2.setExploredBy(dutch, true);
+        FreeColServer server = null;
+        FreeColClient client = null;
+        try {
+            server = ServerTestHelper.startServer(false, true);
+            client = ClientTestHelper.startClient(server);
 
-        Unit hardyPioneer = new Unit(game, plain1, dutch, spec().getUnitType("model.unit.hardyPioneer"), 
-                                     UnitState.ACTIVE);
-
-        client.getPreGameController().startGame();
-        assertEquals(map.getNeighbourOrNull(Direction.NE, plain1), plain2);
-        client.getInGameController().move(hardyPioneer, Direction.NE);
+            Game game = getStandardGame();
+            Player dutch = game.getPlayer("model.nation.dutch");
+            TileType plains = spec().getTileType("model.tile.plains");
+            Map map = getTestMap(plains);
+            game.setMap(map);
+            client.setGame(game);
+            Tile plain1 = map.getTile(5, 8);
+            plain1.setExploredBy(dutch, true);
+            Tile plain2 = map.getTile(5, 7);
+            plain2.setExploredBy(dutch, true);
+    
+            UnitType pionnerType = spec().getUnitType("model.unit.hardyPioneer");
+            Unit hardyPioneer = new Unit(game, plain1, dutch, pionnerType, UnitState.ACTIVE);
+    
+            client.getPreGameController().startGame();
+            assertEquals(map.getNeighbourOrNull(Direction.NE, plain1), plain2);
+            client.getInGameController().move(hardyPioneer, Direction.NE);
+            
+        } finally {
+            if (client!=null)
+                ClientTestHelper.stopClient(client);
+            if (server!=null)
+                ServerTestHelper.stopServer(server);
+        }
     }
 
 }
