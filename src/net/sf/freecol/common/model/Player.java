@@ -685,6 +685,9 @@ public class Player extends FreeColGameObject implements Nameable {
         europe = null;
         monarch = null;
         modifyScore(SCORE_INDEPENDENCE_DECLARED);
+        history.add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                     HistoryEvent.Type.DECLARE_INDEPENDENCE));
+                                     
     }
 
     /**
@@ -692,15 +695,18 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void giveIndependence() {
         if (!isEuropean()) {
-            throw new IllegalStateException("The player \"" + getName() + "\" is not european");
+            throw new IllegalStateException("The player \"" + getName() + "\" is not European.");
         }
         if (playerType != PlayerType.REBEL) {
-            throw new IllegalStateException("The player \"" + getName() + "\" is already independent");
+            throw new IllegalStateException("The player \"" + getName() + "\" is not a Rebel.");
         }
         setPlayerType(PlayerType.INDEPENDENT);
         changeRelationWithPlayer(getREFPlayer(), Stance.PEACE);
         modifyScore(SCORE_INDEPENDENCE_GRANTED - getGame().getTurn().getNumber());
         addModelMessage(this, ModelMessage.MessageType.DEFAULT, "model.player.independence");
+        history.add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                     HistoryEvent.Type.INDEPENDENCE));
+                                     
     }
 
     /**

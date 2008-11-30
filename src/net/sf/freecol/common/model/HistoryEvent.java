@@ -39,6 +39,7 @@ public class HistoryEvent extends FreeColObject {
             COLONY_DESTROYED,
             COLONY_CONQUERED,
             DESTROY_SETTLEMENT,
+            // TODO: when exactly is a European nation destroyed?
             DESTROY_NATION,
             FOUNDING_FATHER,
             DECLARE_INDEPENDENCE,

@@ -513,6 +513,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param defender The <code>Unit</code> defending against attack.
      * @param result The result of the attack.
      * @param plunderGold an <code>int</code> value
+     * @param repairLocation a <code>Location</code> value
      */
     public void attack(Unit attacker, Unit defender, CombatResult result, int plunderGold, Location repairLocation) {
         Player attackingPlayer = attacker.getOwner();
@@ -657,6 +658,10 @@ public class SimpleCombatModel implements CombatModel {
         enemy.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
 
         if (myPlayer.isEuropean()) {
+            myPlayer.getHistory().add(new HistoryEvent(myPlayer.getGame().getTurn().getNumber(),
+                                                       HistoryEvent.Type.CONQUER_COLONY,
+                                                       "%nation%", enemy.getNationAsString(),
+                                                       "%colony%", colony.getName()));
             enemy.addModelMessage(enemy, ModelMessage.MessageType.COMBAT_RESULT,
                                   "model.unit.colonyCapturedBy",
                                   "%colony%", colony.getName(),
@@ -890,6 +895,16 @@ public class SimpleCombatModel implements CombatModel {
         }
         attacker.getOwner().modifyScore(atrocities);
         attacker.setLocation(newTile);
+        attacker.getOwner().getHistory()
+            .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
+                                  HistoryEvent.Type.DESTROY_SETTLEMENT,
+                                  "%nation%", enemy.getNationAsString()));
+        if (enemy.getSettlements().isEmpty()) {
+            attacker.getOwner().getHistory()
+                .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
+                                      HistoryEvent.Type.DESTROY_NATION,
+                                      "%nation%", enemy.getNationAsString()));
+        }
     }
 
     /**
