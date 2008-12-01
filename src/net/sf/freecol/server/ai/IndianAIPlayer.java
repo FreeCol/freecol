@@ -155,6 +155,11 @@ public class IndianAIPlayer extends NewAIPlayer {
                 Iterator<Position> positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
                 while (positionIterator.hasNext()) {
                     Tile t = map.getTile(positionIterator.next());
+                    // ignore sea tiles
+                    // Indians dont have sea power
+                    if(!t.isLand()){
+                        continue;
+                    }
                     if (t.getFirstUnit() != null) {
                         Player enemy = t.getFirstUnit().getOwner();
                         if (enemy == getPlayer()) {

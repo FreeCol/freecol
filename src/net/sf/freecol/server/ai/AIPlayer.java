@@ -645,6 +645,11 @@ public class AIPlayer extends AIObject {
                 Iterator<Position> positionIterator = map.getCircleIterator(is.getTile().getPosition(), true, 2);
                 while (positionIterator.hasNext()) {
                     Tile t = map.getTile(positionIterator.next());
+                    // Do not check ocean tiles
+                    // Indians do not have naval power
+                    if(!t.isLand()){
+                        continue;
+                    }
                     if (t.getFirstUnit() != null) {
                         Player enemy = t.getFirstUnit().getOwner();
                         if (enemy == player) {

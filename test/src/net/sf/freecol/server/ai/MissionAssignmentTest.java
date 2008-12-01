@@ -24,7 +24,9 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -50,6 +52,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 	
 	UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
 	UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
+	UnitType artilleryType = spec().getUnitType("model.unit.artillery");
 	UnitType galleonType = spec().getUnitType("model.unit.galleon");
 	
 	final int MISSION_IMPOSSIBLE = Integer.MIN_VALUE;
@@ -282,5 +285,93 @@ public class MissionAssignmentTest extends FreeColTestCase {
         	// must make sure that the server is stopped
             ServerTestHelper.stopServer(server);
         }
+	}
+	
+	/**
+	 * When searching for threats to a settlement, the indian player
+	 *should ignore naval threats, as he does not have naval power
+	 */
+	public void testSecureIndianSettlementMissionIgnoreNavalThreath() {
+	    // start a server
+	    FreeColServer server = ServerTestHelper.startServer(false, true);
+
+	    Map map = getCoastTestMap(plainsType);
+
+	    server.setMapGenerator(new MockMapGenerator(map));
+
+	    Controller c = server.getController();
+	    PreGameController pgc = (PreGameController)c;
+
+	    try {
+	        pgc.startGame();
+	    } catch (FreeColException e) {
+	        fail("Failed to start game");
+	    }
+
+	    Game game = server.getGame();
+	    map = game.getMap();  // update reference
+
+	    server.getController();
+
+	    AIMain aiMain = server.getAIMain();
+
+	    try{
+	        // Create player and unit
+	        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.inca");
+	        AIPlayer aiPlayer1 = (AIPlayer)aiMain.getAIObject(player1.getId());
+	        ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+
+	        Tile settlementTile = map.getTile(9, 9);
+	        Tile seaTile = map.getTile(10, 9);
+	        assertTrue("Settlement tile should be land",settlementTile.isLand());
+	        assertFalse("Galleon tile should be ocean",seaTile.isLand());
+	        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+	        IndianSettlement camp = builder.player(player1).settlementTile(settlementTile).initialBravesInCamp(10).build();
+
+	        Unit galleon = new Unit(game, seaTile, player2, galleonType, UnitState.ACTIVE);
+
+	        int unitsInGalleon = 6;
+	        for(int i=0; i < unitsInGalleon; i ++){
+	            Unit artillery = new Unit(game, seaTile, player2, artilleryType, UnitState.SENTRY);
+	            artillery.embark(galleon);
+	        }
+	        assertEquals("Wrong number of units onboard galleon",unitsInGalleon,galleon.getUnitCount());
+	        assertEquals("Galleon should be full",0,galleon.getSpaceLeft());
+	        
+	        for(Unit brave : camp.getUnitList()){
+	            AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
+	            assertNotNull(aiUnit);
+	            
+	            aiPlayer1.giveMilitaryMission(aiUnit);
+	            
+	            boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
+	            
+	            assertTrue("No enemy units are present, should be UnitWanderHostileMission", isUnitWanderHostileMission);
+	        }
+
+	        player1.changeRelationWithPlayer(player2, Stance.WAR);
+	        player1.setTension(player2, new Tension(Tension.Level.HATEFUL.getLimit()));
+	        assertTrue("Indian player should be at war with dutch",player1.getStance(player2) == Stance.WAR);
+	        assertEquals("Wrong Indian player tension towards dutch",Tension.Level.HATEFUL.getLimit(),player1.getTension(player2).getValue());
+	        
+	        aiPlayer1.secureIndianSettlement(camp);
+	        
+	        boolean notUnitWanderHostileMission = false;
+	        for(Unit brave : player1.getUnits()){
+                AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
+                assertNotNull(aiUnit);
+
+                boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
+                
+                if(!isUnitWanderHostileMission){
+                    notUnitWanderHostileMission = true;
+                    break;
+                }
+            }
+            assertFalse("Braves should not pursue naval units, or units aboard naval units", notUnitWanderHostileMission);
+	    }finally {
+	        // must make sure that the server is stopped
+	        ServerTestHelper.stopServer(server);
+	    }
 	}
 }
