@@ -682,39 +682,39 @@ public class AIPlayer extends AIObject {
             }
 
             int value = tension.getValue();
+            int threatModifier = 0;
+            int unitThreat = 0;
             if (value >= Tension.TENSION_ADD_MAJOR) {
-                threat += 2;
-                if (t.getUnitCount() * 2 > worstThreat) {
-                    if (t.getSettlement() != null) {
-                        bestTarget = t.getSettlement();
-                    } else {
-                        bestTarget = t.getFirstUnit();
-                    }
-                    worstThreat = t.getUnitCount() * 2;
-                }
+                threatModifier = 2;
+                unitThreat = t.getUnitCount() * 2;
             } else if (value >= Tension.TENSION_ADD_MINOR) {
-                threat += 1;
-                if (t.getUnitCount() > worstThreat) {
-                    if (t.getSettlement() != null) {
-                        bestTarget = t.getSettlement();
-                    } else {
-                        bestTarget = t.getFirstUnit();
-                    }
-                    worstThreat = t.getUnitCount();
+                threatModifier = 1;
+                unitThreat = t.getUnitCount();
+            }
+            
+            threat += threatModifier;
+            if (unitThreat > worstThreat) {
+                if (t.getSettlement() != null) {
+                    bestTarget = t.getSettlement();
+                } else {
+                    bestTarget = t.getFirstUnit();
                 }
+                worstThreat = unitThreat;
             }
         }
+        //Note: this is totally arbitrary
         if (threat > defenders) {
             Unit newDefender = is.getFirstUnit();
             newDefender.setState(UnitState.ACTIVE);
             newDefender.setLocation(is.getTile());
             AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
+            Mission newMission = null;
             if (bestTarget != null) {
-                newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI,
-                        bestTarget));
+                newMission = new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI, bestTarget);
             } else {
-                newDefenderAI.setMission(new UnitWanderHostileMission(getAIMain(), newDefenderAI));
+                newMission = new UnitWanderHostileMission(getAIMain(), newDefenderAI);
             }
+            newDefenderAI.setMission(newMission);
         }
     }
         
