@@ -724,6 +724,14 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
             updateSoL();
         }
     }
+    
+    /**
+     * Gives the number of bells used by the colony each turn
+     * @return
+     */
+    public int getBellUpkeep() {
+    	return getUnitCount() - 2;
+    }
 
     /**
      * Returns the current SoL membership of the colony.
@@ -957,11 +965,16 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
      *         turn.
      */
     public int getProductionNetOf(GoodsType goodsType) {
+        GoodsType bellsType = FreeCol.getSpecification().getGoodsType("model.goods.bells");
         int count = getProductionNextTurn(goodsType);
         int used = 0;
         Building bldg = getBuildingForConsuming(goodsType);
         if (bldg != null) {
             used = bldg.getGoodsInputNextTurn();
+        }
+        
+        if (goodsType == bellsType){
+        	used = getBellUpkeep();
         }
 
         if (goodsType.isStorable()) {
@@ -1616,7 +1629,7 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
         createWarehouseCapacityWarning();
 
         // Remove bells:
-        int bellsToRemove = getUnitCount() - 2;
+        int bellsToRemove = getBellUpkeep();
         if (bellsToRemove > 0) {
             removeGoods(Goods.BELLS, bellsToRemove);
         }

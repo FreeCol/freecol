@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Vector;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -145,5 +143,29 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         assertEquals(false, pioneer.isArmed());
     }
-
+    
+    public void testBellNetProduction(){
+    	GoodsType bellsType = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+    	    	
+    	Game game = getStandardGame();
+    	
+    	game.setMap(getTestMap());
+    	
+    	Colony colony = getStandardColony(7);
+    	    	
+    	int initialBellCount = colony.getGoodsCount(bellsType);
+    	int expectedBellCount = 0;
+    	int bellsProdPerTurn = colony.getProductionOf(bellsType);
+    	int expectedBellProd = 1;
+    	int bellsUpkeep = colony.getBellUpkeep();
+    	int expectedBellUpkeep =  colony.getUnitCount() - 2;
+    	int bellsNetProdPerTurn = colony.getProductionNetOf(bellsType);
+    	int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;
+    	
+    	assertEquals("Wrong bell count", expectedBellCount, initialBellCount);
+    	assertEquals("Wrong bell production",expectedBellProd,bellsProdPerTurn);
+    	assertEquals("Wrong bell upkeep",expectedBellUpkeep,bellsUpkeep);
+    	assertEquals("Wrong bell net production",expectedBellNetProd,bellsNetProdPerTurn);
+    }
+    
 }

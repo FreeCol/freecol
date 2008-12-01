@@ -778,6 +778,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         }
 
         productionPanel.add(new ProductionLabel(Goods.BELLS, bells, parent));
+        int surplusBells = bells - colony.getBellUpkeep();
+        productionPanel.add(new ProductionLabel(Goods.BELLS, surplusBells, parent));
+        
         productionPanel.add(new ProductionLabel(Goods.CROSSES, crosses, parent));
 
     }
