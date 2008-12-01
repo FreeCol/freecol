@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
@@ -286,6 +287,84 @@ public class MissionAssignmentTest extends FreeColTestCase {
             ServerTestHelper.stopServer(server);
         }
 	}
+
+    public void testSecureIndianSettlementMission() {
+        // start a server
+        FreeColServer server = ServerTestHelper.startServer(false, true);
+
+        Map map = getTestMap();
+
+        server.setMapGenerator(new MockMapGenerator(map));
+
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+
+        Game game = server.getGame();
+        map = game.getMap();  // update reference
+
+        server.getController();
+
+        AIMain aiMain = server.getAIMain();
+
+        try{
+            // Create player and unit
+            ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.inca");
+            AIPlayer aiPlayer1 = (AIPlayer)aiMain.getAIObject(player1.getId());
+            ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+
+            Tile settlementTile = map.getTile(9, 9);
+            Tile adjacentTile = map.getNeighbourOrNull(Direction.N, settlementTile);
+            assertTrue("Settlement tile should be land",settlementTile.isLand());
+            assertTrue("Adjacent tile should be land", adjacentTile != null && adjacentTile.isLand());
+            FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+            IndianSettlement camp = builder.player(player1).settlementTile(settlementTile).initialBravesInCamp(3).build();
+
+            Unit soldier = new Unit(game, adjacentTile, player2, veteranType, UnitState.ACTIVE);
+            
+            for(Unit brave : camp.getUnitList()){
+                AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
+                assertNotNull(aiUnit);
+                
+                aiPlayer1.giveMilitaryMission(aiUnit);
+                
+                boolean isUnitWanderHostileMission = aiUnit.getMission() instanceof UnitWanderHostileMission;
+                
+                assertTrue("No enemy units are present, should be UnitWanderHostileMission", isUnitWanderHostileMission);
+            }
+
+            player1.changeRelationWithPlayer(player2, Stance.WAR);
+            player1.setTension(player2, new Tension(Tension.Level.HATEFUL.getLimit()));
+            assertTrue("Indian player should be at war with dutch",player1.getStance(player2) == Stance.WAR);
+            assertEquals("Wrong Indian player tension towards dutch",Tension.Level.HATEFUL.getLimit(),player1.getTension(player2).getValue());
+            
+            aiPlayer1.secureIndianSettlement(camp);
+            
+            // Verify if a unit was assigned a UnitSeekAndDestroyMission
+            boolean isSeekAndDestroyMission = false;
+            for(Unit brave : player1.getUnits()){
+                AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
+                assertNotNull(aiUnit);
+
+                isSeekAndDestroyMission = aiUnit.getMission() instanceof UnitSeekAndDestroyMission;
+                
+                // found unit
+                if(isSeekAndDestroyMission){
+                    break;
+                }
+            }
+            assertTrue("One brave should have a UnitSeekAndDestroyMission", isSeekAndDestroyMission);
+        }finally {
+            // must make sure that the server is stopped
+            ServerTestHelper.stopServer(server);
+        }
+    }
+	
 	
 	/**
 	 * When searching for threats to a settlement, the indian player
