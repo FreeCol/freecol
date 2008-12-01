@@ -20,13 +20,12 @@
 package net.sf.freecol.common.model;
 
 import java.awt.Color;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 
 /**
  * Represents one of the nations present in the game.
@@ -61,16 +60,6 @@ public class Nation extends FreeColGameObjectType {
     private String refId;
 
     /**
-     * Describe coatOfArms here.
-     */
-    private String coatOfArms;
-
-    /**
-     * Describe monarch-art here.
-     */
-    private String monarchArt;
-
-    /**
      * Describe anthem here.
      */
     private String anthem;
@@ -100,42 +89,6 @@ public class Nation extends FreeColGameObjectType {
      */
     public final void setColor(final Color newColor) {
         this.color = newColor;
-    }
-
-    /**
-     * Get the <code>CoatOfArms</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getCoatOfArms() {
-        return coatOfArms;
-    }
-
-    /**
-     * Set the <code>CoatOfArms</code> value.
-     *
-     * @param newCoatOfArms The new CoatOfArms value.
-     */
-    public final void setCoatOfArms(final String newCoatOfArms) {
-        this.coatOfArms = newCoatOfArms;
-    }
-
-    /**
-     * Get the <code>Monarch-Art</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getMonarchArt() {
-        return monarchArt;
-    }
-
-    /**
-     * Set the <code>MonarchArt</code> value.
-     *
-     * @param newMonarchArt The new Monarch art value.
-     */
-    public final void setMonarchArt(final String newMonarchArt) {
-        this.monarchArt = newMonarchArt;
     }
 
     /**
@@ -248,8 +201,6 @@ public class Nation extends FreeColGameObjectType {
         selectable = getAttribute(in, "selectable", false);
         classic = getAttribute(in, "classic", false);
         refId = getAttribute(in, "ref", null);
-        coatOfArms = getAttribute(in, "coat-of-arms", "native.png");
-        monarchArt = getAttribute(in, "monarch-art", "louis.png");
         anthem = in.getAttributeValue(null, "anthem");
    }
 
