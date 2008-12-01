@@ -95,9 +95,7 @@ public final class ImageLibrary extends ImageProvider {
         riverName = new String("river"),
         unitButtonDirectory = new String("order-buttons/"),
         unitButtonName = new String("button"),
-        settlementDirectory = new String("settlements/"),
-        monarchDirectory = new String("monarch/"),
-        coatOfArmsDirectory = new String("coat-of-arms/");
+        settlementDirectory = new String("settlements/");
 
     private final String dataDirectory;
 
@@ -105,10 +103,6 @@ public final class ImageLibrary extends ImageProvider {
      * A ArrayList of Image objects.
      */
     private List<ImageIcon> rivers;
-
-    private Map<Nation, ImageIcon> monarch;
-
-    private Map<Nation, ImageIcon> coatOfArms;
 
     private EnumMap<SettlementType, Image> settlements;
 
@@ -200,8 +194,6 @@ public final class ImageLibrary extends ImageProvider {
         loadUnitButtons(gc, resourceLocator, doLookup);
         loadSettlements(gc, resourceLocator, doLookup);
         loadGoods(gc, resourceLocator, doLookup);
-        loadMonarch(gc, resourceLocator, doLookup);
-        loadCoatOfArms(gc, resourceLocator, doLookup);
 
         alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
         colorChips = new HashMap<Color, Image>();
@@ -228,9 +220,6 @@ public final class ImageLibrary extends ImageProvider {
         ImageLibrary scaledLibrary = new ImageLibrary("", scalingFactor);
         scaledLibrary.rivers = scaleImages(rivers, scalingFactor);
         scaledLibrary.settlements = scaleImages(settlements, scalingFactor);
-        //scaledLibrary.monarch = scaleImages(monarch);
-        scaledLibrary.monarch = new HashMap<Nation, ImageIcon>(monarch);
-        scaledLibrary.coatOfArms = new HashMap<Nation, ImageIcon>(coatOfArms);
 
         scaledLibrary.terrain1 = scaleImages(terrain1, scalingFactor);
         scaledLibrary.terrain2 = scaleImages(terrain2, scalingFactor);
@@ -608,54 +597,6 @@ public final class ImageLibrary extends ImageProvider {
     }
 
     /**
-     * Loads the monarch-images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net/sf/freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadMonarch(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        monarch = new HashMap<Nation, ImageIcon>();
-
-        for (Nation nation : FreeCol.getSpecification().getNations()) {
-            String monarchName = nation.getMonarchArt();
-            String filePath = dataDirectory + path + monarchDirectory + monarchName;
-            monarch.put(nation, findImage(filePath, resourceLocator, doLookup));
-        }
-    }
-
-    /**
-     * Loads the coat-of-arms images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net/sf/freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadCoatOfArms(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-        throws FreeColException {
-        coatOfArms = new HashMap<Nation, ImageIcon>();
-
-        for (Nation nation : FreeCol.getSpecification().getNations()) {
-            String coatOfArmsName = nation.getCoatOfArms();
-            String filePath = dataDirectory + path + coatOfArmsDirectory + coatOfArmsName;
-            coatOfArms.put(nation, findImage(filePath, resourceLocator, doLookup));
-        }
-    }
-
-    /**
      * Generates a color chip image and stores it in memory.
      * 
      * @param gc The GraphicsConfiguration is needed to create images that are
@@ -775,7 +716,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return the monarch-image for the given nation.
      */
     public Image getMonarchImage(Nation nation) {
-        return monarch.get(nation).getImage();
+        return ResourceManager.getImage(nation.getId() + ".monarch.image");
     }
 
     /**
@@ -785,7 +726,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return the monarch-image for the given nation.
      */
     public ImageIcon getMonarchImageIcon(Nation nation) {
-        return monarch.get(nation);
+        return ResourceManager.getImageIcon(nation.getId() + ".monarch.image");
     }
 
     /**
@@ -795,7 +736,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return the coat-of-arms of this nation
      */
     public ImageIcon getCoatOfArmsImageIcon(Nation nation) {
-        return coatOfArms.get(nation);
+        return ResourceManager.getImageIcon(nation.getId() + ".coat-of-arms.image");
     }
 
     /**
@@ -805,7 +746,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return the coat-of-arms of this nation
      */
     public Image getCoatOfArmsImage(Nation nation) {
-        return coatOfArms.get(nation).getImage();
+        return ResourceManager.getImage(nation.getId() + ".coat-of-arms.image");
     }
 
     /**
