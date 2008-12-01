@@ -232,19 +232,18 @@ public class FreeColTestCase extends TestCase {
     	int totalHeight = 15;
     	
     	int landWidth = (int) Math.floor(totalWidth/2);
-    	int landHeight = (int) Math.floor(totalHeight/2);
     	
     	Tile[][] tiles = new Tile[totalWidth][totalHeight];
 
         for (int x = 0; x < landWidth; x++) {
-            for (int y = 0; y < landHeight; y++) {
+            for (int y = 0; y < totalHeight; y++) {
                 tiles[x][y] = new Tile(getGame(), tileType, x, y);
             }
         }
         
         TileType oceanType = spec().getTileType("model.tile.ocean");
         for (int x = landWidth ; x < totalWidth; x++) {
-            for (int y = landHeight ; y < totalHeight; y++) {
+            for (int y = 0 ; y < totalHeight; y++) {
                 tiles[x][y] = new Tile(getGame(), oceanType, x, y);
             }
         }
