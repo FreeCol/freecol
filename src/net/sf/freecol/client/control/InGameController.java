@@ -798,6 +798,10 @@ public final class InGameController implements NetworkConstants {
                 if (path == path.getLastNode() && mt != MoveType.ILLEGAL_MOVE
                     && (mt != MoveType.ATTACK || knownEnemyOnLastTile(path))) {
                     move(unit, path.getDirection());
+                    // unit may have been destroyed while moving
+                    if(unit.isDisposed()){
+                        return;
+                    }
                 } else {
                     Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
                     if (unit.getMovesLeft() == 0 ||
