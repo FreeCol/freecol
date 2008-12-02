@@ -24,6 +24,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -60,13 +61,6 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
     /** How wide the margins should be. */
     private final int marginWidth = 12;
 
-    /** The widths of the columns. */
-    private final int[] widths;
-
-    /** The heights of the rows. */
-    // private final int[] heights;
-    private static final HIGConstraints higConst = new HIGConstraints();
-
     private Canvas parent;
 
     private List<Colony> colonies;
@@ -88,26 +82,6 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         this.parent = parent;
         this.reportPanel = reportPanel;
 
-        if (goodsType == Goods.BELLS) {
-            /*
-            widths = new int[] { 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0,
-                    columnSeparatorWidth, 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0 };
-            */
-            widths = new int[8];
-        } else if (goodsType == Goods.CROSSES) {
-            /*
-            widths = new int[] { 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0,
-                    columnSeparatorWidth, 0 };
-            */
-            widths = new int[5];
-        } else {
-            /*
-            widths = new int[] { 0, columnSeparatorWidth, 0, columnSeparatorWidth, 0 };
-            */
-            widths = new int[3];
-        }
-        // heights = null;
-        totalProduction = 0;
         setOpaque(false);
     }
 
@@ -117,6 +91,12 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
     public void initialize() {
         Player player = parent.getClient().getMyPlayer();
         
+        int columns = 3;
+        if (goodsType == Goods.BELLS) {
+            // percentage, sol, tory, percent50, percent100
+            columns += 5;
+        }
+
         int buildingCount[] = new int[FreeCol.getSpecification().numberOfBuildingTypes()];
         List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
         for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
@@ -128,35 +108,39 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             }
         }
 
+        // add a column for each building
+        columns += buildingTypes.size();
+
         int colonyColumn = 1;
         int productionColumn = 2;
         int unitColumn = 3;
-        int buildingColumn = unitColumn + 1;
+        int buildingColumn = 4;
         int percentageColumn = buildingColumn + buildingTypes.size();
         int solColumn = percentageColumn + 1;
         int toryColumn = solColumn + 1;
+        int percent50Column = toryColumn + 1;
+        int percent100Column = percent50Column + 1;
 
         // Display Panel
         removeAll();
 
         colonies = player.getColonies();
         int numberOfColonies = colonies.size();
+        int[] widths = new int[columns];
         int[] heights = new int[numberOfColonies + extraRows];
 
-        for (int index = extraRows; index < heights.length; index++) {
-            /** TODO: replace this magic number by some value from the
-             * ImageLibrary. At the moment this is difficult, as the
-             * unit images in the library are not sorted according to
-             * type. For this purpose, however, one would need to
-             * consider only ships for the naval report and only units
-             * able to defend colonies for the military report. The
-             * value of 64 is large enough to accommodate the 2/3
-             * scale version of all unit graphics.
-             */
-            heights[index] = 64;
-        }
-        
+        /** TODO: replace this magic number by some value from the
+         * ImageLibrary. At the moment this is difficult, as the
+         * unit images in the library are not sorted according to
+         * type. For this purpose, however, one would need to
+         * consider only ships for the naval report and only units
+         * able to defend colonies for the military report. The
+         * value of 64 is large enough to accommodate the 2/3
+         * scale version of all unit graphics.
+         */
+        Arrays.fill(heights, 0, heights.length, 64);        
 
+        HIGConstraints higConst = new HIGConstraints();
         setLayout(new HIGLayout(widths, heights));
 
         JLabel newLabel;
@@ -193,6 +177,16 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             newLabel = new JLabel(Messages.message("tory"));
             newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
             add(newLabel, higConst.rc(1, toryColumn));
+
+            newLabel = new JLabel("50%");
+            newLabel.setToolTipText(Messages.message("report.50percent"));
+            newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
+            add(newLabel, higConst.rc(1, percent50Column));
+
+            newLabel = new JLabel("100%");
+            newLabel.setToolTipText(Messages.message("report.100percent"));
+            newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
+            add(newLabel, higConst.rc(1, percent100Column));
         }
             
 
@@ -215,6 +209,9 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
 
             // production
             int newValue = colony.getProductionOf(goodsType);
+            if (goodsType == Goods.BELLS) {
+                newValue -= colony.getBellUpkeep();
+            }
             totalProduction += newValue;
             Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
             GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
@@ -274,6 +271,35 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
                 newLabel = new JLabel(String.valueOf(tories), JLabel.TRAILING);
                 newLabel.setBorder(FreeColPanel.CELLBORDER);
                 add(newLabel, higConst.rc(row, toryColumn));
+
+                if (newValue > 0 && percentage < 50) {
+                    int required = (Colony.BELLS_PER_REBEL * count) / 2;
+                    int turns = required / newValue;
+                    if (required % newValue > 0) {
+                        turns++;
+                    }
+                    newLabel = new JLabel(String.valueOf(turns), JLabel.TRAILING);
+                    newLabel.setBorder(FreeColPanel.CELLBORDER);
+                    add(newLabel, higConst.rc(row, percent50Column));
+                } else {
+                    newLabel = new JLabel();
+                    newLabel.setBorder(FreeColPanel.CELLBORDER);
+                    add(newLabel, higConst.rc(row, percent50Column));
+                }
+                if (newValue > 0 && percentage < 100) {
+                    int required = Colony.BELLS_PER_REBEL * count;
+                    int turns = required / newValue;
+                    if (required % newValue > 0) {
+                        turns++;
+                    }
+                    newLabel = new JLabel(String.valueOf(turns), JLabel.TRAILING);
+                    newLabel.setBorder(FreeColPanel.CELLBORDER);
+                    add(newLabel, higConst.rc(row, percent100Column));
+                } else {
+                    newLabel = new JLabel();
+                    newLabel.setBorder(FreeColPanel.CELLBORDER);
+                    add(newLabel, higConst.rc(row, percent100Column));
+                }
             }
 
 
@@ -283,7 +309,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         row = 2;
         // summary
         JLabel allColonies = new JLabel(Messages.message("report.allColonies", "%number%",
-                String.valueOf(numberOfColonies)));
+                                                         String.valueOf(numberOfColonies)));
         allColonies.setForeground(Color.BLUE);
         allColonies.setBorder(FreeColPanel.LEFTCELLBORDER);
         add(allColonies, higConst.rc(row, colonyColumn));
@@ -321,6 +347,12 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             newLabel = new JLabel(String.valueOf(toryCount), JLabel.TRAILING);
             newLabel.setBorder(FreeColPanel.CELLBORDER);
             add(newLabel, higConst.rc(row, toryColumn));
+            newLabel = new JLabel();
+            newLabel.setBorder(FreeColPanel.CELLBORDER);
+            add(newLabel, higConst.rc(row, percent50Column));
+            newLabel = new JLabel();
+            newLabel.setBorder(FreeColPanel.CELLBORDER);
+            add(newLabel, higConst.rc(row, percent100Column));
         }
     }
 
