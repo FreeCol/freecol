@@ -1442,7 +1442,7 @@
     </founding-father>
     <founding-father id="model.foundingFather.juanDeSepulveda" type="religious"
                      weight1="3" weight2="8" weight3="3">
-      <modifier id="model.ability.nativeConvertBonus" type="percentage" value="20"/>
+      <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="20"/>
       <nation id="model.nation.spanish"/>
     </founding-father>
     <founding-father id="model.foundingFather.bartolomeDeLasCasas" type="religious"
@@ -1477,7 +1477,7 @@
     </european-nation-type>
     <!-- this was the French player -->
     <european-nation-type id="model.nationType.cooperation">
-      <modifier id="model.modifier.nativeAlarmBonus" type="percentage" value="-50"/>
+      <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
       <unit id="model.unit.hardyPioneer" role="pioneer"/>
       <unit id="model.unit.freeColonist" role="soldier"/>
       <unit id="model.unit.caravel"/>
@@ -1496,7 +1496,7 @@
     <!-- this was the Spanish player -->
     <european-nation-type id="model.nationType.conquest">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
-      <modifier id="model.modifier.nativeTreasureBonus" type="percentage" value="200"/>
+      <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="200"/>
       <unit id="model.unit.freeColonist" role="pioneer"/>
       <unit id="model.unit.veteranSoldier" role="soldier" mounted="true"/>
       <unit id="model.unit.caravel"/>
