@@ -2100,6 +2100,12 @@ public class Player extends FreeColGameObject implements Nameable {
     	
     	// Set stance
     	setStance(player, newStance);
+    
+    	// For now on, consider null as PEACE
+    	// This may happen with the REF
+    	if(oldStance == null){
+    	    oldStance = Stance.PEACE;
+    	}
     	
     	// Update tension
     	int modifier = 0;

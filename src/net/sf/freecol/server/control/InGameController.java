@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
@@ -43,8 +44,10 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -714,6 +717,18 @@ public final class InGameController extends Controller {
         t.start();
     }
 
+    public ServerPlayer createREFPlayer(ServerPlayer player){
+        Nation refNation = Specification.getSpecification().getNation(player.getNation().getRefId());
+        ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
+        refPlayer.setEntryLocation(player.getEntryLocation());
+        // This will change later, just for setup
+        player.setStance(refPlayer, Stance.PEACE);
+        refPlayer.setTension(player, new Tension(Tension.Level.CONTENT.getLimit()));
+        player.setTension(refPlayer, new Tension(Tension.Level.CONTENT.getLimit()));
+        
+        return refPlayer;
+    }
+    
     private void createUnits(List<AbstractUnit> units, Element element, ServerPlayer nextPlayer) {
         String musketsTypeStr = null;
         String horsesTypeStr = null;
@@ -750,6 +765,81 @@ public final class InGameController extends Controller {
                 }
             }
         }
+    }
+    
+    public List<Unit> createREFUnits(ServerPlayer player, ServerPlayer refPlayer){
+        EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
+        EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
+        
+        List<Unit> unitsList = new ArrayList<Unit>();
+        List<Unit> navalUnits = new ArrayList<Unit>();
+        List<Unit> landUnits = new ArrayList<Unit>();
+        
+        // Create naval units
+        for (AbstractUnit unit : player.getMonarch().getNavalUnits()) {
+            for (int index = 0; index < unit.getNumber(); index++) {
+                Unit newUnit = new Unit(getGame(), refPlayer.getEurope(), refPlayer,
+                                        unit.getUnitType(), UnitState.TO_AMERICA);
+                navalUnits.add(newUnit);
+            }
+        }
+        unitsList.addAll(navalUnits);
+        
+        // Create land units
+        for (AbstractUnit unit : player.getMonarch().getLandUnits()) {
+            EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
+            switch(unit.getRole()) {
+            case SOLDIER:
+                equipment = new EquipmentType[] { muskets };
+                break;
+            case DRAGOON:
+                equipment = new EquipmentType[] { horses, muskets };
+                break;
+            default:
+            }
+            for (int index = 0; index < unit.getNumber(); index++) {
+                landUnits.add(new Unit(getGame(), refPlayer.getEurope(), refPlayer,
+                                        unit.getUnitType(), UnitState.ACTIVE, equipment));
+            }
+        }
+        unitsList.addAll(landUnits);
+            
+        // Board land units
+        Iterator<Unit> carriers = navalUnits.iterator();
+        for(Unit unit : landUnits){
+            //cycle through the naval units to find a carrier for this unit
+            
+            // check if there is space for this unit
+            boolean noSpaceForUnit=true;
+            for(Unit carrier : navalUnits){
+                if (unit.getSpaceTaken() <= carrier.getSpaceLeft()) {
+                    noSpaceForUnit=false;
+                    break;
+                }
+            }
+            // There is no space for this unit, stays in Europe
+            if(noSpaceForUnit){
+                continue;
+            }
+            // Find carrier
+            Unit carrier = null;
+            while (carrier == null){
+                // got to the end of the list, restart
+                if (!carriers.hasNext()) {
+                    carriers = navalUnits.iterator();
+                }
+                carrier = carriers.next();
+                // this carrier cant carry this unit
+                if (unit.getSpaceTaken() > carrier.getSpaceLeft()) {
+                    carrier = null;
+                }
+            }
+            // set unit aboard carrier
+            unit.setLocation(carrier);
+            //XXX: why only the units that can be aboard are sent to the player?
+            //unitsList.add(unit);
+        }
+        return unitsList;
     }
     
     public boolean createMission(IndianSettlement settlement,Unit missionary){

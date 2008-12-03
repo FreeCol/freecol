@@ -2520,53 +2520,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element declareIndependence(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Nation refNation = Specification.getSpecification().getNation(player.getNation().getRefId());
-        ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
-        refPlayer.setEntryLocation(player.getEntryLocation());
+        ServerPlayer refPlayer = getFreeColServer().getInGameController().createREFPlayer(player);
+        List<Unit> refUnits = getFreeColServer().getInGameController().createREFUnits(player, refPlayer);
+        
         Element reply = Message.createNewRootElement("update");
         reply.appendChild(refPlayer.toXMLElement(null, reply.getOwnerDocument()));
-        List<Unit> navalUnits = new ArrayList<Unit>();
-        for (AbstractUnit unit : player.getMonarch().getNavalUnits()) {
-            for (int index = 0; index < unit.getNumber(); index++) {
-                Unit newUnit = new Unit(getGame(), refPlayer.getEurope(), refPlayer,
-                                        unit.getUnitType(), UnitState.TO_AMERICA);
-                navalUnits.add(newUnit);
-            }
+        for (Unit unit : refUnits) {
+            reply.appendChild(unit.toXMLElement(null, reply.getOwnerDocument()));
         }
-        List<Unit> safeUnits = new ArrayList<Unit>(navalUnits);
-        EquipmentType muskets = Specification.getSpecification().getEquipmentType("model.equipment.muskets");
-        EquipmentType horses = Specification.getSpecification().getEquipmentType("model.equipment.horses");
-        Iterator<Unit> unitIterator = navalUnits.iterator();
-        for (AbstractUnit unit : player.getMonarch().getLandUnits()) {
-            EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
-            switch(unit.getRole()) {
-            case SOLDIER:
-                equipment = new EquipmentType[] { muskets };
-                break;
-            case DRAGOON:
-                equipment = new EquipmentType[] { horses, muskets };
-                break;
-            default:
-            }
-            for (int index = 0; index < unit.getNumber(); index++) {
-                Unit newUnit = new Unit(getGame(), refPlayer.getEurope(), refPlayer,
-                                        unit.getUnitType(), UnitState.ACTIVE, equipment);
-                while (newUnit != null) {
-                    if (!unitIterator.hasNext()) {
-                        unitIterator = navalUnits.iterator();
-                    }
-                    Unit carrier = unitIterator.next();
-                    if (newUnit.getSpaceTaken() < carrier.getSpaceLeft()) {
-                        newUnit.setLocation(carrier);
-                        safeUnits.add(newUnit);
-                        newUnit = null;
-                    }
-                }
-            }
-        }
-        for (Unit unit : safeUnits) {
-            reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
-        }
+        
         player.declareIndependence();
         return reply;
     }
