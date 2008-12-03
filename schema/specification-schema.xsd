@@ -487,18 +487,8 @@
   <xs:element name="difficultyLevel">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="integerOption">
-          <xs:complexType>
-            <xs:attribute name="id" use="required" type="xs:string"/>
-            <xs:attribute name="value" use="required" type="xs:int"/>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="booleanOption">
-          <xs:complexType>
-            <xs:attribute name="id" use="required" type="xs:string"/>
-            <xs:attribute name="value" use="required" type="xs:boolean"/>
-          </xs:complexType>
-        </xs:element>
+        <xs:element ref="integerOption"/>
+        <xs:element ref="booleanOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
     </xs:complexType>
@@ -532,15 +522,17 @@
   <xs:element name="integerOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="defaultValue" use="required" type="xs:int"/>
-      <xs:attribute name="minimumValue" use="required" type="xs:int"/>
-      <xs:attribute name="maximumValue" use="required" type="xs:int"/>
+      <xs:attribute name="defaultValue" type="xs:int"/>
+      <xs:attribute name="minimumValue" type="xs:int"/>
+      <xs:attribute name="maximumValue" type="xs:int"/>
+      <xs:attribute name="value" type="xs:int"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="booleanOption">
     <xs:complexType>
       <xs:attribute name="id" use="required" type="xs:string"/>
-      <xs:attribute name="defaultValue" use="required" type="xs:boolean"/>
+      <xs:attribute name="defaultValue" type="xs:boolean"/>
+      <xs:attribute name="value" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="rangeOption">
