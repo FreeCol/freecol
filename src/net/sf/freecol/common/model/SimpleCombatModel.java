@@ -962,7 +962,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param attackerUnit A unit that may have attacked the defender
      **/
     private void evade(Unit defender, Colony attackerColony, Unit attackerUnit) {
-        String nation = defender.getOwner().getNationAsString();
+        String nation = defender.getApparentOwnerName();
 
         if (attackerColony != null) {
             attackerColony.addModelMessage(attackerColony,
@@ -978,7 +978,8 @@ public class SimpleCombatModel implements CombatModel {
                                      "%unit%", defender.getName(),
                                      "%nation%", nation);
         } else if (attackerUnit != null) {
-            String attackerNation = attackerUnit.getOwner().getNationAsString();
+            String attackerNation = attackerUnit.getApparentOwnerName();
+
             attackerUnit.addModelMessage(attackerUnit,
                                          ModelMessage.MessageType.COMBAT_RESULT,
                                          "model.unit.enemyShipEvaded",
@@ -1002,30 +1003,26 @@ public class SimpleCombatModel implements CombatModel {
      * @param attackerUnit A unit which may have damaged the ship
      */
     private void damageShip(Unit damagedShip, Colony attackerColony, Unit attackerUnit, Location repairLocation) {
-        Player damagedPlayer = damagedShip.getOwner();
-        String nation = damagedPlayer.getNationAsString();
+        String nation = damagedShip.getApparentOwnerName();
+        String repairLocationName = (repairLocation == null) ? ""
+            : repairLocation.getLocationName();
 
-        String repairLocationName = "";
-        if(repairLocation != null){
-        	repairLocationName = repairLocation.getLocationName();
-        }
         if (attackerColony != null) {
-        	attackerColony.addModelMessage(attackerColony,
+            attackerColony.addModelMessage(attackerColony,
                                            ModelMessage.MessageType.COMBAT_RESULT,
                                            "model.unit.enemyShipDamagedByBombardment",
                                            "%colony%", attackerColony.getName(),
                                            "%nation%", nation,
                                            "%unit%", damagedShip.getName());
         		
-        	damagedShip.addModelMessage(damagedShip,
+            damagedShip.addModelMessage(damagedShip,
                                         ModelMessage.MessageType.COMBAT_RESULT,
                                         "model.unit.shipDamagedByBombardment", 
                                         "%colony%", attackerColony.getName(),
-                                        "%nation%", nation,
                                         "%unit%", damagedShip.getName(),
                                         "%repairLocation%", repairLocationName);
         } else if (attackerUnit != null) {
-            String attackerNation = attackerUnit.getOwner().getNationAsString();
+            String attackerNation = attackerUnit.getApparentOwnerName();
             
             attackerUnit.addModelMessage(attackerUnit,
                                          ModelMessage.MessageType.COMBAT_RESULT,
@@ -1057,7 +1054,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param attackerUnit The unit which may have attacked the ship
      */
     private void sinkShip(Unit sinkingShip, Colony attackerColony, Unit attackerUnit) {
-        String nation = sinkingShip.getOwner().getNationAsString();
+        String nation = sinkingShip.getApparentOwnerName();
 
         if (attackerColony != null) {
             attackerColony.addModelMessage(attackerColony,
@@ -1070,10 +1067,10 @@ public class SimpleCombatModel implements CombatModel {
                                         ModelMessage.MessageType.COMBAT_RESULT,
                                         "model.unit.shipSunkByBombardment",
                                         "%colony%", attackerColony.getName(),
-                                        "%unit%", sinkingShip.getName(),
-                                        "%nation%", nation);
+                                        "%unit%", sinkingShip.getName());
         } else if (attackerUnit != null) {
-            String attackerNation = attackerUnit.getOwner().getNationAsString();
+            String attackerNation = attackerUnit.getApparentOwnerName();
+
             attackerUnit.addModelMessage(attackerUnit,
                                          ModelMessage.MessageType.COMBAT_RESULT,
                                          "model.unit.enemyShipSunk",

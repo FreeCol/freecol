@@ -2294,6 +2294,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Get the name of the apparent owner of this Unit,
+     * (like getOwner().getNationAsString() but handles pirates)
+     *
+     * @return The name of the owner of this Unit unless this is hidden.
+     */
+    public String getApparentOwnerName() {
+        return (hasAbility("model.ability.piracy")) ? Player.UNKNOWN_ENEMY
+            : owner.getNationAsString();
+    }
+
+    /**
      * Sets the owner of this Unit.
      * 
      * @param owner The new owner of this Unit.
