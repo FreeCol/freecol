@@ -937,11 +937,9 @@ public final class InGameController extends Controller {
                     		}
                     		
                     		// update players view of the unit
-                    		// defending player updates own unit
-                    		if(enemyPlayer != player && enemyPlayer.canSee(unit.getTile())){ 
-                    			opponentAttackElement.setAttribute("update", "unit");
-                    			opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
-                                    opponentAttackElement.getOwnerDocument()));
+                    		if (enemyPlayer.canSee(unit.getTile())) { 
+                            opponentAttackElement.setAttribute("update", "unit");
+                            opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                     		}
                     		
                     		// Send response
