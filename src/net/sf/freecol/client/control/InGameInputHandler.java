@@ -924,33 +924,32 @@ public final class InGameInputHandler extends InputHandler {
         Player second = (Player) getGame().getFreeColGameObject(element.getAttribute("second"));
 
         /*
-         * War declared messages are sometimes not shown, because opponentAttack
-         * message arrives before and when setStance message arrives the player
-         * has the new stance. So not check stance is going to change.
+         * Diplomacy messages were sometimes not shown because opponentAttack
+         * messages arrive before setStance messages, so when the setStance
+         * message arrived the player already had the new stance.
+         * So, do not filter like this:
+         *   if (first.getStance(second) == stance) { return null; }
          */
-        /*
-         * if (first.getStance(second) == stance) { return null; }
-         */
-
         first.setStance(second, stance);
-        
-        if (stance == Stance.WAR) {
-            if (player.equals(second)) {
-                player.addModelMessage(new ModelMessage(first, "model.diplomacy.war.declared",
-                                                        new String[][] {
-                                                            {"%nation%", first.getNationAsString()}},
-                                                        ModelMessage.MessageType.FOREIGN_DIPLOMACY));
-            } else {
-                player.addModelMessage(new ModelMessage(first, "model.diplomacy.war.others",
-                                                        new String[][] {
-                                                            { "%attacker%", first.getNationAsString() },
-                                                            { "%defender%", second.getNationAsString() } },
-                                                        ModelMessage.MessageType.FOREIGN_DIPLOMACY));
-            }
-        }
-
-        if(second.getStance(first) != stance){
-        	second.setStance(first, stance);
+        if (second.getStance(first) != stance) second.setStance(first, stance);
+        if (player.equals(second)) {
+            player.addModelMessage(new ModelMessage(first,
+                    "model.diplomacy." + stance.toString().toLowerCase() + ".declared",
+                    new String[][] {
+                        {"%nation%", first.getNationAsString()}},
+                    ModelMessage.MessageType.FOREIGN_DIPLOMACY));
+        } else if (stance == Stance.WAR
+                   || player.hasAbility("model.ability.tradeWithForeignColonies")
+                   || player.hasContacted(first)
+                   || player.hasContacted(second)) {
+            // Always inform about wars, always inform post-deWitt,
+            // generally inform if have met one of the nations involved
+            player.addModelMessage(new ModelMessage(first,
+                    "model.diplomacy." + stance.toString().toLowerCase() + ".others",
+                    new String[][] {
+                        {"%attacker%", first.getNationAsString()},
+                        {"%defender%", second.getNationAsString()}},
+                    ModelMessage.MessageType.FOREIGN_DIPLOMACY));
         }
         return null;
     }
