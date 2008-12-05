@@ -44,7 +44,8 @@ public class SoundLibrary {
             ATTACK_DRAGOON,
             ATTACK_NAVAL,
             CAPTURED_BY_ARTILLERY,
-            BUILDING_COMPLETE}
+            BUILDING_COMPLETE,
+            MISSION_ESTABLISHED}
 
     
     /** This array contains the playlists. */

@@ -278,6 +278,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getActionManager().update();
 
         canvas.showDeclarationDialog();
+        nextModelMessage();
     }
 
     /**
@@ -456,6 +457,7 @@ public final class InGameController implements NetworkConstants {
         Element reply = client.ask(buildColonyElement);
 
         if (reply.getTagName().equals("buildColonyConfirmed")) {
+            freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
             Element updateElement = getChildElement(reply, "update");
             if (updateElement != null) {
                 freeColClient.getInGameInputHandler().update(updateElement);
@@ -3154,7 +3156,7 @@ public final class InGameController implements NetworkConstants {
             
             if (success.equals("true")) {
                 settlement.setMissionary(unit);
-                
+                freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
                 missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
                 
                 canvas.showInformationMessage(missionResponse,settlement,data);
@@ -3177,6 +3179,7 @@ public final class InGameController implements NetworkConstants {
 
             success = reply.getAttribute("success");
             if (success.equals("true")) {
+                freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
                 settlement.setMissionary(unit);
                 nextActiveUnit(); // At this point: unit.getTile() == null
             } else {
