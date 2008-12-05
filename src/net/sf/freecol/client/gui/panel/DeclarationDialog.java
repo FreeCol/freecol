@@ -106,7 +106,7 @@ public final class DeclarationDialog extends FreeColDialog {
      * Paints an image of the Declaration of Independence on this panel.
      */
     public void paintComponent(Graphics g) {
-        Image image = (Image) UIManager.get("Declaration.image");
+        Image image = ResourceManager.getImage("Declaration.image");
         g.drawImage(image, 0, 0, null);
     }
 
