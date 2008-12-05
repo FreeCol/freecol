@@ -917,7 +917,7 @@ public class SimpleCombatModel implements CombatModel {
         int random = modelController.getRandom(attacker.getId() + "getConvert", 100);
         int convertProbability = (int) FeatureContainer.applyModifierSet(Specification.getSpecification()
                 .getIntegerOption("model.option.nativeConvertProbability").getValue(), attacker.getGame().getTurn(),
-                attacker.getModifierSet("model.ability.nativeConvertBonus"));
+                attacker.getModifierSet("model.modifier.nativeConvertBonus"));
         // TODO: it should be bigger when tension is high
         int burnProbability = Specification.getSpecification().getIntegerOption("model.option.burnProbability")
                 .getValue();
