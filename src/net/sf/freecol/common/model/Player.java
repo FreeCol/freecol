@@ -663,7 +663,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         veterans.add(unit);
                     }
                 }
-                int limit = veterans.size() * (sol - 50) / 100;
+                int limit = (veterans.size() + 2) * (sol - 50) / 100;
                 if (limit > 0) {
                     for (int index = 0; index < limit; index++) {
                         Unit unit = veterans.get(index);
