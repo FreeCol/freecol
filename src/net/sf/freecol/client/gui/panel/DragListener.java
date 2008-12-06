@@ -446,7 +446,8 @@ public final class DragListener extends MouseAdapter {
         }
         separatorNeeded = true;
 
-        if (tempUnit.getLocation() instanceof WorkLocation) {
+        if (tempUnit.getLocation() instanceof WorkLocation
+            && tempUnit.getColony().canReducePopulation()) {
             JMenuItem menuItem = new JMenuItem(Messages.message("leaveTown"));
             menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
             menuItem.addActionListener(unitLabel);
