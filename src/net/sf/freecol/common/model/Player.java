@@ -665,7 +665,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
                 int limit = (veterans.size() + 2) * (sol - 50) / 100;
                 if (limit > 0) {
-                    for (int index = 0; index < limit; index++) {
+                    for (int index = 0; index < limit && limit < veterans.size(); index++) {
                         Unit unit = veterans.get(index);
                         // TODO: use a new upgrade type?
                         unit.setType(unit.getType().getPromotion());
