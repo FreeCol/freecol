@@ -515,10 +515,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             colony.removeGoods(goodsInputType, goodsInput);
         }
         colony.addGoods(goodsOutputType, goodsOutput);
-        if (goodsOutputType == Goods.BELLS) {
-            getOwner().incrementBells(goodsOutput);
-        } else if (goodsOutputType == Goods.CROSSES) {
-            getOwner().incrementCrosses(goodsOutput);
+        if (goodsOutputType.isPlayerAccumulated()) {
+            getOwner().increment(goodsOutputType, goodsOutput);
         }
 
         if (getUnitCount() > 0) {

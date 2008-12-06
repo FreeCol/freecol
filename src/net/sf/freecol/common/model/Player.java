@@ -1712,16 +1712,20 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Increments the player's cross count, with benefits thereof.
+     * Describe <code>increment</code> method here.
      *
-     * @param num The number of crosses to add.
-     * @see #reduceCrosses
+     * @param goodsType a <code>GoodsType</code> value
+     * @param amount an <code>int</code> value
      */
-    public void incrementCrosses(int num) {
-        if (!canRecruitUnits()) {
-            return;
+    // TODO: make this more general
+    public void increment(GoodsType goodsType, int amount) {
+        if (canRecruitUnits()) {
+            if (goodsType == Goods.CROSSES) {
+                crosses += amount;
+            } else if (goodsType == Goods.BELLS) {
+                bells += amount;
+            }
         }
-        crosses += num;
     }
 
     /**
@@ -1734,13 +1738,13 @@ public class Player extends FreeColGameObject implements Nameable {
             return;
         }
 
-        int cost = getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ? crossesRequired : crosses;
+        int cost = getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW)
+            ? crossesRequired : crosses;
 
-        if (cost > this.crosses) {
-            this.crosses = 0;
-        }
-        else {
-            this.crosses -= cost;
+        if (cost > crosses) {
+            crosses = 0;
+        } else {
+            crosses -= cost;
         }
     }
 
@@ -2150,18 +2154,6 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getRecruitPrice() {
         // return Math.max(0, (getCrossesRequired() - crosses) * 10);
         return getEurope().getRecruitPrice();
-    }
-
-    /**
-     * Increments the player's bell count, with benefits thereof.
-     *
-     * @param num The number of bells to add.
-     */
-    public void incrementBells(int num) {
-        if (!canHaveFoundingFathers()) {
-            return;
-        }
-        bells += num;
     }
 
     /**

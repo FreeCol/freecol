@@ -731,7 +731,7 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
     public void addBells(int amount) {
         if (FreeCol.isInDebugMode()) {
             GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
-            getOwner().incrementBells(amount);
+            getOwner().increment(bells, amount);
             if (getMembers() <= getUnitCount() + 1 && amount > 0) {
                 addGoods(bells, amount);
             }
