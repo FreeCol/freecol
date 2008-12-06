@@ -221,6 +221,20 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
         featureContainer.add(building.getType().getFeatureContainer());
     }
 
+
+    /**
+     * Returns true if the colony can reduce its population
+     * voluntarily. This is generally the case, but can be prevented
+     * by buildings such as the stockade.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean canReducePopulation() {
+        return getUnitCount() > 
+            FeatureContainer.applyModifierSet(0f, getGame().getTurn(),
+                                              getModifierSet("model.modifier.minimumColonySize"));
+    }
+
     /**
      * Updates SoL and builds Buildings that are free if possible.
      *

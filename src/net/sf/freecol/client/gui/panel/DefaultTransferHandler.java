@@ -43,6 +43,7 @@ import java.awt.event.MouseEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -51,7 +52,9 @@ import javax.swing.JPanel;
 import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 
@@ -267,7 +270,20 @@ public final class DefaultTransferHandler extends TransferHandler {
                     } else if (comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
                         ((ColonyPanel.BuildingsPanel.ASingleBuildingPanel) comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.OutsideColonyPanel) {
-                        ((ColonyPanel.OutsideColonyPanel) comp).add(data, true);
+                        ColonyPanel.OutsideColonyPanel outside = ((ColonyPanel.OutsideColonyPanel) comp);
+                        if (outside.getColony().canReducePopulation()) {
+                            outside.add(data, true);
+                        } else {
+                            String message = "";
+                            Set<Modifier> modifierSet = outside.getColony().getFeatureContainer()
+                                .getModifierSet("model.modifier.minimumColonySize");
+                            for (Modifier modifier : modifierSet) {
+                                message += Messages.message("colonyPanel.minimumColonySize",
+                                                            "%object%", modifier.getSource().getName())
+                                    + "\n";
+                            }
+                            canvas.showInformationMessage(message);
+                        }
                     } else if (comp instanceof CargoPanel) {
                         ((CargoPanel)comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.TilePanel.ASingleTilePanel) {

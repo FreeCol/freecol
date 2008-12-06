@@ -1130,7 +1130,7 @@
       <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
       <!-- ability needs to be added to prevent missing keys. -->
-      <ability id="model.ability.preventAbandonColony" value="false"/>
+      <modifier id="model.modifier.minimumColonySize" type="additive" value="0"/>
     </building-type>
     <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade"
                    required-population="3" sequence="11">

@@ -1129,7 +1129,7 @@
     <building-type id="model.building.Stockade" workplaces="0" required-population="3" sequence="11">
       <required-goods id="model.goods.hammers" value="64"/>
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
-      <ability id="model.ability.preventAbandonColony" value="true"/>
+      <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
     </building-type>
     <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade"
                    required-population="3" sequence="11">
@@ -1137,7 +1137,7 @@
       <required-goods id="model.goods.tools" value="100"/>
       <modifier id="model.modifier.defence" type="percentage" value="150"/>
       <ability id="model.ability.bombardShips" value="true"/>
-      <ability id="model.ability.preventAbandonColony" value="true"/>
+      <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
     </building-type>
     <building-type id="model.building.Fortress" workplaces="0" upgradesFrom="model.building.Fort"
                    required-population="8" sequence="12">
@@ -1145,7 +1145,7 @@
       <required-goods id="model.goods.tools" value="200"/>
       <modifier id="model.modifier.defence" type="percentage" value="200"/>
       <ability id="model.ability.bombardShips" value="true"/>
-      <ability id="model.ability.preventAbandonColony" value="true"/>
+      <modifier id="model.modifier.minimumColonySize" type="additive" value="3"/>
     </building-type>
     <building-type id="model.building.Depot"              workplaces="0" sequence="13">
       <modifier id="model.modifier.warehouseStorage" type="additive" value="100"/>

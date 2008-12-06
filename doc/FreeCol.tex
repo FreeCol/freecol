@@ -2311,6 +2311,8 @@ in the case of an additive modifier.
     Building Type}}
 \newcommand{\affectsColony}{\\\textit{Affects: Colony\\Provided by:
     Map}}
+\newcommand{\affectsColonyTwo}{\\\textit{Affects: Colony\\Provided by:
+    Building Type, Nation, Nation Type, Founding Father}}
 \newcommand{\affectsTile}{\\\textit{Affects: Tile\\Provided by:
     Tile Type}}
 
@@ -2557,11 +2559,6 @@ unprotected colony.
 
 The unit is a privateer.
 
-\ability{model.ability.preventAbandonColony}
-\affectsBuilding
-
-The building prevents the colony from being abandoned.
-
 \ability{model.ability.produceInWater}
 \affectsBuilding
 
@@ -2647,6 +2644,13 @@ The player can buy Indian land at a reduced price.
 \affectsUnit
 
 The unit has an increased line of sight.
+
+\modifier{model.modifier.minimumColonySize}
+\affectsColonyTwo
+
+The population of the colony can not be voluntarily reduced below this
+number. The modifier does not in any way affect a population reduction
+due to starvation or other events.
 
 \modifier{model.modifier.movementBonus}
 \affectsUnit

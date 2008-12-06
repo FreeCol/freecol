@@ -909,8 +909,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             freeColClient.getCanvas().showConfirmDialog("abandonColony.text",
                                                         "abandonColony.yes",
                                                         "abandonColony.no")) {
-            if (getColony().getUnitCount() <= 0 &&
-                !getColony().hasAbility("model.ability.preventAbandonColony")) {
+            if (getColony().getUnitCount() <= 0) {
                 freeColClient.getInGameController().abandonColony(getColony());
             }
 
@@ -1299,8 +1298,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      * front of a colony.
      */
     public final class OutsideColonyPanel extends JPanel {
-        private final ColonyPanel colonyPanel;
 
+        private final ColonyPanel colonyPanel;
 
         /**
          * Creates this OutsideColonyPanel.
@@ -1309,6 +1308,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
          */
         public OutsideColonyPanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
+        }
+
+        public Colony getColony() {
+            return colonyPanel.getColony();
         }
 
         @Override
