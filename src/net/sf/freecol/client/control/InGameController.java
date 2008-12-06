@@ -2532,6 +2532,8 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             throw new IllegalStateException("Not your turn.");
+        } else if (!unit.getColony().canReducePopulation()) {
+            throw new IllegalStateException("Can not reduce population.");
         }
 
         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
