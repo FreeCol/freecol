@@ -87,40 +87,41 @@ public final class TilePopup extends JPopupMenu {
 
         final Unit activeUnit = gui.getActiveUnit();
         if (activeUnit != null) {
-        	JMenuItem gotoMenuItem;
-        	if (activeUnit.isOffensiveUnit() &&
-        			activeUnit.getTile().isAdjacent(tile) && 
-        			activeUnit.getMoveType(tile) == MoveType.ATTACK) {
-        	    CombatOdds combatOdds = activeUnit.getGame().getCombatModel().calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
-        	    
-        	    String victoryPercent;
-        	    //If attacking a settlement, the true odds are never known because units may be hidden within
-        	    if (tile.getSettlement() != null || combatOdds.win == CombatOdds.UNKNOWN_ODDS) {
-        	        victoryPercent = "??";
-        	    } else {
-        	        victoryPercent = Integer.toString((int)(combatOdds.win * 100));
-        	    }
-        	    gotoMenuItem = new JMenuItem(Messages.message("attackTileOdds", "%chance%", victoryPercent));
-        	} else {
-        		//final Image gotoImage = (Image) UIManager.get("cursor.go.image");
-        		//JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));
-        		gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"));
-        	}
-        	
-        	gotoMenuItem.addActionListener(new ActionListener() {
-    			public void actionPerformed(ActionEvent event) {
-    				if (activeUnit.getTile()!=tile) {
-    					// just checking we are not already at the destination
-    					freeColClient.getInGameController().setDestination(activeUnit, tile);
-    					if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-    						freeColClient.getInGameController().moveToDestination(activeUnit);
-    					}
-    				}
-    			}
-    		});
-            add(gotoMenuItem);
-            hasAnItem = true;
-            addSeparator();
+            JMenuItem gotoMenuItem = null;
+            if (activeUnit.isOffensiveUnit() &&
+                activeUnit.getTile().isAdjacent(tile) && 
+                activeUnit.getMoveType(tile) == MoveType.ATTACK) {
+                CombatOdds combatOdds = activeUnit.getGame().getCombatModel().calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
+                    
+                String victoryPercent;
+                //If attacking a settlement, the true odds are never known because units may be hidden within
+                if (tile.getSettlement() != null || combatOdds.win == CombatOdds.UNKNOWN_ODDS) {
+                    victoryPercent = "??";
+                } else {
+                    victoryPercent = Integer.toString((int)(combatOdds.win * 100));
+                }
+                gotoMenuItem = new JMenuItem(Messages.message("attackTileOdds", "%chance%", victoryPercent));
+            } else if (activeUnit.getMoveType(null, tile, Integer.MAX_VALUE) != MoveType.ILLEGAL_MOVE) {
+                //final Image gotoImage = (Image) UIManager.get("cursor.go.image");
+                //JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));
+                gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"));
+            }
+            if (gotoMenuItem != null) {
+                gotoMenuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            if (activeUnit.getTile()!=tile) {
+                                // just checking we are not already at the destination
+                                freeColClient.getInGameController().setDestination(activeUnit, tile);
+                                if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
+                                    freeColClient.getInGameController().moveToDestination(activeUnit);
+                                }
+                            }
+                        }
+                    });
+                add(gotoMenuItem);
+                hasAnItem = true;
+                addSeparator();
+            }
         }
 
         int unitCount = 0;
@@ -294,10 +295,10 @@ public final class TilePopup extends JPopupMenu {
     private void addColony(final Colony colony) {
         JMenuItem menuItem = new JMenuItem(colony.toString());
         menuItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            canvas.showColonyPanel(colony);
-                        }
-                    });
+                public void actionPerformed(ActionEvent event) {
+                    canvas.showColonyPanel(colony);
+                }
+            });
 
         add(menuItem);
         hasAnItem = true;
@@ -311,10 +312,10 @@ public final class TilePopup extends JPopupMenu {
     private void addIndianSettlement(final IndianSettlement settlement) {
         JMenuItem menuItem = new JMenuItem(settlement.getLocationName());
         menuItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            canvas.showIndianSettlementPanel(settlement);
-                        }
-                    });
+                public void actionPerformed(ActionEvent event) {
+                    canvas.showIndianSettlementPanel(settlement);
+                }
+            });
         add(menuItem);
         hasAnItem = true;
     }
@@ -326,10 +327,10 @@ public final class TilePopup extends JPopupMenu {
     private void addTile(final Tile tile) {
         JMenuItem menuItem = new JMenuItem(tile.getName());
         menuItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            canvas.showTilePanel(tile);
-                        }
-                    });
+                public void actionPerformed(ActionEvent event) {
+                    canvas.showTilePanel(tile);
+                }
+            });
 
         add(menuItem);
         /**

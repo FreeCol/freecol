@@ -1269,9 +1269,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         there are no moves left.
      */
     public MoveType getMoveType(Tile from, Tile target, int ml) {
-        if (from == null) {
-            throw new IllegalStateException("from == null");
-        } else if (isUnderRepair()) {
+        if (isUnderRepair()) {
             return MoveType.ILLEGAL_MOVE;
         } else if (ml <= 0) {
             return MoveType.ILLEGAL_MOVE;
@@ -1354,7 +1352,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Gets the type of a move that is made when moving to the specified
      * <code>Tile</code> from the specified <code>Tile</code>.
      * 
-     * @param from The origin tile of the move
+     * @param from The origin tile of the move. May be null.
      * @param target The target tile of the move
      * @param ml The amount of moves this Unit has left
      * @return The move type. Notice: <code>Unit.MoveType.ILLEGAL_MOVE</code> when
@@ -1400,7 +1398,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     }
                 }
             } else if (defender != null && defender.getOwner() != getOwner()) {
-                if (from.isLand()) {
+                if (from == null || from.isLand()) {
                     if (isOffensiveUnit()) {
                         return MoveType.ATTACK;
                     } else {
@@ -1418,7 +1416,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                        && target.getFirstUnit().getOwner() != getOwner()) {
                 // An enemy ship in land tile without a settlement
                 return MoveType.ILLEGAL_MOVE;
-            } else if (getMoveCost(from, target, ml) > ml) {
+            } else if (from != null && getMoveCost(from, target, ml) > ml) {
                 return MoveType.ILLEGAL_MOVE;
             } else if (target.hasLostCityRumour()) {
                 return MoveType.EXPLORE_LOST_CITY_RUMOUR;
