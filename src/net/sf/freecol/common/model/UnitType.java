@@ -106,11 +106,6 @@ public final class UnitType extends BuildableType {
     private int scoreValue;
 
     /**
-     * Describe art here.
-     */
-    private String art;
-
-    /**
      * Describe pathImage here.
      */
     private String pathImage;
@@ -167,24 +162,6 @@ public final class UnitType extends BuildableType {
      */
     public boolean canCarryGoods() {
         return hasAbility("model.ability.carryGoods");
-    }
-
-    /**
-     * Get the <code>Art</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getArt() {
-        return art;
-    }
-
-    /**
-     * Set the <code>Art</code> value.
-     *
-     * @param newArt The new Art value.
-     */
-    public void setArt(final String newArt) {
-        this.art = newArt;
     }
 
     /**
@@ -622,7 +599,6 @@ public final class UnitType extends BuildableType {
         maximumAttrition = getAttribute(in, "maximumAttrition", Integer.MAX_VALUE);
         skillTaught = getAttribute(in, "skillTaught", getId());
 
-        art = in.getAttributeValue(null, "art");
         pathImage = in.getAttributeValue(null, "pathImage");
 
         recruitProbability = getAttribute(in, "recruitProbability", 0);

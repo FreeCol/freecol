@@ -462,13 +462,11 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     private void increasePrice(Unit unit, int price) {
         Specification spec = Specification.getSpecification();
         String baseOption = "model.option.priceIncreasePerType";
-        String option;
-        int increase = 0;
-
-        option = (spec.getBooleanOption(baseOption).getValue()) 
-            ? "model.option.priceIncrease." + unit.getType().getArt()
+        String name = unit.getType().getId().substring(unit.getType().getId().lastIndexOf('.'));
+        String option = (spec.getBooleanOption(baseOption).getValue()) 
+            ? "model.option.priceIncrease" + name
             : "model.option.priceIncrease";
-        increase = (spec.hasOption(option)) 
+        int increase = (spec.hasOption(option)) 
             ? spec.getIntegerOption(option).getValue()
             : 0;
         if (increase != 0) {
