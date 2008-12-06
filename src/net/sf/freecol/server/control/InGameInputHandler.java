@@ -2693,24 +2693,18 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         object.setName(element.getAttribute("name"));
         return null;
     }
-
+    
     /**
-     * Handles a "tradeProposition"-message.
+     * Checks general conditions for several types of trade queries
      * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
+     * @param element
+     * @param player
+     * @param unit
+     * @param settlement
+     * @param goods
      */
-    private Element tradeProposition(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
-        int gold = -1;
-        if (element.hasAttribute("gold")) {
-            gold = Integer.parseInt(element.getAttribute("gold"));
-        }
-        if (goods.getAmount() > 100) {
+    private void checkGeneralCondForTradeQuery(Element element, Player player, Unit unit, Settlement settlement, Goods goods){
+        if (goods != null && goods.getAmount() > 100) {
             throw new IllegalArgumentException("Amount of goods exceeds 100: " + goods.getAmount());
         }
         if (unit == null) {
@@ -2729,9 +2723,31 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
             throw new IllegalStateException("Not adjacent to settlemen!");
+        }        
+    }
+
+    /**
+     * Handles a "tradeProposition"-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element tradeProposition(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
+        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
+        
+        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+            
+        int gold = -1;
+        if (element.hasAttribute("gold")) {
+            gold = Integer.parseInt(element.getAttribute("gold"));
         }
         int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner()))
                 .tradeProposition(unit, settlement, goods, gold);
+        
         Element tpaElement = Message.createNewRootElement("tradePropositionAnswer");
         tpaElement.setAttribute("gold", Integer.toString(returnGold));
         return tpaElement;
@@ -2749,30 +2765,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
         Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
+        
+        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+        
         int gold = Integer.parseInt(element.getAttribute("gold"));
         if (gold <= 0) {
             throw new IllegalArgumentException();
         }
-        if (goods.getAmount() > 100) {
-            throw new IllegalArgumentException();
-        }
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
-        }
-        if (settlement == null) {
-            throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: "
-                    + element.getAttribute("settlement"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Not adjacent to settlemen!");
-        }
+        
         AIPlayer aiPlayer = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
         int returnGold = aiPlayer.tradeProposition(unit, settlement, goods, gold);
         if (returnGold != gold) {
@@ -2795,7 +2795,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         return reply;
     }
-
+    
     /**
      * Handles a "buyProposition"-message.
      * 
@@ -2808,25 +2808,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
         IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+        
+        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+        
         int gold = -1;
         if (element.hasAttribute("gold")) {
             gold = Integer.parseInt(element.getAttribute("gold"));
-        }
-        if (goods.getAmount() > 100) {
-            throw new IllegalArgumentException();
-        }
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (settlement == null) {
-            throw new IllegalArgumentException("Goods are not in a settlement");
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Not adjacent to settlemen!");
         }
         int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner()))
                 .buyProposition(unit, goods, gold);
@@ -2847,25 +2834,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
         IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+        
+        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+        
         int gold = Integer.parseInt(element.getAttribute("gold"));
         if (gold <= 0) {
             throw new IllegalArgumentException();
-        }
-        if (goods.getAmount() > 100) {
-            throw new IllegalArgumentException();
-        }
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (settlement == null) {
-            throw new IllegalArgumentException("Goods are not in a settlement");
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Not adjacent to settlemen!");
         }
         int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner()))
                 .buyProposition(unit, goods, gold);
@@ -2889,26 +2863,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
         Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
-        if (goods.getAmount() > 100) {
-            throw new IllegalArgumentException();
-        }
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
-        }
-        if (settlement == null) {
-            throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: "
-                    + element.getAttribute("settlement"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Not adjacent to settlemen!");
-        }
+        
+        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+        
         ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
         if (!receiver.isAI() && receiver.isConnected()) {
             Element deliverGiftElement = Message.createNewRootElement("deliverGift");
