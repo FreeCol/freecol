@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- *  Copyright (C) 2002-2007  The FreeCol Team
- *
- *  This file is part of FreeCol.
- *
- *  FreeCol is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  FreeCol is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
- *
--->
+    *  Copyright (C) 2002-2007  The FreeCol Team
+    *
+    *  This file is part of FreeCol.
+    *
+    *  FreeCol is free software: you can redistribute it and/or modify
+    *  it under the terms of the GNU General Public License as published by
+    *  the Free Software Foundation, either version 2 of the License, or
+    *  (at your option) any later version.
+    *
+    *  FreeCol is distributed in the hope that it will be useful,
+    *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+    *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    *  GNU General Public License for more details.
+    *
+    *  You should have received a copy of the GNU General Public License
+    *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+    *
+  -->
 <!-- $Revision$ -->
 <!-- specification version 0.11 -->
 <!-- in case of incompatible changes, please update version number and 
-     create a new Relax NG schema for validation. -->
+     XSD schema for validation. -->
 <freecol-specification>
   <!-- types of goods.  an element must be defined before it is referenced -->
   <goods-types>
@@ -130,35 +130,35 @@
   </resource-types>
 
   <!-- Structure for tile-types
-    Notes:
-    Parent options: ref, name, basic-move-cost, basic-work-turns, sail-to-europe
-    Children: art, gen, modifier, production, resource
-    art child options: basic, overlay, coast
-    - all tiles must have at least basic. overlay will be drawn after all the base tiles are drawn
-    - coast is for land tiles drawing their overlap on water tiles. default for coast = "terrain/beach/" for land tiles
-    gen child options: humidityMin, humidityMax, temperatureMin, temperatureMax, altitudeMin, altitudeMax, latitudeMin, latitudeMax
-    - humidity is a percentage of water vapor saturation (0 is absolute dryness, 100 is total saturation)
-    - temperature in degrees Celsius (from -20 to +40; 0 being the water freezing point)
-    - altitude (values of -3 to 3)
-      - land (values 1 to 3)
-      - water (values -3 to -1)
-        - less negative numbers have a higher chance of appearing near shore
-        - more negative numbers have a higher chance of appearing further from shore
-      - undefined (default = "0,0")
-        - may appear anywhere based on land/water
-    production if any must have the following structure:
-      <production goods-type="model.goods.goodname" value="X"/>
-    resource if any must have the following structure:
-      <resource type="model.resource.resourcename" probability="X"/>
-      - X is a relative probability, not necessarily a percentage value    
-  -->
+       Notes:
+       Parent options: ref, name, basic-move-cost, basic-work-turns, sail-to-europe
+       Children: art, gen, modifier, production, resource
+       art child options: basic, overlay, coast
+       - all tiles must have at least basic. overlay will be drawn after all the base tiles are drawn
+       - coast is for land tiles drawing their overlap on water tiles. default for coast = "terrain/beach/" for land tiles
+       gen child options: humidityMin, humidityMax, temperatureMin, temperatureMax, altitudeMin, altitudeMax, latitudeMin, latitudeMax
+       - humidity is a percentage of water vapor saturation (0 is absolute dryness, 100 is total saturation)
+       - temperature in degrees Celsius (from -20 to +40; 0 being the water freezing point)
+       - altitude (values of -3 to 3)
+       - land (values 1 to 3)
+       - water (values -3 to -1)
+       - less negative numbers have a higher chance of appearing near shore
+       - more negative numbers have a higher chance of appearing further from shore
+       - undefined (default = "0,0")
+       - may appear anywhere based on land/water
+       production if any must have the following structure:
+       <production goods-type="model.goods.goodname" value="X"/>
+       resource if any must have the following structure:
+       <resource type="model.resource.resourcename" probability="X"/>
+       - X is a relative probability, not necessarily a percentage value    
+       -->
   <tile-types>
-<!--
-    <tile-type    ref="tile.unexplored"      name="model.tile.unexplored"
-                    basic-move-cost="3" basic-work-turns="-1">
-      <art basic="model.tile.unexplored">
-    </tile-type>
--->
+    <!--
+        <tile-type    ref="tile.unexplored"      name="model.tile.unexplored"
+                      basic-move-cost="3" basic-work-turns="-1">
+          <art basic="model.tile.unexplored">
+          </tile-type>
+          -->
     <tile-type    id="model.tile.plains"            basic-move-cost="3" basic-work-turns="3"
                   secondary-goods="model.goods.cotton">
       <art basic="terrain/plains/" minimap-color="#24801f"/>
@@ -239,10 +239,10 @@
       <production goods-type="model.goods.furs"       value="3"/>
       <production goods-type="model.goods.lumber"     value="6"/>
       <resource   type="model.resource.Furs"          probability="100"/>
-    <!-- not in colonization
-      <resource   type="model.resource.Lumber"        probability="33"/>
-      <resource   type="model.resource.Game"          probability="34"/>
-    -->
+      <!-- not in colonization
+           <resource   type="model.resource.Lumber"        probability="33"/>
+           <resource   type="model.resource.Game"          probability="34"/>
+           -->
     </tile-type>
     <tile-type    id="model.tile.coniferForest"     basic-move-cost="6" basic-work-turns="4" is-forest="true"
                   secondary-goods="model.goods.furs">
@@ -371,18 +371,18 @@
       <production goods-type="model.goods.fish"       value="2"/>
       <resource   type="model.resource.Fish"          probability="100"/>
     </tile-type>
-<!--
-    <tile-type    ref="tile.beach"           name="model.tile.beach"
-                    basic-move-cost="3" basic-work-turns="-1">
-      <art basic="model.tile.beach"/>
-      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="3" altitudeMax="0"/>
-    </tile-type>
-    <tile-type    ref="tile.forest"          name="model.tile.forest"
-                    basic-move-cost="6" basic-work-turns="-1">
-      <art basic="model.tile.plains"    forest="plains"/>
-      <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="3" altitudeMax="0"/>
-    </tile-type>
--->
+    <!--
+        <tile-type    ref="tile.beach"           name="model.tile.beach"
+                      basic-move-cost="3" basic-work-turns="-1">
+          <art basic="model.tile.beach"/>
+          <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="3" altitudeMax="0"/>
+        </tile-type>
+        <tile-type    ref="tile.forest"          name="model.tile.forest"
+                      basic-move-cost="6" basic-work-turns="-1">
+          <art basic="model.tile.plains"    forest="plains"/>
+          <gen humidityMin="-3" humidityMax="3" temperatureMin="-3" temperatureMax="3" altitudeMin="3" altitudeMax="0"/>
+        </tile-type>
+        -->
   </tile-types>
 
   <equipment-types>
@@ -395,7 +395,7 @@
       <ability id="model.ability.scoutForeignColony" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
+      <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.horses" value="50"/>
       <compatible-equipment id="model.equipment.muskets"/>
     </equipment-type>
@@ -407,7 +407,7 @@
       <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
+      <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.muskets" value="50"/>
       <compatible-equipment id="model.equipment.horses"/>
     </equipment-type>
@@ -422,14 +422,14 @@
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-location-ability id="model.ability.dressMissionary" value="true"/>
     </equipment-type>
-	<equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
+    <equipment-type id="model.equipment.indian.horses" combat-loss-priority="20" role="scout">
       <modifier id="model.modifier.defence" type="additive" value="1"/>
       <modifier id="model.modifier.offence" type="additive" value="1"/>
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1"/>
       <modifier id="model.modifier.movementBonus" type="additive" value="9"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-	  <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
       <required-goods id="model.goods.horses" value="25"/>
       <compatible-equipment id="model.equipment.indian.muskets"/>
     </equipment-type>
@@ -438,32 +438,32 @@
       <modifier id="model.modifier.offence" type="additive" value="2"/>
       <ability id="model.ability.canBeCaptured" value="false"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
-	  <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
+      <required-ability id="model.ability.bornInIndianSettlement" value="true"/>
       <required-goods id="model.goods.muskets" value="25"/>
       <compatible-equipment id="model.equipment.indian.horses"/>
     </equipment-type>
   </equipment-types>
 
   <!--
-  Parent options: name, add-work-turns, overlay, natural, type, required-improvement,
-                  expended-goods-type, expended-amount, deliver-goods-type, deliver-amount
-    - natural="true" means that this improvement cannot be built, but may be present on its own
-    - expended goods/amount are the 'cost' of building this improvement
-    - deliver goods/amount are the instant reward that will be given to the nearby colony (eg. lumber from deforestation)
+      Parent options: name, add-work-turns, overlay, natural, type, required-improvement,
+      expended-goods-type, expended-amount, deliver-goods-type, deliver-amount
+      - natural="true" means that this improvement cannot be built, but may be present on its own
+      - expended goods/amount are the 'cost' of building this improvement
+      - deliver goods/amount are the instant reward that will be given to the nearby colony (eg. lumber from deforestation)
       - deliver-amount is a factor to multiply the base production of that tile to give.
-  Children: worker, type, tiles, tile, effect, change
-  worker child options: id
-  type child options: id, magnitude
-    - id is a string identifier, there must be a "river" and a "road" id among the tileimprovement-types
+      Children: worker, type, tiles, tile, effect, change
+      worker child options: id
+      type child options: id, magnitude
+      - id is a string identifier, there must be a "river" and a "road" id among the tileimprovement-types
       - to get the movement-bonus, must travel from a similar 'id' to this id
-    - magnitude is a number to decide overwriting,
+      - magnitude is a number to decide overwriting,
       a similar id tileimprovement will be replaced with one with a higher magnitude
-  tiles child options: all-land-tiles, all-forest-tiles, all-water-tiles
-    - putting all-water-tiles="false" is redundant, but serves as a reminder
-    - putting all-land-tiles="true" all-forest-tiles="false" will result in all non-forested land tiles.
-  tile child options: id
-  change child options: from, to
-  -->
+      tiles child options: all-land-tiles, all-forest-tiles, all-water-tiles
+      - putting all-water-tiles="false" is redundant, but serves as a reminder
+      - putting all-land-tiles="true" all-forest-tiles="false" will result in all non-forested land tiles.
+      tile child options: id
+      change child options: from, to
+    -->
   <tileimprovement-types>
     <tileimprovement-type id="model.improvement.River" natural="true" add-work-turns="0" magnitude="1"
                           movement-cost="1">
@@ -499,8 +499,8 @@
       <modifier id="model.goods.cotton" type="additive" value="1"/>
     </tileimprovement-type>
     <tileimprovement-type id="model.improvement.ClearForest" add-work-turns="2"
-            expended-equipment-type="model.equipment.tools" expended-amount="1"
-            deliver-goods-type="model.goods.lumber" deliver-amount="5" magnitude="1">
+                          expended-equipment-type="model.equipment.tools" expended-amount="1"
+                          deliver-goods-type="model.goods.lumber" deliver-amount="5" magnitude="1">
       <tiles all-forest-tiles="true"/>
       <change from="model.tile.mixedForest"     to="model.tile.plains"/>
       <change from="model.tile.coniferForest"   to="model.tile.grassland"/>
@@ -514,22 +514,22 @@
   </tileimprovement-types>
 
   <!--
-  For each improvement-action, there is a single accelerator. So in the event that two improvement-types
-    share the same accelerator, like Plow and RemoveForest. The valid TileTypes for the actions are
-    referenced from the Improvement List above, so the onus is on the person modifying to declare the
-    previous section.
-  All actions sharing an accelerator should be mutually exclusive, but the first action takes priority
-    during checking. If the first action cannot be performed, the second and subsequent actions will be
-    considered.
-  Structure:
-  <improvementaction-type id="plowAction" accelerator='P'>
-    <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action" image-id="5"/>
-    <action tileimprovement-type="model.improvement.ClearForest" name="model.improvement.ClearForest.action" image-id="4"/>
-  </improvementaction-type>
-  Notes:
-    image-id is the reference for the unit-button index in ImageLibrary.java
-    Keep the ids in alphabetical order. Not mandatory, but neater.
-  -->
+      For each improvement-action, there is a single accelerator. So in the event that two improvement-types
+      share the same accelerator, like Plow and RemoveForest. The valid TileTypes for the actions are
+      referenced from the Improvement List above, so the onus is on the person modifying to declare the
+      previous section.
+      All actions sharing an accelerator should be mutually exclusive, but the first action takes priority
+      during checking. If the first action cannot be performed, the second and subsequent actions will be
+      considered.
+      Structure:
+      <improvementaction-type id="plowAction" accelerator='P'>
+        <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action" image-id="5"/>
+        <action tileimprovement-type="model.improvement.ClearForest" name="model.improvement.ClearForest.action" image-id="4"/>
+      </improvementaction-type>
+      Notes:
+      image-id is the reference for the unit-button index in ImageLibrary.java
+      Keep the ids in alphabetical order. Not mandatory, but neater.
+      -->
   <improvementaction-types>
     <improvementaction-type id="impPlowAction" accelerator="P">
       <action tileimprovement-type="model.improvement.Plow" name="model.improvement.Plow.action" image-id="5"/>
@@ -954,10 +954,10 @@
       <ability id="model.ability.canBeCaptured" value="true"/>
     </unit-type>
     <!--<unit-type id="model.unit.milkmaid" offence="0"  defence="1" movement="3"  lineOfSight="1"-->
-               <!--expert-production="model.goods.food" pathImage="foot">-->
-      <!--<ability id="model.ability.foundColony" value="true"/>-->
-      <!--<ability id="model.ability.canBeEquipped" value="true"/>-->
-      <!--<ability id="model.ability.canBeCaptured" value="true"/>-->
+    <!--expert-production="model.goods.food" pathImage="foot">-->
+    <!--<ability id="model.ability.foundColony" value="true"/>-->
+    <!--<ability id="model.ability.canBeEquipped" value="true"/>-->
+    <!--<ability id="model.ability.canBeCaptured" value="true"/>-->
     <!--</unit-type>-->
     <unit-type id="model.unit.revenger" offence="666"  defence="666" movement="18" lineOfSight="3"
                pathImage="foot">
@@ -1111,9 +1111,6 @@
     </building-type>
     <building-type id="model.building.Chapel"    workplaces="0" produces="model.goods.crosses" sequence="10">
       <modifier id="model.goods.crosses" type="additive" value="1"/>
-      <ability id="model.ability.build">
-        <scope type="model.equipment.missionary"/>
-      </ability>
     </building-type>
     <building-type id="model.building.Church"    basicProduction="3" workplaces="3" produces="model.goods.crosses" upgradesFrom="model.building.Chapel" required-population="3" sequence="10">
       <required-goods id="model.goods.hammers" value="64"/>
