@@ -19,83 +19,83 @@
  *
 -->
 <!-- $Revision$ -->
-<!-- specification version 0.10 -->
+<!-- specification version 0.11 -->
 <!-- in case of incompatible changes, please update version number and 
      create a new Relax NG schema for validation. -->
 <freecol-specification>
   <!-- types of goods.  an element must be defined before it is referenced -->
   <goods-types>
-    <goods-type id="model.goods.food" art="goods/food.png" is-farmed="false" ignore-limit="true" is-food="true">
+    <goods-type id="model.goods.food" is-farmed="false" ignore-limit="true" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
-    <goods-type id="model.goods.grain" art="goods/grain.png" is-farmed="true" storable="false"
+    <goods-type id="model.goods.grain" is-farmed="true" storable="false"
                 stored-as="model.goods.food" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
-    <goods-type id="model.goods.fish" art="goods/fish.png" is-farmed="true" storable="false"
+    <goods-type id="model.goods.fish" is-farmed="true" storable="false"
                 stored-as="model.goods.food" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
     </goods-type>
-    <goods-type id="model.goods.sugar" art="goods/sugar.png" is-farmed="true" new-world-goods="true">
+    <goods-type id="model.goods.sugar" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.tobacco" art="goods/tobacco.png" is-farmed="true" new-world-goods="true">
+    <goods-type id="model.goods.tobacco" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.cotton" art="goods/cotton.png" is-farmed="true" new-world-goods="true">
+    <goods-type id="model.goods.cotton" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.furs" art="goods/furs.png" is-farmed="true" new-world-goods="true">
+    <goods-type id="model.goods.furs" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.coffee" art="goods/coffee.png" is-farmed="true" new-world-goods="true">
+    <goods-type id="model.goods.coffee" is-farmed="true" new-world-goods="true">
       <market initial-amount="1500"  initial-price="2"  price-difference="4"/>
     </goods-type>
-    <goods-type id="model.goods.lumber" art="goods/lumber.png" is-farmed="true">
+    <goods-type id="model.goods.lumber" is-farmed="true">
       <market initial-amount="3000"  initial-price="1"  price-difference="5"/>
     </goods-type>
-    <goods-type id="model.goods.ore" art="goods/ore.png" is-farmed="true">
+    <goods-type id="model.goods.ore" is-farmed="true">
       <market initial-amount="2000"  initial-price="4"  price-difference="3"/>
     </goods-type>
-    <goods-type id="model.goods.hemp" art="goods/ore.hemp" is-farmed="true">
+    <goods-type id="model.goods.hemp" is-farmed="true">
       <market initial-amount="2000"  initial-price="4"  price-difference="3"/>
     </goods-type>
-    <goods-type id="model.goods.silver" art="goods/silver.png" is-farmed="true">
+    <goods-type id="model.goods.silver" is-farmed="true">
       <market initial-amount="500"   initial-price="16" price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.horses" art="goods/horses.png" is-farmed="false"
+    <goods-type id="model.goods.horses" is-farmed="false"
                 breeding-number="2" made-from="model.goods.grain">
       <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.rum" art="goods/rum.png" is-farmed="false" made-from="model.goods.sugar">
+    <goods-type id="model.goods.rum" is-farmed="false" made-from="model.goods.sugar">
       <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.cigars" art="goods/cigars.png" is-farmed="false" made-from="model.goods.tobacco">
+    <goods-type id="model.goods.cigars" is-farmed="false" made-from="model.goods.tobacco">
       <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.cloth" art="goods/cloth.png" is-farmed="false" made-from="model.goods.cotton">
+    <goods-type id="model.goods.cloth" is-farmed="false" made-from="model.goods.cotton">
       <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.coats" art="goods/coats.png" is-farmed="false" made-from="model.goods.furs">
+    <goods-type id="model.goods.coats" is-farmed="false" made-from="model.goods.furs">
       <market initial-amount="1000"  initial-price="10" price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.cordage" art="goods/cordage.png" is-farmed="false" made-from="model.goods.hemp">
+    <goods-type id="model.goods.cordage" is-farmed="false" made-from="model.goods.hemp">
       <market initial-amount="1000"   initial-price="10"  price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.tradeGoods" art="goods/tradeGoods.png" is-farmed="false" trade-goods="true">
+    <goods-type id="model.goods.tradeGoods" is-farmed="false" trade-goods="true">
       <market initial-amount="1000"  initial-price="1"  price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.tools" art="goods/tools.png" is-farmed="false" made-from="model.goods.ore">
+    <goods-type id="model.goods.tools" is-farmed="false" made-from="model.goods.ore">
       <market initial-amount="500"   initial-price="1"  price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.muskets" art="goods/muskets.png" is-farmed="false" made-from="model.goods.tools">
+    <goods-type id="model.goods.muskets" is-farmed="false" made-from="model.goods.tools">
       <market initial-amount="500"   initial-price="1"  price-difference="2"/>
     </goods-type>
-    <goods-type id="model.goods.bells" art="goods/bells.png" is-farmed="false"
+    <goods-type id="model.goods.bells" is-farmed="false"
                 ignore-limit="true" storable="false" player-accumulated="true"/>
-    <goods-type id="model.goods.crosses" art="goods/crosses.png" is-farmed="false"
+    <goods-type id="model.goods.crosses" is-farmed="false"
                 ignore-limit="true" storable="false" player-accumulated="true"/>
-    <goods-type id="model.goods.hammers" art="goods/hammers.png" is-farmed="false"
+    <goods-type id="model.goods.hammers" is-farmed="false"
                 made-from="model.goods.lumber" ignore-limit="true" storable="false" price="20"/>
   </goods-types>
 

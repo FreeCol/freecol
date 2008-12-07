@@ -107,7 +107,7 @@ public final class ImageLibrary extends ImageProvider {
     private EnumMap<SettlementType, Image> settlements;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
-        forests, goods;
+        forests;
 
     private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
 
@@ -193,7 +193,6 @@ public final class ImageLibrary extends ImageProvider {
         loadRivers(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
         loadSettlements(gc, resourceLocator, doLookup);
-        loadGoods(gc, resourceLocator, doLookup);
 
         alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
         colorChips = new HashMap<Color, Image>();
@@ -226,7 +225,6 @@ public final class ImageLibrary extends ImageProvider {
         scaledLibrary.overlay1 = scaleImages(overlay1, scalingFactor);
         scaledLibrary.overlay2 = scaleImages(overlay2, scalingFactor);
         scaledLibrary.forests = scaleImages(forests, scalingFactor);
-        scaledLibrary.goods = scaleImages(goods, scalingFactor);
         
         scaledLibrary.border1 = scaleImages2(border1, scalingFactor);
         scaledLibrary.border2 = scaleImages2(border2, scalingFactor);
@@ -560,40 +558,6 @@ public final class ImageLibrary extends ImageProvider {
                 settlementType.toString().toLowerCase() + extension;
             settlements.put(settlementType, findImage(filePath, resourceLocator, doLookup).getImage());
         }
-    }
-
-    /**
-     * Loads the goods-images from file into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net/sf/freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadGoods(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        goods = new HashMap<String, ImageIcon>();
-        
-        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
-            String filePath = dataDirectory + path + type.getArt();
-            goods.put(type.getId(), findImage(filePath, resourceLocator, doLookup));
-        }
-
-        /*
-         * If all units are patched together in one graphics file then this is
-         * the way to load them into different images:
-         * 
-         * Image unitsImage = new ImageIcon(url).getImage(); BufferedImage
-         * tempImage = gc.createCompatibleImage(42, 63,
-         * Transparency.TRANSLUCENT);
-         * tempImage.getGraphics().drawImage(unitsImage, 0, 0, null);
-         * units.add(tempImage);
-         */
     }
 
     /**
@@ -992,21 +956,21 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * Returns the goods-image at the given index.
      * 
-     * @param g The type of the goods-image to return.
+     * @param goodsType The type of the goods-image to return.
      * @return The goods-image at the given index.
      */
-    public Image getGoodsImage(GoodsType g) {
-        return getGoodsImageIcon(g).getImage();
+    public Image getGoodsImage(GoodsType goodsType) {
+        return ResourceManager.getImage(goodsType.getId() + ".image");
     }
 
     /**
      * Returns the goods-image for a goods type.
      * 
-     * @param g The type of the goods-image to return.
+     * @param goodsType The type of the goods-image to return.
      * @return The goods-image at the given index.
      */
-    public ImageIcon getGoodsImageIcon(GoodsType g) {
-        return goods.get(g.getId());
+    public ImageIcon getGoodsImageIcon(GoodsType goodsType) {
+        return ResourceManager.getImageIcon(goodsType.getId() + ".image");
     }
 
     /**

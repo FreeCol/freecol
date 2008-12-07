@@ -69,8 +69,6 @@ public final class GoodsType extends FreeColGameObjectType {
     private GoodsType makes;
     private GoodsType storedAs;
     
-    private String art;
-    
     private int initialAmount;
     private int initialPrice;
     private int priceDiff;
@@ -165,10 +163,6 @@ public final class GoodsType extends FreeColGameObjectType {
         return isFood;
     }
     
-    public String getArt() {
-        return art;
-    }
-
     public GoodsType outputType() {
         return makes;
     }
@@ -328,7 +322,6 @@ public final class GoodsType extends FreeColGameObjectType {
         isFood = getAttribute(in, "is-food", false);
         ignoreLimit = getAttribute(in, "ignore-limit", false);
         newWorldGoods = getAttribute(in, "new-world-goods", false);
-        art = in.getAttributeValue(null, "art");
         breedingNumber = getAttribute(in, "breeding-number", NO_BREEDING);
         price = getAttribute(in, "price", NO_PRICE);
         playerAccumulated = getAttribute(in, "player-accumulated", false);
