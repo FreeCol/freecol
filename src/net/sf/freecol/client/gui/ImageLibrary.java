@@ -94,8 +94,7 @@ public final class ImageLibrary extends ImageProvider {
         riverDirectory = new String("river/"),
         riverName = new String("river"),
         unitButtonDirectory = new String("order-buttons/"),
-        unitButtonName = new String("button"),
-        settlementDirectory = new String("settlements/");
+        unitButtonName = new String("button");
 
     private final String dataDirectory;
 
@@ -103,8 +102,6 @@ public final class ImageLibrary extends ImageProvider {
      * A ArrayList of Image objects.
      */
     private List<ImageIcon> rivers;
-
-    private EnumMap<SettlementType, Image> settlements;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
         forests;
@@ -192,7 +189,6 @@ public final class ImageLibrary extends ImageProvider {
         loadForests(gc, resourceLocator, doLookup);
         loadRivers(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
-        loadSettlements(gc, resourceLocator, doLookup);
 
         alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
         colorChips = new HashMap<Color, Image>();
@@ -218,7 +214,6 @@ public final class ImageLibrary extends ImageProvider {
     public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
         ImageLibrary scaledLibrary = new ImageLibrary("", scalingFactor);
         scaledLibrary.rivers = scaleImages(rivers, scalingFactor);
-        scaledLibrary.settlements = scaleImages(settlements, scalingFactor);
 
         scaledLibrary.terrain1 = scaleImages(terrain1, scalingFactor);
         scaledLibrary.terrain2 = scaleImages(terrain2, scalingFactor);
@@ -254,14 +249,6 @@ public final class ImageLibrary extends ImageProvider {
 
     public ImageIcon scaleIcon(ImageIcon icon, float scale) {
         return new ImageIcon(scaleImage(icon.getImage(), scale));
-    }
-
-    private EnumMap<SettlementType, Image> scaleImages(EnumMap<SettlementType, Image> input, float scale) {
-        EnumMap<SettlementType, Image> result = new EnumMap<SettlementType, Image>(SettlementType.class);
-        for (Entry<SettlementType, Image> entry : input.entrySet()) {
-            result.put(entry.getKey(), scaleImage(entry.getValue(), scale));
-        }
-        return result;
     }
 
     private Map<Color, Image> scaleChips(Map<Color, Image> input, float scale) {
@@ -533,30 +520,6 @@ public final class ImageLibrary extends ImageProvider {
                         + extension;
                 unitButtons.get(i).add(findImage(filePath, resourceLocator, doLookup));
             }
-        }
-    }
-
-    /**
-     * Loads the colony pictures from files into memory.
-     * 
-     * @param gc The GraphicsConfiguration is needed to create images that are
-     *            compatible with the local environment.
-     * @param resourceLocator The class that is used to locate data files.
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
-     * @throws FreeColException If one of the data files could not be found.
-     */
-    private void loadSettlements(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
-            throws FreeColException {
-        settlements = new EnumMap<SettlementType, Image>(SettlementType.class);
-
-        for (SettlementType settlementType : SettlementType.values()) {
-            String filePath = dataDirectory + path + settlementDirectory + 
-                settlementType.toString().toLowerCase() + extension;
-            settlements.put(settlementType, findImage(filePath, resourceLocator, doLookup).getImage());
         }
     }
 
@@ -1088,7 +1051,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The graphics that will represent the given settlement.
      */
     public Image getSettlementImage(SettlementType settlementType) {
-        return settlements.get(settlementType);
+        return ResourceManager.getImage(settlementType.toString() + ".image");
     }
 
     /**
@@ -1104,7 +1067,7 @@ public final class ImageLibrary extends ImageProvider {
 
             // TODO: Put it in specification
             if (colony.isUndead()) {
-                return settlements.get(SettlementType.UNDEAD);
+                return getSettlementImage(SettlementType.UNDEAD);
             } else {
                 int stockadeLevel = 0;
                 if (colony.getStockade() != null) {
@@ -1113,35 +1076,35 @@ public final class ImageLibrary extends ImageProvider {
                 switch(stockadeLevel) {
                 case 0:
                     if (colony.getUnitCount() <= 3) {
-                        return settlements.get(SettlementType.SMALL);
+                        return getSettlementImage(SettlementType.SMALL);
                     } else if (colony.getUnitCount() <= 7) {
-                        return settlements.get(SettlementType.MEDIUM);
+                        return getSettlementImage(SettlementType.MEDIUM);
                     } else {
-                        return settlements.get(SettlementType.LARGE);
+                        return getSettlementImage(SettlementType.LARGE);
                     }
                 case 1:
                     if (colony.getUnitCount() > 7) {
-                        return settlements.get(SettlementType.LARGE_STOCKADE);
+                        return getSettlementImage(SettlementType.LARGE_STOCKADE);
                     } else if (colony.getUnitCount() > 3) {
-                        return settlements.get(SettlementType.MEDIUM_STOCKADE);
+                        return getSettlementImage(SettlementType.MEDIUM_STOCKADE);
                     } else {
-                        return settlements.get(SettlementType.SMALL_STOCKADE);
+                        return getSettlementImage(SettlementType.SMALL_STOCKADE);
                     }
                 case 2:
                     if (colony.getUnitCount() > 7) {
-                        return settlements.get(SettlementType.LARGE_FORT);
+                        return getSettlementImage(SettlementType.LARGE_FORT);
                     } else {
-                        return settlements.get(SettlementType.MEDIUM_FORT);
+                        return getSettlementImage(SettlementType.MEDIUM_FORT);
                     }
                 case 3:
-                    return settlements.get(SettlementType.LARGE_FORTRESS);
+                    return getSettlementImage(SettlementType.LARGE_FORTRESS);
                 default:
-                    return settlements.get(SettlementType.SMALL);
+                    return getSettlementImage(SettlementType.SMALL);
                 }
             }
 
         } else { // IndianSettlement
-            return settlements.get(((IndianSettlement) settlement).getTypeOfSettlement());
+            return getSettlementImage(((IndianSettlement) settlement).getTypeOfSettlement());
         }
     }
 
