@@ -355,6 +355,12 @@ public class ScoutingMission extends Mission {
      *         <code>false</code> otherwise.
      */
     public boolean isValid() {
+        Unit unit = getUnit();
+        // unit no longer has horses and not in a colony where it may get some
+        // cannot fulfill role of scout anymore
+        if(!unit.isMounted() && unit.getTile().getColony() == null){
+            return false;
+        }
         return valid && super.isValid();
     }
 
