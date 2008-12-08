@@ -37,8 +37,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.CombatModel;
-import net.sf.freecol.common.model.CombatModel.CombatResult;
-import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
@@ -51,15 +49,10 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nameable;
-import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
@@ -69,11 +62,16 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatResultType;
+import net.sf.freecol.common.model.LostCityRumour.RumourType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -1420,6 +1418,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                             opponentAttackElement.getOwnerDocument()));
                 } else if (!defender.isVisibleTo(enemyPlayer)) {
                     opponentAttackElement.setAttribute("update", "defender");
+                    /*
+                     * We need to send the ID of the Tile, since the unit
+                     * may be inside a (hidden) ColonyTile:
+                     */
+                    opponentAttackElement.setAttribute("defenderTile", defender.getTile().getId());
                     if (!enemyPlayer.canSee(defender.getTile())) {
                         enemyPlayer.setExplored(defender.getTile());
                         opponentAttackElement.appendChild(defender.getTile()

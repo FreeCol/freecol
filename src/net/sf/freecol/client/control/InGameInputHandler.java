@@ -405,13 +405,16 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 unit.setLocation(unit.getTile());
             } else if (updateAttribute.equals("defender")) {
-                Element defenderTileElement = Message.getChildElement(opponentAttackElement, Tile
+                final Tile defenderTile = (Tile) getGame().getFreeColGameObjectSafely(opponentAttackElement.getAttribute("defenderTile"));
+                final Element defenderTileElement = Message.getChildElement(opponentAttackElement, Tile
                         .getXMLElementTagName());
                 if (defenderTileElement != null) {
-                    Tile defenderTile = (Tile) getGame().getFreeColGameObject(defenderTileElement.getAttribute("ID"));
+                    final Tile checkTile = (Tile) getGame().getFreeColGameObject(defenderTileElement.getAttribute("ID"));
+                    if (checkTile == defenderTile) {
+                        throw new IllegalStateException("Trying to update another tile than the defending unit's tile.");
+                    }
                     defenderTile.readFromXMLElement(defenderTileElement);
                 }
-
                 Element defenderElement = Message.getChildElement(opponentAttackElement, Unit.getXMLElementTagName());
                 defender = (Unit) getGame().getFreeColGameObject(defenderElement.getAttribute("ID"));
                 if (defender == null) {
@@ -419,10 +422,7 @@ public final class InGameInputHandler extends InputHandler {
                 } else {
                     defender.readFromXMLElement(defenderElement);
                 }
-                if (defender.getTile() == null) {
-                    throw new NullPointerException("defender.getTile() == null");
-                }
-                defender.setLocation(defender.getTile());
+                defender.setLocationNoUpdate(defenderTile);
             } else if (updateAttribute.equals("tile")) {
                 Element tileElement = Message.getChildElement(opponentAttackElement, Tile
                         .getXMLElementTagName());
