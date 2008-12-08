@@ -49,7 +49,6 @@ import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
-import net.sf.freecol.client.gui.panel.TextDialog.TextDialogStyle;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.AbstractGoods;
