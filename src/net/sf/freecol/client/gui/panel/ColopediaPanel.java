@@ -1160,7 +1160,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         name.setPreferredSize(new Dimension(400, 50));
         detailPanel.add(name);
 
-        Image image = ResourceManager.getImage("FoundingFather." + father.getType().toString().toLowerCase());
+        Image image = library.getFoundingFatherImage(father);
 
         JLabel imageLabel;
         if (image != null) {

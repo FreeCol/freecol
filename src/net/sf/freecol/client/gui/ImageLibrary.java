@@ -46,6 +46,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.panel.ImageProvider;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
@@ -634,6 +635,17 @@ public final class ImageLibrary extends ImageProvider {
         g.fillRect(4, 12, 2, 2);
 
         alarmChips.put(alarm, tempImage);
+    }
+
+
+    /**
+     * Returns the portrait of this Founding Father.
+     *
+     * @param father a <code>FoundingFather</code> value
+     * @return an <code>Image</code> value
+     */
+    public Image getFoundingFatherImage(FoundingFather father) {
+        return ResourceManager.getImage(father.getId() + ".image");
     }
 
     /**
