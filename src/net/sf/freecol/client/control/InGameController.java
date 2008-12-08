@@ -49,6 +49,7 @@ import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.TextDialog.TextDialogStyle;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -271,7 +272,10 @@ public final class InGameController implements NetworkConstants {
             refPlayer = new Player(game, playerElement);
         }
         for (int index = 1; index < childNodes.getLength(); index++) {
-            new Unit(game, (Element) childNodes.item(index));
+            final Element unitElement = (Element) childNodes.item(index);
+            if (game.getFreeColGameObject(unitElement.getAttribute("ID")) == null) {
+                new Unit(game, (Element) childNodes.item(index));
+            } // Else: This unit has already been updated since it's on a carrier.
         }
         game.addPlayer(refPlayer);
         freeColClient.getMyPlayer().declareIndependence();
