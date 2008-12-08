@@ -2714,9 +2714,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + element.getAttribute("unit"));
         }
-        if (unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
-        }
         if (settlement == null) {
             throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: "
                     + element.getAttribute("settlement"));
@@ -2743,6 +2740,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
         
         checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+        
+        if (unit.getMovesLeft() <= 0) {
+            throw new IllegalStateException("No moves left!");
+        }
             
         int gold = -1;
         if (element.hasAttribute("gold")) {
@@ -2770,6 +2771,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
         
         checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+        
+        if (unit.getMovesLeft() <= 0) {
+            throw new IllegalStateException("No moves left!");
+        }
         
         int gold = Integer.parseInt(element.getAttribute("gold"));
         if (gold <= 0) {
@@ -2868,6 +2873,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
         
         checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+        
+        if (unit.getMovesLeft() <= 0) {
+            throw new IllegalStateException("No moves left!");
+        }
         
         ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
         if (!receiver.isAI() && receiver.isConnected()) {
