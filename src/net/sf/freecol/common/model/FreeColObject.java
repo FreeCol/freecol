@@ -113,7 +113,7 @@ public abstract class FreeColObject {
      * @return An XML-representation of this object.
      */    
     public Element toXMLElement(Player player, Document document) {
-        return toXMLElement(player, document, false, false);
+        return toXMLElement(player, document, true, false);
     }
     
     /**
