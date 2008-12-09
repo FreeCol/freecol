@@ -1750,6 +1750,25 @@ public final class Canvas extends JDesktopPane {
 
     }
 
+    public ChoiceItem showIndianSettlementTradeDlg(boolean showBuy, boolean showSell, boolean showGift){
+        ArrayList<ChoiceItem> choices = new ArrayList<ChoiceItem>();
+        if(showBuy){
+            choices.add(new ChoiceItem(Messages.message("tradeProposition.toBuy"), 1));
+        }
+        if(showSell){
+            choices.add(new ChoiceItem(Messages.message("tradeProposition.toSell"), 2));
+        }
+        if(showGift){
+            choices.add(new ChoiceItem(Messages.message("tradeProposition.toGift"), 3));
+        }
+        
+        ChoiceItem choice = (ChoiceItem) showChoiceDialog(Messages.message("tradeProposition.welcome"), 
+                          Messages.message("tradeProposition.cancel"), 
+                          choices.toArray(new ChoiceItem[0]));
+        
+        return choice;
+    }
+
     /**
      * Displays the tile panel of the given <code>Tile</code>.
      * 

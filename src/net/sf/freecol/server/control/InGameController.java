@@ -22,6 +22,7 @@ package net.sf.freecol.server.control;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -73,6 +74,8 @@ public final class InGameController extends Controller {
 
     public int debugOnlyAITurns = 0;
 
+    private java.util.Map<String,java.util.Map> transactionSessions;
+    
     /**
      * The constructor to use.
      * 
@@ -80,6 +83,8 @@ public final class InGameController extends Controller {
      */
     public InGameController(FreeColServer freeColServer) {
         super(freeColServer);
+        
+        transactionSessions = new HashMap<String,java.util.Map>();
     }
 
     /**
@@ -975,5 +980,73 @@ public final class InGameController extends Controller {
                 }
             }
         }
+    }
+    
+    public java.util.Map<String,Object> getTransactionSession(Unit unit, Settlement settlement){
+        java.util.Map<String, java.util.Map<String,Object>> unitTransactions = null;
+        java.util.Map<String,java.util.Map<String,java.util.Map>> transaction = null;
+        if(transactionSessions.containsKey(unit.getId())){
+            unitTransactions = transactionSessions.get(unit.getId());
+            if(unitTransactions.containsKey(settlement.getId())){
+                return unitTransactions.get(settlement.getId());
+            }
+        }
+        // Session does not exist, create, store, and return it
+        java.util.Map<String,Object> session = new HashMap<String,Object>();
+        // default values
+        session.put("canGift", true);
+        session.put("canSell", true);
+        session.put("canBuy", true);
+        session.put("actionTaken", false);
+        session.put("unitMoves", unit.getMovesLeft());
+        if(settlement.getOwner().getStance(unit.getOwner()) == Stance.WAR){
+            session.put("canSell", false);
+            session.put("canBuy", false);
+        }
+        else{
+            if(unit.getSpaceLeft() == 0){
+                session.put("canBuy", false);
+            }
+            if(unit.getSpaceTaken() == 0){
+                session.put("canSell", false);
+            }
+        }
+        // unit has no open transactions
+        if(unitTransactions == null){
+            unitTransactions = new HashMap<String,java.util.Map<String, Object>>();
+            transactionSessions.put(unit.getId(), unitTransactions);
+        }
+        unitTransactions.put(settlement.getId(), session);
+        return session;
+    }
+    
+    public void closeTransactionSession(Unit unit, Settlement settlement){
+        java.util.Map<String, java.util.Map<String,Boolean>> unitTransactions;
+        
+        if(!transactionSessions.containsKey(unit.getId())){
+            throw new IllegalStateException("Trying to close a non-existing session");
+        }
+        
+        unitTransactions = transactionSessions.get(unit.getId());   
+        if(!unitTransactions.containsKey(settlement.getId())){
+            throw new IllegalStateException("Trying to close a non-existing session");
+        }
+        
+        java.util.Map<String,Boolean> session = unitTransactions.get(settlement.getId());
+        unitTransactions.remove(session);
+        if(unitTransactions.isEmpty()){
+            transactionSessions.remove(unitTransactions);
+        }
+    }
+    
+    public boolean isTransactionSessionOpen(Unit unit, Settlement settlement){
+        if(!transactionSessions.containsKey(unit.getId())){
+            return false;
+        }
+        if(settlement != null &&
+           !transactionSessions.get(unit.getId()).containsKey(settlement.getId())){
+                return false;
+        }
+        return true;
     }
 }

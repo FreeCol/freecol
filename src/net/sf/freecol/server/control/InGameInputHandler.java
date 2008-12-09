@@ -327,6 +327,18 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return cashInTreasureTrain(connection, element);
             }
         });
+        register("getTransaction", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return getTransactionSession(connection, element);
+            }
+        });
+        register("closeTransaction", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return closeTransactionSession(connection, element);
+            }
+        });
         register("tradeProposition", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -337,6 +349,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return trade(connection, element);
+            }
+        });
+        register("goodsForSale", new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return goodsForSaleRequest(connection, element);
             }
         });
         register("buyProposition", new CurrentPlayerNetworkRequestHandler() {
@@ -2698,6 +2716,69 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
     
     /**
+     * Handles a "getTransaction"-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element getTransactionSession(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
+        
+        checkGeneralCondForTradeQuery(element, player, unit, settlement, null);
+        
+        InGameController controller = (InGameController) getFreeColServer().getController();     
+        
+        // if starting a transaction session, the unit needs movement points
+        if (!controller.isTransactionSessionOpen(unit, settlement) &&
+            unit.getMovesLeft() <= 0) {
+            throw new IllegalStateException("No moves left!");
+        }
+        
+        java.util.Map<String,Object> session = controller.getTransactionSession(unit,settlement);
+        
+        // Sets unit moves to zero to avoid cheating
+        // If no action was done, the moves will be restored when closing the session
+        unit.setMovesLeft(0);
+        
+        Element reply = Message.createNewRootElement("getTransactionAnswer");
+        reply.setAttribute("canBuy", ((Boolean) session.get("canBuy")).toString());
+        reply.setAttribute("canSell",((Boolean) session.get("canSell")).toString());
+        reply.setAttribute("canGift",((Boolean) session.get("canGift")).toString());
+        return reply;
+    }
+    
+    /**
+     * Handles a "closeTransaction"-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element closeTransactionSession(Connection connection, Element element) {
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
+        
+        InGameController controller = getFreeColServer().getInGameController();
+        
+        if(!controller.isTransactionSessionOpen(unit,settlement)){
+            throw new IllegalStateException("Trying to close a non-existing session");
+        }
+        java.util.Map<String,Object> session = controller.getTransactionSession(unit,settlement);
+        // restore unit movements if no action made
+        boolean isActionTaken = ((Boolean)(session.get("actionTaken"))).booleanValue();
+        if(! isActionTaken){
+                Integer unitMoves = (Integer) session.get("unitMoves");
+                unit.setMovesLeft(unitMoves);
+        }
+        controller.closeTransactionSession(unit,settlement);
+        
+        return null;
+    }
+    
+    /**
      * Checks general conditions for several types of trade queries
      * 
      * @param element
@@ -2722,7 +2803,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your unit!");
         }
         if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Not adjacent to settlemen!");
+            throw new IllegalStateException("Not adjacent to settlement!");
         }        
     }
 
@@ -2741,10 +2822,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
         
-        if (unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
+        // Verify session
+        InGameController controller = (InGameController) getFreeColServer().getController();     
+        if(!controller.isTransactionSessionOpen(unit, settlement)){
+            throw new IllegalStateException("trying to trade without opening a transaction session");
         }
-            
+        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
+        if(!(Boolean)session.get("canSell")){
+            throw new IllegalStateException("trying to sell with a session where selling not allowed");
+        }
+        
         int gold = -1;
         if (element.hasAttribute("gold")) {
             gold = Integer.parseInt(element.getAttribute("gold"));
@@ -2772,8 +2859,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
         
-        if (unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
+        // Verify session
+        InGameController controller = (InGameController) getFreeColServer().getController();     
+        if(!controller.isTransactionSessionOpen(unit, settlement)){
+            throw new IllegalStateException("trying to trade without opening a transaction session");
+        }
+        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
+        if(!(Boolean)session.get("canSell")){
+            throw new IllegalStateException("trying to sell with a session where selling not allowed");
         }
         
         int gold = Integer.parseInt(element.getAttribute("gold"));
@@ -2787,20 +2880,40 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("This was not the price we agreed upon! Cheater?");
         }
         unit.trade(settlement, goods, gold);
+        session.put("actionTaken", true);
         
-        Element reply = null;
-        if (settlement instanceof IndianSettlement) { // offer goods to buy
-            List<Goods> sellGoods = ((IndianSettlement) settlement).getSellGoods();
-            if (!sellGoods.isEmpty()) {
-                Element sellProposition = Message.createNewRootElement("sellProposition");
-                for (Goods goodsToSell : sellGoods) {
-                    aiPlayer.registerSellGoods(goodsToSell);
-                    sellProposition.appendChild(goodsToSell.toXMLElement(null, sellProposition.getOwnerDocument()));
-                }
-                reply = sellProposition;
-            }
+        return null;
+    }
+    
+    /**
+     * Handles a "goodsForSale"-message
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element goodsForSaleRequest(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
+        IndianSettlement settlement = (IndianSettlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
+        
+        checkGeneralCondForTradeQuery(element, player, unit, settlement, null);
+
+        if (!(settlement instanceof IndianSettlement)) { 
+            throw new IllegalStateException("Settlement not an Indian Settlement");
         }
         
+        AIPlayer aiPlayer = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
+
+        // Send reply
+        Element reply = Message.createNewRootElement("goodsForSaleAnswer");
+        List<Goods> goodsForSale = ((IndianSettlement) settlement).getSellGoods();
+        if (!goodsForSale.isEmpty()) {
+            for (Goods goods : goodsForSale) {
+                aiPlayer.registerSellGoods(goods);
+                reply.appendChild(goods.toXMLElement(null, reply.getOwnerDocument()));
+            }
+        }
         return reply;
     }
     
@@ -2818,6 +2931,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         IndianSettlement settlement = (IndianSettlement) goods.getLocation();
         
         checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
+        
+        // Verify session
+        InGameController controller = (InGameController) getFreeColServer().getController();     
+        if(!controller.isTransactionSessionOpen(unit, settlement)){
+            throw new IllegalStateException("trying to trade without opening a transaction session");
+        }
+        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
+        if(!(Boolean)session.get("canBuy")){
+            throw new IllegalStateException("trying to buy with a session where buying not allowed");
+        }
         
         int gold = -1;
         if (element.hasAttribute("gold")) {
@@ -2845,6 +2968,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
         
+        // Verify session
+        InGameController controller = (InGameController) getFreeColServer().getController();     
+        if(!controller.isTransactionSessionOpen(unit, settlement)){
+            throw new IllegalStateException("trying to trade without opening a transaction session");
+        }
+        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
+        if(!(Boolean)session.get("canBuy")){
+            throw new IllegalStateException("trying to buy with a session where buying not allowed");
+        }
+        
         int gold = Integer.parseInt(element.getAttribute("gold"));
         if (gold <= 0) {
             throw new IllegalArgumentException();
@@ -2855,6 +2988,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalArgumentException("This was not the price we agreed upon! Cheater?");
         }
         unit.buy(settlement, goods, gold);
+        session.put("actionTaken", true);
         
         return null;
     }
@@ -2874,8 +3008,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         
         checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
         
-        if (unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
+        InGameController controller = (InGameController) getFreeColServer().getController();     
+        if(!controller.isTransactionSessionOpen(unit, settlement)){
+            throw new IllegalStateException("trying to trade without opening a transaction session");
         }
         
         ServerPlayer receiver = (ServerPlayer) settlement.getOwner();

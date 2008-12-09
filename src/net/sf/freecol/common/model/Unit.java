@@ -510,10 +510,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             logger.warning("Goods not onboard this unit!");
             throw new IllegalStateException("Goods not onboard this unit!");
         }
-        if (getMovesLeft() <= 0) {
-            logger.warning("No more moves!");
-            throw new IllegalStateException("No more moves left!");
-        }
 
         goods.setLocation(settlement);
 
@@ -525,7 +521,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             settlement.getOwner().modifyGold(-gold);
         }
 
-        setMovesLeft(0);
         getOwner().modifyGold(gold);
         getOwner().modifySales(goods.getType(), goods.getAmount());
         getOwner().modifyIncomeBeforeTaxes(goods.getType(), gold);
@@ -580,15 +575,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             logger.warning("Goods not onboard this unit!");
             throw new IllegalStateException("Goods not onboard this unit!");
         }
-        if (getMovesLeft() <= 0) {
-            logger.warning("No more moves left!");
-            throw new IllegalStateException("No more moves left!");
-        }
 
         int amount = goods.getAmount();
 
         goods.setLocation(settlement);
-        setMovesLeft(0);
 
         if (settlement instanceof IndianSettlement) {
             int value = ((IndianSettlement) settlement).getPrice(goods) / 100;
