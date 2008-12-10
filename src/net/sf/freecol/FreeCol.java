@@ -183,7 +183,7 @@ public final class FreeCol {
             System.err.println("Java version " + MIN_JDK_VERSION +
                                " or better is recommended in order to run FreeCol." +
                                " Use --no-java-check to skip this check.");
-            return;
+            System.exit(1);
         }
 
         int  minMemory = 128;  // million bytes
@@ -191,12 +191,12 @@ public final class FreeCol {
             removeSplash(splash);
             System.out.println("You need to assign more memory to the JVM. Restart FreeCol with:");
             System.out.println("java -Xmx" + minMemory + "M -jar FreeCol.jar");
-            return;
+            System.exit(1);
         }
         
         if (!initializeResourceFolders()) {
             removeSplash(splash);
-            return;
+            System.exit(1);
         }
 
         if (standAloneServer) {
@@ -224,6 +224,7 @@ public final class FreeCol {
                     } catch (Exception e) {
                         removeSplash(splash);
                         System.out.println("Could not load savegame.");
+                        System.exit(1);
                         return;
                     } finally {
                         if (fis!=null) {
@@ -250,7 +251,7 @@ public final class FreeCol {
             } catch (IOException e) {
                 removeSplash(splash);
                 System.err.println("Error while loading server: " + e);
-                System.exit(-1);
+                System.exit(1);
             }
         } else {
             final Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -278,7 +279,7 @@ public final class FreeCol {
                 System.out.println("then run the game with a command-line parameter:");
                 System.out.println("");
                 printUsage();
-                return;
+                System.exit(1);
             }
 
             // TODO: don't use same datafolder for both images and
@@ -298,6 +299,7 @@ public final class FreeCol {
                 System.out.println("then run the game with a command-line parameter:");
                 System.out.println("");
                 printUsage();
+                System.exit(1);
                 return;
             }
 
@@ -633,7 +635,7 @@ public final class FreeCol {
                     }
                 } else {
                     printUsage();
-                    System.exit(0);
+                    System.exit(1);
                 }
             } else if (args[i].equals("--tc")) {
                 i++;
@@ -641,7 +643,7 @@ public final class FreeCol {
                     tc = args[i];
                 } else {
                     printUsage();
-                    System.exit(0);
+                    System.exit(1);
                 }
             } else if (args[i].equals("--log-console")) {
                 consoleLogging = true;
@@ -659,7 +661,7 @@ public final class FreeCol {
                     }
                 } else {
                     printUsage();
-                    System.exit(0);
+                    System.exit(1);
                 }
             } else if (args[i].equals("--no-java-check")) {
                 javaCheck = false;
@@ -687,11 +689,11 @@ public final class FreeCol {
                         windowSize = new Dimension(x, y);
                     } catch (Exception e) {
                         printUsage();
-                        System.exit(0);
+                        System.exit(1);
                     }
                 } else if (args[i].length() != 10) {
                     printUsage();
-                    System.exit(0);
+                    System.exit(1);
                 }
                 
                 windowed = true;
@@ -706,7 +708,7 @@ public final class FreeCol {
                     Locale.setDefault(LanguageOption.getLocale(languageID));
                 } else {
                     printUsage();
-                    System.exit(0);
+                    System.exit(1);
                 }
             } else if (args[i].equals("--no-sound")) {
                 sound = false;
@@ -754,7 +756,7 @@ public final class FreeCol {
                     }
                 } else {
                     printUsage();
-                    System.exit(0);
+                    System.exit(1);
                 }
             } else if (args[i].equals("--server-help")) {
                 printServerUsage();
