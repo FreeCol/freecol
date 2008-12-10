@@ -153,7 +153,7 @@ public class ModelMessage extends FreeColObject {
             throw new IllegalArgumentException("ModelMessage should not have a null id.");
         }
         if (source == null) {
-            throw new IllegalArgumentException("ModelMessage with ID " + this.getId() + " should not have a null source.");
+            throw new IllegalArgumentException("ModelMessage with ID " + this.toString() + " should not have a null source.");
         }
         if (owner == null) {
             throw new IllegalArgumentException("ModelMessage with ID " + this.getId() + " should not have a null owner.");
@@ -241,37 +241,45 @@ public class ModelMessage extends FreeColObject {
 
 
     /**
-    * Checks if this <code>ModelMessage</code> has been displayed.
-    * @return <i>true</i> if this <code>ModelMessage</code> has been displayed.
-    * @see #setBeenDisplayed
-    */
+     * Checks if this <code>ModelMessage</code> has been displayed.
+     * @return <i>true</i> if this <code>ModelMessage</code> has been displayed.
+     * @see #setBeenDisplayed
+     */
     public boolean hasBeenDisplayed() {
         return beenDisplayed;
     }
 
 
     /**
-    * Sets the <code>beenDisplayed</code> value of this <code>ModelMessage</code>.
-    * This is used to avoid showing the same message twice.
-    * 
-    * @param beenDisplayed Should be set to <code>true</code> after the
-    *       message has been displayed.
-    */
+     * Sets the <code>beenDisplayed</code> value of this <code>ModelMessage</code>.
+     * This is used to avoid showing the same message twice.
+     * 
+     * @param beenDisplayed Should be set to <code>true</code> after the
+     *       message has been displayed.
+     */
     public void setBeenDisplayed(boolean beenDisplayed) {
         this.beenDisplayed = beenDisplayed;
     }
 
 
     /**
-    * Gets the source of the message. This is what the message
-    * should be associated with. In addition, the owner of the source is the
-    * player getting the message.
-    *
-    * @return The source of the message.
-    * @see #getOwner
-    */
+     * Gets the source of the message. This is what the message
+     * should be associated with. In addition, the owner of the source is the
+     * player getting the message.
+     *
+     * @return The source of the message.
+     * @see #getOwner
+     */
     public FreeColGameObject getSource() {
         return source;
+    }
+
+    /**
+     * Sets the source of the message.
+     * @param newSource a new source for this message
+     */
+    public void setSource(FreeColGameObject newSource) {
+        source = newSource;
     }
     
     /**
@@ -307,6 +315,14 @@ public class ModelMessage extends FreeColObject {
     }
 
     /**
+     * Sets the Object to display.
+     * @param newDisplay the new object to display
+     */
+    public void setDisplay(FreeColGameObject newDisplay) {
+        display = newDisplay;
+    }
+
+    /**
     * Returns the owner of this message. The owner of this method
     * is the owner of the {@link #getSource source}.
     * 
@@ -338,7 +354,7 @@ public class ModelMessage extends FreeColObject {
     @Override
     public int hashCode() {
         int value = 1;
-        value = 37 * value + source.hashCode();
+        value = 37 * value + ((source == null) ? 0 : source.hashCode());
         value = 37 * value + getId().hashCode();
         if (data != null) {
             for (String s : data) {
@@ -352,7 +368,7 @@ public class ModelMessage extends FreeColObject {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("ModelMessage<");
-        sb.append(hashCode() + ", " + source.getId() + ", " + getId() + ", ");
+        sb.append(hashCode() + ", " + ((source == null) ? "null" : source.getId()) + ", " + getId() + ", " + ((display==null) ? "null" : display.getId()) + ", ");
         if (data != null) {
             for (String s : data) {
                 sb.append(s + "/");
@@ -428,7 +444,10 @@ public class ModelMessage extends FreeColObject {
 
         String sourceString = in.getAttributeValue(null, "source");
         source = game.getFreeColGameObject(sourceString);
-        
+        if (source == null) {
+            logger.warning("source null from string " + sourceString);
+            source = owner;
+        }
         String displayString = in.getAttributeValue(null, "display");
         if (displayString != null) {
             // usually referring to a unit, colony or player
@@ -440,6 +459,8 @@ public class ModelMessage extends FreeColObject {
                     display = FreeCol.getSpecification().getType(displayString);
                 } catch (IllegalArgumentException e) {
                     // do nothing
+                    display = owner;
+                    logger.warning("display null from string " + displayString);
                 }
             }
         }

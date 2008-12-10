@@ -671,6 +671,7 @@ public class SimpleCombatModel implements CombatModel {
 
             myPlayer.modifyGold(plunderGold);
             enemy.modifyGold(-plunderGold);
+            enemy.divertModelMessages(colony, enemy);
 
             // This also changes over all of the units...
             colony.setOwner(myPlayer);
@@ -1084,6 +1085,8 @@ public class SimpleCombatModel implements CombatModel {
                                         "%enemyUnit%", attackerUnit.getName(),
                                         "%enemyNation%", attackerNation);
         }
+        sinkingShip.getOwner().divertModelMessages(sinkingShip,
+                                                   sinkingShip.getTile());
         sinkingShip.dispose();
     }
 
@@ -1155,6 +1158,7 @@ public class SimpleCombatModel implements CombatModel {
                              "%enemyNation%", enemyNation,
                              "%enemyUnit%", enemyUnit.getName(),
                              "%location%", locationName);
+        loser.divertModelMessages(unit, unit.getTile());
         unit.setLocation(enemyUnit.getTile());
         unit.setOwner(enemyUnit.getOwner());
         if (enemyUnit.isUndead()) {
@@ -1296,7 +1300,8 @@ public class SimpleCombatModel implements CombatModel {
      */
     private void slaughterUnit(Unit unit, Unit enemyUnit) {
         String locationName = enemyUnit.getLocation().getLocationName();
-        String nation = unit.getOwner().getNationAsString();
+        Player loser = unit.getOwner();
+        String nation = loser.getNationAsString();
         String enemyNation = enemyUnit.getOwner().getNationAsString();
         String messageID = Messages.getKey(unit.getType().getId() + ".destroyed",
                                            "model.unit.unitSlaughtered");
@@ -1317,6 +1322,7 @@ public class SimpleCombatModel implements CombatModel {
                              "%enemyNation%", enemyNation,
                              "%enemyUnit%", enemyUnit.getName(),
                              "%location%", locationName);
+        loser.divertModelMessages(unit, unit.getTile());
         unit.dispose();
     }
 

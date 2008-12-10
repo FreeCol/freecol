@@ -676,11 +676,8 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
         // Drop the price{Inc,Dec}reases already prepared but now irrelevant
-        for (ModelMessage modelMessage : getModelMessages()) {
-            if (modelMessage.getSource() == europe) {
-                modelMessages.remove(modelMessage);
-            }
-        }
+        divertModelMessages(europe, null);
+
         europe.dispose();
         europe = null;
         monarch = null;
@@ -689,6 +686,29 @@ public class Player extends FreeColGameObject implements Nameable {
                                      HistoryEvent.Type.DECLARE_INDEPENDENCE));
                                      
     }
+
+    /*
+     * Sometimes an event causes the source (and display) fields in an
+     * accumulated model message to become invalid (e.g. Europe disappears
+     * on independence.  This routine is for cleaning up such cases.
+     * @param source the source field that has become invalid
+     * @param newSource a new source field to replace the old with, or
+     *   if null then remove the message
+     */
+    public void divertModelMessages(FreeColGameObject source, FreeColGameObject newSource) {
+        for (ModelMessage modelMessage : getModelMessages()) {
+            if (modelMessage.getSource() == source) {
+                if (newSource == null) {
+                    modelMessages.remove(modelMessage);
+                } else {
+                    modelMessage.setSource(newSource);
+                    if (modelMessage.getDisplay() == source) {
+                        modelMessage.setDisplay(newSource);
+                    }
+                }
+            }
+        }
+    }        
 
     /**
      * Gives independence to this <code>Player</code>.
