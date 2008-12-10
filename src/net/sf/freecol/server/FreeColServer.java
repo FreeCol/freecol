@@ -146,6 +146,8 @@ public final class FreeColServer {
     /** The provider for random numbers */
     private final ServerPseudoRandom _pseudoRandom = new ServerPseudoRandom();
 
+    private boolean integrity = false; // Did the integrity check succeed
+
 
     /**
      * Starts a new server in a specified mode and with a specified port.
@@ -691,7 +693,7 @@ public final class FreeColServer {
                             .toArray(new FreeColGameObject[0]));
                     game.setCurrentPlayer(null);
                     gameState = GameState.IN_GAME;
-                    game.checkIntegrity();
+                    integrity = game.checkIntegrity();
                 } else if (xsr.getLocalName().equals(AIMain.getXMLElementTagName())) {
                     if (doNotLoadAI) {
                         aiMain = new AIMain(this);
@@ -935,6 +937,15 @@ public final class FreeColServer {
      */
     public Server getServer() {
         return server;
+    }
+
+    /**
+     * Gets the integrity check result.
+     *
+     * @return The integrity check result.
+     */
+    public boolean getIntegrity() {
+        return integrity;
     }
 
     /**

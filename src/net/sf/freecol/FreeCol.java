@@ -135,6 +135,8 @@ public final class FreeCol {
 
     private static Level logLevel = Level.INFO;
 
+    private static boolean checkIntegrity = false;
+
     private FreeCol() {
         // Hide constructor
     }
@@ -248,6 +250,11 @@ public final class FreeCol {
                             freeColServer.getController().shutdown();
                         }
                     });
+                if (checkIntegrity) {
+                    System.exit((freeColServer != null
+                                 && freeColServer.getIntegrity())
+                                ? 0 : 1);
+                }
             } catch (IOException e) {
                 removeSplash(splash);
                 System.err.println("Error while loading server: " + e);
@@ -525,6 +532,23 @@ public final class FreeCol {
     }
 
     /**
+     * Set up the save file and directory
+     * @param name the name of the save file to use
+     */
+    private static void setSavegame(String name) {
+        savegameFile = new File(name);
+        if (!savegameFile.exists() || !savegameFile.isFile()) {
+            savegameFile = new File(getSaveDirectory(), name);
+            if (!savegameFile.exists() || !savegameFile.isFile()) {
+                System.out.println("Could not find savegame file: " + name);
+                System.exit(1);
+            }
+        } else {
+            setSaveDirectory(savegameFile.getParentFile());
+        }
+    }
+
+    /**
      * Returns the directory where the savegames should be put.
      * @return The directory where the savegames should be put.
      */
@@ -743,17 +767,7 @@ public final class FreeCol {
             } else if (args[i].equals("--load-savegame")) {
                 i++;
                 if (i < args.length) {
-                    savegameFile = new File(args[i]);
-                    if (!savegameFile.exists() || !savegameFile.isFile()) {
-                        savegameFile = new File(getSaveDirectory(), args[i]);
-                        if (!savegameFile.exists() || !savegameFile.isFile()) {
-                            System.out.println("Could not find savegame file: "
-                                               + args[i]);
-                            System.exit(1);
-                        }
-                    } else {
-                        setSaveDirectory(savegameFile.getParentFile());
-                    }
+                    setSavegame(args[i]);
                 } else {
                     printUsage();
                     System.exit(1);
@@ -775,6 +789,19 @@ public final class FreeCol {
                 serverName = args[i];
             } else if (args[i].startsWith("--splash")) {
                 // Ignore - already handled;
+            } else if (args[i].equals("--check-savegame")) {
+                // Debugging aid, checks the integrity of the specified save
+                // game, and exits with corresponding status
+                i++;
+                if (i < args.length) {
+                    setSavegame(args[i]);
+                } else {
+                    printUsage();
+                    System.exit(1);
+                }
+                checkIntegrity = true;
+                standAloneServer = true;
+                serverPort = DEFAULT_PORT;
             } else {
                 printUsage();
                 System.exit(1);
