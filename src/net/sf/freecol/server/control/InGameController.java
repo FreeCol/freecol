@@ -982,6 +982,7 @@ public final class InGameController extends Controller {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public java.util.Map<String,Object> getTransactionSession(Unit unit, Settlement settlement){
         java.util.Map<String, java.util.Map<String,Object>> unitTransactions = null;
         java.util.Map<String,java.util.Map<String,java.util.Map>> transaction = null;
@@ -1019,7 +1020,8 @@ public final class InGameController extends Controller {
         unitTransactions.put(settlement.getId(), session);
         return session;
     }
-    
+
+    @SuppressWarnings("unchecked")
     public void closeTransactionSession(Unit unit, Settlement settlement){
         java.util.Map<String, java.util.Map<String,Boolean>> unitTransactions;
         
@@ -1032,10 +1034,9 @@ public final class InGameController extends Controller {
             throw new IllegalStateException("Trying to close a non-existing session");
         }
         
-        java.util.Map<String,Boolean> session = unitTransactions.get(settlement.getId());
-        unitTransactions.remove(session);
+        unitTransactions.remove(settlement.getId());
         if(unitTransactions.isEmpty()){
-            transactionSessions.remove(unitTransactions);
+            transactionSessions.remove(unit.getId());
         }
     }
     
