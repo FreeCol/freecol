@@ -939,7 +939,7 @@ public final class InGameInputHandler extends InputHandler {
                         {"%nation%", first.getNationAsString()}},
                     ModelMessage.MessageType.FOREIGN_DIPLOMACY));
         } else if (stance == Stance.WAR
-                   || player.hasAbility("model.ability.tradeWithForeignColonies")
+                   || player.hasAbility("model.ability.betterForeignAffairsReport")
                    || player.hasContacted(first)
                    || player.hasContacted(second)) {
             // Always inform about wars, always inform post-deWitt,
