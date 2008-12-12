@@ -407,7 +407,7 @@ public final class InGameController extends Controller {
          * Die if: (No colonies or units on map)
          *         && ((After 20 turns) || (Cannot get a unit from Europe))
          */
-    	
+        
         if (player.isREF()) {
             /*
              * The REF never dies. I can grant independence to
@@ -425,32 +425,32 @@ public final class InGameController extends Controller {
         List<Unit> unitList = player.getUnits();
         if (!unitList.isEmpty()) {
             for(int i=0; i < unitList.size(); i++){
-            	Unit unit = unitList.get(i);
-            	
-            	// Can found new colony
-            	if(unit.isColonist()){
-            		logger.info("Unit " + unit.getId() + " can found colony");
-            		return false;
-            	}
-            	
-            	// Can capture units/goods
-            	if(unit.isOffensiveUnit()){
-            		logger.info("Unit " + unit.getId() + " has offense");
-            		return false;
-            	}
-            	
-            	// Is carrying units and/or goods
-            	if(unit.getGoodsCount() > 0){
-            		logger.info("Unit " + unit.getId() + " has goods");
-            		return false;
-            	}
-            	if(unit.getUnitCount()>0){
-            		logger.info("Unit " + unit.getId() + " has units");
-            		return false;
-            	}
-            	
-            	if(unit.isNaval() && unit.isCarrier())
-            		hasCarrier = true;
+                Unit unit = unitList.get(i);
+                
+                // Can found new colony
+                if(unit.isColonist()){
+                        logger.info("Unit " + unit.getId() + " can found colony");
+                        return false;
+                }
+                
+                // Can capture units/goods
+                if(unit.isOffensiveUnit()){
+                        logger.info("Unit " + unit.getId() + " has offense");
+                        return false;
+                }
+                
+                // Is carrying units and/or goods
+                if(unit.getGoodsCount() > 0){
+                        logger.info("Unit " + unit.getId() + " has goods");
+                        return false;
+                }
+                if(unit.getUnitCount()>0){
+                        logger.info("Unit " + unit.getId() + " has units");
+                        return false;
+                }
+                
+                if(unit.isNaval() && unit.isCarrier())
+                        hasCarrier = true;
             }
         }
         
@@ -477,7 +477,7 @@ public final class InGameController extends Controller {
         boolean hasColonistsWaiting = false;
         
         Iterator<Unit> unitIterator = player.getEurope().getUnitIterator();
-    	while (unitIterator.hasNext()) {
+        while (unitIterator.hasNext()) {
             Unit unit = unitIterator.next();
             if (unit.isCarrier()) {
                 /*
@@ -487,7 +487,7 @@ public final class InGameController extends Controller {
                 if(unit.getGoodsCount() > 0){
                     return false;
                 }
-    			
+                        
                 hasCarrier = true;
                 continue;
             }
@@ -495,76 +495,76 @@ public final class InGameController extends Controller {
                 hasColonistsWaiting = true;
                 continue;
             }
-    	}
+        }
         
         int goldNeeded = 0;
         
         /*
-    	 * No carrier, check if has gold to buy one
-    	 */
-    	if(!hasCarrier){
+         * No carrier, check if has gold to buy one
+         */
+        if(!hasCarrier){
             /*
              * Find the cheapest naval unit
              */
-    		
+                
             Iterator<UnitType> navalUnits = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit").iterator();
-    		
+                
             int lowerPrice = player.getEurope().getUnitPrice(navalUnits.next());
-    		
+                
             while(navalUnits.hasNext()){
                 UnitType unit = navalUnits.next();
                 if(player.getEurope().getUnitPrice(unit) < lowerPrice){
                     lowerPrice = player.getEurope().getUnitPrice(unit);
                 }
             }
-    		
+                
             goldNeeded += lowerPrice;
-    		
+                
             if(goldNeeded > player.getGold()){
                 return true;
             }
-    	}
-    	
-    	/*
-    	 * No colonists, check if has gold to train 
-    	 *or recruit one
-    	 */
-    	
-    	if(!hasColonistsWaiting){
+        }
+        
+        /*
+         * No colonists, check if has gold to train 
+         *or recruit one
+         */
+        
+        if(!hasColonistsWaiting){
             int goldToRecruit =  player.getEurope().getRecruitPrice();
-    		
+                
             /*
              * Find the cheapest colonist, either by recruiting or training
              */
-    		
+                
             Iterator<UnitType> trainedUnits = FreeCol.getSpecification().getUnitTypesTrainedInEurope().iterator();
-    		
+                
             int goldToTrain = Integer.MAX_VALUE;
-    		
+                
             while(trainedUnits.hasNext()){
                 UnitType unit = trainedUnits.next();
-    			
+                        
                 if(!unit.hasAbility("model.ability.foundColony")){
                     continue;
                 }
-    			
+                        
                 if(player.getEurope().getUnitPrice(unit) < goldToTrain){
                     goldToTrain = player.getEurope().getUnitPrice(unit);
                 }
             }
-    		    		
+                                
             goldNeeded += Math.min(goldToTrain, goldToRecruit);
-    		
+                
             if(goldNeeded > player.getGold()){
                 return true;
             }
-    	}
-    	
-    	/*
-    	 * Has carrier and colonists waiting, or
-    	 *enough gold to buy them
-    	 */
-    	return false;
+        }
+        
+        /*
+         * Has carrier and colonists waiting, or
+         *enough gold to buy them
+         */
+        return false;
     }
 
     /**
@@ -737,18 +737,18 @@ public final class InGameController extends Controller {
     private void createUnits(List<AbstractUnit> units, Element element, ServerPlayer nextPlayer) {
         String musketsTypeStr = null;
         String horsesTypeStr = null;
-    	if(nextPlayer.isIndian()){
-    		musketsTypeStr = "model.equipment.indian.muskets";
+        if(nextPlayer.isIndian()){
+                musketsTypeStr = "model.equipment.indian.muskets";
             horsesTypeStr = "model.equipment.indian.horses";
         } else {
-    		musketsTypeStr = "model.equipment.muskets";
+                musketsTypeStr = "model.equipment.muskets";
             horsesTypeStr = "model.equipment.horses";
         }
-    	
-    	final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType(musketsTypeStr);
+        
+        final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType(musketsTypeStr);
         final EquipmentType horses = FreeCol.getSpecification().getEquipmentType(horsesTypeStr);
-    	
-    	EquipmentType[] soldier = new EquipmentType[] { muskets };
+        
+        EquipmentType[] soldier = new EquipmentType[] { muskets };
         EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
         for (AbstractUnit unit : units) {
             EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
@@ -848,10 +848,10 @@ public final class InGameController extends Controller {
     }
     
     public boolean createMission(IndianSettlement settlement,Unit missionary){
-    	settlement.setMissionary(missionary);
-    	
-    	//TODO: make possibility of indians refusing the mission 
-    	return true;
+        settlement.setMissionary(missionary);
+        
+        //TODO: make possibility of indians refusing the mission 
+        return true;
     }
 
     private void bombardEnemyShips(ServerPlayer currentPlayer) {
@@ -868,7 +868,7 @@ public final class InGameController extends Controller {
                     
                     // ignore land tiles and borders
                     if(tile == null || tile.isLand()){
-                    	continue;
+                        continue;
                     }
                     
                     // Go through the units in the tile
@@ -876,105 +876,105 @@ public final class InGameController extends Controller {
                     List<Unit> unitList = new ArrayList<Unit>(tile.getUnitList());
                     Iterator<Unit> unitIterator = unitList.iterator();
                     while (unitIterator.hasNext()) {
-                    	Unit unit = unitIterator.next();
-                    	Player player = unit.getOwner();
+                        Unit unit = unitIterator.next();
+                        Player player = unit.getOwner();
                     
-                    	// ignore own units
-                    	if(player == currentPlayer){
-                    		continue;
-                    	}
-                    	
-                    	// ignore friendly units
-                    	if(currentPlayer.getStance(player) != Stance.WAR &&
-            					!unit.hasAbility("model.ability.piracy")){
-                    		continue;
-                    	}
+                        // ignore own units
+                        if(player == currentPlayer){
+                                continue;
+                        }
+                        
+                        // ignore friendly units
+                        if(currentPlayer.getStance(player) != Stance.WAR &&
+                                                !unit.hasAbility("model.ability.piracy")){
+                                continue;
+                        }
 
-                    	logger.info(colony.getName() + " found enemy unit to bombard: " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
-                    	// generate bombardment result
-                    	CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
+                        logger.info(colony.getName() + " found enemy unit to bombard: " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
+                        // generate bombardment result
+                        CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
 
-                    	// ship was damaged, get repair location
-                    	Location repairLocation = null;
-                    	if(result.type == CombatModel.CombatResultType.WIN){
-                			repairLocation = player.getRepairLocation(unit);
-                    	}
-                			
-                    	// update server data
-                    	getGame().getCombatModel().bombard(colony, unit, result, repairLocation);
+                        // ship was damaged, get repair location
+                        Location repairLocation = null;
+                        if(result.type == CombatModel.CombatResultType.WIN){
+                                        repairLocation = player.getRepairLocation(unit);
+                        }
+                                        
+                        // update server data
+                        getGame().getCombatModel().bombard(colony, unit, result, repairLocation);
 
-                    	// Inform the players (other then the player
-                    	// attacking) about the attack:
-                    	int plunderGold = -1;
-                    	Iterator<Player> enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
-                    	while (enemyPlayerIterator.hasNext()) {
-                    		ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+                        // Inform the players (other then the player
+                        // attacking) about the attack:
+                        int plunderGold = -1;
+                        Iterator<Player> enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
+                        while (enemyPlayerIterator.hasNext()) {
+                                ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
 
-                    		if (//currentPlayer.equals(enemyPlayer) ||
-                    				enemyPlayer.getConnection() == null) {
-                    			continue;
-                    		}
-                    		
-                    		// unit not visible to player, move to next player
-                    		if(!unit.isVisibleTo(enemyPlayer)){
-                    			continue;
-                    		}
-                    		
-                    		Element opponentAttackElement = Message.createNewRootElement("opponentAttack");                    		
-                    		opponentAttackElement.setAttribute("direction", direction.toString());
-                    		opponentAttackElement.setAttribute("result", result.type.toString());
-                    		opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
-                    	    opponentAttackElement.setAttribute("colony", colony.getId());
-                    		opponentAttackElement.setAttribute("defender", unit.getId());
-                    		opponentAttackElement.setAttribute("damage", String.valueOf(result.damage));
+                                if (//currentPlayer.equals(enemyPlayer) ||
+                                                enemyPlayer.getConnection() == null) {
+                                        continue;
+                                }
+                                
+                                // unit not visible to player, move to next player
+                                if(!unit.isVisibleTo(enemyPlayer)){
+                                        continue;
+                                }
+                                
+                                Element opponentAttackElement = Message.createNewRootElement("opponentAttack");                                 
+                                opponentAttackElement.setAttribute("direction", direction.toString());
+                                opponentAttackElement.setAttribute("result", result.type.toString());
+                                opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
+                            opponentAttackElement.setAttribute("colony", colony.getId());
+                                opponentAttackElement.setAttribute("defender", unit.getId());
+                                opponentAttackElement.setAttribute("damage", String.valueOf(result.damage));
 
-                    		// Add repair location to defending player
-                    		if(enemyPlayer == player && repairLocation != null){
-                    			opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
-                    		}
-                    		
-                    		// Every player who witness the confrontation needs to know about the attacker
-                    		if (!enemyPlayer.canSee(colony.getTile())) {
-                    			opponentAttackElement.setAttribute("update", "tile");
-                    			enemyPlayer.setExplored(colony.getTile());
-                    			opponentAttackElement.appendChild(colony.getTile().toXMLElement(
-                    					enemyPlayer, opponentAttackElement.getOwnerDocument()));
-                    		}
-                    		
-                    		// update players view of the unit
-                    		if (enemyPlayer.canSee(unit.getTile())) { 
+                                // Add repair location to defending player
+                                if(enemyPlayer == player && repairLocation != null){
+                                        opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
+                                }
+                                
+                                // Every player who witness the confrontation needs to know about the attacker
+                                if (!enemyPlayer.canSee(colony.getTile())) {
+                                        opponentAttackElement.setAttribute("update", "tile");
+                                        enemyPlayer.setExplored(colony.getTile());
+                                        opponentAttackElement.appendChild(colony.getTile().toXMLElement(
+                                                        enemyPlayer, opponentAttackElement.getOwnerDocument()));
+                                }
+                                
+                                // update players view of the unit
+                                if (enemyPlayer.canSee(unit.getTile())) { 
                             opponentAttackElement.setAttribute("update", "unit");
                             opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
-                    		}
-                    		
-                    		// Send response
-                    		try {
-                    			enemyPlayer.getConnection().send(opponentAttackElement);
-                    		} catch (IOException e) {
-                    			logger.warning("Could not send message to: " + enemyPlayer.getName()
-                    					+ " with connection " + enemyPlayer.getConnection());
-                    		}
-                    	}
+                                }
+                                
+                                // Send response
+                                try {
+                                        enemyPlayer.getConnection().send(opponentAttackElement);
+                                } catch (IOException e) {
+                                        logger.warning("Could not send message to: " + enemyPlayer.getName()
+                                                        + " with connection " + enemyPlayer.getConnection());
+                                }
+                        }
 
-                    	// Create the reply for the attacking player:
-                    	/*
-                    	 * Element bombardElement =
-                    	 * Message.createNewRootElement("bombardResult");
-                    	 * bombardElement.setAttribute("result",
-                    	 * Integer.toString(result));
-                    	 * bombardElement.setAttribute("colony",
-                    	 * colony.getId());
-                    	 * 
-                    	 * if (!unit.isVisibleTo(player)) {
-                    	 * bombardElement.appendChild(unit.toXMLElement(player,
-                    	 * bombardElement.getOwnerDocument())); }
-                    	 * colony.bombard(unit, result); try {
-                    	 * currentPlayer.getConnection().send(bombardElement); }
-                    	 * catch (IOException e) { logger.warning("Could
-                    	 * not send message to: " +
-                    	 * currentPlayer.getName() + " with connection " +
-                    	 * currentPlayer.getConnection()); }
-                    	 */
+                        // Create the reply for the attacking player:
+                        /*
+                         * Element bombardElement =
+                         * Message.createNewRootElement("bombardResult");
+                         * bombardElement.setAttribute("result",
+                         * Integer.toString(result));
+                         * bombardElement.setAttribute("colony",
+                         * colony.getId());
+                         * 
+                         * if (!unit.isVisibleTo(player)) {
+                         * bombardElement.appendChild(unit.toXMLElement(player,
+                         * bombardElement.getOwnerDocument())); }
+                         * colony.bombard(unit, result); try {
+                         * currentPlayer.getConnection().send(bombardElement); }
+                         * catch (IOException e) { logger.warning("Could
+                         * not send message to: " +
+                         * currentPlayer.getName() + " with connection " +
+                         * currentPlayer.getConnection()); }
+                         */
                     }
 
                 }
