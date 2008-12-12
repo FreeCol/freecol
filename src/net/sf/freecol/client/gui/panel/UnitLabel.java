@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.border.Border;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
@@ -257,22 +258,34 @@ public final class UnitLabel extends JLabel implements ActionListener {
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel || 
             getParent() instanceof ColonyPanel.InPortPanel || 
             getParent() instanceof EuropePanel.InPortPanel || 
-            getParent().getParent() instanceof ReportUnitPanel) {
+                   getParent().getParent() instanceof ReportUnitPanel) {
             int x = (getWidth() - getIcon().getIconWidth()) / 2;
             int y = (getHeight() - getIcon().getIconHeight()) / 2;
             parent.getGUI().displayOccupationIndicator(g, unit, x, y);
 
             if (unit.isUnderRepair()) {
-                BufferedImage repairImage = parent.getGUI()
-                    .createStringImage((Graphics2D) g,
-                                       Messages.message("underRepair", "%turns%",
-                                                        Integer.toString(unit.getTurnsForRepair())),
-                                       Color.RED, getWidth(), 16);
-                g.drawImage(repairImage, (getIcon().getIconWidth() - repairImage.getWidth()) / 2,
-                            (getHeight() - repairImage.getHeight()) / 2, null);
+                String underRepair = Messages.message("underRepair",
+                                                      "%turns%", Integer.toString(unit.getTurnsForRepair()));
+                String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
+                String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
+                BufferedImage repairImage1 = parent.getGUI()
+                    .createStringImage((Graphics2D)g, underRepair1, Color.RED, getWidth(), 14);
+                BufferedImage repairImage2 = parent.getGUI()
+                    .createStringImage((Graphics2D)g, underRepair2, Color.RED, getWidth(), 14);
+                int textHeight = repairImage1.getHeight() + repairImage2.getHeight();
+                int leftIndent = Math.min(5, Math.min(getWidth() - repairImage1.getWidth(),
+                                                      getWidth() - repairImage2.getWidth()));
+                g.drawImage(repairImage1,
+                            leftIndent, // indent from left side of label (icon is placed at the left side)
+                            ((getHeight() - textHeight) / 2),
+                            null);
+                g.drawImage(repairImage2, 
+                            leftIndent, 
+                            ((getHeight() - textHeight) / 2) + repairImage1.getHeight(), 
+                            null);
             }
         }
-    }
+	}
 
     /**
      * Analyzes an event and calls the right external methods to take care of
