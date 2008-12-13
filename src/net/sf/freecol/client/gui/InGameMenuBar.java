@@ -73,6 +73,7 @@ import net.sf.freecol.client.gui.action.ReportContinentalCongressAction;
 import net.sf.freecol.client.gui.action.ReportExplorationAction;
 import net.sf.freecol.client.gui.action.ReportForeignAction;
 import net.sf.freecol.client.gui.action.ReportHistoryAction;
+import net.sf.freecol.client.gui.action.ReportHighScoresAction;
 import net.sf.freecol.client.gui.action.ReportIndianAction;
 import net.sf.freecol.client.gui.action.ReportLabourAction;
 import net.sf.freecol.client.gui.action.ReportMilitaryAction;
@@ -81,6 +82,7 @@ import net.sf.freecol.client.gui.action.ReportReligionAction;
 import net.sf.freecol.client.gui.action.ReportRequirementsAction;
 import net.sf.freecol.client.gui.action.ReportTradeAction;
 import net.sf.freecol.client.gui.action.ReportTurnAction;
+import net.sf.freecol.client.gui.action.RetireAction;
 import net.sf.freecol.client.gui.action.SaveAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.ShowMainAction;
@@ -202,6 +204,8 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.addSeparator();
 
         menu.add(getMenuItem(ShowMainAction.id));
+        menu.add(getMenuItem(ReportHighScoresAction.id));
+        menu.add(getMenuItem(RetireAction.id));
         menu.add(getMenuItem(QuitAction.id));
 
         add(menu);

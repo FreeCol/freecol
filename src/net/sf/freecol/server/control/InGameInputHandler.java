@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -428,6 +429,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         register("foreignAffairs", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return foreignAffairs(connection, element);
+            }
+        });
+        register("highScores", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return highScores(connection, element);
             }
         });
         register("getREFUnits", new CurrentPlayerNetworkRequestHandler() {
@@ -2620,6 +2626,23 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 enemyElement.setAttribute("tax", String.valueOf(enemyPlayer.getTax()));
             }
             reply.appendChild(enemyElement);
+        }
+        return reply;
+    }
+
+
+    /**
+     * Handles a "highScores"-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element highScores(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Element reply = Message.createNewRootElement("highScoresReport");
+        for (HighScore score : getFreeColServer().getHighScores()) {
+            reply.appendChild(score.toXMLElement(player, reply.getOwnerDocument()));
         }
         return reply;
     }

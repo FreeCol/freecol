@@ -25,6 +25,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Element;
+
 
 public class HighScore extends FreeColObject {
 
@@ -114,6 +116,20 @@ public class HighScore extends FreeColObject {
      * The final number of colonies.
      */
     private int colonies;
+
+
+    public HighScore() {
+        // empty constructor
+    }
+
+    public HighScore(XMLStreamReader in) throws XMLStreamException {
+        readFromXMLImpl(in);
+    }
+
+    public HighScore(Element element) throws XMLStreamException {
+        readFromXMLElement(element);
+    }
+
 
     /**
      * Get the <code>IndependenceTurn</code> value.

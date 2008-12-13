@@ -3831,6 +3831,13 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Retrieves high scores from server.
+     */
+    public Element getHighScores() {
+        return freeColClient.getClient().ask(Message.createNewRootElement("highScores"));
+    }
+
+    /**
      * Gathers information about the REF.
      */
     public Element getREFUnits() {

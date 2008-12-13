@@ -69,7 +69,6 @@ public final class ReportForeignAffairPanel extends ReportPanel implements Actio
         int labelColumn = 3;
         int valueColumn = 5;
         int percentColumn = 6;
-        HIGConstraints higConst = new HIGConstraints();
 
         FreeColClient client = getCanvas().getClient();
         ImageLibrary imageLibrary = getCanvas().getGUI().getImageLibrary();

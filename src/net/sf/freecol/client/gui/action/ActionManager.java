@@ -101,6 +101,7 @@ public class ActionManager extends OptionGroup {
         add(new NewEmptyMapAction(freeColClient));
         add(new OpenAction(freeColClient));
         add(new PreferencesAction(freeColClient));
+        add(new QuitAction(freeColClient));
         add(new ReconnectAction(freeColClient));
         add(new RenameAction(freeColClient));
         add(new ReportCargoAction(freeColClient));
@@ -108,6 +109,7 @@ public class ActionManager extends OptionGroup {
         add(new ReportColonyAction(freeColClient));
         add(new ReportExplorationAction(freeColClient));
         add(new ReportForeignAction(freeColClient));
+        add(new ReportHighScoresAction(freeColClient));
         add(new ReportHistoryAction(freeColClient));
         add(new ReportIndianAction(freeColClient));
         add(new ReportLabourAction(freeColClient));
@@ -117,16 +119,16 @@ public class ActionManager extends OptionGroup {
         add(new ReportRequirementsAction(freeColClient));
         add(new ReportTradeAction(freeColClient));
         add(new ReportTurnAction(freeColClient));
+        add(new RetireAction(freeColClient));
         add(new SaveAction(freeColClient));
         add(new ScaleMapAction(freeColClient));
-        add(new ShowMainAction(freeColClient));
         add(new SentryAction(freeColClient));
+        add(new ShowMainAction(freeColClient));
         add(new SkipUnitAction(freeColClient));
         add(new ToggleViewModeAction(freeColClient));
         add(new TradeRouteAction(freeColClient));
         add(new UnloadAction(freeColClient));
         add(new WaitAction(freeColClient));
-        add(new QuitAction(freeColClient));
         add(new ZoomInAction(freeColClient));
         add(new ZoomOutAction(freeColClient));
     }

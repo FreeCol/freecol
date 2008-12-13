@@ -83,13 +83,13 @@ import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
-import net.sf.freecol.client.gui.panel.QuitDialog;
 import net.sf.freecol.client.gui.panel.RecruitDialog;
 import net.sf.freecol.client.gui.panel.ReportCargoPanel;
 import net.sf.freecol.client.gui.panel.ReportColonyPanel;
 import net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel;
 import net.sf.freecol.client.gui.panel.ReportExplorationPanel;
 import net.sf.freecol.client.gui.panel.ReportForeignAffairPanel;
+import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
 import net.sf.freecol.client.gui.panel.ReportHistoryPanel;
 import net.sf.freecol.client.gui.panel.ReportIndianPanel;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
@@ -1545,6 +1545,8 @@ public final class Canvas extends JDesktopPane {
             reportPanel = new ReportExplorationPanel(this);
         } else if ("net.sf.freecol.client.gui.panel.ReportHistoryPanel".equals(classname)) {
             reportPanel = new ReportHistoryPanel(this);
+        } else if ("net.sf.freecol.client.gui.panel.ReportHighScoresPanel".equals(classname)) {
+            reportPanel = new ReportHighScoresPanel(this);
         } else {
             logger.warning("Request for Report panel could not be processed.  Name=" + classname);
         }
@@ -2484,7 +2486,17 @@ public final class Canvas extends JDesktopPane {
      * order to get a "Are you sure"-confirmation from the user.
      */
     public void quit() {
-        if (confirmQuitDialog()) {
+        if (showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
+            freeColClient.quit();
+        }
+    }
+
+    /**
+     * Quits the application. This method uses {@link #confirmQuitDialog()} in
+     * order to get a "Are you sure"-confirmation from the user.
+     */
+    public void retire() {
+        if (showConfirmDialog("retireDialog.areYouSure.text", "ok", "cancel")) {
             freeColClient.quit();
         }
     }
@@ -2559,25 +2571,6 @@ public final class Canvas extends JDesktopPane {
         }
 
         return false;
-    }
-
-    /**
-     * Displays a "Are you sure you want to quit"-dialog in which the user may
-     * choose to quit or cancel.
-     * 
-     * @return <i>true</i> if the user decides to quit and <i>false</i>
-     *         otherwise.
-     */
-    public boolean confirmQuitDialog() {
-        QuitDialog quitDialog = new QuitDialog(this);
-
-        addAsFrame(quitDialog);
-        quitDialog.requestFocus();
-        try {
-            return quitDialog.getResponseBoolean();
-        } finally {
-            remove(quitDialog);
-        }
     }
 
     /**

@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +41,6 @@ import java.util.TimerTask;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.logging.Logger;
-import java.util.zip.GZIPOutputStream;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -57,6 +57,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -98,6 +99,8 @@ public final class FreeColServer {
     private static final Logger logger = Logger.getLogger(FreeColServer.class.getName());
 
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
+
+    private static final int NUMBER_OF_HIGH_SCORES = 10;
 
     /** Constant for storing the state of the game. */
     public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME};
@@ -146,7 +149,13 @@ public final class FreeColServer {
     /** The provider for random numbers */
     private final ServerPseudoRandom _pseudoRandom = new ServerPseudoRandom();
 
-    private boolean integrity = false; // Did the integrity check succeed
+    /** Did the integrity check succeed */
+    private boolean integrity = false;
+
+    /**
+     * The high scores on this server.
+     */
+    private List<HighScore> highScores = null;
 
 
     /**
@@ -564,7 +573,6 @@ public final class FreeColServer {
         JarOutputStream fos = null;
         try {
             XMLStreamWriter xsw;
-            GZIPOutputStream gzip;
             fos = new JarOutputStream(new FileOutputStream(file));
             fos.putNextEntry(new JarEntry(file.getName().split("\\.")[0] + "/" + FreeColSavegameFile.SAVEGAME_FILE));
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
@@ -1125,5 +1133,127 @@ public final class FreeColServer {
         return aiPlayer;
     }
 
+    /**
+     * Get the <code>HighScores</code> value.
+     *
+     * @return a <code>List<HighScore></code> value
+     */
+    public List<HighScore> getHighScores() {
+        if (highScores == null) {
+            try {
+                loadHighScores(new File("highScores.xml"));
+            } catch (Exception e) {
+                logger.warning(e.toString());
+            } finally {
+                highScores = new ArrayList<HighScore>();
+            }
+        }
+        return highScores;
+    }
+
+    /**
+     * Set the <code>HighScores</code> value.
+     *
+     * @param newHighScores The new HighScores value.
+     */
+    public void setHighScores(final List<HighScore> newHighScores) {
+        this.highScores = newHighScores;
+    }
+
+    /**
+     * Saves high scores.
+     * 
+     * @param file The file where the data will be written.
+     * @throws IOException If a problem was encountered while trying to open,
+     *             write or close the file.
+     */
+    public void saveHighScores(File file) throws IOException {
+        if (highScores.isEmpty()) {
+            return;
+        }
+        XMLOutputFactory xof = XMLOutputFactory.newInstance();
+        FileOutputStream fos = null;
+        try {
+            XMLStreamWriter xsw;
+            fos = new FileOutputStream(file);
+
+            xsw = xof.createXMLStreamWriter(fos, "UTF-8");
+            xsw.writeStartDocument("UTF-8", "1.0");
+            xsw.writeStartElement("highScores");
+            int count = 0;
+            for (HighScore score : highScores) {
+                score.toXML(xsw);
+                count++;
+                if (count > NUMBER_OF_HIGH_SCORES) {
+                    break;
+                }
+            }
+            xsw.writeEndElement();
+            xsw.writeEndDocument();
+            xsw.flush();
+            xsw.close();
+        } catch (XMLStreamException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException("XMLStreamException.");
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException(e.toString());
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                // do nothing
+            }
+        }
+    }
+
+    /**
+     * Loads high scores.
+     * 
+     * @param file The file where the game data is located.
+     * @throws IOException If a problem was encountered while trying to open,
+     *             read or close the file.
+     * @exception IOException if thrown while loading the game or if a
+     *                <code>XMLStreamException</code> have been thrown by the
+     *                parser.
+     * @exception FreeColException if the savegame contains incompatible data.
+     */
+    public void loadHighScores(File file) throws IOException, FreeColException {
+        highScores = new ArrayList<HighScore>();
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+            XMLStreamReader xsr = xif.createXMLStreamReader(fis);
+            xsr.nextTag();
+            while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (xsr.getLocalName().equals("highScore")) {
+                    HighScore score = new HighScore(xsr);
+                    highScores.add(score);
+                }
+            }
+            xsr.close();
+        } catch (XMLStreamException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException("XMLStreamException.");
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new IOException(e.toString());
+        } finally {
+            if (fis != null) {
+                fis.close();
+            }
+        }
+    }
 
 }

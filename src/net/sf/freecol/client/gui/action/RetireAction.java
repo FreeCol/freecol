@@ -31,12 +31,12 @@ import net.sf.freecol.client.gui.ImageLibrary;
 /**
  * An action for chosing the next unit as the active unit.
  */
-public class QuitAction extends MapboardAction {
+public class RetireAction extends MapboardAction {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(QuitAction.class.getName());
+    private static final Logger logger = Logger.getLogger(RetireAction.class.getName());
 
-    public static final String id = "quitAction";
+    public static final String id = "retireAction";
 
 
     /**
@@ -44,22 +44,14 @@ public class QuitAction extends MapboardAction {
      * 
      * @param freeColClient The main controller object for the client.
      */
-    QuitAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.quit", null, KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit()
-                .getMenuShortcutKeyMask()));
-        putValue(BUTTON_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(ImageLibrary.UNIT_BUTTON_WAIT, 0));
-        putValue(BUTTON_ROLLOVER_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_WAIT, 1));
-        putValue(BUTTON_PRESSED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_WAIT, 2));
-        putValue(BUTTON_DISABLED_IMAGE, freeColClient.getImageLibrary().getUnitButtonImageIcon(
-                ImageLibrary.UNIT_BUTTON_WAIT, 3));
+    RetireAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.game.retire", null, null);
     }
 
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "quitAction"
+     * @return "retireAction"
      */
     public String getId() {
         return id;
@@ -71,6 +63,6 @@ public class QuitAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getCanvas().quit();
+        getFreeColClient().getCanvas().retire();
     }
 }
