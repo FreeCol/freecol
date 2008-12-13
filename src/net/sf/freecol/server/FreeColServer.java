@@ -638,15 +638,20 @@ public final class FreeColServer {
      *                parser.
      */
     public static XMLStreamReader createXMLStreamReader(FreeColSavegameFile fis) throws IOException {
-        InputStream in = fis.getSavegameInputStream();
-        XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
+            InputStream in = fis.getSavegameInputStream();
+            XMLInputFactory xif = XMLInputFactory.newInstance();        
             return xif.createXMLStreamReader(in);
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
             logger.warning(sw.toString());
             throw new IOException("XMLStreamException.");
+        } catch (NullPointerException e) {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            logger.warning(sw.toString());
+            throw new NullPointerException("NullPointerException.");
         }
     }
 

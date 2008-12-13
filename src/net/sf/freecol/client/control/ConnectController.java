@@ -416,6 +416,9 @@ public final class ConnectController {
         } catch (IOException e) {
             SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
             return;
+        } catch (NullPointerException e) {
+            SwingUtilities.invokeLater( new ErrorJob("couldNotLoadGame") );
+            return;
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
