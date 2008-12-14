@@ -185,11 +185,15 @@ public abstract class Mission extends AIObject {
     }
     
     protected void moveButDontAttack(Connection connection, Direction direction) {
-        if (direction == null)
-            return;
-        final MoveType mt = getUnit().getMoveType(direction);
-        if (mt != MoveType.ILLEGAL_MOVE && mt != MoveType.ATTACK) {
-            move(connection, direction);                    
+        if (direction != null) {
+            switch (getUnit().getMoveType(direction)) {
+            case MOVE: case MOVE_HIGH_SEAS: case EXPLORE_LOST_CITY_RUMOUR:
+                // The three cases acceptable to Unit.move()
+                move(connection, direction);
+                break;
+            default:
+                break;
+            }
         }
     }
     
