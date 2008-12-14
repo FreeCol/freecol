@@ -54,7 +54,7 @@ public class ReportHighScoresAction extends MapboardAction {
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
-        return true;
+        return super.shouldBeEnabled();
     }    
     
     /**

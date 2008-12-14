@@ -244,25 +244,33 @@ public final class InGameController implements NetworkConstants {
      */
     public void declareIndependence() {
         Game game = freeColClient.getGame();
-        if (game.getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (game.getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
 
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getMyPlayer().getSoL() < 50) {
+        if (player.getSoL() < 50) {
             canvas.showInformationMessage("declareIndependence.notMajority",
                                           FreeCol.getSpecification().getGoodsType("model.goods.bells"),
                                           "%percentage%",
-                                          Integer.toString(freeColClient.getMyPlayer().getSoL()));
+                                          Integer.toString(player.getSoL()));
             return;
         }
-        if (!canvas.showConfirmDialog("declareIndependence.areYouSure.text", "declareIndependence.areYouSure.yes",
+        if (!canvas.showConfirmDialog("declareIndependence.areYouSure.text",
+                                      "declareIndependence.areYouSure.yes",
                                       "declareIndependence.areYouSure.no")) {
             return;
         }
+        String nationName = Messages.message("declareIndependence.defaultNation",
+                                             "%nation%", player.getNewLandName());
+        nationName = canvas.showInputDialog("declareIndependence.enterNation", nationName, 
+                                            Messages.message("ok"), Messages.message("cancel"));
+        player.setIndependentNationName(nationName);
 
         Element declareIndependenceElement = Message.createNewRootElement("declareIndependence");
+        declareIndependenceElement.setAttribute("independentNationName", nationName);
         Element reply = freeColClient.getClient().ask(declareIndependenceElement);
         NodeList childNodes = reply.getChildNodes();
         Element playerElement = (Element) childNodes.item(0);

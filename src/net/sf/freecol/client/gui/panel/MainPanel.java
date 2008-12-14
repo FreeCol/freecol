@@ -75,7 +75,6 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         JButton mapEditorButton = new JButton( Messages.message("mainPanel.editor") );
         JButton optionsButton = new JButton( Messages.message("mainPanel.options") );
         JButton quitButton = new JButton( Messages.message("menuBar.game.quit") );
-        JButton highScoresButton = new JButton( Messages.message("menuBar.game.highScores") );
         
         setCancelComponent(quitButton);
         newButton = new JButton( Messages.message("menuBar.game.new") );
@@ -85,7 +84,6 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         openButton.setActionCommand(String.valueOf(OPEN));
         optionsButton.setActionCommand(String.valueOf(OPTIONS));
         quitButton.setActionCommand(String.valueOf(QUIT));
-        highScoresButton.setAction(new ReportHighScoresAction(freeColClient));
 
         newButton.addActionListener(this);
         mapEditorButton.addActionListener(this);
@@ -98,7 +96,6 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         enterPressesWhenFocused(openButton);
         enterPressesWhenFocused(optionsButton);
         enterPressesWhenFocused(quitButton);
-        enterPressesWhenFocused(highScoresButton);
 
         Image tempImage = ResourceManager.getImage("TitleImage");
 
@@ -113,7 +110,6 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         buttons.add(newButton);
         buttons.add(openButton);
         buttons.add(mapEditorButton);
-        buttons.add(highScoresButton);
         buttons.add(optionsButton);
         buttons.add(quitButton);
 

@@ -65,7 +65,7 @@ public class HighScore extends FreeColObject {
     /**
      * The turn in which independence was granted.
      */
-    private int independenceTurn;
+    private int independenceTurn = -1;
 
     /**
      * The name of the human player.
@@ -98,11 +98,6 @@ public class HighScore extends FreeColObject {
     private String nationName;
 
     /**
-     * The rule set used for this game.
-     */
-    private String ruleSet;
-
-    /**
      * The difficulty level of this game.
      */
     private String difficulty;
@@ -117,9 +112,33 @@ public class HighScore extends FreeColObject {
      */
     private int colonies;
 
+    /**
+     * Describe newLandName here.
+     */
+    private String newLandName;
 
-    public HighScore() {
-        // empty constructor
+
+    public HighScore(Player player) {
+        score = player.getScore();
+        for (Level someLevel : Level.values()) {
+            if (score >= someLevel.getMinimumScore()) {
+                level = someLevel;
+                break;
+            }
+        }
+        playerName = player.getName();
+        nationID = player.getNationID();
+        nationTypeID = player.getNationType().getId();
+        colonies = player.getColonies().size();
+        units = player.getUnits().size();
+        if (player.getPlayerType() == Player.PlayerType.INDEPENDENT) {
+            independenceTurn = player.getGame().getTurn().getNumber();
+            nationName = player.getIndependentNationName();
+        } else {
+            independenceTurn = -1;
+        }
+        difficulty = player.getDifficulty().getId();
+        newLandName = player.getNewLandName();
     }
 
     public HighScore(XMLStreamReader in) throws XMLStreamException {
@@ -240,6 +259,15 @@ public class HighScore extends FreeColObject {
     }
 
     /**
+     * Get the <code>Nation's</code> localized name.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getOldNationName() {
+        return Messages.message(nationID + ".name");
+    }
+
+    /**
      * Get the <code>NationName</code> value.
      *
      * @return a <code>String</code> value
@@ -258,21 +286,21 @@ public class HighScore extends FreeColObject {
     }
 
     /**
-     * Get the <code>RuleSet</code> value.
+     * Get the <code>NewLandName</code> value.
      *
      * @return a <code>String</code> value
      */
-    public final String getRuleSet() {
-        return ruleSet;
+    public final String getNewLandName() {
+        return newLandName;
     }
 
     /**
-     * Set the <code>RuleSet</code> value.
+     * Set the <code>NewLandName</code> value.
      *
-     * @param newRuleSet The new RuleSet value.
+     * @param newNewLandName The new NewLandName value.
      */
-    public final void setRuleSet(final String newRuleSet) {
-        this.ruleSet = newRuleSet;
+    public final void setNewLandName(final String newNewLandName) {
+        this.newLandName = newNewLandName;
     }
 
     /**
@@ -354,7 +382,7 @@ public class HighScore extends FreeColObject {
         out.writeAttribute("score", Integer.toString(score));
         out.writeAttribute("level", level.toString());
         out.writeAttribute("nationName", nationName);
-        out.writeAttribute("ruleSet", ruleSet);
+        out.writeAttribute("newLandName", newLandName);
         out.writeAttribute("difficulty", difficulty);
         out.writeAttribute("units", Integer.toString(units));
         out.writeAttribute("colonies", Integer.toString(colonies));
@@ -375,7 +403,7 @@ public class HighScore extends FreeColObject {
         score = getAttribute(in, "score", 0);
         level = Enum.valueOf(Level.class, getAttribute(in, "level", "PARASITIC_WORM"));
         nationName = getAttribute(in, "nationName", "Surinam");
-        ruleSet = getAttribute(in, "ruleSet", "freecol");
+        newLandName = getAttribute(in, "nationName", "New World");
         difficulty = getAttribute(in, "difficulty", "model.difficulty.medium");
         units = getAttribute(in, "units", 0);
         colonies = getAttribute(in, "colonies", 0);

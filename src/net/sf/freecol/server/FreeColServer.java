@@ -33,6 +33,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -101,6 +103,7 @@ public final class FreeColServer {
     private static final int META_SERVER_UPDATE_INTERVAL = 60000;
 
     private static final int NUMBER_OF_HIGH_SCORES = 10;
+    private static final String HIGH_SCORE_FILE = "HighScores.xml";
 
     /** Constant for storing the state of the game. */
     public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME};
@@ -156,6 +159,13 @@ public final class FreeColServer {
      * The high scores on this server.
      */
     private List<HighScore> highScores = null;
+
+
+    public static final Comparator<HighScore> highScoreComparator = new Comparator<HighScore>() {
+        public int compare(HighScore score1, HighScore score2) {
+            return score2.getScore() - score1.getScore();
+        }
+    };
 
 
     /**
@@ -1146,10 +1156,9 @@ public final class FreeColServer {
     public List<HighScore> getHighScores() {
         if (highScores == null) {
             try {
-                loadHighScores(new File("highScores.xml"));
+                loadHighScores();
             } catch (Exception e) {
                 logger.warning(e.toString());
-            } finally {
                 highScores = new ArrayList<HighScore>();
             }
         }
@@ -1157,30 +1166,43 @@ public final class FreeColServer {
     }
 
     /**
-     * Set the <code>HighScores</code> value.
+     * Adds a new high score for player and returns <code>true</code>
+     * if possible.
      *
-     * @param newHighScores The new HighScores value.
+     * @param player a <code>Player</code> value
+     * @param nationName a <code>String</code> value
+     * @return a <code>boolean</code> value
      */
-    public void setHighScores(final List<HighScore> newHighScores) {
-        this.highScores = newHighScores;
+    public boolean newHighScore(Player player) {
+        getHighScores();
+        if (!highScores.isEmpty() && player.getScore() < highScores.get(highScores.size() - 1).getScore()) {
+            return false;
+        } else {
+            highScores.add(new HighScore(player));
+            Collections.sort(highScores, highScoreComparator);
+            if (highScores.size() == NUMBER_OF_HIGH_SCORES) {
+                highScores.remove(NUMBER_OF_HIGH_SCORES - 1);
+            }
+            return true;
+        }
     }
 
     /**
      * Saves high scores.
      * 
-     * @param file The file where the data will be written.
      * @throws IOException If a problem was encountered while trying to open,
      *             write or close the file.
      */
-    public void saveHighScores(File file) throws IOException {
-        if (highScores.isEmpty()) {
+    public void saveHighScores() throws IOException {
+        if (highScores == null || highScores.isEmpty()) {
             return;
         }
+        Collections.sort(highScores, highScoreComparator);
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         FileOutputStream fos = null;
         try {
             XMLStreamWriter xsw;
-            fos = new FileOutputStream(file);
+            fos = new FileOutputStream(new File(FreeCol.getDataDirectory(), HIGH_SCORE_FILE));
 
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
             xsw.writeStartDocument("UTF-8", "1.0");
@@ -1189,7 +1211,7 @@ public final class FreeColServer {
             for (HighScore score : highScores) {
                 score.toXML(xsw);
                 count++;
-                if (count > NUMBER_OF_HIGH_SCORES) {
+                if (count == NUMBER_OF_HIGH_SCORES) {
                     break;
                 }
             }
@@ -1221,7 +1243,6 @@ public final class FreeColServer {
     /**
      * Loads high scores.
      * 
-     * @param file The file where the game data is located.
      * @throws IOException If a problem was encountered while trying to open,
      *             read or close the file.
      * @exception IOException if thrown while loading the game or if a
@@ -1229,21 +1250,21 @@ public final class FreeColServer {
      *                parser.
      * @exception FreeColException if the savegame contains incompatible data.
      */
-    public void loadHighScores(File file) throws IOException, FreeColException {
+    public void loadHighScores() throws IOException, FreeColException {
         highScores = new ArrayList<HighScore>();
         XMLInputFactory xif = XMLInputFactory.newInstance();
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream(file);
+            fis = new FileInputStream(new File(FreeCol.getDataDirectory(), HIGH_SCORE_FILE));
             XMLStreamReader xsr = xif.createXMLStreamReader(fis);
             xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("highScore")) {
-                    HighScore score = new HighScore(xsr);
-                    highScores.add(score);
+                    highScores.add(new HighScore(xsr));
                 }
             }
             xsr.close();
+            Collections.sort(highScores, highScoreComparator);
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

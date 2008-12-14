@@ -508,6 +508,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return getServerStatistics(connection, element);
             }
         });
+        register("retire", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return retire(connection, element);
+            }
+        });
     }
 
     private List<ServerPlayer> getOtherPlayers(Player player) {
@@ -2544,6 +2549,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      */
     private Element declareIndependence(Connection connection, Element element) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
+        String nationName = element.getAttribute("independentNationName");
+        player.setIndependentNationName(nationName);
+
         ServerPlayer refPlayer = getFreeColServer().getInGameController().createREFPlayer(player);
         List<Unit> refUnits = getFreeColServer().getInGameController().createREFUnits(player, refPlayer);
         
@@ -2643,6 +2651,33 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Element reply = Message.createNewRootElement("highScoresReport");
         for (HighScore score : getFreeColServer().getHighScores()) {
             reply.appendChild(score.toXMLElement(player, reply.getOwnerDocument()));
+        }
+        return reply;
+    }
+
+
+    /**
+     * Handles a "retire"-message.
+     * 
+     * @param connection The <code>Connection</code> the message was received
+     *            on.
+     * @param element The element containing the request.
+     */
+    private Element retire(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        Element reply = Message.createNewRootElement("confirmRetire");
+        boolean highScore = getFreeColServer().newHighScore(player);
+        if (highScore) {
+            try {
+                getFreeColServer().saveHighScores();
+                reply.setAttribute("highScore", "true");
+            } catch (Exception e) {
+                logger.warning(e.toString());
+            } finally {
+                reply.setAttribute("highScore", "false");
+            }
+        } else {
+            reply.setAttribute("highScore", "false");
         }
         return reply;
     }

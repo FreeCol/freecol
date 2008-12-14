@@ -523,6 +523,19 @@ public final class FreeColClient {
     }
 
     /**
+     * Retires the player from the game. Returns true if the player
+     * achieved a new high score.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean retire() {
+        Element retireElement = Message.createNewRootElement("retire");
+        Element reply = client.ask(retireElement);
+        return ("true".equals(reply.getAttribute("highScore")));
+    }
+
+
+    /**
      * Continue playing after win the game
      */
     public void continuePlaying() {

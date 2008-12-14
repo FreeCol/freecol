@@ -93,7 +93,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public static enum Stance {
         WAR, CEASE_FIRE, PEACE, ALLIANCE
-    }
+            }
 
 
     /**
@@ -216,7 +216,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private List<TradeRoute> tradeRoutes = new ArrayList<TradeRoute>();
 
     // Model messages for this player
-    private final List<ModelMessage> modelMessages = new ArrayList<ModelMessage>();                                                                            
+    private final List<ModelMessage> modelMessages = new ArrayList<ModelMessage>();
 
     // Temporary variables:
     protected boolean[][] canSeeTiles = null;
@@ -225,6 +225,11 @@ public class Player extends FreeColGameObject implements Nameable {
      * Contains the abilities and modifiers of this type.
      */
     private FeatureContainer featureContainer = new FeatureContainer();
+
+    /**
+     * Describe independentNationName here.
+     */
+    private String independentNationName;
 
     /**
      * Describe history here.
@@ -473,7 +478,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (settlements.contains(s)) {
             if (s.getOwner() == this) {
                 throw new IllegalStateException(
-                        "Cannot remove the ownership of the given settlement before it has been given to another player.");
+                                                "Cannot remove the ownership of the given settlement before it has been given to another player.");
             }
             settlements.remove(s);
         }
@@ -624,6 +629,24 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the <code>IndependentNationName</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getIndependentNationName() {
+        return independentNationName;
+    }
+
+    /**
+     * Set the <code>IndependentNationName</code> value.
+     *
+     * @param newIndependentNationName The new IndependentNationName value.
+     */
+    public final void setIndependentNationName(final String newIndependentNationName) {
+        this.independentNationName = newIndependentNationName;
+    }
+
+    /**
      * Declares independence.
      */
     public void declareIndependence() {
@@ -652,7 +675,7 @@ public class Player extends FreeColGameObject implements Nameable {
         europe.disposeUnitList();
         if (!unitNames.isEmpty()) {
             addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, "model.player.independence.unitsSeized",
-                    "%units%", Utils.join(", ", unitNames));
+                            "%units%", Utils.join(", ", unitNames));
         }
         for (Colony colony : getColonies()) {
             int sol = colony.getSoL();
@@ -671,7 +694,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         unit.setType(unit.getType().getPromotion());
                     }
                     addModelMessage(colony, ModelMessage.MessageType.DEFAULT, "model.player.continentalArmyMuster",
-                            "%colony%", colony.getName(), "%number%", String.valueOf(limit));
+                                    "%colony%", colony.getName(), "%number%", String.valueOf(limit));
                 }
             }
         }
@@ -684,7 +707,7 @@ public class Player extends FreeColGameObject implements Nameable {
         modifyScore(SCORE_INDEPENDENCE_DECLARED);
         history.add(new HistoryEvent(getGame().getTurn().getNumber(),
                                      HistoryEvent.Type.DECLARE_INDEPENDENCE));
-                                     
+
     }
 
     /*
@@ -708,7 +731,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
             }
         }
-    }        
+    }
 
     /**
      * Gives independence to this <code>Player</code>.
@@ -726,7 +749,7 @@ public class Player extends FreeColGameObject implements Nameable {
         addModelMessage(this, ModelMessage.MessageType.DEFAULT, "model.player.independence");
         history.add(new HistoryEvent(getGame().getTurn().getNumber(),
                                      HistoryEvent.Type.INDEPENDENCE));
-                                     
+
     }
 
     /**
@@ -902,9 +925,9 @@ public class Player extends FreeColGameObject implements Nameable {
             price += tile.potential(type);
         }
         price = price * Specification.getSpecification().getIntegerOption("model.option.landPriceFactor").getValue()
-                + 100;
+            + 100;
         return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier", null, getGame()
-                .getTurn());
+                                                    .getTurn());
     }
 
     /**
@@ -987,21 +1010,20 @@ public class Player extends FreeColGameObject implements Nameable {
                 if (player.isEuropean()) {
                     if (!contactedEuro) {
                         addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
-                                "EventPanel.MEETING_EUROPEANS");
+                                        "EventPanel.MEETING_EUROPEANS");
                     }
                 } else {
                     if (!contactedIndians) {
                         addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
-                                "EventPanel.MEETING_NATIVES");
+                                        "EventPanel.MEETING_NATIVES");
                     }
                     // special cases for Aztec/Inca
                     if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.aztec")) {
                         addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
-                                "EventPanel.MEETING_AZTEC");
-                    } else if (player.getNationType() == FreeCol.getSpecification().getNationType(
-                            "model.nationType.inca")) {
+                                        "EventPanel.MEETING_AZTEC");
+                    } else if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.inca")) {
                         addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
-                                "EventPanel.MEETING_INCA");
+                                        "EventPanel.MEETING_INCA");
                     }
                 }
             } else if (!isEuropean()) {
@@ -1084,14 +1106,14 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void setExplored(Unit unit) {
         if (getGame() == null || getGame().getMap() == null || unit == null || unit.getLocation() == null
-                || unit.getTile() == null || isIndian()) {
+            || unit.getTile() == null || isIndian()) {
             return;
         }
         if (canSeeTiles == null) {
             resetCanSeeTiles();
         }
         Iterator<Position> positionIterator = getGame().getMap().getCircleIterator(unit.getTile().getPosition(), true,
-                unit.getLineOfSight());
+                                                                                   unit.getLineOfSight());
         while (positionIterator.hasNext()) {
             Map.Position p = positionIterator.next();
             canSeeTiles[p.getX()][p.getY()] = true;
@@ -1184,7 +1206,7 @@ public class Player extends FreeColGameObject implements Nameable {
                      * "), Tile: " + position); }
                      */
                     Iterator<Position> positionIterator = map.getCircleIterator(position, true, settlement
-                            .getLineOfSight());
+                                                                                .getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = positionIterator.next();
                         canSeeTiles[p.getX()][p.getY()] = true;
@@ -1688,7 +1710,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 indianSettlements.add((IndianSettlement) s);
             } else {
                 throw new RuntimeException(
-                        "getIndianSettlements can only be called for players whose settlements are IndianSettlements.");
+                                           "getIndianSettlements can only be called for players whose settlements are IndianSettlements.");
             }
         }
         return indianSettlements;
@@ -1720,7 +1742,7 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             int distance;
             if (colony.hasAbility("model.ability.repairUnits")
-                    && (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
+                && (distance = unit.getTile().getDistanceTo(colony.getTile())) < shortestDistance) {
                 closestLocation = colony;
                 shortestDistance = distance;
             }
@@ -1862,7 +1884,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return;
         }
         crossesRequired += (int) featureContainer.applyModifier(Specification.getSpecification().getIntegerOption(
-                "model.option.crossesIncrement").getValue(), "model.modifier.religiousUnrestBonus");
+                                                                                                                  "model.option.crossesIncrement").getValue(), "model.modifier.religiousUnrestBonus");
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,
@@ -1942,19 +1964,19 @@ public class Player extends FreeColGameObject implements Nameable {
             return tension.get(player);
         }
     }
-    
+
     /**
      * Indian player surrenders
      * @param player The <code>Player</code> he surrenders to.
-     * 
+     *
      */
     public void surrenderTo(Player player) {
-    	if(!isIndian()){
-    		logger.warning("Only indians should surrender");
-    		return;
-    	}
-    	changeRelationWithPlayer(player, Stance.PEACE);
-    	getTension(player).setValue(Tension.SURRENDED);
+        if(!isIndian()){
+            logger.warning("Only indians should surrender");
+            return;
+        }
+        changeRelationWithPlayer(player, Stance.PEACE);
+        getTension(player).setValue(Tension.SURRENDED);
     }
 
     /**
@@ -2052,7 +2074,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 while (ui.hasNext()) {
                     Unit u = ui.next();
                     if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()
-                            && getStance(u.getOwner()) == Stance.WAR) {
+                        && getStance(u.getOwner()) == Stance.WAR) {
                         value -= Math.max(0, 40 - tile.getDistanceTo(tile) * 9);
                     }
                 }
@@ -2109,58 +2131,58 @@ public class Player extends FreeColGameObject implements Nameable {
             return;
         }
         if (newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR) {
-        	throw new IllegalStateException("Cease fire can only be declared when at war.");
+            throw new IllegalStateException("Cease fire can only be declared when at war.");
         }
         stance.put(player.getId(), newStance);
     }
 
     public void changeRelationWithPlayer(Player player,Stance newStance){
-    	Stance oldStance = getStance(player);
-    	
-    	// Sanitation
-    	if(newStance == oldStance){
-    		return;
-    	}
-    	
-    	// Set stance
-    	setStance(player, newStance);
-    
-    	// For now on, consider null as PEACE
-    	// This may happen with the REF
-    	if(oldStance == null){
-    	    oldStance = Stance.PEACE;
-    	}
-    	
-    	// Update tension
-    	int modifier = 0;
-    	switch(newStance){
-    		case PEACE:
-    			if(oldStance == Stance.WAR){
-    				modifier = Tension.CEASE_FIRE_MODIFIER + Tension.PEACE_TREATY_MODIFIER;
-    			}
-    			if(oldStance == Stance.CEASE_FIRE){
-    				modifier = Tension.PEACE_TREATY_MODIFIER;
-    			}
-    			break;
-    		case CEASE_FIRE:
-    			if(oldStance == Stance.WAR){
-    				modifier = Tension.CEASE_FIRE_MODIFIER;
-    			}
-    	}
-    	modifyTension(player,modifier);
-    	
+        Stance oldStance = getStance(player);
+        
+        // Sanitation
+        if(newStance == oldStance){
+            return;
+        }
+        
+        // Set stance
+        setStance(player, newStance);
+
+        // For now on, consider null as PEACE
+        // This may happen with the REF
+        if(oldStance == null){
+            oldStance = Stance.PEACE;
+        }
+        
+        // Update tension
+        int modifier = 0;
+        switch(newStance){
+        case PEACE:
+            if(oldStance == Stance.WAR){
+                modifier = Tension.CEASE_FIRE_MODIFIER + Tension.PEACE_TREATY_MODIFIER;
+            }
+            if(oldStance == Stance.CEASE_FIRE){
+                modifier = Tension.PEACE_TREATY_MODIFIER;
+            }
+            break;
+        case CEASE_FIRE:
+            if(oldStance == Stance.WAR){
+                modifier = Tension.CEASE_FIRE_MODIFIER;
+            }
+        }
+        modifyTension(player,modifier);
+        
         if (player.getStance(this) != newStance) {
             getGame().getModelController().setStance(this, player, newStance);
             player.setStance(this, newStance);
-        
+
             if(newStance == Stance.WAR){
-            	switch(oldStance){
-            		case PEACE:
-            			modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE;
-            			break;
-            		case CEASE_FIRE:
-            			modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE;
-            	}
+                switch(oldStance){
+                case PEACE:
+                    modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE;
+                    break;
+                case CEASE_FIRE:
+                    modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE;
+                }
             }
             player.modifyTension(this, modifier);
         }
@@ -2357,10 +2379,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 if (oldSoL / 10 != newSoL / 10) {
                     if (newSoL > oldSoL) {
                         addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY, "model.player.SoLIncrease",
-                                "%oldSoL%", String.valueOf(oldSoL), "%newSoL%", String.valueOf(newSoL));
+                                        "%oldSoL%", String.valueOf(oldSoL), "%newSoL%", String.valueOf(newSoL));
                     } else {
                         addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY, "model.player.SoLDecrease",
-                                "%oldSoL%", String.valueOf(oldSoL), "%newSoL%", String.valueOf(newSoL));
+                                        "%oldSoL%", String.valueOf(oldSoL), "%newSoL%", String.valueOf(newSoL));
                     }
                 }
             }
@@ -2556,7 +2578,7 @@ public class Player extends FreeColGameObject implements Nameable {
             return true;
         } else {
             return (data.getArrears() == 0 || (marketAccess == Market.CUSTOM_HOUSE && getGameOptions().getBoolean(
-                    GameOptions.CUSTOM_IGNORE_BOYCOTT)));
+                                                                                                                  GameOptions.CUSTOM_IGNORE_BOYCOTT)));
         }
     }
 
@@ -2948,7 +2970,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *             stream.
      */
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        throws XMLStreamException {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("ID", getId());
@@ -2986,6 +3008,9 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         if (newLandName != null) {
             out.writeAttribute("newLandName", newLandName);
+        }
+        if (independentNationName != null) {
+            out.writeAttribute("independentNationName", independentNationName);
         }
         if (entryLocation != null) {
             out.writeAttribute("entryLocation", entryLocation.getId());
@@ -3068,6 +3093,7 @@ public class Player extends FreeColGameObject implements Nameable {
         currentFather = FreeCol.getSpecification().getType(in, "currentFather", FoundingFather.class, null);
         crossesRequired = getAttribute(in, "crossesRequired", 12);
         newLandName = getAttribute(in, "newLandName", null);
+        independentNationName = getAttribute(in, "independentNationName", null);
 
         attackedByPrivateers = getAttribute(in, "attackedByPrivateers", false);
         final String entryLocationStr = in.getAttributeValue(null, "entryLocation");
@@ -3107,7 +3133,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(STANCE_TAG)) {
-            	String playerId = in.getAttributeValue(null, "player");
+                String playerId = in.getAttributeValue(null, "player");
                 stance.put(playerId, Enum.valueOf(Stance.class, in.getAttributeValue(null, "value")));
                 in.nextTag(); // close element
             } else if (in.getLocalName().equals(Europe.getXMLElementTagName())) {
@@ -3132,7 +3158,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // sanity check: we should be on the closing tag
         if (!in.getLocalName().equals(Player.getXMLElementTagName())) {
             logger.warning("Error parsing xml: expecting closing tag </" + Player.getXMLElementTagName() + "> "
-                    + "found instead: " + in.getLocalName());
+                           + "found instead: " + in.getLocalName());
         }
 
         if (market == null) {

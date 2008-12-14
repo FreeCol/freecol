@@ -27,6 +27,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.common.model.Player.PlayerType;
 
 /**
  * An action for chosing the next unit as the active unit.
@@ -40,7 +41,7 @@ public class RetireAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>WaitAction</code>.
+     * Creates a new <code>RetireAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      */
@@ -57,6 +58,17 @@ public class RetireAction extends MapboardAction {
         return id;
     }
 
+    /**
+     * Checks if this action should be enabled.
+     * 
+     * @return true if this action should be enabled.
+     */
+    protected boolean shouldBeEnabled() {
+        return super.shouldBeEnabled()
+            && freeColClient.getMyPlayer() != null
+            && freeColClient.getMyPlayer().getPlayerType() != PlayerType.INDEPENDENT;
+    }    
+    
     /**
      * Applies this action.
      * 

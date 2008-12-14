@@ -2497,6 +2497,9 @@ public final class Canvas extends JDesktopPane {
      */
     public void retire() {
         if (showConfirmDialog("retireDialog.areYouSure.text", "ok", "cancel")) {
+            if (freeColClient.retire()) {
+                showReportPanel(ReportHighScoresPanel.class.getName());
+            }
             freeColClient.quit();
         }
     }
