@@ -381,7 +381,9 @@ public class HighScore extends FreeColObject {
         out.writeAttribute("nationTypeID", nationTypeID);
         out.writeAttribute("score", Integer.toString(score));
         out.writeAttribute("level", level.toString());
-        out.writeAttribute("nationName", nationName);
+        if (nationName != null) {
+            out.writeAttribute("nationName", nationName);
+        }
         out.writeAttribute("newLandName", newLandName);
         out.writeAttribute("difficulty", difficulty);
         out.writeAttribute("units", Integer.toString(units));
@@ -402,7 +404,7 @@ public class HighScore extends FreeColObject {
         nationTypeID = getAttribute(in, "nationTypeID", "model.nationType.trade");
         score = getAttribute(in, "score", 0);
         level = Enum.valueOf(Level.class, getAttribute(in, "level", "PARASITIC_WORM"));
-        nationName = getAttribute(in, "nationName", "Surinam");
+        nationName = getAttribute(in, "nationName", null);
         newLandName = getAttribute(in, "nationName", "New World");
         difficulty = getAttribute(in, "difficulty", "model.difficulty.medium");
         units = getAttribute(in, "units", 0);

@@ -2673,7 +2673,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 reply.setAttribute("highScore", "true");
             } catch (Exception e) {
                 logger.warning(e.toString());
-            } finally {
                 reply.setAttribute("highScore", "false");
             }
         } else {

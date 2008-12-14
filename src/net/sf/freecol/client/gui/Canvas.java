@@ -2500,7 +2500,9 @@ public final class Canvas extends JDesktopPane {
             if (freeColClient.retire()) {
                 showReportPanel(ReportHighScoresPanel.class.getName());
             }
-            freeColClient.quit();
+            // TODO: quit as soon as panel has been closed
+            //freeColClient.quit();
+            quit();
         }
     }
 
