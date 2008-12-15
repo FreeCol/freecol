@@ -130,7 +130,6 @@ public class SimpleCombatModel implements CombatModel {
         float defencePower = getDefencePower(attacker, defender);
         float victory = attackPower / (attackPower + defencePower);
         int damage = 0;
-
         int r = random.nextInt(100);
         
         CombatResultType result = CombatResultType.EVADES;
@@ -176,7 +175,6 @@ public class SimpleCombatModel implements CombatModel {
         
         if (result.compareTo(CombatResultType.WIN) >= 0 &&
             defender.getTile().getSettlement() != null) {
-            final boolean lastDefender;
             if (defender.getTile().getSettlement() instanceof Colony) {
                 if (!defender.isDefensiveUnit()) {
                     result = CombatResultType.DONE_SETTLEMENT;
@@ -652,17 +650,23 @@ public class SimpleCombatModel implements CombatModel {
      * @param colony a <code>Colony</code> value
      * @param plunderGold The amount of gold to plunder.
      */
-    public void captureColony(Unit attacker, Colony colony, int plunderGold, Location repairLocation) {
+    public void captureColony(Unit attacker, Colony colony, int plunderGold,
+                              Location repairLocation) {
         Player enemy = colony.getOwner();
         Player myPlayer = attacker.getOwner();
-        enemy.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
 
+        enemy.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
         if (myPlayer.isEuropean()) {
             myPlayer.getHistory().add(new HistoryEvent(myPlayer.getGame().getTurn().getNumber(),
                                                        HistoryEvent.Type.CONQUER_COLONY,
                                                        "%nation%", enemy.getNationAsString(),
                                                        "%colony%", colony.getName()));
-            enemy.addModelMessage(enemy, ModelMessage.MessageType.COMBAT_RESULT,
+            enemy.getHistory().add(new HistoryEvent(enemy.getGame().getTurn().getNumber(),
+                                                    HistoryEvent.Type.COLONY_CONQUERED,
+                                                    "%colony%", colony.getName(),
+                                                    "%nation%", myPlayer.getNationAsString()));
+            enemy.addModelMessage(enemy,
+                                  ModelMessage.MessageType.COMBAT_RESULT,
                                   "model.unit.colonyCapturedBy",
                                   "%colony%", colony.getName(),
                                   "%amount%", Integer.toString(plunderGold),
@@ -677,6 +681,7 @@ public class SimpleCombatModel implements CombatModel {
             colony.setOwner(myPlayer);
             // However, not all units might be available
             for (Unit capturedUnit : colony.getUnitList()) {
+                enemy.divertModelMessages(capturedUnit, enemy);
                 if (!capturedUnit.getType().isAvailableTo(myPlayer)) {
                     UnitType downgrade = capturedUnit.getType().getDowngrade(DowngradeType.CAPTURE);
                     if (downgrade != null && downgrade.isAvailableTo(myPlayer)) {
@@ -687,13 +692,15 @@ public class SimpleCombatModel implements CombatModel {
                 }
             }                    
 
-            myPlayer.addModelMessage(colony, ModelMessage.MessageType.COMBAT_RESULT,
+            myPlayer.addModelMessage(colony,
+                                     ModelMessage.MessageType.COMBAT_RESULT,
                                      "model.unit.colonyCaptured", 
                                      "%colony%", colony.getName(),
                                      "%amount%", Integer.toString(plunderGold));
 
             // Demote all soldiers and clear all orders:
             for (Unit capturedUnit : colony.getTile().getUnitList()) {
+                enemy.divertModelMessages(capturedUnit, enemy);
                 if (attacker.isUndead()) {
                     capturedUnit.setType(attacker.getType());
                 } else {
@@ -717,29 +724,43 @@ public class SimpleCombatModel implements CombatModel {
             attacker.setLocation(colony.getTile());
         } else { // Indian:
             if (colony.getUnitCount() <= 1) {
-                myPlayer.modifyGold(plunderGold);
-                enemy.modifyGold(-plunderGold);
-                myPlayer.addModelMessage(enemy, ModelMessage.MessageType.COMBAT_RESULT,
+                myPlayer.getHistory().add(new HistoryEvent(myPlayer.getGame().getTurn().getNumber(),
+                                                           HistoryEvent.Type.COLONY_DESTROYED,
+                                                           "%nation%", enemy.getNationAsString(),
+                                                           "%colony%", colony.getName()));
+                myPlayer.addModelMessage(enemy,
+                                         ModelMessage.MessageType.COMBAT_RESULT,
                                          "model.unit.colonyBurning",
                                          "%colony%", colony.getName(),
                                          "%amount%", Integer.toString(plunderGold),
                                          "%nation%", myPlayer.getNationAsString(),
                                          "%unit%", attacker.getName());
+                myPlayer.modifyGold(plunderGold);
+                enemy.modifyGold(-plunderGold);
                 damageAllShips(colony, attacker, repairLocation);
+                enemy.divertModelMessages(colony, enemy);
+                for (Unit victim : colony.getUnitList()) {
+                    enemy.divertModelMessages(victim, enemy);
+                    victim.dispose();
+                }
                 colony.dispose();
                 attacker.setLocation(colony.getTile());
             } else {
                 Unit victim = colony.getRandomUnit();
+
                 if (victim == null) {
-                    return;
+                    logger.warning("could not find colonist to slaughter");
+                } else {
+                    myPlayer.addModelMessage(colony,
+                                             ModelMessage.MessageType.COMBAT_RESULT,
+                                             "model.unit.colonistSlaughtered",
+                                             "%colony%", colony.getName(),
+                                             "%unit%", victim.getName(),
+                                             "%nation%", myPlayer.getNationAsString(),
+                                             "%enemyUnit%", attacker.getName());
+                    enemy.divertModelMessages(victim, enemy);
+                    victim.dispose();
                 }
-                myPlayer.addModelMessage(colony, ModelMessage.MessageType.COMBAT_RESULT,
-                                         "model.unit.colonistSlaughtered",
-                                         "%colony%", colony.getName(),
-                                         "%unit%", victim.getName(),
-                                         "%nation%", myPlayer.getNationAsString(),
-                                         "%enemyUnit%", attacker.getName());
-                victim.dispose();
             }
         }
 
