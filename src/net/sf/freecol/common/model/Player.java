@@ -710,10 +710,11 @@ public class Player extends FreeColGameObject implements Nameable {
 
     }
 
-    /*
+    /**
      * Sometimes an event causes the source (and display) fields in an
      * accumulated model message to become invalid (e.g. Europe disappears
      * on independence.  This routine is for cleaning up such cases.
+     *
      * @param source the source field that has become invalid
      * @param newSource a new source field to replace the old with, or
      *   if null then remove the message
