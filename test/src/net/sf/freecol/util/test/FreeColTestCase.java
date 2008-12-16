@@ -116,18 +116,6 @@ public class FreeColTestCase extends TestCase {
         Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
         return game;
     }
-
-    public static Tile[][] getTestTiles(Game game, int width, int height, TileType tileType) {
-        Tile[][] tiles = new Tile[width][height];
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                tiles[x][y] = new Tile(game, tileType, x, y);
-            }
-        }
-        return tiles;
-    }
-
     
     /**
      * Creates a standardized map on which all fields have the plains type.
@@ -139,11 +127,8 @@ public class FreeColTestCase extends TestCase {
      * @return The map created as described above.
      */
     public static Map getTestMap() {
-    	TileType tileType = plainsType;
-    	int width = 20;
-    	int height = 15;
-    	boolean explored = false;
-    	return getTestMap(tileType, width, height, explored);
+        MapBuilder builder = new MapBuilder(getGame());
+        return builder.build();
     }
 
     /**
@@ -158,10 +143,9 @@ public class FreeColTestCase extends TestCase {
      * @return The map created as described above.
      */
     public static Map getTestMap(TileType tileType) {
-    	int width = 20;
-    	int height = 15;
-    	boolean explored = false;
-    	return getTestMap(tileType, width, height, explored);
+        MapBuilder builder = new MapBuilder(getGame());
+        builder.setBaseTileType(tileType);
+        return builder.build();
     }
     
     /**
@@ -178,40 +162,11 @@ public class FreeColTestCase extends TestCase {
      * @return The map created as described above.
      */
     public static Map getTestMap(TileType tileType, boolean explored) {
-    	int width = 20;
-    	int height = 15;
-    	return getTestMap(tileType, width, height, explored);
+        MapBuilder builder = new MapBuilder(getGame());
+        builder.setBaseTileType(tileType).setExploredByAll(explored);
+        return builder.build();
     }
     
-    /**
-     * Creates a standardized map on which all fields have the same given type.
-     * 
-     * Uses the getGame() method to access the currently running game.
-     * 
-     * Does not call Game.setMap(Map) with the returned map.
-     * 
-     * @param type The type of land with which to initialize the map.
-     * 
-     * @param width The width of the map
-     * 
-     * @param height The height of the map
-     * 
-     * @param explored Set to true if you want all the tiles on the map to have been explored by all players.
-     * 
-     * @return The map created as described above.
-     */
-    public static Map getTestMap(TileType tileType, int width, int height, boolean explored) {
-        Map m = new Map(getGame(), getTestTiles(getGame(), width, height, tileType));
-        if (explored) {
-            for (Player player : getGame().getPlayers()) {
-                for (Tile tile : m.getAllTiles()) {
-                    tile.setExploredBy(player, true);
-                }
-            }
-        }
-        return m;
-    }
-
     /**
      * Creates a standardized map, half land (left), half sea (right)
      * 
@@ -227,30 +182,23 @@ public class FreeColTestCase extends TestCase {
      * 
      * @return The map created as described above.
      */
-    public static Map getCoastTestMap(TileType tileType) {
-    	int totalWidth = 20;
-    	int totalHeight = 15;
-    	
-    	int landWidth = (int) Math.floor(totalWidth/2);
-    	
-    	Tile[][] tiles = new Tile[totalWidth][totalHeight];
+    public static Map getCoastTestMap(TileType landTileType) {        
+        int totalWidth = 20;
+        int totalHeight = 15;
+        TileType oceanType = spec().getTileType("model.tile.ocean");
+        
+        MapBuilder builder = new MapBuilder(getGame());
+        builder.setDimensions(totalWidth, totalHeight).setBaseTileType(oceanType);
 
+        // Fill half with land, the builder will fill the rest with ocean
+        int landWidth = (int) Math.floor(totalWidth/2);
         for (int x = 0; x < landWidth; x++) {
             for (int y = 0; y < totalHeight; y++) {
-                tiles[x][y] = new Tile(getGame(), tileType, x, y);
+                builder.setTile(x, y, landTileType);
             }
         }
-        
-        TileType oceanType = spec().getTileType("model.tile.ocean");
-        for (int x = landWidth ; x < totalWidth; x++) {
-            for (int y = 0 ; y < totalHeight; y++) {
-                tiles[x][y] = new Tile(getGame(), oceanType, x, y);
-            }
-        }
-    	
-    	Map m = new Map(getGame(), tiles);
-        
-        return m;
+
+        return builder.build();
     }
     
     /**
@@ -312,6 +260,129 @@ public class FreeColTestCase extends TestCase {
         assertEquals(numberOfSettlers, colony.getUnitCount());
 
         return colony;
+    }
+    
+    public static class MapBuilder{
+        
+        // Required parameter
+        private final Game game;
+        
+        private TileType[][] tiles = null; 
+        private int width;
+        private int height;
+        private TileType baseTile;
+        private boolean exploredByAll;
+        private boolean initiated;
+        
+        public MapBuilder(Game game){
+            this.game = game;
+            setStartingParams();
+        }
+        
+        private void setStartingParams(){
+            width = 20;
+            height = 15;
+            baseTile = plainsType;
+            exploredByAll = false;
+            initiated = false;
+            // set empty grid
+            if(tiles == null){
+                tiles = new TileType[width][height];
+            }
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    tiles[x][y] = null;
+                }
+            }
+        }
+        
+        public MapBuilder setBaseTileType(TileType baseType){
+            if(baseType == null){
+                throw new NullPointerException("Base tile type cannot be null");
+            }
+            this.baseTile = baseType;
+            return this;
+        }
+        
+        public MapBuilder setDimensions(int width, int heigth){
+            if(width <= 0){
+                throw new IllegalArgumentException("Width must be positive");
+            }
+            if(heigth <= 0){
+                throw new IllegalArgumentException("Heigth must be positive");
+            }
+            if(initiated){
+                throw new IllegalStateException("Cannot resize map after setting a tile");
+            }
+            this.width = width;
+            this.height = heigth;
+            return this;
+        }
+        
+        public MapBuilder setExploredByAll(boolean exploredByAll){
+            this.exploredByAll = exploredByAll;
+            return this;
+        }
+        
+        public MapBuilder setTile(int x, int y, TileType tileType){
+            if(x < 0 || y < 0){
+                throw new IllegalArgumentException("Coordenates cannot be negative");
+            }
+            if(x >= width || y >= height ){
+                throw new IllegalArgumentException("Coordenate out of bounds");
+            }
+            if(tileType == null){
+                throw new NullPointerException("Tile type cannot be null");
+            }
+            
+            tiles[x][y]= tileType;
+            initiated = true;
+            
+            return this;
+        }
+        
+        // Implementation method, completes grid by setting uninitialized tiles
+        //to the base tile type
+        private void completeWorkingGrid(){      
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    // Already manually set by the tester
+                    if(tiles[x][y] != null){
+                        continue;
+                    }
+                    tiles[x][y] = baseTile;
+                }
+            }
+            initiated=true;
+        }
+        
+        public Map build(){
+            completeWorkingGrid();
+            Tile[][] mapTiles = new Tile[width][height];
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    TileType tileType = tiles[x][y];
+                    mapTiles[x][y] = new Tile(game, tileType, x, y);
+                }
+            }
+            
+            Map m = new Map(game, mapTiles);
+            if (exploredByAll) {
+                for (Player player : game.getPlayers()) {
+                    for (Tile tile : m.getAllTiles()) {
+                        tile.setExploredBy(player, true);
+                    }
+                }
+            }
+            return m;
+        }
+        
+        public MapBuilder reset() {
+            setStartingParams();
+            
+            return this;
+        }
     }
 
     public static class IndianSettlementBuilder{
