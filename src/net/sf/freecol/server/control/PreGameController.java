@@ -104,7 +104,6 @@ public final class PreGameController extends Controller {
             nations.addAll(game.getVacantNations().subList(0, numberOfPlayers));
         }
         nations.addAll(FreeCol.getSpecification().getIndianNations());
-        //nations.addAll(FreeCol.getSpecification().getREFNations());
 
         // Apply the difficulty level
         Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
@@ -117,9 +116,16 @@ public final class PreGameController extends Controller {
             }
         }
         
+        // Save the old GameOptions as possibly set by clients..
+        // TODO: This might not be the best way to do it, the createMap should not really use the entire loadGame method
+        Element oldGameOptions = game.getGameOptions().toXMLElement(Message.createNewRootElement("oldGameOptions").getOwnerDocument());
+        
         // Make the map:
         mapGenerator.createMap(game);
         Map map = game.getMap();
+        
+        // Restore the GameOptions that may have been overwritten by loadGame in createMap
+        game.getGameOptions().readFromXMLElement(oldGameOptions);
         
         // Inform the clients:
         setMapAndMarket(map);
