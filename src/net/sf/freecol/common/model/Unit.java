@@ -2553,12 +2553,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return The detailed occupation indicator string.
      */
     public String getDetailedOccupationIndicator() {
+        TradeRoute tradeRoute = getTradeRoute();
+
         switch (state) {
         case ACTIVE:
             if (getMovesLeft() != 0) break;
             return (isUnderRepair())
                 ? Messages.message("model.unit.occupation.underRepair")
                     + ": " + Integer.toString(getTurnsForRepair())
+                : (tradeRoute != null)
+                ? Messages.message("model.unit.occupation.inTradeRoute")
+                    + ": " + tradeRoute.getName()
                 : Messages.message("model.unit.occupation.activeNoMovesLeft");
         case IMPROVING:
             if (workImprovement == null) break;
@@ -2574,16 +2579,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         case SKIPPED:
             break;
         }
-        if (getDestination() != null) {
-            TradeRoute tradeRoute = getTradeRoute();
-
-            return (tradeRoute == null)
-                ? Messages.message("model.unit.occupation.goingSomewhere")
-                : Messages.message("model.unit.occupation.inTradeRoute")
-                    + ": " + tradeRoute.getName();
-        }
-        return Messages.message("model.unit.occupation."
-                                + state.toString().toLowerCase());
+        return (tradeRoute != null)
+            ? Messages.message("model.unit.occupation.inTradeRoute")
+                + ": " + tradeRoute.getName()
+            : (getDestination() != null)
+            ? Messages.message("model.unit.occupation.goingSomewhere")
+            : Messages.message("model.unit.occupation."
+                               + state.toString().toLowerCase());
     }
 
     /**
