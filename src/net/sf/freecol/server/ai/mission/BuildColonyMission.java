@@ -289,63 +289,47 @@ public class BuildColonyMission extends Mission {
             return null;
         }
 
-        /*
-         * If no suitable position is found within the first 500 spots
-         * the range gets increased until the whole map is searched.
-         */
-        
         Tile bestTile = null;
         int highestColonyValue = 0;
         int maxNumberofTiles = 500;
         int tileCounter = 0;
-        
         Iterator<Position> it = game.getMap().getFloodFillIterator(startTile.getPosition());
         
-        while (it.hasNext()){
-            for (; it.hasNext() && tileCounter < maxNumberofTiles; tileCounter++) {
-                Tile tile = game.getMap().getTile(it.next());
-                if (tile.getColonyValue() > 0) {
-                    if (tile != startTile) {
-                        PathNode path;
-                        if (unit.isOnCarrier()) {
-                            Unit carrier = (Unit) unit.getLocation();
-                            path = game.getMap().findPath(unit, startTile, tile, carrier);
-                        } else {
-                            path = game.getMap().findPath(unit, startTile, tile);
-                        }
-        
-                        if (path != null) {
-                            int newColonyValue = 10000
-                                + unit.getOwner().getColonyValue(tile)
-                                - path.getTotalTurns()
-                                * ((unit.getGame().getTurn().getNumber() < 10 && unit.isOnCarrier()) ? 25
-                                   : 4);
-                            if (newColonyValue > highestColonyValue) {
-                                highestColonyValue = newColonyValue;
-                                bestTile = tile;
-                            }
-                        }
+        while (it.hasNext()) {
+            Tile tile = game.getMap().getTile(it.next());
+            int newColonyValue = -1;
+
+            if (tile.getColonyValue() > 0) {
+                if (tile != startTile) {
+                    PathNode path;
+
+                    if (unit.isOnCarrier()) {
+                        Unit carrier = (Unit) unit.getLocation();
+                        path = game.getMap().findPath(unit, startTile, tile, carrier);
                     } else {
-                        int newColonyValue = 10000 + unit.getOwner().getColonyValue(tile);
-                        if (newColonyValue > highestColonyValue) {
-                            highestColonyValue = newColonyValue;
-                            bestTile = tile;
-                        }
+                        path = game.getMap().findPath(unit, startTile, tile);
                     }
+                    if (path != null) {
+                        newColonyValue = 10000
+                            + unit.getOwner().getColonyValue(tile)
+                            - path.getTotalTurns()
+                            * ((unit.getGame().getTurn().getNumber() < 10
+                                && unit.isOnCarrier()) ? 25 : 4);
+                    }
+                } else {
+                    newColonyValue = 10000 + unit.getOwner().getColonyValue(tile);
+                }
+                if (newColonyValue > highestColonyValue) {
+                    highestColonyValue = newColonyValue;
+                    bestTile = tile;
                 }
             }
-            if (bestTile != null && bestTile.getColonyValue() > 0) {
-                return bestTile;
-            } else {
-                        
-                // no good location found within search radius, increase range.
-                maxNumberofTiles *= 4;
-            }
+            if (++tileCounter >= maxNumberofTiles) break;
         }
-
-        // We have searched the complete map and not found a tile.
-        logger.info("Unit " + unit.getId() + "unsuccessfully searched for colony spot");
-        return null;
+        if (bestTile == null) {
+            logger.info("Unit " + unit.getId() + " unsuccessfully searched for colony spot");
+        }
+        return bestTile;
     }
 
     /**
