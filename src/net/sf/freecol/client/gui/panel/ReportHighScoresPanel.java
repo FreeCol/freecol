@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -62,17 +63,53 @@ public final class ReportHighScoresPanel extends ReportPanel implements ActionLi
     public void initialize() {
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new GridLayout(0, 1));
 
         FreeColClient client = getCanvas().getClient();
         ImageLibrary imageLibrary = getCanvas().getGUI().getImageLibrary();
         Element report = client.getInGameController().getHighScores();
         int number = report.getChildNodes().getLength();
         
+        int[] widths1 = new int[] { 0, 30, 0, 30, 0 };
+        int[] heights1 = new int[4 * number - 1];
+        for (int index = 1; index < heights1.length; index += 2) {
+            heights1[index] = margin;
+        }
+
+        reportPanel.setLayout(new HIGLayout(widths1, heights1));
+        int reportRow = 1;
+        int scoreColumn = 1;
+        int panelColumn = 3;
+        int dateColumn = 5;
+
         for (int i = 0; i < number; i++) {
             Element element = (Element) report.getChildNodes().item(i);
             try {
                 HighScore highScore = new HighScore(element);
+
+                JLabel scoreValue = new JLabel(String.valueOf(highScore.getScore()));
+                scoreValue.setFont(smallHeaderFont);
+                reportPanel.add(scoreValue, higConst.rc(reportRow, scoreColumn, "r"));
+                
+                String messageID = null;
+                String nation = null;
+                if (highScore.getIndependenceTurn() > 0) {
+                    messageID = "report.highScores.president";
+                    nation = highScore.getNationName();
+                } else {
+                    messageID = "report.highScores.governor";
+                    nation = highScore.getNewLandName();
+                }
+                JLabel headline = new JLabel(Messages.message(messageID,
+                                                              "%name%", highScore.getPlayerName(),
+                                                              "%nation%", nation));
+                headline.setFont(smallHeaderFont);
+                reportPanel.add(headline, higConst.rc(reportRow, panelColumn));
+
+                DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+                JLabel dateLabel = new JLabel(format.format(highScore.getDate()));
+                reportPanel.add(dateLabel, higConst.rc(reportRow, dateColumn));
+                reportRow += 2;
+
                 JPanel scorePanel = new JPanel();
                 scorePanel.setOpaque(false);
                 
@@ -88,26 +125,10 @@ public final class ReportHighScoresPanel extends ReportPanel implements ActionLi
                 int labelColumn = 1;
                 int valueColumn = 3;
 
-                String messageID = null;
-                String nation = null;
-                if (highScore.getIndependenceTurn() > 0) {
-                    messageID = "report.highScores.president";
-                    nation = highScore.getNationName();
-                } else {
-                    messageID = "report.highScores.governor";
-                    nation = highScore.getNewLandName();
-                }
-                JLabel headline = new JLabel(Messages.message(messageID,
-                                                              "%name%", highScore.getPlayerName(),
-                                                              "%nation%", nation));
-                headline.setFont(smallHeaderFont);
-                scorePanel.add(headline, higConst.rcwh(row, labelColumn, widths.length, 1));
-                row += 2;
-
                 JLabel scoreLabel = new JLabel(Messages.message("report.highScores.score"));
                 scorePanel.add(scoreLabel, higConst.rc(row, labelColumn, "l"));
-                JLabel scoreValue = new JLabel(String.valueOf(highScore.getScore()));
-                scorePanel.add(scoreValue, higConst.rc(row, valueColumn, "r"));
+                JLabel scoreValue2 = new JLabel(String.valueOf(highScore.getScore()));
+                scorePanel.add(scoreValue2, higConst.rc(row, valueColumn, "r"));
                 row += 2;
 
                 JLabel difficultyLabel = new JLabel(Messages.message("report.highScores.difficulty"));
@@ -149,7 +170,8 @@ public final class ReportHighScoresPanel extends ReportPanel implements ActionLi
                 scorePanel.add(coloniesValue, higConst.rc(row, valueColumn, "r"));
                 row += 2;
 
-                reportPanel.add(scorePanel);
+                reportPanel.add(scorePanel, higConst.rc(reportRow, panelColumn));
+                reportRow += 2;
 
             } catch (XMLStreamException e) {
                 logger.warning(e.toString());

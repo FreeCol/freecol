@@ -35,6 +35,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -1178,7 +1179,7 @@ public final class FreeColServer {
         if (!highScores.isEmpty() && player.getScore() < highScores.get(highScores.size() - 1).getScore()) {
             return false;
         } else {
-            highScores.add(new HighScore(player));
+            highScores.add(new HighScore(player, new Date()));
             Collections.sort(highScores, highScoreComparator);
             if (highScores.size() == NUMBER_OF_HIGH_SCORES) {
                 highScores.remove(NUMBER_OF_HIGH_SCORES - 1);

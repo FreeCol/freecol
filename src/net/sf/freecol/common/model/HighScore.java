@@ -19,11 +19,14 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.client.gui.i18n.Messages;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -66,6 +69,8 @@ public class HighScore extends FreeColObject {
             return minimumScore;
         }
     }
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 
     /**
      * The turn in which independence was granted.
@@ -122,8 +127,14 @@ public class HighScore extends FreeColObject {
      */
     private String newLandName;
 
+    /**
+     * Describe date here.
+     */
+    private Date date;
 
-    public HighScore(Player player) {
+
+    public HighScore(Player player, Date theDate) {
+        date = theDate;
         score = player.getScore();
         for (Level someLevel : Level.values()) {
             if (score >= someLevel.getMinimumScore()) {
@@ -362,6 +373,24 @@ public class HighScore extends FreeColObject {
         this.colonies = newColonies;
     }
 
+    /**
+     * Get the <code>Date</code> value.
+     *
+     * @return a <code>Date</code> value
+     */
+    public final Date getDate() {
+        return date;
+    }
+
+    /**
+     * Set the <code>Date</code> value.
+     *
+     * @param newDate The new Date value.
+     */
+    public final void setDate(final Date newDate) {
+        this.date = newDate;
+    }
+
    /**
      * This method writes an XML-representation of this object to
      * the given stream.
@@ -380,6 +409,7 @@ public class HighScore extends FreeColObject {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("date", dateFormat.format(date));
         out.writeAttribute("independenceTurn", Integer.toString(independenceTurn));
         out.writeAttribute("playerName", playerName);
         out.writeAttribute("nationID", nationID);
@@ -403,6 +433,12 @@ public class HighScore extends FreeColObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
 
+        try {
+            date = dateFormat.parse(getAttribute(in, "date", "2008-01-01 00:00:00+0000"));
+        } catch (Exception e) {
+            logger.warning(e.toString());
+            date = new Date();
+        }
         independenceTurn = getAttribute(in, "independenceTurn", 0);
         playerName = getAttribute(in, "playerName", "");
         nationID = getAttribute(in, "nationID", "model.nation.dutch");
