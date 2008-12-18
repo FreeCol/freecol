@@ -69,9 +69,6 @@ public class DefaultCostDecider implements CostDecider {
         }
         
         MoveType moveType = unit.getMoveType(oldTile, newTile, ml);
-        if(moveType == MoveType.ILLEGAL_MOVE){
-            return ILLEGAL_MOVE;
-        }
         
         int mc = unit.getMoveCost(oldTile, newTile, ml);
         Unit defender = newTile.getFirstUnit();
@@ -90,15 +87,27 @@ public class DefaultCostDecider implements CostDecider {
                 }
                 break;
             case ATTACK:
+                // use case when searching for targets
                 if (unit.getDestination() == null ||
                         unit.getDestination().getTile() != newTile) {
+                   
                     movesLeft = 0;
                     return ml + unit.getInitialMovesLeft() * 5;
                 }
                 break;
+            case ILLEGAL_MOVE:
+                // units cannot pass through a tile with a foreign colony
+                if (unit.getDestination() == null ||
+                        unit.getDestination().getTile() != newTile) {
+                    return ILLEGAL_MOVE;
+                }
             }
         } else if (defender != null && defender.getOwner() != unit.getOwner()) {
             // A unit is blocking the path:                
+            if(!unit.isOffensiveUnit()){
+                return ILLEGAL_MOVE;
+            }
+            // use case when searching for targets
             if (moveType != MoveType.ATTACK || unit.getDestination() == null ||
                     unit.getDestination().getTile() != newTile) {
                 mc += Math.max(0, 20 - turns * 4);

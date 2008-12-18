@@ -29,7 +29,19 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ServerTestHelper;
+import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.mission.BuildColonyMission;
+import net.sf.freecol.server.ai.mission.Mission;
+import net.sf.freecol.server.control.Controller;
+import net.sf.freecol.server.control.PreGameController;
+import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.MockMapGenerator;
+import net.sf.freecol.util.test.FreeColTestCase.MapBuilder;
 
 public class MapTest extends FreeColTestCase {
     TileType oceanType = spec().getTileType("model.tile.ocean");
@@ -43,6 +55,41 @@ public class MapTest extends FreeColTestCase {
         builder.setTile(2,10,plainsType);
         builder.setTile(2,9,plainsType); 
         builder.setTile(3,8,plainsType);
+        builder.setTile(3,7,plainsType);
+       
+        return builder.build();
+    }
+    
+    // (1,5)*
+    //          *            
+    //      *        *     * F(3,7)
+    //                  * C(3,8)
+    //      *        *
+    //            
+    //      *   *
+    //      
+    //      *S(1,11)
+    //
+    private Map getShortLongPathMap(Game game){
+        TileType oceanType = spec().getTileType("model.tile.ocean");
+        TileType plainsType = spec().getTileType("model.tile.plains");
+        
+        MapBuilder builder = new MapBuilder(game);
+        builder.setBaseTileType(oceanType);
+        //Start
+        builder.setTile(1,11,plainsType);
+        //Short path
+        builder.setTile(2,10,plainsType);
+        builder.setTile(2,9,plainsType);
+        //Longer path
+        builder.setTile(1,9,plainsType);
+        builder.setTile(1,7,plainsType);
+        builder.setTile(1,5,plainsType);
+        builder.setTile(2,6,plainsType);
+        builder.setTile(2,7,plainsType);
+        // Common
+        builder.setTile(3,8,plainsType);
+        // Finish
         builder.setTile(3,7,plainsType);
        
         return builder.build();
@@ -254,6 +301,33 @@ public class MapTest extends FreeColTestCase {
      * Tests path discoverability in a map with only one path available
      * That path is obstructed by a settlement, so is invalid
      */
+    public void testNoPathAvailableDueToColonyInTheWay() {
+        Game game = getStandardGame();
+        Map map = getSingleLandPathMap(game);
+        game.setMap(map);
+        
+        // set obstructing french colony
+        Player frenchPlayer = game.getPlayer("model.nation.french");
+        Tile settlementTile = map.getTile(2,10);
+        Colony frenchColony = new Colony(game, frenchPlayer, "New Paris", settlementTile);
+        settlementTile.setSettlement(frenchColony);
+        assertTrue("French colony was not set properly on the map",settlementTile.getSettlement() != null);
+        
+        // set unit
+        Player dutchPlayer = game.getPlayer("model.nation.dutch");
+        Tile unitTile = map.getTile(1, 11);
+        Tile destinationTile = map.getTile(3,7);
+        Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
+        colonist.setDestination(destinationTile);
+        
+        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
+        assertNull("No path should be available",path);
+    }
+    
+    /**
+     * Tests path discoverability in a map with only one path available
+     * That path is obstructed by a settlement, so is invalid
+     */
     public void testNoPathAvailableDueToUnitInTheWay() {
         Game game = getStandardGame();
         Map map = getSingleLandPathMap(game);
@@ -273,5 +347,26 @@ public class MapTest extends FreeColTestCase {
         
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
         assertNull("No path should be available",path);
+    }
+    
+    public void testShortestPathObstructed() {        
+        Game game = getStandardGame();
+        Map map = getShortLongPathMap(getGame());
+        game.setMap(map);
+
+        // set obstructing indian camp
+        Tile settlementTile = map.getTile(2, 10);
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        builder.settlementTile(settlementTile).build();
+
+        // set unit
+        Player dutchPlayer = game.getPlayer("model.nation.dutch");
+        Tile unitTile = map.getTile(1, 11);
+        Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
+        Tile destinationTile = map.getTile(3,7);
+        colonist.setDestination(destinationTile);
+        
+        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
+        assertNotNull("A path should be available",path);
     }
 }
