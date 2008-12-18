@@ -28,9 +28,25 @@ import java.util.Set;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MapTest extends FreeColTestCase {
+    TileType oceanType = spec().getTileType("model.tile.ocean");
+    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    
+    private Map getSingleLandPathMap(Game game){
+        MapBuilder builder = new MapBuilder(game);
+        builder.setBaseTileType(oceanType);
+        // Land Stripe
+        builder.setTile(1,11,plainsType);
+        builder.setTile(2,10,plainsType);
+        builder.setTile(2,9,plainsType); 
+        builder.setTile(3,8,plainsType);
+        builder.setTile(3,7,plainsType);
+       
+        return builder.build();
+    }
 
     public void testMapGameInt() throws FreeColException {
         int expectedWidth = 20;
@@ -207,5 +223,55 @@ public class MapTest extends FreeColTestCase {
         
         Direction[] dirs = map.getRandomDirectionArray();
         assertNotNull(dirs);
+    }
+    
+    /**
+     * Tests path discoverability in a map with only one path available
+     * That path is obstructed by a settlement, so is invalid
+     */
+    public void testNoPathAvailableDueToCampInTheWay() {
+        Game game = getStandardGame();
+        Map map = getSingleLandPathMap(game);
+        game.setMap(map);
+        
+        // set obstructing indian camp
+        Tile settlementTile = map.getTile(2,10);
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        builder.settlementTile(settlementTile).build();
+        
+        // set unit
+        Player dutchPlayer = game.getPlayer("model.nation.dutch");
+        Tile unitTile = map.getTile(1, 11);
+        Tile destinationTile = map.getTile(3,7);
+        Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
+        colonist.setDestination(destinationTile);
+        
+        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
+        assertNull("No path should be available",path);
+    }
+    
+    /**
+     * Tests path discoverability in a map with only one path available
+     * That path is obstructed by a settlement, so is invalid
+     */
+    public void testNoPathAvailableDueToUnitInTheWay() {
+        Game game = getStandardGame();
+        Map map = getSingleLandPathMap(game);
+        game.setMap(map);
+        
+        // set obstructing unit
+        Tile unitObstructionTile = map.getTile(2,10);
+        Player frenchPlayer = game.getPlayer("model.nation.french");
+        new Unit(game, unitObstructionTile, frenchPlayer, colonistType, UnitState.ACTIVE);
+        
+        // set unit
+        Player dutchPlayer = game.getPlayer("model.nation.dutch");
+        Tile unitTile = map.getTile(1, 11);
+        Tile destinationTile = map.getTile(3,7);
+        Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
+        colonist.setDestination(destinationTile);
+        
+        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
+        assertNull("No path should be available",path);
     }
 }

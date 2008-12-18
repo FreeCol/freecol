@@ -55,64 +55,71 @@ public class DefaultCostDecider implements CostDecider {
         if (!newTile.isExplored()) {
             // Not allowed to use an unexplored tile for a path:
             return ILLEGAL_MOVE;
-        } else if (newTile.isLand() && unit.isNaval() && (newTile.getSettlement() == null
+        } 
+        
+        if (newTile.isLand() && unit.isNaval() && (newTile.getSettlement() == null
                 || newTile.getSettlement().getOwner() != unit.getOwner())) {
             // Not allowed to move a naval unit on land:
             return ILLEGAL_MOVE;
-        } else if (!newTile.isLand() && !unit.isNaval()) {
+        } 
+        
+        if (!newTile.isLand() && !unit.isNaval()) {
             // Not allowed to move a land unit on water:
             return ILLEGAL_MOVE;
-        } else {
-            int mc = unit.getMoveCost(oldTile, newTile, ml);
-            MoveType moveType = unit.getMoveType(oldTile, newTile, ml);
-            Unit defender = newTile.getFirstUnit();
-            
-            if (newTile.getSettlement() != null
-                    && newTile.getSettlement().getOwner() != unit.getOwner()) {
-                // A settlement is blocking the path:   
-                switch (moveType) {
-                    case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-                    case ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
-                    case ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
-                    case ENTER_INDIAN_VILLAGE_WITH_SCOUT:
-                    case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-                    case ATTACK:
-                        if (unit.getDestination() == null ||
-                                unit.getDestination().getTile() != newTile) {
-                            movesLeft = 0;
-                            return ml + unit.getInitialMovesLeft() * 5;
-                        }
-                        break;
-                    case ILLEGAL_MOVE:
-                        if (ml > 0) {
-                            movesLeft = 0;
-                            return ml + unit.getInitialMovesLeft() * 5;
-                        }
-                        break;
-                }
-            } else if (defender != null && defender.getOwner() != unit.getOwner()) {
-                // A unit is blocking the path:                
-                if (moveType != MoveType.ATTACK || unit.getDestination() == null ||
-                    unit.getDestination().getTile() != newTile) {
-                    mc += Math.max(0, 20 - turns * 4);
-                }
-            } else if (newTile.isLand() && newTile.getFirstUnit() != null &&
-                    newTile.getFirstUnit().isNaval() &&
-                    newTile.getFirstUnit().getOwner() != unit.getOwner()) {
-                // An enemy ship in land tile without a settlement is blocking the path:                
-                mc += Math.max(0, 20 - turns * 4); 
-            }
-
-            if (mc <= ml) {
-                movesLeft -= mc;
-                return mc;
-            } else {
-                // This move takes an extra turn to complete:
-                mc = getCost(unit, oldTile, newTile, unit.getInitialMovesLeft(), turns+1);
-                newTurn = true;
-                return ml + mc;
-            }
         }
+        
+        MoveType moveType = unit.getMoveType(oldTile, newTile, ml);
+        if(moveType == MoveType.ILLEGAL_MOVE){
+            return ILLEGAL_MOVE;
+        }
+        
+        int mc = unit.getMoveCost(oldTile, newTile, ml);
+        Unit defender = newTile.getFirstUnit();
+        if (newTile.getSettlement() != null
+                && newTile.getSettlement().getOwner() != unit.getOwner()) {
+            // A settlement is blocking the path:   
+            switch (moveType) {
+            case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
+            case ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
+            case ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
+            case ENTER_INDIAN_VILLAGE_WITH_SCOUT:
+            case ENTER_FOREIGN_COLONY_WITH_SCOUT:
+                if (unit.getDestination() == null ||
+                        unit.getDestination().getTile() != newTile) {
+                    return ILLEGAL_MOVE;
+                }
+                break;
+            case ATTACK:
+                if (unit.getDestination() == null ||
+                        unit.getDestination().getTile() != newTile) {
+                    movesLeft = 0;
+                    return ml + unit.getInitialMovesLeft() * 5;
+                }
+                break;
+            }
+        } else if (defender != null && defender.getOwner() != unit.getOwner()) {
+            // A unit is blocking the path:                
+            if (moveType != MoveType.ATTACK || unit.getDestination() == null ||
+                    unit.getDestination().getTile() != newTile) {
+                mc += Math.max(0, 20 - turns * 4);
+            }
+        } else if (newTile.isLand() && newTile.getFirstUnit() != null &&
+                newTile.getFirstUnit().isNaval() &&
+                newTile.getFirstUnit().getOwner() != unit.getOwner()) {
+            // An enemy ship in land tile without a settlement is blocking the path:                
+            mc += Math.max(0, 20 - turns * 4); 
+        }
+
+        if (mc <= ml) {
+            movesLeft -= mc;
+            return mc;
+        } else {
+            // This move takes an extra turn to complete:
+            mc = getCost(unit, oldTile, newTile, unit.getInitialMovesLeft(), turns+1);
+            newTurn = true;
+            return ml + mc;
+        }
+
     }
     
     /**
