@@ -1200,7 +1200,12 @@ public final class InGameController implements NetworkConstants {
             if (settlement instanceof Colony) {
                 negotiate(unit, direction);
             } else {
-                tradeWithSettlement(unit, direction);
+                if (freeColClient.getGame().getCurrentPlayer().hasContacted(settlement.getOwner())) {
+                    tradeWithSettlement(unit, direction);
+                }
+                else {
+                    freeColClient.getCanvas().showInformationMessage("noContactWithIndians");
+                }
             }
             break;
         case EXPLORE_LOST_CITY_RUMOUR:
