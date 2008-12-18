@@ -28,36 +28,30 @@ import java.util.Set;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MapTest extends FreeColTestCase {
 
     public void testMapGameInt() throws FreeColException {
-
+        int expectedWidth = 20;
+        int expectedHeigth = 15;
+        
         Game game = getStandardGame();
-        Map m = getTestMap();
+        MapBuilder builder = new MapBuilder(game);
+        Map map = builder.setDimensions(expectedWidth, expectedHeigth).build();
 
-        assertEquals(20, m.getWidth());
-        assertEquals(15, m.getHeight());
-
+        assertEquals(expectedWidth, map.getWidth());
+        assertEquals(expectedHeigth, map.getHeight());
     }
 
     public void testGetSurroundingTiles() {
         Game game = getStandardGame();
 
-        Tile[][] tiles = new Tile[10][15];
-
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
-            }
-        }
-
-        Map map = new Map(game, tiles);
+        MapBuilder builder = new MapBuilder(game);
+        Map map = builder.setDimensions(10, 15).build();
 
         // Check in the middle
-        List<Tile> surroundingTiles = map.getSurroundingTiles(tiles[4][8], 1);
+        List<Tile> surroundingTiles = map.getSurroundingTiles(map.getTile(4,8), 1);
 
         assertEquals(8, surroundingTiles.size());
         assertTrue(surroundingTiles.contains(map.getTile(4, 6)));
@@ -70,7 +64,7 @@ public class MapTest extends FreeColTestCase {
         assertTrue(surroundingTiles.contains(map.getTile(4, 9)));
 
         // Check on sides
-        surroundingTiles = map.getSurroundingTiles(tiles[0][0], 1);
+        surroundingTiles = map.getSurroundingTiles(map.getTile(0, 0), 1);
 
         assertEquals(3, surroundingTiles.size());
         assertTrue(surroundingTiles.contains(map.getTile(0, 2)));
@@ -78,12 +72,12 @@ public class MapTest extends FreeColTestCase {
         assertTrue(surroundingTiles.contains(map.getTile(0, 1)));
 
         // Check larger range
-        surroundingTiles = map.getSurroundingTiles(tiles[4][8], 2);
+        surroundingTiles = map.getSurroundingTiles(map.getTile(4,8), 2);
 
         assertEquals(25 - 1, surroundingTiles.size());
 
         // Check that all tiles are returned
-        surroundingTiles = map.getSurroundingTiles(tiles[4][8], 10);
+        surroundingTiles = map.getSurroundingTiles(map.getTile(4,8), 10);
         assertEquals(150 - 1, surroundingTiles.size());
     }
 
@@ -103,11 +97,7 @@ public class MapTest extends FreeColTestCase {
         Game game = getStandardGame();
 
         Tile[][] tiles = new Tile[5][6];
-        /*
-        for (int x = 0; x < 5; x++) {
-            tiles.add(new Vector<Tile>(6));
-        }
-        */
+
         Set<Position> positions = new HashSet<Position>();
         Set<Tile> allTiles = new HashSet<Tile>();
         
@@ -140,15 +130,8 @@ public class MapTest extends FreeColTestCase {
     public void testGetAdjacent() {
         Game game = getStandardGame();
 
-        Tile[][] tiles = new Tile[10][15];
-
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
-            }
-        }
-
-        Map map = new Map(game, tiles);
+        MapBuilder builder = new MapBuilder(game);
+        Map map = builder.setDimensions(10, 15).build();
 
         { // Even case
             Iterator<Position> i = map.getAdjacentIterator(map.getTile(4, 8).getPosition());
@@ -219,13 +202,8 @@ public class MapTest extends FreeColTestCase {
 
     public void testRandomDirection() {
         Game game = getStandardGame();
-        Tile[][] tiles = new Tile[10][15];
-        for (int x = 0; x < 10; x++) {
-            for (int y = 0; y < 15; y++) {
-                tiles[x][y] = new Tile(game, spec().getTileType("model.tile.plains"), x, y);
-            }
-        }
-        Map map = new Map(game, tiles);
+        MapBuilder builder = new MapBuilder(game);
+        Map map = builder.setDimensions(10, 15).build();
         
         Direction[] dirs = map.getRandomDirectionArray();
         assertNotNull(dirs);
