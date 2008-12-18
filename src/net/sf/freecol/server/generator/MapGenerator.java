@@ -122,7 +122,7 @@ public class MapGenerator implements IMapGenerator {
         // Create land map:
         boolean[][] landMap;
         if (importGame != null) {
-            landMap = landGenerator.importLandMap(importGame);
+            landMap = LandGenerator.importLandMap(importGame);
         } else {
             landMap = landGenerator.createLandMap();
         }
