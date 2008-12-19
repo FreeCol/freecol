@@ -2861,7 +2861,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
             throw new IllegalStateException("Not adjacent to settlement!");
-        }        
+        }
+        if (settlement.getOwner().isIndian() && !player.hasContacted(settlement.getOwner())) {
+            throw new IllegalStateException("Player has not established contact with the Indians!");
+        }
     }
 
     /**
