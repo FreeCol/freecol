@@ -31,6 +31,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.client.gui.animation.UnitMoveAnimation;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -963,6 +964,10 @@ public final class InGameInputHandler extends InputHandler {
     private Element giveIndependence(Element element) {
         Player player = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
         player.giveIndependence();
+        if (getFreeColClient().retire()) {
+            getFreeColClient().getCanvas().showReportPanel(ReportHighScoresPanel.class.getName());
+        }
+
         return null;
     }
 

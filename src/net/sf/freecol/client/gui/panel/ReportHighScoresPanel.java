@@ -69,7 +69,7 @@ public final class ReportHighScoresPanel extends ReportPanel implements ActionLi
         Element report = client.getInGameController().getHighScores();
         int number = report.getChildNodes().getLength();
         
-        int[] widths1 = new int[] { 0, 30, 0, 30, 0 };
+        int[] widths1 = new int[] { 0, 30, 0 };
         int[] heights1 = new int[4 * number - 1];
         for (int index = 1; index < heights1.length; index += 2) {
             heights1[index] = margin;
@@ -79,7 +79,6 @@ public final class ReportHighScoresPanel extends ReportPanel implements ActionLi
         int reportRow = 1;
         int scoreColumn = 1;
         int panelColumn = 3;
-        int dateColumn = 5;
 
         for (int i = 0; i < number; i++) {
             Element element = (Element) report.getChildNodes().item(i);
@@ -104,16 +103,12 @@ public final class ReportHighScoresPanel extends ReportPanel implements ActionLi
                                                               "%nation%", nation));
                 headline.setFont(smallHeaderFont);
                 reportPanel.add(headline, higConst.rc(reportRow, panelColumn));
-
-                DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-                JLabel dateLabel = new JLabel(format.format(highScore.getDate()));
-                reportPanel.add(dateLabel, higConst.rc(reportRow, dateColumn));
                 reportRow += 2;
 
                 JPanel scorePanel = new JPanel();
                 scorePanel.setOpaque(false);
                 
-                int rows = 8;
+                int rows = 9;
                 int[] widths = new int[] { 200, 30, 200 };
                 int[] heights = new int[2 * rows - 1];
 
@@ -169,6 +164,12 @@ public final class ReportHighScoresPanel extends ReportPanel implements ActionLi
                 JLabel coloniesValue = new JLabel(String.valueOf(highScore.getColonies()));
                 scorePanel.add(coloniesValue, higConst.rc(row, valueColumn, "r"));
                 row += 2;
+
+                JLabel dateLabel = new JLabel(Messages.message("report.highScores.retired"));
+                scorePanel.add(dateLabel, higConst.rc(row, labelColumn, "l"));
+                DateFormat format = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
+                JLabel dateValue = new JLabel(format.format(highScore.getDate()));
+                scorePanel.add(dateValue, higConst.rc(row, valueColumn, "r"));
 
                 reportPanel.add(scorePanel, higConst.rc(reportRow, panelColumn));
                 reportRow += 2;
