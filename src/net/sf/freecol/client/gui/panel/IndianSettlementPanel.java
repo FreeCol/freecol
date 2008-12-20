@@ -50,7 +50,7 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
     private static final int OK = 0;
 
     private final JLabel settlementLabel;
-    private final JLabel missionnaryLabel;
+    private final JLabel missionaryLabel;
     private final JLabel skillLabel;
     private final JLabel wantedGoodsLabels[];
 
@@ -64,7 +64,7 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         
         this.freeColClient = freeColClient;
         
-        int[] w = { 10, 0, 0, 10 };
+        int[] w = { 10, 0, 30, 0, 10 };
         int[] h = { 10, 0, 5, 0, 5, 0, 5, 0, 10, 0, 10 };
         setLayout(new HIGLayout(w, h));
 
@@ -73,26 +73,28 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         okButton.addActionListener(this);
 
         settlementLabel = new JLabel();
-        missionnaryLabel = new JLabel();
+        missionaryLabel = new JLabel();
         skillLabel = new JLabel();
         wantedGoodsLabels = new JLabel[3];
         for (int i=0; i<3; i++) {
             wantedGoodsLabels[i] = new JLabel();
         }
+        int labelColumn = 2;
+        int valueColumn = 4;
 
-        add(settlementLabel, higConst.rc(2, 2));
-        add(missionnaryLabel, higConst.rc(2, 3));
-        add(new JLabel(Messages.message("indianSettlement.learnableSkill") + " "), higConst.rc(4, 2));
-        add(skillLabel, higConst.rc(4, 3));
-        add(new JLabel(Messages.message("indianSettlement.highlyWanted") + " "), higConst.rc(6, 2));
-        add(wantedGoodsLabels[0], higConst.rc(6, 3));
-        add(new JLabel(Messages.message("indianSettlement.otherWanted") + " "), higConst.rc(8, 2));
+        add(settlementLabel, higConst.rc(2, labelColumn));
+        add(missionaryLabel, higConst.rc(2, valueColumn));
+        add(new JLabel(Messages.message("indianSettlement.learnableSkill")), higConst.rc(4, labelColumn));
+        add(skillLabel, higConst.rc(4, valueColumn));
+        add(new JLabel(Messages.message("indianSettlement.highlyWanted")), higConst.rc(6, labelColumn));
+        add(wantedGoodsLabels[0], higConst.rc(6, valueColumn));
+        add(new JLabel(Messages.message("indianSettlement.otherWanted")), higConst.rc(8, labelColumn));
         JPanel otherGoodsPanel = new JPanel();
         otherGoodsPanel.setOpaque(false);
         otherGoodsPanel.add(wantedGoodsLabels[1]);
         otherGoodsPanel.add(wantedGoodsLabels[2]);
-        add(otherGoodsPanel, higConst.rc(8, 3));
-        add(okButton, higConst.rcwh(10, 2, 2, 1));
+        add(otherGoodsPanel, higConst.rc(8, valueColumn));
+        add(okButton, higConst.rcwh(10, 2, 3, 1));
     }
 
     public void requestFocus() {
@@ -113,14 +115,16 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         Tension tension = settlement.getAlarm(freeColClient.getMyPlayer());
         if (tension != null) {
             text += " (" + tension.toString() + ")";
+        } else if (!freeColClient.getMyPlayer().hasContacted(settlement.getOwner())) {
+            text += " (" + Messages.message("notContacted") + ")";
         }
         settlementLabel.setText(text);
-        Unit missionnary = settlement.getMissionary();
-        if (missionnary != null) {
-            ImageIcon missionnaryImage = freeColClient.getImageLibrary().getUnitImageIcon(missionnary);
-            missionnaryLabel.setIcon(freeColClient.getImageLibrary().getScaledImageIcon(missionnaryImage, 0.66f));
-            String missionnaryName = missionnary.getName() + " (" + missionnary.getOwner().getNationAsString() + ")";
-            missionnaryLabel.setText(missionnaryName);
+        Unit missionary = settlement.getMissionary();
+        if (missionary != null) {
+            ImageIcon missionaryImage = freeColClient.getImageLibrary().getUnitImageIcon(missionary);
+            missionaryLabel.setIcon(freeColClient.getImageLibrary().getScaledImageIcon(missionaryImage, 0.66f));
+            String missionaryName = missionary.getName() + " (" + missionary.getOwner().getNationAsString() + ")";
+            missionaryLabel.setText(missionaryName);
         }
         UnitType skill = settlement.getLearnableSkill();
         String skillName;

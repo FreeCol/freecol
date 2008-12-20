@@ -2228,15 +2228,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
             }
             out.writeAttribute("connected", Boolean.toString(connected));
-            writeAttribute(out, "learnableSkill", skill);
             writeAttribute(out, "region", region);
-            writeAttribute(out, "wantedGoods0", wantedGoods[0]);
-            writeAttribute(out, "wantedGoods1", wantedGoods[1]);
-            writeAttribute(out, "wantedGoods2", wantedGoods[2]);
 
             out.writeAttribute("settlementVisited", Boolean.toString(settlementVisited));
+            if (settlementVisited) {
+                writeAttribute(out, "learnableSkill", skill);
+                writeAttribute(out, "wantedGoods0", wantedGoods[0]);
+                writeAttribute(out, "wantedGoods1", wantedGoods[1]);
+                writeAttribute(out, "wantedGoods2", wantedGoods[2]);
+            }
 
-            if (missionary != null) {
+            if (missionary != null && settlementVisited) {
                 out.writeStartElement("missionary");
                 missionary.toXML(out, player, showAll, toSavedGame);
                 out.writeEndElement();
@@ -2261,7 +2263,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
 
             explored = getAttribute(in, "explored", true);
-            settlementVisited = getAttribute(in, "settlementVisited", false);
             colonyUnitCount = getAttribute(in, "colonyUnitCount", 0);
             colonyStockadeLevel = getAttribute(in, "colonyStockadeLevel", 0);
             lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(),
@@ -2271,11 +2272,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             owner = getFreeColGameObject(in, "owner", Player.class, Tile.this.getOwner());
             region = getFreeColGameObject(in, "region", Region.class, null);
 
-            Specification spec = FreeCol.getSpecification();
-            skill = spec.getType(in, "learnableSkill", UnitType.class, null);
-            wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class, null);
-            wantedGoods[1] = spec.getType(in, "wantedGoods1", GoodsType.class, null);
-            wantedGoods[2] = spec.getType(in, "wantedGoods2", GoodsType.class, null);
+            settlementVisited = getAttribute(in, "settlementVisited", false);
+            if (settlementVisited) {
+                Specification spec = FreeCol.getSpecification();
+                skill = spec.getType(in, "learnableSkill", UnitType.class, null);
+                wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class, null);
+                wantedGoods[1] = spec.getType(in, "wantedGoods1", GoodsType.class, null);
+                wantedGoods[2] = spec.getType(in, "wantedGoods2", GoodsType.class, null);
+            }
 
             missionary = null;
             TileItemContainer tileItemContainer = new TileItemContainer(getGame(), Tile.this);
