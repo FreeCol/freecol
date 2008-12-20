@@ -19,6 +19,9 @@
 
 package net.sf.freecol.server.generator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
@@ -53,8 +56,10 @@ public class LandGenerator {
 
     private int preferredDistanceToEdge;
     private int numberOfLandTiles;
+    private int minLandMass;
+    private int minimumNumberOfTiles;
 
-
+    private int genType;
 
     /**
      * Creates a new <code>LandGenerator</code>.
@@ -95,18 +100,61 @@ public class LandGenerator {
      * and <i>false</i> means ocean.
      */
     public boolean[][] createLandMap() {
+        //get values from mapGeneratorOptions
         width = mapGeneratorOptions.getWidth();
         height = mapGeneratorOptions.getHeight();         
         preferredDistanceToEdge = mapGeneratorOptions.getPrefDistToEdge();
+        minLandMass = mapGeneratorOptions.getLandMass();
+        minimumNumberOfTiles = mapGeneratorOptions.getLand();
+        genType = mapGeneratorOptions.getLandGeneratorType();
+        
+        //set other internal values        
         map = new boolean[width][height];
         numberOfLandTiles = 0;
-         
+
+        //run one of different land generators,
+        //based on setting in mapGeneratorOptions
+        //"Classic" is the original FreeCol land generator
+        switch (genType) {
+            case MapGeneratorOptions.LAND_GEN_CLASSIC:
+                createClassicLandMap();
+                break;
+            case MapGeneratorOptions.LAND_GEN_CONTINENT:
+                addPolarRegions();
+                //create one landmass of 75%
+                int contsize = (minimumNumberOfTiles*75)/100;
+                addLandmass(contsize,contsize);
+                //then create small islands to fill up
+                while (numberOfLandTiles < minimumNumberOfTiles) {
+                    addLandmass(15,25);
+                }
+                break;
+            case MapGeneratorOptions.LAND_GEN_ARCHIPELAGO:
+                addPolarRegions();
+                //create 5 islands of 10% each
+                int archsize = (minimumNumberOfTiles*10)/100;
+                for (int i=0;i<5;i++) {
+                    addLandmass(archsize-10,archsize);
+                }
+                //then, fall into next case to generate small islands
+            case MapGeneratorOptions.LAND_GEN_ISLANDS:
+                addPolarRegions();
+                //creates only islands of 20..50 tiles
+                while (numberOfLandTiles < minimumNumberOfTiles) {
+                    int s=((int) (Math.random() * 30)) + 20;
+                    addLandmass(20,s);
+                }
+                break;
+        }
+
+        return map;
+    }
+
+
+    private void createClassicLandMap() {    
         int x;
         int y;
 
-        int minLandMass = mapGeneratorOptions.getLandMass();
-
-        int minimumNumberOfTiles = (width * height * minLandMass) / 100;
         while (numberOfLandTiles < minimumNumberOfTiles) {
             do {
                 x=((int) (Math.random() * (width-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
@@ -116,10 +164,74 @@ public class LandGenerator {
             setLand(x,y);
         }
 
+        addPolarRegions();
         cleanMap();
-        createPolarRegions();
+    }
 
-        return map;
+
+
+    /**
+     * Tries to create a new land mass (unconnected to existing land masses)
+     * of size=maxsize, and adds it to the current map if it is
+     * at least size=minsize.
+     */
+    private void addLandmass(int minsize, int maxsize) {
+        int x;
+        int y;
+        int size = 0;
+        boolean[][] newland = new boolean[width][height];
+
+        List<Position>l = new ArrayList<Position>();
+        Position p;
+
+        //pick a starting position that is sea without neighbouring land
+        do {
+            x=((int) (Math.random() * (width-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
+            y=((int) (Math.random() * (height-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
+        } while (map[x][y] || !isSingleTile(x,y));
+
+        newland[x][y] = true;
+        size++;
+
+        //add all valid neighbour positions to list
+        p = new Position(x, y);  
+        for (Direction direction : adjacentDirections) {
+            Position n = Map.getAdjacent(p, direction);
+            if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
+                l.add(n);
+            }
+        }
+
+        //get a random position from the list,
+        //set it to land,
+        //add its valid neighbours to the list
+        while (size < maxsize && l.size()>0) {
+            int i=((int) (Math.random() * (l.size())));
+            p = l.remove(i);
+            
+            if (!newland[p.getX()][p.getY()]) {
+                newland[p.getX()][p.getY()] = true;
+                size++;
+                
+                //add all valid neighbour positions to list    
+                for (Direction direction : adjacentDirections) {
+                    Position n = Map.getAdjacent(p, direction);
+                    if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
+                        l.add(n);
+                    }
+                }
+            }
+        }
+        
+        //add generated island to map
+        for (x=0; x<width; x++) {
+            for (y=0; y<height; y++) {
+                if (newland[x][y] == true) {
+                    map[x][y] = true;
+                    numberOfLandTiles++;
+                }
+            }
+        }
     }
 
 
@@ -127,14 +239,20 @@ public class LandGenerator {
     /**
      * Adds land to the first two and last two rows. 
      */
-    private void createPolarRegions() {
+    private void addPolarRegions() {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < POLAR_HEIGHT; y++) {
-                map[x][y] = true;
+                if (map[x][y] == false) {
+                    map[x][y] = true;
+                    numberOfLandTiles++;
+                }
             }
             int limit = height - 1 - POLAR_HEIGHT;
             for (int y = limit; y < height; y++) {
-                map[x][y] = true;
+                if (map[x][y] == false) {
+                    map[x][y] = true;
+                    numberOfLandTiles++;
+                }
             }
         }
     }
@@ -163,7 +281,7 @@ public class LandGenerator {
     private boolean isSingleTile(int x, int y) {
         Position p = new Position(x, y);
 
-        for (Direction direction : adjacentDirections) {
+        for (Direction direction : Direction.values()) {
             Position n = Map.getAdjacent(p, direction);
             if (Map.isValid(n, width, height) && map[n.getX()][n.getY()]) {
                 return false;

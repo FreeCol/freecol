@@ -1888,6 +1888,13 @@
         <rangeValue label="veryLarge" value="40"/>
         <rangeValue label="huge" value="50"/>
       </rangeOption>
+      <!-- Option for setting the type of land generator to be used -->
+      <rangeOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
+        <rangeValue label="Classic" value="0"/>
+        <rangeValue label="Continent" value="1"/>
+        <rangeValue label="Archipelago" value="2"/>
+        <rangeValue label="Islands" value="3"/>
+      </rangeOption>
     </optionGroup>
     <optionGroup id="mapGeneratorOptions.terrainGenerator" >
       <!-- Option for setting the number of rivers on the map

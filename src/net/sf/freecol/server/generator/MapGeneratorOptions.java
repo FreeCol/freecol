@@ -54,6 +54,7 @@ public class MapGeneratorOptions extends OptionMap {
      * <li>{@link #MAP_SIZE_SMALL}</li>
      * <li>{@link #MAP_SIZE_MEDIUM}</li>
      * <li>{@link #MAP_SIZE_LARGE}</li>
+     * <li>{@link #MAP_SIZE_VERY_LARGE}</li>
      * <li>{@link #MAP_SIZE_HUGE}</li>
      * 
      */
@@ -62,8 +63,11 @@ public class MapGeneratorOptions extends OptionMap {
     /**
      * One of the settings used by {@link #MAP_SIZE}.
      */
-    public static final int MAP_SIZE_SMALL = 0, MAP_SIZE_MEDIUM = 1, MAP_SIZE_LARGE = 2, MAP_SIZE_VERY_LARGE = 3,
-            MAP_SIZE_HUGE = 4;
+    public static final int MAP_SIZE_SMALL      = 0,
+                            MAP_SIZE_MEDIUM     = 1,
+                            MAP_SIZE_LARGE      = 2,
+                            MAP_SIZE_VERY_LARGE = 3,
+                            MAP_SIZE_HUGE       = 4;
 
     /**
      * Option for setting the land mass of the map.
@@ -113,8 +117,11 @@ public class MapGeneratorOptions extends OptionMap {
     /**
      * One of the settings used by {@link #TEMPERATURE}.
      */
-    public static final int TEMPERATURE_COLD = 0, TEMPERATURE_CHILLY = 1, TEMPERATURE_TEMPERATE = 2,
-            TEMPERATURE_WARM = 3, TEMPERATURE_HOT = 4;
+    public static final int TEMPERATURE_COLD      = 0,
+                            TEMPERATURE_CHILLY    = 1,
+                            TEMPERATURE_TEMPERATE = 2,
+                            TEMPERATURE_WARM      = 3,
+                            TEMPERATURE_HOT       = 4;
 
     /**
      * Option for setting a file to be imported (map etc).
@@ -141,6 +148,15 @@ public class MapGeneratorOptions extends OptionMap {
      */
     public static final String IMPORT_SETTLEMENTS = "model.option.importSettlements";
 
+    /**
+     * Option for setting the type of land generator to be used.
+     */
+    public static final String LAND_GEN_TYPE = "model.option.landGeneratorType";
+
+    public static final int LAND_GEN_CLASSIC     = 0,
+                            LAND_GEN_CONTINENT   = 1,
+                            LAND_GEN_ARCHIPELAGO = 2,
+                            LAND_GEN_ISLANDS     = 3;
 
     /**
      * Creates a new <code>MapGeneratorOptions</code>.
@@ -269,6 +285,15 @@ public class MapGeneratorOptions extends OptionMap {
      */
     public int getLand() {
         return getWidth() * getHeight() * getLandMass() / 100;
+    }
+
+    /**
+     * Gets the type of land generator to be used.
+     * 
+     * @return The value of the land generator.
+     */
+    public int getLandGeneratorType() {
+        return Specification.getSpecification().getRangeOption(LAND_GEN_TYPE).getValue();
     }
 
     /**
