@@ -635,8 +635,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Player owner = unit.getOwner();
         ServerPlayer askingPlayer = getFreeColServer().getPlayer(connection);
         if (owner != askingPlayer) {
-            throw new IllegalStateException("Unit " + unit + " with owner " + owner + " not owned by " + askingPlayer
-                    + ", refusing to get vacant location!");
+            throw new IllegalStateException("Unit " + unit.getId() + " with owner " + owner
+                                            + " not owned by " + askingPlayer
+                                            + ", refusing to get vacant location!");
         }
         Location entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
         Element reply = Message.createNewRootElement("getVacantEntryLocationConfirmed");

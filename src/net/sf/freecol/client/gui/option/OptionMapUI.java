@@ -49,10 +49,8 @@ import net.sf.freecol.common.option.SelectOption;
  * enable values to be both seen and changed.
  */
 public final class OptionMapUI extends JPanel implements OptionUpdater {
+
     private static final Logger logger = Logger.getLogger(OptionMapUI.class.getName());
-
-
-
 
     private final OptionUpdater[] optionUpdaters;
     

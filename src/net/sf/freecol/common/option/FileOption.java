@@ -30,6 +30,7 @@ import javax.xml.stream.XMLStreamWriter;
  * Represents an option for specifying a <code>File</code>.
  */
 public class FileOption extends AbstractOption {
+
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(FileOption.class.getName());
 

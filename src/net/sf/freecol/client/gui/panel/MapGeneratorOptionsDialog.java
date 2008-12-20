@@ -51,10 +51,8 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
  * {@link net.sf.freecol.server.generator.MapGeneratorOptions}.
  */
 public final class MapGeneratorOptionsDialog extends FreeColDialog implements ActionListener {
+
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
-
-
-
 
     private static final int OK = 0, CANCEL = 1, RESET = 2;
 
@@ -144,6 +142,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog implements Ac
          *       The update should be solved by PropertyEvent.
          */
         JPanel shortcutsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        shortcutsPanel.setOpaque(false);
         shortcutsPanel.add(new JLabel(Messages.message("shortcuts")));
         File mapDirectory = new File(FreeCol.getDataDirectory(), "maps");
         if (mapDirectory.isDirectory()) {

@@ -41,16 +41,14 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.Option;
 
-
-
 /**
  * This class provides visualization for an {@link FileOption}. In order to
  * enable values to be both seen and changed.
-*/
+ */
 public final class FileOptionUI extends JPanel implements OptionUpdater, PropertyChangeListener {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FileOptionUI.class.getName());
-
 
     private final FileOption option;
     private final JTextField fileField;
@@ -76,8 +74,8 @@ public final class FileOptionUI extends JPanel implements OptionUpdater, Propert
         add(label);
 
         final String value = (option.getValue() != null) 
-                ? option.getValue().getAbsolutePath()
-                        : "";
+            ? option.getValue().getAbsolutePath()
+            : "";
         fileField = new JTextField(value, 10);
         add(fileField);
         
