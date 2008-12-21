@@ -75,6 +75,7 @@ import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
+import net.sf.freecol.client.gui.panel.InformationDialog;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
@@ -659,7 +660,8 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else {
-            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText, messageIcon);
+            //FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText, messageIcon);
+            InformationDialog informationDialog = new InformationDialog(messageText, messageIcon);
             addAsFrame(informationDialog);
             informationDialog.requestFocus();
 
@@ -2357,8 +2359,10 @@ public final class Canvas extends JDesktopPane {
         if (displayObject != null) {
             icon = getImageIcon(displayObject, false);
         }
-        FreeColDialog infoDialog = FreeColDialog.createInformationDialog(new String[] { text },
-                                                                         new ImageIcon[] { icon });
+        //FreeColDialog infoDialog = FreeColDialog.createInformationDialog(new String[] { text },
+        //                                                               new ImageIcon[] { icon });
+        InformationDialog infoDialog = new InformationDialog(new String[] { text },
+                                                             new ImageIcon[] { icon });
         addAsFrame(infoDialog);
         infoDialog.requestFocus();
 
