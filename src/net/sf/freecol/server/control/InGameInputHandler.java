@@ -634,12 +634,25 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         Player owner = unit.getOwner();
         ServerPlayer askingPlayer = getFreeColServer().getPlayer(connection);
+        Location entryLocation = unit.getEntryLocation();
         if (owner != askingPlayer) {
-            throw new IllegalStateException("Unit " + unit.getId() + " with owner " + owner
-                                            + " not owned by " + askingPlayer
-                                            + ", refusing to get vacant location!");
+            /**
+             * WARNING: this is a gruesome hack to prevent a game
+             * crash when the client tries to move AI units. As this
+             * should never happen, we need to find out why it does.
+             */
+            if (entryLocation == null) {
+                throw new IllegalStateException("Unit " + unit.getId() + " with owner " + owner
+                                                + " not owned by " + askingPlayer
+                                                + ", refusing to get vacant location!");
+            } else {
+                logger.warning("Unit " + unit.getId() + " with owner " + owner
+                               + " not owned by " + askingPlayer
+                               + ", entry location is " + entryLocation.getId());
+            }
+        } else {
+            entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
         }
-        Location entryLocation = getFreeColServer().getModelController().setToVacantEntryLocation(unit);
         Element reply = Message.createNewRootElement("getVacantEntryLocationConfirmed");
         reply.setAttribute("location", entryLocation.getId());
         return reply;
