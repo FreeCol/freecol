@@ -374,7 +374,7 @@ public class MapGeneratorOptions extends OptionMap {
     }
 
     /**
-     * Gets the maximum distance to edge of the map to be created.
+     * Gets the maximum allowed distance between edge and possible highSea tile.
      * 
      * @return The maximum distance to edge.
      */
@@ -398,22 +398,24 @@ public class MapGeneratorOptions extends OptionMap {
 
     /**
      * Gets the preferred distance to edge of the map to be created.
-     * 
+     * This should always be higher than the value returned by #getDistLandHighSea(),
+     * to avoid having non-highSea on the map edge.      
+     *     
      * @return The preferred distance to edge.
      */
     public int getPrefDistToEdge() {
         final int size = getInteger(MAP_SIZE);
         switch (size) {
         case MAP_SIZE_SMALL:
-            return 4;
+            return 5;
         case MAP_SIZE_MEDIUM:
-            return 4;
+            return 5;
         case MAP_SIZE_LARGE:
-            return 4;
+            return 5;
         case MAP_SIZE_VERY_LARGE:
-            return 4;
+            return 5;
         case MAP_SIZE_HUGE:
-            return 4;
+            return 5;
         default:
             throw new IllegalStateException("Invalid map-size: " + size + ".");
         }
