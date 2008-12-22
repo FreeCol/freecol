@@ -246,7 +246,7 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
             // this means we might get a building for free
             for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
                 if (isFree(buildingType)) {
-                    Building b = createBuilding(buildingType);
+                    Building b = createFreeBuilding(buildingType);
                     if (b != null) {
                         addBuilding(b);
                     }
@@ -1102,6 +1102,16 @@ public final class Colony extends Settlement implements Location, Nameable, Prop
      */
     public Building createBuilding(BuildingType buildingType) {
         return getGame().getModelController().createBuilding(getId() + "buildBuilding", this, buildingType);
+    }
+
+    /**
+     * Ask the server to create a free building for us.
+     *
+     * @param buildingType a <code>BuildingType</code> value
+     * @return a <code>Building</code> value
+     */
+    public Building createFreeBuilding(BuildingType buildingType) {
+        return getGame().getModelController().createBuilding(getId() + "buildFreeBuilding", this, buildingType);
     }
 
     private void checkBuildableComplete() {
