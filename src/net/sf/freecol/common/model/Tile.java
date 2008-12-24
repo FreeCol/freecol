@@ -890,7 +890,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                 }
             }
-            if (!type.isConnected()) {
+            // TODO: how can this happen? I suspect the client is
+            // trying to do work for some other player, and the tile
+            // has not yet been explored.
+            if (type != null && !type.isConnected()) {
                 fishBonus = fishBonus / 2;
             }
         }
