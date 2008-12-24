@@ -192,12 +192,8 @@ public class TerrainGenerator {
      * @param landMap The landMap.
      */
     private void perhapsAddBonus(Tile t, boolean[][] landMap) {
-        if (t.isLand()) {
-            if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
-                // Create random Bonus Resource
-                t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
-            }
-        } else {
+        if (!t.isLand() && t.getType().isConnected()) {
+            // this should only apply to ocean and high seas
             int adjacentLand = 0;
             for (Direction direction : Direction.values()) {
                 Position mp = Map.getAdjacent(t.getPosition(), direction);
@@ -211,6 +207,12 @@ public class TerrainGenerator {
                 if (t.getTileItemContainer() == null) {
                     t.setTileItemContainer(new TileItemContainer(t.getGame(), t));
                 }
+                t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
+            }
+        } else {
+            // this should apply to land tiles, as well as rivers and lakes
+            if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
+                // Create random Bonus Resource
                 t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
             }
         }

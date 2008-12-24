@@ -890,6 +890,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                 }
             }
+            if (!type.isConnected()) {
+                fishBonus = fishBonus / 2;
+            }
         }
         return fishBonus;
     }
