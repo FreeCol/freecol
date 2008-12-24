@@ -660,8 +660,8 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else {
-            //FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText, messageIcon);
-            InformationDialog informationDialog = new InformationDialog(messageText, messageIcon);
+            FreeColDialog informationDialog = FreeColDialog.createInformationDialog(messageText, messageIcon);
+            //InformationDialog informationDialog = new InformationDialog(messageText, messageIcon);
             addAsFrame(informationDialog);
             informationDialog.requestFocus();
 
@@ -2359,10 +2359,10 @@ public final class Canvas extends JDesktopPane {
         if (displayObject != null) {
             icon = getImageIcon(displayObject, false);
         }
-        //FreeColDialog infoDialog = FreeColDialog.createInformationDialog(new String[] { text },
-        //                                                               new ImageIcon[] { icon });
-        InformationDialog infoDialog = new InformationDialog(new String[] { text },
-                                                             new ImageIcon[] { icon });
+        FreeColDialog infoDialog = FreeColDialog.createInformationDialog(new String[] { text },
+                                                                         new ImageIcon[] { icon });
+        //InformationDialog infoDialog = new InformationDialog(new String[] { text },
+        //                                                     new ImageIcon[] { icon });
         addAsFrame(infoDialog);
         infoDialog.requestFocus();
 
