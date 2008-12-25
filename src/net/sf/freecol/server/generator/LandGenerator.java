@@ -21,6 +21,7 @@ package net.sf.freecol.server.generator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -41,7 +42,8 @@ import net.sf.freecol.common.model.Map.Position;
  * </ul>
  */
 public class LandGenerator {
-
+    private final Random random = new Random();
+    
     public final static int POLAR_HEIGHT = 2;
 
     private final static Direction[] adjacentDirections = new Direction[] {
@@ -121,9 +123,9 @@ public class LandGenerator {
                 break;
             case MapGeneratorOptions.LAND_GEN_CONTINENT:
                 addPolarRegions();
-                //create one landmass of 75%
+                //create one landmass of 75%, start it somewhere near the center
                 int contsize = (minimumNumberOfTiles*75)/100;
-                addLandmass(contsize,contsize);
+                addLandmass(contsize,contsize, width/2, random.nextInt(height/2)+height/4);
                 //then create small islands to fill up
                 while (numberOfLandTiles < minimumNumberOfTiles) {
                     addLandmass(15,25);
@@ -139,9 +141,9 @@ public class LandGenerator {
                 //then, fall into next case to generate small islands
             case MapGeneratorOptions.LAND_GEN_ISLANDS:
                 addPolarRegions();
-                //creates only islands of 20..50 tiles
+                //creates only islands of 25..75 tiles
                 while (numberOfLandTiles < minimumNumberOfTiles) {
-                    int s=((int) (Math.random() * 30)) + 20;
+                    int s=random.nextInt(50) + 25;
                     addLandmass(20,s);
                 }
                 break;
@@ -157,8 +159,8 @@ public class LandGenerator {
 
         while (numberOfLandTiles < minimumNumberOfTiles) {
             do {
-                x=((int) (Math.random() * (width-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
-                y=((int) (Math.random() * (height-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
+                x=(random.nextInt(width-preferredDistanceToEdge*4)) + preferredDistanceToEdge*2;
+                y=(random.nextInt(height-preferredDistanceToEdge*4)) + preferredDistanceToEdge*2;
             } while (map[x][y]);
 
             setLand(x,y);
@@ -175,9 +177,7 @@ public class LandGenerator {
      * of size=maxsize, and adds it to the current map if it is
      * at least size=minsize.
      */
-    private void addLandmass(int minsize, int maxsize) {
-        int x;
-        int y;
+    private void addLandmass(int minsize, int maxsize, int x, int y) {
         int size = 0;
         boolean[][] newland = new boolean[width][height];
 
@@ -185,10 +185,12 @@ public class LandGenerator {
         Position p;
 
         //pick a starting position that is sea without neighbouring land
-        do {
-            x=((int) (Math.random() * (width-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
-            y=((int) (Math.random() * (height-preferredDistanceToEdge*2))) + preferredDistanceToEdge;
-        } while (map[x][y] || !isSingleTile(x,y));
+        if (x<0 || y<0) {
+            do {
+                x=(random.nextInt(width-preferredDistanceToEdge*2)) + preferredDistanceToEdge;
+                y=(random.nextInt(height-preferredDistanceToEdge*2)) + preferredDistanceToEdge;
+            } while (map[x][y] || !isSingleTile(x,y));
+        }
 
         newland[x][y] = true;
         size++;
@@ -206,7 +208,7 @@ public class LandGenerator {
         //set it to land,
         //add its valid neighbours to the list
         while (size < maxsize && l.size()>0) {
-            int i=((int) (Math.random() * (l.size())));
+            int i=random.nextInt(l.size());
             p = l.remove(i);
             
             if (!newland[p.getX()][p.getY()]) {
@@ -234,7 +236,9 @@ public class LandGenerator {
         }
     }
 
-
+    private void addLandmass(int minsize, int maxsize) {
+        addLandmass(minsize, maxsize, -1, -1);
+    }
 
     /**
      * Adds land to the first two and last two rows. 
@@ -336,7 +340,7 @@ public class LandGenerator {
         //This value is part random, part based on position, that is:
         //-1 in the center of the map, and growing to
         //preferredDistanceToEdge (*2 for pole ends) at the maps edges.
-        int r = ((int) (Math.random() * 8))
+        int r = random.nextInt(8)
                 + Math.max(-1,
                           (1+Math.max(preferredDistanceToEdge-Math.min(i,width-i),
                                     2*preferredDistanceToEdge-Math.min(j, height-j))));
