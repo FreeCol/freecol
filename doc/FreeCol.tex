@@ -247,14 +247,13 @@ list of servers from \verb$meta.freecol.org$\index{meta.freecol.org},
 to join a \Concept{multi-player game}, or to start a new multi-player
 game.
 
-If you wish to join a multi-player game, you must enter the
-\Concept{IP address} of a server that is running a FreeCol game as
-well as the port it is running on. The default port is
-$3541$\index{Port 3541}. If you wish to start a multi-player game,
-then the IP address of the server will be that of your computer, but
-you must still select a port to run the server on. Again, the default
-port is $3541$. You must also decide whether you want to run a public
-server or a private server. By default, you start a private game.
+If you start a single-player game, you must decide on the number of
+European players (1--8) and whether to allow additional nations (which
+were not available in the original game) and whether to allow national
+advantages to be selectable (in the original game, national advantages
+were fixed). Of course, if you wish to have more than four European
+players, you must also enable additional nations, since the original
+game only made four European nations available.
 
 If you choose to retrieve a list of running games from the metaserver,
 your computer will attempt to establish a connection to
@@ -262,6 +261,21 @@ your computer will attempt to establish a connection to
 presented with a list of games, from which you can select one to
 connect to. Please note that the list will frequently be empty, since
 not that many public multi-player games are being run.
+
+If you wish to join a multi-player game, you must enter the
+\Concept{IP address} of a server that is running a FreeCol game as
+well as the port it is running on. The default port is
+$3541$\index{Port 3541}.
+
+If you wish to start a multi-player game, then the IP address of the
+server will be that of your computer, but you must still select a port
+to run the server on. Again, the default port is $3541$. You must also
+decide whether you want to run a public server or a private server. By
+default, you start a private game, which means that the game will not
+be available on the metaserver. Furthermore, you must decide on the
+number of European players (see above), and whether to use national
+advantages. A multi-player game may be more balanced if you do not use
+them, so that all players start with the same units and abilities.
 
 FreeCol is a client-server game. The game server takes care of the
 game logic, and the client provides the graphical user interface. One
@@ -286,19 +300,65 @@ permit the clients to connect to the port of the game server.
 \hypertarget{Game options}{\subsubsection{Game options}}
 
 If you decide to start a single-player game or a game server, you will
-be able to choose which nation to play and which colour to use. The
-\hypertarget{map generator options}{map generator options} allow you
-to load a map, or to set several parameters that will influence the
+be able to choose which nation to play and which colour to use. If you
+join a multi-player game, you can also choose a nation and colour, but
+another players might already have selected your preferred nation.
+
+The \hypertarget{map generator options}{map generator options} allow
+you to import a map, and to set several parameters that influence the
 size and terrain of a randomly generated map. FreeCol includes several
 hand-made maps, which can be selected by clicking on the map icon.
 
+To import a map, either select one of the maps in the shortcut panel,
+enter the name of a file in the import field, or click on the browser
+button in order to select a file via a file browser. You have the
+choice to import terrain, bonuses, rumors and settlements. At the
+moment, the map editor does not provide all these options, however.
+
+The map generator tab allows you to select the size of the map, as
+well as the amount and the general shape of the land on the map. The
+terrain generator tab allows you to select the number of rivers,
+mountains, lost city rumors, native settlements, forests, and bonus
+tiles on the map, as well as the humidity and temperature of the
+map. The latter settings will influence the terrain.
+
 The game options proper allow you to select several parameters that
 influence game play, such as non-standard rules, victory conditions
-and the difficulty of the game.
+and the difficulty of the game. The initial values tab allows you to
+set the amount of gold available to the players at the start of the
+game. This is zero by default.
 
-If you join a multi-player game, you can also choose a nation and
-colour, but other players might already have selected your preferred
-nation.
+The map tab allows you to select whether to use the \textit{Fog of
+  War}, whether to hide enemy units in settlements and carriers, and
+whether to award exploration points for regions discovered by the
+players. By default, exploration points are only awarded for the
+discovery of the Pacific Ocean.
+
+The colony tab allows you to enable custom houses to ignore
+boycotts. This means that custom houses will be able to export
+boycotted goods. This does not apply to carriers, however, and does
+not prevent further boycotts by the Crown. This feature of the
+original game is considered a bug by the FreeCol team and is therefore
+disabled by default. You can also allow experts to ``have
+connections'', which means that experts working in factory-level
+buildings will be able to produce a small amount of goods even if the
+necessary raw materials are not generally available. This alleged
+feature of the original game is also disabled by default. Finally, you
+have the choice to save production overflow, which means that new
+buildings, for example, will not use up all available hammers, but
+only the exact number required. The remaining hammers will remain
+available for the next building project.
+
+The victory conditions tab allows you to choose among three possible
+victory conditions. The game will be won by the first player to
+achieve independence, the player to eliminate all other European
+players, or the player to eliminate all other human players.
+
+Finally, the difficulty tab enables you to select a difficulty level
+between very easy and very hard. The difficulty level influences
+various prices and probabilites in the game, such as amount of gold
+required to buy Indian land, and the probability of converting
+natives.
 
 
 \hypertarget{Client options}{\subsection{Client options}}
@@ -307,7 +367,7 @@ The client options panel allows you to customize how your client
 displays the game objects and how it handles some tasks such as
 auto-saving.
 
-\hypertarget{display options}{\subsubsection{Display Options}}:
+\hypertarget{display options}{\subsubsection{Display Options}}
 
 \begin{itemize}
 
