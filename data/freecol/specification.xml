@@ -94,10 +94,10 @@
       <modifier id="model.goods.ore" type="additive" value="3"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </resource-type>
-    <resource-type id="model.resource.Ore" minimum-value="40" maximum-value="4000">
+    <resource-type id="model.resource.Ore" minimum-value="200" maximum-value="4000">
       <modifier id="model.goods.ore" type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Silver" minimum-value="40" maximum-value="800">
+    <resource-type id="model.resource.Silver" minimum-value="80" maximum-value="800">
       <modifier id="model.goods.silver" type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Lumber">
