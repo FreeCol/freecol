@@ -2561,6 +2561,12 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
+        if (!dump && goods.getLocation() instanceof Unit && 
+            ((Unit) goods.getLocation()).getLocation() instanceof Europe){
+            sellGoods(goods);
+            return;
+        }
+
         Client client = freeColClient.getClient();
 
         goods.adjustAmount();
