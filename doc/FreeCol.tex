@@ -307,9 +307,10 @@ The client options panel allows you to customize how your client
 displays the game objects and how it handles some tasks such as
 auto-saving.
 
-First, we have general \hypertarget{display options}{display options}:
+\hypertarget{display options}{\subsubsection{Display Options}}:
 
 \begin{itemize}
+
 \item The language\index{language} to use. Some languages are spoken in
 more than one country. In this case, you might also be able to select
 a specific country. If the translation you choose is not complete, the
@@ -318,30 +319,71 @@ be the default translation for your language or the English language
 version. If you selected Austrian German, for example, missing strings
 would be taken from the default German translation if available, and
 the English language version otherwise.
+
 \item The minimum number of goods to display with a counter. If you
 accept the default setting of seven, for example, six hammers will be
 displayed without a number, and seven hammers will be displayed with
 the number \verb$7$ on top. Note that some panels only show a single
 item with a number next to it or below it anyway.
+
 \item The maximum number of goods to display. If you accept the
 default setting of seven, then no more than seven items will be
 displayed, even if the corresponding counter tells you that these
 seven items represent a far larger amount.
+
+\item Whether to center on the selected tile automatically.
+
 \item Whether to center on the active unit always.
-\item Whether to display the Fog of War.
+
+\item Whether to display the \textit{Fog of War}, which enables you to
+  see which tiles are currently visible to your units..
+
 \item Whether to scroll the map when dragging with the mouse.
+
+\item Whether to display the \hyperlink{compass rose}{compass rose} in
+  the top right hand corner of the map. The compass rose enables you
+  to direct your units with the mouse as well as the keypad. This is
+  particularly useful if you play with a small keyboard, such as a
+  laptop keyboard, which does not have a keypad.
+
+\item Whether to display the map controls, which include the
+  \hyperlink{minimap}{minimap}, the \hyperlink{info panel}{info panel}
+  and the \hyperlink{unit buttons}{unit buttons}.
+
+\item Whether to display the map grid.
+
+\item Whether to display tile names, owners, regions or none of the
+  above.
+
 \item Whether to sort your colonies by name, age, position, size or
 Sons of Liberty membership. Since name, age and position are unique,
 these keys impose a total order, whereas size and Sons of Liberty
 membership do not. In the case of size, the Sons of Liberty membership
 is used as a secondary key, and vice versa.
+
+\item How to animate the movements of your own units.
+
+\item How to animate the movements of enemy units.
+
+\item How to display the minimap:
+
+\begin{itemize}
+\item Whether to attempt smooth rendering.
+
+\item Which background color to use.
+
+\item Which zoom level to use as default.
 \end{itemize}
 
-Next, we have message display options: You can choose whether to group
-messages by type, by source, or not at all. The source of the message
-is a game object, typically a colony or unit, and the type of the
-message is either the default type, which is always displayed, or one
-of the following types, which can be turned off:
+\end{itemize}
+
+\hypertarget{message options}{\subsubsection{Message Options}}
+
+You can choose whether to group messages by type, by source, or not at
+all. The source of the message is a game object, typically a colony or
+unit, and the type of the message is either the default type, which is
+always displayed, or one of the following types, which can be turned
+off:
 
 \begin{itemize}
 \item Warning messages. These are important and should generally not
@@ -363,15 +405,25 @@ of starvation.
 \item Foreign diplomatic messages about the declaration of wars and
 signing of peace treaties.
 \item Messages about the prices of goods in Europe changing.
+\item Messages about reduced production due to missing goods.
 \item Warnings about the suitability of colony sites. These messages
   are particularly useful for new players. Turn them on if you are
   unsure where to establish your colonies.
 \item Messages about the factors that influence combat. Turn them on
 to learn more about things like the terrain bonus, the ambush bonus,
 or the ``artillery in the open'' penalty.
+\item Tutorial messages. These are still a work in progress and thus
+  rather limited.
 \end{itemize}
 
-Finally, there are the savegame settings:
+\hypertarget{audio options}{\subsubsection{Audio Options}}
+
+FreeCol comes with a limited selection of music and special sound
+effects. The audio options enable you to select the output device,
+which you should probably leave to be automatically detected, as well
+as the volume of the music and special effects.
+
+\hypertarget{savegame options}{\subsubsection{Savegame Options}}
 
 \begin{itemize}
 \item Whether to \hypertarget{show savegame settings}{show savegame
@@ -380,10 +432,43 @@ never. These settings include the name, address and port of the game
 server you wish to connect to. If you only play single-player games,
 you can choose the option ``never''.
 \item After how many turns you want the client to create an auto-save
-file. If you select \verb$0$, then the client will never create
-auto-save files.
+  file. If you select \verb$0$, the client will never create auto-save
+  files. If you select \verb$1$, the client will create an auto-save
+  file every turn.
+\item How many generations of auto-save files you wish to retain.
 \end{itemize}
 
+\hypertarget{warehouse options}{\subsubsection{Warehouse Options}}
+
+\begin{itemize}
+\item The number of goods to keep in your warehouse when exporting
+  goods automatically (which requires a \hyperlink{Custom House}
+  {custom house}), or by means of a \hyperlink{Trade Routes}{trade
+    route}.
+\item The minimum number of goods in your warehouse. If you store
+  goods of a certain type in your warehouse and the level drops below
+  this number, you will be warned.
+\item The maximum number of goods in your warehouse. If you store
+  goods of a certain type in your warehouse and the level rises above
+  this number, you will be warned.
+\end{itemize}
+
+
+\hypertarget{keyboard accelerators}{\subsubsection{Keyboard
+    Accelerators}}
+
+Many but not all of the actions available via the game menu or via
+orders buttons are also available as keyboard shortcuts. These
+shortcuts can be configured.
+
+\hypertarget{other options}{\subsubsection{Other Options}}
+
+\begin{itemize}
+\item Whether to load immigrants waiting in Europe onto your ships
+  automatically.
+\item Whether to end the turn automatically after all your units have
+  been moved.
+\end{itemize}
 
 
 \hypertarget{main screen}{\subsection{The main screen}}
@@ -407,11 +492,11 @@ some of these controls if you wish to do so.
 
 \hypertarget{menubar}{\subsubsection{The Menubar}}
 
-The menubar obviously contains the menu. It contains the submenus
-Game, View, Orders, Report and Colopedia, at the left hand of the
-screen, as well as a status area at the right hand of the screen. The
-status area tells you about your score, the amount of gold you
-possess, your current tax rate and the current turn.
+The menubar contains the Game, View, Orders, Report and Colopedia
+submenus at the left hand of the screen, as well as a status area at
+the right hand of the screen. The status area displays your score, the
+amount of gold you possess, your current tax rate and the current
+turn.
 
 The \hypertarget{game menu}{Game Menu} allows you to:
 
@@ -424,36 +509,43 @@ The \hypertarget{game menu}{Game Menu} allows you to:
 \item chat with another player
 \item declare independence
 \item end your turn
-\item quit
+\item return to the main menu
+\item view high scores
+\item retire from the game
+\item quit the game entirely
 \end{itemize}
 
 The \hypertarget{view menu}{View Menu} allows you to:
 
 \begin{itemize}
-\item turn the minimap and the info panel on or off
-\item turn the display of tile names on or off
-\item turn the display of tile owners on or off
+\item turn the map controls (minimap and info panel) on or off
 \item turn the map grid on or off
 \item switch between the unit view and the terrain view
+\item display tile names, owner, regions or none of the above
+\item change the zoom level of the main map
 \item switch to the Europe panel
+\item display trade routes
 \end{itemize}
 
 The \hypertarget{orders menu}{Orders Menu} enables you to give orders
 to the currently selected unit:
 
 \begin{itemize}
-\item wait until other units have moved
 \item switch to sentry mode
 \item fortify
 \item go to a destination you select
+\item go to a tile you select
+\item execute goto orders
+\item assign trade route
 \item build a colony
 \item plow the tile the unit is on (requires 20 tools)
 \item build a road on the tile the unit is on (requires 20 tools)
+\item load a carrier if possible
 \item unload all goods and units on board if possible
-\item continue towards a selected destination
+\item wait until other units have moved
 \item skip this turn
 \item switch to a different unit on the same tile
-\item forget current orders
+\item clear current orders
 \item change the unit's name
 \item disband the unit
 \end{itemize}
@@ -523,10 +615,19 @@ colonies require expert units and where these units can be obtained or
 trained, for example. It also tells you which colonies require raw
 materials in order to increase their production of manufactured goods,
 and which colonies produce a surplus of these materials.
+\item The \Report{Exploration Report} provides some information about
+  the regions you have discovered and named. If you did not select the
+  exploration option, then the report will only show you when you
+  discovered the Pacific Ocean, provided you did discover it.
+\item The \Report{History Report} contains a short overview of
+  important events that took place during the game, such as the first
+  meeting with native tribes, the foundation and abandonment of
+  colonies, among other things.
+
 \end{itemize}
 
 The \hypertarget{colopedia menu}{Colopedia Menu} provides access to
-the online game help, which is divided into six sections:
+the online game help, which is divided into eight sections:
 
 \begin{itemize}
 \item The terrain section contains information on all the different
@@ -541,13 +642,19 @@ constructions you may build in your colonies.
 \item The Founding Father section can be used to look up information
 on the various Founding Fathers you may elect to the Continental
 Congress.
+\item The nations section tells you which nations are available in the
+  game, which national advantage they currently have, and which one
+  they have by default.
+\item The national advantages section tells you which national
+  advantages are available. Some advantages only apply to European
+  players, others only to native players.
 \end{itemize}
 
 
 \hypertarget{info panel}{\subsubsection{The Info Panel}}
 
 If you are in unit view mode (the default), the info panel in the
-lower right corner of the screen either shows information on the
+lower right corner of the screen either shows information about the
 currently selected unit, or contains a button to end the current turn
 if no unit is selected. If a unit is selected, then the info panel
 shows an image of the unit, as well as its name and the moves it has
