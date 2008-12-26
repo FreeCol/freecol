@@ -148,7 +148,9 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
      * @param out The target stream for the reply.
      */
     private void login(Connection connection, XMLStreamReader in, XMLStreamWriter out) {        
-        // TODO: Do not allow more than one (human) player to connect to a singleplayer game.
+        // TODO: Do not allow more than one (human) player to connect
+        // to a singleplayer game. This would be easy if we used a
+        // dummy connection for single-player games.
         Game game = freeColServer.getGame();
         Server server = freeColServer.getServer();
         
@@ -170,6 +172,7 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
         if (freeColServer.getGameState() != FreeColServer.GameState.STARTING_GAME) {
             if (game.getPlayerByName(username) == null) {
                 Message.createError(out, "server.alreadyStarted", "The game has already been started!");
+                logger.warning("game state: " + freeColServer.getGameState().toString());
                 return;
             }
 
@@ -285,115 +288,6 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
         return;
 
-        /*
-        Game game = freeColServer.getGame();
-        Server server = freeColServer.getServer();
-
-        if (!element.hasAttribute("username")) {
-            throw new IllegalArgumentException("The attribute 'username' is missing.");
-        }
-
-        if (!element.hasAttribute("freeColVersion")) {
-            throw new IllegalArgumentException("The attribute 'freeColVersion' is missing.");
-        }
-
-
-        if (!element.getAttribute("freeColVersion").equals(FreeCol.getVersion())) {
-            return Message.createError("server.wrongFreeColVersion", "The game versions do not match.");
-        }
-
-        String username = element.getAttribute("username");
-
-        if (freeColServer.getGameState() != FreeColServer.STARTING_GAME) {
-            if (game.getPlayerByName(username) == null) {
-                return Message.createError("server.alreadyStarted", "The game has already been started!");
-            }
-
-            ServerPlayer player = (ServerPlayer) game.getPlayerByName(username);
-            if (player.isConnected() && !player.isAI()) {
-                return Message.createError("server.usernameInUse", "The specified username is already in use.");
-            }
-            player.setConnection(connection);
-            player.setConnected(true);
-
-            if (player.isAI()) {
-                player.setAI(false);
-                Element setAIElement = Message.createNewRootElement("setAI");
-                setAIElement.setAttribute("player", player.getId());
-                setAIElement.setAttribute("ai", Boolean.toString(false));
-                server.sendToAll(setAIElement);
-            }
-
-            // In case this player is the first to reconnect:
-            boolean isCurrentPlayer = (game.getCurrentPlayer() == null);
-            if (isCurrentPlayer) {
-                game.setCurrentPlayer(player);
-            }
-
-            connection.setMessageHandler(freeColServer.getInGameInputHandler());
-
-            freeColServer.updateMetaServer();
-
-            // Make the reply:
-            Element reply = Message.createNewRootElement("loginConfirmed");
-            reply.setAttribute("admin", Boolean.toString(player.isAdmin()));
-            reply.setAttribute("startGame", "true");
-            reply.setAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
-            reply.appendChild(freeColServer.getGame().toXMLElement(player, reply.getOwnerDocument()));
-
-            // Successful login:
-            server.addConnection(connection);
-
-            return reply;
-        }
-
-        // Wait until the game has been created:
-        int timeOut = 20000;
-        while (freeColServer.getGame() == null) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-
-            timeOut -= 1000;
-
-            if (timeOut <= 0) {
-                return Message.createError("server.timeOut", "Timeout when connecting to the server.");
-            }
-        }
-
-        if (!freeColServer.getGame().canAddNewPlayer()) {
-            return Message.createError("server.maximumPlayers", "Sorry, the maximum number of players reached.");
-        }
-
-        if (freeColServer.getGame().playerNameInUse(username)) {
-            return Message.createError("server.usernameInUse", "The specified username is already in use.");
-        }
-
-
-        // Create and add the new player:
-        boolean admin = (freeColServer.getGame().getPlayers().size() == 0);
-        ServerPlayer newPlayer = new ServerPlayer(freeColServer.getGame(), username, admin, connection.getSocket(), connection);
-        freeColServer.getGame().addPlayer(newPlayer);
-
-        // Send message to all players except to the new player:
-        Element addNewPlayer = Message.createNewRootElement("addPlayer");
-        addNewPlayer.appendChild(newPlayer.toXMLElement(null, addNewPlayer.getOwnerDocument()));
-        freeColServer.getServer().sendToAll(addNewPlayer, connection);
-
-        connection.setMessageHandler(freeColServer.getPreGameInputHandler());
-
-        freeColServer.updateMetaServer();
-
-        // Make the reply:
-        Element reply = Message.createNewRootElement("loginConfirmed");
-        reply.setAttribute("admin", (admin ? "true" : "false"));
-        reply.appendChild(freeColServer.getGame().toXMLElement(newPlayer, reply.getOwnerDocument()));
-
-        // Successful login:
-        server.addConnection(connection);
-
-        return reply;
-        */
     }
     
     /**
