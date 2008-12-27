@@ -1690,7 +1690,7 @@
       <integerOption id="model.option.foundingFatherFactor" value="9"/>
       <integerOption id="model.option.arrearsFactor" value="700"/>
       <integerOption id="model.option.nativeSettlementDensity" value="80"/>
-      <integerOption id="model.option.nativeConvertProbability" value="40"/>
+      <integerOption id="model.option.nativeConvertProbability" value="10"/>
       <integerOption id="model.option.burnProbability" value="10"/>
       <integerOption id="model.option.recruitPriceIncrease" value="30"/>
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
