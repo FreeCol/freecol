@@ -877,16 +877,20 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public int getFishBonus() {
         if (fishBonus < 0) {
-            fishBonus = 0;
+            int tempFishBonus = 0;
+            boolean bonusIsFinal = true;
             if (!isLand()) {
                 Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
                 while (tileIterator.hasNext()) {
                     Tile t = getMap().getTile(tileIterator.next());
+                    if (!t.isExplored()) {
+                        bonusIsFinal = false;
+                    }
                     if (t.isLand()) {
-                        fishBonus++;
+                        tempFishBonus++;
                     }
                     if (t.hasRiver()) {
-                        fishBonus += t.getRiver().getMagnitude();
+                        tempFishBonus += t.getRiver().getMagnitude();
                     }
                 }
             }
@@ -894,8 +898,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             // trying to do work for some other player, and the tile
             // has not yet been explored.
             if (type != null && !type.isConnected()) {
-                fishBonus = fishBonus / 2;
+                tempFishBonus = tempFishBonus / 2;
             }
+            
+            //set final bonus only if all adjacent tiles have been explored
+            if (bonusIsFinal) {
+                fishBonus = tempFishBonus;
+            }
+            return tempFishBonus;
         }
         return fishBonus;
     }
