@@ -857,13 +857,22 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public int getLandCount() {
         if (landCount < 0) {
-            landCount = 0;
+            int tempLandCount = 0;
+            boolean countIsFinal = true;
             Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
             while (tileIterator.hasNext()) {
-                if (getMap().getTile(tileIterator.next()).isLand()) {
-                    landCount++;
+                Tile t = getMap().getTile(tileIterator.next());
+                if (!t.isExplored()) {
+                    countIsFinal = false;
+                }
+                if (t.isLand()) {
+                    tempLandCount++;
                 }
             }
+            if (countIsFinal) {
+                landCount = tempLandCount;
+            }
+            return tempLandCount;
         }
         return landCount;
     }
