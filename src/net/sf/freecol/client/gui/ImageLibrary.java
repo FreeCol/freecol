@@ -113,6 +113,7 @@ public final class ImageLibrary extends ImageProvider {
     private List<ArrayList<ImageIcon>> unitButtons; 
 
     private EnumMap<Tension.Level, Image> alarmChips;
+    private EnumMap<Tension.Level, Image> alarmChipsUnvisited;
 
     private Map<Color, Image> colorChips;
 
@@ -192,6 +193,7 @@ public final class ImageLibrary extends ImageProvider {
         loadUnitButtons(gc, resourceLocator, doLookup);
 
         alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
+        alarmChipsUnvisited = new EnumMap<Tension.Level, Image>(Tension.Level.class);
         colorChips = new HashMap<Color, Image>();
         missionChips = new HashMap<Color, Image>();
         expertMissionChips = new HashMap<Color, Image>();
@@ -602,8 +604,9 @@ public final class ImageLibrary extends ImageProvider {
      * @param gc The GraphicsConfiguration is needed to create images that are
      *            compatible with the local environment.
      * @param alarm The alarm level.
+     * @param visited whether the village was visited before.
      */
-    private void loadAlarmChip(GraphicsConfiguration gc, Tension.Level alarm) {
+    private void loadAlarmChip(GraphicsConfiguration gc, Tension.Level alarm, final boolean visited) {
         BufferedImage tempImage = gc.createCompatibleImage(10, 17);
         Graphics2D g = (Graphics2D) tempImage.getGraphics();
 
@@ -631,10 +634,17 @@ public final class ImageLibrary extends ImageProvider {
         g.fillRect(1, 1, 8, 15);
         g.setColor(Color.BLACK);
 
-        g.fillRect(4, 3, 2, 7);
+        if (visited) {
+        	g.fillRect(4, 3, 2, 7);
+        } else {
+        	g.fillRect(3, 3, 4, 2);
+        	g.fillRect(6, 4, 2, 2);
+        	g.fillRect(4, 6, 3, 1);
+        	g.fillRect(4, 7, 2, 3);
+        }
         g.fillRect(4, 12, 2, 2);
 
-        alarmChips.put(alarm, tempImage);
+        (visited?alarmChips:alarmChipsUnvisited).put(alarm, tempImage);
     }
 
 
@@ -1012,14 +1022,14 @@ public final class ImageLibrary extends ImageProvider {
      * @param alarm The alarm level.
      * @return The alarm chip.
      */
-    public Image getAlarmChip(Tension.Level alarm) {
-        Image alarmChip = alarmChips.get(alarm);
+    public Image getAlarmChip(Tension.Level alarm, final boolean visited) {
+        Image alarmChip = (visited?alarmChips:alarmChipsUnvisited).get(alarm);
 
         if (alarmChip == null) {
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
                     .getDefaultConfiguration();
-            loadAlarmChip(gc, alarm);
-            alarmChip = alarmChips.get(alarm);
+            loadAlarmChip(gc, alarm, visited);
+            alarmChip = (visited?alarmChips:alarmChipsUnvisited).get(alarm);
         }
         return alarmChip;
     }

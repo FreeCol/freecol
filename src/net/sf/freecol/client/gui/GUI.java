@@ -1946,8 +1946,9 @@ public final class GUI {
                     // Draw the alarm chip if needed.
                     if (freeColClient.getMyPlayer() != null) {
                         Tension alarm = indianSettlement.getAlarm(freeColClient.getMyPlayer());
+                        final boolean visited = indianSettlement.hasBeenVisited();
                         if (alarm != null) {
-                            g.drawImage(lib.getAlarmChip(alarm.getLevel()),
+                            g.drawImage(lib.getAlarmChip(alarm.getLevel(), visited),
                                         x + (int) (STATE_OFFSET_X * lib.getScalingFactor()) +
                                         (ALARM_OFFSET_X - STATE_OFFSET_X),
                                         y + (int) (ALARM_OFFSET_Y  * lib.getScalingFactor()), null);
