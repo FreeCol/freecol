@@ -507,7 +507,9 @@ public final class InGameInputHandler extends InputHandler {
      *            that holds all the information.
      */
     private Element newTurn(Element newTurnElement) {
-        getGame().newTurn();
+        //getGame().newTurn();
+        getGame().getTurn().increase();
+        getFreeColClient().getMyPlayer().newTurn();
         new UpdateMenuBarSwingTask().invokeLater();
         return null;
     }
