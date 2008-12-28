@@ -855,7 +855,7 @@ public final class InGameController extends Controller {
     }
 
     private void bombardEnemyShips(ServerPlayer currentPlayer) {
-        logger.info("Entering method bombardEnemyShips.");
+        logger.finest("Entering method bombardEnemyShips.");
         Map map = getFreeColServer().getGame().getMap();
         CombatModel combatModel = getFreeColServer().getGame().getCombatModel();
         for (Settlement settlement : currentPlayer.getSettlements()) {
@@ -985,7 +985,7 @@ public final class InGameController extends Controller {
     @SuppressWarnings("unchecked")
     public java.util.Map<String,Object> getTransactionSession(Unit unit, Settlement settlement){
         java.util.Map<String, java.util.Map<String,Object>> unitTransactions = null;
-        java.util.Map<String,java.util.Map<String,java.util.Map>> transaction = null;
+
         if(transactionSessions.containsKey(unit.getId())){
             unitTransactions = transactionSessions.get(unit.getId());
             if(unitTransactions.containsKey(settlement.getId())){
@@ -1012,6 +1012,13 @@ public final class InGameController extends Controller {
                 session.put("canSell", false);
             }
         }
+        // only keep track of human player sessions
+        if(unit.getOwner().isAI()){
+            return session;
+        }
+        
+        // Save session for tracking
+        
         // unit has no open transactions
         if(unitTransactions == null){
             unitTransactions = new HashMap<String,java.util.Map<String, Object>>();
@@ -1024,6 +1031,11 @@ public final class InGameController extends Controller {
     @SuppressWarnings("unchecked")
     public void closeTransactionSession(Unit unit, Settlement settlement){
         java.util.Map<String, java.util.Map<String,Boolean>> unitTransactions;
+        
+        // only keep track of human player sessions
+        if(unit.getOwner().isAI()){
+          return;  
+        }
         
         if(!transactionSessions.containsKey(unit.getId())){
             throw new IllegalStateException("Trying to close a non-existing session");
@@ -1041,6 +1053,11 @@ public final class InGameController extends Controller {
     }
     
     public boolean isTransactionSessionOpen(Unit unit, Settlement settlement){
+        // AI does not need to send a message to open a session
+        if(unit.getOwner().isAI()){
+            return true;
+        }
+        
         if(!transactionSessions.containsKey(unit.getId())){
             return false;
         }
