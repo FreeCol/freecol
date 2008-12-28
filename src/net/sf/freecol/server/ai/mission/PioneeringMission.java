@@ -32,13 +32,12 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.GoalDecider;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileItemContainer;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -138,18 +137,29 @@ public class PioneeringMission extends Mission {
     }
 
     private void updateTileImprovementPlan() {
-        if (tileImprovementPlan != null && tileImprovementPlan.getTarget() != null) {
-            return;
-        }    
-        
         final AIPlayer aiPlayer = (AIPlayer) getAIMain().getAIObject(getUnit().getOwner().getId());
         final Unit carrier = (getUnit().isOnCarrier()) ? (Unit) getUnit().getLocation() : null;
         
+        Tile improvementTarget = (tileImprovementPlan != null)? tileImprovementPlan.getTarget():null;
         // invalid tileImprovementPlan, remove and get a new valid one
-        if (tileImprovementPlan != null && tileImprovementPlan.getTarget() == null) {
+        if (tileImprovementPlan != null && improvementTarget == null) {
         	logger.warning("Found invalid TileImprovementPlan, removing it and assigning a new one");
         	aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
         	tileImprovementPlan.dispose();
+        }
+        
+        // Verify if the improvement has been applied already
+        // If it has, remove this improvement
+        if( tileImprovementPlan != null &&
+            improvementTarget != null &&
+            improvementTarget.hasImprovement(tileImprovementPlan.getType())){
+                aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
+                tileImprovementPlan.dispose();
+        }
+        
+        // mission still valid, no update needed
+        if (tileImprovementPlan != null && improvementTarget != null) {
+            return;
         }
         
         final Tile startTile;
