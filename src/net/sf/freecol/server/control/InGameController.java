@@ -658,6 +658,10 @@ public final class InGameController extends Controller {
                                 logger.warning("Declared war on nobody.");
                                 return;
                             }
+                            // We also need to change the tension to avoid the AI player declaring cease-fire right away
+                            if(nextPlayer.isAI()){
+                                nextPlayer.modifyTension(enemy, Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE);
+                            }
                             nextPlayer.changeRelationWithPlayer(enemy, Stance.WAR);
                             monarchActionElement.setAttribute("enemy", enemy.getId());
                             try {
