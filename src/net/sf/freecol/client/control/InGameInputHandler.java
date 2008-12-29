@@ -411,7 +411,7 @@ public final class InGameInputHandler extends InputHandler {
                         .getXMLElementTagName());
                 if (defenderTileElement != null) {
                     final Tile checkTile = (Tile) getGame().getFreeColGameObject(defenderTileElement.getAttribute("ID"));
-                    if (checkTile == defenderTile) {
+                    if (checkTile != defenderTile) {
                         throw new IllegalStateException("Trying to update another tile than the defending unit's tile.");
                     }
                     defenderTile.readFromXMLElement(defenderTileElement);
