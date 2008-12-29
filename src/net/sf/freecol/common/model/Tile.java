@@ -924,7 +924,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 //get an additional +1 bonus
                 //TODO: This probably has some false positives, means river tiles
                 //that are NOT a river mouth next to this tile!
-                if (adjacentRiver) {
+                if (!hasRiver() && adjacentRiver) {
                     tempFishBonus += riverBonus;
                 }
             }
