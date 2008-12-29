@@ -851,6 +851,22 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Determine whether this tile has adjacent tiles that are unexplored.
+     * 
+     * @return true if at least one neighbouring tiles is unexplored, otherwise false
+     */
+    public boolean hasUnexploredAdjacent() {
+        Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
+        while (tileIterator.hasNext()) {
+            Tile t = getMap().getTile(tileIterator.next());
+            if (!t.isExplored()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Return the number of land tiles adjacent to this one.
      * 
      * @return an <code>int</code> value
@@ -858,18 +874,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public int getLandCount() {
         if (landCount < 0) {
             int tempLandCount = 0;
-            boolean countIsFinal = true;
             Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
             while (tileIterator.hasNext()) {
                 Tile t = getMap().getTile(tileIterator.next());
-                if (!t.isExplored()) {
-                    countIsFinal = false;
-                }
                 if (t.isLand()) {
                     tempLandCount++;
                 }
             }
-            if (countIsFinal) {
+            if (!hasUnexploredAdjacent()) {
                 landCount = tempLandCount;
             }
             return tempLandCount;
@@ -887,20 +899,33 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public int getFishBonus() {
         if (fishBonus < 0) {
             int tempFishBonus = 0;
-            boolean bonusIsFinal = true;
             if (!isLand()) {
+                int adjacentLand = 0;
+                boolean adjacentRiver = false;
+                int riverBonus = 0;
                 Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
                 while (tileIterator.hasNext()) {
                     Tile t = getMap().getTile(tileIterator.next());
-                    if (!t.isExplored()) {
-                        bonusIsFinal = false;
-                    }
-                    if (t.isLand()) {
-                        tempFishBonus++;
-                    }
                     if (t.hasRiver()) {
-                        tempFishBonus += t.getRiver().getMagnitude();
+                        adjacentRiver = true;
+                        //note: this is not river magnitude, but tileimprovement-type
+                        //magnitude, as given in the specification!
+                        //Should be =1 in Col1-compatible ruleset.
+                        riverBonus = Math.max(riverBonus,t.getRiver().getMagnitude());
                     }
+                }
+                //In Col1, ocean tiles with less than 3 land neighbours produce 2 fish,
+                //all others produce 4 fish
+                if (getLandCount()>2) {
+                        tempFishBonus+=2;
+                }
+                
+                //In Col1, the ocean tile in front of a river mouth would
+                //get an additional +1 bonus
+                //TODO: This probably has some false positives, means river tiles
+                //that are NOT a river mouth next to this tile!
+                if (adjacentRiver) {
+                    tempFishBonus += riverBonus;
                 }
             }
             // TODO: how can this happen? I suspect the client is
@@ -911,7 +936,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
             
             //set final bonus only if all adjacent tiles have been explored
-            if (bonusIsFinal) {
+            if (!hasUnexploredAdjacent()) {
                 fishBonus = tempFishBonus;
             }
             return tempFishBonus;
