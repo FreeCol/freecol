@@ -53,6 +53,8 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
 
     public static final int MEETING_INCA = 4;
 
+    public static final int DISCOVER_PACIFIC = 5;
+
     private static final int OK = 0;
 
     private final FreeColClient freeColClient;
@@ -122,6 +124,10 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
             Image image = ResourceManager.getImage("EventImage.meetingInca");
             imageLabel.setIcon(new ImageIcon(image));
             header.setText(Messages.message("event.meetingInca"));
+        } else if (eventID == DISCOVER_PACIFIC) {
+            Image image = ResourceManager.getImage("EventImage.discoverPacific");
+            imageLabel.setIcon(new ImageIcon(image));
+            header.setText(Messages.message("model.region.pacific.discover"));
         } else {
             setResponse(new Boolean(false));
         }

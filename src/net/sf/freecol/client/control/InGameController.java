@@ -1979,7 +1979,8 @@ public final class InGameController implements NetworkConstants {
             String name = null;
             if (region.isPacific()) {
                 name = Messages.message("model.region.pacific");
-                canvas.showInformationMessage("model.region.pacific.discover");
+                //canvas.showInformationMessage("model.region.pacific.discover");
+                canvas.showEventDialog(EventPanel.DISCOVER_PACIFIC);
             } else if (unit.getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {
                 String defaultName = unit.getOwner().getDefaultRegionName(region.getType());
                 name = freeColClient.getCanvas().showInputDialog("nameRegion.text", defaultName,

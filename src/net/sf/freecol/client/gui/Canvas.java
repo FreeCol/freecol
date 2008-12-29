@@ -610,6 +610,18 @@ public final class Canvas extends JDesktopPane {
      * @param modelMessages
      */
     public void showModelMessages(ModelMessage... modelMessages) {
+
+        if (modelMessages.length == 1) {
+            String id = modelMessages[0].getId();
+            if ("EventPanel.MEETING_NATIVES".equals(id)) {
+                showEventDialog(EventPanel.MEETING_NATIVES);
+                return;
+            } else if ("EventPanel.MEETING_AZTEC".equals(id)) {
+                showEventDialog(EventPanel.MEETING_AZTEC);
+                return;
+            }
+        }
+
         String okText = "ok";
         String cancelText = "display";
         String[] messageText = new String[modelMessages.length];
