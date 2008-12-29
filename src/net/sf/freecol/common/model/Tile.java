@@ -899,7 +899,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public int getFishBonus() {
         if (fishBonus < 0) {
             int tempFishBonus = 0;
-            if (!isLand()) {
+            if (isLand()) {
+                fishBonus = 0;
+            } else {
                 int adjacentLand = 0;
                 boolean adjacentRiver = false;
                 int riverBonus = 0;
@@ -927,19 +929,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 if (!hasRiver() && adjacentRiver) {
                     tempFishBonus += riverBonus;
                 }
-            }
-            // TODO: how can this happen? I suspect the client is
-            // trying to do work for some other player, and the tile
-            // has not yet been explored.
-            if (type != null && !type.isConnected()) {
-                tempFishBonus = tempFishBonus / 2;
-            }
+
+                // TODO: how can this happen? I suspect the client is
+                // trying to do work for some other player, and the tile
+                // has not yet been explored.
+                if (type != null && !type.isConnected()) {
+                    tempFishBonus = tempFishBonus / 2;
+                }
             
-            //set final bonus only if all adjacent tiles have been explored
-            if (!hasUnexploredAdjacent()) {
-                fishBonus = tempFishBonus;
+                //set final bonus only if all adjacent tiles have been explored
+                if (!hasUnexploredAdjacent()) {
+                    fishBonus = tempFishBonus;
+                }
             }
-            return tempFishBonus;
         }
         return fishBonus;
     }
