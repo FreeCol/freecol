@@ -126,8 +126,7 @@ public final class PreGameController extends Controller {
         game.getGameOptions().readFromXMLElement(oldGameOptions);
         
         // Inform the clients:
-        setMapAndMarket(map);
-        
+        sendUpdatedGame();        
         
         // Start the game:
         freeColServer.setGameState(FreeColServer.GameState.IN_GAME);
@@ -143,10 +142,8 @@ public final class PreGameController extends Controller {
     /**
      * Sets the map and sends an updated <code>Game</code>-object
      * (that includes the map) to the clients.
-     *
-     * @param map The new <code>Map</code> to be set.
      */
-    public void setMapAndMarket(Map map) {
+    public void sendUpdatedGame() {
         Game game = getFreeColServer().getGame();
 
         Iterator<Player> playerIterator = game.getPlayerIterator();
@@ -155,6 +152,7 @@ public final class PreGameController extends Controller {
             
             if (player.isEuropean() && !player.isREF()) {
                 player.modifyGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
+                player.getEurope().generateInitialRecruits();
                 Market market = player.getMarket();
                 for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                     if (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) {

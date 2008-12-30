@@ -86,17 +86,6 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         super(game);
         this.owner = owner;
 
-        for (int index = 0; index < 3; index++) {
-            String optionId = "model.option.recruitable.slot" + index;
-            if (Specification.getSpecification().hasOption(optionId)) {
-                String unitTypeId = Specification.getSpecification()
-                    .getStringOption(optionId).getValue();
-                setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
-            } else {
-                setRecruitable(index, owner.generateRecruitable("recruitable" + index));
-            }
-        }
-
         recruitPrice = RECRUIT_PRICE_INITIAL;
         recruitLowerCap = LOWER_CAP_INITIAL;
     }
@@ -155,6 +144,26 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
             }
         }
         return true;
+    }
+
+
+    /**
+     * Generates the initial recruits for the player who owns this
+     * instance of Europe. Recruits may be determined by the
+     * difficulty level, or generated randomly.
+     *
+     */
+    public void generateInitialRecruits() {
+        for (int index = 0; index < recruitables.length; index++) {
+            String optionId = "model.option.recruitable.slot" + index;
+            if (Specification.getSpecification().hasOption(optionId)) {
+                String unitTypeId = Specification.getSpecification()
+                    .getStringOption(optionId).getValue();
+                setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
+            } else {
+                setRecruitable(index, owner.generateRecruitable("recruitable" + index));
+            }
+        }
     }
 
     /**
@@ -595,9 +604,11 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         out.writeStartElement(getXMLElementTagName());
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute("recruit0", recruitables[0].getId());
-        out.writeAttribute("recruit1", recruitables[1].getId());
-        out.writeAttribute("recruit2", recruitables[2].getId());
+        for (int index = 0; index < recruitables.length; index++) {
+            if (recruitables[index] != null) {
+                out.writeAttribute("recruit" + index, recruitables[index].getId());
+            }
+        }
         out.writeAttribute("recruitPrice", Integer.toString(recruitPrice));
         out.writeAttribute("recruitLowerCap", Integer.toString(recruitLowerCap));
         out.writeAttribute("owner", owner.getId());
@@ -624,9 +635,12 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         setId(in.getAttributeValue(null, ID_ATTRIBUTE));
 
         Specification spec = FreeCol.getSpecification();
-        recruitables[0] = spec.getUnitType(in.getAttributeValue(null, "recruit0"));
-        recruitables[1] = spec.getUnitType(in.getAttributeValue(null, "recruit1"));
-        recruitables[2] = spec.getUnitType(in.getAttributeValue(null, "recruit2"));
+        for (int index = 0; index < recruitables.length; index++) {
+            String unitTypeId = in.getAttributeValue(null, "recruit" + index);
+            if (unitTypeId != null) {
+                recruitables[index] = spec.getUnitType(unitTypeId);
+            }
+        }
 
         owner = getFreeColGameObject(in, "owner", Player.class);
 
