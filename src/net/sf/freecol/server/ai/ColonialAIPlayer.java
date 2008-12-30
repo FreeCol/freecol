@@ -33,7 +33,6 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Tile;

@@ -31,7 +31,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 
 import net.sf.freecol.client.FreeColClient;

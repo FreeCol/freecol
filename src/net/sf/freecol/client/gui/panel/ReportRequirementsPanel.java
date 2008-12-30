@@ -19,20 +19,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JTextPane;
-import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.FreeCol;
@@ -45,7 +40,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.WorkLocation;
+
 import cz.autel.dmi.HIGLayout;
 
 /**

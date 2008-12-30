@@ -27,7 +27,6 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;

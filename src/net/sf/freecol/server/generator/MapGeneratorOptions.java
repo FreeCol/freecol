@@ -19,19 +19,13 @@
 
 package net.sf.freecol.server.generator;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.FileOption;
-import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
-import net.sf.freecol.common.option.RangeOption;
 
 import org.w3c.dom.Element;
 

@@ -26,7 +26,6 @@ import javax.swing.ImageIcon;
 
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.Unit;
 
 /**
  * An object that should be able to provide images upon request.

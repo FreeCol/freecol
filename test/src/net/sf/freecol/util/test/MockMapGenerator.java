@@ -3,7 +3,6 @@ package net.sf.freecol.util.test;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;

@@ -20,7 +20,6 @@
 package net.sf.freecol.server.ai;
 
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -37,7 +36,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
-import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.control.Controller;

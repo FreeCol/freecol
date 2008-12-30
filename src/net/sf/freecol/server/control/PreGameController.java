@@ -40,11 +40,9 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.model.ServerPlayer;
-import net.sf.freecol.server.networking.DummyConnection;
 
 import org.w3c.dom.Element;
 

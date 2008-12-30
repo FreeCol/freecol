@@ -35,7 +35,6 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;

@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TileTest extends FreeColTestCase {

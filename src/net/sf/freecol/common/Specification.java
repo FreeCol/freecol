@@ -19,20 +19,15 @@
 
 package net.sf.freecol.common;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLInputFactory;
@@ -55,7 +50,6 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.ResourceType;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;

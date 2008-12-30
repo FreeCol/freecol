@@ -20,7 +20,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 

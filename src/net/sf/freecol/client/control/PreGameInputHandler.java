@@ -33,7 +33,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
@@ -42,7 +41,6 @@ import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 /**

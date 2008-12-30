@@ -26,11 +26,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import org.w3c.dom.Element;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -54,7 +51,6 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.server.ai.AIUnit;
 
 public class DebugMenu extends JMenu {

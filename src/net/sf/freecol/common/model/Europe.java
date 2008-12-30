@@ -21,11 +21,9 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -36,8 +34,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.common.option.IntegerOption;
-
 import org.w3c.dom.Element;
 
 /**

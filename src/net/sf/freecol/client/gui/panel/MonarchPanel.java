@@ -31,7 +31,6 @@ import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
 import cz.autel.dmi.HIGLayout;

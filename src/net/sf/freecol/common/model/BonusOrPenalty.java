@@ -19,16 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
-import net.sf.freecol.common.Specification;
-import net.sf.freecol.client.gui.i18n.Messages;
-
 /**
  * The class <code>BonusOrPenalty</code> is used as the source of an
  * <code>Ability</code> or <code>Modifier</code> that is defined by

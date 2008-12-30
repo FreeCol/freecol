@@ -21,18 +21,10 @@ package net.sf.freecol.common.networking;
 
 import java.util.HashMap;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
-import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
-
-import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
 
 public class StatisticsMessage extends Message {

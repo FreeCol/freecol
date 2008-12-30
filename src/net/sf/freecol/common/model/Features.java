@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Map;
-
 public interface Features {
 
     /**

@@ -31,7 +31,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;

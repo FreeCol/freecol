@@ -60,7 +60,6 @@ import net.sf.freecol.client.gui.action.ZoomInAction;
 import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
-import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**

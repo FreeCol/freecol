@@ -25,22 +25,18 @@ import java.awt.Font;
 
 import java.util.Set;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 
 import cz.autel.dmi.HIGLayout;

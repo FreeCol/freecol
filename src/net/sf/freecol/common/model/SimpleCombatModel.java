@@ -30,7 +30,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;

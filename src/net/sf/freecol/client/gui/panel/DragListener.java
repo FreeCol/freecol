@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -42,7 +41,6 @@ import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -50,7 +48,6 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
-import net.sf.freecol.common.resources.ResourceManager;
 
 /**
  * A DragListener should be attached to Swing components that have a

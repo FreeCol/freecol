@@ -20,16 +20,10 @@
 package net.sf.freecol.common.option;
 
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-
-import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * Represents an option where the valid choice is an integer and the choices are

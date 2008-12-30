@@ -26,7 +26,6 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;

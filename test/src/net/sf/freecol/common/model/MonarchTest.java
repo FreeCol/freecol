@@ -19,18 +19,12 @@
 
 package net.sf.freecol.common.model;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Iterator;
 import java.util.List;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.util.test.FreeColTestCase;

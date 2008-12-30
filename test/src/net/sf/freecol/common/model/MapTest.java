@@ -29,19 +29,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.ServerTestHelper;
-import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.ai.AIUnit;
-import net.sf.freecol.server.ai.mission.BuildColonyMission;
-import net.sf.freecol.server.ai.mission.Mission;
-import net.sf.freecol.server.control.Controller;
-import net.sf.freecol.server.control.PreGameController;
-import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.util.test.MockMapGenerator;
-import net.sf.freecol.util.test.FreeColTestCase.MapBuilder;
 
 public class MapTest extends FreeColTestCase {
     TileType oceanType = spec().getTileType("model.tile.ocean");

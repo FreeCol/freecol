@@ -24,10 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;

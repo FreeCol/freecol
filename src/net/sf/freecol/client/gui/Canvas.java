@@ -75,7 +75,6 @@ import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
 import net.sf.freecol.client.gui.panel.GameOptionsDialog;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
-import net.sf.freecol.client.gui.panel.InformationDialog;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
 import net.sf.freecol.client.gui.panel.MapControls;

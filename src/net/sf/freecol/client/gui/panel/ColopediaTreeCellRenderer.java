@@ -25,7 +25,6 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 

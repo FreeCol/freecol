@@ -19,22 +19,11 @@
 
 package net.sf.freecol.client;
 
-import java.io.File;
-import java.io.IOException;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.networking.NoRouteToServerException;
-import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.client.control.ConnectController;
-import net.sf.freecol.client.control.InGameController;
-import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.util.test.FreeColTestCase;
-import net.sf.freecol.server.ServerTestHelper;
-
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 

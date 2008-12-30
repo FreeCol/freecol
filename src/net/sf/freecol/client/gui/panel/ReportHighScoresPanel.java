@@ -19,15 +19,11 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
@@ -39,7 +35,6 @@ import net.sf.freecol.common.model.Turn;
 
 import org.w3c.dom.Element;
 
-import cz.autel.dmi.HIGConstraints;
 import cz.autel.dmi.HIGLayout;
 
 /**

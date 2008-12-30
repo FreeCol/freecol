@@ -25,7 +25,6 @@ import java.awt.Rectangle;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Tile;
 
 

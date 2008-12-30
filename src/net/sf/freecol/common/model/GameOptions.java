@@ -26,12 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
-import net.sf.freecol.common.option.RangeOption;
-
 import org.w3c.dom.Element;
 
 

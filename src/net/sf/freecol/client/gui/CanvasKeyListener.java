@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui;
 
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.logging.Level;
@@ -28,9 +27,6 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.action.GotoTileAction;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Map.Direction;
 
 /**

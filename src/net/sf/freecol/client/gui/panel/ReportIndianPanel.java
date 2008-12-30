@@ -27,7 +27,6 @@ import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;

@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.border.Border;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.InGameController;
@@ -43,8 +42,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;

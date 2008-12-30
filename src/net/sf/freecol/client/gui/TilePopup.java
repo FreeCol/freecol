@@ -42,7 +42,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.mission.TransportMission;
 

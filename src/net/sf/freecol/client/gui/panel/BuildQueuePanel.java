@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.io.IOException;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -30,10 +29,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -57,7 +54,6 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.BuildQueue;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
 import cz.autel.dmi.HIGLayout;

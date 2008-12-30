@@ -38,7 +38,6 @@ import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.action.ReportHighScoresAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 

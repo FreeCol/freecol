@@ -39,7 +39,6 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
-import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;

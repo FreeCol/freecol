@@ -32,12 +32,9 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
-import net.sf.freecol.common.option.IntegerOption;
-import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.option.PercentageOption;
-import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
 
 import org.w3c.dom.Element;

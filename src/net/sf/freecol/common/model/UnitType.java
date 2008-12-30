@@ -24,7 +24,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -33,7 +32,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.common.model.Player.PlayerType;
 
 public final class UnitType extends BuildableType {
 
