@@ -272,6 +272,10 @@ public final class InGameController implements NetworkConstants {
         Element declareIndependenceElement = Message.createNewRootElement("declareIndependence");
         declareIndependenceElement.setAttribute("independentNationName", nationName);
         Element reply = freeColClient.getClient().ask(declareIndependenceElement);
+        if(reply == null){
+            NullPointerException e = new NullPointerException("Failed to receive reply to \"declareIndependence\" message");
+            throw e;
+        }
         NodeList childNodes = reply.getChildNodes();
         Element playerElement = (Element) childNodes.item(0);
         Player refPlayer = (Player) game.getFreeColGameObject(playerElement.getAttribute("ID"));

@@ -720,7 +720,12 @@ public class Player extends FreeColGameObject implements Nameable {
      *   if null then remove the message
      */
     public void divertModelMessages(FreeColGameObject source, FreeColGameObject newSource) {
-        for (ModelMessage modelMessage : getModelMessages()) {
+        // Since we are changing the list, we need to copy it to be able
+        //to iterate through it
+        List<ModelMessage> modelMessagesList = new ArrayList<ModelMessage>();
+        modelMessagesList.addAll(modelMessages);
+        
+        for (ModelMessage modelMessage : modelMessagesList) {
             if (modelMessage.getSource() == source) {
                 if (newSource == null) {
                     modelMessages.remove(modelMessage);
