@@ -323,7 +323,9 @@ public class TileItemContainer extends FreeColGameObject {
     public String getLabel(String separator) {
         String label = new String();
         for (TileImprovement ti : improvements) {
-            label += separator + Messages.message(ti.getName());
+            if (ti.isComplete()) {
+                label += separator + Messages.message(ti.getName());
+            }
         }
         return label;
     }
