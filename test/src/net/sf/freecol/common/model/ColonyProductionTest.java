@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -167,5 +169,33 @@ public class ColonyProductionTest extends FreeColTestCase {
     	assertEquals("Wrong bell upkeep",expectedBellUpkeep,bellsUpkeep);
     	assertEquals("Wrong bell net production",expectedBellNetProd,bellsNetProdPerTurn);
     }
-    
+    /**
+     * Tests that there is no over production of horses, to avoid being thrown out
+     * A test of the proper production of horses is in <code>BuildingTest</code>
+     */
+    public void testNoHorsesOverProduction() {
+        Game game = getGame();
+        game.setMap(getTestMap());
+        
+        Colony colony = getStandardColony(1);
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+
+        Building pasture = colony.getBuilding(spec().getBuildingType("model.building.Country"));
+        assertEquals(horsesType, pasture.getGoodsOutputType());
+        assertEquals("Wrong warehouse capacity in colony",100,colony.getWarehouseCapacity());
+        
+        // Still room for more
+        colony.addGoods(horsesType, 99);
+        
+        assertEquals("Wrong horse production",1, pasture.getProductionOf(horsesType));
+        assertEquals("Wrong maximum horse production",9, pasture.getMaximumProduction());
+        assertEquals("Wrong net horse production",1, colony.getProductionNetOf(horsesType));
+        
+        // No more room available
+        colony.addGoods(horsesType, 1);
+        assertEquals("Wrong number of horses in colony",colony.getWarehouseCapacity(), colony.getGoodsCount(horsesType));
+        assertEquals("Wrong horse production",0, pasture.getProductionOf(horsesType));
+        assertEquals("Wrong maximum horse production",10, pasture.getMaximumProduction());
+        assertEquals("Wrong net horse production",0, colony.getProductionNetOf(horsesType));
+    }
 }

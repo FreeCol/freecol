@@ -788,10 +788,20 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
         int goodsOutput = getMaximumAutoProduction();
 
+        // Limit production to available raw materials
         if (getGoodsInputType() != null && availableInput < goodsOutput) {
             goodsOutput = availableInput;
         }
-
+        
+        // horses should not overflow    
+        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        if(getGoodsOutputType() == horsesType ){
+            int availSpaceForHorses = colony.getWarehouseCapacity() - colony.getGoodsCount(horsesType);
+            if(goodsOutput > availSpaceForHorses){
+                goodsOutput = availSpaceForHorses;
+            }
+        }
+        
         return applyModifiers(goodsOutput);
     }
 
