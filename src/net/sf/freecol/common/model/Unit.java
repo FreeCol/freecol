@@ -975,13 +975,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param type The type of goods to attempt to produce.
      */
     public void setWorkType(GoodsType type) {
-        if (!type.isFarmed()) {
-            return;
-        }
         if (workType != type) {
             experience = 0;
         }
-        workType = type;
+        if (type.isFarmed()) {
+            workType = type;
+        }
     }
 
     /**

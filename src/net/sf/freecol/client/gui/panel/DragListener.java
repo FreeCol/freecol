@@ -313,7 +313,7 @@ public final class DragListener extends MouseAdapter {
             separatorNeeded = true;
         }
         int experience = Math.min(tempUnit.getExperience(), 200);
-        if (experience > 0) {
+        if (experience > 0 && tempUnit.getWorkType() != null) {
             UnitType workType = Specification.getSpecification()
                 .getExpertForProducing(tempUnit.getWorkType());
             if (tempUnit.getType().canBeUpgraded(workType, UnitType.UpgradeType.EXPERIENCE)) {
