@@ -678,6 +678,15 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         public EuropeCargoPanel(Canvas parent) {
             super(parent, true);
         }
+        
+        @Override
+        public Component add(Component comp, boolean editState) {
+            Component result = super.add(comp, editState);
+            updateCargoPanel();
+            getCargoPanel().revalidate();
+            refresh();
+            return result;
+        }
 
         @Override
         public String getUIClassID() {
