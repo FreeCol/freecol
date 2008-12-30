@@ -155,7 +155,7 @@ public class BuildQueue extends FreeColObject implements ListModel {
         return model.isEmpty();
     }
 
-    public Iterator iterator() {
+    public Iterator<BuildableType> iterator() {
         return model.iterator();
     }
 

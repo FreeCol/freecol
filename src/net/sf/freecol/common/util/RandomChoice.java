@@ -65,7 +65,7 @@ public class RandomChoice<T> {
 
     public static <T> int getTotalProbability(Collection<RandomChoice<T>> input) {
         int total = 0;
-        for (RandomChoice choice : input) {
+        for (RandomChoice<T> choice : input) {
             total += choice.getProbability();
         }
         return total;

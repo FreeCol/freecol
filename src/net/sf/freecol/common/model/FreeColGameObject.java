@@ -493,7 +493,7 @@ abstract public class FreeColGameObject extends FreeColObject {
             T returnValue = returnClass.cast(getGame().getFreeColGameObject(attributeString));
             try {
                 if (returnValue == null) {
-                    Constructor c = returnClass.getConstructor(Game.class, String.class);
+                    Constructor<T> c = returnClass.getConstructor(Game.class, String.class);
                     returnValue = returnClass.cast(c.newInstance(getGame(), attributeString));
                 }
                 return returnValue;
@@ -522,7 +522,7 @@ abstract public class FreeColGameObject extends FreeColObject {
             T returnValue = returnClass.cast(getGame().getFreeColGameObject(attributeString));
             try {
                 if (returnValue == null) {
-                    Constructor c = returnClass.getConstructor(Game.class, XMLStreamReader.class);
+                    Constructor<T> c = returnClass.getConstructor(Game.class, XMLStreamReader.class);
                     returnValue = returnClass.cast(c.newInstance(getGame(), in));
                 } else {
                     returnValue.readFromXML(in);

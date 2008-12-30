@@ -74,7 +74,7 @@ public final class InGameController extends Controller {
 
     public int debugOnlyAITurns = 0;
 
-    private java.util.Map<String,java.util.Map> transactionSessions;
+    private java.util.Map<String,java.util.Map<String, java.util.Map<String,Object>>> transactionSessions;
     
     /**
      * The constructor to use.
@@ -84,7 +84,7 @@ public final class InGameController extends Controller {
     public InGameController(FreeColServer freeColServer) {
         super(freeColServer);
         
-        transactionSessions = new HashMap<String,java.util.Map>();
+        transactionSessions = new HashMap<String,java.util.Map<String, java.util.Map<String,Object>>>();
     }
 
     /**
@@ -986,7 +986,6 @@ public final class InGameController extends Controller {
         }
     }
     
-    @SuppressWarnings("unchecked")
     public java.util.Map<String,Object> getTransactionSession(Unit unit, Settlement settlement){
         java.util.Map<String, java.util.Map<String,Object>> unitTransactions = null;
 
@@ -1032,9 +1031,8 @@ public final class InGameController extends Controller {
         return session;
     }
 
-    @SuppressWarnings("unchecked")
     public void closeTransactionSession(Unit unit, Settlement settlement){
-        java.util.Map<String, java.util.Map<String,Boolean>> unitTransactions;
+        java.util.Map<String, java.util.Map<String,Object>> unitTransactions;
         
         // only keep track of human player sessions
         if(unit.getOwner().isAI()){

@@ -872,7 +872,6 @@ public class Game extends FreeColGameObject {
      * 
      * @see #setFreeColGameObject
      */
-    @SuppressWarnings("unchecked")
     public void newTurn() {
         turn.increase();
         logger.info("Turn is now " + turn.toString());
