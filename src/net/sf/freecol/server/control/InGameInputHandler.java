@@ -1759,7 +1759,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     while (circleIterator.hasNext()) {
                         Position position = circleIterator.next();
                         if ((!position.equals(center))
-                                && (map.getTile(position).isLand() || map.getTile(position).getLandCount() > 0)) {
+                                && (map.getTile(position).isLand()
+                                    || map.getTile(position).getLandCount() > 0)) {
                             Tile t = map.getTile(position);
                             player.setExplored(t);
                             update.appendChild(t.toXMLElement(player, update.getOwnerDocument(), true, false));

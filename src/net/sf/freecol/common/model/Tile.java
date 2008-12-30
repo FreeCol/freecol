@@ -83,10 +83,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     private List<Unit> units = Collections.emptyList();
 
     /** The number of adjacent land tiles, if this is an ocean tile */
-    private int landCount = Integer.MIN_VALUE;
+    private int landCount = 0;
 
     /** The fish bonus of this tile, if it is an ocean tile */
-    private int fishBonus = Integer.MIN_VALUE;
+    private int fishBonus = 0;
 
     /**
      * Indicates which colony or Indian settlement that owns this tile ('null'
@@ -872,21 +872,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return an <code>int</code> value
      */
     public int getLandCount() {
-        if (landCount < 0) {
-            int tempLandCount = 0;
-            Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
-            while (tileIterator.hasNext()) {
-                Tile t = getMap().getTile(tileIterator.next());
-                if (t.isLand()) {
-                    tempLandCount++;
-                }
-            }
-            if (!hasUnexploredAdjacent()) {
-                landCount = tempLandCount;
-            }
-            return tempLandCount;
-        }
         return landCount;
+    }
+
+    public void setLandCount(int landCount) {
+        this.landCount = landCount;
     }
 
     /**
@@ -897,53 +887,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return an <code>int</code> value
      */
     public int getFishBonus() {
-        if (fishBonus < 0) {
-            int tempFishBonus = 0;
-            if (isLand()) {
-                fishBonus = 0;
-            } else {
-                int adjacentLand = 0;
-                boolean adjacentRiver = false;
-                int riverBonus = 0;
-                Iterator<Position> tileIterator = getMap().getAdjacentIterator(getPosition());
-                while (tileIterator.hasNext()) {
-                    Tile t = getMap().getTile(tileIterator.next());
-                    if (t.hasRiver()) {
-                        adjacentRiver = true;
-                        //note: this is not river magnitude, but tileimprovement-type
-                        //magnitude, as given in the specification!
-                        //Should be =1 in Col1-compatible ruleset.
-                        riverBonus = Math.max(riverBonus,t.getRiver().getMagnitude());
-                    }
-                }
-                //In Col1, ocean tiles with less than 3 land neighbours produce 2 fish,
-                //all others produce 4 fish
-                if (getLandCount()>2) {
-                        tempFishBonus+=2;
-                }
-                
-                //In Col1, the ocean tile in front of a river mouth would
-                //get an additional +1 bonus
-                //TODO: This probably has some false positives, means river tiles
-                //that are NOT a river mouth next to this tile!
-                if (!hasRiver() && adjacentRiver) {
-                    tempFishBonus += riverBonus;
-                }
-
-                // TODO: how can this happen? I suspect the client is
-                // trying to do work for some other player, and the tile
-                // has not yet been explored.
-                if (type != null && !type.isConnected()) {
-                    tempFishBonus = tempFishBonus / 2;
-                }
-            
-                //set final bonus only if all adjacent tiles have been explored
-                if (!hasUnexploredAdjacent()) {
-                    fishBonus = tempFishBonus;
-                }
-            }
-        }
         return fishBonus;
+    }
+
+    public void setFishBonus(int fishBonus) {
+        this.fishBonus = fishBonus;
     }
 
     /**
@@ -1604,6 +1552,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         writeAttribute(out, "type", getType());
         writeAttribute(out, "region", getRegion());
 
+        if (fishBonus != 0) {
+            out.writeAttribute("fishBonus", Integer.toString(fishBonus));
+        }
+
         boolean lostCity = (pet == null) ? lostCityRumour : pet.hasLostCityRumour();
         if (lostCity) {
             // this is hardly ever the case
@@ -1775,6 +1727,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         owner = getFreeColGameObject(in, "owner", Player.class, null);
         region = getFreeColGameObject(in, "region", Region.class, null);
 
+        fishBonus = getAttribute(in, "fishBonus", 0);
+
         final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
         if (owningSettlementStr != null) {
             owningSettlement = (Settlement) getGame().getFreeColGameObject(owningSettlementStr);
@@ -1902,6 +1856,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         pet.setConnected(connected);
         pet.setOwner(owner);
         pet.setRegion(region);
+        pet.setFishBonus(getFishBonus());
 
         if (getColony() != null) {
             pet.setColonyUnitCount(getSettlement().getUnitCount());
@@ -2060,6 +2015,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         private List<TileImprovement> improvements;
         private TileImprovement road;
         private TileImprovement river;
+        private int fishBonus;
 
         // Colony data:
         private int colonyUnitCount = 0, colonyStockadeLevel;
@@ -2218,6 +2174,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             this.region = region;
         }
 
+        public int getFishBonus() {
+            return fishBonus;
+        }
+
+        public void setFishBonus(int fishBonus) {
+            this.fishBonus = fishBonus;
+        }
+
+
         /**
          * Checks if this <code>Tile</code> has been explored.
          * 
@@ -2279,6 +2244,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
                 out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
             }
+            if (fishBonus != 0) {
+                out.writeAttribute("fishBonus", Integer.toString(fishBonus));
+            }
             out.writeAttribute("connected", Boolean.toString(connected));
             writeAttribute(out, "region", region);
 
@@ -2321,6 +2289,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                           Tile.this.hasLostCityRumour());
             connected = getAttribute(in, "connected", false);
 
+            fishBonus = getAttribute(in, "fishBonus", 0);
             owner = getFreeColGameObject(in, "owner", Player.class, Tile.this.getOwner());
             region = getFreeColGameObject(in, "region", Region.class, null);
 

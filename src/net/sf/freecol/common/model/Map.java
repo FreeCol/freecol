@@ -1471,7 +1471,7 @@ public class Map extends FreeColGameObject {
         }
     }
 
-    private final class WholeMapIterator extends MapIterator {
+    public final class WholeMapIterator extends MapIterator {
         private int x;
         private int y;
 

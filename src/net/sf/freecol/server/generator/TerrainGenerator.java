@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Map.WholeMapIterator;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Tile;
@@ -112,8 +113,10 @@ public class TerrainGenerator {
         final int width = landMap.length;
         final int height = landMap[0].length;
 
-        final boolean importTerrain = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
-        final boolean importBonuses = (importGame != null) && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
+        final boolean importTerrain = (importGame != null)
+            && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_TERRAIN);
+        final boolean importBonuses = (importGame != null)
+            && getMapGeneratorOptions().getBoolean(MapGeneratorOptions.IMPORT_BONUSES);
 
         boolean mapHasLand = false;
         Tile[][] tiles = new Tile[width][height];
@@ -161,12 +164,10 @@ public class TerrainGenerator {
         // Add the bonuses only after the map is completed.
         // Otherwise we risk creating resources on fields where they
         // don't belong (like sugar in large rivers or tobaco on hills).
-        if (!importBonuses) {
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    perhapsAddBonus(tiles[x][y], landMap);
-                }
-            }
+        WholeMapIterator iterator = map.getWholeMapIterator();
+        while (iterator.hasNext()) {
+            Tile tile = map.getTile(iterator.next());
+            perhapsAddBonus(tile, !importBonuses);
         }
     }
 
@@ -178,7 +179,6 @@ public class TerrainGenerator {
         } else {
             t = new Tile(game, ocean, x, y);
         }
-        perhapsAddBonus(t, landMap);
         
         return t;
     }
@@ -189,31 +189,58 @@ public class TerrainGenerator {
      * <code>MapGeneratorOptions</code>.
      * 
      * @param t The Tile.
-     * @param landMap The landMap.
+     * @param generateBonus a <code>boolean</code> value
      */
-    private void perhapsAddBonus(Tile t, boolean[][] landMap) {
-        if (!t.isLand() && t.getType().isConnected()) {
-            // this should only apply to ocean and high seas
-            int adjacentLand = 0;
-            for (Direction direction : Direction.values()) {
-                Position mp = Map.getAdjacent(t.getPosition(), direction);
-                final boolean valid = Map.isValid(mp, landMap.length, landMap[0].length);
-                if (valid && landMap[mp.getX()][mp.getY()]) {
-                    adjacentLand++;
-                }
-            }
-
-            if (adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
-                if (t.getTileItemContainer() == null) {
-                    t.setTileItemContainer(new TileItemContainer(t.getGame(), t));
-                }
+    private void perhapsAddBonus(Tile t, boolean generateBonus) {
+        if (t.isLand()) {
+            if (generateBonus && random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
+                // Create random Bonus Resource
                 t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
             }
         } else {
-            // this should apply to land tiles, as well as rivers and lakes
-            if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
-                // Create random Bonus Resource
-                t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
+            int adjacentLand = 0;
+            int riverBonus = 0;
+            int fishBonus = 0;
+            boolean adjacentRiver = false;
+            for (Direction direction : Direction.values()) {
+                Tile otherTile = t.getMap().getNeighbourOrNull(direction, t);
+                if (otherTile != null && otherTile.isLand()) {
+                    adjacentLand++;
+                    if (otherTile.hasRiver()) {
+                        adjacentRiver = true;
+                        //note: this is not river magnitude, but tileimprovement-type
+                        //magnitude, as given in the specification!
+                        //Should be =1 in Col1-compatible ruleset.
+                        riverBonus = Math.max(riverBonus, otherTile.getRiver().getMagnitude());
+                    }
+                }
+            }
+
+            //In Col1, ocean tiles with less than 3 land neighbours produce 2 fish,
+            //all others produce 4 fish
+            if (adjacentLand > 2) {
+                fishBonus += 2;
+            }
+                
+            //In Col1, the ocean tile in front of a river mouth would
+            //get an additional +1 bonus
+            //TODO: This probably has some false positives, means river tiles
+            //that are NOT a river mouth next to this tile!
+            if (!t.hasRiver() && adjacentRiver) {
+                fishBonus += riverBonus;
+            }
+            t.setFishBonus(fishBonus);
+            t.setLandCount(adjacentLand);
+
+            if (t.getType().isConnected()) {
+                if (generateBonus && adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
+                    t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
+                }
+            } else {
+                if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
+                    // Create random Bonus Resource
+                    t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
+                }
             }
         }
     }
