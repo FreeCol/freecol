@@ -68,6 +68,7 @@ import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.RangeOption;
 import net.sf.freecol.common.option.SelectOption;
+import net.sf.freecol.common.option.StringOption;
 
 /**
  * This class encapsulates any parts of the "specification" for FreeCol that are
@@ -373,17 +374,26 @@ public final class Specification {
                         String optionType = xsr.getLocalName();
                         if (OptionGroup.getXMLElementTagName().equals(optionType)) {
                             option = new OptionGroup(xsr);
-                        } else if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
+                        } else if (IntegerOption.getXMLElementTagName().equals(optionType)
+                                   || "integer-option".equals(optionType)) {
                             option = new IntegerOption(xsr);
-                        } else if (BooleanOption.getXMLElementTagName().equals(optionType) || "boolean-option".equals(optionType)) {
+                        } else if (BooleanOption.getXMLElementTagName().equals(optionType)
+                                   || "boolean-option".equals(optionType)) {
                             option = new BooleanOption(xsr);
-                        } else if (RangeOption.getXMLElementTagName().equals(optionType) || "range-option".equals(optionType)) {
+                        } else if (StringOption.getXMLElementTagName().equals(optionType)
+                                   || "string-option".equals(optionType)) {
+                            option = new StringOption(xsr);
+                        } else if (RangeOption.getXMLElementTagName().equals(optionType)
+                                   || "range-option".equals(optionType)) {
                             option = new RangeOption(xsr);
-                        } else if (SelectOption.getXMLElementTagName().equals(optionType) || "select-option".equals(optionType)) {
+                        } else if (SelectOption.getXMLElementTagName().equals(optionType)
+                                   || "select-option".equals(optionType)) {
                             option = new SelectOption(xsr);
-                        } else if (LanguageOption.getXMLElementTagName().equals(optionType) || "language-option".equals(optionType)) {
+                        } else if (LanguageOption.getXMLElementTagName().equals(optionType)
+                                   || "language-option".equals(optionType)) {
                             option = new LanguageOption(xsr);
-                        } else if (FileOption.getXMLElementTagName().equals(optionType) || "file-option".equals(optionType)) {
+                        } else if (FileOption.getXMLElementTagName().equals(optionType)
+                                   || "file-option".equals(optionType)) {
                             option = new FileOption(xsr);
                         } else {
                             logger.finest("Parsing of " + optionType + " is not implemented yet");
@@ -601,6 +611,18 @@ public final class Specification {
      */
     public BooleanOption getBooleanOption(String Id) {
         return (BooleanOption) getOption(Id);
+    }
+
+    /**
+     * Returns the <code>StringOption</code> with the given ID. Throws an
+     * IllegalArgumentException if the ID is null, or if no such Type can be
+     * retrieved.
+     *
+     * @param Id a <code>String</code> value
+     * @return an <code>StringOption</code> value
+     */
+    public StringOption getStringOption(String Id) {
+        return (StringOption) getOption(Id);
     }
 
     // -- Buildings --

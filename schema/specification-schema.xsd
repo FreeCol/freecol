@@ -487,6 +487,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="integerOption"/>
         <xs:element ref="booleanOption"/>
+        <xs:element ref="stringOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
     </xs:complexType>
@@ -496,6 +497,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="integerOption"/>
         <xs:element ref="booleanOption"/>
+        <xs:element ref="stringOption"/>
         <xs:element ref="rangeOption"/>
         <xs:element ref="selectOption"/>
         <xs:element ref="languageOption"/>
@@ -509,6 +511,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="integerOption"/>
         <xs:element ref="booleanOption"/>
+        <xs:element ref="stringOption"/>
         <xs:element ref="rangeOption"/>
         <xs:element ref="selectOption"/>
         <xs:element ref="languageOption"/>
@@ -531,6 +534,13 @@
       <xs:attribute name="id" use="required" type="xs:string"/>
       <xs:attribute name="defaultValue" type="xs:boolean"/>
       <xs:attribute name="value" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="stringOption">
+    <xs:complexType>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="defaultValue" type="xs:string"/>
+      <xs:attribute name="value" type="xs:string"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="rangeOption">

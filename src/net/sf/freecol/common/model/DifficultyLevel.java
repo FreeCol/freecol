@@ -30,6 +30,7 @@ import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.IntegerOption;
+import net.sf.freecol.common.option.StringOption;
 
 /**
  * Represents a difficulty level.
@@ -78,6 +79,10 @@ public class DifficultyLevel extends FreeColGameObjectType {
             } else if (BooleanOption.getXMLElementTagName().equals(optionType) ||
                        "boolean-option".equals(optionType)) {
                 BooleanOption option = new BooleanOption(in);
+                levelOptions.put(option.getId(), option);
+            } else if (StringOption.getXMLElementTagName().equals(optionType) ||
+                       "string-option".equals(optionType)) {
+                StringOption option = new StringOption(in);
                 levelOptions.put(option.getId(), option);
             } else {
                 logger.finest("Parsing of " + optionType + " is not implemented yet");

@@ -90,9 +90,16 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         super(game);
         this.owner = owner;
 
-        setRecruitable(0, owner.generateRecruitable("r1"));
-        setRecruitable(1, owner.generateRecruitable("r2"));
-        setRecruitable(2, owner.generateRecruitable("r3"));
+        for (int index = 0; index < 3; index++) {
+            String optionId = "model.option.recruitable.slot" + index;
+            if (Specification.getSpecification().hasOption(optionId)) {
+                String unitTypeId = Specification.getSpecification()
+                    .getStringOption(optionId).getValue();
+                setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
+            } else {
+                setRecruitable(index, owner.generateRecruitable("recruitable" + index));
+            }
+        }
 
         recruitPrice = RECRUIT_PRICE_INITIAL;
         recruitLowerCap = LOWER_CAP_INITIAL;

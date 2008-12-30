@@ -1634,6 +1634,9 @@
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
+      <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
+      <stringOption  id="model.option.recruitable.slot2" value="model.unit.seasonedScout"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.easy">
       <integerOption id="model.option.crossesIncrement" value="8"/>
@@ -1649,6 +1652,8 @@
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
+      <stringOption  id="model.option.recruitable.slot1" value="model.unit.expertFarmer"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.medium">
       <integerOption id="model.option.crossesIncrement" value="10"/>
@@ -1664,6 +1669,7 @@
       <integerOption id="model.option.lowerCapIncrease" value="0"/>
       <booleanOption id="model.option.priceIncreasePerType" value="true"/>
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
+      <stringOption  id="model.option.recruitable.slot0" value="model.unit.masterCarpenter"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.hard">
       <integerOption id="model.option.crossesIncrement" value="12"/>

@@ -93,6 +93,9 @@ public final class PreGameController extends Controller {
         FreeColServer freeColServer = getFreeColServer();
 
         Game game = freeColServer.getGame();
+        // Apply the difficulty level
+        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
+        
         IMapGenerator mapGenerator = freeColServer.getMapGenerator();
         AIMain aiMain = new AIMain(freeColServer);
         freeColServer.setAIMain(aiMain);
@@ -105,9 +108,6 @@ public final class PreGameController extends Controller {
         }
         nations.addAll(FreeCol.getSpecification().getIndianNations());
 
-        // Apply the difficulty level
-        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
-        
         // Add AI players
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
         for (Nation nation : nations) {
