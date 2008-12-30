@@ -130,18 +130,14 @@ public class UnitSeekAndDestroyMission extends Mission {
         
         PathNode pathToTarget = null;
         if (unit.isOnCarrier()) {
-            if (unit.getTile() == null) {
-                pathToTarget = null;
-            } else {
+            if (unit.getTile() != null) {
                 pathToTarget = getDisembarkPath(unit, unit.getTile(), target.getTile(), (Unit) unit.getLocation());
                 if (pathToTarget.getTransportDropNode() != pathToTarget) {
                     pathToTarget = null;
                 }
             }
         } else {
-            if (unit.getTile() == null) {
-                pathToTarget = null;
-            } else {
+            if (unit.getTile() != null) {
                 pathToTarget = getUnit().findPath(target.getTile());
             }
         }

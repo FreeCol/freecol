@@ -1450,7 +1450,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 opponentAttackElement.setAttribute("unit", unit.getId());
                 opponentAttackElement.setAttribute("defender", defender.getId());
                 
-                if (defender != null && defender.getOwner() == enemyPlayer) {
+                if (defender.getOwner() == enemyPlayer) {
                 	// Naval battle, defender lost, needs repair location
                 	if(repairLocation != null && loserOwner == defender.getOwner()){
                 		opponentAttackElement.setAttribute("repairIn", repairLocation.getId());

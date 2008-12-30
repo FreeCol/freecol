@@ -1886,11 +1886,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
         }
         
-        if (!canPerformImprovement(improvement.getType())){
-            throw new IllegalArgumentException("Cannot perform this improvement for this tile");
+        // TODO: Check whether and why improvement can be null here - possible bug in caller?
+        if (improvement == null){
+            throw new IllegalArgumentException("Improvement must not be 'null'.");
         }
         
-        if (improvement == null){
+        if (!canPerformImprovement(improvement.getType())){
             throw new IllegalArgumentException("Cannot perform this improvement for this tile");
         }
         

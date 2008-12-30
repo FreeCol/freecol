@@ -58,11 +58,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         this.game = game;
 
         if (game != null) {
-            //game.setFreeColGameObject(id, this);            
-            String nextID = getRealXMLElementTagName() + ":" + game.getNextID();
-            if (nextID != null) {
-                setId(nextID);
-            }
+            setId(getRealXMLElementTagName() + ":" + game.getNextID());
         } else if (this instanceof Game) {
             setId("0");
         } else {

@@ -370,11 +370,7 @@ public class TerrainGenerator {
         }
         
         // All scoped, if none have been selected by elimination, randomly choose one
-        TileType chosen = null;
-        if (chosen == null) {
-            chosen = candidateTileTypes.get(random.nextInt(candidateTileTypes.size()));
-        }
-        return chosen;
+        return candidateTileTypes.get(random.nextInt(candidateTileTypes.size()));
     }
 
 

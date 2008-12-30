@@ -887,9 +887,6 @@ public class AIPlayer extends AIObject {
                         continue;
                     }
                     GoodsWish gw = (GoodsWish) w;
-                    if (gw == null) {
-                        continue;
-                    }
                     if (gw.getGoodsType() == Goods.MUSKETS) {
                         made = true;
                     }
@@ -912,9 +909,6 @@ public class AIPlayer extends AIObject {
                         continue;
                     }
                     GoodsWish gw = (GoodsWish) w;
-                    if (gw == null) {
-                        continue;
-                    }
                     if (gw.getGoodsType() == Goods.HORSES) {
                         made = true;
                     }

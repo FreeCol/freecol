@@ -126,7 +126,7 @@ public class OptionGroup extends AbstractOption {
             setId(id);
         }
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            AbstractOption option = (AbstractOption) null;
+            AbstractOption option = null;
             String optionType = in.getLocalName();
             if (IntegerOption.getXMLElementTagName().equals(optionType) || "integer-option".equals(optionType)) {
                 option = new IntegerOption(in);
@@ -145,7 +145,7 @@ public class OptionGroup extends AbstractOption {
                 in.nextTag();
             }
 
-            if (option != (AbstractOption) null) {
+            if (option != null) {
                 add(option);
                 option.setGroup(this.getId());
             }

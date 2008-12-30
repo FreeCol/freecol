@@ -129,7 +129,7 @@ public class Messages {
             return messageId;
         }
 
-        if (data!=null && data.length > 0 && message != null) {
+        if (data!=null && data.length > 0) {
             for (int i = 0; i < data.length; i += 2) {
                 if (data[i] == null || data[i+1] == null) {
                     throw new IllegalArgumentException("Programming error, no data should be <null>.");

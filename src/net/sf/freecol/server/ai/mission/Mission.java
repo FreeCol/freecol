@@ -244,8 +244,7 @@ public abstract class Mission extends AIObject {
                 Tile newTile = pathNode.getTile();
                 Unit defender = newTile.getDefendingUnit(unit);
                 if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
-                        defender != null && 
-                    defender.getOwner() != unit.getOwner()) {
+                        defender != null && defender.getOwner() != unit.getOwner()) {
 
                     int tension = 0;
                     Tension alarm = unit.getOwner().getTension(defender.getOwner());
@@ -269,7 +268,6 @@ public abstract class Mission extends AIObject {
                     }
                     // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:
                     if (unit.getOwner().isIndian() 
-                            && defender != null
                             && defender.getOwner().isAI()) {
                         tension -= 200;
                     }

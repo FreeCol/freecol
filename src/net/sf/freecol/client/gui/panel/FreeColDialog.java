@@ -363,14 +363,11 @@ public class FreeColDialog extends FreeColPanel {
             });
             enterPressesWhenFocused(objectButton);
             objectsPanel.add(objectButton);
-            //height += objectButton.getMinimumSize().height;
         }
         if (cancelText != null) {
-            final JButton cancelButton = new JButton();
-            if (cancelText != null) {
-                cancelButton.setText(cancelText);
-                enterPressesWhenFocused(cancelButton);
-            }
+            final JButton cancelButton = new JButton();           
+            cancelButton.setText(cancelText);
+            enterPressesWhenFocused(cancelButton);            
             cancelButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         choiceDialog.setResponse(null);

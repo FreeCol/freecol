@@ -71,14 +71,12 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
 
         String type = element.getTagName();
 
-        if (element != null) {
-            if (type.equals("getVacantPlayers")) {
-                reply = getVacantPlayers(connection, element);
-            } else if (type.equals("disconnect")) {
-                reply = disconnect(connection, element);                                
-            } else {
-                logger.warning("Unkown request: " + type);
-            }
+        if (type.equals("getVacantPlayers")) {
+            reply = getVacantPlayers(connection, element);
+        } else if (type.equals("disconnect")) {
+            reply = disconnect(connection, element);                                
+        } else {
+            logger.warning("Unkown request: " + type);
         }
 
         return reply;

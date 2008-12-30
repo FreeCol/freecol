@@ -346,7 +346,7 @@ public final class ImageLibrary extends ImageProvider {
         }
 
         File tmpFile = new File(filePath);
-        if ((tmpFile == null) || !tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
+        if (!tmpFile.exists() || !tmpFile.isFile() || !tmpFile.canRead()) {
             throw new FreeColException("The data file \"" + filePath + "\" could not be found.");
         }
 

@@ -294,7 +294,7 @@ public final class InGameInputHandler extends InputHandler {
                     new RefreshTilesSwingTask(unit.getTile(), toTile).invokeLater();
                 }
             }
-            if (toTile!=null && getFreeColClient().getMyPlayer().canSee(toTile)) {
+            if (getFreeColClient().getMyPlayer().canSee(toTile)) {
                 unit.moveToTile(toTile);
             } else {
                 unit.dispose();

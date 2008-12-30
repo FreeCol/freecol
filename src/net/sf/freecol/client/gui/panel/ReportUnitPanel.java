@@ -407,13 +407,11 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
             units.addAll(dragoonUnits);
             units.addAll(soldierUnits);
         }
-        if (unitPanel != null) {
-            unitPanel.setOpaque(false);
-            unitPanel.setBorder(BorderFactory.createTitledBorder(player.getNationAsString()));
-            unitPanel.setLayout(new GridLayout(1, units.size()));
-            for (AbstractUnit unit : units) {
-                unitPanel.add(createUnitTypeLabel(unit));
-            }
+        unitPanel.setOpaque(false);
+        unitPanel.setBorder(BorderFactory.createTitledBorder(player.getNationAsString()));
+        unitPanel.setLayout(new GridLayout(1, units.size()));
+        for (AbstractUnit unit : units) {
+            unitPanel.add(createUnitTypeLabel(unit));
         }
         return unitPanel;
     }

@@ -251,8 +251,7 @@ public final class FreeCol {
                         }
                     });
                 if (checkIntegrity) {
-                    System.exit((freeColServer != null
-                                 && freeColServer.getIntegrity())
+                    System.exit((freeColServer.getIntegrity())
                                 ? 0 : 1);
                 }
             } catch (IOException e) {

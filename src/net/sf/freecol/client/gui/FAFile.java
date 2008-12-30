@@ -137,7 +137,7 @@ public class FAFile {
         maxHeight = Integer.parseInt(st.nextToken());
 
         String line = in.readLine();
-        while (!line.startsWith("[Chars]") && line != null) {
+        while (line != null && !line.startsWith("[Chars]")) {
             String name = line;
             st = new StringTokenizer(in.readLine());
             int width = Integer.parseInt(st.nextToken());

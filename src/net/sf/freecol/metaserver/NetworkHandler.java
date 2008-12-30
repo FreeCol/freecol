@@ -74,20 +74,18 @@ public final class NetworkHandler implements MessageHandler {
 
         String type = element.getTagName();
 
-        if (element != null) {
-            if (type.equals("register")) {
-                reply = register(connection, element);
-            } else if (type.equals("update")) {
-                reply = update(connection, element);
-            } else if (type.equals("getServerList")) {
-                reply = getServerList(connection, element);
-            } else if (type.equals("remove")) {
-                reply = remove(connection, element);
-            } else if (type.equals("disconnect")) {
-                reply = disconnect(connection, element);
-            } else {
-                logger.warning("Unkown request: " + type);
-            }
+        if (type.equals("register")) {
+            reply = register(connection, element);
+        } else if (type.equals("update")) {
+            reply = update(connection, element);
+        } else if (type.equals("getServerList")) {
+            reply = getServerList(connection, element);
+        } else if (type.equals("remove")) {
+            reply = remove(connection, element);
+        } else if (type.equals("disconnect")) {
+            reply = disconnect(connection, element);
+        } else {
+            logger.warning("Unkown request: " + type);
         }
 
         return reply;

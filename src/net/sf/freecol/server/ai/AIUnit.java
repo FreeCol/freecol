@@ -100,9 +100,6 @@ public class AIUnit extends AIObject implements Transportable {
         super(aiMain, unit.getId());
 
         this.unit = unit;
-        if (unit == null) {
-            throw new NullPointerException("unit == null");
-        }
 
         mission = new UnitWanderHostileMission(aiMain, this);
     }

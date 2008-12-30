@@ -364,7 +364,7 @@ public final class Specification {
                 } else if ("options".equals(childName)) {
 
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        AbstractOption option = (AbstractOption) null;
+                        AbstractOption option = null;
                         String optionType = xsr.getLocalName();
                         if (OptionGroup.getXMLElementTagName().equals(optionType)) {
                             option = new OptionGroup(xsr);
@@ -395,7 +395,7 @@ public final class Specification {
                         }
 
                         // If the option is valid, add it to Specification options
-                        if (option != (AbstractOption) null) {
+                        if (option != null) {
                             if(option instanceof OptionGroup) {
                                 this.addOptionGroup((OptionGroup) option);
                             } else {

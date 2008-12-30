@@ -398,9 +398,6 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                         continue;
                     }
                     GoodsWish gw = (GoodsWish) w;
-                    if (gw == null) {
-                        continue;
-                    }
                     if (gw.getGoodsType() == Goods.MUSKETS) {
                         made = true;
                     }
@@ -423,9 +420,6 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                         continue;
                     }
                     GoodsWish gw = (GoodsWish) w;
-                    if (gw == null) {
-                        continue;
-                    }
                     if (gw.getGoodsType() == Goods.HORSES) {
                         made = true;
                     }

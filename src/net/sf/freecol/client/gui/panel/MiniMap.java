@@ -346,10 +346,10 @@ public final class MiniMap extends JPanel implements MouseInputListener {
                 if (tile == null) {
                     continue;
                 }
-                Settlement settlement = (tile != null ? tile.getSettlement() : null);
-                int units = (tile != null ? tile.getUnitCount() : 0);
+                Settlement settlement = tile.getSettlement();
+                int units = tile.getUnitCount();
                 g.setColor(Color.BLACK); //Default
-                if (tile != null && tile.isExplored()) {
+                if (tile.isExplored()) {
                     g.setColor(tile.getType().getMinimapColor());
                 }
                 if (tileSize == 4) {

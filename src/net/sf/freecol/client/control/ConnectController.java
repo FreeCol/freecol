@@ -456,48 +456,32 @@ public final class ConnectController {
                         }
                     } );                    
                 } catch (NoRouteToServerException e) {
-                    final FreeColServer theFreeColServer = freeColServer;
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (theFreeColServer != null) {
-                                theFreeColServer.getServer().shutdown();
-                            }
                             freeColClient.getCanvas().closeMainPanel();
                             freeColClient.getCanvas().showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("server.noRouteToServer") );
-                } catch (FileNotFoundException e) {                    
-                    final FreeColServer theFreeColServer = freeColServer;
+                } catch (FileNotFoundException e) {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (theFreeColServer != null) {
-                                theFreeColServer.getServer().shutdown();
-                            }
                             freeColClient.getCanvas().closeMainPanel();
                             freeColClient.getCanvas().showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("fileNotFound") );
                 } catch (IOException e) {
-                    final FreeColServer theFreeColServer = freeColServer;
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (theFreeColServer != null) {
-                                theFreeColServer.getServer().shutdown();
-                            }
                             freeColClient.getCanvas().closeMainPanel();
                             freeColClient.getCanvas().showMainPanel();
                         }
                     });
                     SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
                 } catch (FreeColException e) {
-                    final FreeColServer theFreeColServer = freeColServer;
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
-                            if (theFreeColServer != null) {
-                                theFreeColServer.getServer().shutdown();
-                            }
                             freeColClient.getCanvas().closeMainPanel();
                             freeColClient.getCanvas().showMainPanel();
                         }

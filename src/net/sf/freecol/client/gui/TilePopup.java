@@ -80,10 +80,6 @@ public final class TilePopup extends JPopupMenu {
         this.canvas = canvas;
         this.gui = gui;
 
-        if (tile == null) {
-            return;
-        }
-
         final Unit activeUnit = gui.getActiveUnit();
         if (activeUnit != null) {
             JMenuItem gotoMenuItem = null;

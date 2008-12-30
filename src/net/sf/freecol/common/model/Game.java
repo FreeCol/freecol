@@ -497,7 +497,7 @@ public class Game extends FreeColGameObject {
      * @return game object with id or null.
      */
     public FreeColGameObject getFreeColGameObjectSafely(String id) {
-        if (id != null || id != "") {
+        if (id != null && id.length()>0) {
             return freeColGameObjects.get(id);
         } else {
             return null;
