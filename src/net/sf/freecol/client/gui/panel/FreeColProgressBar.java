@@ -205,15 +205,25 @@ public class FreeColProgressBar extends JPanel {
             }
         }
 
-        String progressString = String.valueOf(value) + "+" + step + "/" + max;
-        if (step > 0 && max > value) {
-            int turns = (max - value) / step;
-            if ((max - value) % step > 0) {
-                turns++;
+        String stepSignal = (step < 0) ? "-" : "+"; 
+        String progressString = String.valueOf(value) + stepSignal + Math.abs(step) + "/" + max;
+        String turnsString = "";
+        if (max > value) {
+            if (step > 0) {
+                // There is progress, find how many turns necessary with current production
+                int turns = (max - value) / step;
+                if ((max - value) % step > 0) {
+                    turns++;
+                }
+                turnsString = " (" + turns + " " + Messages.message("turns") + ")";
             }
-            progressString += " (" + turns + " " + Messages.message("turns") + ")";
+            else {
+                // No progress, or even negative progress, impossible to determine
+                turnsString = " (" + Messages.message("turns") + ": N/A)";
+            }
         }
-
+        progressString += turnsString;
+        
         int stringWidth = g2d.getFontMetrics().stringWidth(progressString);
         int stringHeight = g2d.getFontMetrics().getAscent() + g2d.getFontMetrics().getDescent();
         int restWidth = getWidth() - stringWidth;
