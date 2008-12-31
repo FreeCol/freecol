@@ -322,6 +322,9 @@ public class ColonyPlan {
                 }
             }
             if (highestPotential > 0) {
+                // this must be true because it is the only way to
+                // increase highestPotential
+                assert bestChoice != null;
                 bestChoice.setGoodsType(Goods.LUMBER);
             }
         }
