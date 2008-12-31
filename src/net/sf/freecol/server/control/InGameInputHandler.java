@@ -994,12 +994,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 Colony colony = tile.getColony();
                 // ships in settlements don't slow enemy ships
                 if (colony != null) {
+                    /* TODO: this doesn't actually do anything.
+                     * Should a fortress slow enemy ships?
                     Player enemy = colony.getOwner();
                     if (player != enemy && (player.getStance(enemy) == Stance.WAR
                             || unit.hasAbility("model.ability.piracy"))
                             && colony.hasAbility("model.ability.bombardShips")) {
                         float bombardingPower = combatModel.getOffencePower(colony, unit);
                     }
+                    */
                 } else if (!tile.isLand() && tile.getFirstUnit() != null) {
                     Player enemy = tile.getFirstUnit().getOwner();
                     if (player == enemy) { // own units, check another tile
@@ -1020,6 +1023,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             
             if (attackPower > 0) {
+                // this must be the case, because it is the only way
+                // to increase attackPower
+                assert attacker != null;
                 float defencePower = combatModel.getDefencePower(attacker, unit);
                 float totalProbability = attackPower + defencePower;
                 int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
