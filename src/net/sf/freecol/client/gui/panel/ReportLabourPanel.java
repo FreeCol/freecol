@@ -49,7 +49,7 @@ import java.util.Set;
 /**
  * This panel displays the Labour Report.
  */
-public final class ReportLabourPanel extends ReportPanel implements ActionListener {
+public final class ReportLabourPanel extends ReportPanel {
 
     private static final int HEADER_ROWS = 1;
 

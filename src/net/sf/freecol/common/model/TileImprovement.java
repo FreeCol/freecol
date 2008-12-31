@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * Represents a tile improvement, such as a river or road.
  */
-public class TileImprovement extends TileItem implements Locatable, Named {
+public class TileImprovement extends TileItem {
 
     private static Logger logger = Logger.getLogger(TileImprovement.class.getName());
 

@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
  * {@link ColonyTile}s. The latter represents the tiles around the
  * <code>Colony</code> where working is possible.
  */
-public final class Colony extends Settlement implements Location, Nameable, PropertyChangeListener {
+public final class Colony extends Settlement implements Nameable, PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 

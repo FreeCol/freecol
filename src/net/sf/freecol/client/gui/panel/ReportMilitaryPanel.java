@@ -28,7 +28,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * This panel displays the Military Report.
  */
-public final class ReportMilitaryPanel extends ReportPanel implements ActionListener {
+public final class ReportMilitaryPanel extends ReportPanel {
 
     private static ReportUnitPanel reportUnitPanel;
 

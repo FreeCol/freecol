@@ -37,7 +37,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel displays the ContinentalCongress Report.
  */
-public final class ReportContinentalCongressPanel extends ReportPanel implements ActionListener {
+public final class ReportContinentalCongressPanel extends ReportPanel {
 
 
 

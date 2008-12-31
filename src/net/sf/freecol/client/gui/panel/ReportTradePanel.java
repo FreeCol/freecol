@@ -47,7 +47,7 @@ import java.util.List;
 /**
  * This panel displays the Trade Report.
  */
-public final class ReportTradePanel extends ReportPanel implements ActionListener {
+public final class ReportTradePanel extends ReportPanel {
 
     /**
      * How many additional rows are defined.

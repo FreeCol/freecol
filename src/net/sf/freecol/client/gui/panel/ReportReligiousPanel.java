@@ -33,7 +33,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel displays the Religious Report.
  */
-public final class ReportReligiousPanel extends ReportPanel implements ActionListener {
+public final class ReportReligiousPanel extends ReportPanel {
 
 
     private final ReportProductionPanel religiousReportPanel;

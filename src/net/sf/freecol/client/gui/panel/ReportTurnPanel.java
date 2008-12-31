@@ -52,7 +52,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel displays the Turn Report.
  */
-public final class ReportTurnPanel extends ReportPanel implements ActionListener {
+public final class ReportTurnPanel extends ReportPanel {
 
     /**
      * The constructor that will add the items to this panel.

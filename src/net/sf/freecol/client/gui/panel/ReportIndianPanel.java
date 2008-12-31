@@ -41,7 +41,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel displays the Foreign Affairs Report.
  */
-public final class ReportIndianPanel extends ReportPanel implements ActionListener {
+public final class ReportIndianPanel extends ReportPanel {
 
     public static final int EXTRA_ROWS = 10;
     

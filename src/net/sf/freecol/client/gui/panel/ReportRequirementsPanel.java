@@ -46,7 +46,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel displays the Advanced Colony Report.
  */
-public final class ReportRequirementsPanel extends ReportPanel implements ActionListener {
+public final class ReportRequirementsPanel extends ReportPanel {
 
 
 

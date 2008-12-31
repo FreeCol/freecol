@@ -40,7 +40,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel displays the Foreign Affairs Report.
  */
-public final class ReportHighScoresPanel extends ReportPanel implements ActionListener {
+public final class ReportHighScoresPanel extends ReportPanel {
 
 
     /**

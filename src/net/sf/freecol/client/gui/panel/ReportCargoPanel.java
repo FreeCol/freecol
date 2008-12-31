@@ -28,7 +28,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * This panel displays the Cargo Report.
  */
-public final class ReportCargoPanel extends ReportPanel implements ActionListener {
+public final class ReportCargoPanel extends ReportPanel {
 
     private static ReportUnitPanel reportUnitPanel;
 

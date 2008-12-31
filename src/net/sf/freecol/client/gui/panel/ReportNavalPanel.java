@@ -29,7 +29,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * This panel displays the Naval Report.
  */
-public final class ReportNavalPanel extends ReportPanel implements ActionListener {
+public final class ReportNavalPanel extends ReportPanel {
 
     private static ReportUnitPanel reportUnitPanel;
 
