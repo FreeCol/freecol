@@ -1079,6 +1079,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 updateSoLLabel();
             }
             updateCargoLabel();
+            // Tools may have been loaded into the carrier, so we need to also update
+            //the progress labels
+            updateProgressLabel();
             return result;
         }
 
