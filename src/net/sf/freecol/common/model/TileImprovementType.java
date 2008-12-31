@@ -247,7 +247,7 @@ public final class TileImprovementType extends FreeColGameObjectType
     public int getMovementCost(int moveCost) {
         int cost = moveCost;
         if (movementCostFactor >= 0) {
-            float cost2 = (float)cost * movementCostFactor;
+            float cost2 = cost * movementCostFactor;
             cost = (int)cost2;
             if (cost < cost2) {
                 cost++;

@@ -69,7 +69,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      * Creates a new <code>TradeRoute</code> instance.
      *
      */
-    private TradeRoute() {};
+    private TradeRoute() {}
 
     /**
      * Creates a new <code>TradeRoute</code> instance.

@@ -107,7 +107,7 @@ public final class FreeColServer {
     private static final String HIGH_SCORE_FILE = "HighScores.xml";
 
     /** Constant for storing the state of the game. */
-    public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME};
+    public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME}
 
     /** Stores the current state of the game. */
     private GameState gameState = GameState.STARTING_GAME;

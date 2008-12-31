@@ -91,7 +91,7 @@ public abstract class NewAIPlayer extends AIObject {
 
     public NewAIPlayer() {
         super(null);
-    };
+    }
 
     /**
      * Creates a new <code>AIPlayer</code>.

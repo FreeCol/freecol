@@ -370,7 +370,7 @@ public final class ConnectController {
                 canvas.closeMenus();
                 canvas.errorMessage( message );
             }
-        };
+        }
 
         final boolean publicServer;
         final boolean singleplayer;

@@ -225,7 +225,7 @@ public class BuildQueue extends FreeColObject implements ListModel {
 
     public void addAll(int preferredIndex, BuildQueue buildQueue) {
         for (int index = 0; index < buildQueue.size(); index++) {
-            BuildableType item = (BuildableType) buildQueue.get(index);
+            BuildableType item = buildQueue.get(index);
             add(preferredIndex + index, item);
         }
     }

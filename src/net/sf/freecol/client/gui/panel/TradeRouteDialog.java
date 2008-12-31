@@ -46,7 +46,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
 
     private static final Logger logger = Logger.getLogger(TradeRouteDialog.class.getName());
     
-    private static enum Action { OK, CANCEL, DEASSIGN };
+    private static enum Action { OK, CANCEL, DEASSIGN }
 
     private final JButton ok = new JButton(Messages.message("ok"));
     private final JButton cancel = new JButton(Messages.message("cancel"));

@@ -37,7 +37,6 @@ public class ActionManager extends OptionGroup {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ActionManager.class.getName());
 
-    @SuppressWarnings("unused")
     private FreeColClient freeColClient;
 
     /**

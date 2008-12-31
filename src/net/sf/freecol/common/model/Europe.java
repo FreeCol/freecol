@@ -316,7 +316,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      */
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            units.remove((Unit) locatable);
+            units.remove(locatable);
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a europe.");
         }
@@ -331,7 +331,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      */
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return units.contains((Unit) locatable);
+            return units.contains(locatable);
         }
 
         return false;

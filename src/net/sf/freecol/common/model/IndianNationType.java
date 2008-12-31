@@ -40,8 +40,8 @@ import net.sf.freecol.common.util.RandomChoice;
  */
 public class IndianNationType extends NationType {
 
-    public static enum SettlementNumber { LOW, AVERAGE, HIGH };
-    public static enum AggressionLevel { LOW, AVERAGE, HIGH };
+    public static enum SettlementNumber { LOW, AVERAGE, HIGH }
+    public static enum AggressionLevel { LOW, AVERAGE, HIGH }
 
     /**
      * The number of settlements this Nation has.

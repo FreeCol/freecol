@@ -43,7 +43,6 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
 
     private static final int OK = 0, CONTINUE = 1;
 
-    @SuppressWarnings("unused")
     private final Canvas parent;
 
     private Box buttonsBox = Box.createHorizontalBox();

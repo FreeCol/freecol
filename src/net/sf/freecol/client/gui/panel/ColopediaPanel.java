@@ -86,7 +86,6 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class ColopediaPanel extends FreeColPanel implements ActionListener, TreeSelectionListener {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
 
     public static enum PanelType { TERRAIN, RESOURCES, UNITS, GOODS, 

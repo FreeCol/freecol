@@ -2678,5 +2678,5 @@ public final class Canvas extends JDesktopPane {
 
         public void mouseMoved(MouseEvent arg0) {
         }
-    };
+    }
 }

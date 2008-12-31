@@ -83,7 +83,7 @@ public class StatisticsMessage extends Message {
         Element memoryElement = (Element)element.getElementsByTagName("memoryStatistics").item(0);
         if (memoryElement != null) {
             memoryStats = new HashMap<String, Long>();
-            NamedNodeMap atts = (NamedNodeMap)memoryElement.getAttributes();
+            NamedNodeMap atts = memoryElement.getAttributes();
             for (int i=0; i<atts.getLength(); i++) {
                 memoryStats.put(atts.item(i).getNodeName(), new Long(atts.item(i).getNodeValue()));
             }
@@ -91,7 +91,7 @@ public class StatisticsMessage extends Message {
         Element gameElement = (Element)element.getElementsByTagName("gameStatistics").item(0);
         if (gameElement != null) {
             gameStats = new HashMap<String, Long>();
-            NamedNodeMap atts = (NamedNodeMap)gameElement.getAttributes();
+            NamedNodeMap atts = gameElement.getAttributes();
             for (int i=0; i<atts.getLength(); i++) {
                 gameStats.put(atts.item(i).getNodeName(), new Long(atts.item(i).getNodeValue()));
             }
@@ -99,7 +99,7 @@ public class StatisticsMessage extends Message {
         Element aiElement = (Element)element.getElementsByTagName("aiStatistics").item(0);
         if (aiElement != null) {
             aiStats = new HashMap<String, Long>();
-            NamedNodeMap atts = (NamedNodeMap)aiElement.getAttributes();
+            NamedNodeMap atts = aiElement.getAttributes();
             for (int i=0; i<atts.getLength(); i++) {
                 aiStats.put(atts.item(i).getNodeName(), new Long(atts.item(i).getNodeValue()));
             }

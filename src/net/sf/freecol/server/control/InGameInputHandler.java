@@ -2982,7 +2982,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         // Send reply
         Element reply = Message.createNewRootElement("goodsForSaleAnswer");
-        List<Goods> goodsForSale = ((IndianSettlement) settlement).getSellGoods();
+        List<Goods> goodsForSale = (settlement).getSellGoods();
         if (!goodsForSale.isEmpty()) {
             for (Goods goods : goodsForSale) {
                 aiPlayer.registerSellGoods(goods);

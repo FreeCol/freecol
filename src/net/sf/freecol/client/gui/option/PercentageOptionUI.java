@@ -93,7 +93,7 @@ public final class PercentageOptionUI extends JPanel implements OptionUpdater, P
 
         slider.addChangeListener(new ChangeListener () {
             public void stateChanged(ChangeEvent e) {
-                if (option.isPreviewEnabled()) {;
+                if (option.isPreviewEnabled()) {
                     if (option.getValue() != slider.getValue()) {
                         option.setValue(slider.getValue());
                     }

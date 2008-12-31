@@ -209,7 +209,7 @@ public final class DragListener extends MouseAdapter {
 
         final Unit tempUnit = unitLabel.getUnit();
         ImageLibrary imageLibrary = unitLabel.getCanvas().getGUI().getImageLibrary();
-        Colony colony = (Colony) tempUnit.getLocation().getColony();
+        Colony colony = tempUnit.getLocation().getColony();
         boolean separatorNeeded = false;
 
         List<GoodsType> farmedGoods = Specification.getSpecification().getFarmedGoodsTypeList();

@@ -399,7 +399,7 @@ public final class Specification {
                             if(option instanceof OptionGroup) {
                                 this.addOptionGroup((OptionGroup) option);
                             } else {
-                                this.addAbstractOption((AbstractOption) option);
+                                this.addAbstractOption(option);
                             }
                         }
                     }

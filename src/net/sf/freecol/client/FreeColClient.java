@@ -108,7 +108,6 @@ public final class FreeColClient {
 
     private SfxLibrary sfxLibrary;
 
-    @SuppressWarnings("unused")
     private SoundPlayer musicPlayer;
 
     private SoundPlayer sfxPlayer;

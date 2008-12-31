@@ -649,8 +649,8 @@ public abstract class FreeColObject {
     abstract protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
 
     // TODO: make these abstract
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {};
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {};
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {}
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {}
 
 
     //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------

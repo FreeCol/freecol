@@ -567,7 +567,7 @@ public class IndianSettlement extends Settlement {
     @Override
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            if (!units.remove((Unit) locatable)) {
+            if (!units.remove(locatable)) {
                 logger.warning("Failed to remove unit " + ((Unit)locatable).getId() + " from IndianSettlement");
             }
         } else if (locatable instanceof Goods) {
@@ -884,7 +884,7 @@ public class IndianSettlement extends Settlement {
     @Override
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return units.contains((Unit) locatable);
+            return units.contains(locatable);
         } else {
             return false;
         }

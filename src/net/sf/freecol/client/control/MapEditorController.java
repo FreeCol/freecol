@@ -259,7 +259,7 @@ public final class MapEditorController {
                 canvas.closeMenus();
                 canvas.errorMessage( message );
             }
-        };
+        }
 
         canvas.showStatusPanel(Messages.message("status.loadingGame"));
         

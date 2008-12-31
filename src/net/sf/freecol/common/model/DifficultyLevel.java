@@ -37,7 +37,7 @@ import net.sf.freecol.common.option.StringOption;
  */
 public class DifficultyLevel extends FreeColGameObjectType {
 
-    private final Map<String, AbstractOption> levelOptions = new HashMap<String, AbstractOption>();;
+    private final Map<String, AbstractOption> levelOptions = new HashMap<String, AbstractOption>();
     
     public DifficultyLevel(int index) {
         setIndex(index);

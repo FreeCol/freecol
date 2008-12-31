@@ -320,7 +320,7 @@ public final class ReportRequirementsPanel extends ReportPanel implements Action
         } else {
             Colony colony = (Colony) getCanvas().getClient().getGame().getFreeColGameObject(command);
             if (colony instanceof Colony) {
-                getCanvas().showColonyPanel((Colony) colony);
+                getCanvas().showColonyPanel(colony);
             }
         }
     }

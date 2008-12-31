@@ -135,7 +135,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniMapZoomOutButton.setFocusable(false);
         miniMapZoomInButton.setFocusable(false);
 
-        int bh = mapY + MAP_HEIGHT - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight());;
+        int bh = mapY + MAP_HEIGHT - Math.max(miniMapZoomOutButton.getHeight(), miniMapZoomInButton.getHeight());
         int bw = mapX;
         if (getBorder() != null) {
             Insets insets = getBorder().getBorderInsets(this);

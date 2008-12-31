@@ -25,7 +25,7 @@ public interface CombatModel {
 
     public static enum CombatResultType {
         GREAT_LOSS, LOSS, EVADES, WIN,
-            GREAT_WIN, DONE_SETTLEMENT };
+            GREAT_WIN, DONE_SETTLEMENT }
 
     public class CombatResult {
         public CombatResultType type;

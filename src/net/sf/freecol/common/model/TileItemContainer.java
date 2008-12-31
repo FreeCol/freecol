@@ -43,7 +43,6 @@ import org.w3c.dom.Element;
  */
 public class TileItemContainer extends FreeColGameObject {
 
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(Location.class.getName());
 
     /** The list of TileItems stored in this <code>TileItemContainer</code>. */
@@ -452,7 +451,7 @@ public class TileItemContainer extends FreeColGameObject {
         if (t instanceof Resource) {
             return ((Resource) t) == resource;
         } else if (t instanceof TileImprovement) {
-            return (improvements.indexOf((TileImprovement) t) >= 0);
+            return (improvements.indexOf(t) >= 0);
         }
         return false;
     }

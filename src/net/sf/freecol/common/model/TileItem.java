@@ -100,7 +100,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable, N
      * @return The location of this <code>TileItem</code>.
      */
     public Location getLocation() {
-        return ((Location) tile);
+        return (tile);
     }
 
     /**

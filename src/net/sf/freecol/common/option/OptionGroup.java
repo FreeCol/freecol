@@ -36,7 +36,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 */
 public class OptionGroup extends AbstractOption {
 
-    @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(OptionGroup.class.getName());
 
     private ArrayList<Option> options;

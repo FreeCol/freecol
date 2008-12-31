@@ -211,14 +211,14 @@ public final class GUI {
 
     private void updateMapDisplayVariables() {
         // Calculate the amount of rows that will be drawn above the central Tile
-        topSpace = ((int) size.height - tileHeight) / 2;
+        topSpace = (size.height - tileHeight) / 2;
         if ((topSpace % (tileHeight / 2)) != 0) {
             topRows = topSpace / (tileHeight / 2) + 2;
         } else {
             topRows = topSpace / (tileHeight / 2) + 1;
         }
         bottomRows = topRows;
-        leftSpace = ((int) size.width - tileWidth) / 2;
+        leftSpace = (size.width - tileWidth) / 2;
         rightSpace = leftSpace;
     }
     
@@ -2572,9 +2572,9 @@ public final class GUI {
             }
         } else {
             if ((focus.getY() % 2) == 0) {
-                leftOffset = (int) (size.width / 2);
+                leftOffset = (size.width / 2);
             } else {
-                leftOffset = (int) (size.width / 2) + tileWidth / 2;;
+                leftOffset = (size.width / 2) + tileWidth / 2;
             }
         }
 
@@ -2586,7 +2586,7 @@ public final class GUI {
             // we are at the bottom of the map
             topOffset = size.height - (gameData.getMap().getHeight() - focus.getY()) * (tileHeight / 2);
         } else {
-            topOffset = (int) (size.height / 2);
+            topOffset = (size.height / 2);
         }
 
         // At this point (leftOffset, topOffset) is the center pixel of the Tile

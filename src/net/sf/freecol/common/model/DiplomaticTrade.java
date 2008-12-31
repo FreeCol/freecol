@@ -46,7 +46,6 @@ public class DiplomaticTrade extends FreeColObject {
      */
     private List<TradeItem> items;
 
-    @SuppressWarnings("unused")
     private final Game game;
 
     /**

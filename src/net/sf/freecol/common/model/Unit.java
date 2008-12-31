@@ -1684,7 +1684,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (locatable == null) {
             throw new IllegalArgumentException("Locatable must not be 'null'.");
         } else if (locatable instanceof Unit && canCarryUnits()) {
-            units.remove((Unit) locatable);
+            units.remove(locatable);
             spendAllMoves();
         } else if (locatable instanceof Goods && canCarryGoods()) {
             goodsContainer.removeGoods((Goods) locatable);
@@ -1708,7 +1708,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit && canCarryUnits()) {
-            return units.contains((Unit) locatable);
+            return units.contains(locatable);
         } else if (locatable instanceof Goods && canCarryGoods()) {
             return goodsContainer.contains((Goods) locatable);
         } else {

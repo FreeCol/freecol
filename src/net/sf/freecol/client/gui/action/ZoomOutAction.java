@@ -33,7 +33,6 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * An action for chosing the next unit as the active unit.
  */
 public class ZoomOutAction extends FreeColAction {
-    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ZoomOutAction.class.getName());
 
 

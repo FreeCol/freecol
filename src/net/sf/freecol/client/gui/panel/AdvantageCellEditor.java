@@ -44,6 +44,6 @@ public final class AdvantageCellEditor extends DefaultCellEditor {
     }
     
     public Object getCellEditorValue() {
-        return (NationType) ((JComboBox) getComponent()).getSelectedItem();
+        return ((JComboBox) getComponent()).getSelectedItem();
     }
 }

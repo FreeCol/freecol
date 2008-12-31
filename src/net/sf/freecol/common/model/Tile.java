@@ -642,7 +642,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public boolean contains(Locatable locatable) {
         if (locatable instanceof Unit) {
-            return units.contains((Unit) locatable);
+            return units.contains(locatable);
         } else if (locatable instanceof TileItem) {
             return tileItemContainer != null && tileItemContainer.contains((TileItem) locatable);
         }
@@ -1192,7 +1192,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
-            boolean removed = units.remove((Unit) locatable);
+            boolean removed = units.remove(locatable);
             if (!removed) {
                 logger.warning("Unit with ID " + ((Unit) locatable).getId() +
                                " could not be removed from " + this.toString() + " with ID " +

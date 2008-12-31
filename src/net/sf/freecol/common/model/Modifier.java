@@ -65,7 +65,7 @@ public final class Modifier extends Feature {
 
     private Modifier() {
         // empty constructor
-    };
+    }
 
     /**
      * Creates a new <code>Modifier</code> instance.

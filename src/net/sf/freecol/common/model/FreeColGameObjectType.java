@@ -98,7 +98,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
 
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // currently, FreeColGameObjectTypes are not serialized
-    };
+    }
 
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         throw new UnsupportedOperationException("Call 'readFromXML' instead.");
@@ -111,7 +111,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
     }
 
     // TODO: make this abstract
-    protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {};
+    protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {}
 
     public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
