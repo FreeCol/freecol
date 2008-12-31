@@ -159,6 +159,9 @@ public class DefendSettlementMission extends Mission {
             }
             
             if (bestTarget != null) {
+                // this must be true, since it is the only way to get
+                // a bestTarget
+                assert bestDirection != null;
                 Element element = Message.createNewRootElement("attack");
                 element.setAttribute("unit", unit.getId());
                 element.setAttribute("direction", bestDirection.toString());
