@@ -378,34 +378,20 @@ public class TransportMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-        Unit carrier = getUnit();
-
-        updateTransportList();
-
-        if (carrier.getLocation() instanceof Europe) {
-            if (carrier.getState() == UnitState.TO_EUROPE || carrier.getState() == UnitState.TO_AMERICA) {
-                return;
-            } else {
-                restockCargoAtDestination(connection);
-                buyCargo(connection);
-                restockCargoAtDestination(connection);
-
-                // Move back to america:
-                if (carrier.getOwner().getGold() < MINIMUM_GOLD_TO_STAY_IN_EUROPE || transportList.size() > 0) {
-                    Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
-                    moveToAmericaElement.setAttribute("unit", carrier.getId());
-                    try {
-                        connection.sendAndWait(moveToAmericaElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send \"moveToAmericaElement\"-message!");
-                    }
-                }
-                return;
-            }
-        }
-
         if (transportList == null || transportList.size() <= 0) {
             updateTransportList();
+        }
+
+        Unit carrier = getUnit();
+        if (carrier.getLocation() instanceof Europe) {
+            // Coming to/from Europe, do nothing
+            if (carrier.getState() == UnitState.TO_EUROPE || carrier.getState() == UnitState.TO_AMERICA) {
+                return;
+            }
+            // Actually in Europe
+            inEurope(connection);
+            return;
+            
         }
 
         restockCargoAtDestination(connection);
@@ -1127,6 +1113,28 @@ public class TransportMission extends Mission {
     }
 
     /**
+     * unit is in Europe, unload cargo on board, buy required goods and board unit 
+     * @param connection  The <code>Connection</code> to the server.
+     */
+    private void inEurope(Connection connection){
+        restockCargoAtDestination(connection);
+        buyCargo(connection);
+        restockCargoAtDestination(connection);
+
+        // Move back to America:
+        Unit carrier = getUnit();
+        if (carrier.getOwner().getGold() < MINIMUM_GOLD_TO_STAY_IN_EUROPE || transportList.size() > 0) {
+            Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
+            moveToAmericaElement.setAttribute("unit", carrier.getId());
+            try {
+                connection.sendAndWait(moveToAmericaElement);
+            } catch (IOException e) {
+                logger.warning("Could not send \"moveToAmericaElement\"-message!");
+            }
+        }        
+    }
+    
+    /**
      * Finds the best path to <code>Europe</code>.
      * 
      * @param start The starting <code>Tile</code>.
@@ -1217,7 +1225,7 @@ public class TransportMission extends Mission {
      */
     public String getDebuggingInfo() {
         Unit carrier = getUnit();
-        return carrier.getState().toString();
+        return this.toString();
     }
 
     /**

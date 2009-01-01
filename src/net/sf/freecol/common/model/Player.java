@@ -2414,13 +2414,27 @@ public class Player extends FreeColGameObject implements Nameable {
         Iterator<Position> tileIterator = getGame().getMap().getWholeMapIterator();
         while (tileIterator.hasNext()) {
             Tile tile = getGame().getMap().getTile((tileIterator.next()));
-            if (tile.getColony() != null) {
-                tiles.add(tile);
-                for (Direction direction : Direction.values()) {
-                    Tile addTile = getGame().getMap().getNeighbourOrNull(direction, tile);
-                    if (addTile != null) {
-                        tiles.add(addTile);
+            // no colony, move on
+            if (tile.getColony() == null) {
+                continue;
+            }
+            // Do not resend ours
+            // Not only is unnecessary, it will override players current info
+            //and create desynchronizations
+            if(tile.getColony().getOwner() == this){
+                continue;
+            }
+
+            tiles.add(tile);
+            for (Direction direction : Direction.values()) {
+                Tile addTile = getGame().getMap().getNeighbourOrNull(direction, tile);
+                if (addTile != null) {
+                    // Do not send already explored tiles
+                    // also avoids sending info that may desynchronize the client
+                    if(addTile.isExploredBy(this)){
+                        continue;
                     }
+                    tiles.add(addTile);
                 }
             }
         }
