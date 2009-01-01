@@ -421,7 +421,8 @@ public final class ProductionLabel extends JComponent {
             goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
         }
 
-        if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber>0) {
+        if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber > 0
+            || (maximumProduction > production && production > 0)) {
             String number = "";
             if (stockNumber >= 0 ) {
                 number = Integer.toString(stockNumber);  // Show stored items in ReportColonyPanel
