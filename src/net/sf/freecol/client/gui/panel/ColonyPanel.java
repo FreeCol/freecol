@@ -1145,13 +1145,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             ProductionLabel productionLabel;
 
-            public final int[] widths = { 162, 46, 46, 46, 90 };
+            public final int[] widths = { 46, 46, 46, 100, 52, 100 };
 
-            public final int[] heights = { 64, 0, 0 };
+            public final int[] heights = { 20, 4, 40, 0, 0 };
 
             public static final int labelColumn = 1;
-            public static final int unitColumn = 2;
-            public static final int productionColumn = 5;
+            public static final int unitColumn = 1;
+            public static final int productionColumn = 4;
 
 
             /**
@@ -1163,8 +1163,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 this.building = building;
 
                 setBackground(Color.WHITE);
-                
                 setLayout(new HIGLayout(widths, heights));
+                setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, LINK_COLOR),
+                                                             BorderFactory.createEmptyBorder(0, 0, 1, 0)));
 
                 initialize();
             }
@@ -1172,15 +1173,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public void initialize() {
 
                 removeAll();
-                JLabel buildingLabel = new JLabel(new ImageIcon(building.getType().getImage()));
+                //JLabel buildingLabel = new JLabel(new ImageIcon(building.getType().getImage()));
                 JLabel buildingName = new JLabel();
                 if (building.getMaxUnits() == 0) {
                     buildingName.setText("(" + building.getName() + ")");
                 } else {
                     buildingName.setText(building.getName());
                 }
-                add(buildingName, higConst.rc(1, labelColumn));
-                add(buildingLabel, higConst.rc(1, labelColumn));
+                add(buildingName, higConst.rcwh(1, labelColumn, widths.length, 1));
+                //add(buildingLabel, higConst.rc(1, labelColumn));
 
                 List<Unit> unitList = building.getUnitList();
                 for (int index = 0; index < unitList.size(); index++) {
@@ -1190,23 +1191,37 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                     }
-                    add(unitLabel, higConst.rc(1, unitColumn + index));
+                    add(unitLabel, higConst.rc(3, unitColumn + index));
                     if (building.getType().hasAbility("model.ability.teach")) {
                         if (unit.getStudent() != null) {
                             JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
                                                          unit.getNeededTurnsOfTraining());
-                            add(progress, higConst.rc(2, unitColumn + index));
+                            add(progress, higConst.rc(4, unitColumn + index));
                             UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
                             studentLabel.setIgnoreLocation(true);
-                            add(studentLabel, higConst.rc(3, unitColumn + index));
+                            add(studentLabel, higConst.rc(5, unitColumn + index));
                         }
                     }
                 }
 
+                if (building.getGoodsInputNextTurn() != 0) {
+                    GoodsType inputType = building.getGoodsInputType();
+                    ProductionLabel inputLabel = new ProductionLabel(inputType,
+                                                                     building.getGoodsInputNextTurn(),
+                                                                     building.getMaximumGoodsInput(),
+                                                                     parent);
+                    inputLabel.setGoodsIcon(parent.getGUI().getImageLibrary()
+                                            .getScaledGoodsImageIcon(inputType, 0.8f));
+                    add(inputLabel, higConst.rc(3, productionColumn, ""));
+                    
+                    if (building.getGoodsInputType() != null) {
+                        add(new JLabel("--->"), higConst.rc(3, productionColumn + 1, ""));
+                    }
+                }
                 productionLabel = new ProductionLabel(building.getGoodsOutputType(),
                                                       building.getProductionNextTurn(),
                                                       building.getMaximumProduction(), parent);
-                add(productionLabel, higConst.rc(1, productionColumn));
+                add(productionLabel, higConst.rc(3, productionColumn + 2, ""));
 
                 setSize(getPreferredSize());
             }

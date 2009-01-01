@@ -40,9 +40,6 @@ import net.sf.freecol.common.model.GoodsType;
  */
 public final class ProductionLabel extends JComponent {
 
-
-
-
     private static Logger logger = Logger.getLogger(ProductionLabel.class.getName());
 
     private final Canvas parent;
@@ -145,8 +142,7 @@ public final class ProductionLabel extends JComponent {
             setForeground(Color.WHITE);
         }
         if (goodsType != null) {
-            goodsIcon = parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType);
-            compressedWidth = goodsIcon.getIconWidth()*2;
+            setGoodsIcon(parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType));
             setToolTipText(String.valueOf(amount) + " " + goodsType.getName());
         }
     }
@@ -195,6 +191,7 @@ public final class ProductionLabel extends JComponent {
      */
     public void setGoodsIcon(final ImageIcon newGoodsIcon) {
         this.goodsIcon = newGoodsIcon;
+        compressedWidth = goodsIcon.getIconWidth()*2;
     }
 
     /**
