@@ -660,6 +660,21 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         buildingsPanel.initialize();
     }
 
+    public void updateBuildingsPanel(GoodsType goodsType) {
+        for (Component component : buildingsPanel.getComponents()) {
+            if (component instanceof BuildingsPanel.ASingleBuildingPanel) {
+                BuildingsPanel.ASingleBuildingPanel buildingPanel =
+                    (BuildingsPanel.ASingleBuildingPanel) component;
+                if (buildingPanel.getBuilding().getGoodsInputType() == goodsType) {
+                    buildingPanel.updateProductionLabel();
+                    buildingsPanel.revalidate();
+                }
+            }
+        }
+        buildingsPanel.revalidate();
+    }
+
+
     /**
      * Updates the building progress label.
      */
@@ -1079,9 +1094,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 updateSoLLabel();
             }
             updateCargoLabel();
-            // Tools may have been loaded into the carrier, so we need to also update
-            //the progress labels
-            updateProgressLabel();
+            if (comp instanceof GoodsLabel) {
+                // removing cargo from colony may affect production
+                updateBuildingsPanel(((GoodsLabel) comp).getGoods().getType());
+
+                // Tools may have been loaded into the carrier, so we
+                // need to also update the progress labels
+                updateProgressLabel();
+            }
             return result;
         }
 
@@ -1141,6 +1161,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
          * <code>BuildingsPanel</code>.
          */
         public final class ASingleBuildingPanel extends JPanel implements Autoscroll {
+
             Building building;
 
             ProductionLabel productionLabel;
@@ -1241,6 +1262,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public Insets getAutoscrollInsets() {
                 Rectangle r = getBounds();
                 return new Insets(r.x, r.y, r.width, r.height);
+            }
+
+            public Building getBuilding() {
+                return building;
             }
 
             public void updateProductionLabel() {
@@ -1446,6 +1471,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 if (comp instanceof GoodsLabel) {
                     comp.getParent().remove(comp);
                     ((GoodsLabel) comp).setSmall(false);
+                    // adding goods may affect production
+                    updateBuildingsPanel(((GoodsLabel) comp).getGoods().getType());
                     reinitialize();
                     return comp;
                 }
