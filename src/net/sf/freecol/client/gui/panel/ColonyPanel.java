@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -172,6 +173,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
     private JButton renameButton = new JButton(Messages.message("rename"));
 
     private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
+
+    private static final Font hugeFont = new Font("Dialog", Font.BOLD, 24);
 
 
     /**
@@ -1193,6 +1196,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             public void initialize() {
 
+                JLabel arrow = new JLabel("\u2192");
+                arrow.setFont(hugeFont);
+
                 removeAll();
                 //JLabel buildingLabel = new JLabel(new ImageIcon(building.getType().getImage()));
                 JLabel buildingName = new JLabel();
@@ -1236,7 +1242,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     add(inputLabel, higConst.rc(3, productionColumn, ""));
                     
                     if (building.getGoodsInputType() != null) {
-                        add(new JLabel("--->"), higConst.rc(3, productionColumn + 1, ""));
+                        add(arrow, higConst.rc(3, productionColumn + 1, ""));
                     }
                 }
                 productionLabel = new ProductionLabel(building.getGoodsOutputType(),
