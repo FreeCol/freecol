@@ -27,8 +27,10 @@ public class ColonyTest extends FreeColTestCase {
     BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
     BuildingType warehouseExpansionType = FreeCol.getSpecification().getBuildingType("model.building.WarehouseExpansion");
     BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
+    BuildingType carpenterHouseType =  FreeCol.getSpecification().getBuildingType("model.building.CarpenterHouse");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
+    GoodsType lumberGoodsType = spec().getGoodsType("model.goods.lumber");
     
     public void testCurrentlyBuilding() {
         Game game = getGame();
@@ -93,11 +95,7 @@ public class ColonyTest extends FreeColTestCase {
         assertTrue("Colony should be able to build warehouse",colony.canBuild(warehouseType));
         colony.setCurrentlyBuilding(warehouseType);
         colony.addGoods(hammerGoodsType, 90);
-        
-        Player player = colony.getOwner();
-        //Simulate that the player is human
-        player.setAI(false);
-        
+                
         // Simulate that the build is done
         assertFalse("Colony should not have warehouse",colony.getWarehouse().getType() == warehouseType);
         colony.checkBuildableComplete();
@@ -105,5 +103,28 @@ public class ColonyTest extends FreeColTestCase {
         
         // Verify that upgrade is next to build
         assertEquals("Colony should not be building nothing", BuildableType.NOTHING, colony.getCurrentlyBuilding()); 
+    }
+    
+    public void testNoBuildingMaterialsProductionWhenBuildingNothing(){
+        Game game = getGame();
+        game.setMap(getTestMap(plainsType,true));
+        
+        Colony colony = getStandardColony();
+        Building carpenterHouse = new Building(getGame(), colony, carpenterHouseType);
+        colony.addBuilding(carpenterHouse);
+        Unit unit = colony.getUnitList().get(0);
+        colony.getBuilding(carpenterHouseType).add(unit);
+        // necessary for work production
+        int initialLumber = 100;
+        int initialHammers = 0;
+        colony.addGoods(lumberGoodsType, initialLumber);
+        
+        assertEquals("Wrong initial lumber quantity, ",initialLumber,colony.getGoodsCount(lumberGoodsType));
+        assertEquals("Colony should not be building nothing, ", BuildableType.NOTHING, colony.getCurrentlyBuilding());
+        assertTrue("Colony shoud be able to produce work (hammers)",colony.getProductionOf(hammerGoodsType)>0);
+        assertEquals("Colony shold not have any work production(hammers) initially, ",initialHammers,colony.getGoodsCount(hammerGoodsType));
+        colony.newTurn();
+        assertEquals("Colony shold not have any work production(hammers) after, ",initialHammers,colony.getGoodsCount(hammerGoodsType));
+        assertEquals("Wrong final lumber quantity, ",initialLumber,colony.getGoodsCount(lumberGoodsType));
     }
 }

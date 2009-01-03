@@ -507,6 +507,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (goodsOutput <= 0) {
             return;
         }
+        
+        // Do nothing if:
+        //  - produces building material that is not storable
+        // and
+        //  -for some reason the colony is not building nothing that turn
+        if (goodsOutputType.isBuildingMaterial() 
+                && !goodsOutputType.isStorable()
+                && !getColony().canBuild()){
+            return;
+        }
 
         // Actually produce the goods:
         if (goodsInputType != null) {
