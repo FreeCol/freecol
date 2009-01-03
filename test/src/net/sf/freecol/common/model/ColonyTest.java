@@ -81,12 +81,9 @@ public class ColonyTest extends FreeColTestCase {
     }
     
     /**
-     * Tests Colonization 1 compliance
-     * After a building is completed, the upgrade should be chosen by default
-     *   as the next build
-     * Should only apply to human players
+     * Tests completion of buildable
      */
-    public void testSettingBuildingUpgradeAsNextBuildByDefault() {
+    public void testBuildingCompletion() {
         Game game = getGame();
         game.setMap(getTestMap(plainsType,true));
         
