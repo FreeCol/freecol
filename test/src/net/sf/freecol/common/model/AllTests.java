@@ -29,6 +29,7 @@ public class AllTests {
 	//$JUnit-BEGIN$
 	suite.addTestSuite(AbstractUnitTest.class);
 	suite.addTestSuite(BuildingTest.class);
+	suite.addTestSuite(ColonyTest.class);
 	suite.addTestSuite(ColonyProductionTest.class);
 	suite.addTestSuite(ColonyConsumptionTest.class);
 	suite.addTestSuite(CombatTest.class);

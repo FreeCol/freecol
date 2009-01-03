@@ -693,6 +693,12 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param buildable The type of building to be built.
      */
     public void setCurrentlyBuilding(BuildableType buildable) {
+        // There should not be more than one entry of a building type
+        if(buildable instanceof BuildingType){
+            if(buildQueue.contains(buildable)){
+                buildQueue.remove(buildable);
+            }
+        }
         buildQueue.add(0, buildable);
     }
 
