@@ -1120,7 +1120,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         return getGame().getModelController().createBuilding(getId() + "buildFreeBuilding", this, buildingType);
     }
 
-    private void checkBuildableComplete() {
+    void checkBuildableComplete() {
         // In order to avoid duplicate messages:
         if (lastVisited == getGame().getTurn().getNumber()) {
             return;

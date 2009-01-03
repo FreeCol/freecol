@@ -23,9 +23,12 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyTest extends FreeColTestCase {
-    BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Depot");
+    BuildingType depotType = FreeCol.getSpecification().getBuildingType("model.building.Depot");
+    BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
+    BuildingType warehouseExpansionType = FreeCol.getSpecification().getBuildingType("model.building.WarehouseExpansion");
     BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
+    GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
     
     public void testCurrentlyBuilding() {
         Game game = getGame();
@@ -75,5 +78,35 @@ public class ColonyTest extends FreeColTestCase {
                 
         colony.setCurrentlyBuilding(wagonTrainType);
         assertEquals("Building queue should have 3 entries",3,colony.getBuildQueue().size());
+    }
+    
+    /**
+     * Tests Colonization 1 compliance
+     * After a building is completed, the upgrade should be chosen by default
+     *   as the next build
+     * Should only apply to human players
+     */
+    public void testSettingBuildingUpgradeAsNextBuildByDefault() {
+        Game game = getGame();
+        game.setMap(getTestMap(plainsType,true));
+        
+        Colony colony = getStandardColony();
+        Building initialWarehouse = new Building(getGame(), colony, depotType);
+        colony.addBuilding(initialWarehouse);
+        assertTrue("Colony should be able to build warehouse",colony.canBuild(warehouseType));
+        colony.setCurrentlyBuilding(warehouseType);
+        colony.addGoods(hammerGoodsType, 90);
+        
+        Player player = colony.getOwner();
+        //Simulate that the player is human
+        player.setAI(false);
+        
+        // Simulate that the build is done
+        assertFalse("Colony should not have warehouse",colony.getWarehouse().getType() == warehouseType);
+        colony.checkBuildableComplete();
+        assertTrue("Colony should have warehouse",colony.getWarehouse().getType() == warehouseType);
+        
+        // Verify that upgrade is next to build
+        assertEquals("Colony should not be building nothing", BuildableType.NOTHING, colony.getCurrentlyBuilding()); 
     }
 }
