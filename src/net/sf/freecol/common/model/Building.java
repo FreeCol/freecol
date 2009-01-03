@@ -42,8 +42,6 @@ import org.w3c.dom.Element;
  */
 public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named {
 
-    public static final int AUTO_PRODUCTION_INPUT = 2;
-    
     /** The colony containing this building. */
     private Colony colony;
 
@@ -608,7 +606,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (getGoodsInputType() == null) {
             return 0;
         } else if (canAutoProduce()) {
-            return AUTO_PRODUCTION_INPUT * getMaximumAutoProduction();
+            return getMaximumAutoProduction();
         } else {
             return getProductivity();
         }
@@ -658,21 +656,25 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     private int getGoodsInputAuto(int available) {
-        int outputGoods = colony.getGoodsCount(getGoodsOutputType());
-        if (getGoodsInputType() == null ||
-            outputGoods < getGoodsOutputType().getBreedingNumber() ||
-            outputGoods >= colony.getWarehouseCapacity()) {
+        if (getGoodsInputType() == null) {
             return 0;
-        }
-        int surplus = available;
-        // we need to take into consideration the residents consumption
-        if (getGoodsInputType().isFoodType()) {
-            surplus -= colony.getFoodConsumptionByType(getGoodsInputType());
-            if (surplus <= 0) {
+        } else {
+            int outputGoods = colony.getGoodsCount(getGoodsOutputType());
+            if (outputGoods < getGoodsOutputType().getBreedingNumber() ||
+                outputGoods >= colony.getWarehouseCapacity()) {
                 return 0;
+            } else {
+                int surplus = available;
+                // we need to take into consideration the residents consumption
+                if (getGoodsInputType().isFoodType()) {
+                    surplus -= colony.getFoodConsumptionByType(getGoodsInputType());
+                    if (surplus <= 0) {
+                        return 0;
+                    }
+                }
+                return surplus / 2; // store the half of surplus
             }
         }
-        return surplus / 2; // store the half of surplus
     }
 
     private int calculateGoodsInput(final int maximumGoodsInput, final int addToWarehouse) {
@@ -774,8 +776,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * Returns the production of a building with no workplaces with
      * given input. Unlike other buildings, buildings with no
      * workplaces stop producing as soon as the warehouse capacity has
-     * been reached. At the moment, the only building of this type is
-     * the pasture/stable.
+     * been reached. In the original game, the only building of this
+     * type is the pasture/stable.
      *
      * @param availableInput an <code>int</code> value
      * @return an <code>int</code> value
@@ -793,13 +795,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             goodsOutput = availableInput;
         }
         
-        // horses should not overflow    
-        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
-        if(getGoodsOutputType() == horsesType ){
-            int availSpaceForHorses = colony.getWarehouseCapacity() - colony.getGoodsCount(horsesType);
-            if(goodsOutput > availSpaceForHorses){
-                goodsOutput = availSpaceForHorses;
-            }
+        // auto-produced goods should not overflow    
+        int availSpace = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
+        if (goodsOutput > availSpace) {
+            goodsOutput = availSpace;
         }
         
         return applyModifiers(goodsOutput);
