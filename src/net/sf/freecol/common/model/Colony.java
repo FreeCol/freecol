@@ -1126,74 +1126,91 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             return;
         }
         lastVisited = getGame().getTurn().getNumber();
-        if (canBuild()) {
-            BuildableType buildable = getCurrentlyBuilding();
-            ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
-            for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
-                GoodsType requiredGoodsType = goodsRequired.getType();
-                int available = getGoodsCount(requiredGoodsType);
-                int required = goodsRequired.getAmount();
-                if (available < required) {
-                    if (!requiredGoodsType.isStorable()) {
-                        // buildable is not complete and we don't care
-                        // about missing goods because unstorable
-                        // goods (e.g. hammers) are still missing
-                        return;
-                    }
-                    messages.add(new ModelMessage(this, ModelMessage.MessageType.MISSING_GOODS,
-                                                  requiredGoodsType,
-                                                  "model.colony.buildableNeedsGoods",
-                                                  "%colony%", getName(),
-                                                  "%buildable%", buildable.getName(),
-                                                  "%amount%", String.valueOf(required - available),
-                                                  "%goodsType%", requiredGoodsType.getName()));
+        
+        // No valid buildable being constructed
+        if (!canBuild()) {
+            return;
+        }
+        
+        // Check availability of goods required for construction
+        BuildableType buildable = getCurrentlyBuilding();
+        ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
+        for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
+            GoodsType requiredGoodsType = goodsRequired.getType();
+            int available = getGoodsCount(requiredGoodsType);
+            int required = goodsRequired.getAmount();
+            if (available < required) {
+                if (!requiredGoodsType.isStorable()) {
+                    // buildable is not complete and we don't care
+                    // about missing goods because unstorable
+                    // goods (e.g. hammers) are still missing
+                    return;
                 }
+                messages.add(new ModelMessage(this, ModelMessage.MessageType.MISSING_GOODS,
+                        requiredGoodsType,
+                        "model.colony.buildableNeedsGoods",
+                        "%colony%", getName(),
+                        "%buildable%", buildable.getName(),
+                        "%amount%", String.valueOf(required - available),
+                        "%goodsType%", requiredGoodsType.getName()));
             }
-            if (messages.isEmpty()) {
-                // no messages means all goods are present
-                for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
-                    if (getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ||
-                        goodsRequired.getType().isStorable()) {
-                        removeGoods(goodsRequired);
-                    } else {
-                        // waste excess goods
-                        removeGoods(goodsRequired.getType());
-                    }
-                }
-                if (buildable instanceof UnitType) {
-                    // artillery/ship/wagon completed
-                    Unit unit = getGame().getModelController().createUnit(getId() + "buildUnit", getTile(), getOwner(),
-                                                                          (UnitType) buildable);
-                    addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit,
-                            "model.colony.unitReady",
-                            "%colony%", getName(),
-                            "%unit%", unit.getName());
-                } else if (buildable instanceof BuildingType) {
-                    // building completed
-                    BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
-                    if (upgradesFrom == null) {
-                        addBuilding(createBuilding((BuildingType) buildable));
-                    } else {
-                        getBuilding(upgradesFrom).upgrade();
-                    }
-                    addModelMessage(this, ModelMessage.MessageType.BUILDING_COMPLETED, this,
-                            "model.colony.buildingReady", 
-                            "%colony%", getName(),
-                            "%building%", buildable.getName());
-                    buildQueue.remove(0);
-                    if (buildQueue.isEmpty()) {
-                        buildQueue.add(BuildableType.NOTHING);
-                    }
-                    if (buildQueue.size()==1 && buildQueue.get(0)==BuildableType.NOTHING) {
-                        addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
-                                "model.colony.cannotBuild", 
-                                "%colony%", getName());
-                    }
-                }
+        }
+       
+        if (!messages.isEmpty()) {
+            // building/unit cant be completed
+            // storable goods necessary for the build are missing
+            // warn player
+            for (ModelMessage message : messages) {
+                owner.addModelMessage(message);
+            }
+            return;
+        }
+      
+        // All required goods are present
+        // Buildable can be completed
+        
+        // consume the goods
+        for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
+            if (getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ||
+                    goodsRequired.getType().isStorable()) {
+                removeGoods(goodsRequired);
             } else {
-                for (ModelMessage message : messages) {
-                    owner.addModelMessage(message);
-                }
+                // waste excess goods
+                removeGoods(goodsRequired.getType());
+            }
+        }
+        
+        if (buildable instanceof UnitType) {
+            // artillery/ship/wagon completed
+            Unit unit = getGame().getModelController().createUnit(getId() + "buildUnit", getTile(), getOwner(),
+                    (UnitType) buildable);
+            addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit,
+                    "model.colony.unitReady",
+                    "%colony%", getName(),
+                    "%unit%", unit.getName());
+        } else if (buildable instanceof BuildingType) {
+            // building completed
+            BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
+            if (upgradesFrom == null) {
+                addBuilding(createBuilding((BuildingType) buildable));
+            } else {
+                getBuilding(upgradesFrom).upgrade();
+            }
+            addModelMessage(this, ModelMessage.MessageType.BUILDING_COMPLETED, this,
+                    "model.colony.buildingReady", 
+                    "%colony%", getName(),
+                    "%building%", buildable.getName());
+            buildQueue.remove(0);
+            
+            // sanitation
+            if (buildQueue.isEmpty()) {
+                buildQueue.add(BuildableType.NOTHING);
+            }
+            // warn player that no suitable replacement was found
+            if (buildQueue.size()==1 && buildQueue.get(0)==BuildableType.NOTHING) {
+                addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
+                        "model.colony.cannotBuild", 
+                        "%colony%", getName());
             }
         }
     }
