@@ -574,11 +574,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      * unit.
      */
     private void updateCargoLabel() {
-        if (selectedUnit != null) {
+        if ( cargoPanel.getCarrier() != null) {
+            Unit carrier = cargoPanel.getCarrier();
             cargoPanel.getParent().setEnabled(true);
+            int spaceLeft = carrier.getSpaceLeft();
             cargoBorder.setTitle(Messages.message("cargoOnCarrierLong", 
-                    "%name%", selectedUnit.getUnit().getName(),
-                    "%space%", String.valueOf(selectedUnit.getUnit().getSpaceLeft())));
+                    "%name%", carrier.getName(),
+                    "%space%", String.valueOf(spaceLeft)));
         } else {
             cargoPanel.getParent().setEnabled(false);
             cargoBorder.setTitle(Messages.message("cargoOnCarrier"));
@@ -1084,7 +1086,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         updateCarrierButtons();
     }
     */
-
+    /**
+     * This panel shows the content of a carrier in the colony
+     */
     public final class ColonyCargoPanel extends CargoPanel {
         public ColonyCargoPanel(Canvas parent) {
             super(parent, false);
@@ -1096,7 +1100,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             if (editState && result != null && result instanceof UnitLabel) {
                 updateSoLLabel();
             }
-            updateCargoLabel();
             if (comp instanceof GoodsLabel) {
                 // removing cargo from colony may affect production
                 updateBuildingsPanel(((GoodsLabel) comp).getGoods().getType());
@@ -1105,7 +1108,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 // need to also update the progress labels
                 updateProgressLabel();
             }
+            updateCargoLabel();
+            refresh();
             return result;
+        }
+        
+        @Override
+        public void remove(Component comp) {
+            super.remove(comp);
+            updateCargoLabel();
         }
 
         @Override
