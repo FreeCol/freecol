@@ -9,7 +9,7 @@
 \newcommand{\Wikipedia}[1]{\href{http://en.wikipedia.org/wiki/#1}%
 {\includegraphics[scale=0.6]{images/wikipedia.png}}}
 
-\documentclass[12pt]{article}
+\documentclass[12pt]{book}
 \usepackage[T1]{fontenc}
 \usepackage{longtable}
 \usepackage{graphicx}
@@ -26,7 +26,7 @@
 \newpage
 
 
-\hypertarget{Introduction}{\section{Introduction}}
+\hypertarget{Introduction}{\chapter{Introduction}}
 
 Welcome to FreeCol! If you're interested in development of this
 program, please see the \href{http://freecol.sourceforge.net}{FreeCol
@@ -34,10 +34,7 @@ web site}. This is a draft version of the user's guide. You can find
 the latest version at the
 \href{http://freecol.sourceforge.net}{FreeCol homepage}.
 
-
-\hypertarget{About}{\section{About}}
-
-\hypertarget{About FreeCol}{\subsection{About FreeCol}}
+\hypertarget{About FreeCol}{\section{About FreeCol}}
 
 The FreeCol team aims to create an Open Source version of
 Colonization (released under the
@@ -61,7 +58,7 @@ Once FreeCol 1.0.0 is finished we'll start working towards FreeCol
 will have many new features, it will be an implementation of our (and
 our users') image of what Colonization 2 would have been.
 
-\hypertarget{The Original Colonization}{\subsection{The Original Colonization}}
+\hypertarget{The Original Colonization}{\section{The Original Colonization}}
 
 The original Colonization\Wikipedia{Colonization (computer game)} was
 released in 1994 by Microprose. \textbf{Colonization is heavily based
@@ -114,7 +111,7 @@ behind you}. This can be done by \textbf{promoting free speech} and by
 providing a strong governmental system.
 
 
-\hypertarget{Installation}{\section{Installation}}
+\hypertarget{Installation}{\chapter{Installation}}
 
 You can download a system independent installer, which should install
 FreeCol and set up the required shortcuts on your desktop. If
@@ -122,7 +119,7 @@ everything works as planned, you will only need to double click the
 icon in order to start the game. If this is not the case, then please
 read the following paragraphs.
 
-\hypertarget{System Requirements}{\subsection{System Requirements}}
+\hypertarget{System Requirements}{\section{System Requirements}}
 
 FreeCol is written in Java. In order to run, it requires a Java
 Virtual Machine. In theory, FreeCol should run on any platform on
@@ -142,17 +139,17 @@ resolution of at least 1024x768 pixels. You can still use the game
 with a smaller screen, but some dialogs will not be completely
 displayed.
 
-\hypertarget{Compiling FreeCol}{\subsection{Compiling FreeCol}}
+\hypertarget{Compiling FreeCol}{\section{Compiling FreeCol}}
 
-In order to compile FreeCol you will need Java and the Ant build
-system, which you can get \href{http://ant.apache.org/}{here}. When
-these are installed, go to the root directory of FreeCol and type
-\verb$ant$ to build a JAR file containing the game. This process
-requires the \verb$native2ascii$\index{native2ascii} task, which is an
-optional ant task. Some Linux distributions place optional tasks in a
-different package, so make sure you have installed all necessary
-packages if you are a Linux user. The game is started using the
-command \verb$java -Xmx128M -jar FreeCol.jar$.
+In order to compile FreeCol you will need Java and
+\href{http://ant.apache.org/}{the Ant build system}. When these are
+installed, go to the root directory of FreeCol and type \verb$ant$ to
+build a JAR file containing the game. This process requires the
+\verb$native2ascii$\index{native2ascii} task, which is an optional ant
+task. Some Linux distributions place optional tasks in a different
+package, so make sure you have installed all necessary packages if you
+are a Linux user. The game is started using the command
+\verb$java -Xmx128M -jar FreeCol.jar$.
 
 If something goes wrong, please open a bug report at the
 \href{http://sourceforge.net/projects/freecol}{SourceForge page of
@@ -162,13 +159,13 @@ example). Note that you will require additional software to build the
 manual, however.
 
 
-\hypertarget{Interface}{\section{Interface}}
+\hypertarget{Interface}{\chapter{Interface}}
 
 This section will provide information about various interface
 elements, as well as the keyboard shortcuts and the different actions
 that can be used in the game.
 
-\hypertarget{Starting the game}{\subsection{Starting the game}}
+\hypertarget{Starting the game}{\section{Starting the game}}
 
 If you installed FreeCol with the system independent installer, or the
 Windows installer, there should be a shortcut on your desktop. Double
@@ -177,7 +174,7 @@ if you prefer using the command line, then please read the following
 paragraphs.
 
 
-\hypertarget{Command line options}{\subsubsection{Command line options}}
+\hypertarget{Command line options}{\subsection{Command line options}}
 
 If you are in the directory in which FreeCol is installed, you can
 start the game with the command \verb$java -Xmx128M -jar FreeCol.jar$.
@@ -234,7 +231,7 @@ interested in if you are a developer:
 \end{itemize}
 
 
-\hypertarget{Game setup}{\subsubsection{Game setup}}
+\hypertarget{Game setup}{\subsection{Game setup}}
 
 If you start FreeCol without command line options, the game will first
 open a dialog that allows you to start a new game, to open a saved
@@ -297,7 +294,7 @@ If you are running a public game server, then your firewall must also
 permit the clients to connect to the port of the game server.
 
 
-\hypertarget{Game options}{\subsubsection{Game options}}
+\hypertarget{Game options}{\subsection{Game options}}
 
 If you decide to start a single-player game or a game server, you will
 be able to choose which nation to play and which colour to use. If you
@@ -361,13 +358,13 @@ required to buy Indian land, and the probability of converting
 natives.
 
 
-\hypertarget{Client options}{\subsection{Client options}}
+\hypertarget{Client options}{\section{Client options}}
 
 The client options panel allows you to customize how your client
 displays the game objects and how it handles some tasks such as
 auto-saving.
 
-\hypertarget{display options}{\subsubsection{Display Options}}
+\hypertarget{display options}{\subsection{Display Options}}
 
 \begin{itemize}
 
@@ -437,7 +434,7 @@ is used as a secondary key, and vice versa.
 
 \end{itemize}
 
-\hypertarget{message options}{\subsubsection{Message Options}}
+\hypertarget{message options}{\subsection{Message Options}}
 
 You can choose whether to group messages by type, by source, or not at
 all. The source of the message is a game object, typically a colony or
@@ -476,14 +473,14 @@ or the ``artillery in the open'' penalty.
   rather limited.
 \end{itemize}
 
-\hypertarget{audio options}{\subsubsection{Audio Options}}
+\hypertarget{audio options}{\subsection{Audio Options}}
 
 FreeCol comes with a limited selection of music and special sound
 effects. The audio options enable you to select the output device,
 which you should probably leave to be automatically detected, as well
 as the volume of the music and special effects.
 
-\hypertarget{savegame options}{\subsubsection{Savegame Options}}
+\hypertarget{savegame options}{\subsection{Savegame Options}}
 
 \begin{itemize}
 \item Whether to \hypertarget{show savegame settings}{show savegame
@@ -498,7 +495,7 @@ you can choose the option ``never''.
 \item How many generations of auto-save files you wish to retain.
 \end{itemize}
 
-\hypertarget{warehouse options}{\subsubsection{Warehouse Options}}
+\hypertarget{warehouse options}{\subsection{Warehouse Options}}
 
 \begin{itemize}
 \item The number of goods to keep in your warehouse when exporting
@@ -514,14 +511,14 @@ you can choose the option ``never''.
 \end{itemize}
 
 
-\hypertarget{keyboard accelerators}{\subsubsection{Keyboard
+\hypertarget{keyboard accelerators}{\subsection{Keyboard
     Accelerators}}
 
 Many but not all of the actions available via the game menu or via
 orders buttons are also available as keyboard shortcuts. These
 shortcuts can be configured.
 
-\hypertarget{other options}{\subsubsection{Other Options}}
+\hypertarget{other options}{\subsection{Other Options}}
 
 \begin{itemize}
 \item Whether to load immigrants waiting in Europe onto your ships
@@ -531,7 +528,7 @@ shortcuts can be configured.
 \end{itemize}
 
 
-\hypertarget{main screen}{\subsection{The main screen}}
+\hypertarget{main screen}{\section{The main screen}}
 
 The figure \ref{main_screen_fig} represents the main screen.
 \begin{figure}[htb]
@@ -550,7 +547,7 @@ main map. They are also represented as coloured dots on the minimap.
 The \hyperlink{Client options}{preferences menu} allows you to disable
 some of these controls if you wish to do so.
 
-\hypertarget{menubar}{\subsubsection{The Menubar}}
+\hypertarget{menubar}{\subsection{The Menubar}}
 
 The menubar contains the Game, View, Orders, Report and Colopedia
 submenus at the left hand of the screen, as well as a status area at
@@ -711,7 +708,7 @@ Congress.
 \end{itemize}
 
 
-\hypertarget{info panel}{\subsubsection{The Info Panel}}
+\hypertarget{info panel}{\subsection{The Info Panel}}
 
 If you are in unit view mode (the default), the info panel in the
 lower right corner of the screen either shows information about the
@@ -732,7 +729,7 @@ the selected tile. You can switch between view modes by pressing
 \verb$Shift-Ctrl-V$, or by using the view menu.
 
 
-\hypertarget{minimap}{\subsubsection{The Minimap}}
+\hypertarget{minimap}{\subsection{The Minimap}}
 
 The minimap in the lower left corner of the screen shows you a more
 abstract view of the map than the main map. Different types of terrain
@@ -744,7 +741,7 @@ white frame around. Zoom buttons to the left and to the right of the
 minimap allow you to zoom into and out of the view.
 
 
-\hypertarget{unit buttons}{\subsubsection{The Unit Buttons}}
+\hypertarget{unit buttons}{\subsection{The Unit Buttons}}
 
 The unit buttons displayed between the minimap and the info panel
 allow you to give order to your units. Note that not all buttons are
@@ -757,7 +754,7 @@ buttons have the following functions:
 \item skip turn
 \item fortify
 \item clear forest / plow tile (requires 20 tools)
-\item build road
+\item build road (requires 20 tools)
 \item build colony
 \item disband unit
 \end{itemize}
@@ -767,15 +764,15 @@ menu}{Orders Menu} of the menu bar, and as \hyperlink{keyboard
 shortcuts}{keyboard shortcuts}.
 
 
-\hypertarget{compass rose}{\subsubsection{The Compass Rose}}
+\hypertarget{compass rose}{\subsection{The Compass Rose}}
 
 The compass rose can be displayed in the top right corner and allows
-you to give your units movement order by clicking on the corresponding
+you to give your units movement orders by clicking on the corresponding
 direction. It is primarily intended for users who do not wish to (or
 are unable to) use the keyboard shortcuts.
 
 
-\hypertarget{main map}{\subsubsection{The Main Map}}
+\hypertarget{main map}{\subsection{The Main Map}}
 
 The main map shows you the New World in greater detail. You can see
 the different types of terrain, forested and otherwise, hills,
@@ -948,7 +945,7 @@ use the following \hypertarget{keyboard shortcuts}{keyboard shortcuts}:
 You can customize these settings in the preferences dialog.
 
 
-\hypertarget{europe panel}{\subsection{The Europe Panel}}
+\hypertarget{europe panel}{\section{The Europe Panel}}
 
 The figure \ref{europe_panel_fig} represents the Europe panel.
 \begin{figure}[htb]
@@ -1000,7 +997,7 @@ Going to America section of the Europe panel, or press the ``Set
 sail'' button.
 
 
-\hypertarget{colony panel}{\subsection{The Colony panel}}
+\hypertarget{colony panel}{\section{The Colony panel}}
 
 The figure \ref{colony_panel_fig} represents the Colony panel.
 \begin{figure}[htb]
@@ -1096,7 +1093,7 @@ warning levels for all types of goods (see below)
 \end{itemize}
 
 
-\hypertarget{The Warehouse Dialog}{\subsubsection{The Warehouse Dialog}}
+\hypertarget{The Warehouse Dialog}{\subsection{The Warehouse Dialog}}
 
 The warehouse dialog allows you to set the warning levels for all
 types of goods. If you have turned on the warnings about goods levels,
@@ -1114,7 +1111,7 @@ Custom House or not. If you have not yet built a Custom House in this
 colony, the checkbox is disabled.
 
 
-\hypertarget{The New World}{\section{The New World}}
+\hypertarget{The New World}{\chapter{The New World}}
 
 At the beginning of the game, you will start with a naval vessel and
 two colonists. Your first task will be to discover the New World,
@@ -1122,7 +1119,7 @@ which should lie due West, although sailing North West or South West
 may prove quicker. As soon as you have discovered land, you can
 establish your colonies and produce goods to send home to Europe.
 
-\hypertarget{Terrain Types}{\subsection{Terrain Types}}
+\hypertarget{Terrain Types}{\section{Terrain Types}}
 
 There are many different types of terrain in the New World, each with
 its own peculiar advantages. At the beginning of the game you will
@@ -1163,7 +1160,7 @@ tools. Therefore, these actions can only be carried out by units
 carrying at least 20 tools. You can equip your units in your colonies
 or in Europe.
 
-\hypertarget{Goods}{\subsection{Goods}}
+\hypertarget{Goods}{\section{Goods}}
 
 The New World produces many goods, which can be traded in Europe. In
 order to this, you must use your ships to transport them to your
@@ -1253,7 +1250,7 @@ in Europe and are useful for trading with native settlements, which
 generally demand Trade Goods.
 
 
-\hypertarget{Trade Routes}{\subsubsection{Trade Routes}}
+\hypertarget{Trade Routes}{\subsection{Trade Routes}}
 
 The \hyperlink{orders menu}{orders menu} allows you to assign a Trade
 Route to a ship or wagon train. If you select this order, the trade
@@ -1284,7 +1281,7 @@ As soon as a ship or wagon train reaches the last destination of the
 trade route, it will continue at the first destination.
 
 
-\hypertarget{Resources}{\subsection{Special Resources}}
+\hypertarget{Resources}{\section{Special Resources}}
 
 Some types of terrain can also have special resources, which increase
 the production of a particular type of goods. These resources look
@@ -1292,7 +1289,7 @@ just like the goods they will produce. These tiles are particularly
 valuable.
 
 
-\hypertarget{Native Settlements}{\subsection{Native Settlements}}
+\hypertarget{Native Settlements}{\section{Native Settlements}}
 
 The New World is by no means an uninhabited country. Various tribes of
 Indians already live there, and make use of the land. When your
@@ -1364,7 +1361,7 @@ Note that the missionary will always remain in the settlement. He is
 effectively lost to you.
 
 
-\hypertarget{Lost City Rumours}{\subsection{Lost City Rumours}}
+\hypertarget{Lost City Rumours}{\section{Lost City Rumours}}
 
 In the New World, there are also rumours about \Concept{Lost Cities},
 such as El Dorado, or C{\'\i}bola. You may send your colonists to
@@ -1390,7 +1387,7 @@ the \hyperlink{Continental Congress}{Continental Congress}, Lost City
 Rumours always yield positive results.
 
 
-\hypertarget{Exploration}{\subsection{Exploration}}
+\hypertarget{Exploration}{\section{Exploration}}
 
 The original Colonization game awarded exploration points only for the
 discovery of the Pacific Ocean. This is also the default behaviour for
@@ -1404,15 +1401,15 @@ and you will be awarded a number of exploration points depending on
 the size of the region discovered.
 
 
-\hypertarget{Colonies}{\section{Colonies}}
+\hypertarget{Colonies}{\chapter{Colonies}}
 
-\hypertarget{Picking a suitable site}{\subsection{Picking a suitable site}}
+\hypertarget{Picking a suitable site}{\section{Picking a suitable site}}
 
 Your colonies are your most important assets in the new world.
 Therefore, it is very important to build them in the right
 place. There are several aspects to consider:
 
-\hypertarget{The colony tile}{\subsubsection{The colony tile}}
+\hypertarget{The colony tile}{\subsection{The colony tile}}
 
 Some terrain types are more suitable for establishing a colony than
 others. Colonies can not be built on Arctic tiles, nor on Mountains,
@@ -1446,7 +1443,7 @@ Forest into Marsh, Rain Forest into Swamp, Scrub Forest into Desert,
 and Broadleaf Forest into Prairie.
 
 
-\hypertarget{The adjacent tiles}{\subsubsection{The adjacent tiles}}
+\hypertarget{The adjacent tiles}{\subsection{The adjacent tiles}}
 
 In the early stages of the game, you will need to generate cash by
 selling products from the New World in your Home Port. Thus, many of
@@ -1473,7 +1470,7 @@ strategy, however, as long as you avoid sharing tiles between several
 colonies as far as possible.
 
 
-\hypertarget{No Reforestation}{\subsubsection{No Reforestation}}
+\hypertarget{No Reforestation}{\subsection{No Reforestation}}
 
 You can order your pioneers to cut down forests by plowing a tile.
 This will increase the food produced on these tiles, and the lumber
@@ -1481,7 +1478,7 @@ will be delivered to your colonies. However, you can not plant new
 forests later. Once cleared, a tile will never produce lumber again.
 
 
-\hypertarget{Government Efficiency}{\subsubsection{Government Efficiency}}
+\hypertarget{Government Efficiency}{\subsection{Government Efficiency}}
 
 The efficiency of the local governments of your colonies depends on
 the colonists' support for the \hyperlink{Sons of Liberty}{Sons of
@@ -1502,7 +1499,7 @@ the support for the Sons of Liberty. You can do this by producing
 Freedom Bells in the Town Hall.
 
 
-\hypertarget{Colony Buildings}{\subsection{Colony Buildings}}
+\hypertarget{Colony Buildings}{\section{Colony Buildings}}
 
 A newly established colony already includes several buildings, namely
 a town hall, a carpenter's house, a blacksmith's house, a
@@ -1653,7 +1650,7 @@ have to be constructed later:
 \end{itemize}
 
 
-\hypertarget{Using Buildings}{\subsection{{Using Buildings}}}
+\hypertarget{Using Buildings}{\section{{Using Buildings}}}
 
 Some buildings have an immediate effect. The
 \hyperlink{Stockade}{Stockade}, for example, provides protection for
@@ -1674,7 +1671,7 @@ expert units that work more effectively than \hyperlink{Free
   Colonist}{Free Colonists}. Other units may work less effectively.
 
 
-\hypertarget{Building Units and Buildings}{\subsection{Building Units 
+\hypertarget{Building Units and Buildings}{\section{Building Units 
 and Buildings}}
 
 In order to upgrade buildings, and to construct new buildings and
@@ -1696,7 +1693,7 @@ House}{Blacksmith's House}, in order to convert the ore into tools.
 
 
 
-\hypertarget{Home Country}{\section{Your Home Country}}
+\hypertarget{Home Country}{\chapter{Your Home Country}}
 
 Your \textbf{Home Country} is a European monarchy, either 
 \Concept{Spain}, \Concept{France}, \Concept{England} or the 
@@ -1706,7 +1703,7 @@ fighting against the natives. If you are French, you will be more
 successful cooperating with the natives. The English generate more
 colonists, and the Dutch are better traders.
 
-\hypertarget{Home Port}{\subsection{Your Home Port}}
+\hypertarget{Home Port}{\section{Your Home Port}}
 
 The \textbf{Home Port} is a port city in your home country, where you
 can trade \hyperlink{Goods}{Goods}, and train, recruit and buy
@@ -1743,7 +1740,7 @@ in your colonies, as soon as you have built a
 respectively.
 
 
-\hypertarget{Monarch}{\subsection{Your Monarch}}
+\hypertarget{Monarch}{\section{Your Monarch}}
 
 Your Home Country is ruled by a \textbf{Monarch} whose actions can
 have a profound influence on your colonies and your relations to other
@@ -1793,7 +1790,7 @@ World.
 
 
 
-\hypertarget{Units}{\section{Units}}
+\hypertarget{Units}{\chapter{Units}}
 
 Several dozen different units are available in FreeCol, but not all
 units are available to all players. Some units are available only to
@@ -1990,7 +1987,7 @@ each.
 %% &&&Broadleaf Forest (4)\\
 %% \end{longtable}
 
-\hypertarget{Equipment}{\subsection{Equipment}}
+\hypertarget{Equipment}{\section{Equipment}}
 
 Most units can be equipped with tools, horses, muskets, or a
 bible. This equipment grants them certain abilities, which they do not
@@ -2023,7 +2020,7 @@ trains and treasure trains, can not be equipped. The Indian Convert is
 another unit that can not be equipped.
 
 
-\hypertarget{Skills and Education}{\subsection{Skills and Education}}
+\hypertarget{Skills and Education}{\section{Skills and Education}}
 
 In FreeCol, your colonists come from all walks of life. Some are
 unskilled \hyperlink{Petty Criminal}{Petty Criminals}, who are
@@ -2092,7 +2089,7 @@ City Rumours}{Lost City Rumours} may also be upgraded to a Seasoned
 Scout, unless that unit already has another skill.
 
 
-\hypertarget{Combat}{\subsection{Combat}}
+\hypertarget{Combat}{\section{Combat}}
 
 A tile can only be occupied by units of a single Player. If a unit of
 another Player attempts to enter that tile, combat ensues. The combat
@@ -2147,7 +2144,7 @@ chance of success is not very high. And colonies with a
 automatically fire at enemy ships on adjacent ocean tiles.
 
 
-\hypertarget{combat bonuses}{\subsubsection{Combat Bonuses and Penalties}}
+\hypertarget{combat bonuses}{\subsection{Combat Bonuses and Penalties}}
 
 Bonuses and penalties for naval units:
 
@@ -2207,7 +2204,7 @@ Bonuses and penalties for land units:
 
 
 
-\hypertarget{Continental Congress}{\section{The Continental Congress}}
+\hypertarget{Continental Congress}{\chapter{The Continental Congress}}
 
 As the player generates \hyperlink{Liberty Bells}{Liberty Bells},
 \hypertarget{Founding Fathers}{\textbf{Founding Fathers}} are elected
@@ -2400,9 +2397,9 @@ colonists. \Wikipedia{Bartolome_de_las_Casas}
 
 
 
-\hypertarget{The Birth of a Nation}{\section{The Birth of a Nation}}
+\hypertarget{The Birth of a Nation}{\chapter{The Birth of a Nation}}
 
-\hypertarget{Sons of Liberty}{\subsection{Sons of Liberty}}
+\hypertarget{Sons of Liberty}{\section{Sons of Liberty}}
 
 At the beginning of the game, all your colonists will be
 \hypertarget{Tories}{\textbf{Tory Loyalists}}, who support your
@@ -2420,7 +2417,7 @@ of Liberty enjoy a production bonus of one unit, which is increased to
 two units as soon as 100\% of the population become Sons of Liberty.
 
 
-\hypertarget{Declaration of Independence}{\subsection{The Declaration
+\hypertarget{Declaration of Independence}{\section{The Declaration
 of Independence}}
 
 As soon as 50\% of your entire population support the Sons of Liberty,
@@ -2440,7 +2437,7 @@ support your effort if you generate a sufficient number of Liberty
 Bells after the War of Independence has begun.
 
 
-\hypertarget{Changing the Rules}{\section{Changing the Rules}}
+\hypertarget{Changing the Rules}{\chapter{Changing the Rules}}
 
 We would like to make FreeCol configurable, so that the game engine
 becomes capable of emulating many similar games. For this purpose,
@@ -2469,7 +2466,7 @@ check whether the result is still valid. You can do this by validating
 the result with the command \verb$ant validate$.
 
 
-\hypertarget{Modifiers and Abilities}{\subsection{Modifiers and Abilities}}
+\hypertarget{Modifiers and Abilities}{\section{Modifiers and Abilities}}
 
 Most of the objects defined by the rule set can be customized via
 modifiers and abilities.  Abilities are boolean values (``true'' or
@@ -2890,7 +2887,7 @@ The building increases the capacity of the warehouse.
 
 
 
-\hypertarget{Known bugs}{\section{Known bugs}}
+\hypertarget{Known bugs}{\chapter{Known bugs}}
 
 FreeCol is still alpha software. In plain English, this means that it
 is full of bugs. Some of these bugs have already been reported, but
@@ -2909,7 +2906,7 @@ reconnect to the server by using the reconnect option in the
 \hyperlink{game menu}{game menu} or by pressing \verb$ctrl-r$.
 
 
-\hypertarget{Copyright Notice}{\section{Copyright Notice}}
+\hypertarget{Copyright Notice}{\chapter{Copyright Notice}}
 
 Copyright \copyright 2008
 \href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol
