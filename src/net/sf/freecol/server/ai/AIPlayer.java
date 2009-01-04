@@ -1216,18 +1216,17 @@ public class AIPlayer extends AIObject {
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
                     chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
-                    if (!(chosenOne.getUnit().getLocation() instanceof Tile)) {
-                        chosenOne = null;
-                    } else if (chosenOne.getMission() == null
-                            || chosenOne.getMission() instanceof UnitWanderHostileMission) {
-                        break;
-                    }
-                }
-                if (chosenOne != null) {
-                    // Check that the colony can be reached:
-                    PathNode pn = chosenOne.getUnit().findPath(indianSettlement.getTile(), target.getTile());
-                    if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_BRING_GIFT) {
-                        chosenOne.setMission(new IndianBringGiftMission(getAIMain(), chosenOne, target));
+                    if ((chosenOne.getUnit().getLocation() instanceof Tile
+                         || chosenOne.getUnit().getLocation() instanceof IndianSettlement)
+                        && (chosenOne.getMission() == null
+                            || chosenOne.getMission() instanceof UnitWanderHostileMission)) {
+                        // Check that the colony can be reached:
+                        PathNode pn = chosenOne.getUnit().findPath(indianSettlement.getTile(),
+                                                                   target.getTile());
+                        if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_BRING_GIFT) {
+                            chosenOne.setMission(new IndianBringGiftMission(getAIMain(), chosenOne, target));
+                            break;
+                        }
                     }
                 }
             }
@@ -1277,42 +1276,45 @@ public class AIPlayer extends AIObject {
                         indianSettlement.getAlarm(to) == null) {
                         continue;
                     }
-                    int tension = 1 + getPlayer().getTension(to).getValue() + indianSettlement.getAlarm(to).getValue();
+                    int tension = 1 + getPlayer().getTension(to).getValue()
+                        + indianSettlement.getAlarm(to).getValue();
                     tension = getRandom().nextInt(tension);
                     if (tension > targetTension) {
                         targetTension = tension;
                         target = t;
                     }
                 }
-                Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
-                AIUnit chosenOne = null;
-                while (it2.hasNext()) {
-                    chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
-                    if (!(chosenOne.getUnit().getLocation() instanceof Tile)) {
-                        chosenOne = null;
-                    } else if (chosenOne.getMission() == null
-                            || chosenOne.getMission() instanceof UnitWanderHostileMission) {
-                        break;
-                    }
-                }
-                if (chosenOne != null && target != null) {
-                    // Check that the colony can be reached:
-                    PathNode pn = chosenOne.getUnit().findPath(indianSettlement.getTile(), target.getTile());
-                    if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_MAKE_DEMANDS) {
-                        // Make it less probable that nice players get targeted
-                        // for a demand mission:
-                        Player tp = target.getOwner();
-                        int tension = 1 + getPlayer().getTension(tp).getValue()
-                                + indianSettlement.getAlarm(tp).getValue();
-                        if (getRandom().nextInt(tension) > Tension.Level.HAPPY.getLimit()) {
-                            chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne, target));
+                if (target != null) {
+                    Iterator<Unit> it2 = indianSettlement.getOwnedUnitsIterator();
+                    AIUnit chosenOne = null;
+                    while (it2.hasNext()) {
+                        chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
+                        if ((chosenOne.getUnit().getLocation() instanceof Tile
+                             || chosenOne.getUnit().getLocation() instanceof IndianSettlement)
+                            && (chosenOne.getMission() == null
+                                || chosenOne.getMission() instanceof UnitWanderHostileMission)) {
+                            // Check that the colony can be reached:
+                            PathNode pn = chosenOne.getUnit().findPath(indianSettlement.getTile(),
+                                                                       target.getTile());
+                            if (pn != null && pn.getTotalTurns() <= MAX_DISTANCE_TO_MAKE_DEMANDS) {
+                                // Make it less probable that nice players get targeted
+                                // for a demand mission:
+                                Player tp = target.getOwner();
+                                int tension = 1 + getPlayer().getTension(tp).getValue()
+                                    + indianSettlement.getAlarm(tp).getValue();
+                                if (getRandom().nextInt(tension) > Tension.Level.HAPPY.getLimit()) {
+                                    chosenOne.setMission(new IndianDemandMission(getAIMain(), chosenOne,
+                                                                                 target));
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
-
+    
     /**
      * Calls {@link AIColony#createAIGoods()} for every colony this player owns.
      */
