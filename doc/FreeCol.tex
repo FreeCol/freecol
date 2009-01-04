@@ -2262,7 +2262,7 @@ Canyon. Though he never found the golden cities he searched for, his
 mapping of the area now called the Southwestern US was important to
 further exploration. As soon as Francisco de Coronado joins the
 Continental Congress, all existing colonies become visible on the
-map. \Wikipedia{Francisco_V�zquez_de_Coronado}
+map. \Wikipedia{Francisco_Vazquez_de_Coronado}
 
 \Father{Hernando de Soto} (1496--1542) was the first European to
 explore Florida and the southeastern US.  He also held a prominent
@@ -2502,7 +2502,9 @@ in the case of an additive modifier.
 \ability{model.ability.addTaxToBells}
 \affectsPlayer
 
-The player adds the current tax rate as a bonus to bells production.
+The player adds the current tax rate as a bonus to bells
+production. The bonus is modified every time the tax increases or
+decreases.
 
 \ability{model.ability.alwaysOfferedPeace}
 \affectsPlayer
@@ -2522,7 +2524,8 @@ The unit suffers an ambush penalty equal to the terrain's defence value.
 \ability{model.ability.autoProduction}
 \affectsBuilding
 
-The building produces goods even if no units are present.
+The building needs no units to produce goods, and will never produce
+more goods than can be stored in the colony.
 
 \ability{model.ability.automaticEquipment}
 \affectsUnit
@@ -2786,7 +2789,8 @@ to units generated as a result of finding a Fountain of Youth.
 \ability{model.ability.teach}
 \affectsBuilding
 
-The building enables experts to teach other units.
+The building enables experts to teach other units. However, the
+building may place limits on the experience level of teachers.
 
 \ability{model.ability.tradeWithForeignColonies}
 \affectsPlayer
