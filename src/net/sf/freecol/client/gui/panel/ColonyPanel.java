@@ -1100,6 +1100,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             if (editState && result != null && result instanceof UnitLabel) {
                 updateSoLLabel();
                 updateProductionPanel();
+                updateBuildingsPanel();
             }
             if (comp instanceof GoodsLabel) {
                 // removing cargo from colony may affect production
