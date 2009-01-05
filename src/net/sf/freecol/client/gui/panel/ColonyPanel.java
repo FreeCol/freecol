@@ -1099,15 +1099,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             Component result = super.add(comp, editState);
             if (editState && result != null && result instanceof UnitLabel) {
                 updateSoLLabel();
+                updateProductionPanel();
             }
             if (comp instanceof GoodsLabel) {
                 // removing cargo from colony may affect production
                 updateBuildingsPanel(((GoodsLabel) comp).getGoods().getType());
-
-                // Tools may have been loaded into the carrier, so we
-                // need to also update the progress labels
-                updateProgressLabel();
             }
+            // Either Tools or units previously working on building materials
+            //may have been loaded into the carrier, so we need to also update
+            //the progress labels
+            updateProgressLabel();
+            
             updateCargoLabel();
             refresh();
             return result;
