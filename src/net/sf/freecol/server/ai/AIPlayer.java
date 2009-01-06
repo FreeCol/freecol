@@ -101,8 +101,6 @@ import org.w3c.dom.Element;
 public class AIPlayer extends AIObject {
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
-    protected static final EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
-
     private static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
 
     private static final int MAX_NUMBER_OF_GIFTS_BEING_DELIVERED = 1;
@@ -675,7 +673,7 @@ public class AIPlayer extends AIObject {
     private void secureColony(Colony colony) {
         final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
         final EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
-    	
+    
         Map map = player.getGame().getMap();
         int olddefenders = 0;
         int defenders = 0;
@@ -1000,7 +998,7 @@ public class AIPlayer extends AIObject {
                        && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") || 
                         getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
-            } else if (unit.getEquipment().contains(toolsType)
+            } else if (unit.hasAbility("model.ability.improveTerrain")
                        && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
             } else if (unit.isColonist()) {                
