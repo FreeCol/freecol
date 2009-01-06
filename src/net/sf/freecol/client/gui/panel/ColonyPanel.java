@@ -27,6 +27,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -87,6 +88,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ResourceManager;
 
 import cz.autel.dmi.HIGLayout;
 
@@ -1183,13 +1185,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
             ProductionLabel productionLabel;
 
-            public final int[] widths = { 46, 46, 46, 100, 52, 100 };
+            public final int[] widths = { 64, 46, 46, 46, 78, 32, 78 };
 
             public final int[] heights = { 20, 4, 40, 0, 0 };
 
             public static final int labelColumn = 1;
-            public static final int unitColumn = 1;
-            public static final int productionColumn = 4;
+            public static final int unitColumn = 2;
+            public static final int productionColumn = 5;
 
 
             /**
@@ -1291,6 +1293,36 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             public void updateProductionLabel() {
                 initialize();
             }
+
+            /**
+             * Paints this component.
+             * 
+             * @param g The graphics context in which to paint.
+             */
+            public void paintComponent(Graphics g) {
+                int width = getWidth();
+                int height = getHeight();
+
+                Image bgImage = ResourceManager.getImage(building.getType().getId() + ".image");
+                if (bgImage != null) {
+                    g.drawImage(bgImage, 0, 0, this);
+                } else {
+                    Image tempImage = ResourceManager.getImage("BackgroundImage");
+
+                    if (tempImage != null) {
+                        for (int x = 0; x < width; x += tempImage.getWidth(null)) {
+                            for (int y = 0; y < height; y += tempImage.getHeight(null)) {
+                                g.drawImage(tempImage, x, y, null);
+                            }
+                        }
+                    } else {
+                        g.setColor(getBackground());
+                        g.fillRect(0, 0, width, height);
+                    }
+                }
+            }
+
+
 
             /**
              * Adds a component to this ASingleBuildingPanel and makes sure that
