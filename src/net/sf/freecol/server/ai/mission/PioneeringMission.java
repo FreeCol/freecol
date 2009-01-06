@@ -265,7 +265,7 @@ public class PioneeringMission extends Mission {
         }
         
         if (getUnit().getTile() != null) {
-            if (!getUnit().getEquipment().contains(toolsType)) {
+            if (!getUnit().hasAbility("model.ability.improveTerrain")) {
                 // Get tools from a Colony.
                 if (getUnit().getColony() == null) {
                     PathNode bestPath = findColonyWithTools();        
