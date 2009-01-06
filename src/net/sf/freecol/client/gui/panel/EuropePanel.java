@@ -640,7 +640,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     UnitLabel unitLabel = getSelectedUnitLabel();
                     inPortPanel.remove(unitLabel);
                     toAmericaPanel.add(unitLabel, false);
-                    refresh();
+                    refreshInPort();
+                    revalidate();
                 }
                 break;
             default:
@@ -764,6 +765,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             }
             setSelectedUnitLabel(null);
             Component c = add(comp);
+            toAmericaPanel.revalidate();
             europePanel.refresh();
             return c;
         }
