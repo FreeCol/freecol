@@ -101,7 +101,7 @@ import org.w3c.dom.Element;
 public class AIPlayer extends AIObject {
     private static final Logger logger = Logger.getLogger(AIPlayer.class.getName());
 
-    protected static EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+    protected static final EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
 
     private static final int MAX_DISTANCE_TO_BRING_GIFT = 5;
 
@@ -230,55 +230,6 @@ public class AIPlayer extends AIObject {
     }
     
     /**
-     * Gets a list of the players this REF player is currently fighting.
-     * @return The list. Empty if this is not an REF player. 
-     */
-    private List<Player> getDominionsAtWar() {
-        List<Player> dominions = new LinkedList<Player>();        
-        Iterator<Player> it = getGame().getPlayerIterator();
-        while (it.hasNext()) {
-            Player p = it.next();
-            if (p.getREFPlayer() == getPlayer()
-                    && p.getPlayerType() == PlayerType.REBEL
-                    && p.getMonarch() == null) {
-                dominions.add(p);
-            }
-        }
-        return dominions;
-    }
-    
-    /**
-     * Checks if this player has a single Man-of-War.
-     * @return <code>true</code> if this player owns
-     *      a single Man-of-War.
-     */
-    private boolean hasManOfWar() {
-        Iterator<Unit> it = player.getUnitIterator();
-        while (it.hasNext()) {
-            Unit unit = it.next();
-            if ("model.unit.manOWar".equals(unit.getType().getId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Gets the number of King's land units.
-     * @return The number of units of type
-     *      {@link Unit#KINGS_REGULAR} this player owns.
-     */
-    private int getNumberOfKingLandUnits() {
-        int n = 0;
-        for (Unit unit : player.getUnits()) {
-            if (unit.hasAbility("model.ability.refUnit") && !unit.isNaval()) {
-                n++;
-            }
-        }
-        return n;
-    }
-
-    /**
      * For REF-players: Checks if we have lost the war of independence.
      */
     private void checkForREFDefeat() {
@@ -287,7 +238,7 @@ public class AIPlayer extends AIObject {
             return;
         }
         
-        List<Player> dominions = getDominionsAtWar();
+        List<Player> dominions = getPlayer().getDominionsAtWar();
         
         // Return if independence should not be granted:
         
@@ -299,7 +250,7 @@ public class AIPlayer extends AIObject {
             return;
         }
         
-        if (hasManOfWar() && getNumberOfKingLandUnits() > 6) {
+        if (getPlayer().hasManOfWar() && getPlayer().getNumberOfKingLandUnits() > 6) {
             return;
         }
         
@@ -722,7 +673,7 @@ public class AIPlayer extends AIObject {
      * Takes the necessary actions to secure a european colony
      */
     private void secureColony(Colony colony) {
-    	final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+        final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
         final EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
     	
         Map map = player.getGame().getMap();
