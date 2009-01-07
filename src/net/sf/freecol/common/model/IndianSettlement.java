@@ -1122,7 +1122,7 @@ public class IndianSettlement extends Settlement {
     	int horsesAvail = getGoodsCount(horsesType);
     	
     	for(Unit brave : getUnitList()){
-    		logger.info("Muskets available=" + getGoodsCount(armsType));
+    		logger.finest("Muskets available=" + getGoodsCount(armsType));
     		if(armsAvail < musketsToArmIndian){
     			break;
     		}
