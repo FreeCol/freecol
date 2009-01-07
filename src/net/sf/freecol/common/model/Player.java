@@ -2109,17 +2109,32 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == this || player == null) {
             return;
         }
+        
         if (tension.get(player) == null) {
             tension.put(player, new Tension(addToTension));
         } else {
             tension.get(player).modify(addToTension);
         }
 
-        if (origin != null && isIndian() && origin.getOwner() == this) {
+        // XXX: Can this really happen? Its not an error???
+        if(origin != null && origin.getOwner() != this){
+            return;
+        }
+        
+        // For indian players, we also need to set each settlement alarm.
+        // If the alarm originated on a settlement, it is propagated to all others.
+        // Global effects, like declaration of war, affect all settlements
+        if (isIndian()) {
             for (Settlement settlement : settlements) {
-                if (settlement instanceof IndianSettlement && !origin.equals(settlement)) {
-                    ((IndianSettlement) settlement).propagatedAlarm(player, addToTension);
+                // alarm originated on this settlement, has been already applied
+                if (origin != null && origin.equals(settlement)){
+                    continue;
                 }
+                // Sanitation, should never occur?
+                if (!(settlement instanceof IndianSettlement)){
+                    throw new IllegalStateException("Indian player owns non indian settlement");
+                }
+                ((IndianSettlement) settlement).propagatedAlarm(player, addToTension);
             }
         }
     }

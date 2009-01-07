@@ -1986,25 +1986,62 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void contactAdjacent(Tile tile) {
         Iterator<Position> tileIterator = getGame().getMap().getAdjacentIterator(tile.getPosition());
+ 
+        Player thisUnitOwner = getOwner();
+        // Sanitation
+        if(thisUnitOwner == null){
+            throw new IllegalStateException("This unit has no owner");
+        }
+        
         while (tileIterator.hasNext()) {
             Tile t = getGame().getMap().getTile(tileIterator.next());
 
-            if (t == null) {
+            // invalid tile for check
+            if (t == null || !t.isLand()) {
                 continue;
             }
+            
             Settlement settlement = t.getSettlement();
+            Unit unitOnTile = t.getFirstUnit();
+            
+            // nothing on tile, nothing to do
+            if(settlement == null && unitOnTile == null){
+                continue;
+            }
+            
+            // get the other intervening player
+            Player otherPlayer = null;
             if (settlement != null) {
-                if (!settlement.getOwner().hasContacted(getOwner())) {
-                    settlement.getOwner().setContacted(getOwner(), true);
-                    getOwner().setContacted(settlement.getOwner(), true);
+                otherPlayer = settlement.getOwner();
+            } else {
+                otherPlayer = unitOnTile.getOwner(); 
+            }
+            // Sanitation
+            if(otherPlayer == null){
+                throw new IllegalStateException("Cannot determine the other player.");    
+            }
+            
+            // update players contact information with one another
+            if (!otherPlayer.hasContacted(thisUnitOwner)) {
+                otherPlayer.setContacted(thisUnitOwner, true);
+                thisUnitOwner.setContacted(otherPlayer, true);
+            }
+            
+            // If the settlement is an indian settlement,
+            //or the unit an indian belonging to one,
+            //we also need to initialize the alarm of the indian settlement
+            //if it has no been already
+            IndianSettlement indianSettlement = null;
+            if (settlement != null){
+                if(settlement instanceof IndianSettlement ){
+                    indianSettlement = (IndianSettlement) settlement;
                 }
-                if (settlement instanceof IndianSettlement) {
-                    ((IndianSettlement) settlement).getAlarm().put(getOwner(), new Tension(0));
-                }
-            } else if (t.isLand() && t.getFirstUnit() != null
-                       && !t.getFirstUnit().getOwner().hasContacted(getOwner())) {
-                t.getFirstUnit().getOwner().setContacted(getOwner(), true);
-                getOwner().setContacted(t.getFirstUnit().getOwner(), true);
+            } else {
+                // if indian belonging to a camp, the result will not be null
+                indianSettlement = unitOnTile.getIndianSettlement();
+            }   
+            if(indianSettlement != null && indianSettlement.getAlarm(thisUnitOwner) == null){
+                indianSettlement.setAlarm(thisUnitOwner, otherPlayer.getTension(thisUnitOwner));
             }
         }
     }
