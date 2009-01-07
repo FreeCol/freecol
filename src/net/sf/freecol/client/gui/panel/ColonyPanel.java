@@ -665,6 +665,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
 
     public void updateBuildingsPanel() {
         buildingsPanel.initialize();
+        buildingsPanel.revalidate();
     }
 
     public void updateBuildingsPanel(GoodsType goodsType) {
@@ -804,7 +805,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
         productionPanel.add(new ProductionLabel(Goods.BELLS, surplusBells, parent));
         
         productionPanel.add(new ProductionLabel(Goods.CROSSES, crosses, parent));
-
+        productionPanel.revalidate();
     }
     
     /**
