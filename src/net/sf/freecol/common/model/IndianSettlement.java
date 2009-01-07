@@ -300,7 +300,10 @@ public class IndianSettlement extends Settlement {
      * @param newAlarm The new alarm value.
      */
     public void setAlarm(Player player, Tension newAlarm) {
-        alarm.put(player, newAlarm);
+        //sanitize: don't save alarm towards ourselves
+        if (player != owner) {
+            alarm.put(player, newAlarm);
+        }
     }
 
     /**
