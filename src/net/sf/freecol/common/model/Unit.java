@@ -2040,7 +2040,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 // if indian belonging to a camp, the result will not be null
                 indianSettlement = unitOnTile.getIndianSettlement();
             }   
-            if(indianSettlement != null && indianSettlement.getAlarm(thisUnitOwner) == null){
+            if(otherPlayer != thisUnitOwner && indianSettlement != null && indianSettlement.getAlarm(thisUnitOwner) == null){
                 indianSettlement.setAlarm(thisUnitOwner, otherPlayer.getTension(thisUnitOwner));
             }
         }
