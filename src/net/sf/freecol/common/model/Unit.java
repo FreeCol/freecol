@@ -2021,6 +2021,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 throw new IllegalStateException("Cannot determine the other player.");    
             }
             
+            // Own unit/settlement, ignore
+            if(otherPlayer == thisUnitOwner){
+                continue;
+            }
+            
             // update players contact information with one another
             if (!otherPlayer.hasContacted(thisUnitOwner)) {
                 otherPlayer.setContacted(thisUnitOwner, true);
@@ -2040,7 +2045,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 // if indian belonging to a camp, the result will not be null
                 indianSettlement = unitOnTile.getIndianSettlement();
             }   
-            if(otherPlayer != thisUnitOwner && indianSettlement != null && indianSettlement.getAlarm(thisUnitOwner) == null){
+            if(indianSettlement != null && indianSettlement.getAlarm(thisUnitOwner) == null){
                 indianSettlement.setAlarm(thisUnitOwner, otherPlayer.getTension(thisUnitOwner));
             }
         }
