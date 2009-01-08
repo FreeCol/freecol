@@ -51,6 +51,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 	
 	UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
 	UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
+    UnitType braveType = spec().getUnitType("model.unit.brave");
 	UnitType artilleryType = spec().getUnitType("model.unit.artillery");
 	UnitType galleonType = spec().getUnitType("model.unit.galleon");
 	
@@ -132,6 +133,60 @@ public class MissionAssignmentTest extends FreeColTestCase {
             ServerTestHelper.stopServer(server);
         }
         
+	}
+	
+	public void testIsTargetValidForSeekAndDestroy() {
+        // start a server
+        FreeColServer server = ServerTestHelper.startServer(false, true);
+
+        Map map = getTestMap();
+
+        server.setMapGenerator(new MockMapGenerator(map));
+
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+
+        try{
+            Game game = server.getGame();
+            map = game.getMap();  // update reference
+
+            server.getController();
+
+            AIMain aiMain = server.getAIMain();
+        
+            // Create player and unit
+            ServerPlayer incaPlayer = (ServerPlayer) game.getPlayer("model.nation.inca");
+            AIPlayer aiInca = (AIPlayer)aiMain.getAIObject(incaPlayer.getId());
+            ServerPlayer dutchPlayer = (ServerPlayer) game.getPlayer("model.nation.dutch");
+            
+            Tile dutchUnitTile = map.getTile(9, 9);
+            Tile braveUnitTile = map.getTile(9, 8);;
+            
+            Unit brave = new Unit(game, braveUnitTile, incaPlayer, braveType, UnitState.ACTIVE);
+            Unit soldier = new Unit(game, dutchUnitTile, dutchPlayer, veteranType, UnitState.ACTIVE);
+
+            incaPlayer.setStance(dutchPlayer, Stance.PEACE);
+            dutchPlayer.setStance(incaPlayer, Stance.PEACE);
+            incaPlayer.setTension(dutchPlayer, new Tension(0));
+            dutchPlayer.setTension(incaPlayer, new Tension(0));
+            
+            assertFalse("Target should NOT be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
+            
+            incaPlayer.setTension(dutchPlayer, new Tension(Tension.Level.HATEFUL.getLimit()));
+            assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
+            
+            incaPlayer.changeRelationWithPlayer(dutchPlayer, Stance.WAR);
+            assertTrue("Target should be valid for UnitSeekAndDestroyMission", aiInca.isTargetValidForSeekAndDestroy(brave, soldier));
+        }finally {
+            // must make sure that the server is stopped
+            ServerTestHelper.stopServer(server);
+        }
 	}
 	
 	public void testGiveMilitaryMission() {
