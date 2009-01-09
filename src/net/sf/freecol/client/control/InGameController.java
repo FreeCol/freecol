@@ -632,8 +632,7 @@ public final class InGameController implements NetworkConstants {
             //or no longer be on the map
             boolean alwaysCenter = freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER);
             if(alwaysCenter && unit.getTile() != null){
-                Position unitPosition = unit.getTile().getPosition();
-                freeColClient.getGUI().setFocus(unitPosition);
+                centerOnUnit(unit);
             }
         } // else: nothing: There is no active unit that can be moved.
     }
@@ -3909,18 +3908,30 @@ public final class InGameController implements NetworkConstants {
      * Centers the map on the selected tile.
      */
     public void centerActiveUnit() {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        Unit activeUnit = freeColClient.getGUI().getActiveUnit();
+        if (activeUnit == null){
             return;
         }
 
-        GUI gui = freeColClient.getGUI();
-
-        if (gui.getActiveUnit() != null && gui.getActiveUnit().getTile() != null) {
-            gui.setFocus(gui.getActiveUnit().getTile().getPosition());
-        }
+        centerOnUnit(activeUnit);
     }
 
+    /**
+     * Centers the map on the given unit location.
+     */
+    public void centerOnUnit(Unit unit) {
+        // Sanitation
+        if(unit == null){
+            return;
+        }
+        Tile unitTile = unit.getTile();
+        if(unitTile == null){
+            return;
+        }
+        
+        freeColClient.getGUI().setFocus(unitTile.getPosition());
+    }
+    
     /**
      * Executes the units' goto orders.
      */
