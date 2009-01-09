@@ -1443,6 +1443,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 repairLocation = loserOwner.getRepairLocation(unit);
             }
             break;
+        case EVADES:
+        case GREAT_LOSS:
+        case GREAT_WIN:
+            // Nothing special to do here.
+            break;
         }
         
         // Inform the players (other then the player attacking) about

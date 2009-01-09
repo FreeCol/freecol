@@ -875,6 +875,8 @@ public class IndianSettlement extends Settlement {
         case INCA_CITY:
             multiplier = 3;
             break;
+        default:
+            // No modifier.
         }
         if (isCapital()) {
             multiplier++;

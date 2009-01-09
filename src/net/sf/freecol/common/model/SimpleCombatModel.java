@@ -639,6 +639,14 @@ public class SimpleCombatModel implements CombatModel {
         case GREAT_WIN:
             sinkShip(defender, colony, null);
             break;
+        case DONE_SETTLEMENT:
+            // cannot happen when we are bombarding an enemy ship.
+            assert false;
+            break;
+        case GREAT_LOSS:
+        case LOSS:
+            // nothing to do here...
+            break;
         }
     }
 

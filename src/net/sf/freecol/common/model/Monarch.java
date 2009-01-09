@@ -65,7 +65,6 @@ public final class Monarch extends FreeColGameObject {
             SUPPORT_LAND,
             OFFER_MERCENARIES,
             LOWER_TAX,
-            NUMBER_OF_ACTIONS,
             WAIVE_TAX,
             ADD_UNITS }
 
@@ -232,6 +231,9 @@ public final class Monarch extends FreeColGameObject {
                     case PEACE:
                     case CEASE_FIRE:
                         canDeclareWar = true;
+                        break;
+                    case ALLIANCE:
+                        // we can neither have nor declare war.
                         break;
                     }
                 }

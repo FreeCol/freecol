@@ -55,7 +55,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     private static Logger logger = Logger.getLogger(UnitLabel.class.getName());
 
-    public static enum UnitAction { ARM, MOUNT, TOOLS, DRESS, ASSIGN,
+    public static enum UnitAction { ASSIGN,
             CLEAR_SPECIALITY, ACTIVATE_UNIT, FORTIFY, SENTRY,
             COLOPEDIA, LEAVE_TOWN, WORK_TILE, WORK_BUILDING }
 

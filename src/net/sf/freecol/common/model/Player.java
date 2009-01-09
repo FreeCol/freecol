@@ -2369,6 +2369,11 @@ public class Player extends FreeColGameObject implements Nameable {
             if(oldStance == Stance.WAR){
                 modifier = Tension.CEASE_FIRE_MODIFIER;
             }
+            break;
+        case ALLIANCE:
+        case WAR:
+            // No tension modifiers.
+            break;
         }
         modifyTension(player,modifier);
         
@@ -2383,6 +2388,11 @@ public class Player extends FreeColGameObject implements Nameable {
                     break;
                 case CEASE_FIRE:
                     modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_CEASE_FIRE;
+                    break;
+                case ALLIANCE:
+                case WAR:
+                    // No tension modifiers.
+                    break;
                 }
             }
             player.modifyTension(this, modifier);
@@ -3202,6 +3212,9 @@ public class Player extends FreeColGameObject implements Nameable {
         case REBEL:
         case INDEPENDENT:
             featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
+            break;
+        default:
+            // no special abilities for other playertypes, but silent warning about unused enum.
             break;
         }
 

@@ -717,6 +717,9 @@ public final class InGameController extends Controller {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
                             break;
+                        case NO_ACTION:
+                            // nothing to do here. :-)
+                            break;
                         }
                     } catch (Exception e) {
                         logger.log(Level.WARNING, "Monarch action failed!", e);

@@ -101,6 +101,13 @@ public class DefaultCostDecider implements CostDecider {
                         unit.getDestination().getTile() != newTile) {
                     return ILLEGAL_MOVE;
                 }
+                break;
+            case DISEMBARK:
+            case EMBARK:
+            case EXPLORE_LOST_CITY_RUMOUR:
+            case MOVE:
+            case MOVE_HIGH_SEAS:
+                assert false;
             }
         } else if (defender != null && defender.getOwner() != unit.getOwner()) {
             // A unit is blocking the path:                

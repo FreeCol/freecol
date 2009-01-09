@@ -909,6 +909,9 @@ public final class InGameInputHandler extends InputHandler {
                 reply.setAttribute("accepted", String.valueOf(false));
             }
             return reply;
+        case NO_ACTION:
+            // Nothing to do here, obviously.
+            break;
         }
         return null;
     }
