@@ -3116,7 +3116,7 @@ public final class InGameController implements NetworkConstants {
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
             .getSettlement();
 
-        if (settlement.getLearnableSkill() != null || !settlement.hasBeenVisited()) {
+        if (settlement != null && (settlement.getLearnableSkill() != null || !settlement.hasBeenVisited())) {
             unit.setMovesLeft(0);
             String skillName;
 

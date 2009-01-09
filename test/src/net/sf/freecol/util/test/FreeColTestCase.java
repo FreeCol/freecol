@@ -19,6 +19,7 @@
 
 package net.sf.freecol.util.test;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 import junit.framework.TestCase;
@@ -397,7 +398,7 @@ public class FreeColTestCase extends TestCase {
     	private Tile settlementTile;
     	
     	private boolean isCapital;
-        private boolean isVisited;
+        private java.util.Map<Player, Boolean> isVisited;
         private Unit residentMissionary;
     	
     	public IndianSettlementBuilder(Game game){
@@ -415,7 +416,7 @@ public class FreeColTestCase extends TestCase {
         	settlementTile = null;
         	skillTaught = "model.unit.masterCottonPlanter";
         	isCapital = false;
-            isVisited = false;
+            isVisited = new HashMap<Player, Boolean>();
             residentMissionary = null;
     	}
     	
@@ -451,9 +452,11 @@ public class FreeColTestCase extends TestCase {
     		
     		return this;
     	}
-    	
-    	public IndianSettlementBuilder visited(boolean isVisited){
-    		this.isVisited = isVisited;
+
+    	public IndianSettlementBuilder isVisitedByPlayer(Player player, boolean isVisited){
+    		if (player != null) {
+    		    this.isVisited.put(player, new Boolean(isVisited));
+    		}
     		
     		return this;
     	}

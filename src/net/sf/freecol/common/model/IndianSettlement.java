@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
@@ -59,6 +60,7 @@ public class IndianSettlement extends Settlement {
 
     public static final String UNITS_TAG_NAME = "units";
     public static final String OWNED_UNITS_TAG_NAME = "ownedUnits";
+    public static final String IS_VISITED_TAG_NAME = "isVisited";
     public static final String ALARM_TAG_NAME = "alarm";
     public static final String MISSIONARY_TAG_NAME = "missionary";
     public static final String WANTED_GOODS_TAG_NAME = "wantedGoods";
@@ -81,10 +83,12 @@ public class IndianSettlement extends Settlement {
     private GoodsType[] wantedGoods = new GoodsType[] {null, null, null};
 
     /**
-     * At the client side isVisited is true in case the player has
-     * visited the settlement.
+     * A map that tells if a player has visited the settlement.
+     * 
+     * At the client side, only the information regarding the player
+     * on that client should be included.
      */
-    private boolean isVisited = false;
+    private java.util.Map<Player, Boolean> isVisited = new HashMap<Player, Boolean>();
 
     /**
      * Whether this is the capital of the tribe.
@@ -140,7 +144,7 @@ public class IndianSettlement extends Settlement {
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
     public IndianSettlement(Game game, Player player, Tile tile, boolean isCapital,
-                            UnitType learnableSkill, boolean isVisited, Unit missionary) {
+                            UnitType learnableSkill, Map<Player, Boolean> isVisited, Unit missionary) {
         super(game, player, tile);
 
         if (tile == null) {
@@ -288,7 +292,7 @@ public class IndianSettlement extends Settlement {
     public void propagatedAlarm(Player player, int addToAlarm) {
         Tension tension = alarm.get(player);
         // only applies tension if settlement has met europeans
-        if (tension != null && isVisited) {
+        if (tension != null && hasBeenVisited(player)) {
             tension.modify(addToAlarm);            
         }
     }
@@ -334,7 +338,27 @@ public class IndianSettlement extends Settlement {
      * @return true if a European player has visited this settlement to speak with the chief.
      */
     public boolean hasBeenVisited() {
-        return isVisited;
+        for (Player player : isVisited.keySet()) {
+            if (player.isEuropean() && isVisited.get(player).booleanValue() == true) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Returns true if a the given player has visited this settlement to speak with the chief.
+     * @param player The player to check if has visited the settlement
+     * @return true if a European player has visited this settlement to speak with the chief.
+     */
+    public boolean hasBeenVisited(Player player) {
+        Boolean playerHasVisited = isVisited.get(player);
+        if (playerHasVisited != null && playerHasVisited.booleanValue() == true) { 
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -344,7 +368,7 @@ public class IndianSettlement extends Settlement {
      * @param player a <code>Player</code> value
      */
     public void setVisited(Player player) {
-        this.isVisited = true;
+        this.isVisited.put(player, Boolean.TRUE);
         if (alarm.get(player) == null) {
             alarm.put(player, new Tension(0));
         }
@@ -1243,7 +1267,6 @@ public class IndianSettlement extends Settlement {
         out.writeAttribute("isCapital", Boolean.toString(isCapital));
 
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
-            out.writeAttribute("hasBeenVisited", Boolean.toString(isVisited));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
             writeAttribute(out, "learnableSkill", learnableSkill);
 
@@ -1254,6 +1277,14 @@ public class IndianSettlement extends Settlement {
         }
 
         // attributes end here
+        
+        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
+            for (Entry<Player, Boolean> entry : isVisited.entrySet()) {
+                out.writeStartElement(IS_VISITED_TAG_NAME);
+                out.writeAttribute(entry.getKey().getId(), Boolean.toString(entry.getValue().booleanValue()));
+                out.writeEndElement();
+            }
+        }
         
         for (Entry<Player, Tension> entry : alarm.entrySet()) {
             out.writeStartElement(ALARM_TAG_NAME);
@@ -1340,14 +1371,17 @@ public class IndianSettlement extends Settlement {
             }
         }
 
-        isVisited = getAttribute(in, "hasBeenVisited", false);
         convertProgress = getAttribute(in, "convertProgress", 0);
         lastTribute = getAttribute(in, "lastTribute", 0);
         learnableSkill = FreeCol.getSpecification().getType(in, "learnableSkill", UnitType.class, null);
 
+        isVisited = new HashMap<Player, Boolean>();
         alarm = new HashMap<Player, Tension>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (ALARM_TAG_NAME.equals(in.getLocalName())) {
+            if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
+                Player player = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+                isVisited.put(player, Boolean.TRUE);
+            } if (ALARM_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
                 alarm.put(player, new Tension(getAttribute(in, "value", 0)));
                 in.nextTag(); // close element

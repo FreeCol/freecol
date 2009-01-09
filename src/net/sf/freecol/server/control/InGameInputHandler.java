@@ -1358,6 +1358,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (settlement.getLearnableSkill() != null) {
             reply.setAttribute("skill", settlement.getLearnableSkill().getId());
         }
+        settlement.setVisited(unit.getOwner());
         // Set the Tile.PlayerExploredTile attribute.
         settlement.getTile().updateIndianSettlementSkill(player);
         return reply;

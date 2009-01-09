@@ -453,7 +453,7 @@ public class UnitTest extends FreeColTestCase {
         assertTrue(jesuit.hasAbility("model.ability.expertMissionary"));
         // check mission creation
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement s = builder.player(sioux).settlementTile(tile).capital(true).visited(true).build();
+        IndianSettlement s = builder.player(sioux).settlementTile(tile).capital(true).isVisitedByPlayer(dutch, true).build();
        
         // add the missionary
         s.setMissionary(jesuit);
