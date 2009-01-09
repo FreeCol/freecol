@@ -1067,7 +1067,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
         for (int i = 0; i < surroundingTiles.size(); i++) {
             Tile t = surroundingTiles.get(i);
-            reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
+            reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument(), false, false));
         }
         if (newTile.hasLostCityRumour() && player.isEuropean()) {
             newTile.setLostCityRumour(false);
