@@ -1177,8 +1177,7 @@ public class AIPlayer extends AIObject {
                 AIUnit chosenOne = null;
                 while (it2.hasNext()) {
                     chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
-                    if ((chosenOne.getUnit().getLocation() instanceof Tile
-                         || chosenOne.getUnit().getLocation() instanceof IndianSettlement)
+                    if (chosenOne.getUnit().getLocation() instanceof Tile
                         && (chosenOne.getMission() == null
                             || chosenOne.getMission() instanceof UnitWanderHostileMission)) {
                         // Check that the colony can be reached:
@@ -1250,8 +1249,7 @@ public class AIPlayer extends AIObject {
                     AIUnit chosenOne = null;
                     while (it2.hasNext()) {
                         chosenOne = (AIUnit) getAIMain().getAIObject(it2.next());
-                        if ((chosenOne.getUnit().getLocation() instanceof Tile
-                             || chosenOne.getUnit().getLocation() instanceof IndianSettlement)
+                        if (chosenOne.getUnit().getLocation() instanceof Tile
                             && (chosenOne.getMission() == null
                                 || chosenOne.getMission() instanceof UnitWanderHostileMission)) {
                             // Check that the colony can be reached:
