@@ -1282,9 +1282,11 @@ public class IndianSettlement extends Settlement {
         
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
             for (Entry<Player, Boolean> entry : isVisited.entrySet()) {
-                out.writeStartElement(IS_VISITED_TAG_NAME);
-                out.writeAttribute(entry.getKey().getId(), Boolean.toString(entry.getValue().booleanValue()));
-                out.writeEndElement();
+                if (entry.getValue()) {
+                    out.writeStartElement(IS_VISITED_TAG_NAME);
+                    out.writeAttribute("player", entry.getKey().getId());
+                    out.writeEndElement();
+                }
             }
         }
         
