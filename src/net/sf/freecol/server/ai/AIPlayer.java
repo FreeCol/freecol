@@ -573,11 +573,7 @@ public class AIPlayer extends AIObject {
             */
         } else {
             for (IndianSettlement is : player.getIndianSettlements()) {
-                /*
-                 * No need for this task at the present since wandering
-                 * braves can be used for UnitSeekAndDestroyMission.
-                 */
-                //secureIndianSettlement(is);
+                secureIndianSettlement(is);
                 is.equipBraves();
             }
         }
@@ -655,28 +651,30 @@ public class AIPlayer extends AIObject {
             }
         }
         //Note: this is totally arbitrary
-        if (threat > defenders) {
-            Unit newDefender = is.getFirstUnit();
-            newDefender.setState(UnitState.ACTIVE);
-            newDefender.setLocation(is.getTile());
-            AIUnit newDefenderAI = (AIUnit) getAIMain().getAIObject(newDefender);
-            
-            Mission newMission = null;
-            // check if there is a candidate for a UnitSeekAndDestroyMission
-            if (bestTarget != null){
+        if (threat > defenders && bestTarget != null) {
+            AIUnit newDefenderAI = getBraveForSeekAndDestroy(is);
+            if (newDefenderAI != null) {
                 Tile targetTile = bestTarget.getTile();
                 boolean targetIsSettlement = (targetTile.getSettlement() != null);
-                boolean isValidUnitTarget = (!targetIsSettlement && isTargetValidForSeekAndDestroy(newDefender, targetTile.getFirstUnit())); 
-                if(targetIsSettlement || isValidUnitTarget) {
-                    newMission = new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI, bestTarget);
+                boolean validUnitTarget = (!targetIsSettlement && isTargetValidForSeekAndDestroy(newDefenderAI.getUnit(), targetTile.getFirstUnit())); 
+                if (targetIsSettlement || validUnitTarget) {
+                    newDefenderAI.setMission(new UnitSeekAndDestroyMission(getAIMain(), newDefenderAI, bestTarget));
                 }
-            } 
-            // no  valid target found, reassign basic mission
-            if(newMission == null){
-                newMission = new UnitWanderHostileMission(getAIMain(), newDefenderAI);
             }
-            newDefenderAI.setMission(newMission);
         }
+    }
+    
+    private AIUnit getBraveForSeekAndDestroy(final IndianSettlement indianSettlement) {
+        final Iterator<Unit> it = indianSettlement.getOwnedUnitsIterator();
+        while (it.hasNext()) {
+            final AIUnit chosenOne = (AIUnit) getAIMain().getAIObject(it.next());
+            if (chosenOne.getUnit().getLocation() instanceof Tile
+                && (chosenOne.getMission() == null
+                    || chosenOne.getMission() instanceof UnitWanderHostileMission)) {
+                return chosenOne;
+            }
+        }
+        return null;
     }
         
     /**
