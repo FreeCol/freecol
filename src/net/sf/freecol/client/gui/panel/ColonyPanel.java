@@ -1108,6 +1108,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             if (comp instanceof GoodsLabel) {
                 // removing cargo from colony may affect production
                 updateBuildingsPanel(((GoodsLabel) comp).getGoods().getType());
+                updateProductionPanel();
             }
             // Either Tools or units previously working on building materials
             //may have been loaded into the carrier, so we need to also update
@@ -1526,6 +1527,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                     ((GoodsLabel) comp).setSmall(false);
                     // adding goods may affect production
                     updateBuildingsPanel(((GoodsLabel) comp).getGoods().getType());
+                    updateProductionPanel();
                     reinitialize();
                     return comp;
                 }
@@ -1539,14 +1541,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
             return c;
         }
 
+        /* This is never called, since we never remove
+           GoodsLabels from the WarehousePanel!
         @Override
         public void remove(Component comp) {
             if (comp instanceof GoodsLabel) {
                 super.remove(comp);
-                colonyPanel.getWarehousePanel().revalidate();
+                revalidate();
                 colonyPanel.getCargoPanel().revalidate();
+                updateProductionPanel();
             }
         }
+        */
 
         public void initialize() {
             removeAll();
