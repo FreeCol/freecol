@@ -1149,7 +1149,9 @@ public class SimpleCombatModel implements CombatModel {
         EquipmentType typeToLose;
         UnitType downgrade;
 
-        if ((typeToLose = findEquipmentTypeToLose(unit)) != null) {
+        if (unit.hasAbility("model.ability.disposeOnCombatLoss")) {
+            slaughterUnit(unit, enemyUnit);
+        } else if ((typeToLose = findEquipmentTypeToLose(unit)) != null) {
             disarmUnit(unit, typeToLose, enemyUnit);
         } else if ((downgrade = unit.getType().getDowngrade(DowngradeType.DEMOTION))
                    != null) {

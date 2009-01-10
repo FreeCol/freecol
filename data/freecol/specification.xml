@@ -841,6 +841,7 @@
       <ability id="model.ability.carryGoods" value="true"/>
       <ability id="model.ability.bornInIndianSettlement" value="true"/>
       <ability id="model.ability.pillageUnprotectedColony" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <ability id="model.ability.captureUnits" value="false"/>
       <ability id="model.ability.captureEquipment" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -864,6 +865,7 @@
       <downgrade unit="model.unit.freeColonist" capture="true"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
