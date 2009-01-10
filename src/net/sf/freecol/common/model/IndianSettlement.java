@@ -1389,6 +1389,7 @@ public class IndianSettlement extends Settlement {
             if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
                 isVisited.put(player, Boolean.TRUE);
+                in.nextTag(); // close tag is always generated.
             } if (ALARM_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
                 alarm.put(player, new Tension(getAttribute(in, "value", 0)));
