@@ -1039,22 +1039,26 @@ public class IndianSettlement extends Settlement {
     private void checkForNewIndian() {
         // Alcohol also contributes to create children. 
         if (getFoodCount() + 4*getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
-            if (ownedUnits.size() <= 6 + getTypeOfSettlement().ordinal()) {
+            /*
+             * Allow one more brave than the initially generated number.
+             * This is more than sufficient. Do not increase the amount
+             * without discussing it on the developer's mailing list first.
+             */
+            if (ownedUnits.size() <= getGeneratedUnitCount()) {
                 // up to a limit. Anyway cities produce more children than camps
                 List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInIndianSettlement");
                 if (unitTypes.size() > 0) {
                     int random = getGame().getModelController().getRandom(getId() + "bornInIndianSettlement", unitTypes.size());
                     Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
                                                                        getTile(), getOwner(), unitTypes.get(random));
-                    consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
-                    consumeGoods(Goods.RUM, 200/4);    // Also, some available RUM is consumed
-                    // I know that consumeGoods will produce gold, which is explained because children are always a gift
-
                     addOwnedUnit(u);    // New indians quickly go out of their city and start annoying.
                     u.setIndianSettlement(this);
                     logger.info("New indian native created in " + getTile() + " with ID=" + u.getId());
                 }
             }
+            // Always consume goods in order to avoid stockpiling.
+            consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
+            consumeGoods(Goods.RUM, 200/4); // Also, some available RUM is consumed
         }
     }
 

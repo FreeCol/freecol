@@ -572,9 +572,12 @@ public class AIPlayer extends AIObject {
             }
             */
         } else {
-            // Determines if we need to move a brave out of the settlement.
             for (IndianSettlement is : player.getIndianSettlements()) {
-                secureIndianSettlement(is);
+                /*
+                 * No need for this task at the present since wandering
+                 * braves can be used for UnitSeekAndDestroyMission.
+                 */
+                //secureIndianSettlement(is);
                 is.equipBraves();
             }
         }

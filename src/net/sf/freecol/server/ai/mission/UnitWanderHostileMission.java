@@ -127,15 +127,6 @@ public class UnitWanderHostileMission extends Mission {
                 }
 
             }
-        } else if (unit.getIndianSettlement() != null) {
-            if (unit.getIndianSettlement().getTile() != unit.getTile()) {
-                logger.finest("Unit " + unit.getId() + ": No target found - returning to settlement.");
-                Direction direction = moveTowards(connection, unit.getIndianSettlement().getTile());
-                moveButDontAttack(connection, direction);
-            } else {
-                logger.finest("Unit " + unit.getId() + ": No target found - entering settlement.");
-                unit.setLocation(unit.getIndianSettlement());
-            }
         } else {
             // Just make a random move if no target can be found.
             moveRandomly(connection);
