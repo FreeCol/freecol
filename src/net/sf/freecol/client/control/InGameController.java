@@ -3128,12 +3128,11 @@ public final class InGameController implements NetworkConstants {
             UnitType skill = null;
 
             if (reply.getTagName().equals("provideSkill")) {
-                String skillStr = reply.getAttribute("skill");
-                if (skillStr == null) {
-                    skillName = null;
-                } else {
-                    skill = FreeCol.getSpecification().getUnitType(skillStr);
+                if (reply.hasAttribute("skill")) {
+                    skill = FreeCol.getSpecification().getUnitType(reply.getAttribute("skill"));
                     skillName = skill.getName();
+                } else {
+                    skillName = null;
                 }
             } else {
                 logger.warning("Server gave an invalid reply to an askSkill message");
