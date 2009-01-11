@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -516,7 +517,7 @@ public class MapGenerator implements IMapGenerator {
         IndianSettlement settlement = 
             new IndianSettlement(map.getGame(), player, tile, capital,
                                  generateSkillForLocation(map, tile, player.getNationType()),
-                                 new HashMap<Player, Boolean>(), null);
+                                 new HashSet<Player>(), null);
         SettlementType kind = settlement.getTypeOfSettlement();
         logger.fine("Generated skill: " + settlement.getLearnableSkill().getName());
 

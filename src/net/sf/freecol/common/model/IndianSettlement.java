@@ -24,9 +24,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 
@@ -88,7 +90,7 @@ public class IndianSettlement extends Settlement {
      * At the client side, only the information regarding the player
      * on that client should be included.
      */
-    private java.util.Map<Player, Boolean> isVisited = new HashMap<Player, Boolean>();
+    private Set<Player> visitedBy = new HashSet<Player>();
 
     /**
      * Whether this is the capital of the tribe.
@@ -144,7 +146,7 @@ public class IndianSettlement extends Settlement {
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
     public IndianSettlement(Game game, Player player, Tile tile, boolean isCapital,
-                            UnitType learnableSkill, Map<Player, Boolean> isVisited, Unit missionary) {
+                            UnitType learnableSkill, Set<Player> isVisited, Unit missionary) {
         super(game, player, tile);
 
         if (tile == null) {
@@ -158,7 +160,7 @@ public class IndianSettlement extends Settlement {
 
         this.learnableSkill = learnableSkill;
         this.isCapital = isCapital;
-        this.isVisited = isVisited;
+        this.visitedBy = isVisited;
         this.missionary = missionary;
 
         convertProgress = 0;
@@ -338,8 +340,9 @@ public class IndianSettlement extends Settlement {
      * @return true if a European player has visited this settlement to speak with the chief.
      */
     public boolean hasBeenVisited() {
-        for (Player player : isVisited.keySet()) {
-            if (player.isEuropean() && isVisited.get(player).booleanValue() == true) {
+        Iterator<Player> playerIterator = visitedBy.iterator();
+        while (playerIterator.hasNext()) {
+            if (playerIterator.next().isEuropean()) {
                 return true;
             }
         }
@@ -352,13 +355,7 @@ public class IndianSettlement extends Settlement {
      * @return true if a European player has visited this settlement to speak with the chief.
      */
     public boolean hasBeenVisited(Player player) {
-        Boolean playerHasVisited = isVisited.get(player);
-        if (playerHasVisited != null && playerHasVisited.booleanValue() == true) { 
-            return true;
-        }
-        else {
-            return false;
-        }
+        return visitedBy.contains(player);
     }
 
     /**
@@ -368,7 +365,7 @@ public class IndianSettlement extends Settlement {
      * @param player a <code>Player</code> value
      */
     public void setVisited(Player player) {
-        this.isVisited.put(player, Boolean.TRUE);
+        visitedBy.add(player);
         if (alarm.get(player) == null) {
             alarm.put(player, new Tension(0));
         }
@@ -1285,12 +1282,11 @@ public class IndianSettlement extends Settlement {
         // attributes end here
         
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
-            for (Entry<Player, Boolean> entry : isVisited.entrySet()) {
-                if (entry.getValue()) {
-                    out.writeStartElement(IS_VISITED_TAG_NAME);
-                    out.writeAttribute("player", entry.getKey().getId());
-                    out.writeEndElement();
-                }
+            Iterator<Player> playerIterator = visitedBy.iterator();
+            while (playerIterator.hasNext()) {
+                out.writeStartElement(IS_VISITED_TAG_NAME);
+                out.writeAttribute("player", playerIterator.next().getId());
+                out.writeEndElement();
             }
         }
         
@@ -1369,6 +1365,9 @@ public class IndianSettlement extends Settlement {
                 ownedUnits.add(u);
             }
         }
+        if (getAttribute(in, "hasBeenVisited", false)) {
+            visitedBy = new HashSet<Player>(getGame().getEuropeanPlayers());
+        }
         // end TODO
 
         for (int i = 0; i < wantedGoods.length; i++) {
@@ -1383,12 +1382,12 @@ public class IndianSettlement extends Settlement {
         lastTribute = getAttribute(in, "lastTribute", 0);
         learnableSkill = FreeCol.getSpecification().getType(in, "learnableSkill", UnitType.class, null);
 
-        isVisited = new HashMap<Player, Boolean>();
+        visitedBy = new HashSet<Player>();
         alarm = new HashMap<Player, Tension>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                isVisited.put(player, Boolean.TRUE);
+                visitedBy.add(player);
                 in.nextTag(); // close tag is always generated.
             } else if (ALARM_TAG_NAME.equals(in.getLocalName())) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
