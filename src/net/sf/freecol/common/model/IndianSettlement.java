@@ -1288,8 +1288,12 @@ public class IndianSettlement extends Settlement {
                 out.writeAttribute("player", playerIterator.next().getId());
                 out.writeEndElement();
             }
+        } else if (hasBeenVisited(player)) {
+            out.writeStartElement(IS_VISITED_TAG_NAME);
+            out.writeAttribute("player", player.getId());
+            out.writeEndElement();
         }
-        
+
         for (Entry<Player, Tension> entry : alarm.entrySet()) {
             out.writeStartElement(ALARM_TAG_NAME);
             out.writeAttribute("player", entry.getKey().getId());

@@ -1870,8 +1870,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             	pet.setColonyStockadeLevel(0);
             }
         } else if (getSettlement() != null) {
-            pet.setMissionary(((IndianSettlement) getSettlement()).getMissionary());
-
+            IndianSettlement settlement = (IndianSettlement) getSettlement();
+            pet.setMissionary(settlement.getMissionary());
+            if (settlement.hasBeenVisited(player)) {
+                pet.setVisited();
+            }
             /*
              * These attributes should not be updated by this method: skill,
              * highlyWantedGoods, wantedGoods1 and wantedGoods2
