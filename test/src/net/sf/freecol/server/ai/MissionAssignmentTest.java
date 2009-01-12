@@ -19,6 +19,8 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.Iterator;
+
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
@@ -376,13 +378,24 @@ public class MissionAssignmentTest extends FreeColTestCase {
             assertTrue("Settlement tile should be land",settlementTile.isLand());
             assertTrue("Adjacent tile should be land", adjacentTile != null && adjacentTile.isLand());
             FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-            IndianSettlement camp = builder.player(player1).settlementTile(settlementTile).initialBravesInCamp(3).build();
-
-            Unit soldier = new Unit(game, adjacentTile, player2, veteranType, UnitState.ACTIVE);
+            IndianSettlement camp = builder.player(player1).settlementTile(settlementTile).build();
+                
+            // put one brave outside the camp, but in the settlement tile, so that he may defend the settlement
+            Unit braveOutside = new Unit(game, settlementTile, player1, braveType, UnitState.ACTIVE,braveType.getDefaultEquipment());
+            braveOutside.setIndianSettlement(camp);
             
-            for(Unit brave : camp.getUnitList()){
+            // Setup enemy units
+            int enemyUnits = camp.getUnitCount() + 1;
+            for(int i=0; i< enemyUnits; i++){
+                new Unit(game, adjacentTile, player2, veteranType, UnitState.ACTIVE);
+            }
+            
+            Iterator<Unit> campUnitIter = camp.getOwnedUnitsIterator();
+            while(campUnitIter.hasNext()){
+                Unit brave = campUnitIter.next();
+                assertNotNull("Got null while getting the camps units", brave);
                 AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
-                assertNotNull(aiUnit);
+                assertNotNull("Couldnt get the ai object for the brave", aiUnit);
                 
                 aiPlayer1.giveMilitaryMission(aiUnit);
                 
@@ -402,8 +415,9 @@ public class MissionAssignmentTest extends FreeColTestCase {
             boolean isSeekAndDestroyMission = false;
             for(Unit brave : player1.getUnits()){
                 AIUnit aiUnit = (AIUnit) aiMain.getAIObject(brave);
-                assertNotNull(aiUnit);
-
+                assertNotNull("Couldnt get aiUnit for players brave",aiUnit);
+                assertNotNull("Unit missing mission",aiUnit.getMission());
+                
                 isSeekAndDestroyMission = aiUnit.getMission() instanceof UnitSeekAndDestroyMission;
                 
                 // found unit

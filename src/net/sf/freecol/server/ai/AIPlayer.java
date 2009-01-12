@@ -584,9 +584,7 @@ public class AIPlayer extends AIObject {
      */
     public void secureIndianSettlement(IndianSettlement is) {
         // if not at war, no need to secure settlement
-        // or
-        // Not enough units to be hostile
-        if (!is.getOwner().isAtWar() || is.getUnitCount() <= 2) {
+        if (!is.getOwner().isAtWar()) {
             return;
         }
         
