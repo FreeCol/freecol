@@ -292,6 +292,15 @@ public class BuildColonyMission extends Mission {
         int highestColonyValue = 0;
         int maxNumberofTiles = 500;
         int tileCounter = 0;
+
+        //if called during the first few turns of the game,
+        //and our unit may be the starting unit (==isOnCarrier())
+        //make sure to find _some_ starting position        
+        boolean gameStart = false;
+        if (unit.getGame().getTurn().getNumber() < 10 && unit.isOnCarrier()) {
+            gameStart = true;
+        }
+        
         Iterator<Position> it = game.getMap().getFloodFillIterator(startTile.getPosition());
         
         while (it.hasNext()) {
@@ -323,7 +332,11 @@ public class BuildColonyMission extends Mission {
                     bestTile = tile;
                 }
             }
-            if (++tileCounter >= maxNumberofTiles) break;
+            //break after checking a fixed number of tiles
+            //unless this may be the first colony,
+            //in which case we'll continue until we found _some_ location.
+            if ((++tileCounter >= maxNumberofTiles)
+                && (!gameStart || bestTile!= null)) break;
         }
         if (bestTile == null) {
             logger.info("Unit " + unit.getId() + " unsuccessfully searched for colony spot");
