@@ -1914,7 +1914,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (player.isIndian()) {
             return true;
         }
-        if (playerExploredTiles.get(player) == null || !isExplored()) {
+        if (playerExploredTiles == null || playerExploredTiles.get(player) == null || !isExplored()) {
             return false;
         }
 
