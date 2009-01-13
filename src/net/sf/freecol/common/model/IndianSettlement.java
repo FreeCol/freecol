@@ -1390,7 +1390,7 @@ public class IndianSettlement extends Settlement {
         lastTribute = getAttribute(in, "lastTribute", 0);
         learnableSkill = FreeCol.getSpecification().getType(in, "learnableSkill", UnitType.class, null);
 
-        visitedBy = new HashSet<Player>();
+        visitedBy.clear();
         alarm = new HashMap<Player, Tension>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (IS_VISITED_TAG_NAME.equals(in.getLocalName())) {
