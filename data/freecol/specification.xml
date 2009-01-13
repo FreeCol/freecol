@@ -933,12 +933,14 @@
       <required-goods id="model.goods.hammers" value="192"/>
       <required-goods id="model.goods.tools" value="40"/>
       <ability id="model.ability.refUnit" value="true"/>
+      <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.bombard" value="true"/>
       <downgrade unit="model.unit.damagedArtillery" demotion="true"/>
     </unit-type>
     <unit-type id="model.unit.damagedArtillery" offence="5"  defence="3" movement="3"
                scoreValue="1" lineOfSight="1" pathImage="wagon">
+      <ability id="model.ability.captureUnits" value="true"/>
       <ability id="model.ability.bombard" value="true"/>
     </unit-type>
     <unit-type id="model.unit.treasureTrain" offence="0"  defence="0" movement="3"
