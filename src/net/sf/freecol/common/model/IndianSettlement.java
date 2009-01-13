@@ -950,7 +950,11 @@ public class IndianSettlement extends Settlement {
         int workers = ownedUnits.size();
         for (GoodsType g : goodsList) {
             /* Determine the maximum possible production for each type of goods: */
-            goodsContainer.addGoods(g, getProductionOf(g));
+            if (g.getStoredAs() != null) {
+                goodsContainer.addGoods(g.getStoredAs(), getProductionOf(g));
+            } else {
+                goodsContainer.addGoods(g, getProductionOf(g));
+            }
         }
 
         /* Use tools (if available) to produce manufactured goods: */
