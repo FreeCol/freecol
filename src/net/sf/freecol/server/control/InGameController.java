@@ -405,7 +405,7 @@ public final class InGameController extends Controller {
     private boolean checkForDeath(Player player) {
         /*
          * Die if: (No colonies or units on map)
-         *         && ((After 20 turns) || (Cannot get a unit from Europe))
+         *         && ((After year 1600) || (Cannot get a unit from Europe))
          */
         
         if (player.isREF()) {
@@ -421,38 +421,50 @@ public final class InGameController extends Controller {
             return false;
         }
         
+        // Verify player units
         boolean hasCarrier = false;
         List<Unit> unitList = player.getUnits();
-        if (!unitList.isEmpty()) {
-            for(int i=0; i < unitList.size(); i++){
-                Unit unit = unitList.get(i);
-                
-                // Can found new colony
-                if(unit.isColonist()){
-                        logger.info("Unit " + unit.getId() + " can found colony");
-                        return false;
-                }
-                
-                // Can capture units/goods
-                if(unit.isOffensiveUnit()){
-                        logger.info("Unit " + unit.getId() + " has offense");
-                        return false;
-                }
-                
-                // Is carrying units and/or goods
-                if(unit.getGoodsCount() > 0){
-                        logger.info("Unit " + unit.getId() + " has goods");
-                        return false;
-                }
-                if(unit.getUnitCount()>0){
-                        logger.info("Unit " + unit.getId() + " has units");
-                        return false;
-                }
-                
-                if(unit.isNaval() && unit.isCarrier())
-                        hasCarrier = true;
+        for(Unit unit : unitList){
+            boolean isValidUnit = false;
+            
+            if(unit.isCarrier()){
+                hasCarrier = true;
+                logger.info("Still has carrier");
+                continue;
+            }
+            
+            // Can found new colony
+            if(unit.isColonist()){
+                isValidUnit = true;
+            }
+
+            // Can capture units
+            if(unit.isOffensiveUnit()){
+                isValidUnit = true;
+            }
+             
+            if(!isValidUnit){
+                continue;
+            }
+
+            // Verify if unit is in new world
+            Location unitLocation = unit.getLocation();
+            // unit in new world
+            if(unitLocation instanceof Tile){
+                logger.info("Found colonist in new world");
+                return false;
+            }
+            // onboard a carrier
+            if(unit.isOnCarrier()){
+                Unit carrier = (Unit) unitLocation;
+                // carrier in new world
+                if(carrier.getLocation() instanceof Tile){
+                    logger.info("Found colonist aboard carrier in new world");
+                    return false;
+                }   
             }
         }
+
         
         /*
          * At this point we know the player does not have any valid units or
@@ -466,39 +478,13 @@ public final class InGameController extends Controller {
             return true;
         }
         
-        // After 20 turns, no presence in New World means endgame
-        if (getGame().getTurn().getNumber() > 20) {
+        // After the year 1600, no presence in New World means endgame
+        if (getGame().getTurn().getYear() >= 1600) {
+            logger.info("No presence in new world after 1600");
             return true;
         }
         
-        /*
-         * Check if player has colonists and carrier to transport them to New World
-         */
-        boolean hasColonistsWaiting = false;
-        
-        Iterator<Unit> unitIterator = player.getEurope().getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit unit = unitIterator.next();
-            if (unit.isCarrier()) {
-                /*
-                 * The carrier has units 
-                 *or goods that can be sold
-                 */
-                if(unit.getGoodsCount() > 0){
-                    return false;
-                }
-                        
-                hasCarrier = true;
-                continue;
-            }
-            if (unit.isColonist()){
-                hasColonistsWaiting = true;
-                continue;
-            }
-        }
-        
         int goldNeeded = 0;
-        
         /*
          * No carrier, check if has gold to buy one
          */
@@ -509,19 +495,61 @@ public final class InGameController extends Controller {
                 
             Iterator<UnitType> navalUnits = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit").iterator();
                 
-            int lowerPrice = player.getEurope().getUnitPrice(navalUnits.next());
+            int lowerPrice = Integer.MAX_VALUE;
                 
             while(navalUnits.hasNext()){
                 UnitType unit = navalUnits.next();
-                if(player.getEurope().getUnitPrice(unit) < lowerPrice){
-                    lowerPrice = player.getEurope().getUnitPrice(unit);
+                
+                int unitPrice = player.getEurope().getUnitPrice(unit);
+                
+                // cannot be bought
+                if(unitPrice == UnitType.UNDEFINED){
+                    continue;
+                }
+                
+                if(unitPrice < lowerPrice){
+                    lowerPrice = unitPrice;
                 }
             }
-                
-            goldNeeded += lowerPrice;
-                
-            if(goldNeeded > player.getGold()){
+            
+            //Sanitation
+            if(lowerPrice == Integer.MAX_VALUE){
+                logger.warning("Couldnt find naval unit to buy");
                 return true;
+            }
+            
+            goldNeeded += lowerPrice;
+            
+            // cannot buy carrier
+            if(goldNeeded > player.getGold()){
+                logger.info("Does not have enough money to buy carrier");
+                return true;
+            }
+            logger.info("Has enough money to buy carrier, has=" + player.getGold() + ", needs=" + lowerPrice);
+        }
+
+        /*
+         * Check if player has colonists 
+         * We already checked that it has (or can buy) a carrier 
+         *to transport them to New World
+         */
+        Iterator<Unit> unitIterator = player.getEurope().getUnitIterator();
+        while (unitIterator.hasNext()) {
+            Unit unit = unitIterator.next();
+            if (unit.isCarrier()) {
+                /*
+                 * The carrier has units 
+                 *or goods that can be sold
+                 */
+                if(unit.getGoodsCount() > 0){
+                    logger.info("Has goods to sell");
+                    return false;
+                }
+                continue;
+            }
+            if (unit.isColonist()){
+                logger.info("Has colonist unit waiting in port");
+                return false;
             }
         }
         
@@ -529,41 +557,42 @@ public final class InGameController extends Controller {
          * No colonists, check if has gold to train 
          *or recruit one
          */
-        
-        if(!hasColonistsWaiting){
-            int goldToRecruit =  player.getEurope().getRecruitPrice();
-                
-            /*
-             * Find the cheapest colonist, either by recruiting or training
-             */
-                
-            Iterator<UnitType> trainedUnits = FreeCol.getSpecification().getUnitTypesTrainedInEurope().iterator();
-                
-            int goldToTrain = Integer.MAX_VALUE;
-                
-            while(trainedUnits.hasNext()){
-                UnitType unit = trainedUnits.next();
-                        
-                if(!unit.hasAbility("model.ability.foundColony")){
-                    continue;
-                }
-                        
-                if(player.getEurope().getUnitPrice(unit) < goldToTrain){
-                    goldToTrain = player.getEurope().getUnitPrice(unit);
-                }
+        int goldToRecruit =  player.getEurope().getRecruitPrice();
+
+        /*
+         * Find the cheapest colonist, either by recruiting or training
+         */
+
+        Iterator<UnitType> trainedUnits = FreeCol.getSpecification().getUnitTypesTrainedInEurope().iterator();
+
+        int goldToTrain = Integer.MAX_VALUE;
+
+        while(trainedUnits.hasNext()){
+            UnitType unit = trainedUnits.next();
+
+            if(!unit.hasAbility("model.ability.foundColony")){
+                continue;
             }
-                                
-            goldNeeded += Math.min(goldToTrain, goldToRecruit);
-                
-            if(goldNeeded > player.getGold()){
-                return true;
+
+            int unitPrice = player.getEurope().getUnitPrice(unit);
+            
+            // cannot be bought
+            if(unitPrice == UnitType.UNDEFINED){
+                continue;
+            }
+            
+            if(unitPrice < goldToTrain){
+                goldToTrain = unitPrice;
             }
         }
-        
-        /*
-         * Has carrier and colonists waiting, or
-         *enough gold to buy them
-         */
+
+        goldNeeded += Math.min(goldToTrain, goldToRecruit);
+
+        // Does not have enough money for recruiting or training
+        if(goldNeeded > player.getGold()){
+            logger.info("Does not have enough money for recruiting or training");
+            return true;
+        }
         return false;
     }
 
