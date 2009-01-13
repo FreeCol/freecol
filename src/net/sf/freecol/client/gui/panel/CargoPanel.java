@@ -250,7 +250,9 @@ public class CargoPanel extends FreeColPanel {
         		if (oldParent instanceof ColonyPanel.WarehousePanel) {
         			((ColonyPanel.WarehousePanel) oldParent).initialize();
         		} else {
-        			oldParent.remove(comp);
+        		    if(oldParent != null){
+        		        oldParent.remove(comp);
+        		    }
         		}
         		return comp;
         	} else if (comp instanceof MarketLabel) {
