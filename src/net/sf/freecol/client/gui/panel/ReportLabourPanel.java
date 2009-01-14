@@ -356,12 +356,10 @@ public final class ReportLabourPanel extends ReportPanel {
             JLabel production = new JLabel(imageLibrary.getGoodsImageIcon(goods));
             production.setBorder(TOPCELLBORDER);
 
-            GoodsType storedAs = goods.getStoredAs();
+            headerRow.add(production, higConst.rcwh(row, PRODUCTION_SYMBOL_COLUMN, !goods.isStoredAs() ? 4 : 3, 1));
 
-            headerRow.add(production, higConst.rcwh(row, PRODUCTION_SYMBOL_COLUMN, storedAs == null ? 4 : 3, 1));
-
-            if (showNetProduction && storedAs != null) {
-                JLabel netProduction = new JLabel(imageLibrary.getGoodsImageIcon(storedAs));
+            if (showNetProduction && goods.isStoredAs()) {
+                JLabel netProduction = new JLabel(imageLibrary.getGoodsImageIcon(goods.getStoredAs()));
                 netProduction.setBorder(TOPCELLBORDER);
                 headerRow.add(netProduction, higConst.rc(row, NETPRODUCTION_SUMMARY_COLUMN));
             }
