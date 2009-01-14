@@ -387,12 +387,17 @@ public class ModelMessage extends FreeColObject {
         out.writeStartElement(getXMLElementTagName());
         out.writeAttribute("owner", owner.getId());
         if (source!=null) {
-            if (source instanceof Unit && ((Unit)source).isDisposed())
-                out.writeAttribute("source", sourceLocation.getId());
-            else if (source instanceof Settlement && ((Settlement)source).isDisposed())
-                out.writeAttribute("source", sourceLocation.getId());
-            else
+            if ((source instanceof Unit && ((Unit)source).isDisposed())
+              ||(source instanceof Settlement && ((Settlement)source).isDisposed())) {
+                if (sourceLocation==null) {
+                    logger.warning("sourceLocation==null for source "+source.getId());
+                    out.writeAttribute("source", owner.getId());
+                } else {
+                    out.writeAttribute("source", sourceLocation.getId());
+                }
+            } else {
                 out.writeAttribute("source", source.getId());
+            }
         }
         if (display != null) {
             out.writeAttribute("display", display.getId());
