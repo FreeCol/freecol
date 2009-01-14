@@ -500,7 +500,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 locatable.setLocation(getTile());
             }
         } else if (locatable instanceof Goods) {
-            goodsContainer.addGoods((Goods) locatable);
+            addGoods((Goods) locatable);
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a 'Colony'.");
         }
@@ -526,7 +526,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 }
             }
         } else if (locatable instanceof Goods) {
-            goodsContainer.removeGoods((Goods) locatable);
+            removeGoods((Goods) locatable);
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a 'Colony'.");
         }

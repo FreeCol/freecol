@@ -576,7 +576,7 @@ public class IndianSettlement extends Settlement {
                 }
             }
         } else if (locatable instanceof Goods) {
-            goodsContainer.addGoods((Goods)locatable);
+            addGoods((Goods)locatable);
         } else {
             logger.warning("Tried to add an unrecognized 'Locatable' to a IndianSettlement.");
         }
@@ -595,7 +595,7 @@ public class IndianSettlement extends Settlement {
                 logger.warning("Failed to remove unit " + ((Unit)locatable).getId() + " from IndianSettlement");
             }
         } else if (locatable instanceof Goods) {
-            goodsContainer.removeGoods((Goods)locatable);
+            removeGoods((Goods)locatable);
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a IndianSettlement.");
         }
@@ -950,11 +950,7 @@ public class IndianSettlement extends Settlement {
         int workers = ownedUnits.size();
         for (GoodsType g : goodsList) {
             /* Determine the maximum possible production for each type of goods: */
-            if (g.getStoredAs() != null) {
-                goodsContainer.addGoods(g.getStoredAs(), getProductionOf(g));
-            } else {
-                goodsContainer.addGoods(g, getProductionOf(g));
-            }
+            addGoods(g, getProductionOf(g));
         }
 
         /* Use tools (if available) to produce manufactured goods: */
@@ -974,9 +970,9 @@ public class IndianSettlement extends Settlement {
             if (typeWithSmallestAmount != null) {
                 int production = Math.min(getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
                                           Math.min(10, getGoodsCount(Goods.TOOLS)));
-                goodsContainer.removeGoods(Goods.TOOLS, production);
-                goodsContainer.removeGoods(typeWithSmallestAmount.getRawMaterial(), production);
-                goodsContainer.addGoods(typeWithSmallestAmount, production * 5);
+                removeGoods(Goods.TOOLS, production);
+                removeGoods(typeWithSmallestAmount.getRawMaterial(), production);
+                addGoods(typeWithSmallestAmount, production * 5);
             }
         }
 
@@ -1136,7 +1132,7 @@ public class IndianSettlement extends Settlement {
         if (getGoodsCount(type) > 0) {
             amount = Math.min(amount, getGoodsCount(type));
             getOwner().modifyGold(amount);
-            goodsContainer.removeGoods(type, amount);
+            removeGoods(type, amount);
         }
     }
     /**

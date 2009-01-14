@@ -135,8 +135,16 @@ public final class GoodsType extends FreeColGameObjectType {
         return storable;
     }
 
+    public boolean isStoredAs() {
+        return storedAs!=null;
+    }
+
     public GoodsType getStoredAs() {
-        return storedAs;
+        if (storedAs==null) {
+            return this;
+        } else {
+            return storedAs;
+        }
     }
 
     public int getInitialAmount() {
