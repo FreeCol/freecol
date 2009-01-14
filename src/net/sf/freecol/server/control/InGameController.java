@@ -205,7 +205,7 @@ public final class InGameController extends Controller {
         else if (newPlayer.isIndian()) {
             
             for (IndianSettlement indianSettlement: newPlayer.getIndianSettlements()) {
-                if (indianSettlement.checkForNewMissionnaryConvert()) {
+                if (indianSettlement.checkForNewMissionaryConvert()) {
                     // an Indian brave gets converted by missionary
                     Unit missionary = indianSettlement.getMissionary();
                     ServerPlayer european = (ServerPlayer) missionary.getOwner();

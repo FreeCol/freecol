@@ -932,7 +932,11 @@ public class IndianSettlement extends Settlement {
                 potential += workTile.potential(type);
             }
         }
-        
+
+        //TODO: This currently limits production _per_food_type_ to units*3.
+        //With multiple food types, this may lead to varying results.
+        //If hard-coded limiting makes sense at all, it should be done
+        //after adding up all food types.        
         if (type.isFoodType()) {
             potential = Math.min(potential, ownedUnits.size()*3);
         }
@@ -1005,7 +1009,7 @@ public class IndianSettlement extends Settlement {
         updateWantedGoods();
     }
 
-    public boolean checkForNewMissionnaryConvert() {
+    public boolean checkForNewMissionaryConvert() {
         
         /* Increase convert progress and generate convert if needed. */
         if (missionary != null && getGame().getViewOwner() == null) {
@@ -1020,11 +1024,7 @@ public class IndianSettlement extends Settlement {
             increment += 2 * alarm.get(missionary.getOwner()).getValue() / 100;
             convertProgress += increment;
     
-            int extra = Math.max(0, 8-getUnitCount()*getUnitCount());
-            extra *= extra;
-            extra *= extra;
-            
-            if (convertProgress >= 100 + extra && getUnitCount() > 2) {
+            if (convertProgress >= 100 && getUnitCount() > 2) {
                 convertProgress = 0;
                 return true;
             }
@@ -1096,7 +1096,7 @@ public class IndianSettlement extends Settlement {
             } else {
                 // Settlement:
                 Player enemy = colony.getOwner();
-                extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + colony.getUnitCount());
+                extraAlarm.put(enemy, extraAlarm.get(enemy).intValue() + ALARM_TILE_IN_USE + colony.getUnitCount());
             }
         }
 
