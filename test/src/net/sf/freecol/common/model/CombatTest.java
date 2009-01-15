@@ -394,6 +394,7 @@ public class CombatTest extends FreeColTestCase {
         Unit defender = new Unit(getGame(), colony.getTile(), dutch, veteranType, UnitState.ACTIVE, horses, muskets);
         Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, indianHorses, indianMuskets);
 
+        assertTrue(attacker.isArmed());
         assertTrue(attacker.isMounted());
         assertTrue(inca.isIndian());
         
@@ -408,24 +409,12 @@ public class CombatTest extends FreeColTestCase {
         assertTrue(defender.isArmed());
         assertEquals(veteranType, defender.getType());
         assertTrue(defender.isDefensiveUnit());
-
-        // attacker should lose horses
-        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
-        combatModel.attack(attacker, defender, defeat, 0, null);
-        assertEquals(1, colony.getUnitCount());
-        assertFalse(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(braveType, attacker.getType());
-        assertFalse(defender.isMounted());
-        assertTrue(defender.isArmed());
-        assertEquals(veteranType, defender.getType());
-        assertTrue(defender.isDefensiveUnit());
-
+        
         // defender should lose muskets
         assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
         combatModel.attack(attacker, defender, victory, 0, null);
         assertEquals(1, colony.getUnitCount());
-        assertFalse(attacker.isMounted());
+        assertTrue(attacker.isMounted());
         assertTrue(attacker.isArmed());
         assertEquals(braveType, attacker.getType());
         assertFalse(defender.isMounted());
@@ -436,7 +425,7 @@ public class CombatTest extends FreeColTestCase {
 
         // colony should be destroyed
         combatModel.captureColony(attacker, colony, 0, dutch.getEurope());
-        assertFalse(attacker.isMounted());
+        assertTrue(attacker.isMounted());
         assertTrue(attacker.isArmed());
         assertEquals(braveType, attacker.getType());
         assertFalse(defender.isDisposed());
