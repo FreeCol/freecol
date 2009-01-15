@@ -115,7 +115,7 @@ public class Map extends FreeColGameObject {
     public static final int NUMBER_OF_DIRECTIONS = Direction.values().length;
 
     /** The infinity cost as used by {@link #findPath(Unit, Tile, Tile)}. */
-    public static final int COST_INFINITY = Integer.MAX_VALUE - 100000000;
+    public static final int COST_INFINITY = Integer.MIN_VALUE;
 
     /** Constant used for given options in {@link #findPath(Unit, Tile, Tile)}. */
     public static enum PathType { BOTH_LAND_AND_SEA, ONLY_LAND, ONLY_SEA }

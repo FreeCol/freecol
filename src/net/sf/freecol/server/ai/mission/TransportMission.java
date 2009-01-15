@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
@@ -369,7 +370,13 @@ public class TransportMission extends Mission {
      */
     private int getDistanceTo(Transportable t, Location start, boolean source) {
         // TODO: This takes to much resources - find another method:
-        return getPath(t, start, source).getTotalTurns();
+        PathNode path = getPath(t, start, source);
+        
+        if(path == null){
+            return Map.COST_INFINITY;
+        }
+        
+        return path.getTotalTurns();
     }
 
     /**
