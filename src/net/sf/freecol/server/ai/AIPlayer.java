@@ -1681,7 +1681,7 @@ public class AIPlayer extends AIObject {
         }
         ArrayList<Transportable> transportables = new ArrayList<Transportable>();
 
-        // Add units
+        // Add units to transport
         Iterator<AIUnit> aui = getAIUnitIterator();
         while (aui.hasNext()) {
             AIUnit au = aui.next();
@@ -1690,7 +1690,7 @@ public class AIPlayer extends AIObject {
             }
         }
 
-        // Add goods
+        // Add goods to transport
         Iterator<AIColony> aci = getAIColonyIterator();
         while (aci.hasNext()) {
             AIColony ac = aci.next();
@@ -1703,6 +1703,34 @@ public class AIPlayer extends AIObject {
             }
         }
 
+        // save further processing
+        if(transportables.isEmpty()){
+            return;
+        }
+        
+        // Update the priority
+        for (Transportable t : transportables){
+            t.increaseTransportPriority();
+        }
+
+        // get available transports
+        ArrayList<Mission> vacantTransports = new ArrayList<Mission>();
+        Iterator<AIUnit> iter = getAIUnitIterator();
+        while (iter.hasNext()) {
+            AIUnit au = iter.next();
+            if (au.hasMission() && au.getMission() instanceof TransportMission
+                    && !(au.getUnit().getLocation() instanceof Europe)) {
+                vacantTransports.add(au.getMission());
+            }
+        }
+        
+        // save further processing
+        // we must only do this verification after the priority update
+        if(vacantTransports.isEmpty()){
+            return;
+        }
+        
+        // order the list by priority
         Collections.sort(transportables, new Comparator<Transportable>() {
             public int compare(Transportable o1, Transportable o2) {
                 if (o1 == o2) {
@@ -1716,27 +1744,22 @@ public class AIPlayer extends AIObject {
             }
         });
 
-        ArrayList<Mission> vacantTransports = new ArrayList<Mission>();
-        Iterator<AIUnit> iter = getAIUnitIterator();
-        while (iter.hasNext()) {
-            AIUnit au = iter.next();
-            if (au.hasMission() && au.getMission() instanceof TransportMission
-                    && !(au.getUnit().getLocation() instanceof Europe)) {
-                vacantTransports.add(au.getMission());
-            }
-        }
-
-        Iterator<Transportable> ti = transportables.iterator();
-        while (ti.hasNext()) {
-            Transportable t = ti.next();
-            t.increaseTransportPriority();
-            if (t.getTransportLocatable().getLocation() instanceof Unit) {
-                Mission m = ((AIUnit) getAIMain().getAIObject(
-                        (FreeColGameObject) t.getTransportLocatable().getLocation())).getMission();
+        // Since we are manipulating the contents of the list, we need to have a clone list
+        //to iterate through
+        // If a good is already in a carrier, just add it the transport list
+        // Note however that it may not be possible to complete such transport
+        //in which case, the carrier should dump the transportable in the nearest colony
+        ArrayList<Transportable> iteratingList = new ArrayList<Transportable>(transportables);
+        for(Transportable t : iteratingList){
+            Location transportableLoc = t.getTransportLocatable().getLocation();
+            boolean isTransportableAlreadyOnCarrier = transportableLoc instanceof Unit;
+            if (isTransportableAlreadyOnCarrier) {
+                AIUnit carrierAI = (AIUnit) getAIMain().getAIObject((Unit) transportableLoc);
+                Mission m = carrierAI.getMission();
                 if (m instanceof TransportMission) {
                     ((TransportMission) m).addToTransportList(t);
                 }
-                ti.remove();
+                transportables.remove(t);
             }
         }
 
