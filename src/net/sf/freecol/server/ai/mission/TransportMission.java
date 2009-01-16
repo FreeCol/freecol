@@ -283,15 +283,21 @@ public class TransportMission extends Mission {
 
         int bestSourceIndex = -1;
         if (!isCarrying(newTransportable)) {
-            int bestSourceDistance;
+            
+            int distToSource;
             if (carrier.getLocation().getTile() == newSource.getTile()) {
-                bestSourceIndex = 0;
-                bestSourceDistance = 0;
+                distToSource = 0;
             } else {
-                bestSourceIndex = 0;
-                bestSourceDistance = getDistanceTo(newTransportable, ((carrier.getTile() != null) ? carrier.getTile()
+                distToSource = getDistanceTo(newTransportable, ((carrier.getTile() != null) ? carrier.getTile()
                         : carrier.getEntryLocation().getTile()), true);
+                // Sanitation
+                // Carrier cant reach source
+                if(distToSource == Map.COST_INFINITY){
+                    return;
+                }
             }
+            bestSourceIndex = 0;
+            int bestSourceDistance = distToSource;
             for (int i = 1; i < transportList.size() && bestSourceDistance > 0; i++) {
                 Transportable t1 = transportList.get(i - 1);
                 if (t1.getTransportSource() != null && t1.getTransportSource().getTile() == newSource.getTile()
@@ -302,16 +308,28 @@ public class TransportMission extends Mission {
                 }
 
             }
+            
             for (int i = 1; i < transportList.size() && bestSourceDistance > 0; i++) {
                 Transportable t1 = transportList.get(i - 1);
-                if (isCarrying(t1)
-                        && getDistanceTo(newTransportable, t1.getTransportDestination(), true) <= bestSourceDistance) {
-                    bestSourceIndex = i;
-                    bestSourceDistance = getDistanceTo(newTransportable, t1.getTransportDestination(), true);
-                } else if (!isCarrying(t1)
-                        && getDistanceTo(newTransportable, t1.getTransportSource(), true) <= bestSourceDistance) {
-                    bestSourceIndex = i;
-                    bestSourceDistance = getDistanceTo(newTransportable, t1.getTransportSource(), true);
+                 
+                if (isCarrying(t1)){
+                    int distToDestination = getDistanceTo(newTransportable, t1.getTransportDestination(), true);
+                    if(distToDestination == Map.COST_INFINITY){
+                        continue;
+                    }
+                    if(distToDestination <= bestSourceDistance) {
+                         bestSourceIndex = i;
+                         bestSourceDistance = distToDestination;
+                    }
+                } else{
+                    distToSource = getDistanceTo(newTransportable, t1.getTransportSource(), true);
+                    if(distToSource == Map.COST_INFINITY){
+                        continue;
+                    }   
+                    if (distToSource <= bestSourceDistance) {
+                        bestSourceIndex = i;
+                        bestSourceDistance = distToSource;
+                    }
                 }
             }
             transportList.add(bestSourceIndex, newTransportable);
@@ -324,7 +342,10 @@ public class TransportMission extends Mission {
             if (carrier.getTile() == newSource.getTile()) {
                 bestDestinationDistance = 0;
             } else {
-                bestDestinationDistance = getDistanceTo(newTransportable, carrier.getTile(), false);
+                int distToCarrier = getDistanceTo(newTransportable, carrier.getTile(), false);
+                if(distToCarrier != Map.COST_INFINITY){
+                    bestDestinationDistance = distToCarrier;
+                }
             }
         }
         for (int i = Math.max(bestSourceIndex, 1); i < transportList.size() && bestDestinationDistance > 0; i++) {
@@ -334,18 +355,27 @@ public class TransportMission extends Mission {
                 bestDestinationIndex = i;
                 bestDestinationDistance = 0;
             }
-
         }
         for (int i = Math.max(bestSourceIndex, 1); i < transportList.size() && bestDestinationDistance > 0; i++) {
             Transportable t1 = transportList.get(i - 1);
-            if (isCarrying(t1)
-                    && getDistanceTo(newTransportable, t1.getTransportDestination(), false) <= bestDestinationDistance) {
-                bestDestinationIndex = i;
-                bestDestinationDistance = getDistanceTo(newTransportable, t1.getTransportDestination(), false);
-            } else if (!isCarrying(t1)
-                    && getDistanceTo(newTransportable, t1.getTransportSource(), false) <= bestDestinationDistance) {
-                bestDestinationIndex = i;
-                bestDestinationDistance = getDistanceTo(newTransportable, t1.getTransportSource(), false);
+            if (isCarrying(t1)){
+                int distToDestination = getDistanceTo(newTransportable, t1.getTransportDestination(), false);
+                if(distToDestination == Map.COST_INFINITY){
+                    continue;
+                }
+                if(distToDestination <= bestDestinationDistance) {
+                    bestDestinationIndex = i;
+                    bestDestinationDistance = distToDestination;
+                }
+            } else{
+                int distToSource = getDistanceTo(newTransportable, t1.getTransportSource(), false); 
+                if(distToSource == Map.COST_INFINITY){
+                    continue;
+                }
+                if(distToSource <= bestDestinationDistance) {
+                    bestDestinationIndex = i;
+                    bestDestinationDistance =  distToSource;
+                }
             }
         }
         transportList.add(bestDestinationIndex, newTransportable);
@@ -929,7 +959,10 @@ public class TransportMission extends Mission {
                                 au.getTransportDestination().getTile(), carrier);
                         if (p != null) {
                             final PathNode dropNode = p.getTransportDropNode();
-                            if (dropNode != null && dropNode.getTile().getDistanceTo(carrier.getTile()) <= 1) {
+                            int distToCarrier = dropNode.getTile().getDistanceTo(carrier.getTile());
+                            if (dropNode != null &&
+                                    distToCarrier != Map.COST_INFINITY &&
+                                    distToCarrier <= 1) {
                                 mission.doMission(connection);
                                 if (u.getLocation() != getUnit()) {
                                     removeFromTransportList(au);
