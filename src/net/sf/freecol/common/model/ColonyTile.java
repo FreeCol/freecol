@@ -240,7 +240,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (getUnit() != null) {
             for (WorkLocation wl : getColony().getWorkLocations()) {
                 if (wl != this && wl.canAdd(getUnit())) {
-                    getUnit().setLocation(wl);
+                    getUnit().work(wl);
                     break;
                 }
             }

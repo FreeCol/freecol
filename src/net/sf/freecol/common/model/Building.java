@@ -250,14 +250,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             // Colonists which can't work here must be put outside
             for (Unit unit : units) {
                 if (!canAdd(unit.getType())) {
-                    unit.setLocation(getTile());
+                    unit.putOutsideColony();
                 }
             }
         }
         
         // Colonists exceding units limit must be put outside
         while (units.size() > getMaxUnits()) {
-            getLastUnit().setLocation(getTile());
+            getLastUnit().putOutsideColony();
         }
     }
     

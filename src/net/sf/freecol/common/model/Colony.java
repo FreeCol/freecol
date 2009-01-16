@@ -488,16 +488,16 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 WorkLocation w = getVacantWorkLocationFor((Unit) locatable);
                 if (w == null) {
                     logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
-                    locatable.setLocation(getTile());
+                    ((Unit) locatable).putOutsideColony();
                 } else {
                     int oldPopulation = getUnitCount();
-                    locatable.setLocation(w);
+                    ((Unit) locatable).work(w);
                     firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
                                        oldPopulation, oldPopulation + 1);
                     updatePopulation(1);
                 }
             } else {
-                locatable.setLocation(getTile());
+                ((Unit) locatable).putOutsideColony();
             }
         } else if (locatable instanceof Goods) {
             addGoods((Goods) locatable);

@@ -1862,12 +1862,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * 
      * @param workLocation The place where this <code>Unit</code> shall be out
      *            to work.
-     * @exception IllegalStateException If the <code>workLocation</code> is on
-     *                another {@link Tile} than this <code>Unit</code>.
+     * @exception IllegalStateException If the <code>workLocation</code> is in
+     *                another {@link Colony} than this <code>Unit</code>.
      */
     public void work(WorkLocation workLocation) {
-        if (workLocation.getTile() != getTile()) {
-            throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is on the same 'Tile'.");
+        //colonies will be the same if the unit is either on the tile of the colony
+        //or already working in one of the colonies WorkLocations.
+        if (workLocation.getColony() != this.getColony()) {
+            throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is in the same 'Colony'.");
         }
         setState(UnitState.IN_COLONY);
         setLocation(workLocation);
@@ -1941,12 +1943,20 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     // this should always be the case, except possibly for unit tests
                     int newPopulation = oldColony.getUnitCount();
                     oldColony.updatePopulation(-1);
+                    if (getState()!=UnitState.ACTIVE) {
+                        logger.warning("Removing unit "+getId()+" with state=="+getState()+" (should not be IN_COLONY) from WorkLocation in "+oldLocation.getColony().getName()+". Fixing: ");
+                        setState(UnitState.ACTIVE);
+                    }
                 }
             }
         } else if (newLocation instanceof WorkLocation) {
             getOwner().modifyScore(getType().getScoreValue());
             int oldPopulation = newLocation.getColony().getUnitCount();
             newLocation.getColony().updatePopulation(1);
+            if (getState()!=UnitState.IN_COLONY) {
+                logger.warning("Adding unit "+getId()+" with state=="+getState()+" (should be IN_COLONY) to WorkLocation in "+newLocation.getColony().getName()+". Fixing: ");
+                setState(UnitState.IN_COLONY);
+            }
         }
                 
         // Reset training when changing/leaving colony
@@ -2922,6 +2932,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         getTile().setOwner(owner);
         getTile().setSettlement(colony);
+        setState(UnitState.IN_COLONY);
         setLocation(colony);
         setMovesLeft(0);
         owner.getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
@@ -3722,6 +3733,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             location = (Location) getGame().getFreeColGameObject(locationStr);
             if (location == null) {
                 location = newLocation(getGame(), locationStr);
+            }
+            //TODO: added to fix bug in pre-rev.4883 savegames. Might eventually
+            //be removed later.
+            //Savegame sanitation: A WorkLocation is always inside a colony, so
+            //a unit located there should always have state "IN_COLONY".
+            //If not, parts of the code may consider the unit to be outside
+            //the colony, leading to errors.
+            if ((location instanceof WorkLocation) && state!=UnitState.IN_COLONY) {
+                logger.warning("Found "+getId()+" with state=="+state+" on WorkLocation in "+location.getColony().getName()+". Fixing: ");
+                state=UnitState.IN_COLONY;
             }
         }
 

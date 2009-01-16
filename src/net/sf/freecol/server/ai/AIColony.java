@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
@@ -864,7 +865,7 @@ public class AIColony extends AIObject {
                     && (unequippedPioneer.getMission() == null ||
                         !(unequippedPioneer.getMission() instanceof PioneeringMission))
                     && PioneeringMission.isValid(unequippedPioneer)) {
-                    unequippedPioneer.getUnit().setLocation(colony.getTile());
+                    unequippedPioneer.getUnit().putOutsideColony();
                     unequippedPioneer.setMission(new PioneeringMission(getAIMain(), unequippedPioneer));
                 }
             }
@@ -886,7 +887,9 @@ public class AIColony extends AIObject {
         while (ui.hasNext()) {
             Unit unit = ui.next();
             units.add(unit);
-            unit.setLocation(null);
+            //don't set location to null, but to the tile of the colony this
+            //unit is being removed from!
+            unit.putOutsideColony();
         }
 
         // Place all the experts:
@@ -905,7 +908,9 @@ public class AIColony extends AIObject {
                                 && colony.hasAbility("model.ability.produceInWater")
                                 || ((ColonyTile) wl).getWorkTile().isLand()
                                 && !unit.getType().getExpertProduction().equals(Goods.FISH))) {
-                        unit.setLocation(wlp.getWorkLocation());
+                        //use work() instead of setLocation()
+                        //to make sure that unitState is properly updated!
+                        unit.work(wlp.getWorkLocation());
                         unit.setWorkType(wlp.getGoodsType());
                         wlpIterator.remove();
                         uit.remove();
@@ -941,7 +946,9 @@ public class AIColony extends AIObject {
                         }
                     }
                     if (bestUnit != null && wlp.getWorkLocation().canAdd(bestUnit)) {
-                        bestUnit.setLocation(wlp.getWorkLocation());
+                        //use work() instead of setLocation()
+                        //to make sure that unitState is properly updated!
+                        bestUnit.work(wlp.getWorkLocation());
                         bestUnit.setWorkType(wlp.getGoodsType());
                         units.remove(bestUnit);
                         workLocationPlans.remove(wlp);
@@ -975,7 +982,9 @@ public class AIColony extends AIObject {
                             }
                         }
                         if (bestUnit != null && wlp.getWorkLocation().canAdd(bestUnit)) {
-                            bestUnit.setLocation(wlp.getWorkLocation());
+                            //use work() instead of setLocation()
+                            //to make sure that unitState is properly updated!
+                            bestUnit.work(wlp.getWorkLocation());
                             bestUnit.setWorkType(wlp.getGoodsType());
                             units.remove(bestUnit);
                             workLocationPlans.remove(wlp);
@@ -1035,7 +1044,7 @@ public class AIColony extends AIObject {
                 if (ct.getProductionOf(u, Goods.FOOD) > 1) {
                     u.setWorkType(Goods.FOOD);
                 } else {
-                    u.setLocation(colony.getTile());
+                    u.putOutsideColony();
                     AIUnit au = (AIUnit) getAIMain().getAIObject(u);
                     if (au.getMission() instanceof WorkInsideColonyMission) {
                         au.setMission(null);
@@ -1052,7 +1061,7 @@ public class AIColony extends AIObject {
                         break;
                     }
                 }
-                bestUnit.setLocation(colony.getTile());
+                bestUnit.putOutsideColony();
                 AIUnit au = (AIUnit) getAIMain().getAIObject(bestUnit);
                 if (au.getMission() instanceof WorkInsideColonyMission) {
                     au.setMission(null);
@@ -1077,19 +1086,19 @@ public class AIColony extends AIObject {
                 GoodsType rawMaterial = bestPick.getWorkType().getRawMaterial();
                 ColonyTile ct = (rawMaterial != null) ? colony.getVacantColonyTileFor(bestPick, rawMaterial) : null;
                 if (ct != null) {
-                    bestPick.setLocation(ct);
+                    bestPick.work(ct);
                     bestPick.setWorkType(rawMaterial);
                 } else {
                     Building th = colony.getBuildingForProducing(Goods.BELLS);
                     if (th.canAdd(bestPick)) {
-                        bestPick.setLocation(th);
+                        bestPick.work(th);
                     } else {
                         ct = colony.getVacantColonyTileFor(bestPick, Goods.FOOD);
                         if (ct != null) {
-                            bestPick.setLocation(ct);
+                            bestPick.work(ct);
                             bestPick.setWorkType(Goods.FOOD);
                         } else {
-                            bestPick.setLocation(colony);
+                            bestPick.putOutsideColony();
                             if (bestPick.getLocation() == wl) {
                                 break;
                             }
@@ -1114,7 +1123,7 @@ public class AIColony extends AIObject {
         			Unit unit = unitIterator.next();
         			if (unit.getWorkType() == goodsType) {
                         final Location oldLocation = unit.getLocation();
-        				unit.setLocation(null);
+        				unit.putOutsideColony();
         				boolean working = false;
         				waste = colony.getGoodsCount(goodsType) + colony.getProductionNetOf(goodsType)
         					    - colony.getWarehouseCapacity();
@@ -1126,10 +1135,10 @@ public class AIColony extends AIObject {
         					if (production2 > best && production2 + colony.getGoodsCount(goodsType2)
         							+ colony.getProductionNetOf(goodsType2) < colony.getWarehouseCapacity()){
         						if (working){
-        							unit.setLocation(null);
+        						    unit.putOutsideColony();
         						}
-        						unit.setLocation(colony.getVacantColonyTileFor(unit, goodsType2));
-                                unit.setWorkType(goodsType2);
+        						unit.work(colony.getVacantColonyTileFor(unit, goodsType2));
+                    unit.setWorkType(goodsType2);
         						best = production2;
         						working = true;
         					}
@@ -1141,6 +1150,9 @@ public class AIColony extends AIObject {
                              * colonies are assigned Missions.
                              */
                             // TODO: Create a Mission for units temporarily moved outside colonies.
+                            //Assuming that unit already has the correct UnitState here.
+                            //If not, this will be fixed by setLocation(),
+                            //resulting in a logger warning.
                             unit.setLocation(oldLocation);
         				}
         			}
@@ -1171,7 +1183,8 @@ public class AIColony extends AIObject {
                     }
                 }
                 if (bestUnit != null && wlp.getWorkLocation().canAdd(bestUnit)) {
-                    bestUnit.setLocation(wlp.getWorkLocation());
+                    
+                    bestUnit.work(wlp.getWorkLocation());
                     bestUnit.setWorkType(wlp.getGoodsType());
                     units.remove(bestUnit);
                     workLocationPlans.remove(wlp);
@@ -1183,7 +1196,7 @@ public class AIColony extends AIObject {
         Iterator<Unit> ui6 = units.iterator();
         while (ui6.hasNext()) {
             Unit u = ui6.next();
-            u.setLocation(colony.getTile());
+            u.putOutsideColony();
             AIUnit au = (AIUnit) getAIMain().getAIObject(u);
             if (au.getMission() instanceof WorkInsideColonyMission) {
                 au.setMission(null);
