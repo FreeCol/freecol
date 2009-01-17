@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 
@@ -44,6 +45,19 @@ public class InformationDialog extends FreeColDialog {
     public static final int vGap = 10;
 
     private JButton okButton = new JButton(Messages.message("ok"));
+
+    /**
+     * Returns an information dialog that shows the given 
+     * texts and images, and an "OK" button.
+     * 
+     * @param text The text to be displayed in the dialog.
+     * @param image The image to be displayed in the dialog.
+     * @return An information dialog that shows the given text 
+     *       and an "OK" button.
+     */
+    public InformationDialog(String text, ImageIcon image) {
+        this(new String[] { text }, new ImageIcon[] { image });
+    }
 
     /**
      * Returns an information dialog that shows the given 
@@ -78,7 +92,7 @@ public class InformationDialog extends FreeColDialog {
 
         HIGLayout layout = new HIGLayout(textWidths, textHeights);
         JPanel textPanel = new JPanel(layout);
-        //textPanel.setOpaque(false);
+        textPanel.setOpaque(false);
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -98,13 +112,13 @@ public class InformationDialog extends FreeColDialog {
         JScrollPane scrollPane = new JScrollPane(textPanel,
                                                  JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        // correct way to make scroll pane opaque
+        scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(null);
-        //scrollPane.setOpaque(false);
         setBorder(null);
 
         add(scrollPane, higConst.rc(2, 2));
         add(okButton, higConst.rc(4, 2));
-        //ResourceManager.getImage("InformationDialog.backgroundImage");
         setSize(getPreferredSize());
 
     }
