@@ -84,6 +84,7 @@ public class ActionManager extends OptionGroup {
         add(new EndTurnAction(freeColClient));
         add(new EuropeAction(freeColClient));
         add(new ExecuteGotoOrdersAction(freeColClient));
+        add(new FindColonyAction(freeColClient));
         add(new FortifyAction(freeColClient));
         add(new GotoAction(freeColClient));
         add(new GotoTileAction(freeColClient));

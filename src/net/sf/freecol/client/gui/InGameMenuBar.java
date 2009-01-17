@@ -55,6 +55,7 @@ import net.sf.freecol.client.gui.action.DisplayTileRegionsAction;
 import net.sf.freecol.client.gui.action.EndTurnAction;
 import net.sf.freecol.client.gui.action.EuropeAction;
 import net.sf.freecol.client.gui.action.ExecuteGotoOrdersAction;
+import net.sf.freecol.client.gui.action.FindColonyAction;
 import net.sf.freecol.client.gui.action.FortifyAction;
 import net.sf.freecol.client.gui.action.GotoAction;
 import net.sf.freecol.client.gui.action.GotoTileAction;
@@ -238,6 +239,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         menu.add(getMenuItem(EuropeAction.id));
         menu.add(getMenuItem(TradeRouteAction.id));
+        menu.add(getMenuItem(FindColonyAction.id));
 
         add(menu);
     }

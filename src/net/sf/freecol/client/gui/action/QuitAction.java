@@ -29,7 +29,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.ImageLibrary;
 
 /**
- * An action for chosing the next unit as the active unit.
+ * An action for quitting the game.
  */
 public class QuitAction extends MapboardAction {
 
@@ -40,7 +40,7 @@ public class QuitAction extends MapboardAction {
 
 
     /**
-     * Creates a new <code>WaitAction</code>.
+     * Creates a new <code>QuitAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      */

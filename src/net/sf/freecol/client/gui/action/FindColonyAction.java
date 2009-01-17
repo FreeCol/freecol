@@ -26,26 +26,37 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.model.Player.PlayerType;
 
 /**
- * An action for saving the game.
+ * An action for chosing the next unit as the active unit.
  */
-public class SaveAction extends MapboardAction {
+public class FindColonyAction extends MapboardAction {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(SaveAction.class.getName());
+    private static final Logger logger = Logger.getLogger(FindColonyAction.class.getName());
 
-    public static final String id = "saveAction";
+    public static final String id = "findColonyAction";
 
 
     /**
-     * Creates a new <code>SaveAction</code>.
+     * Creates a new <code>FindColonyAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      */
-    SaveAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.game.save", null, KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit()
+    FindColonyAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.view.findColony", null,
+              KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit()
                 .getMenuShortcutKeyMask()));
+    }
+
+    /**
+     * Returns the id of this <code>Option</code>.
+     * 
+     * @return "findColonyAction"
+     */
+    public String getId() {
+        return id;
     }
 
     /**
@@ -54,32 +65,15 @@ public class SaveAction extends MapboardAction {
      * @return true if this action should be enabled.
      */
     protected boolean shouldBeEnabled() {
-        if (freeColClient.isMapEditor()) {
-            return true;
-        } else {
-            return !freeColClient.getCanvas().isShowingSubPanel();
-        }
-    }
-
-    /**
-     * Returns the id of this <code>Option</code>.
-     * 
-     * @return "declareIndependenceAction"
-     */
-    public String getId() {
-        return id;
-    }
-
+        return super.shouldBeEnabled();
+    }    
+    
     /**
      * Applies this action.
      * 
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        if (!freeColClient.isMapEditor()) {
-            freeColClient.getInGameController().saveGame();
-        } else {
-            freeColClient.getMapEditorController().saveGame();
-        }
+        getFreeColClient().getCanvas().findColony();
     }
 }
