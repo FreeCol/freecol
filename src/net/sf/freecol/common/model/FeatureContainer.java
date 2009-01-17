@@ -86,7 +86,7 @@ public class FeatureContainer {
         }
         Set<Ability> abilitySet = abilities.get(id);
         if (abilitySet == null) {
-            return Collections.emptySet();
+            return new HashSet<Ability>();
         } else {
             Set<Ability> result = new HashSet<Ability>();
             for (Ability ability : abilitySet) {
@@ -206,7 +206,7 @@ public class FeatureContainer {
         }
         Set<Modifier> modifierSet = modifiers.get(id);
         if (modifierSet == null) {
-            return Collections.emptySet();
+            return new HashSet<Modifier>();
         } else if (objectType == null) {
             return modifierSet;
         } else {
