@@ -248,7 +248,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
                 PlayerExploredTile pet = playerExploredTiles.get(player);
-                if (pet != null && pet.explored) {
+                if (pet != null && pet.isExplored()) {
                     return getType().getName();
                 }
                 return Messages.message("unexplored");
@@ -1669,9 +1669,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         if (toSavedGame) {
-            for (PlayerExploredTile peTile : playerExploredTiles.values()) {
-                if (peTile.isExplored()) {
-                    peTile.toXML(out, player, showAll, toSavedGame);
+            for (Entry<Player, PlayerExploredTile> entry : playerExploredTiles.entrySet()) {
+                if (entry.getValue().isExplored()) {
+                    entry.getValue().toXML(out, entry.getKey(), showAll, toSavedGame);
                 }
             }
         }
@@ -1771,7 +1771,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 // Only from a savegame:
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
                 if (playerExploredTiles.get(player) == null) {
-                    PlayerExploredTile pet = new PlayerExploredTile(in);
+                    PlayerExploredTile pet = new PlayerExploredTile(getGame(), in);
                     playerExploredTiles.put(player, pet);
                 } else {
                     playerExploredTiles.get(player).readFromXML(in);
@@ -1820,7 +1820,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @see PlayerExploredTile
      */
     private void createPlayerExploredTile(Player player) {
-        playerExploredTiles.put(player, new PlayerExploredTile(player, getTileItemContainer()));
+        playerExploredTiles.put(player, new PlayerExploredTile(getGame(), player, this));
     }
 
     /**
@@ -1843,7 +1843,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                  player.canSee(this) + ", " + isExploredBy(player) + " ::: " + getPosition();
                 logger.warning(message);
                 //throw new IllegalStateException(message);
-                pet = new PlayerExploredTile(player, getTileItemContainer());
+                pet = new PlayerExploredTile(getGame(), player, this);
                 playerExploredTiles.put(player, pet);
             } else {
                 return;
@@ -1855,8 +1855,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         pet.setLostCityRumour(lostCityRumour);
         pet.setConnected(connected);
         pet.setOwner(owner);
-        pet.setRegion(region);
-        pet.setFishBonus(getFishBonus());
 
         if (getColony() != null) {
             pet.setColonyUnitCount(getSettlement().getUnitCount());
@@ -1987,370 +1985,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         playerExploredTile.setVisited();
     }
 
-    /**
-     * This class contains the data visible to a specific player.
-     * 
-     * <br>
-     * <br>
-     * 
-     * Sometimes a tile contains information that should not be given to a
-     * player. For instance; a settlement that was built after the player last
-     * viewed the tile.
-     * 
-     * <br>
-     * <br>
-     * 
-     * The <code>toXMLElement</code> of {@link Tile} uses information from
-     * this class to hide information that is not available.
-     */
-    public class PlayerExploredTile {
-
-        private Player player;
-
-        private boolean explored = false;
-
-        private Player owner;
-
-        private Region region;
-
-        // All known TileItems
-        private Resource resource;
-        private List<TileImprovement> improvements;
-        private TileImprovement road;
-        private TileImprovement river;
-        private int fishBonus;
-
-        // Colony data:
-        private int colonyUnitCount = 0, colonyStockadeLevel;
-
-        // IndianSettlement data:
-        private UnitType skill = null;
-        private GoodsType[] wantedGoods = {null, null, null};
-        private boolean settlementVisited = false;
-
-        private Unit missionary = null;
-
-        private boolean lostCityRumour;
-        private boolean connected = false;
-
-        /**
-         * Creates a new <code>PlayerExploredTile</code>.
-         * 
-         * @param player the player 
-         * @param tic a tile item container
-         */
-        public PlayerExploredTile(Player player, TileItemContainer tic) {
-            this.player = player;
-            getTileItemInfo(tic);
-        }
-
-        /**
-         * Initialize this object from an XML-representation of this object.
-         * 
-         * @param in The XML stream to read the data from.
-         * @throws XMLStreamException if an error occurred during parsing.
-         */
-        public PlayerExploredTile(XMLStreamReader in) throws XMLStreamException {
-            readFromXML(in);
-        }
-
-        /**
-         * Copies given TileItemContainer
-         * @param tic The <code>TileItemContainer</code> to copy from
-         */
-        public void getTileItemInfo(TileItemContainer tic) {
-            if (tic != null) {
-                resource = tic.getResource();
-                improvements = tic.getImprovements();
-                road = tic.getRoad();
-                river = tic.getRiver();
-            } else {
-                improvements = Collections.emptyList();
-            }
-        }
-
-        public void setColonyUnitCount(int colonyUnitCount) {
-            this.colonyUnitCount = colonyUnitCount;
-        }
-
-        public int getColonyUnitCount() {
-            return colonyUnitCount;
-        }
-
-        public void setColonyStockadeLevel(int colonyStockadeLevel) {
-            this.colonyStockadeLevel = colonyStockadeLevel;
-        }
-
-        public int getColonyStockadeLevel() {
-            return colonyStockadeLevel;
-        }
-
-        public boolean hasRoad() {
-            return (road != null);
-        }
-
-        public TileImprovement getRoad() {
-            return road;
-        }
-
-        public boolean hasRiver() {
-            return (river != null);
-        }
-
-        public TileImprovement getRiver() {
-            return river;
-        }
-
-        public Resource getResource() {
-            return resource;
-        }
-
-        public List<TileImprovement> getImprovements() {
-            return improvements;
-        }
-
-        public void setLostCityRumour(boolean lostCityRumour) {
-            this.lostCityRumour = lostCityRumour;
-        }
-
-        public boolean hasLostCityRumour() {
-            return lostCityRumour;
-        }
-
-        public void setConnected(boolean connected) {
-            this.connected = connected;
-        }
-
-        public boolean isConnected() {
-            return connected;
-        }
-
-        public void setExplored(boolean explored) {
-            this.explored = explored;
-        }
-
-        public void setSkill(UnitType newSkill) {
-            this.skill = newSkill;
-        }
-
-        public UnitType getSkill() {
-            return skill;
-        }
-
-        public void setOwner(Player owner) {
-            this.owner = owner;
-        }
-
-        public Player getOwner() {
-            return owner;
-        }
-
-        public void setWantedGoods(GoodsType[] newWantedGoods) {
-            this.wantedGoods = newWantedGoods;
-        }
-
-        public GoodsType[] getWantedGoods() {
-            return wantedGoods;
-        }
-
-        public void setMissionary(Unit missionary) {
-            this.missionary = missionary;
-        }
-
-        public Unit getMissionary() {
-            return missionary;
-        }
-
-        private void setVisited() {
-            settlementVisited = true;
-        }
-
-        private boolean hasBeenVisited() {
-            return settlementVisited;
-        }
-
-        public Region getRegion() {
-            return region;
-        }
-
-        private void setRegion(Region region) {
-            this.region = region;
-        }
-
-        public int getFishBonus() {
-            return fishBonus;
-        }
-
-        public void setFishBonus(int fishBonus) {
-            this.fishBonus = fishBonus;
-        }
-
-
-        /**
-         * Checks if this <code>Tile</code> has been explored.
-         * 
-         * @return <i>true</i> if the tile has been explored.
-         */
-        public boolean isExplored() {
-            return explored;
-        }
-
-        /**
-         * Gets the Player owning this object (not the Tile).
-         * 
-         * @return The Player of this <code>PlayerExploredTile</code>.
-         */
-        public Player getPlayer() {
-            return player;
-        }
-
-        /**
-         * This method writes an XML-representation of this object to the given
-         * stream.
-         * 
-         * <br>
-         * <br>
-         * 
-         * Only attributes visible to the given <code>Player</code> will be
-         * added to that representation if <code>showAll</code> is set to
-         * <code>false</code>.
-         * 
-         * @param out The target stream.
-         * @param player The <code>Player</code> this XML-representation
-         *            should be made for, or <code>null</code> if
-         *            <code>showAll == true</code>.
-         * @param showAll Only attributes visible to <code>player</code> will
-         *            be added to the representation if <code>showAll</code>
-         *            is set to <i>false</i>.
-         * @param toSavedGame If <code>true</code> then information that is
-         *            only needed when saving a game is added.
-         * @throws XMLStreamException if there are any problems writing to the
-         *             stream.
-         */
-        public void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-            // Start element:
-            out.writeStartElement("playerExploredTile");
-
-            out.writeAttribute("player", this.player.getId());
-
-            if (!explored) {
-                out.writeAttribute("explored", Boolean.toString(explored));
-            }
-            if (Tile.this.hasLostCityRumour()) {
-                out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
-            }
-            if (Tile.this.getOwner() != owner && owner != null) {
-                out.writeAttribute("owner", owner.getId());
-            }
-            if (colonyUnitCount != 0) {
-                out.writeAttribute("colonyUnitCount", Integer.toString(colonyUnitCount));
-                out.writeAttribute("colonyStockadeLevel", Integer.toString(colonyStockadeLevel));
-            }
-            if (fishBonus != 0) {
-                out.writeAttribute("fishBonus", Integer.toString(fishBonus));
-            }
-            out.writeAttribute("connected", Boolean.toString(connected));
-            writeAttribute(out, "region", region);
-
-            out.writeAttribute("settlementVisited", Boolean.toString(settlementVisited));
-            if (settlementVisited) {
-                writeAttribute(out, "learnableSkill", skill);
-                writeAttribute(out, "wantedGoods0", wantedGoods[0]);
-                writeAttribute(out, "wantedGoods1", wantedGoods[1]);
-                writeAttribute(out, "wantedGoods2", wantedGoods[2]);
-            }
-
-            if (missionary != null && settlementVisited) {
-                out.writeStartElement("missionary");
-                missionary.toXML(out, player, showAll, toSavedGame);
-                out.writeEndElement();
-            }
-            if (hasResource()) {
-                resource.toXML(out, player, showAll, toSavedGame);
-            }
-            for (TileImprovement t : improvements) { 
-                t.toXML(out, player, showAll, toSavedGame);
-            }
-
-            out.writeEndElement();
-        }
-
-        /**
-         * Initialize this object from an XML-representation of this object.
-         * 
-         * @param in The input stream with the XML.
-         * @throws XMLStreamException if an error occurred during parsing.
-         */
-        public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-            player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-
-            explored = getAttribute(in, "explored", true);
-            colonyUnitCount = getAttribute(in, "colonyUnitCount", 0);
-            colonyStockadeLevel = getAttribute(in, "colonyStockadeLevel", 0);
-            lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(),
-                                          Tile.this.hasLostCityRumour());
-            connected = getAttribute(in, "connected", false);
-
-            fishBonus = getAttribute(in, "fishBonus", 0);
-            owner = getFreeColGameObject(in, "owner", Player.class, Tile.this.getOwner());
-            region = getFreeColGameObject(in, "region", Region.class, null);
-
-            settlementVisited = getAttribute(in, "settlementVisited", false);
-            if (settlementVisited) {
-                Specification spec = FreeCol.getSpecification();
-                skill = spec.getType(in, "learnableSkill", UnitType.class, null);
-                wantedGoods[0] = spec.getType(in, "wantedGoods0", GoodsType.class, null);
-                wantedGoods[1] = spec.getType(in, "wantedGoods1", GoodsType.class, null);
-                wantedGoods[2] = spec.getType(in, "wantedGoods2", GoodsType.class, null);
-            }
-
-            missionary = null;
-            TileItemContainer tileItemContainer = new TileItemContainer(getGame(), Tile.this);
-            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                if (in.getLocalName().equals(IndianSettlement.MISSIONARY_TAG_NAME)) {
-                    in.nextTag(); // advance to the Unit tag
-                    missionary = (Unit) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                    if (missionary == null) {
-                        missionary = new Unit(getGame(), in);
-                    } else {
-                        missionary.readFromXML(in);
-                    }
-                    in.nextTag(); // close <missionary> tag
-                } else if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
-                    Resource resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                    if (resource != null) {
-                        resource.readFromXML(in);
-                    } else {
-                        resource = new Resource(getGame(), in);
-                    }
-                    tileItemContainer.addTileItem(resource);
-                } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                    TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                    if (ti != null) {
-                        ti.readFromXML(in);
-                    } else {
-                        ti = new TileImprovement(getGame(), in);
-                    }
-                    tileItemContainer.addTileItem(ti);
-                } else {
-                    logger.warning("Unknown tag: " + in.getLocalName() + " loading PlayerExploredTile");
-                    in.nextTag();
-                }
-            }
-            getTileItemInfo(tileItemContainer);
-        }
-
-        /**
-         * Returns the tag name of the root element representing this object.
-         * 
-         * @return "playerExploredTile".
-         */
-        /*
-         * public static String getXMLElementTagName() { return
-         * "playerExploredTile"; }
-         */
-    }
 
     /**
      * Returns the number of turns it takes for a non-expert pioneer to perform
