@@ -88,11 +88,6 @@ public final class FreeCol {
     private static final int     DEFAULT_WINDOW_SPACE = 100;
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
-    
-    /**
-     * Initialized on first access. @See #getSpecification
-     */
-    private static Specification specification;
 
     private static final String FREECOL_VERSION = "svn-20081230";
     private static String FREECOL_REVISION;
@@ -573,6 +568,14 @@ public final class FreeCol {
         } else {        
             return new File(dataFolder);
         }
+    }
+    
+    /**
+     * Returns the mods directory.
+     * @return The directory where the mods are located.
+     */
+    public static File getModsDirectory() {
+        return new File(getDataDirectory(), "mods");
     }
     
     /**
