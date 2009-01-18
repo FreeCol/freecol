@@ -1,0 +1,146 @@
+/**
+ *  Copyright (C) 2002-2007  The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package net.sf.freecol.server.ai.goal;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import net.sf.freecol.server.ai.AIMain;
+import net.sf.freecol.server.ai.AIPlayer;
+import net.sf.freecol.server.ai.AIUnit;
+
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Unit.Role;
+
+/**
+ * This {@link Goal} deals with all missionaries of one {@link AIPlayer}.
+ * </p><p>
+ * For each missionary unit that is being added, this goal will try to find
+ * an {@link IndianSettlement} needing a visit.
+ * Distance and reachability from the current position of the unit are taken into
+ * account, with the implicit assumption that the current location of the unit
+ * is sensible in that a nearby settlement is even worth visiting.
+ * Since missionary units are either created in a player-owned colony,
+ * or brought there from Europe, this assumption will most often be valid.
+ * </p><p>
+ * If a settlement has been found, a {@link CreateMissionAtSettlementGoal}
+ * will be created, and the unit be moved there.   
+ */       
+public class ManageMissionariesGoal extends Goal {
+
+    //Since all our subgoals are the same, we're keeping them on a simple list
+    private List<Goal> subGoalList;
+
+    public ManageMissionariesGoal(AIPlayer p, Goal g, float w) {
+        super(p,g,w);
+        subGoalList = new ArrayList<Goal>();
+    }
+
+    protected Iterator<AIUnit> getOwnedAIUnitsIterator() {
+        //we're managing units by directly putting them to individual subgoals,
+        //so all our own units at any moment are the unused ones
+        return availableUnitsList.iterator();
+    }
+
+    protected Iterator<Goal> getSubGoalIterator() {
+        //all our subgoals are on the subGoalList
+        return subGoalList.iterator();
+    }
+    
+    protected void removeUnit(AIUnit u) {
+        Iterator<AIUnit> uit = availableUnitsList.iterator();
+        while (uit.hasNext()) {
+            AIUnit unit = uit.next();
+            if (unit.equals(u)) {
+                uit.remove();
+            }
+        }
+    }
+    
+    /**
+     * Plans this goal.
+     * NOTE: This goal currently does not send unit requests, but only deals
+     * with the units it gets passively.          
+     */         
+    protected void plan() {
+        isFinished = false;
+        
+        //cancel already finished subgoals first
+        //most of the time, we won't get any units back from this
+        Iterator<Goal> git = subGoalList.iterator();
+        while (git.hasNext()) {
+            Goal g = git.next();
+            if (g.isFinished()) {
+                List<AIUnit> units = g.cancelGoal();
+                availableUnitsList.addAll(units);
+                git.remove();
+            }
+        }
+        
+        //check whether our unit references are still valid,
+        //so that we can use them in the following step
+        validateOwnedUnits();
+        
+        //Run through available units. If it's a missionary, create a subgoal
+        //for it. If not, return unit to AIPlayer.
+        Iterator<AIUnit> uit = availableUnitsList.iterator();
+        while (uit.hasNext()) {
+            AIUnit u = uit.next();
+            uit.remove();
+            
+            if (u.getUnit().getRole() == Role.MISSIONARY) {
+                //TODO:Find best indian settlement to send this missionary to
+                IndianSettlement i = null;
+                CreateMissionAtSettlementGoal g = new CreateMissionAtSettlementGoal(player,this,1,u,i);
+                g.addUnit(u);
+            } else {
+                //TODO: Uncomment after this method has been added to AIPlayer
+                //player.addUnit(u);
+            }
+        }
+        
+        if (availableUnitsList.size()==0 && subGoalList.size()==0) {
+            //we don't have any units to deal with, and no active subgoals
+            //signal that we may safely be cancelled now
+            isFinished = true;
+        } else {
+            //set subgoal weights in case their number has changed
+            float newWeight = 1f/subGoalList.size();
+            git = subGoalList.iterator();
+            while (git.hasNext()) {
+                Goal g = git.next();
+                g.setWeight(newWeight);
+            }
+        }
+    }
+    
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        //TODO
+    }
+    
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        //TODO
+    }
+}
