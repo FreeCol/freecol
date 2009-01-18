@@ -116,11 +116,10 @@ public class AIPlayer extends AIObject {
 
     private static final int MAX_NUMBER_OF_DEMANDS = 1;
 
-    public static final int STRATEGY_NONE = 0, STRATEGY_TRADE = 1, STRATEGY_IMMIGRATION = 2, STRATEGY_COOPERATION = 3,
-            STRATEGY_CONQUEST = 4;
+    public static enum AIStrategy { NONE, TRADE, IMMIGRATION, COOPERATION, CONQUEST }
 
     /** The strategy of this player. */
-    private int strategy = STRATEGY_NONE;
+    private AIStrategy strategy = AIStrategy.NONE;
 
     /*
      * Stores temporary information for sessions (trading with another player
@@ -188,20 +187,20 @@ public class AIPlayer extends AIObject {
         /** TODO: find some intelligent solution
         switch (player.getNation()) {
         case Player.DUTCH:
-            this.strategy = STRATEGY_TRADE;
+            this.strategy = AIStrategy.TRADE;
             break;
         case Player.ENGLISH:
-            this.strategy = STRATEGY_IMMIGRATION;
+            this.strategy = AIStrategy.IMMIGRATION;
             break;
         case Player.FRENCH:
-            this.strategy = STRATEGY_COOPERATION;
+            this.strategy = AIStrategy.COOPERATION;
             break;
         case Player.SPANISH:
-            this.strategy = STRATEGY_CONQUEST;
+            this.strategy = AIStrategy.CONQUEST;
             break;
         }
         */
-        this.strategy = STRATEGY_TRADE;
+        this.strategy = AIStrategy.TRADE;
         sessionRegister.clear();
         aiUnits.clear();
         if (getPlayer().isREF()) {
@@ -2003,7 +2002,7 @@ public class AIPlayer extends AIObject {
      */
     public boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold) {
         // TODO: make a better choice
-        if (strategy == STRATEGY_CONQUEST) {
+        if (strategy == AIStrategy.CONQUEST) {
             return false;
         } else {
             return true;
@@ -2018,7 +2017,7 @@ public class AIPlayer extends AIObject {
      */
     public boolean acceptMercenaryOffer() {
         // TODO: make a better choice
-        if (strategy == STRATEGY_CONQUEST || getPlayer().isAtWar()) {
+        if (strategy == AIStrategy.CONQUEST || getPlayer().isAtWar()) {
             return true;
         } else {
             return false;
@@ -2146,7 +2145,7 @@ public class AIPlayer extends AIObject {
      * 
      * @return the strategy of this <code>AIPlayer</code>.
      */
-    public int getStrategy() {
+    public AIStrategy getStrategy() {
         return strategy;
     }
 
