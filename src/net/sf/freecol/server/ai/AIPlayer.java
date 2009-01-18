@@ -41,13 +41,17 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoalDecider;
+import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
@@ -58,11 +62,14 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
@@ -2001,6 +2008,83 @@ public class AIPlayer extends AIObject {
         } else {
             return true;
         }
+    }
+
+    /**
+     * Decides whether to accept a mercenary offer, or not.
+     * 
+     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
+     *         offer and <code>false</code> otherwise.
+     */
+    public boolean acceptMercenaryOffer() {
+        // TODO: make a better choice
+        if (strategy == STRATEGY_CONQUEST || getPlayer().isAtWar()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
+        Stance stance = null;
+        int value = 0;
+        Iterator<TradeItem> itemIterator = agreement.iterator();
+        while (itemIterator.hasNext()) {
+            TradeItem item = itemIterator.next();
+            if (item instanceof GoldTradeItem) {
+                int gold = ((GoldTradeItem) item).getGold();
+                if (item.getSource() == player) {
+                    value -= gold;
+                } else {
+                    value += gold;
+                }
+            } else if (item instanceof StanceTradeItem) {
+                // TODO: evaluate whether we want this stance change
+                stance = ((StanceTradeItem) item).getStance();
+            } else if (item instanceof ColonyTradeItem) {
+                // TODO: evaluate whether we might wish to give up a colony
+                if (item.getSource() == player) {
+                    value = Integer.MIN_VALUE;
+                    break;
+                } else {
+                    value += 1000;
+                }
+            } else if (item instanceof UnitTradeItem) {
+                // TODO: evaluate whether we might wish to give up a unit
+                if (item.getSource() == player) {
+                    value = Integer.MIN_VALUE;
+                    break;
+                } else {
+                    value += 100;
+                }
+            } else if (item instanceof GoodsTradeItem) {
+                Goods goods = ((GoodsTradeItem) item).getGoods();
+                if (item.getSource() == player) {
+                    value -= player.getMarket().getBidPrice(goods.getType(), goods.getAmount());
+                } else {
+                    value += player.getMarket().getSalePrice(goods.getType(), goods.getAmount());
+                }
+            }
+        }
+
+        boolean accept = false;
+        if (stance == Stance.PEACE) {
+            if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace") &&
+                value >= 0) {
+                // TODO: introduce some kind of counter in order to avoid
+                // Benjamin Franklin exploit
+                accept = true;
+            } else if (value >= 1000) {
+                accept = true;
+            }
+        } else if (player.getStance(agreement.getSender()).compareTo(Stance.PEACE) >= 0) {
+            if (value > 100) {
+                accept = true;
+            }
+        }
+
+        logger.info("Trade value is " + value + ", accept is " + accept);
+        return accept;
     }
 
     /**

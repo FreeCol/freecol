@@ -31,21 +31,15 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsTradeItem;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.StanceTradeItem;
-import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
@@ -260,10 +254,11 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
     private Element monarchAction(DummyConnection connection, Element element) {
         MonarchAction action = Enum.valueOf(MonarchAction.class, element.getAttribute("action"));
         Element reply = null;
+        boolean accept = false;
         switch (action) {
         case RAISE_TAX:
             int tax = Integer.parseInt(element.getAttribute("amount"));
-            boolean accept = getAIPlayer().acceptTax(tax);
+            accept = getAIPlayer().acceptTax(tax);
             reply = Message.createNewRootElement("acceptTax");
             reply.setAttribute("accepted", String.valueOf(accept));
             break;
@@ -275,11 +270,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
 
         case OFFER_MERCENARIES:
             reply = Message.createNewRootElement("hireMercenaries");
-            if (getAIPlayer().getStrategy() == AIPlayer.STRATEGY_CONQUEST || getAIPlayer().getPlayer().isAtWar()) {
-                reply.setAttribute("accepted", String.valueOf(true));
-            } else {
-                reply.setAttribute("accepted", String.valueOf(false));
-            }
+            accept = getAIPlayer().acceptMercenaryOffer();
+            reply.setAttribute("accepted", String.valueOf(accept));
             break;
 
         default:
@@ -325,63 +317,8 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
         NodeList childElements = element.getChildNodes();
         Element childElement = (Element) childElements.item(0);
         DiplomaticTrade agreement = new DiplomaticTrade(freeColServer.getGame(), childElement);
-        Stance stance = null;
-        int value = 0;
-        Iterator<TradeItem> itemIterator = agreement.iterator();
-        while (itemIterator.hasNext()) {
-            TradeItem item = itemIterator.next();
-            if (item instanceof GoldTradeItem) {
-                int gold = ((GoldTradeItem) item).getGold();
-                if (item.getSource() == serverPlayer) {
-                    value -= gold;
-                } else {
-                    value += gold;
-                }
-            } else if (item instanceof StanceTradeItem) {
-                stance = ((StanceTradeItem) item).getStance();
-            } else if (item instanceof ColonyTradeItem) {
-                // TODO: evaluate whether we might wish to give up a colony
-                if (item.getSource() == serverPlayer) {
-                    value = Integer.MIN_VALUE;
-                    break;
-                } else {
-                    value += 1000;
-                }
-            } else if (item instanceof UnitTradeItem) {
-                // TODO: evaluate whether we might wish to give up a unit
-                if (item.getSource() == serverPlayer) {
-                    value = Integer.MIN_VALUE;
-                    break;
-                } else {
-                    value += 100;
-                }
-            } else if (item instanceof GoodsTradeItem) {
-                Goods goods = ((GoodsTradeItem) item).getGoods();
-                if (item.getSource() == serverPlayer) {
-                    value -= serverPlayer.getMarket().getBidPrice(goods.getType(), goods.getAmount());
-                } else {
-                    value += serverPlayer.getMarket().getSalePrice(goods.getType(), goods.getAmount());
-                }
-            }
-        }
+        boolean accept = getAIPlayer().acceptDiplomaticTrade(agreement);
 
-        boolean accept = false;
-        if (stance == Stance.PEACE) {
-            if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace") &&
-                value >= 0) {
-                // TODO: introduce some kind of counter in order to avoid
-                // Benjamin Franklin exploit
-                accept = true;
-            } else if (value >= 1000) {
-                accept = true;
-            }
-        } else if (serverPlayer.getStance(agreement.getSender()).compareTo(Stance.PEACE) >= 0) {
-            if (value > 100) {
-                accept = true;
-            }
-        }
-
-        System.out.println("value is " + value + ", accept is " + accept);
         if (accept) {
             Element reply = Message.createNewRootElement("diplomaticTrade");
             reply.setAttribute("accept", "accept");
