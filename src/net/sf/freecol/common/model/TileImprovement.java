@@ -64,6 +64,13 @@ public class TileImprovement extends TileItem {
      * @see River
      */
     private int style;
+
+    /**
+     * Whether this is a virtual improvement granted by some structure
+     * on the tile (a Colony, for example). Virtual improvements will
+     * be removed along with the structure that granted them.
+     */
+    private boolean virtual;
     
     // ------------------------------------------------------------ constructor
 
@@ -123,6 +130,24 @@ public class TileImprovement extends TileItem {
 
     public void setMagnitude(int magnitude) {
         this.magnitude = magnitude;
+    }
+
+    /**
+     * Get the <code>Virtual</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean isVirtual() {
+        return virtual;
+    }
+
+    /**
+     * Set the <code>Virtual</code> value.
+     *
+     * @param newVirtual The new Virtual value.
+     */
+    public final void setVirtual(final boolean newVirtual) {
+        this.virtual = newVirtual;
     }
 
     /**
@@ -455,6 +480,9 @@ public class TileImprovement extends TileItem {
         out.writeAttribute("turns", Integer.toString(turnsToComplete));
         out.writeAttribute("magnitude", Integer.toString(magnitude));
         out.writeAttribute("style", Integer.toString(style));
+        if (virtual) {
+            out.writeAttribute("virtual", Boolean.toString(virtual));
+        }
 
         // End element:
         out.writeEndElement();
@@ -478,6 +506,7 @@ public class TileImprovement extends TileItem {
         turnsToComplete = Integer.parseInt(in.getAttributeValue(null, "turns"));
         magnitude = Integer.parseInt(in.getAttributeValue(null, "magnitude"));
         style = Integer.parseInt(in.getAttributeValue(null, "style"));
+        virtual = getAttribute(in, "virtual", false);
         
         in.nextTag();
     }

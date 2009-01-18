@@ -128,10 +128,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         oldSonsOfLiberty = 0;
         final Map map = game.getMap();
         tile.setOwner(owner);
-        TileImprovement road = new TileImprovement(game, tile, FreeCol.getSpecification()
-                                                   .getTileImprovementType("model.improvement.Road"));
-        road.setTurnsToComplete(0);
-        tile.add(road);
+        if (!tile.hasRoad()) {
+            TileImprovement road = new TileImprovement(game, tile, FreeCol.getSpecification()
+                                                       .getTileImprovementType("model.improvement.Road"));
+            road.setTurnsToComplete(0);
+            road.setVirtual(true);
+            tile.add(road);
+        }
         for (Direction direction : Direction.values()) {
             Tile t = map.getNeighbourOrNull(direction, tile);
             if (t == null) {
@@ -1733,7 +1736,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             ((FreeColGameObject) workLocation).dispose();
         }
         TileItemContainer container = getTile().getTileItemContainer();
-        container.removeTileItem(container.getRoad());
+        TileImprovement road = container.getRoad();
+        if (road != null && road.isVirtual()) {
+            container.removeTileItem(road);
+        }
         super.dispose();
     }
 
