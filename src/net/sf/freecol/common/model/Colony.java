@@ -1491,8 +1491,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
 
     private void createSoLMessages() {
-        final int veryBadGovernment = Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
-        final int badGovernment = Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue();
         if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
             if (sonsOfLiberty > oldSonsOfLiberty) {
                 addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
@@ -1527,33 +1525,51 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                                     "model.colony.SoL50", "%colony%", getName());
                 }
             }
-            if (tories > veryBadGovernment) {
-                if (oldTories <= veryBadGovernment) {
-                    // government has become very bad
-                    addModelMessage(this, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
-                                    FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                    "model.colony.veryBadGovernment", "%colony%", getName());
-                }
-            } else if (tories > badGovernment) {
-                if (oldTories <= badGovernment) {
-                    // government has become bad
-                    addModelMessage(this, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY, 
-                                    FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                    "model.colony.badGovernment", "%colony%", getName());
-                } else if (oldTories > veryBadGovernment) {
-                    // government has improved, but is still bad
-                    addModelMessage(this, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
-                                    FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                    "model.colony.governmentImproved1", "%colony%", getName());
-                }
-            } else if (oldTories > badGovernment) {
-                // government was bad, but has improved
-                addModelMessage(this, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY, 
-                                FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                "model.colony.governmentImproved2", "%colony%", getName());
+
+            ModelMessage govMgtMessage = checkForGovMgtChangeMessage();
+            if(govMgtMessage != null){
+            	addModelMessage(govMgtMessage);
             }
         }
-
+    }
+    
+    public ModelMessage checkForGovMgtChangeMessage(){
+        final int veryBadGovernment = Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
+        final int badGovernment = Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue();
+        
+        String msgId = null;
+        
+        if (tories > veryBadGovernment) {
+            if (oldTories <= veryBadGovernment) {
+                // government has become very bad
+            	msgId = "model.colony.veryBadGovernment";
+            }
+        } else if (tories > badGovernment) {
+            if (oldTories <= badGovernment) {
+                // government has become bad
+            	msgId = "model.colony.badGovernment";
+            } else if (oldTories > veryBadGovernment) {
+                // government has improved, but is still bad
+            	msgId = "model.colony.governmentImproved1";
+            }
+        } else if (oldTories > badGovernment) {
+            // government was bad, but has improved
+        	msgId = "model.colony.governmentImproved2";
+            addModelMessage(this, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY, 
+                            FreeCol.getSpecification().getGoodsType("model.goods.bells"),
+                            "model.colony.governmentImproved2", "%colony%", getName());
+        }
+        
+        // no change happened
+        if(msgId == null){
+        	return null;
+        }
+        
+        ModelMessage msg = new ModelMessage(this,ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
+        		FreeCol.getSpecification().getGoodsType("model.goods.bells"),
+        		msgId,"%colony%", getName());
+     
+        return msg;
     }
 
 
