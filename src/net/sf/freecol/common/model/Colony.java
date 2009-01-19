@@ -1555,9 +1555,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         } else if (oldTories > badGovernment) {
             // government was bad, but has improved
         	msgId = "model.colony.governmentImproved2";
-            addModelMessage(this, ModelMessage.MessageType.GOVERNMENT_EFFICIENCY, 
-                            FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                            "model.colony.governmentImproved2", "%colony%", getName());
         }
         
         // no change happened
