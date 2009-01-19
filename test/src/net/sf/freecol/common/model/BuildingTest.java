@@ -31,7 +31,10 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class BuildingTest extends FreeColTestCase {
-
+    
+    BuildingType printingPressType = FreeCol.getSpecification().getBuildingType("model.building.PrintingPress");
+    BuildingType newspaperType = FreeCol.getSpecification().getBuildingType("model.building.Newspaper");
+    
     public void testCanBuildNext() {
     	Game game = getGame();
     	game.setMap(getTestMap(plainsType,true));
@@ -394,7 +397,63 @@ public class BuildingTest extends FreeColTestCase {
         Colony colony = getStandardColony(6);
         Unit unit = colony.getRandomUnit();
         Building building = colony.getBuilding(spec().getBuildingType("model.building.TownHall"));
+        int bellProduction = building.getProduction();
+        int expectBellProd = 1;
+        assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
         building.add(unit);
-        building.newTurn(); 
+        bellProduction = building.getProduction();
+        expectBellProd = 4; // 1 initial plus 3 from the colonist
+        assertEquals("Wrong bell production",expectBellProd,bellProduction); 
     }
+    
+    public void testPrintingPressBonus() {
+        Game game = getGame();
+        game.setMap(getTestMap(plainsType,true));
+        
+        Colony colony = getStandardColony(6);
+        Unit unit = colony.getRandomUnit();
+        Building building = colony.getBuilding(spec().getBuildingType("model.building.TownHall"));
+        
+        int bellProduction = building.getProduction();
+        int expectBellProd = 1;
+        assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
+        
+        Building printingPress = new Building(getGame(), colony, printingPressType);
+        colony.addBuilding(printingPress);
+        
+        bellProduction = building.getProduction();
+        expectBellProd = 2;
+        assertEquals("Wrong bell production with printing press",expectBellProd,bellProduction);
+        
+        building.add(unit);
+        bellProduction = building.getProduction();
+        expectBellProd = 6; // 1 initial plus 3 from the colonist + 2 from printing press
+        assertEquals("Wrong final bell production",expectBellProd,bellProduction); 
+    }
+    
+    public void testNewspaperBonus() {
+        Game game = getGame();
+        game.setMap(getTestMap(plainsType,true));
+        
+        Colony colony = getStandardColony(6);
+        Unit unit = colony.getRandomUnit();
+        Building building = colony.getBuilding(spec().getBuildingType("model.building.TownHall"));
+        
+        int bellProduction = building.getProduction();
+        int expectBellProd = 1;
+        assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
+        
+        Building newspaper = new Building(getGame(), colony, newspaperType);
+        colony.addBuilding(newspaper);
+        
+        bellProduction = building.getProduction();
+        expectBellProd = 2;
+        assertEquals("Wrong bell production with newspaper",expectBellProd,bellProduction);
+        
+        building.add(unit);
+        bellProduction = building.getProduction();
+        expectBellProd = 8; // 1 initial plus 3 from the colonist + 4 from newspaper
+        assertEquals("Wrong final bell production",expectBellProd,bellProduction); 
+    }
+    
 }
