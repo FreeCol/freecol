@@ -295,7 +295,7 @@ public final class InGameInputHandler extends InputHandler {
                 }
             }
             if (getFreeColClient().getMyPlayer().canSee(toTile)) {
-                unit.moveToTile(toTile);
+                unit.setLocation(toTile);
             } else {
                 unit.dispose();
             }

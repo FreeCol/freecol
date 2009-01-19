@@ -1504,16 +1504,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                             + " Moves Left: " + getMovesLeft());
         }
 
-        moveToTile(getGame().getMap().getNeighbourOrNull(direction, getTile()));
-    }
-
-    /**
-     * Move to a given tile. Unlike {@link #move(Direction)} no validation is done, so
-     * this method may be called from the opponentMove-handler.
-     * 
-     * @param newTile The new tile.
-     */
-    public void moveToTile(Tile newTile) {
+        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, getTile());
         if (newTile != null) {
             setState(UnitState.ACTIVE);
             setStateToAllChildren(UnitState.SENTRY);
