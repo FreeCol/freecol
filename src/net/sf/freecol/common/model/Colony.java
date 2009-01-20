@@ -782,6 +782,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         } else if (membership > 100) {
             membership = 100;
         }
+        
+        oldSonsOfLiberty = sonsOfLiberty;
+        oldTories = tories;
         sonsOfLiberty = membership;
         tories = (units - getMembers());
     }
@@ -1510,27 +1513,12 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
         }
 
-        if (sonsOfLiberty == 100) {
-            // there are no tories left
-            if (oldSonsOfLiberty < 100) {
-                addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
-                                FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                "model.colony.SoL100", "%colony%", getName());
-            }
-        } else {
-            if (sonsOfLiberty >= 50) {
-                if (oldSonsOfLiberty < 50) {
-                    addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
-                                    FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                    "model.colony.SoL50", "%colony%", getName());
-                }
-            }
 
-            ModelMessage govMgtMessage = checkForGovMgtChangeMessage();
-            if(govMgtMessage != null){
-            	addModelMessage(govMgtMessage);
-            }
+        ModelMessage govMgtMessage = checkForGovMgtChangeMessage();
+        if(govMgtMessage != null){
+        	addModelMessage(govMgtMessage);
         }
+
     }
     
     public ModelMessage checkForGovMgtChangeMessage(){
@@ -1538,23 +1526,47 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         final int badGovernment = Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue();
         
         String msgId = null;
+        ModelMessage.MessageType msgType = ModelMessage.MessageType.GOVERNMENT_EFFICIENCY;
         
-        if (tories > veryBadGovernment) {
-            if (oldTories <= veryBadGovernment) {
-                // government has become very bad
-            	msgId = "model.colony.veryBadGovernment";
+        if (sonsOfLiberty == 100) {
+            // there are no tories left
+            if (oldSonsOfLiberty < 100) {
+            	msgId = "model.colony.SoL100";
+                msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
             }
-        } else if (tories > badGovernment) {
-            if (oldTories <= badGovernment) {
-                // government has become bad
-            	msgId = "model.colony.badGovernment";
-            } else if (oldTories > veryBadGovernment) {
-                // government has improved, but is still bad
-            	msgId = "model.colony.governmentImproved1";
-            }
-        } else if (oldTories > badGovernment) {
-            // government was bad, but has improved
-        	msgId = "model.colony.governmentImproved2";
+        } else if (sonsOfLiberty >= 50) {
+        	if (oldSonsOfLiberty == 100) {
+        		msgId = "model.colony.lostSoL100";
+        		msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+        	}
+        	if (oldSonsOfLiberty < 50) {
+        		msgId = "model.colony.SoL50";
+        		msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+        	}
+        } else {
+        	if(oldSonsOfLiberty >= 50){
+        		msgId = "model.colony.lostSoL50";
+        		msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+        	}
+        	
+        	// Now that no bonus is applied, penalties may.
+        	if (tories > veryBadGovernment) {
+        		if (oldTories <= veryBadGovernment) {
+        			// government has become very bad
+        			msgId = "model.colony.veryBadGovernment";
+        		}
+        	} else if (tories > badGovernment) {
+        		if (oldTories <= badGovernment) {
+        			// government has become bad
+        			msgId = "model.colony.badGovernment";
+        		} else if (oldTories > veryBadGovernment) {
+        			// government has improved, but is still bad
+        			msgId = "model.colony.governmentImproved1";
+        		}
+        	} else if (oldTories > badGovernment) {
+        		// government was bad, but has improved
+        		msgId = "model.colony.governmentImproved2";
+        	}
         }
         
         // no change happened
@@ -1562,7 +1574,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         	return null;
         }
         
-        ModelMessage msg = new ModelMessage(this,ModelMessage.MessageType.GOVERNMENT_EFFICIENCY,
+        ModelMessage msg = new ModelMessage(this,msgType,
         		FreeCol.getSpecification().getGoodsType("model.goods.bells"),
         		msgId,"%colony%", getName());
      
@@ -1700,9 +1712,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         // Update SoL:
         updateSoL();
         createSoLMessages();
-        // Remember current SoL and tories for check changes at the next turn
-        oldSonsOfLiberty = sonsOfLiberty;
-        oldTories = tories;
         updateProductionBonus();
     }
 

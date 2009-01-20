@@ -37,6 +37,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -81,6 +83,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -88,6 +91,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.resources.ResourceManager;
 
 import cz.autel.dmi.HIGLayout;
@@ -96,7 +100,7 @@ import cz.autel.dmi.HIGLayout;
  * This is a panel for the Colony display. It shows the units that are working
  * in the colony, the buildings and much more.
  */
-public final class ColonyPanel extends FreeColPanel implements ActionListener {
+public final class ColonyPanel extends FreeColPanel implements ActionListener,PropertyChangeListener {
 
 
     private static Logger logger = Logger.getLogger(ColonyPanel.class.getName());
@@ -1046,7 +1050,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
      * @param colony The new colony value.
      */
     private synchronized void setColony(Colony colony) {
+    	if(this.colony != null){
+    		this.colony.removePropertyChangeListener(this);
+    	}
         this.colony = colony;
+        if(this.colony != null){
+    		this.colony.addPropertyChangeListener(Colony.ColonyChangeEvent.BONUS_CHANGE.toString(), this);
+    	}
         editable = colony.getOwner() == freeColClient.getMyPlayer();
     }
 
@@ -1894,6 +1904,30 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener {
                 return ((px >= 63 - activePixels) && (px <= 63 + activePixels));
             }
         }
+    }
+    
+    public void propertyChange(PropertyChangeEvent e){        
+        if(!isShowing()){
+        	return;
+        }
+    	
+    	if(e.getSource() != this.getColony()){
+    		return;
+    	}
+    	
+    	if(e.getPropertyName() != ColonyChangeEvent.BONUS_CHANGE.toString()){
+    		return;
+    	}
+    	
+    	if(getColony() == null){
+    		return;
+    	}
+    	
+    	ModelMessage msg = getColony().checkForGovMgtChangeMessage();
+    	
+    	if(msg != null){
+    		parent.showInformationMessage(msg.getId(),msg.getDisplay(),msg.getData());
+    	}
     }
 
 }
