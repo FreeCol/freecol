@@ -130,6 +130,7 @@ public class LandGenerator {
                 while (numberOfLandTiles < minimumNumberOfTiles) {
                     addLandmass(15,25);
                 }
+                cleanMap();
                 break;
             case MapGeneratorOptions.LAND_GEN_ARCHIPELAGO:
                 addPolarRegions();
@@ -146,6 +147,7 @@ public class LandGenerator {
                     int s=random.nextInt(50) + 25;
                     addLandmass(20,s);
                 }
+                cleanMap();
                 break;
         }
 
