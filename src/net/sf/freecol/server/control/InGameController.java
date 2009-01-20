@@ -1034,15 +1034,14 @@ public final class InGameController extends Controller {
         session.put("canSell", true);
         session.put("canBuy", true);
         session.put("actionTaken", false);
+        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
         session.put("unitMoves", unit.getMovesLeft());
         if(settlement.getOwner().getStance(unit.getOwner()) == Stance.WAR){
             session.put("canSell", false);
             session.put("canBuy", false);
         }
         else{
-            if(unit.getSpaceLeft() == 0){
-                session.put("canBuy", false);
-            }
+        	// the unit took nothing to sell, so nothing should be in this session
             if(unit.getSpaceTaken() == 0){
                 session.put("canSell", false);
             }

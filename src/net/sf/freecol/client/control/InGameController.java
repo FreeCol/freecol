@@ -1428,7 +1428,7 @@ public final class InGameController implements NetworkConstants {
         java.util.Map<String, Boolean> transactionSession = getTransactionSession(unit,settlement);
         unit.setMovesLeft(0);
         
-        boolean canBuy  = transactionSession.get("canBuy");
+        boolean canBuy  = transactionSession.get("canBuy") && unit.getSpaceLeft() != 0;
         boolean canSell = transactionSession.get("canSell");
         boolean canGift = transactionSession.get("canGift");
         
@@ -1449,6 +1449,9 @@ public final class InGameController implements NetworkConstants {
                     if(tradeFinished){
                         actionTaken = true;
                         canSell = false;
+                        // we may not have been able to buy only because of space constraints
+                        // after selling, space is available, so a recheck is required
+                        canBuy  = transactionSession.get("canBuy") && unit.getSpaceLeft() != 0;
                     }
                     break;
                 case 3:

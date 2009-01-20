@@ -2831,6 +2831,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         reply.setAttribute("canBuy", ((Boolean) session.get("canBuy")).toString());
         reply.setAttribute("canSell",((Boolean) session.get("canSell")).toString());
         reply.setAttribute("canGift",((Boolean) session.get("canGift")).toString());
+        reply.setAttribute("hasSpaceLeft",((Boolean) session.get("hasSpaceLeft")).toString());
+        
         return reply;
     }
     
@@ -2968,6 +2970,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.trade(settlement, goods, gold);
         session.put("actionTaken", true);
+        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
         
         return null;
     }
@@ -3025,7 +3028,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("trying to trade without opening a transaction session");
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if(!(Boolean)session.get("canBuy")){
+        if(!(Boolean)session.get("canBuy") && !(Boolean)session.get("hasSpaceLeft")){
             throw new IllegalStateException("trying to buy with a session where buying not allowed");
         }
         
@@ -3061,7 +3064,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("trying to trade without opening a transaction session");
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if(!(Boolean)session.get("canBuy")){
+        if(!(Boolean)session.get("canBuy") && !(Boolean)session.get("hasSpaceLeft")){
             throw new IllegalStateException("trying to buy with a session where buying not allowed");
         }
         
