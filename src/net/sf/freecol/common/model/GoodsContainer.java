@@ -259,6 +259,19 @@ public class GoodsContainer extends FreeColGameObject {
         }
     }
 
+    /**
+     * Returns the amount of one type of Goods at the beginning of the turn.
+     * @param type The type of Goods being looked for in this container.
+     * @return The amount of this type of Goods in this container. at the beginning of the turn 
+     */
+    public int getOldGoodsCount(GoodsType type) {
+        if (oldStoredGoods.containsKey(type)) {
+            return oldStoredGoods.get(type).intValue();
+        } else {
+            return 0;
+        }
+    }
+    
     public Goods getGoods(GoodsType goodsType) {
         return new Goods(getGame(), parent, goodsType, getGoodsCount(goodsType));
     }
@@ -384,7 +397,7 @@ public class GoodsContainer extends FreeColGameObject {
             int low = exportData.getLowLevel() * adjustment;
             int high = exportData.getHighLevel() * adjustment;
             int amount = storedGoods.get(goodsType).intValue();
-            int oldAmount = getGoodsCount(goodsType);
+            int oldAmount = getOldGoodsCount(goodsType);
             if (amount > limit) {
                 // limit has been exceeded
                 int waste = amount - limit;
