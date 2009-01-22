@@ -60,6 +60,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
@@ -511,6 +512,13 @@ public final class InGameInputHandler extends InputHandler {
         getGame().getTurn().increase();
         getFreeColClient().getMyPlayer().newTurn();
         new UpdateMenuBarSwingTask().invokeLater();
+        
+        // Show info message for change to two turns per year
+        Turn currTurn = getGame().getTurn(); 
+        if(currTurn.getYear() == 1600 &&
+        		Turn.getYear(currTurn.getNumber()-1) == 1599 ){
+        	new ShowInformationMessageSwingTask("twoTurnsPerYear").invokeLater(); 
+        }
         return null;
     }
 
