@@ -681,8 +681,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                     if (surplus <= 0) {
                         return 0;
                     }
+                    // half of the surplus food, rounded down, is stored
+                    surplus = (int) Math.ceil(surplus / 2.0);  
                 }
-                return surplus / 2; // store the half of surplus
+               return surplus;
             }
         }
     }
