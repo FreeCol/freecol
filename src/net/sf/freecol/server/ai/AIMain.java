@@ -307,7 +307,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         if (freeColGameObject instanceof Unit) {
             new AIUnit(this, (Unit) freeColGameObject);
         } else if (freeColGameObject instanceof ServerPlayer) {
-            new AIPlayer(this, (ServerPlayer) freeColGameObject);
+            new StandardAIPlayer(this, (ServerPlayer) freeColGameObject);
         } else if (freeColGameObject instanceof Colony) {
             new AIColony(this, (Colony) freeColGameObject);
         }
@@ -390,7 +390,7 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
                 } else if (tagName.equals(AIUnit.getXMLElementTagName())) {
                     new AIUnit(this, in);
                 } else if (tagName.equals(AIPlayer.getXMLElementTagName())) {
-                    new AIPlayer(this, in);
+                    new StandardAIPlayer(this, in);
                 } else if (tagName.equals(AIColony.getXMLElementTagName())) {
                     new AIColony(this, in);
                 } else if (tagName.equals(AIGoods.getXMLElementTagName())) {
