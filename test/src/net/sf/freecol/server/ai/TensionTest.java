@@ -73,8 +73,8 @@ public class TensionTest extends FreeColTestCase {
         
         ServerPlayer european = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer indian = (ServerPlayer) game.getPlayer("model.nation.tupi");
-        AIPlayer europeanAI = (AIPlayer)aiMain.getAIObject(european.getId());
-        AIPlayer indianAI = (AIPlayer)aiMain.getAIObject(indian.getId());
+        StandardAIPlayer europeanAI = (StandardAIPlayer)aiMain.getAIObject(european.getId());
+        StandardAIPlayer indianAI = (StandardAIPlayer)aiMain.getAIObject(indian.getId());
         
         // initially, the players are unknown to each other
         Tension tension = indian.getTension(european);

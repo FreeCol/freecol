@@ -97,7 +97,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         
         // Create attacking player and units
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        AIPlayer aiPlayer1 = (AIPlayer)aiMain.getAIObject(player1.getId());
+        StandardAIPlayer aiPlayer1 = (StandardAIPlayer)aiMain.getAIObject(player1.getId());
 
         Tile tile1 = map.getTile(2, 2);
         Tile tile2 = map.getTile(2, 1);
@@ -164,7 +164,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         
             // Create player and unit
             ServerPlayer incaPlayer = (ServerPlayer) game.getPlayer("model.nation.inca");
-            AIPlayer aiInca = (AIPlayer)aiMain.getAIObject(incaPlayer.getId());
+            StandardAIPlayer aiInca = (StandardAIPlayer)aiMain.getAIObject(incaPlayer.getId());
             ServerPlayer dutchPlayer = (ServerPlayer) game.getPlayer("model.nation.dutch");
             
             Tile dutchUnitTile = map.getTile(9, 9);
@@ -216,7 +216,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         
         // Create attacking player and units
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        AIPlayer aiPlayer1 = (AIPlayer)aiMain.getAIObject(player1.getId());
+        StandardAIPlayer aiPlayer1 = (StandardAIPlayer)aiMain.getAIObject(player1.getId());
 
         Tile tile1 = map.getTile(2, 2);
         Unit soldier = new Unit(game, tile1, player1, veteranType, UnitState.ACTIVE);
@@ -288,7 +288,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         
         // Create player and unit
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        AIPlayer aiPlayer1 = (AIPlayer)aiMain.getAIObject(player1.getId());
+        StandardAIPlayer aiPlayer1 = (StandardAIPlayer)aiMain.getAIObject(player1.getId());
 
         Tile tile1 = map.getTile(2, 2);
         Unit soldier = new Unit(game, tile1, player1, veteranType, UnitState.ACTIVE);
@@ -370,7 +370,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
         try{
             // Create player and unit
             ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.inca");
-            AIPlayer aiPlayer1 = (AIPlayer)aiMain.getAIObject(player1.getId());
+            StandardAIPlayer aiPlayer1 = (StandardAIPlayer)aiMain.getAIObject(player1.getId());
             ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
             Tile settlementTile = map.getTile(9, 9);
@@ -464,7 +464,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
 	    try{
 	        // Create player and unit
 	        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.inca");
-	        AIPlayer aiPlayer1 = (AIPlayer)aiMain.getAIObject(player1.getId());
+	        StandardAIPlayer aiPlayer1 = (StandardAIPlayer)aiMain.getAIObject(player1.getId());
 	        ServerPlayer player2 = (ServerPlayer) game.getPlayer("model.nation.dutch");
 
 	        Tile settlementTile = map.getTile(9, 9);

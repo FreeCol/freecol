@@ -484,8 +484,10 @@ public class StandardAIPlayer extends AIPlayer {
 
     /**
      * Takes the necessary actions to secure an indian settlement
-     */
-    private void secureIndianSettlement(IndianSettlement is) {
+     *
+     * TODO: Public for access by a test only - necessary?
+     */      
+    public void secureIndianSettlement(IndianSettlement is) {
         // if not at war, no need to secure settlement
         if (!is.getOwner().isAtWar()) {
             return;
@@ -1248,7 +1250,10 @@ public class StandardAIPlayer extends AIPlayer {
         return Math.max(0, value);
     }
     
-    private boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender) {
+    /**
+     * TODO: Public for access by a test only - necessary?
+     */     
+    public boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender) {
         if (defender == null) { // Sanitation
             return false;
         }
@@ -1292,10 +1297,12 @@ public class StandardAIPlayer extends AIPlayer {
      * Gives a military <code>Mission</code> to the given unit. <br>
      * <br>
      * <b>This method should only be used on units owned by european players.</b>
+     *
+     * TODO: Public for access by a test only - necessary?
      * 
      * @param aiUnit The unit.
      */
-    private void giveMilitaryMission(AIUnit aiUnit) {
+    public void giveMilitaryMission(AIUnit aiUnit) {
         logger.finest("Entering method giveMilitaryMission");
         /*
          * 
