@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.12 -->
+<!-- XSD for specification version 0.13 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="freecol-specification">
     <xs:complexType>
@@ -615,6 +615,8 @@
   </xs:element>
   <xs:element name="scope">
     <xs:complexType>
+      <xs:attribute name="matchesNull" type="xs:boolean"/>
+      <xs:attribute name="matchNegated" type="xs:boolean"/>
       <xs:attribute name="type" type="xs:IDREF"/>
       <xs:attribute name="ability-id" type="xs:string"/>
       <xs:attribute name="ability-value" type="xs:boolean"/>

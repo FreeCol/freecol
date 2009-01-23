@@ -211,7 +211,7 @@ public final class TileImprovementType extends FreeColGameObjectType
             for (GoodsType g : goodsList) {
                 if (!g.isFarmed())
                     continue;
-                int change = newTileType.getPotential(g) - tileType.getPotential(g);
+                int change = newTileType.getProductionOf(g, null) - tileType.getProductionOf(g, null);
                 if (goodsType == g) {
                     if (change < 0) {
                         return 0;   // Reject if there is a drop in preferred GoodsType

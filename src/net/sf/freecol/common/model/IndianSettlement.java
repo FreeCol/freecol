@@ -804,7 +804,8 @@ public class IndianSettlement extends Settlement {
         while (it.hasNext()) {
             Tile workTile = getGame().getMap().getTile(it.next());
             if (workTile.getOwningSettlement() == null || workTile.getOwningSettlement() == this) {
-                amount += workTile.potential(goodsType);
+                // TODO: make unitType brave
+                amount += workTile.potential(goodsType, null);
             }
         }
 
@@ -929,7 +930,8 @@ public class IndianSettlement extends Settlement {
             Tile workTile = getGame().getMap().getTile(it.next());
             if ((workTile.getOwningSettlement() == null ||
                  workTile.getOwningSettlement() == this) && !workTile.isOccupied()) {
-                potential += workTile.potential(type);
+                // TODO: make unitType brave
+                potential += workTile.potential(type, null);
             }
         }
 

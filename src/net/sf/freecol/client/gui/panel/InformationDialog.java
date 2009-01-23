@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -45,6 +46,8 @@ public class InformationDialog extends FreeColDialog {
     public static final int vGap = 10;
 
     private JButton okButton = new JButton(Messages.message("ok"));
+
+    private static Image bgImage = ResourceManager.getImage("InformationDialog.backgroundImage");
 
     /**
      * Returns an information dialog that shows the given 
@@ -105,7 +108,9 @@ public class InformationDialog extends FreeColDialog {
             if (images != null && images[i] != null) {
                 textPanel.add(new JLabel(images[i]), higConst.rc(row, imageColumn));
             }
-            textPanel.add(getDefaultTextArea(texts[i]), higConst.rc(row, textColumn));
+            JTextArea textArea = getDefaultTextArea(texts[i]);
+            textArea.setColumns(30);
+            textPanel.add(textArea, higConst.rc(row, textColumn));
             row += 2;
         }
 
@@ -133,7 +138,6 @@ public class InformationDialog extends FreeColDialog {
      * @param g The graphics context in which to paint.
      */
     public void paintComponent(Graphics g) {
-        Image bgImage = ResourceManager.getImage("InformationDialog.backgroundImage");
         if (bgImage != null) {
             g.drawImage(bgImage, 0, 0, this);
         } else {

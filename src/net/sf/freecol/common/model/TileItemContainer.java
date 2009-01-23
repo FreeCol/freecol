@@ -245,6 +245,7 @@ public class TileItemContainer extends FreeColGameObject {
 
     /**
      * Determine the total bonus from all Improvements
+     * @param g a <code>GoodsType</code> value
      * @return The total bonus
      */
     public int getImprovementBonusPotential(GoodsType g) {
@@ -257,22 +258,28 @@ public class TileItemContainer extends FreeColGameObject {
 
     /**
      * Determine the total bonus from Resource if any
+     * @param g a <code>GoodsType</code> value
+     * @param unitType an <code>UnitType</code> value
+     * @param potential an <code>int</code> value
      * @return The total bonus
      */
-    public int getResourceBonusPotential(GoodsType g, int potential) {
+    public int getResourceBonusPotential(GoodsType g, UnitType unitType, int potential) {
         if (hasResource()) {
-            potential = resource.getBonus(g, potential);
+            potential = resource.getBonus(g, unitType, potential);
         }
         return potential;
     }
 
     /**
      * Determine the total bonus for a GoodsType. Checks Resource and all Improvements.
+     * @param g a <code>GoodsType</code> value
+     * @param unitType an <code>UnitType</code> value
+     * @param tilePotential an <code>int</code> value
      * @return The total bonus
      */
-    public int getTotalBonusPotential(GoodsType g, int tilePotential) {
+    public int getTotalBonusPotential(GoodsType g, UnitType unitType, int tilePotential) {
         int potential = tilePotential + getImprovementBonusPotential(g);
-        potential = getResourceBonusPotential(g, potential);
+        potential = getResourceBonusPotential(g, unitType, potential);
         return potential;
     }
 
@@ -280,15 +287,13 @@ public class TileItemContainer extends FreeColGameObject {
      * Describe <code>getProductionBonus</code> method here.
      *
      * @param goodsType a <code>GoodsType</code> value
+     * @param unitType a <code>UnitType</code> value
      * @return a <code>Modifier</code> value
      */
-    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
+    public Set<Modifier> getProductionBonus(GoodsType goodsType, UnitType unitType) {
         Set<Modifier> result = new HashSet<Modifier>();
         if (resource != null) {
-            Modifier resourceBonus = resource.getType().getProductionModifier(goodsType);
-            if (resourceBonus != null) {
-                result.add(resourceBonus);
-            }
+            result.addAll(resource.getType().getProductionModifier(goodsType, unitType));
         }
         for (TileImprovement improvement : improvements) {
             Modifier modifier = improvement.getProductionModifier(goodsType);
@@ -302,6 +307,9 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Determine the movement cost to this <code>Tile</code> from another <code>Tile</code>.
      * Does not consider special unit abilities.
+     *
+     * @param basicMoveCost an <code>int</code> value
+     * @param fromTile a <code>Tile</code> value
      * @return The movement cost
      */
     public int getMoveCost(int basicMoveCost, Tile fromTile) {
@@ -316,6 +324,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Returns a description of the tile, with the name of the tile
      * and any improvements made to it (road/plow)
+     *
      * @param separator The separator to be used (e.g. "/")
      * @return The description label for this tile
      */
@@ -337,6 +346,7 @@ public class TileItemContainer extends FreeColGameObject {
 
     /**
      * Adds a <code>TileItem</code> to this container.
+     *
      * @param t The TileItem to add to this container.
      * @return The added TileItem or the existing TileItem or <code>null</code> on error
      */

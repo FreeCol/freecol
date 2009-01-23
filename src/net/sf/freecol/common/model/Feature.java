@@ -39,7 +39,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 public abstract class Feature extends FreeColObject {
 
     /**
-     * The category of this Feature, e.g. "offenseModifier".
+     * The source of this Feature, e.g. a UnitType.
      */
     private FreeColGameObjectType source;
 
@@ -165,7 +165,7 @@ public abstract class Feature extends FreeColObject {
      * @return a <code>boolean</code> value
      */
     public boolean appliesTo(final FreeColGameObjectType objectType) {
-        if (objectType == null || !hasScope()) {
+        if (!hasScope()) {
             return true;
         } else {
             for (Scope scope : scopes) {

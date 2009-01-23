@@ -3082,7 +3082,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     // Deliver Goods if any
                     GoodsType deliverType = getWorkImprovement().getDeliverGoodsType();
                     if (deliverType != null) {
-                        int deliverAmount = getTile().potential(deliverType) * getWorkImprovement().getDeliverAmount();
+                        int deliverAmount = getTile().potential(deliverType, getType())
+                            * getWorkImprovement().getDeliverAmount();
                         if (unitType.hasAbility("model.ability.expertPioneer")) {
                             deliverAmount *= 2;
                         }
@@ -3404,6 +3405,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param base an <code>int</code> value
      * @return The potential amount of goods to be farmed.
      */
+    // TODO: do we need this?
     public int getProductionOf(GoodsType goodsType, int base) {
         if (base == 0) {
             return 0;
@@ -3412,6 +3414,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                                                 getModifierSet(goodsType.getId())));
         }
     }
+
 
     /**
      * Disposes all Units aboard this one.

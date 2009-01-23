@@ -577,7 +577,7 @@ public class MapGenerator implements IMapGenerator {
             Map.Position p = iter.next();
             Tile t = map.getTile(p);
             for (GoodsType goodsType : scale.keySet()) {
-                scale.put(goodsType, scale.get(goodsType).intValue() + t.potential(goodsType));
+                scale.put(goodsType, scale.get(goodsType).intValue() + t.potential(goodsType, null));
             }
         }
 

@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.12 -->
+<!-- specification version 0.13 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -87,7 +87,9 @@
   <resource-types>
     <resource-type id="model.resource.Game">
       <modifier id="model.goods.food" type="additive" value="2"/>
-      <!-- in colonization game gives 2 food (4 for expert farmer) -->
+      <modifier id="model.goods.food" type="additive" value="2">
+        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+      </modifier>
       <modifier id="model.goods.furs" type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Minerals" minimum-value="40" maximum-value="400">
@@ -116,15 +118,21 @@
     </resource-type>
     <resource-type id="model.resource.Oasis">
       <modifier id="model.goods.food" type="additive" value="2"/>
-      <!-- in colonization game gives 2 food (4 for expert farmer) -->
+      <modifier id="model.goods.food" type="additive" value="2">
+        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+      </modifier>
     </resource-type>
     <resource-type id="model.resource.Grain">
       <modifier id="model.goods.food" type="additive" value="2"/>
-      <!-- in colonization game gives 2 food (4 for expert farmer) -->
+      <modifier id="model.goods.food" type="additive" value="2">
+        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+      </modifier>
     </resource-type>
     <resource-type id="model.resource.Fish">
       <modifier id="model.goods.fish" type="additive" value="3"/>
-      <!-- in colonization game gives 3 food (6 for expert fisherman) -->
+      <modifier id="model.goods.food" type="additive" value="3">
+        <scope type="model.unit.expertFisherman" matchesNull="false"/>
+      </modifier>
     </resource-type>
   </resource-types>
 

@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -129,30 +130,30 @@ public class Resource extends TileItem {
     /**
      * Returns the bonus (checking available stock) for next turn.
      * @param goodsType The GoodsType to check
+     * @param unitType an <code>UnitType</code> value
      * @param potential Potential of Tile + Improvements
+     * @return an <code>int</code> value
      */
-    public int getBonus(GoodsType goodsType, int potential) {
-        Modifier productionBonus = type.getProductionModifier(goodsType);
-        if (productionBonus == null) {
-            return potential;
+    public int getBonus(GoodsType goodsType, UnitType unitType, int potential) {
+        Set<Modifier> productionBonus = type.getProductionModifier(goodsType, unitType);
+        int bonusAmount = (int) FeatureContainer.applyModifierSet(potential, null, productionBonus) - potential;
+        if (quantity > -1 && bonusAmount > quantity) {
+            return potential + quantity;
         } else {
-            int bonusAmount = (int) productionBonus.applyTo(potential) - potential;
-            if (quantity > -1 && bonusAmount > quantity) {
-                return potential + quantity;
-            } else {
-                return potential + bonusAmount;
-            }
+            return potential + bonusAmount;
         }
     }
 
     /**
      * Reduces the available quantity by the bonus output of <code>GoodsType</code>.
      * @param goodsType The GoodsType to check
+     * @param unitType an <code>UnitType</code> value
      * @param potential Potential of Tile + Improvements
+     * @return an <code>int</code> value
      */
-    public int useQuantity(GoodsType goodsType, int potential) {
+    public int useQuantity(GoodsType goodsType, UnitType unitType, int potential) {
         // Return -1 here if not limited resource?
-        return useQuantity(getBonus(goodsType, potential) - potential);
+        return useQuantity(getBonus(goodsType, unitType, potential) - potential);
     }
 
     /**

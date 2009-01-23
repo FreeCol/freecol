@@ -30,8 +30,6 @@ import net.sf.freecol.common.Specification;
 public final class ResourceType extends FreeColGameObjectType
 {
 
-    private String art;
-
     private int minValue;
     private int maxValue;
 
@@ -43,10 +41,6 @@ public final class ResourceType extends FreeColGameObjectType
 
     // ------------------------------------------------------------ retrieval methods
 
-    public String getArt() {
-        return art;
-    }
-
     // TODO: remove this
     public int getRandomValue() {
         if (minValue == maxValue)
@@ -56,16 +50,8 @@ public final class ResourceType extends FreeColGameObjectType
         return (minValue + rand.nextInt(maxValue-minValue+1));
     }
 
-    public Modifier getProductionModifier(GoodsType goodsType) {
-        Set<Modifier> modifierSet = featureContainer.getModifierSet(goodsType.getId());
-        if (modifierSet == null || modifierSet.isEmpty()) {
-            return null;
-        } else {
-            if (modifierSet.size() > 1) {
-                logger.warning("Only one Modifier for " + goodsType.getId() + " expected!");
-            }
-            return modifierSet.iterator().next();
-        }
+    public Set<Modifier> getProductionModifier(GoodsType goodsType, UnitType unitType) {
+        return featureContainer.getModifierSet(goodsType.getId(), unitType);
     }
 
     public GoodsType getBestGoodsType() {
@@ -106,7 +92,6 @@ public final class ResourceType extends FreeColGameObjectType
 
     public void readAttributes(XMLStreamReader in, Specification specification)
             throws XMLStreamException {
-        art = in.getAttributeValue(null, "art");
         if (hasAttribute(in, "maximum-value")) {
             maxValue = Integer.parseInt(in.getAttributeValue(null, "maximum-value"));
             minValue = getAttribute(in, "minimum-value", 0);

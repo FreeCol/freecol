@@ -1061,7 +1061,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         int price = 0;
         for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
-            price += tile.potential(type);
+            price += tile.potential(type, null);
         }
         price = price * Specification.getSpecification().getIntegerOption("model.option.landPriceFactor").getValue()
             + 100;

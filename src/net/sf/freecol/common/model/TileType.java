@@ -139,11 +139,12 @@ public final class TileType extends FreeColGameObjectType {
      * unless an additive modifier is present. This is intentional.
      *
      * @param goodsType a <code>GoodsType</code> value
+     * @param unitType an <code>UnitType</code> value
      * @return an <code>int</code> value
      * @see getProductionBonus(goodsType)
      */
-    public int getPotential(GoodsType goodsType) {
-        return (int) featureContainer.applyModifier(0f, goodsType.getId());
+    public int getProductionOf(GoodsType goodsType, UnitType unitType) {
+        return (int) featureContainer.applyModifier(0f, goodsType.getId(), unitType);
     }
 
     /**

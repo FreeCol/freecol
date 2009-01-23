@@ -60,6 +60,16 @@ public final class Scope extends FreeColObject implements Cloneable {
      */
     private String methodValue;
 
+    /**
+     * True if the scope applies to a null object.
+     */
+    private boolean matchesNull = true;
+
+    /**
+     * Whether the match is negated.
+     */
+    private boolean matchNegated = false;
+
 
     /**
      * Creates a new <code>Scope</code> instance.
@@ -77,6 +87,41 @@ public final class Scope extends FreeColObject implements Cloneable {
         readFromXMLImpl(in);
     }
 
+    /**
+     * Get the <code>MatchesNull</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isMatchesNull() {
+        return matchesNull;
+    }
+
+    /**
+     * Set the <code>MatchesNull</code> value.
+     *
+     * @param newMatchesNull The new MatchesNull value.
+     */
+    public void setMatchesNull(final boolean newMatchesNull) {
+        this.matchesNull = newMatchesNull;
+    }
+
+    /**
+     * Get the <code>MatchNegated</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isMatchNegated() {
+        return matchNegated;
+    }
+
+    /**
+     * Set the <code>MatchNegated</code> value.
+     *
+     * @param newMatchNegated The new MatchNegated value.
+     */
+    public void setMatchNegated(final boolean newMatchNegated) {
+        this.matchNegated = newMatchNegated;
+    }
 
     /**
      * Get the <code>Type</code> value.
@@ -176,28 +221,37 @@ public final class Scope extends FreeColObject implements Cloneable {
      * @return a <code>boolean</code> value
      */
     public boolean appliesTo(FreeColGameObjectType object) {
+        if (object == null) {
+            return matchesNull;
+        }
         if (type != null && !type.equals(object.getId())) {
-            return false;
+            return matchNegated;
         }
         if (abilityID != null && object.hasAbility(abilityID) != abilityValue) {
-            return false;
+            return matchNegated;
         }
         if (methodName != null) {
             try {
                 Method method = object.getClass().getMethod(methodName);
                 if (!method.invoke(object).toString().equals(methodValue)) {
-                    return false;
+                    return matchNegated;
                 }
             } catch(Exception e) {
-                return false;
+                return matchNegated;
             }
         }
-        return true;
+        return !matchNegated;
     }
 
     public boolean equals(Object o) {
         if (o instanceof Scope) {
             Scope otherScope = (Scope) o;
+            if (matchNegated != otherScope.matchNegated) {
+                return false;
+            }
+            if (matchesNull != otherScope.matchesNull) {
+                return false;
+            }
             if (type == null) {
                 if (otherScope.getType() != type) {
                     return false;
@@ -244,6 +298,8 @@ public final class Scope extends FreeColObject implements Cloneable {
      *      during parsing.
      */
     public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        matchNegated = getAttribute(in, "matchNegated", false);
+        matchesNull = getAttribute(in, "matchesNull", true);
         type = in.getAttributeValue(null, "type");
         abilityID = in.getAttributeValue(null, "ability-id");
         abilityValue = getAttribute(in, "ability-value", true);
@@ -264,6 +320,8 @@ public final class Scope extends FreeColObject implements Cloneable {
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
+        out.writeAttribute("matchNegated", Boolean.toString(matchNegated));
+        out.writeAttribute("matchesNull", Boolean.toString(matchesNull));
         out.writeAttribute("type", type);
         out.writeAttribute("ability-id", abilityID);
         out.writeAttribute("ability-value", String.valueOf(abilityValue));

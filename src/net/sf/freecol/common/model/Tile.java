@@ -382,7 +382,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else if (getSettlement() != null) {
             return 0;
         } else {
-            int value = potential(primaryGoods()) * 3;
+            int value = potential(primaryGoods(), null) * 3;
             
             boolean nearbyTileIsOcean = false;
 
@@ -405,7 +405,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         nearbyTileIsOcean = true;
                     }
                     for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
-                        int potential = tile.potential(type);
+                        int potential = tile.potential(type, null);
                         value += potential;
                         if (type.isRawBuildingMaterial() && potential > 4) {
                             buildingMaterialMap.put(type, true);
@@ -1272,11 +1272,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * The potential of this tile to produce a certain type of goods.
      * 
      * @param goodsType The type of goods to check the potential for.
+     * @param unitType an <code>UnitType</code> value
      * @return The normal potential of this tile to produce that amount of
      *         goods.
      */
-    public int potential(GoodsType goodsType) {
-        return getTileTypePotential(getType(), goodsType, getTileItemContainer(), getFishBonus());
+    public int potential(GoodsType goodsType, UnitType unitType) {
+        return getTileTypePotential(getType(), goodsType, getTileItemContainer(), unitType, getFishBonus());
     }
 
     /**
@@ -1285,9 +1286,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * plowed/built road on.
      * 
      * @param goodsType The type of goods.
+     * @param unitType an <code>UnitType</code> value
      * @return The maximum potential.
      */
-    public int getMaximumPotential(GoodsType goodsType) {
+    public int getMaximumPotential(GoodsType goodsType, UnitType unitType) {
         // If we consider maximum potential to the effect of having
         // all possible improvements done, iterate through the
         // improvements and get the bonuses of all related ones.  If
@@ -1308,12 +1310,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         int maxProduction = 0;
 
         for (TileType tileType : tileTypes) {
-            float potential = tileType.getPotential(goodsType);
+            float potential = tileType.getProductionOf(goodsType, unitType);
             if (tileType.isWater() && goodsType.isFoodType()) {
                 potential += fishBonus;
             }
             if (tileType == getType() && hasResource()) {
-                potential = tileItemContainer.getResourceBonusPotential(goodsType, (int) potential);
+                potential = tileItemContainer.getResourceBonusPotential(goodsType, unitType, (int) potential);
             }
             for (TileImprovementType impType : FreeCol.getSpecification().getTileImprovementTypeList()) {
                 if (impType.isNatural() || !impType.isTileTypeAllowed(tileType)) {
@@ -1333,11 +1335,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param goodsType a <code>GoodsType</code> value
      * @return a <code>Modifier</code> value
      */
-    public Set<Modifier> getProductionBonus(GoodsType goodsType) {
+    public Set<Modifier> getProductionBonus(GoodsType goodsType, UnitType unitType) {
         Set<Modifier> result = new HashSet<Modifier>();
         result.addAll(type.getProductionBonus(goodsType));
         if (!result.isEmpty() && tileItemContainer != null) {
-            result.addAll(tileItemContainer.getProductionBonus(goodsType));
+            result.addAll(tileItemContainer.getProductionBonus(goodsType, unitType));
         }
         return result;
     }
@@ -1389,23 +1391,24 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @param tiContainer
      *            The <code>TileItemContainer</code> with any TileItems to
      *            give bonuses.
+     * @param unitType an <code>UnitType</code> value
      * @param fishBonus
      *            The Bonus Fish to be considered if valid
      * @return The amount of goods.
      */
     public static int getTileTypePotential(TileType tileType, GoodsType goodsType, 
-                                           TileItemContainer tiContainer, int fishBonus) {
+                                           TileItemContainer tiContainer, UnitType unitType, int fishBonus) {
         if (tileType == null || goodsType == null || !goodsType.isFarmed()) {
             return 0;
         }
         // Get tile potential + bonus if any
-        int potential = tileType.getPotential(goodsType);
+        int potential = tileType.getProductionOf(goodsType, unitType);
         if (potential > 0) {
             if (tileType.isWater() && goodsType.isFoodType()) {
                 potential += fishBonus;
             }
             if (tiContainer != null) {
-                potential = tiContainer.getTotalBonusPotential(goodsType, potential);
+                potential = tiContainer.getTotalBonusPotential(goodsType, unitType, potential);
             }
         }
         return potential;
@@ -1420,7 +1423,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public List<AbstractGoods> getSortedPotential() {
         List<AbstractGoods> goodsTypeList = new ArrayList<AbstractGoods>();
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            int potential = potential(goodsType);
+            int potential = potential(goodsType, null);
             if (potential > 0) {
                 goodsTypeList.add(new AbstractGoods(goodsType, potential));
             }
@@ -1473,13 +1476,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @see ResourceType
      * @see ColonyTile#newTurn
      */
-    public void expendResource(GoodsType goodsType, Settlement settlement) {
+    public void expendResource(GoodsType goodsType, UnitType unitType, Settlement settlement) {
         if (hasResource() && tileItemContainer.getResource().getQuantity() != -1) {
             Resource resource = tileItemContainer.getResource();
             // Potential of this Tile and Improvements
-            int potential = getTileTypePotential(getType(), goodsType, null, getFishBonus())
+            // TODO: review
+            int potential = getTileTypePotential(getType(), goodsType, tileItemContainer,
+                                                 unitType, getFishBonus())
                 + tileItemContainer.getImprovementBonusPotential(goodsType);
-            if (resource.useQuantity(goodsType, potential) == 0) {
+            if (resource.useQuantity(goodsType, unitType, potential) == 0) {
                 addModelMessage(settlement, ModelMessage.MessageType.WARNING,
                                 "model.tile.resourceExhausted", 
                                 "%resource%", resource.getName(),
@@ -1689,44 +1694,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
-        String typeStr = in.getAttributeValue(null, "type");
-        if (typeStr != null) {
-            if (!typeStr.startsWith("model.tile")) {
-                // upgrade of legacy 0.7 maps (America, Africa, Australia) which use older xml format
-                final String additionStr = in.getAttributeValue(null, "addition");
-                final String forestedStr = in.getAttributeValue(null, "forested");
-                boolean forested = (forestedStr!=null)?Boolean.valueOf(forestedStr).booleanValue():false;
-                if (additionStr!=null && additionStr.equals("4")) typeStr = "model.tile.mountains";
-                else if (additionStr!=null && additionStr.equals("3")) typeStr = "model.tile.hills";
-                else if (typeStr.equals("1")) typeStr = forested?"model.tile.mixedForest":"model.tile.plains";
-                else if (typeStr.equals("2")) typeStr = forested?"model.tile.coniferForest":"model.tile.grassland";
-                else if (typeStr.equals("3")) typeStr = forested?"model.tile.broadleafForest":"model.tile.prairie";
-                else if (typeStr.equals("4")) typeStr = forested?"model.tile.tropicalForest":"model.tile.savannah";
-                else if (typeStr.equals("5")) typeStr = forested?"model.tile.wetlandForest":"model.tile.marsh";
-                else if (typeStr.equals("6")) typeStr = forested?"model.tile.rainForest":"model.tile.swamp";
-                else if (typeStr.equals("7")) typeStr = forested?"model.tile.scrubForest":"model.tile.desert";
-                else if (typeStr.equals("8")) typeStr = forested?"model.tile.borealForest":"model.tile.tundra";
-                else if (typeStr.equals("9")) typeStr = "model.tile.arctic";
-                else if (typeStr.equals("10")) typeStr = "model.tile.ocean";
-                else if (typeStr.equals("11")) typeStr = "model.tile.highSeas";
-                final String riverString = in.getAttributeValue(null, "river");
-                if (riverString != null && !typeStr.equals("model.tile.ocean") &&
-                    !typeStr.equals("model.tile.highSeas")) {
-                    int riverType = Integer.parseInt(riverString);
-                    if (tileItemContainer == null) {
-                        tileItemContainer = new TileItemContainer(getGame(), this);
-                    }
-                    tileItemContainer.addRiver(1, riverType);
-                }
-            }
-            type = FreeCol.getSpecification().getTileType(typeStr);
+        String typeString = in.getAttributeValue(null, "type");
+        if (typeString != null) {
+            type = FreeCol.getSpecification().getTileType(typeString);
         }
 
         lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(), false);
         connected = getAttribute(in, "connected", false);
         owner = getFreeColGameObject(in, "owner", Player.class, null);
         region = getFreeColGameObject(in, "region", Region.class, null);
-
         fishBonus = getAttribute(in, "fishBonus", 0);
 
         final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");

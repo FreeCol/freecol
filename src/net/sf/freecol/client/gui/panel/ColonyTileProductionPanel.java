@@ -37,6 +37,8 @@ import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Scope;
+import net.sf.freecol.common.model.UnitType;
 import cz.autel.dmi.HIGLayout;
 
 public class ColonyTileProductionPanel extends FreeColPanel implements ActionListener {
@@ -49,7 +51,11 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
         parent = canvas;
 
         Colony colony = colonyTile.getColony();
-        Set<Modifier> basicModifiers = colonyTile.getProductionModifiers(goodsType);
+        UnitType unitType = null;
+        if (colonyTile.getUnit() != null) {
+            unitType = colonyTile.getUnit().getType();
+        }
+        Set<Modifier> basicModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
         basicModifiers.addAll(colony.getModifierSet(goodsType.getId()));
         Set<Modifier> modifiers = sortModifiers(basicModifiers);
         if (colony.getProductionBonus() != 0) {
@@ -95,6 +101,13 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
                 sourceName = "???";
             } else {
                 sourceName = source.getName();
+                if (unitType != null && modifier.hasScope()) {
+                    for (Scope scope : modifier.getScopes()) {
+                        if (scope.appliesTo(unitType)) {
+                            sourceName += " (" + unitType.getName() + ")";
+                        }
+                    }
+                }
             }
             add(new JLabel(sourceName), higConst.rc(row, labelColumn));
             String bonus = getModifierFormat().format(modifier.getValue());

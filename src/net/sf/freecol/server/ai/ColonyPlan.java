@@ -315,9 +315,10 @@ public class ColonyPlan {
             Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
             while (wlpIterator.hasNext()) {
                 WorkLocationPlan wlp = wlpIterator.next();
+                // TODO: find out about unit working here, if any (?)
                 if (wlp.getWorkLocation() instanceof ColonyTile
-                        && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.LUMBER) > highestPotential) {
-                    highestPotential = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.LUMBER);
+                    && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.LUMBER, null) > highestPotential) {
+                    highestPotential = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.LUMBER, null);
                     bestChoice = wlp;
                 }
             }
@@ -364,7 +365,8 @@ public class ColonyPlan {
                     || wlp.getGoodsType() == Goods.SILVER) {
                 continue;
             }
-            if (((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.FOOD) <= 2) {
+            // TODO: find out about unit working here, if any (?)
+            if (((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.FOOD, null) <= 2) {
                 if (wlp.getGoodsType() == null) {
                     // on arctic tiles nothing can be produced
                     wlpIterator.remove();
@@ -407,7 +409,8 @@ public class ColonyPlan {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == secondaryRawMaterial) {
                     Tile t = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
-                    if (t.getMaximumPotential(Goods.FOOD) > 2) {
+                    // TODO: find out about unit working here, if any (?)
+                    if (t.getMaximumPotential(Goods.FOOD, null) > 2) {
                         wlp.setGoodsType(Goods.FOOD);
                     } else {
                         wlpIterator2.remove();
@@ -423,7 +426,8 @@ public class ColonyPlan {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == primaryRawMaterial) {
                     Tile t = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
-                    if (t.getMaximumPotential(Goods.FOOD) > 2) {
+                    // TODO: find out about unit working here, if any (?)
+                    if (t.getMaximumPotential(Goods.FOOD, null) > 2) {
                         wlp.setGoodsType(Goods.FOOD);
                     } else {
                         wlpIterator2.remove();
@@ -560,7 +564,7 @@ public class ColonyPlan {
     }
 
     /**
-     * Returns the production of the given type of goods accoring to this plan.
+     * Returns the production of the given type of goods according to this plan.
      * 
      * @param goodsType The type of goods to check the production for.
      * @return The maximum possible production of the given type of goods
@@ -578,7 +582,8 @@ public class ColonyPlan {
         // Add values for the center tile:
         if (goodsType == colony.getTile().primaryGoods() ||
             goodsType == colony.getTile().secondaryGoods()) {
-            amount += colony.getTile().getMaximumPotential(goodsType);
+            // TODO: find out about unit working here, if any (?)
+            amount += colony.getTile().getMaximumPotential(goodsType, null);
         }
 
         return amount;
@@ -602,7 +607,8 @@ public class ColonyPlan {
             // Add values for the center tile:
             if (foodType == colony.getTile().primaryGoods() ||
                 foodType == colony.getTile().secondaryGoods()) {
-                amount += colony.getTile().getMaximumPotential(foodType);
+                // TODO: find out about unit working here, if any (?)
+                amount += colony.getTile().getMaximumPotential(foodType, null);
             }
         }
 

@@ -330,7 +330,7 @@ public final class InfoPanel extends FreeColPanel {
             goodsPanel.removeAll();
             List<AbstractGoods> production = tile.getType().getProduction();
             for (AbstractGoods goods : production) {
-                JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goods.getType())),
+                JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goods.getType(), null)),
                                                library.getScaledGoodsImageIcon(goods.getType(), 0.50f),
                                                JLabel.RIGHT);
                 goodsLabel.setToolTipText(goods.getType().getName());

@@ -35,6 +35,12 @@ public class ScopeTest extends FreeColTestCase {
         // empty scope applies to all
         assertTrue(testScope.appliesTo(carpenter));
         assertTrue(testScope.appliesTo(frigate));
+
+        // unless negated
+        testScope.setMatchNegated(true);
+        assertFalse(testScope.appliesTo(carpenter));
+        assertFalse(testScope.appliesTo(frigate));
+
     }
 
     public void testTypeScope() {
@@ -44,10 +50,17 @@ public class ScopeTest extends FreeColTestCase {
         testScope.setType("model.unit.frigate");
         assertTrue(testScope.appliesTo(frigate));
         assertFalse(testScope.appliesTo(carpenter));
+        testScope.setMatchNegated(true);
+        assertFalse(testScope.appliesTo(frigate));
+        assertTrue(testScope.appliesTo(carpenter));
 
+        testScope.setMatchNegated(false);
         testScope.setType("model.unit.masterCarpenter");
         assertFalse(testScope.appliesTo(frigate));
         assertTrue(testScope.appliesTo(carpenter));
+        testScope.setMatchNegated(true);
+        assertTrue(testScope.appliesTo(frigate));
+        assertFalse(testScope.appliesTo(carpenter));
 
     }
 
@@ -94,6 +107,19 @@ public class ScopeTest extends FreeColTestCase {
         assertFalse(testScope.appliesTo(frigate));
     }
 
+    public void testMatchesNull() {
+
+        Scope testScope = new Scope();
+        testScope.setType("model.unit.frigate");
+
+        assertTrue(testScope.appliesTo(frigate));
+        assertTrue(testScope.appliesTo(null));
+        testScope.setMatchesNull(false);
+        assertTrue(testScope.appliesTo(frigate));
+        assertFalse(testScope.appliesTo(null));
+
+    }
+
     public void testEquality() {
 
         Scope testScope1 = new Scope();
@@ -101,6 +127,8 @@ public class ScopeTest extends FreeColTestCase {
         testScope1.setAbilityID("model.ability.navalUnit");
         testScope1.setMethodName("getLineOfSight");
         testScope1.setMethodValue("2");
+        testScope1.setMatchesNull(true);
+        testScope1.setMatchNegated(false);
         assertTrue(testScope1.equals(testScope1));
 
         Scope testScope2 = new Scope();
@@ -108,6 +136,8 @@ public class ScopeTest extends FreeColTestCase {
         testScope2.setAbilityID("model.ability.navalUnit");
         testScope2.setMethodName("getLineOfSight");
         testScope2.setMethodValue("2");
+        testScope2.setMatchesNull(true);
+        testScope2.setMatchNegated(false);
         assertTrue(testScope2.equals(testScope2));
 
         assertTrue(testScope1.equals(testScope2));
@@ -146,6 +176,27 @@ public class ScopeTest extends FreeColTestCase {
 
         assertTrue(testScope1.equals(testScope2));
         assertTrue(testScope2.equals(testScope1));
+
+        testScope1.setMatchesNull(false);
+
+        assertFalse(testScope1.equals(testScope2));
+        assertFalse(testScope2.equals(testScope1));
+
+        testScope1.setMatchesNull(true);
+
+        assertTrue(testScope1.equals(testScope2));
+        assertTrue(testScope2.equals(testScope1));
+
+        testScope1.setMatchNegated(true);
+
+        assertFalse(testScope1.equals(testScope2));
+        assertFalse(testScope2.equals(testScope1));
+
+        testScope1.setMatchNegated(false);
+
+        assertTrue(testScope1.equals(testScope2));
+        assertTrue(testScope2.equals(testScope1));
+
 
     }
         

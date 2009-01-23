@@ -402,7 +402,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             produceGoodsCenterTile();
         } else if (getUnit() != null && !isOccupied()) {
             produceGoods();
-            workTile.expendResource(getUnit().getWorkType(), colony);
+            workTile.expendResource(getUnit().getWorkType(), getUnit().getType(), colony);
         }
     }
 
@@ -466,7 +466,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             if (isColonyCenterTile() &&
                 (goodsType.isFoodType() || 
                  goodsType.equals(workTile.secondaryGoods()))) {
-                return workTile.potential(goodsType);
+                return workTile.potential(goodsType, null);
             } else {
                 return 0;
             }
@@ -481,28 +481,27 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * Returns the production of the given type of goods.
      *
      * @param goodsType a <code>GoodsType</code> value
+     * @param unitType a <code>unitType</code> value
      * @return an <code>int</code> value
      */
-    public Set<Modifier> getProductionModifiers(GoodsType goodsType) {
+    public Set<Modifier> getProductionModifiers(GoodsType goodsType, UnitType unitType) {
         if (goodsType == null) {
             throw new IllegalArgumentException("GoodsType must not be 'null'.");
-        } else if (getUnit() == null) {
-            if (isColonyCenterTile() &&
-                (goodsType.isFoodType() || 
-                 goodsType.equals(workTile.secondaryGoods()))) {
-                Set<Modifier> result = new HashSet<Modifier>();
-                result.addAll(workTile.getProductionBonus(goodsType));
-                result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
-                return result;
-            }
-        } else if (goodsType.equals(getUnit().getWorkType())) {
+        } else {
             Set<Modifier> result = new HashSet<Modifier>();
-            result.addAll(workTile.getProductionBonus(goodsType));
-            result.addAll(getUnit().getModifierSet(goodsType.getId()));
-            //result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
+            if (getUnit() == null) {
+                if (isColonyCenterTile() &&
+                    (goodsType.isFoodType() || 
+                     goodsType.equals(workTile.secondaryGoods()))) {
+                    result.addAll(workTile.getProductionBonus(goodsType, null));
+                    result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
+                }
+            } else if (goodsType.equals(getUnit().getWorkType())) {
+                result.addAll(workTile.getProductionBonus(goodsType, unitType));
+                result.addAll(getUnit().getModifierSet(goodsType.getId()));
+            }
             return result;
         }
-        return Collections.emptySet();
     }
 
     /**
@@ -517,7 +516,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         } else if (workTile.isLand() || colony.hasAbility("model.ability.produceInWater")) {
-            int production = unit.getProductionOf(goodsType, workTile.potential(goodsType));
+            int production = unit.getProductionOf(goodsType, workTile.potential(goodsType, unit.getType()));
             if (production > 0) {
                 production = Math.max(1, production + colony.getProductionBonus());
             }

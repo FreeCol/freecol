@@ -186,7 +186,7 @@ public class WorkLocationPlan {
             Tile t = ct.getWorkTile();
             UnitType expertUnitType = FreeCol.getSpecification().getExpertForProducing(goodsType);
 
-            int base = t.getMaximumPotential(goodsType);
+            int base = t.getMaximumPotential(goodsType, expertUnitType);
 
             if (t.isLand() && base != 0) {
                 base++;

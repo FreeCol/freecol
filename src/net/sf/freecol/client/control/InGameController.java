@@ -514,7 +514,7 @@ public final class InGameController implements NetworkConstants {
             if (goodsType.isFoodType()) {
                 int potential = 0;
                 if (tile.primaryGoods() == goodsType) {
-                    potential = tile.potential(goodsType);
+                    potential = tile.potential(goodsType, null);
                 }
                 goodsMap.put(goodsType, new Integer(potential));
             } else if (goodsType.isBuildingMaterial()) {
@@ -523,7 +523,7 @@ public final class InGameController implements NetworkConstants {
                 }
                 int potential = 0;
                 if (tile.secondaryGoods() == goodsType) {
-                    potential = tile.potential(goodsType);
+                    potential = tile.potential(goodsType, null);
                 }
                 goodsMap.put(goodsType, new Integer(potential));
             }
@@ -536,7 +536,7 @@ public final class InGameController implements NetworkConstants {
             if (newTile.isLand()) {
                 for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
                     entry.setValue(entry.getValue().intValue() +
-                                   newTile.potential(entry.getKey()));
+                                   newTile.potential(entry.getKey(), null));
                 }
                 Player tileOwner = newTile.getOwner();
                 if (tileOwner == unit.getOwner()) {

@@ -101,18 +101,19 @@
 
   <resource-types>
     <resource-type id="model.resource.Game">
-      <modifier id="model.goods.grain" type="additive" value="2"/>
-      <!-- in colonization game gives 2 grain (4 for expert farmer) -->
+      <modifier id="model.goods.food" type="additive" value="2"/>
+      <modifier id="model.goods.food" type="additive" value="2">
+        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+      </modifier>
       <modifier id="model.goods.furs" type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Minerals" minimum-value="40" maximum-value="400">
       <modifier id="model.goods.ore" type="additive" value="3"/>
-      <modifier id="model.goods.silver" type="additive" value="1"/>
     </resource-type>
-    <resource-type id="model.resource.Ore" minimum-value="40" maximum-value="4000">
+    <resource-type id="model.resource.Ore" minimum-value="200" maximum-value="4000">
       <modifier id="model.goods.ore" type="additive" value="2"/>
     </resource-type>
-    <resource-type id="model.resource.Silver" minimum-value="40" maximum-value="800">
+    <resource-type id="model.resource.Silver" minimum-value="80" maximum-value="800">
       <modifier id="model.goods.silver" type="additive" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Lumber">
@@ -131,16 +132,22 @@
       <modifier id="model.goods.cotton" type="multiplicative" value="2"/>
     </resource-type>
     <resource-type id="model.resource.Oasis">
-      <modifier id="model.goods.grain" type="additive" value="2"/>
-      <!-- in colonization game gives 2 grain (4 for expert farmer) -->
+      <modifier id="model.goods.food" type="additive" value="2"/>
+      <modifier id="model.goods.food" type="additive" value="2">
+        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+      </modifier>
     </resource-type>
     <resource-type id="model.resource.Grain">
-      <modifier id="model.goods.grain" type="additive" value="2"/>
-      <!-- in colonization game gives 2 grain (4 for expert farmer) -->
+      <modifier id="model.goods.food" type="additive" value="2"/>
+      <modifier id="model.goods.food" type="additive" value="2">
+        <scope type="model.unit.expertFarmer" matchesNull="false"/>
+      </modifier>
     </resource-type>
     <resource-type id="model.resource.Fish">
       <modifier id="model.goods.fish" type="additive" value="3"/>
-      <!-- in colonization game gives 3 grain (6 for expert fisherman) -->
+      <modifier id="model.goods.food" type="additive" value="3">
+        <scope type="model.unit.expertFisherman" matchesNull="false"/>
+      </modifier>
     </resource-type>
   </resource-types>
 
