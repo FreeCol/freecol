@@ -70,6 +70,7 @@ public class ActionManager extends OptionGroup {
         add(new ColopediaGoodsAction(freeColClient));
         add(new ColopediaNationAction(freeColClient));
         add(new ColopediaNationTypeAction(freeColClient));
+        add(new ColopediaResourceAction(freeColClient));
         add(new ColopediaSkillAction(freeColClient));
         add(new ColopediaTerrainAction(freeColClient));
         add(new ColopediaUnitAction(freeColClient));

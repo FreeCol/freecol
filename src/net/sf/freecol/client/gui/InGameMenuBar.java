@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.action.ColopediaFatherAction;
 import net.sf.freecol.client.gui.action.ColopediaGoodsAction;
 import net.sf.freecol.client.gui.action.ColopediaNationAction;
 import net.sf.freecol.client.gui.action.ColopediaNationTypeAction;
+import net.sf.freecol.client.gui.action.ColopediaResourceAction;
 import net.sf.freecol.client.gui.action.ColopediaSkillAction;
 import net.sf.freecol.client.gui.action.ColopediaTerrainAction;
 import net.sf.freecol.client.gui.action.ColopediaUnitAction;
@@ -326,6 +327,7 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.setMnemonic(KeyEvent.VK_C);
 
         menu.add(getMenuItem(ColopediaTerrainAction.id));
+        menu.add(getMenuItem(ColopediaResourceAction.id));
         menu.add(getMenuItem(ColopediaUnitAction.id));
         menu.add(getMenuItem(ColopediaGoodsAction.id));
         menu.add(getMenuItem(ColopediaSkillAction.id));

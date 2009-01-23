@@ -72,6 +72,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.ResourceType;
+import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit.Role;
@@ -717,6 +718,20 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         goodsPanel.setOpaque(false);
         for (Modifier modifier : modifiers) {
             String text = getModifierAsString(modifier);
+            if (modifier.hasScope()) {
+                List<String> scopeStrings = new ArrayList<String>();
+                for (Scope scope : modifier.getScopes()) {
+                    if (scope.getType() != null) {
+                        FreeColGameObjectType objectType = Specification.getSpecification()
+                            .getType(scope.getType());
+                        scopeStrings.add(objectType.getName());
+                    }
+                }
+                if (!scopeStrings.isEmpty()) {
+                    text += " (" + Utils.join(", ", scopeStrings) + ")";
+                }
+            }
+                        
             GoodsType goodsType = Specification.getSpecification().getGoodsType(modifier.getId());
             JButton goodsButton = getGoodsButton(goodsType, text);
             goodsPanel.add(goodsButton);
