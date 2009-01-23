@@ -130,7 +130,7 @@
     </resource-type>
     <resource-type id="model.resource.Fish">
       <modifier id="model.goods.fish" type="additive" value="3"/>
-      <modifier id="model.goods.food" type="additive" value="3">
+      <modifier id="model.goods.fish" type="additive" value="3">
         <scope type="model.unit.expertFisherman" matchesNull="false"/>
       </modifier>
     </resource-type>
