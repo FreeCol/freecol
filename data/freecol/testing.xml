@@ -1682,7 +1682,7 @@
             ref="model.nation.danishREF"/>
     <nation id="model.nation.russian" color="#ffffff"
             nation-type="model.nationType.immigration" selectable="true"
-            ref="model.nation.russionREF"/>
+            ref="model.nation.russianREF"/>
     <nation id="model.nation.inca" color="#f4f0c4"
             nation-type="model.nationType.inca" />
     <nation id="model.nation.aztec" color="#c4a020"
