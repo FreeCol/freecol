@@ -75,10 +75,10 @@ public abstract class AIPlayer extends AIObject {
     /**
      * Temporary variable, used to hold all AIUnit objects belonging to this AI.
      * Any implementation of AIPlayer needs to make sure this list is invalidated
-     * as necessary, using aiUnits.clear(), so that getAIUnitIterator() will
+     * as necessary, using clearAIUnits(), so that getAIUnitIterator() will
      * create a new list.           
      */
-    protected ArrayList<AIUnit> aiUnits = new ArrayList<AIUnit>();
+    private ArrayList<AIUnit> aiUnits = new ArrayList<AIUnit>();
 
     public AIPlayer(AIMain aiMain, String id) {
         super(aiMain, id);
@@ -100,6 +100,13 @@ public abstract class AIPlayer extends AIObject {
      */              
     protected void setPlayer(ServerPlayer p) {
         player = p;
+    }
+
+    /**
+     * Helper method to let implementing subclasses clear aiUnits.
+     */         
+    protected void clearAIUnits() {
+        aiUnits.clear();    
     }
 
     /**
@@ -354,7 +361,7 @@ public abstract class AIPlayer extends AIObject {
      * 
      * NOTE: For the moment, any implementation of this _must_ make sure
      * to call checkForREFDefeat() at the start of a turn,
-     * if the player this AI works for isREF(). See TODO at that method.
+     * iff the player this AI works for isREF(). See TODO at that method.
      */
     public abstract void startWorking();
 

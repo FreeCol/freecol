@@ -17,6 +17,15 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* "STANDARD" AIPLAYER *********************************************************
+ *
+ * This class is able to control _any_ Player type,
+ * whether European (both Colonial and REF), or Indian.
+ * 
+ * It is currently used as the standard AI for all non-player nations.
+ * 
+ ******************************************************************************/
+   
 package net.sf.freecol.server.ai;
 
 import java.io.PrintWriter;
@@ -119,7 +128,7 @@ public class StandardAIPlayer extends AIPlayer {
     /** The strategy of this player. */
     private AIStrategy strategy = AIStrategy.NONE;
 
-    /*
+    /**
      * Stores temporary information for sessions (trading with another player
      * etc).
      */
@@ -138,7 +147,6 @@ public class StandardAIPlayer extends AIPlayer {
     }
 
     /**
-     * 
      * Creates a new <code>AIPlayer</code> and reads the information from the
      * given <code>Element</code>.
      * 
@@ -162,8 +170,11 @@ public class StandardAIPlayer extends AIPlayer {
         readFromXML(in);
     }
 
+
+/* IMPLEMENTATION (AIPlayer interface) ****************************************/
+
+
     /**
-     * 
      * Tells this <code>AIPlayer</code> to make decisions. The
      * <code>AIPlayer</code> is done doing work this turn when this method
      * returns.
@@ -188,7 +199,7 @@ public class StandardAIPlayer extends AIPlayer {
         */
         this.strategy = AIStrategy.TRADE;
         sessionRegister.clear();
-        aiUnits.clear();
+        clearAIUnits();
         if (getPlayer().isREF()) {
             checkForREFDefeat();
             if (!isWorkForREF()) {
@@ -216,8 +227,439 @@ public class StandardAIPlayer extends AIPlayer {
         rearrangeWorkersInColonies();
         abortInvalidMissions();
         ensureCorrectMissions();
-        aiUnits.clear();
+        clearAIUnits();
     }
+
+    /**
+     * Returns an <code>Iterator</code> over all the
+     * <code>TileImprovement</code>s needed by all of this player's colonies.
+     * 
+     * @return The <code>Iterator</code>.
+     * @see TileImprovement
+     */
+    public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
+        ArrayList<TileImprovementPlan> tileImprovements = new ArrayList<TileImprovementPlan>();
+        Iterator<AIColony> acIterator = getAIColonyIterator();
+        while (acIterator.hasNext()) {
+            AIColony ac = acIterator.next();
+            Iterator<TileImprovementPlan> it = ac.getTileImprovementPlanIterator();
+            while (it.hasNext()) {
+                tileImprovements.add(it.next());
+            }
+        }
+        return tileImprovements.iterator();
+    }
+    
+    /**
+     * Remove a <code>TileImprovementPlan</code> from the list
+     */
+    public void removeTileImprovementPlan(TileImprovementPlan plan){
+    	Iterator<AIColony> colonyIter = getAIColonyIterator();
+        while (colonyIter.hasNext()) {
+            AIColony colony = colonyIter.next();
+            if(colony.removeTileImprovementPlan(plan)){
+            	return;
+            }
+        }
+        logger.warning("Not found given TileImprovementPlan to remove");
+    }
+
+    /**
+     * This is a temporary method which are used for forcing the computer
+     * players into building more colonies. The method will be removed after the
+     * proper code for deciding whether a colony should be built or not has been
+     * implemented.
+     * 
+     * @return <code>true</code> if the AI should build more colonies.
+     */
+    public boolean hasFewColonies() {        
+        logger.finest("Entering method hasFewColonies");
+        if (!getPlayer().canBuildColonies()) {
+            return false;
+        }
+        int numberOfColonies = 0;
+        int numberOfWorkers = 0;
+        for (Colony colony : getPlayer().getColonies()) {
+            numberOfColonies++;
+            numberOfWorkers += colony.getUnitCount();
+        }
+        
+        logger.finest("Leaving method hasFewColonies");
+        return numberOfColonies <= 2 || numberOfColonies >= 3
+                && numberOfWorkers / numberOfColonies > numberOfColonies - 2;
+    }
+
+    /**
+     * Returns an <code>Iterator</code> for all the wishes. The items are
+     * sorted by the {@link Wish#getValue value}, with the item having the
+     * highest value appearing first in the <code>Iterator</code>.
+     * 
+     * @return The <code>Iterator</code>.
+     * @see Wish
+     */
+    public Iterator<Wish> getWishIterator() {
+        ArrayList<Wish> wishList = new ArrayList<Wish>();
+        Iterator<AIColony> ai = getAIColonyIterator();
+        while (ai.hasNext()) {
+            AIColony ac = ai.next();
+            Iterator<Wish> wishIterator = ac.getWishIterator();
+            while (wishIterator.hasNext()) {
+                Wish w = wishIterator.next();
+                wishList.add(w);
+            }
+        }
+        Collections.sort(wishList, new Comparator<Wish>() {
+            public int compare(Wish o1, Wish o2) {
+                Integer a = o1.getValue();
+                Integer b = o2.getValue();
+                return b.compareTo(a);
+            }
+        });
+        return wishList.iterator();
+    }
+
+    /**
+     * Selects the most useful founding father offered.
+     * 
+     * @param foundingFathers The founding fathers on offer.
+     * @return The founding father selected.
+     */
+    public FoundingFather selectFoundingFather(List<FoundingFather> foundingFathers) {
+        // TODO: improve choice
+        int age = getGame().getTurn().getAge();
+        FoundingFather bestFather = null;
+        int bestWeight = -1;
+        for (FoundingFather father : foundingFathers) {
+            if (father == null) continue;
+            int weight = father.getWeight(age);
+            if (weight > bestWeight) {
+                bestWeight = weight;
+                bestFather = father;
+            }
+        }
+        return bestFather;
+    }
+
+    /**
+     * Decides whether to accept the monarch's tax raise or not.
+     * 
+     * @param tax The new tax rate to be considered.
+     * @return <code>true</code> if the tax raise should be accepted.
+     */
+    public boolean acceptTax(int tax) {
+        Goods toBeDestroyed = getPlayer().getMostValuableGoods();
+        if (toBeDestroyed == null) {
+            return false;
+        }
+        
+        GoodsType goodsType = toBeDestroyed.getType();
+        if (goodsType.isFoodType() || goodsType.isBreedable()) {
+            // we should be able to produce food and horses ourselves
+            return false;
+        } else if (goodsType.isMilitaryGoods() || 
+                   goodsType.isTradeGoods() ||
+                   goodsType.isBuildingMaterial()) {
+            if (getGame().getTurn().getAge() == 3) {
+                // by this time, we should be able to produce
+                // enough ourselves
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            int averageIncome = 0;
+            int numberOfGoods = 0;
+            List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+            for (GoodsType type : goodsTypes) {
+                if (type.isStorable()) {
+                    averageIncome += getPlayer().getIncomeAfterTaxes(type);
+                    numberOfGoods++;
+                }
+            }
+            averageIncome = averageIncome / numberOfGoods;
+            if (getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
+                // this is a more valuable type of goods
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    /**
+     * Decides whether to accept an Indian demand, or not.
+     * 
+     * @param unit The unit making demands.
+     * @param colony The colony where demands are being made.
+     * @param goods The goods demanded.
+     * @param gold The amount of gold demanded.
+     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
+     *         indian demand and <code>false</code> otherwise.
+     */
+    public boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold) {
+        // TODO: make a better choice
+        if (strategy == AIStrategy.CONQUEST) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Decides whether to accept a mercenary offer, or not.
+     * 
+     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
+     *         offer and <code>false</code> otherwise.
+     */
+    public boolean acceptMercenaryOffer() {
+        // TODO: make a better choice
+        if (strategy == AIStrategy.CONQUEST || getPlayer().isAtWar()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
+        Stance stance = null;
+        int value = 0;
+        Iterator<TradeItem> itemIterator = agreement.iterator();
+        while (itemIterator.hasNext()) {
+            TradeItem item = itemIterator.next();
+            if (item instanceof GoldTradeItem) {
+                int gold = ((GoldTradeItem) item).getGold();
+                if (item.getSource() == getPlayer()) {
+                    value -= gold;
+                } else {
+                    value += gold;
+                }
+            } else if (item instanceof StanceTradeItem) {
+                // TODO: evaluate whether we want this stance change
+                stance = ((StanceTradeItem) item).getStance();
+            } else if (item instanceof ColonyTradeItem) {
+                // TODO: evaluate whether we might wish to give up a colony
+                if (item.getSource() == getPlayer()) {
+                    value = Integer.MIN_VALUE;
+                    break;
+                } else {
+                    value += 1000;
+                }
+            } else if (item instanceof UnitTradeItem) {
+                // TODO: evaluate whether we might wish to give up a unit
+                if (item.getSource() == getPlayer()) {
+                    value = Integer.MIN_VALUE;
+                    break;
+                } else {
+                    value += 100;
+                }
+            } else if (item instanceof GoodsTradeItem) {
+                Goods goods = ((GoodsTradeItem) item).getGoods();
+                if (item.getSource() == getPlayer()) {
+                    value -= getPlayer().getMarket().getBidPrice(goods.getType(), goods.getAmount());
+                } else {
+                    value += getPlayer().getMarket().getSalePrice(goods.getType(), goods.getAmount());
+                }
+            }
+        }
+
+        boolean accept = false;
+        if (stance == Stance.PEACE) {
+            if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace") &&
+                value >= 0) {
+                // TODO: introduce some kind of counter in order to avoid
+                // Benjamin Franklin exploit
+                accept = true;
+            } else if (value >= 1000) {
+                accept = true;
+            }
+        } else if (getPlayer().getStance(agreement.getSender()).compareTo(Stance.PEACE) >= 0) {
+            if (value > 100) {
+                accept = true;
+            }
+        }
+
+        logger.info("Trade value is " + value + ", accept is " + accept);
+        return accept;
+    }
+
+    
+    /**
+     * Called after another <code>Player</code> sends a <code>trade</code> message
+     * 
+     * 
+     * @param goods The goods which we are going to offer
+     */
+    public void registerSellGoods(Goods goods) {
+        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
+            + "#" + goods.getLocation().getId();
+        sessionRegister.put(goldKey, null);
+    }
+
+    /**
+     * Called when another <code>Player</code> proposes a trade.
+     * 
+     * 
+     * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param goods The goods the given <code>Unit</code> is trying to sell.
+     * @param gold The suggested price.
+     * @return The price this <code>AIPlayer</code> suggests or
+     *         {@link NetworkConstants#NO_TRADE}.
+     */
+    public int buyProposition(Unit unit, Goods goods, int gold) {
+        logger.finest("Entering method tradeProposition");
+        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
+        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
+            + "#" + settlement.getId();
+        String hagglingKey = "tradeHaggling#" + unit.getId();
+        
+        Integer registered = sessionRegister.get(goldKey);
+        if (registered == null) {
+            int price = settlement.getPriceToSell(goods)
+                + getPlayer().getTension(unit.getOwner()).getValue();
+            sessionRegister.put(goldKey, new Integer(price));
+            return price;
+        } else {
+            int price = registered.intValue();
+            if (price < 0 || price == gold) {
+                return price;
+            } else if (gold < (price * 9) / 10) {
+                logger.warning("Cheating attempt: sending a offer too low");
+                sessionRegister.put(goldKey, new Integer(-1));
+                return NetworkConstants.NO_TRADE;
+            } else {
+                int haggling = 1;
+                if (sessionRegister.containsKey(hagglingKey)) {
+                    haggling = sessionRegister.get(hagglingKey).intValue();
+                }
+                if (getRandom().nextInt(3 + haggling) <= 3) {
+                    sessionRegister.put(goldKey, new Integer(gold));
+                    sessionRegister.put(hagglingKey, new Integer(haggling + 1));
+                    return gold;
+                } else {
+                    sessionRegister.put(goldKey, new Integer(-1));
+                    return NetworkConstants.NO_TRADE;
+                }
+            }
+        }
+    }
+
+    /**
+     * Called when another <code>Player</code> proposes a trade.
+     * 
+     * @param unit The foreign <code>Unit</code> trying to trade.
+     * @param settlement The <code>Settlement</code> this player owns and
+     *            which the given <code>Unit</code> if trying to sell goods.
+     * @param goods The goods the given <code>Unit</code> is trying to sell.
+     * @param gold The suggested price.
+     * @return The price this <code>AIPlayer</code> suggests or
+     *         {@link NetworkConstants#NO_TRADE}.
+     */
+    public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
+        logger.finest("Entering method tradeProposition");
+        if (settlement instanceof IndianSettlement) {
+            String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount() + "#" + unit.getId();
+            String hagglingKey = "tradeHaggling#" + unit.getId();
+            int price;
+            if (sessionRegister.containsKey(goldKey)) {
+                price = sessionRegister.get(goldKey).intValue();
+                if (price <= 0) {
+                    return price;
+                }
+            } else {
+                price = ((IndianSettlement) settlement).getPrice(goods) - getPlayer().getTension(unit.getOwner()).getValue();
+                price = Math.min(price, getPlayer().getGold() / 2);
+                if (price <= 0) {
+                    return 0;
+                }
+                sessionRegister.put(goldKey, new Integer(price));
+            }
+            if (gold < 0 || price == gold) {
+                return price;
+            } else if (gold > (getPlayer().getGold() * 3) / 4) {
+                sessionRegister.put(goldKey, new Integer(-1));
+                return NetworkConstants.NO_TRADE;
+            } else if (gold > (price * 11) / 10) {
+                logger.warning("Cheating attempt: haggling with a request too high");
+                sessionRegister.put(goldKey, new Integer(-1));
+                return NetworkConstants.NO_TRADE;
+            } else {
+                int haggling = 1;
+                if (sessionRegister.containsKey(hagglingKey)) {
+                    haggling = sessionRegister.get(hagglingKey).intValue();
+                }
+                if (getRandom().nextInt(3 + haggling) <= 3) {
+                    sessionRegister.put(goldKey, new Integer(gold));
+                    sessionRegister.put(hagglingKey, new Integer(haggling + 1));
+                    return gold;
+                } else {
+                    sessionRegister.put(goldKey, new Integer(-1));
+                    return NetworkConstants.NO_TRADE;
+                }
+            }
+        } else if (settlement instanceof Colony) {
+            Colony colony = (Colony) settlement;
+            Player otherPlayer = unit.getOwner();
+            // the client should have prevented this
+            if (getPlayer().getStance(otherPlayer) == Stance.WAR) {
+                return NetworkConstants.NO_TRADE;
+            }
+            // don't pay for more than fits in the warehouse
+            int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
+            amount = Math.min(amount, goods.getAmount());
+            // get a good price
+            Tension.Level tensionLevel = getPlayer().getTension(otherPlayer).getLevel();
+            int percentage = (9 - tensionLevel.ordinal()) * 10;
+            // what we could get for the goods in Europe (minus taxes)
+            int netProfits = ((100 - getPlayer().getTax()) * getPlayer().getMarket().getSalePrice(goods.getType(), amount)) / 100;
+            int price = (netProfits * percentage) / 100;
+            return price;
+        } else {
+            throw new IllegalArgumentException("Unknown type of settlement.");
+        }
+    }
+
+    /**
+     * Writes this object to an XML stream.
+     * 
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    @Override
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute("ID", getId());
+        out.writeEndElement();
+    }
+
+    /**
+     * Reads information for this object from an XML stream.
+     * 
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if there are any problems reading from the
+     *             stream.
+     */
+    @Override
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setPlayer((ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID")));
+        in.nextTag();
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     * 
+     * ATTN: For compatibility, this has the same tag name as its super class,
+     * the previous implementation of all AIPlayers. Eventually change this at some point.     
+     *          
+     * @return the tag name.
+     */
+    public static String getXMLElementTagName() {
+        return "aiPlayer";
+    }
+
+
+/* Internal methods ***********************************************************/
+
 
     /**
      * Cheats for the AI :-)
@@ -485,9 +927,9 @@ public class StandardAIPlayer extends AIPlayer {
     /**
      * Takes the necessary actions to secure an indian settlement
      *
-     * TODO: Public for access by a test only - necessary?
+     * TODO: Package for access by a test only - necessary?
      */      
-    public void secureIndianSettlement(IndianSettlement is) {
+    void secureIndianSettlement(IndianSettlement is) {
         // if not at war, no need to secure settlement
         if (!is.getOwner().isAtWar()) {
             return;
@@ -1251,9 +1693,9 @@ public class StandardAIPlayer extends AIPlayer {
     }
     
     /**
-     * TODO: Public for access by a test only - necessary?
+     * TODO: Package for access by a test only - necessary?
      */     
-    public boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender) {
+    boolean isTargetValidForSeekAndDestroy(Unit attacker, Unit defender) {
         if (defender == null) { // Sanitation
             return false;
         }
@@ -1298,11 +1740,11 @@ public class StandardAIPlayer extends AIPlayer {
      * <br>
      * <b>This method should only be used on units owned by european players.</b>
      *
-     * TODO: Public for access by a test only - necessary?
+     * TODO: Package for access by a test only - necessary?
      * 
      * @param aiUnit The unit.
      */
-    public void giveMilitaryMission(AIUnit aiUnit) {
+    void giveMilitaryMission(AIUnit aiUnit) {
         logger.finest("Entering method giveMilitaryMission");
         /*
          * 
@@ -1471,65 +1913,6 @@ public class StandardAIPlayer extends AIPlayer {
     }
 
     /**
-     * Returns an <code>Iterator</code> over all the
-     * <code>TileImprovement</code>s needed by all of this player's colonies.
-     * 
-     * @return The <code>Iterator</code>.
-     * @see TileImprovement
-     */
-    public Iterator<TileImprovementPlan> getTileImprovementPlanIterator() {
-        ArrayList<TileImprovementPlan> tileImprovements = new ArrayList<TileImprovementPlan>();
-        Iterator<AIColony> acIterator = getAIColonyIterator();
-        while (acIterator.hasNext()) {
-            AIColony ac = acIterator.next();
-            Iterator<TileImprovementPlan> it = ac.getTileImprovementPlanIterator();
-            while (it.hasNext()) {
-                tileImprovements.add(it.next());
-            }
-        }
-        return tileImprovements.iterator();
-    }
-    
-    /**
-     * Remove a <code>TileImprovementPlan</code> from the list
-     */
-    public void removeTileImprovementPlan(TileImprovementPlan plan){
-    	Iterator<AIColony> colonyIter = getAIColonyIterator();
-        while (colonyIter.hasNext()) {
-            AIColony colony = colonyIter.next();
-            if(colony.removeTileImprovementPlan(plan)){
-            	return;
-            }
-        }
-        logger.warning("Not found given TileImprovementPlan to remove");
-    }
-
-    /**
-     * This is a temporary method which are used for forcing the computer
-     * players into building more colonies. The method will be removed after the
-     * proper code for deciding whether a colony should be built or not has been
-     * implemented.
-     * 
-     * @return <code>true</code> if the AI should build more colonies.
-     */
-    public boolean hasFewColonies() {        
-        logger.finest("Entering method hasFewColonies");
-        if (!getPlayer().canBuildColonies()) {
-            return false;
-        }
-        int numberOfColonies = 0;
-        int numberOfWorkers = 0;
-        for (Colony colony : getPlayer().getColonies()) {
-            numberOfColonies++;
-            numberOfWorkers += colony.getUnitCount();
-        }
-        
-        logger.finest("Leaving method hasFewColonies");
-        return numberOfColonies <= 2 || numberOfColonies >= 3
-                && numberOfWorkers / numberOfColonies > numberOfColonies - 2;
-    }
-
-    /**
      * Maps <code>Transportable</code>s to carrier's using a
      * <code>TransportMission</code>.
      */
@@ -1670,371 +2053,6 @@ public class StandardAIPlayer extends AIPlayer {
         }
     }
 
-    /**
-     * Returns an <code>Iterator</code> for all the wishes. The items are
-     * sorted by the {@link Wish#getValue value}, with the item having the
-     * highest value appearing first in the <code>Iterator</code>.
-     * 
-     * @return The <code>Iterator</code>.
-     * @see Wish
-     */
-    public Iterator<Wish> getWishIterator() {
-        ArrayList<Wish> wishList = new ArrayList<Wish>();
-        Iterator<AIColony> ai = getAIColonyIterator();
-        while (ai.hasNext()) {
-            AIColony ac = ai.next();
-            Iterator<Wish> wishIterator = ac.getWishIterator();
-            while (wishIterator.hasNext()) {
-                Wish w = wishIterator.next();
-                wishList.add(w);
-            }
-        }
-        Collections.sort(wishList, new Comparator<Wish>() {
-            public int compare(Wish o1, Wish o2) {
-                Integer a = o1.getValue();
-                Integer b = o2.getValue();
-                return b.compareTo(a);
-            }
-        });
-        return wishList.iterator();
-    }
-
-    /**
-     * Selects the most useful founding father offered.
-     * 
-     * @param foundingFathers The founding fathers on offer.
-     * @return The founding father selected.
-     */
-    public FoundingFather selectFoundingFather(List<FoundingFather> foundingFathers) {
-        // TODO: improve choice
-        int age = getGame().getTurn().getAge();
-        FoundingFather bestFather = null;
-        int bestWeight = -1;
-        for (FoundingFather father : foundingFathers) {
-            if (father == null) continue;
-            int weight = father.getWeight(age);
-            if (weight > bestWeight) {
-                bestWeight = weight;
-                bestFather = father;
-            }
-        }
-        return bestFather;
-    }
-
-    /**
-     * Called when another <code>Player</code> proposes a trade.
-     * 
-     * 
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param settlement The <code>Settlement</code> this player owns and
-     *            which the given <code>Unit</code> if trying to sell goods.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link NetworkConstants#NO_TRADE}.
-     */
-    public int tradeProposition(Unit unit, Settlement settlement, Goods goods, int gold) {
-        logger.finest("Entering method tradeProposition");
-        if (settlement instanceof IndianSettlement) {
-            String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount() + "#" + unit.getId();
-            String hagglingKey = "tradeHaggling#" + unit.getId();
-            int price;
-            if (sessionRegister.containsKey(goldKey)) {
-                price = sessionRegister.get(goldKey).intValue();
-                if (price <= 0) {
-                    return price;
-                }
-            } else {
-                price = ((IndianSettlement) settlement).getPrice(goods) - getPlayer().getTension(unit.getOwner()).getValue();
-                price = Math.min(price, getPlayer().getGold() / 2);
-                if (price <= 0) {
-                    return 0;
-                }
-                sessionRegister.put(goldKey, new Integer(price));
-            }
-            if (gold < 0 || price == gold) {
-                return price;
-            } else if (gold > (getPlayer().getGold() * 3) / 4) {
-                sessionRegister.put(goldKey, new Integer(-1));
-                return NetworkConstants.NO_TRADE;
-            } else if (gold > (price * 11) / 10) {
-                logger.warning("Cheating attempt: haggling with a request too high");
-                sessionRegister.put(goldKey, new Integer(-1));
-                return NetworkConstants.NO_TRADE;
-            } else {
-                int haggling = 1;
-                if (sessionRegister.containsKey(hagglingKey)) {
-                    haggling = sessionRegister.get(hagglingKey).intValue();
-                }
-                if (getRandom().nextInt(3 + haggling) <= 3) {
-                    sessionRegister.put(goldKey, new Integer(gold));
-                    sessionRegister.put(hagglingKey, new Integer(haggling + 1));
-                    return gold;
-                } else {
-                    sessionRegister.put(goldKey, new Integer(-1));
-                    return NetworkConstants.NO_TRADE;
-                }
-            }
-        } else if (settlement instanceof Colony) {
-            Colony colony = (Colony) settlement;
-            Player otherPlayer = unit.getOwner();
-            // the client should have prevented this
-            if (getPlayer().getStance(otherPlayer) == Stance.WAR) {
-                return NetworkConstants.NO_TRADE;
-            }
-            // don't pay for more than fits in the warehouse
-            int amount = colony.getWarehouseCapacity() - colony.getGoodsCount(goods.getType());
-            amount = Math.min(amount, goods.getAmount());
-            // get a good price
-            Tension.Level tensionLevel = getPlayer().getTension(otherPlayer).getLevel();
-            int percentage = (9 - tensionLevel.ordinal()) * 10;
-            // what we could get for the goods in Europe (minus taxes)
-            int netProfits = ((100 - getPlayer().getTax()) * getPlayer().getMarket().getSalePrice(goods.getType(), amount)) / 100;
-            int price = (netProfits * percentage) / 100;
-            return price;
-        } else {
-            throw new IllegalArgumentException("Unknown type of settlement.");
-        }
-    }
-
-    /**
-     * Decides whether to accept the monarch's tax raise or not.
-     * 
-     * @param tax The new tax rate to be considered.
-     * @return <code>true</code> if the tax raise should be accepted.
-     */
-    public boolean acceptTax(int tax) {
-        Goods toBeDestroyed = getPlayer().getMostValuableGoods();
-        if (toBeDestroyed == null) {
-            return false;
-        }
-        
-        GoodsType goodsType = toBeDestroyed.getType();
-        if (goodsType.isFoodType() || goodsType.isBreedable()) {
-            // we should be able to produce food and horses ourselves
-            return false;
-        } else if (goodsType.isMilitaryGoods() || 
-                   goodsType.isTradeGoods() ||
-                   goodsType.isBuildingMaterial()) {
-            if (getGame().getTurn().getAge() == 3) {
-                // by this time, we should be able to produce
-                // enough ourselves
-                return false;
-            } else {
-                return true;
-            }
-        } else {
-            int averageIncome = 0;
-            int numberOfGoods = 0;
-            List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
-            for (GoodsType type : goodsTypes) {
-                if (type.isStorable()) {
-                    averageIncome += getPlayer().getIncomeAfterTaxes(type);
-                    numberOfGoods++;
-                }
-            }
-            averageIncome = averageIncome / numberOfGoods;
-            if (getPlayer().getIncomeAfterTaxes(toBeDestroyed.getType()) > averageIncome) {
-                // this is a more valuable type of goods
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    /**
-     * Decides whether to accept an Indian demand, or not.
-     * 
-     * @param unit The unit making demands.
-     * @param colony The colony where demands are being made.
-     * @param goods The goods demanded.
-     * @param gold The amount of gold demanded.
-     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
-     *         indian demand and <code>false</code> otherwise.
-     */
-    public boolean acceptIndianDemand(Unit unit, Colony colony, Goods goods, int gold) {
-        // TODO: make a better choice
-        if (strategy == AIStrategy.CONQUEST) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * Decides whether to accept a mercenary offer, or not.
-     * 
-     * @return <code>true</code> if this <code>AIPlayer</code> accepts the
-     *         offer and <code>false</code> otherwise.
-     */
-    public boolean acceptMercenaryOffer() {
-        // TODO: make a better choice
-        if (strategy == AIStrategy.CONQUEST || getPlayer().isAtWar()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
-        Stance stance = null;
-        int value = 0;
-        Iterator<TradeItem> itemIterator = agreement.iterator();
-        while (itemIterator.hasNext()) {
-            TradeItem item = itemIterator.next();
-            if (item instanceof GoldTradeItem) {
-                int gold = ((GoldTradeItem) item).getGold();
-                if (item.getSource() == getPlayer()) {
-                    value -= gold;
-                } else {
-                    value += gold;
-                }
-            } else if (item instanceof StanceTradeItem) {
-                // TODO: evaluate whether we want this stance change
-                stance = ((StanceTradeItem) item).getStance();
-            } else if (item instanceof ColonyTradeItem) {
-                // TODO: evaluate whether we might wish to give up a colony
-                if (item.getSource() == getPlayer()) {
-                    value = Integer.MIN_VALUE;
-                    break;
-                } else {
-                    value += 1000;
-                }
-            } else if (item instanceof UnitTradeItem) {
-                // TODO: evaluate whether we might wish to give up a unit
-                if (item.getSource() == getPlayer()) {
-                    value = Integer.MIN_VALUE;
-                    break;
-                } else {
-                    value += 100;
-                }
-            } else if (item instanceof GoodsTradeItem) {
-                Goods goods = ((GoodsTradeItem) item).getGoods();
-                if (item.getSource() == getPlayer()) {
-                    value -= getPlayer().getMarket().getBidPrice(goods.getType(), goods.getAmount());
-                } else {
-                    value += getPlayer().getMarket().getSalePrice(goods.getType(), goods.getAmount());
-                }
-            }
-        }
-
-        boolean accept = false;
-        if (stance == Stance.PEACE) {
-            if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace") &&
-                value >= 0) {
-                // TODO: introduce some kind of counter in order to avoid
-                // Benjamin Franklin exploit
-                accept = true;
-            } else if (value >= 1000) {
-                accept = true;
-            }
-        } else if (getPlayer().getStance(agreement.getSender()).compareTo(Stance.PEACE) >= 0) {
-            if (value > 100) {
-                accept = true;
-            }
-        }
-
-        logger.info("Trade value is " + value + ", accept is " + accept);
-        return accept;
-    }
-
-    /**
-     * Writes this object to an XML stream.
-     * 
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    @Override
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getId());
-        out.writeEndElement();
-    }
-
-    /**
-     * Reads information for this object from an XML stream.
-     * 
-     * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are any problems reading from the
-     *             stream.
-     */
-    @Override
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setPlayer((ServerPlayer) getAIMain().getFreeColGameObject(in.getAttributeValue(null, "ID")));
-        in.nextTag();
-    }
-
-    /**
-     * Returns the tag name of the root element representing this object.
-     * 
-     * @return the tag name.
-     */
-    public static String getXMLElementTagName() {
-        return "aiPlayer";
-    }
-
-    
-    /**
-     * Called after another <code>Player</code> sends a <code>trade</code> message
-     * 
-     * 
-     * @param goods The goods which we are going to offer
-     */
-    public void registerSellGoods(Goods goods) {
-        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
-            + "#" + goods.getLocation().getId();
-        sessionRegister.put(goldKey, null);
-    }
-
-    /**
-     * Called when another <code>Player</code> proposes a trade.
-     * 
-     * 
-     * @param unit The foreign <code>Unit</code> trying to trade.
-     * @param goods The goods the given <code>Unit</code> is trying to sell.
-     * @param gold The suggested price.
-     * @return The price this <code>AIPlayer</code> suggests or
-     *         {@link NetworkConstants#NO_TRADE}.
-     */
-    public int buyProposition(Unit unit, Goods goods, int gold) {
-        logger.finest("Entering method tradeProposition");
-        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
-        String goldKey = "tradeGold#" + goods.getType().getIndex() + "#" + goods.getAmount()
-            + "#" + settlement.getId();
-        String hagglingKey = "tradeHaggling#" + unit.getId();
-        
-        Integer registered = sessionRegister.get(goldKey);
-        if (registered == null) {
-            int price = settlement.getPriceToSell(goods)
-                + getPlayer().getTension(unit.getOwner()).getValue();
-            sessionRegister.put(goldKey, new Integer(price));
-            return price;
-        } else {
-            int price = registered.intValue();
-            if (price < 0 || price == gold) {
-                return price;
-            } else if (gold < (price * 9) / 10) {
-                logger.warning("Cheating attempt: sending a offer too low");
-                sessionRegister.put(goldKey, new Integer(-1));
-                return NetworkConstants.NO_TRADE;
-            } else {
-                int haggling = 1;
-                if (sessionRegister.containsKey(hagglingKey)) {
-                    haggling = sessionRegister.get(hagglingKey).intValue();
-                }
-                if (getRandom().nextInt(3 + haggling) <= 3) {
-                    sessionRegister.put(goldKey, new Integer(gold));
-                    sessionRegister.put(hagglingKey, new Integer(haggling + 1));
-                    return gold;
-                } else {
-                    sessionRegister.put(goldKey, new Integer(-1));
-                    return NetworkConstants.NO_TRADE;
-                }
-            }
-        }
-    }
     /**
      * Returns the treasure train carrying the largest treasure
      * located on the given <code>Tile</code>.
