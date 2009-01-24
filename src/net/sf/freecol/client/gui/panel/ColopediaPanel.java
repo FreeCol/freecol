@@ -27,6 +27,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -63,6 +64,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -428,8 +430,22 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildFathersSubtree(DefaultMutableTreeNode parent) {
+        EnumMap<FoundingFatherType, List<FoundingFather>> fathersByType =
+            new EnumMap<FoundingFatherType, List<FoundingFather>>(FoundingFatherType.class);
+        for (FoundingFatherType fatherType : FoundingFatherType.values()) {
+            fathersByType.put(fatherType, new ArrayList<FoundingFather>());
+        }
         for (FoundingFather foundingFather : Specification.getSpecification().getFoundingFathers()) {
-            buildFatherItem(foundingFather, parent);
+            fathersByType.get(foundingFather.getType()).add(foundingFather);
+        }
+        for (FoundingFatherType fatherType : FoundingFatherType.values()) {
+            DefaultMutableTreeNode node = 
+                new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS,
+                                                                 FoundingFather.getTypeAsString(fatherType)));
+            parent.add(node);
+            for (FoundingFather father : fathersByType.get(fatherType)) {
+                buildFatherItem(father, node);
+            }
         }
     }
     
@@ -1033,7 +1049,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
 
         int[] widths = { 0, 3 * margin, 0 };
-        int[] heights = new int[15];
+        int[] heights = new int[17];
         for (int index = 0; index < 7; index++) {
             heights[2 * index + 1] = margin;
         }
@@ -1111,7 +1127,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         // Specialist
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.specialist")), higConst.rc(row, leftColumn));
         final UnitType unitType = Specification.getSpecification().getExpertForProducing(buildingType.getProducedGoodsType());
-        if (unitType != null) {
+        if (unitType == null) {
+            detailPanel.add(new JLabel(Messages.message("none")), higConst.rc(row, rightColumn));
+        } else {
             detailPanel.add(getUnitButton(unitType), higConst.rc(row, rightColumn, "l"));
         }
         row += 2;
@@ -1119,24 +1137,77 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         // Production - Needs & Produces
         JPanel production = new JPanel();
         production.setOpaque(false);
-        production.setLayout(new FlowLayout(FlowLayout.LEFT));
-        GoodsType inputType = buildingType.getConsumedGoodsType();
-        if (inputType != null) {
-            JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"));
-            label.setHorizontalTextPosition(SwingConstants.LEADING);
-            production.add(label);
-            production.add(getGoodsButton(inputType));
+        if (buildingType.hasAbility("model.ability.teach")) {
+            production.setLayout(new GridLayout(0, 3));
+            for (UnitType unitType2 : Specification.getSpecification().getUnitTypeList()) {
+                if (buildingType.canAdd(unitType2)) {
+                    production.add(getButton(unitType2));
+                }
+            }
+            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.teaches")),
+                            higConst.rc(row, leftColumn));
+            detailPanel.add(production, higConst.rc(row, rightColumn));
+            row += 2;
+        } else {
+            production.setLayout(new FlowLayout(FlowLayout.LEFT));
+            GoodsType inputType = buildingType.getConsumedGoodsType();
+            if (inputType != null) {
+                JLabel label = new JLabel(Messages.message("colopedia.buildings.needs"));
+                label.setHorizontalTextPosition(SwingConstants.LEADING);
+                production.add(label);
+                production.add(getGoodsButton(inputType));
+            }
+            GoodsType outputType = buildingType.getProducedGoodsType();
+            if (outputType != null) {
+                JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"));
+                label.setHorizontalTextPosition(SwingConstants.LEADING);
+                production.add(label);
+                production.add(getGoodsButton(outputType));
+            }
+            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.production")),
+                            higConst.rc(row, leftColumn));
+            detailPanel.add(production, higConst.rc(row, rightColumn));
+            row += 2;
         }
-        GoodsType outputType = buildingType.getProducedGoodsType();
-        if (outputType != null) {
-            JLabel label = new JLabel(Messages.message("colopedia.buildings.produces"));
-            label.setHorizontalTextPosition(SwingConstants.LEADING);
-            production.add(label);
-            production.add(getGoodsButton(outputType));
+
+        JPanel productionPanel = null;
+        Set<Modifier> bonusList = buildingType.getFeatureContainer().getModifiers();
+        int bonusNumber = bonusList.size();
+        if (bonusNumber > 0) {
+            int rows = bonusNumber / MODIFIERS_PER_ROW;
+            if (bonusNumber % MODIFIERS_PER_ROW != 0) {
+                rows++;
+            }
+            int pwidths[] = new int[2 * MODIFIERS_PER_ROW - 1];
+            for (int index = 1; index < pwidths.length; index += 2) {
+                pwidths[index] = 3 * margin;
+            }
+            int pheights[] = new int[2 * rows - 1];
+            for (int index = 1; index < pheights.length; index += 2) {
+                pheights[index] = margin;
+            }
+            productionPanel = new JPanel(new HIGLayout(pwidths, pheights));
+            productionPanel.setOpaque(false);
+
+            int prow = 1;
+            int pcolumn = 1;
+            for (Modifier productionBonus : bonusList) {
+                GoodsType goodsType = Specification.getSpecification().getGoodsType(productionBonus.getId());
+                String bonus = getModifierAsString(productionBonus);
+                productionPanel.add(getGoodsButton(goodsType, bonus),
+                                    higConst.rc(prow, pcolumn));
+                pcolumn += 2;
+                if (pcolumn == 11) {
+                    pcolumn = 1;
+                    prow += 2;
+                }
+            }
+
+            detailPanel.add(new JLabel(Messages.message("colopedia.unit.productionBonus")),
+                            higConst.rc(row, leftColumn));
+            detailPanel.add(productionPanel, higConst.rc(row, rightColumn));
+            row += 2;
         }
-        detailPanel.add(new JLabel(Messages.message("colopedia.buildings.production")), higConst.rc(row, leftColumn));
-        detailPanel.add(production, higConst.rc(row, rightColumn));
-        row += 2;
 
         // Upkeep
         // detailPanel.add(new
@@ -1167,7 +1238,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         detailPanel.setLayout(new FlowLayout());
 
-        JLabel name = new JLabel(father.getName(), SwingConstants.CENTER);
+        JLabel name = new JLabel(father.getName() + " (" + father.getTypeAsString() + ")", 
+                                 SwingConstants.CENTER);
         name.setFont(smallHeaderFont);
         name.setPreferredSize(new Dimension(400, 50));
         detailPanel.add(name);
