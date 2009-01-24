@@ -111,6 +111,7 @@ public final class FreeCol {
     private static boolean standAloneServer = false;
     private static boolean publicServer = true;
     private static boolean inDebugMode = false;
+    private static boolean usesExperimentalAI = false;
 
     private static int serverPort;
     private static String serverName = null;
@@ -804,6 +805,8 @@ public final class FreeCol {
                 checkIntegrity = true;
                 standAloneServer = true;
                 serverPort = DEFAULT_PORT;
+            } else if (args[i].equals("--experimentalAI")) {
+                usesExperimentalAI = true;
             } else {
                 printUsage();
                 System.exit(1);
@@ -851,6 +854,14 @@ public final class FreeCol {
         inDebugMode = debug;
     }
 
+    /**
+     * Checks if the program is in "Experimental AI mode".
+     * @return <code>true</code> if the program is in Experimental AI
+     *       mode and <code>false</code> otherwise.
+     */
+    public static boolean usesExperimentalAI() {
+        return usesExperimentalAI;
+    }
 
     /**
      * Prints the command-line usage for the server options.

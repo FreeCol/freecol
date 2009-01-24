@@ -352,6 +352,14 @@ public class Player extends FreeColGameObject implements Nameable {
         crosses = 0;
         bells = 0;
         currentFather = null;
+
+        //call of super() will lead to this object being registered with AIMain
+        //before playerType has been set. AIMain will fall back to use of
+        //standard AIPlayer in this case. Set object again to fix this.
+        //Possible TODO: Is there a better way to do this?         
+        final String curId = getId();
+        game.removeFreeColGameObject(curId);
+        game.setFreeColGameObject(curId, this);
     }
 
     /**

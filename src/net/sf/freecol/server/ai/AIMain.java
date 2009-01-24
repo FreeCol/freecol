@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -307,7 +308,17 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
         if (freeColGameObject instanceof Unit) {
             new AIUnit(this, (Unit) freeColGameObject);
         } else if (freeColGameObject instanceof ServerPlayer) {
-            new StandardAIPlayer(this, (ServerPlayer) freeColGameObject);
+            if (FreeCol.usesExperimentalAI()) {
+                ServerPlayer p = (ServerPlayer) freeColGameObject;
+                if (!p.isREF() && !p.isIndian() && p.isEuropean()) {
+                    logger.info("Using experimental ColonialAIPlayer for "+p.getName());
+                    new ColonialAIPlayer(this, p);
+                } else {
+                    new StandardAIPlayer(this, p);
+                }
+            } else {
+                new StandardAIPlayer(this, (ServerPlayer) freeColGameObject);
+            }
         } else if (freeColGameObject instanceof Colony) {
             new AIColony(this, (Colony) freeColGameObject);
         }
@@ -391,6 +402,8 @@ public class AIMain extends FreeColObject implements FreeColGameObjectListener {
                     new AIUnit(this, in);
                 } else if (tagName.equals(AIPlayer.getXMLElementTagName())) {
                     new StandardAIPlayer(this, in);
+                } else if (tagName.equals(ColonialAIPlayer.getXMLElementTagName())) {
+                    new ColonialAIPlayer(this, in);
                 } else if (tagName.equals(AIColony.getXMLElementTagName())) {
                     new AIColony(this, in);
                 } else if (tagName.equals(AIGoods.getXMLElementTagName())) {
