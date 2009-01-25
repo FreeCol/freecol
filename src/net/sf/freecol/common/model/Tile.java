@@ -85,9 +85,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /** The number of adjacent land tiles, if this is an ocean tile */
     private int landCount = 0;
 
-    /** The fish bonus of this tile, if it is an ocean tile */
-    private int fishBonus = 0;
-
     /**
      * Indicates which colony or Indian settlement that owns this tile ('null'
      * indicates no owner). A colony owns the tile it is located on, and every
@@ -880,21 +877,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Return the fish bonus of this tile. The fish bonus is zero if
-     * this is a land tile. Otherwise it depends on the number of
-     * adjacent land tiles and the rivers on these tiles (if any).
-     * 
-     * @return an <code>int</code> value
-     */
-    public int getFishBonus() {
-        return fishBonus;
-    }
-
-    public void setFishBonus(int fishBonus) {
-        this.fishBonus = fishBonus;
-    }
-
-    /**
      * Puts a <code>Settlement</code> on this <code>Tile</code>. A
      * <code>Tile</code> can only have one <code>Settlement</code> located
      * on it. The <code>Settlement</code> will also become the owner of this
@@ -1277,7 +1259,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         goods.
      */
     public int potential(GoodsType goodsType, UnitType unitType) {
-        return getTileTypePotential(getType(), goodsType, getTileItemContainer(), unitType, getFishBonus());
+        return getTileTypePotential(getType(), goodsType, getTileItemContainer(), unitType);
     }
 
     /**
@@ -1311,9 +1293,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         for (TileType tileType : tileTypes) {
             float potential = tileType.getProductionOf(goodsType, unitType);
-            if (tileType.isWater() && goodsType.isFoodType()) {
-                potential += fishBonus;
-            }
             if (tileType == getType() && hasResource()) {
                 potential = tileItemContainer.getResourceBonusPotential(goodsType, unitType, (int) potential);
             }
@@ -1392,31 +1371,25 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *            The <code>TileItemContainer</code> with any TileItems to
      *            give bonuses.
      * @param unitType an <code>UnitType</code> value
-     * @param fishBonus
      *            The Bonus Fish to be considered if valid
      * @return The amount of goods.
      */
     public static int getTileTypePotential(TileType tileType, GoodsType goodsType, 
-                                           TileItemContainer tiContainer, UnitType unitType, int fishBonus) {
+                                           TileItemContainer tiContainer, UnitType unitType) {
         if (tileType == null || goodsType == null || !goodsType.isFarmed()) {
             return 0;
         }
         // Get tile potential + bonus if any
         int potential = tileType.getProductionOf(goodsType, unitType);
-        if (potential > 0) {
-            if (tileType.isWater() && goodsType.isFoodType()) {
-                potential += fishBonus;
-            }
-            if (tiContainer != null) {
-                potential = tiContainer.getTotalBonusPotential(goodsType, unitType, potential);
-            }
+        if (potential > 0 && tiContainer != null) {
+            potential = tiContainer.getTotalBonusPotential(goodsType, unitType, potential);
         }
         return potential;
     }
 
     /**
      * Sorts GoodsTypes according to potential based on TileType,
-     * TileItemContainer and FishBonus if any.
+     * TileItemContainer if any.
      *
      * @return The sorted GoodsTypes.
      */
@@ -1481,8 +1454,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             Resource resource = tileItemContainer.getResource();
             // Potential of this Tile and Improvements
             // TODO: review
-            int potential = getTileTypePotential(getType(), goodsType, tileItemContainer,
-                                                 unitType, getFishBonus())
+            int potential = getTileTypePotential(getType(), goodsType, tileItemContainer, unitType)
                 + tileItemContainer.getImprovementBonusPotential(goodsType);
             if (resource.useQuantity(goodsType, unitType, potential) == 0) {
                 addModelMessage(settlement, ModelMessage.MessageType.WARNING,
@@ -1556,10 +1528,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         writeAttribute(out, "type", getType());
         writeAttribute(out, "region", getRegion());
-
-        if (fishBonus != 0) {
-            out.writeAttribute("fishBonus", Integer.toString(fishBonus));
-        }
 
         boolean lostCity = (pet == null) ? lostCityRumour : pet.hasLostCityRumour();
         if (lostCity) {
@@ -1703,7 +1671,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         connected = getAttribute(in, "connected", false);
         owner = getFreeColGameObject(in, "owner", Player.class, null);
         region = getFreeColGameObject(in, "region", Region.class, null);
-        fishBonus = getAttribute(in, "fishBonus", 0);
 
         final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
         if (owningSettlementStr != null) {
