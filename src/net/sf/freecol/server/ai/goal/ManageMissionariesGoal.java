@@ -22,6 +22,8 @@ package net.sf.freecol.server.ai.goal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -32,6 +34,11 @@ import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit.Role;
 
 /**
@@ -49,6 +56,7 @@ import net.sf.freecol.common.model.Unit.Role;
  * will be created, and the unit be moved there.   
  */       
 public class ManageMissionariesGoal extends Goal {
+    private static final Logger logger = Logger.getLogger(ManageMissionariesGoal.class.getName());
 
     //Since all our subgoals are the same, we're keeping them on a simple list
     private List<Goal> subGoalList;
@@ -111,16 +119,20 @@ public class ManageMissionariesGoal extends Goal {
             uit.remove();
             
             if (u.getUnit().getRole() == Role.MISSIONARY) {
-                //TODO:Find best indian settlement to send this missionary to
-                IndianSettlement i = null;
-                CreateMissionAtSettlementGoal g = new CreateMissionAtSettlementGoal(player,this,1,u,i);
-                g.addUnit(u);
+                IndianSettlement i = findSettlement(u.getUnit().getTile());
+                if (i != null) {
+                    PathNode pathNode = u.getUnit().findPath(i.getTile());
+                    if (pathNode != null) {
+                        CreateMissionAtSettlementGoal g = new CreateMissionAtSettlementGoal(player,this,1,u,i);
+                        subGoalList.add(g);
+                    }
+                }
             } else {
                 //TODO: Uncomment after this method has been added to AIPlayer
                 //player.addUnit(u);
             }
         }
-        
+
         if (availableUnitsList.size()==0 && subGoalList.size()==0) {
             //we don't have any units to deal with, and no active subgoals
             //signal that we may safely be cancelled now
@@ -142,5 +154,34 @@ public class ManageMissionariesGoal extends Goal {
     
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         //TODO
+    }
+
+
+/* INTERNAL *******************************************************************/
+
+
+    private IndianSettlement findSettlement(Tile t) {
+        if (t==null) {
+            //TODO: We're in europe - let's deal with it.
+            return null;
+        } else {
+            //Possible TODO: Slightly randomize findings?
+            //Otherwise, missionaries starting from the same position will find
+            //the same settlement.
+            final int MAX_SETTLEMENT_DISTANCE = 10;
+            Iterator<Position> i = player.getGame().getMap().getCircleIterator(t.getPosition(), true, MAX_SETTLEMENT_DISTANCE);
+            while (i.hasNext()) {
+                Position pos = i.next();
+                Settlement s = player.getGame().getMap().getTile(pos).getSettlement();
+                if (s instanceof IndianSettlement &&
+                    (((IndianSettlement)s).getMissionary()==null ||
+                    ((IndianSettlement)s).getMissionary().getOwner()!=player.getPlayer())) {
+                        //TODO: Check if this settlement is reachable
+                        return (IndianSettlement)s;
+                }
+            }
+        //TODO: We didn't find a settlement in range - what now?
+        }
+        return null;
     }
 }

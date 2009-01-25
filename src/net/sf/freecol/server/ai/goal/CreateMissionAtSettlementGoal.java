@@ -19,9 +19,12 @@
 
 package net.sf.freecol.server.ai.goal;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -31,8 +34,14 @@ import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
+
+import org.w3c.dom.Element;
 
 /**
  * This {@link Goal} deals with one missionary unit.
@@ -46,12 +55,13 @@ import net.sf.freecol.common.model.Unit.Role;
  * Excess units will be given back to the parent, or the {@link AIPlayer} directly. 
  */
 public class CreateMissionAtSettlementGoal extends Goal {
+    private static final Logger logger = Logger.getLogger(CreateMissionAtSettlementGoal.class.getName());
 
     //the settlement to build a mission at
     private IndianSettlement target;
     
     //our only possible subgoal, a GoToAdjacentGoal
-    private Goal gotoSubGoal;
+    private GotoAdjacentGoal gotoSubGoal;
 
     public CreateMissionAtSettlementGoal(AIPlayer p, Goal g, float w, AIUnit u, IndianSettlement i) {
         super(p,g,w,u);
@@ -134,12 +144,29 @@ public class CreateMissionAtSettlementGoal extends Goal {
                     if (!hasFoundMissionary) {
                         hasFoundMissionary = true;
                         if (u.getUnit().getTile().isAdjacent(target.getTile())) {
-                            //TODO: Missionary is adjacent.
-                            //Use it to finish the goal.
+                            //Missionary is adjacent, use it to finish the goal.
+                            if (((IndianSettlement)target).getMissionary()==null ||
+                                ((IndianSettlement)target).getMissionary().getOwner()!=player.getPlayer()) {
+                                PathNode pathNode = u.getUnit().findPath(target.getTile());
+                                Direction d = pathNode.getDirection();
+                                u.getUnit().setMovesLeft(0);
+                                                        
+                                Element establishMsg = Message.createNewRootElement("missionaryAtSettlement");
+                                establishMsg.setAttribute("unit", u.getUnit().getId());
+                                establishMsg.setAttribute("direction", d.toString());
+                                establishMsg.setAttribute("action", "establish");
+
+                                try {
+                                    player.getConnection().sendAndWait(establishMsg);
+                                } catch (IOException e) {
+                                    logger.warning("Could not send \"move\"-message!");
+                                }
+                            }
                             isFinished = true;
                         } else {
-                            //TODO: Missionary is not adjacent to target,
+                            //Missionary is not adjacent to target,
                             //use it to create a GoToAdjacentGoal
+                            gotoSubGoal = new GotoAdjacentGoal(player,this,1,u,target.getTile());
                         }
                     } else {
                         //We already have one missionary at work, so we send all

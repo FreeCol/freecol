@@ -26,6 +26,8 @@ package net.sf.freecol.server.ai.goal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -56,6 +58,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * also be used to assist the human player (i.e. GoTo, Scouting, Trade, Piracy).
  */
 public abstract class Goal extends AIObject {
+    private static final Logger logger = Logger.getLogger(Goal.class.getName());
 
     private float relativeWeight;
     private int turnCreated;
@@ -121,11 +124,12 @@ public abstract class Goal extends AIObject {
      * @return A list of all {@link AIUnit} being freed up by this action          
      */
     public List<AIUnit> cancelGoal() {
+        logger.finest("Entering method cancelGoal()");
         List<AIUnit> cancelledUnitsList = new ArrayList<AIUnit>();
         
         //get units from subgoals
         Iterator<Goal> git = getSubGoalIterator();
-        while (git.hasNext()) {
+        while (git!=null && git.hasNext()) {
             Goal g = git.next();
             List<AIUnit> ulist = g.cancelGoal();
             cancelledUnitsList.addAll(ulist);
@@ -145,12 +149,13 @@ public abstract class Goal extends AIObject {
      * then calls its own planning method.
      */              
     public void doPlanning() {
+        logger.finest("Entering method doPlanning()");
         boolean subgoalsPlanned = false;
         
         normalizeSubGoalWeights();
         
         Iterator<Goal> git = getSubGoalIterator();
-        while (git.hasNext()) {
+        while (git!=null && git.hasNext()) {
             Goal g = git.next();
             if (g.needsPlanning()) {
                 g.doPlanning();
@@ -171,11 +176,12 @@ public abstract class Goal extends AIObject {
      * @return true if this Goal or at least one subgoal needs planning, false otherwise
      */
     public boolean needsPlanning() {
+        logger.finest("Entering method needsPlanning()");
         if (needsPlanning) {
             return true;
         } else {
             Iterator<Goal> git = getSubGoalIterator();
-            while (git.hasNext()) {
+            while (git!=null && git.hasNext()) {
                 Goal g = git.next();
                 if (g.needsPlanning()) {
                     return true;
@@ -194,10 +200,11 @@ public abstract class Goal extends AIObject {
      * @param p Boolean determining whether to set needsPlanning =true or =false
      */
     public void setNeedsPlanningRecursive(boolean p) {
+        logger.finest("Entering method setNeedsPlanningRecursive()");
         needsPlanning = p;
         
         Iterator<Goal> git = getSubGoalIterator();
-        while (git.hasNext()) {
+        while (git!=null && git.hasNext()) {
             Goal g = git.next();
             g.setNeedsPlanningRecursive(p);
         }
@@ -263,7 +270,7 @@ public abstract class Goal extends AIObject {
         float sumWeights = 0f;
         
         Iterator<Goal> git = getSubGoalIterator();
-        while (git.hasNext()) {
+        while (git!=null && git.hasNext()) {
             Goal g = git.next();
             sumWeights += g.getWeight();
         }
@@ -271,7 +278,7 @@ public abstract class Goal extends AIObject {
         //allow for a small rounding or other error margin before normalizing
         if (sumWeights>0f && (sumWeights<0.95f || sumWeights>1.05f)) {
             git = getSubGoalIterator();
-            while (git.hasNext()) {
+            while (git!=null && git.hasNext()) {
                 Goal g = git.next();
                 g.setWeight(g.getWeight()/sumWeights);
             }
@@ -317,6 +324,7 @@ public abstract class Goal extends AIObject {
      * @param u The {@link AIUnit} being added to this goal
      */
     public void addUnit(AIUnit u) {
+        logger.finest("Entering method addUnit() with unit: "+u.getId());
         turnLastUnitAdded = getGame().getTurn().getNumber();
         availableUnitsList.add(u);
         needsPlanning = true; //adding a unit to the Goal means it might need planning
@@ -331,6 +339,7 @@ public abstract class Goal extends AIObject {
      * @param u The {@link AIUnit} to be added to the parent     
      */                   
     protected void addUnitToParent(AIUnit u) {
+        logger.finest("Entering method addUnitToParent() with unit: "+u.getId());
         if (parentGoal != null) {
             parentGoal.addUnit(u);
         } else {
@@ -363,7 +372,7 @@ public abstract class Goal extends AIObject {
         }
         //None found among our own units, check subgoals
         Iterator<Goal> git = getSubGoalIterator();
-        while (git.hasNext()) {
+        while (git!=null && git.hasNext()) {
             Goal g = git.next();
             if (g.canYieldUnit(ut, o)) {
                 return true;
@@ -401,7 +410,7 @@ public abstract class Goal extends AIObject {
         }
         //check subgoals
         Iterator<Goal> git = getSubGoalIterator();
-        while (git.hasNext()) {
+        while (git!=null && git.hasNext()) {
             Goal g = git.next();
             float newWeight = g.getYieldedUnitWeight(ut, o);
             if (newWeight < unitWeight) {
@@ -441,7 +450,7 @@ public abstract class Goal extends AIObject {
         }
         //check subgoals
         Iterator<Goal> git = getSubGoalIterator();
-        while (git.hasNext()) {
+        while (git!=null && git.hasNext()) {
             Goal g = git.next();
             float newWeight = g.getYieldedUnitWeight(ut, o);
             if (newWeight < unitWeight) {
