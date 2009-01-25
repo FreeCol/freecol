@@ -30,7 +30,6 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
@@ -40,6 +39,8 @@ import net.sf.freecol.common.model.Map.WholeMapIterator;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.server.model.ServerRegion;
@@ -50,6 +51,7 @@ import net.sf.freecol.common.util.RandomChoice;
  * Class for making a <code>Map</code> based upon a land map.
  */
 public class TerrainGenerator {
+
     private static final Logger logger = Logger.getLogger(TerrainGenerator.class.getName());
     
     public static final int LAND_REGIONS_SCORE_VALUE = 1000;
@@ -62,8 +64,10 @@ public class TerrainGenerator {
 
     private final Random random = new Random();
 
-    private TileType ocean = FreeCol.getSpecification().getTileType("model.tile.ocean");
-    private TileType lake = FreeCol.getSpecification().getTileType("model.tile.lake");
+    private TileType ocean = Specification.getSpecification().getTileType("model.tile.ocean");
+    private TileType lake = Specification.getSpecification().getTileType("model.tile.lake");
+    private TileImprovementType fishBonusType =
+        Specification.getSpecification().getTileImprovementType("model.improvement.fishBonus");
 
     private ArrayList<TileType> terrainTileTypes = null;
 
@@ -167,7 +171,7 @@ public class TerrainGenerator {
         WholeMapIterator iterator = map.getWholeMapIterator();
         while (iterator.hasNext()) {
             Tile tile = map.getTile(iterator.next());
-            perhapsAddBonus(tile, !importBonuses);
+            perhapsAddBonus(game, tile, !importBonuses);
         }
     }
 
@@ -188,10 +192,11 @@ public class TerrainGenerator {
      * Adds a terrain bonus with a probability determined by the
      * <code>MapGeneratorOptions</code>.
      * 
-     * @param t The Tile.
+     * @param game a <code>Game</code> value
+     * @param t a <code>Tile</code> value
      * @param generateBonus a <code>boolean</code> value
      */
-    private void perhapsAddBonus(Tile t, boolean generateBonus) {
+    private void perhapsAddBonus(Game game, Tile t, boolean generateBonus) {
         if (t.isLand()) {
             if (generateBonus && random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
                 // Create random Bonus Resource
@@ -229,7 +234,9 @@ public class TerrainGenerator {
             if (!t.hasRiver() && adjacentRiver) {
                 fishBonus += riverBonus;
             }
-            t.setFishBonus(fishBonus);
+            if (fishBonus > 0) {
+                t.add(new TileImprovement(game, t, fishBonusType));
+            }
             t.setLandCount(adjacentLand);
 
             if (t.getType().isConnected()) {
@@ -271,7 +278,7 @@ public class TerrainGenerator {
         // create the main list of TileTypes the first time, and reuse it afterwards
         if (terrainTileTypes==null) {
             terrainTileTypes = new ArrayList<TileType>();
-            for (TileType tileType : FreeCol.getSpecification().getTileTypeList()) {
+            for (TileType tileType : Specification.getSpecification().getTileTypeList()) {
                 if (tileType.getId().equals("model.tile.hills") ||
                     tileType.getId().equals("model.tile.mountains") ||
                     tileType.isWater()) {
@@ -690,7 +697,7 @@ public class TerrainGenerator {
         
         // lookup ocean TileTypes from xml specification
         TileType ocean = null, highSeas = null;
-        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+        for (TileType t : Specification.getSpecification().getTileTypeList()) {
             if (t.isWater()) {
                 if (t.hasAbility("model.ability.moveToEurope")) {
                     if (highSeas == null) {
@@ -745,7 +752,7 @@ public class TerrainGenerator {
         }
 
         TileType highSeas = null;
-        for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
+        for (TileType t : Specification.getSpecification().getTileTypeList()) {
             if (t.isWater()) {
                 if (t.hasAbility("model.ability.moveToEurope")) {
                     highSeas = t;
@@ -794,8 +801,8 @@ public class TerrainGenerator {
         logger.fine("Maximum length of mountain ranges is " + maximumLength);
         
         // lookup the resources from specification
-        TileType hills = FreeCol.getSpecification().getTileType("model.tile.hills");
-        TileType mountains = FreeCol.getSpecification().getTileType("model.tile.mountains");
+        TileType hills = Specification.getSpecification().getTileType("model.tile.hills");
+        TileType mountains = Specification.getSpecification().getTileType("model.tile.mountains");
         if (hills == null || mountains == null) {
             throw new RuntimeException("Both Hills and Mountains TileTypes must be defined");
         }
