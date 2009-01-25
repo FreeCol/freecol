@@ -2477,6 +2477,8 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
+        } else if (!freeColClient.getCanvas().showConfirmDialog("clearSpeciality.areYouSure", "yes", "no")) {
+            return;
         }
 
         Client client = freeColClient.getClient();
