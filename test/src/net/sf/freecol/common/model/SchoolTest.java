@@ -950,9 +950,9 @@ public class SchoolTest extends FreeColTestCase {
         school.newTurn();
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(expertOreMinerType, colonist.getType());
-        assertEquals(teacher.getStudent(), null);
+        assertEquals(teacher.getStudent(), indenturedServant);
         assertEquals(colonist.getTeacher(), null);
-        assertEquals(indenturedServant.getTeacher(), null);
+        assertEquals(indenturedServant.getTeacher(), teacher);
 
         // Servant training
         school.newTurn();
@@ -963,12 +963,16 @@ public class SchoolTest extends FreeColTestCase {
         school.newTurn();
         assertEquals(0, getUnitList(colony, indenturedServantType).size());
         assertEquals(freeColonistType, indenturedServant.getType());
+        assertEquals(indenturedServant, teacher.getStudent());
+        // remove servant from colony
         indenturedServant.setLocation(getGame().getMap().getTile(10,8));
 
         // Criminal training
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(0, getUnitList(colony, indenturedServantType).size());
         school.newTurn();
+        assertEquals(teacher, criminal.getTeacher());
+        assertEquals(criminal, teacher.getStudent());
         school.newTurn();
         school.newTurn();
         school.newTurn();

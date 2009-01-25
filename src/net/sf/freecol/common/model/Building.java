@@ -550,23 +550,27 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return student;
     }
 
+    private boolean assignStudent(Unit teacher) {
+        final Unit student = findStudent(teacher);
+        if (student == null) {
+            addModelMessage(getColony(), ModelMessage.MessageType.WARNING, teacher,
+                            "model.building.noStudent",
+                            "%teacher%", teacher.getName(),
+                            "%colony%", colony.getName());
+            return false;
+        } else {
+            teacher.setStudent(student);
+            student.setTeacher(teacher);
+            return true;
+        }                
+    }
 
     private void trainStudents() {
         final Iterator<Unit> teachers = getUnitIterator();
         while (teachers.hasNext()) {
             final Unit teacher = teachers.next();
-            if (teacher.getStudent() == null) {
-                final Unit student = findStudent(teacher);
-                if (student == null) {
-                    addModelMessage(getColony(), ModelMessage.MessageType.WARNING, teacher,
-                                    "model.building.noStudent",
-                                    "%teacher%", teacher.getName(),
-                                    "%colony%", colony.getName());
-                    continue;
-                } else {
-                    teacher.setStudent(student);
-                    student.setTeacher(teacher);
-                }                
+            if (teacher.getStudent() == null && !assignStudent(teacher)) {
+                continue;
             }
             final int training = teacher.getTurnsOfTraining() + 1;
             if (training < teacher.getNeededTurnsOfTraining()) {
@@ -574,6 +578,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             } else {
                 teacher.setTurnsOfTraining(0);
                 teacher.getStudent().train();
+                if (teacher.getStudent() == null) {
+                    assignStudent(teacher);
+                }
             }
         }
     }

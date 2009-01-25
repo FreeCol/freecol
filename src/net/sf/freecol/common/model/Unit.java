@@ -3286,7 +3286,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                             "%colony%", colony.getName());
         }
         this.setTurnsOfTraining(0);
-        setState(UnitState.ACTIVE);
+        //setState(UnitState.ACTIVE);
         setMovesLeft(0);
     }
 
@@ -3510,6 +3510,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (getState() == UnitState.SKIPPED) {
             setState(UnitState.ACTIVE);
         }
+
     }
 
     private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
