@@ -327,6 +327,7 @@ public abstract class Goal extends AIObject {
         logger.finest("Entering method addUnit() with unit: "+u.getId());
         turnLastUnitAdded = getGame().getTurn().getNumber();
         availableUnitsList.add(u);
+        u.setGoal(this);
         needsPlanning = true; //adding a unit to the Goal means it might need planning
         isFinished = false; //in case the goal was finished but not yet cancelled
     }
@@ -343,8 +344,9 @@ public abstract class Goal extends AIObject {
         if (parentGoal != null) {
             parentGoal.addUnit(u);
         } else {
-            //TODO: Uncomment after this method has been added to AIPlayer
-            //player.addUnit(u);
+            //Setting goal=null will make the unit appear in the unit iterator next turn.
+            //TODO: What about this turn?
+            u.setGoal(null);
         }
     }
 

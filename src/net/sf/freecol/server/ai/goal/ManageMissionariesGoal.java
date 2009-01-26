@@ -128,8 +128,9 @@ public class ManageMissionariesGoal extends Goal {
                     }
                 }
             } else {
-                //TODO: Uncomment after this method has been added to AIPlayer
-                //player.addUnit(u);
+                //Setting goal=null will make the unit appear in the unit iterator next turn.
+                //TODO: What about this turn?
+                u.setGoal(null);
             }
         }
 

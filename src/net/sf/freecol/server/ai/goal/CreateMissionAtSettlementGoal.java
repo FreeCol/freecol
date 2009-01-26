@@ -156,11 +156,17 @@ public class CreateMissionAtSettlementGoal extends Goal {
                                 establishMsg.setAttribute("direction", d.toString());
                                 establishMsg.setAttribute("action", "establish");
 
+                                //Possible TODO: Inform other players about this change.
+                                //Should be done centrally, though.
+
                                 try {
                                     player.getConnection().sendAndWait(establishMsg);
                                 } catch (IOException e) {
                                     logger.warning("Could not send \"move\"-message!");
                                 }
+                            } else {
+                                //we can't establish a mission here
+                                addUnitToParent(u);
                             }
                             isFinished = true;
                         } else {

@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.server.ai.goal.Goal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -76,6 +77,12 @@ public class AIUnit extends AIObject implements Transportable {
      * The mission this unit has been assigned.
      */
     private Mission mission;
+
+    /**
+     * The goal this AIUnit belongs to,
+     * if one has been assigned.
+     */
+    private Goal goal = null;              
 
     /**
      * The dynamic part of the transport priority.
@@ -340,6 +347,14 @@ public class AIUnit extends AIObject implements Transportable {
             logger.warning("unit == null");
             return null;
         }
+    }
+
+    public void setGoal(Goal g) {
+        goal = g;
+    }
+
+    public Goal getGoal() {
+        return goal;
     }
 
     /**

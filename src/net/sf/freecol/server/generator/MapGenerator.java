@@ -804,6 +804,12 @@ public class MapGenerator implements IMapGenerator {
                     Goods cigards = new Goods(map.getGame(), unit14, cigarsType, 5);
                     unit14.add(cigards);
 
+                    unitType = FreeCol.getSpecification().getUnitType("model.unit.jesuitMissionary");
+                    @SuppressWarnings("unused") Unit unit15 = new Unit(map.getGame(), colonyTile, player,
+                                                                       unitType, UnitState.ACTIVE);
+                    @SuppressWarnings("unused") Unit unit16 = new Unit(map.getGame(), colonyTile, player,
+                                                                       unitType, UnitState.ACTIVE);
+
                     /* DEBUGGING LINES FOR AI (0.4.1):
                     for (int j=0; j<10; j++) {
                         Unit u = new Unit(game, null, player, Unit.FREE_COLONIST, Unit.ACTIVE);

@@ -76,6 +76,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
@@ -83,6 +84,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.server.ai.goal.ManageMissionariesGoal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
@@ -117,6 +119,14 @@ public class ColonialAIPlayer extends AIPlayer {
 
     /** The strategy of this player. */
     private AIStrategy strategy = AIStrategy.NONE;
+
+    /** Used in temporary override of AIUnit iterator methods */
+    private ArrayList<AIUnit> myAIUnits = new ArrayList<AIUnit>();
+
+    /**
+     * Goal to manage missionary units of this player.
+     */         
+    private ManageMissionariesGoal mGoal = new ManageMissionariesGoal((AIPlayer)this, null, 1.0f);
 
     /**
      * Creates a new <code>AIPlayer</code>.
@@ -175,8 +185,21 @@ public class ColonialAIPlayer extends AIPlayer {
         
         // TODO: find some intelligent solution to set a proper strategy!
         this.strategy = AIStrategy.TRADE;
-        
+
+        //reset unit iterator to all units without current goal         
         clearAIUnits();
+
+        //add goals for missionaries (this will remove them from the iterator)
+        manageMissionaries();
+        mGoal.setNeedsPlanningRecursive(true);
+
+        boolean furtherPlanning = true;
+        while (furtherPlanning) {
+            mGoal.doPlanning();
+            furtherPlanning = mGoal.needsPlanning();            
+        }
+        
+        //manage the remaining units as before
         cheat();
         determineStances();
         rearrangeWorkersInColonies();
@@ -195,6 +218,7 @@ public class ColonialAIPlayer extends AIPlayer {
         rearrangeWorkersInColonies();
         abortInvalidMissions();
         ensureCorrectMissions();
+        
         clearAIUnits();
     }
 
@@ -1425,6 +1449,60 @@ public class ColonialAIPlayer extends AIPlayer {
         }
 
         return bestTreasureTrain;
+    }
+
+    private void manageMissionaries() {
+        Iterator<AIUnit> it = getAIUnitIterator();
+        while (it.hasNext()) {
+            AIUnit au = it.next();
+            Unit u = au.getUnit();
+            
+            if (u.getRole()==Role.MISSIONARY) {
+                logger.info("Found missionary unit:"+u.getId());
+                mGoal.addUnit(au);
+                //NOTE: Removes units being assigned a goal from the units list
+                it.remove(); 
+            }
+        }
+    }
+
+    /**
+     * Returns an iterator over all <code>AIUnit</code>s owned by this
+     * player, which currently do _not_ have a goal.
+     * 
+     * This is a temporary override to allow the old AI code to keep working
+     * with some units, while exempting those already managed by new code.
+     * 
+     * @return The <code>Iterator</code>.
+     */
+    protected Iterator<AIUnit> getAIUnitIterator() {
+        logger.info("Override: getAIUnitIterator()!");
+        if (myAIUnits.size() == 0) {
+            ArrayList<AIUnit> au = new ArrayList<AIUnit>();
+            Iterator<Unit> unitsIterator = getPlayer().getUnitIterator();
+            while (unitsIterator.hasNext()) {
+                Unit theUnit = unitsIterator.next();
+                AIUnit a = (AIUnit) getAIMain().getAIObject(theUnit.getId());
+                if (a != null && a.getGoal()==null) {
+                    //NOTE: Only adds units that currently don't have a goal.
+                    au.add(a);
+                } else {
+                    logger.warning("Could not find the AIUnit for: " + theUnit + " (" + theUnit.getId() + ") - "
+                            + (getGame().getFreeColGameObject(theUnit.getId()) != null));
+                }
+            }
+            myAIUnits = au;
+        }
+        return myAIUnits.iterator();
+    }
+
+    /**
+     * Helper method to let implementing subclasses clear aiUnits.
+     * Override, see above!     
+     */         
+    protected void clearAIUnits() {
+        logger.info("Override: clearAIUnits()!");
+        myAIUnits.clear();    
     }
 
 }
