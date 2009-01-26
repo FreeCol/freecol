@@ -1913,8 +1913,8 @@
         <rangeValue label="small" value="15"/>
         <rangeValue label="medium" value="25"/>
         <rangeValue label="large" value="30"/>
-        <rangeValue label="veryLarge" value="40"/>
-        <rangeValue label="huge" value="50"/>
+        <rangeValue label="veryLarge" value="35"/>
+        <rangeValue label="huge" value="40"/>
       </rangeOption>
       <!-- Option for setting the type of land generator to be used -->
       <rangeOption id="model.option.landGeneratorType" defaultValue="0" localizedLabels="true">
