@@ -201,7 +201,9 @@ public class StandardAIPlayer extends AIPlayer {
         sessionRegister.clear();
         clearAIUnits();
         if (getPlayer().isREF()) {
-            checkForREFDefeat();
+            if(checkForREFDefeat()){
+                return;
+            }
             if (!isWorkForREF()) {
                 return;
             }

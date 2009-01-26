@@ -1177,7 +1177,7 @@ public final class FreeColServer {
      */
     public boolean newHighScore(Player player) {
         getHighScores();
-        if (!highScores.isEmpty() && player.getScore() < highScores.get(highScores.size() - 1).getScore()) {
+        if (!highScores.isEmpty() && player.getScore() <= highScores.get(highScores.size() - 1).getScore()) {
             return false;
         } else {
             highScores.add(new HighScore(player, new Date()));

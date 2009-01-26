@@ -977,10 +977,6 @@ public final class InGameInputHandler extends InputHandler {
     private Element giveIndependence(Element element) {
         Player player = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
         player.giveIndependence();
-        if (getFreeColClient().retire()) {
-            getFreeColClient().getCanvas().showReportPanel(ReportHighScoresPanel.class.getName());
-        }
-
         return null;
     }
 

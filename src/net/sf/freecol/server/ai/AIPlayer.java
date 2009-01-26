@@ -318,10 +318,10 @@ public abstract class AIPlayer extends AIObject {
      * TODO: "REF defeat" is a gameplay decision, not a decision an AI
      * should make for itself. Move this to another class (Player?).               
      */
-    protected void checkForREFDefeat() {
+    protected boolean checkForREFDefeat() {
         logger.finest("Entering method checkForREFDefeat");
         if (!getPlayer().isREF()) {
-            return;
+        	throw new IllegalStateException("Checking for REF player defeat when player not REF.");
         }
         
         List<Player> dominions = getPlayer().getDominionsAtWar();
@@ -329,15 +329,15 @@ public abstract class AIPlayer extends AIObject {
         // Return if independence should not be granted:
         
         if (dominions.isEmpty()) {
-            return;
+            return false;
         }
         
         if (!getPlayer().getSettlements().isEmpty()) {
-            return;
+            return false;
         }
         
         if (getPlayer().hasManOfWar() && getPlayer().getNumberOfKingLandUnits() > 6) {
-            return;
+            return false;
         }
         
         for (Player p : dominions) {
@@ -345,6 +345,7 @@ public abstract class AIPlayer extends AIObject {
             giveIndependenceElement.setAttribute("player", p.getId());
             sendAndWaitSafely(giveIndependenceElement);
         }
+        return true;
     }
 
 
@@ -361,7 +362,7 @@ public abstract class AIPlayer extends AIObject {
      * 
      * NOTE: For the moment, any implementation of this _must_ make sure
      * to call checkForREFDefeat() at the start of a turn,
-     * iff the player this AI works for isREF(). See TODO at that method.
+     * if the player this AI works for isREF(). See TODO at that method.
      */
     public abstract void startWorking();
 
