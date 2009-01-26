@@ -2477,8 +2477,17 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
-        } else if (!freeColClient.getCanvas().showConfirmDialog("clearSpeciality.areYouSure", "yes", "no")) {
-            return;
+        } else {
+            UnitType newUnit = unit.getType().getDowngrade(UnitType.DowngradeType.CLEAR_SKILL);
+            if (newUnit == null) {
+                freeColClient.getCanvas().showInformationMessage("clearSpeciality.impossible",
+                                                                 "%unit%", unit.getName());
+                return;
+            } else if (!freeColClient.getCanvas().showConfirmDialog("clearSpeciality.areYouSure", "yes", "no",
+                                                                    "%oldUnit%", unit.getName(),
+                                                                    "%unit%", newUnit.getName())) {
+                return;
+            }
         }
 
         Client client = freeColClient.getClient();
