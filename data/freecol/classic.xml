@@ -518,11 +518,17 @@
       <change from="model.tile.scrubForest"     to="model.tile.desert"/>
       <change from="model.tile.borealForest"    to="model.tile.tundra"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.fishBonus" natural="true" add-work-turns="0" magnitude="1">
+    <tileimprovement-type id="model.improvement.fishBonusLand" natural="true">
       <tile id="model.tile.ocean" value="true"/>
       <tile id="model.tile.lake" value="true"/>
       <tile id="model.tile.greatRiver" value="true"/>
       <modifier id="model.goods.fish" type="additive" value="2"/>
+    </tileimprovement-type>
+    <tileimprovement-type id="model.improvement.fishBonusRiver" natural="true">
+      <tile id="model.tile.ocean" value="true"/>
+      <tile id="model.tile.lake" value="true"/>
+      <tile id="model.tile.greatRiver" value="true"/>
+      <modifier id="model.goods.fish" type="additive" value="1"/>
     </tileimprovement-type>
   </tileimprovement-types>
 

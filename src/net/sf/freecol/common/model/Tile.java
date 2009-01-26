@@ -82,8 +82,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     private List<Unit> units = Collections.emptyList();
 
-    /** The number of adjacent land tiles, if this is an ocean tile */
-    private int landCount = 0;
 
     /**
      * Indicates which colony or Indian settlement that owns this tile ('null'
@@ -864,16 +862,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Return the number of land tiles adjacent to this one.
-     * 
-     * @return an <code>int</code> value
+     * Returns true if this tile has at least one adjacent land tile.
+     *
+     * @return a <code>boolean</code> value
      */
-    public int getLandCount() {
-        return landCount;
-    }
-
-    public void setLandCount(int landCount) {
-        this.landCount = landCount;
+    public boolean isCoast() {
+        for (Direction direction : Direction.values()) {
+            Tile otherTile = getMap().getNeighbourOrNull(direction, this);
+            if (otherTile != null && otherTile.isLand()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

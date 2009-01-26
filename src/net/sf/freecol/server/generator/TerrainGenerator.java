@@ -66,8 +66,10 @@ public class TerrainGenerator {
 
     private TileType ocean = Specification.getSpecification().getTileType("model.tile.ocean");
     private TileType lake = Specification.getSpecification().getTileType("model.tile.lake");
-    private TileImprovementType fishBonusType =
-        Specification.getSpecification().getTileImprovementType("model.improvement.fishBonus");
+    private TileImprovementType fishBonusLandType =
+        Specification.getSpecification().getTileImprovementType("model.improvement.fishBonusLand");
+    private TileImprovementType fishBonusRiverType =
+        Specification.getSpecification().getTileImprovementType("model.improvement.fishBonusRiver");
 
     private ArrayList<TileType> terrainTileTypes = null;
 
@@ -213,10 +215,6 @@ public class TerrainGenerator {
                     adjacentLand++;
                     if (otherTile.hasRiver()) {
                         adjacentRiver = true;
-                        //note: this is not river magnitude, but tileimprovement-type
-                        //magnitude, as given in the specification!
-                        //Should be =1 in Col1-compatible ruleset.
-                        riverBonus = Math.max(riverBonus, otherTile.getRiver().getMagnitude());
                     }
                 }
             }
@@ -224,7 +222,7 @@ public class TerrainGenerator {
             //In Col1, ocean tiles with less than 3 land neighbours produce 2 fish,
             //all others produce 4 fish
             if (adjacentLand > 2) {
-                fishBonus += 2;
+                t.add(new TileImprovement(game, t, fishBonusLandType));
             }
                 
             //In Col1, the ocean tile in front of a river mouth would
@@ -232,12 +230,8 @@ public class TerrainGenerator {
             //TODO: This probably has some false positives, means river tiles
             //that are NOT a river mouth next to this tile!
             if (!t.hasRiver() && adjacentRiver) {
-                fishBonus += riverBonus;
+                t.add(new TileImprovement(game, t, fishBonusRiverType));
             }
-            if (fishBonus > 0) {
-                t.add(new TileImprovement(game, t, fishBonusType));
-            }
-            t.setLandCount(adjacentLand);
 
             if (t.getType().isConnected()) {
                 if (generateBonus && adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
