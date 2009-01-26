@@ -138,28 +138,28 @@ public final class UnitMoveAnimation extends Animation {
         //Setting new location
         unitLabel.setLocation(currentPoint);
     }
-
+    
     @Override
     public void animate() {
-        logger.finest("Removing the unit temporarily from its Location and painting screen.");
-        unit.setLocationNoUpdate(null);
-        if (currentLocation instanceof Tile)
-            ((Tile) currentLocation).removeUnitNoUpdate(unit);
-        
-        // Painting the whole screen once to get rid of disposed dialog-boxes.
-        canvas.paintImmediately(canvas.getBounds());
-        try {
-            super.animate();
-        } 
-        finally { // If there are any exceptions during animate() I don't want my unit to just vanish.
-            logger.finest("Adding the unit back to its Tile and removing the label component.");
-            
-            unit.setLocationNoUpdate(currentLocation);
-            if (currentLocation instanceof Tile)
-                ((Tile) currentLocation).addUnitNoUpdate(unit);
-            
-            canvas.remove(unitLabel, false);
-        }
+        final UnitMoveAnimation self = this;
+        canvas.getGUI().executeWithUnitOutForAnimation(unit, new Runnable() {
+            public void run() {
+                // Painting the whole screen once to get rid of disposed dialog-boxes.
+                canvas.paintImmediately(canvas.getBounds());
+                try {
+                    self.animateFromSuper();
+                } finally {
+                    canvas.remove(unitLabel, false);
+                }                
+            }
+        });
+    }
+    
+    /**
+     * Temporary hack to call super's animate.
+     */
+    protected void animateFromSuper() {
+        super.animate();
     }
     
     protected int distance(Point p1, Point p2) {

@@ -39,6 +39,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -174,6 +175,8 @@ public final class GUI {
     private JLabel coatOfArms;
     private JLabel greyLayer;
     private JLabel waitingForMsg;
+    
+    private java.util.Map<Unit, Integer> unitsOutForAnimation; 
 
     /**
     * The constructor to use.
@@ -187,6 +190,8 @@ public final class GUI {
         this.size = size;
 
         setImageLibrary(lib);
+        
+        unitsOutForAnimation = new HashMap<Unit, Integer>();
 
         inGame = false;
         logger.info("GUI created.");
@@ -207,6 +212,48 @@ public final class GUI {
         tileHeight = lib.getTerrainImageHeight(tileType);
         tileWidth = lib.getTerrainImageWidth(tileType);
         updateMapDisplayVariables();
+    }
+    
+    private boolean isOutForAnimation(final Unit unit) {
+        return unitsOutForAnimation.containsKey(unit);
+    }
+    
+    /**
+     * Run some code with the given unit made invisible.
+     * You can nest several of these method calls in order
+     * to hide multiple units. There are no problems
+     * related to nested calls with the same unit.
+     * 
+     * @param unit The unit to be hidden.
+     * @param r The code to be executed.
+     */
+    public void executeWithUnitOutForAnimation(final Unit unit, Runnable r) {
+        enterUnitOutForAnimation(unit);
+        r.run();
+        releaseUnitOutForAnimation(unit);
+    }
+    
+    private void enterUnitOutForAnimation(final Unit unit) {
+        Integer i = unitsOutForAnimation.get(unit);
+        if (i == null) {
+            i = 1;
+        } else {
+            i++;
+        }
+        unitsOutForAnimation.put(unit, i);
+    }
+    
+    private void releaseUnitOutForAnimation(final Unit unit) {
+        Integer i = unitsOutForAnimation.get(unit);
+        if (i == null) {
+            throw new IllegalStateException("Tried to release unit that was not out for animation"); 
+        }
+        if (i == 1) {
+            unitsOutForAnimation.remove(unit);
+        } else {
+            i--;
+            unitsOutForAnimation.put(unit, i); 
+        }
     }
 
     private void updateMapDisplayVariables() {
@@ -1085,7 +1132,7 @@ public final class GUI {
                 // Display any units on that Tile:
 
                 Unit unitInFront = getUnitInFront(map.getTile(tileX, tileY));
-                if (unitInFront != null) {
+                if (unitInFront != null && !isOutForAnimation(unitInFront)) {
                     displayUnit(g, unitInFront, xx, yy);
                         
                     if (unitInFront.isUndead()) {
