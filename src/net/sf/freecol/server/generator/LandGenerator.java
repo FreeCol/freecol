@@ -109,7 +109,7 @@ public class LandGenerator {
         minLandMass = mapGeneratorOptions.getLandMass();
         minimumNumberOfTiles = mapGeneratorOptions.getLand();
         genType = mapGeneratorOptions.getLandGeneratorType();
-        
+
         //set other internal values        
         map = new boolean[width][height];
         numberOfLandTiles = 0;
@@ -160,9 +160,19 @@ public class LandGenerator {
         int y;
 
         while (numberOfLandTiles < minimumNumberOfTiles) {
+            int failCounter=0;
             do {
                 x=(random.nextInt(width-preferredDistanceToEdge*4)) + preferredDistanceToEdge*2;
                 y=(random.nextInt(height-preferredDistanceToEdge*4)) + preferredDistanceToEdge*2;
+                failCounter++;
+                //if landmass% is set to high, this loop may fail to find a free tile.
+                //decrease necessary minimum over time, so that this process
+                //will eventually come to an end.
+                if (failCounter>100) {
+                    failCounter=0;
+                    minimumNumberOfTiles--;
+                    break;
+                }
             } while (map[x][y]);
 
             setLand(x,y);
