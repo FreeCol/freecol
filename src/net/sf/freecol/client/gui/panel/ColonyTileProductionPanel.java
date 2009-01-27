@@ -19,15 +19,19 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Font;
+import java.awt.image.BufferedImage;
 
 import java.util.Set;
 
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -38,8 +42,10 @@ import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Scope;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 public class ColonyTileProductionPanel extends FreeColPanel implements ActionListener {
 
@@ -62,38 +68,23 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
             modifiers.add(colony.getProductionModifier(goodsType));
         }
 
-        int numberOfModifiers = modifiers.size();
-        int extraRows = 4; // title, icon, result, buttons
-        int numberOfRows = 2 * (numberOfModifiers + extraRows) - 1;
-
-        int[] widths = {0, 20, 0, 0};
-        int[] heights = new int[numberOfRows];
-        int labelColumn = 1;
-        int valueColumn = 3;
-        int percentageColumn = 4;
-
-        for (int index = 1; index < numberOfRows; index += 2) {
-            heights[index] = margin;
-        }
+        setLayout(new MigLayout("wrap 3, insets 30 30 10 30", "[]30:push[right][]", ""));
 
         okButton.setActionCommand("ok");
         okButton.addActionListener(this);
-        //okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         enterPressesWhenFocused(okButton);
 
-        setLayout(new HIGLayout(widths, heights));
+        add(new JLabel(colonyTile.getLabel()), "span, align center, wrap 30");
 
-        int row = 1;
+        TileType tileType = colonyTile.getWorkTile().getType();
+        int width = canvas.getClient().getImageLibrary().getTerrainImageWidth(tileType);
+        int height = canvas.getClient().getImageLibrary().getTerrainImageHeight(tileType);
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        canvas.getGUI().displayColonyTile((Graphics2D) image.getGraphics(), colonyTile.getWorkTile().getMap(),
+                                          colonyTile.getWorkTile(), 0, 0, colony);
+        add(new JLabel(new ImageIcon(image)));
+        add(new UnitLabel(colonyTile.getUnit(), parent, false, false), "wrap");
 
-        add(new JLabel(colonyTile.getLabel()),
-            higConst.rc(row, labelColumn));
-        row += 2;
-        // TODO: make this a single tile panel (from ColonyPanel)
-        add(new UnitLabel(colonyTile.getUnit(), parent, false, true),
-            higConst.rc(row, labelColumn));
-        add(new JLabel(parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType)),
-            higConst.rc(row, valueColumn));
-        row += 2;
         for (Modifier modifier : modifiers) {
             FreeColGameObjectType source = modifier.getSource();
             String sourceName;
@@ -109,8 +100,9 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
                     }
                 }
             }
-            add(new JLabel(sourceName), higConst.rc(row, labelColumn));
+            add(new JLabel(sourceName), "newline");
             String bonus = getModifierFormat().format(modifier.getValue());
+            boolean percentage = false;
             switch(modifier.getType()) {
             case ADDITIVE:
                 if (modifier.getValue() > 0) {
@@ -121,32 +113,36 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
                 if (modifier.getValue() > 0) {
                     bonus = "+" + bonus;
                 }
-                add(new JLabel("%"), higConst.rc(row, percentageColumn));
+                percentage = true;
                 break;
             case MULTIPLICATIVE:
                 bonus = "\u00D7" + bonus;
                 break;
             default:
             }                
-            add(new JLabel(bonus), higConst.rc(row, valueColumn, "r"));
-            row += 2;
+            add(new JLabel(bonus));
+            if (percentage) {
+                add(new JLabel("%"));
+            }
         }
 
-        Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
+        Font bigFont = getFont().deriveFont(Font.BOLD, 16);
 
-        int result = (int) FeatureContainer.applyModifierSet(0, colonyTile.getGame().getTurn(), basicModifiers) + 
-            colony.getProductionBonus();
+        int result = (int) FeatureContainer.applyModifierSet(0, colonyTile.getGame().getTurn(), basicModifiers)
+            + colony.getProductionBonus();
         JLabel finalLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
         finalLabel.setFont(bigFont);
-        add(finalLabel, higConst.rc(row, labelColumn));
+        add(finalLabel, "newline");
+
         JLabel finalResult = new JLabel(getModifierFormat().format(result));
         finalResult.setFont(bigFont);
-        add(finalResult, higConst.rc(row, valueColumn, "r"));
+        finalResult.setBorder(BorderFactory
+                              .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK),
+                                                    BorderFactory.createEmptyBorder(2, 2, 2, 2)));
+        add(finalResult, "wrap 30");
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(okButton);
-        add(buttonPanel, higConst.rcwh(heights.length, 1, widths.length, 1));
+        add(okButton, "span, align center");
+
         setSize(getPreferredSize());
 
     }
@@ -165,4 +161,7 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
         parent.remove(this);
     }
 
+
 }
+
+
