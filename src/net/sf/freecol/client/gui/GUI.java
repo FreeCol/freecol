@@ -229,8 +229,11 @@ public final class GUI {
      */
     public void executeWithUnitOutForAnimation(final Unit unit, Runnable r) {
         enterUnitOutForAnimation(unit);
-        r.run();
-        releaseUnitOutForAnimation(unit);
+        try {
+            r.run();
+        } finally {
+            releaseUnitOutForAnimation(unit);
+        }
     }
     
     private void enterUnitOutForAnimation(final Unit unit) {
