@@ -46,6 +46,7 @@ import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.server.generator.River;
 import net.sf.freecol.server.generator.RiverSection;
@@ -75,6 +76,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     
     private ButtonGroup group;
     
+    private static final TileImprovementType riverType = 
+        FreeCol.getSpecification().getTileImprovementType("model.improvement.River");
 
     /**
      * The constructor that will add the items to this panel. 
@@ -214,7 +217,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
         
         public void transform(Tile tile) {
-            if (tile.getType().canHaveRiver()) {
+            if (tile.getType().canHaveImprovement(riverType)) {
                 TileItemContainer tic = tile.getTileItemContainer();
                 if (tic == null) {
                     tic = new TileItemContainer(tile.getGame(), tile);
@@ -238,8 +241,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         if (!t.isLand() && otherRiver == null) {
                             // add a virtual river in the ocean/lake tile 
                             // just for the purpose of drawing the river mouth
-                            otherRiver = new TileImprovement(tile.getGame(), tile, FreeCol.getSpecification()
-                                                             .getTileImprovementType("model.improvement.River"));
+                            otherRiver = new TileImprovement(tile.getGame(), tile, riverType);
                             otherRiver.setMagnitude(tile.getRiver().getMagnitude());
                         }
                         if (otherRiver != null) {

@@ -66,6 +66,8 @@ public class TerrainGenerator {
 
     private TileType ocean = Specification.getSpecification().getTileType("model.tile.ocean");
     private TileType lake = Specification.getSpecification().getTileType("model.tile.lake");
+    private TileImprovementType riverType =
+        Specification.getSpecification().getTileImprovementType("model.improvement.River");
     private TileImprovementType fishBonusLandType =
         Specification.getSpecification().getTileImprovementType("model.improvement.fishBonusLand");
     private TileImprovementType fishBonusRiverType =
@@ -934,7 +936,7 @@ public class TerrainGenerator {
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
                 Position position = map.getRandomLandPosition();
-                if (!map.getTile(position).getType().canHaveRiver()) {
+                if (map.getTile(position).getType().canHaveImprovement(riverType)) {
                     continue;
                 }
                 // check the river source/spring is not too close to the ocean

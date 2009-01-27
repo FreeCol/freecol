@@ -1242,12 +1242,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Checks whether or not the specified locatable may be added to this
      * <code>Location</code>.
-     * 
-     * @param locatable The <code>Locatable</code> to test the addabillity of.
-     * @return <i>true</i>.
+     *
+     * @param locatable a <code>Locatable</code> value
+     * @return a <code>boolean</code> value
      */
     public boolean canAdd(Locatable locatable) {
-        return true;
+        if (locatable instanceof Unit) {
+            // TODO: check for land/naval units?
+            return true;
+        } else if (locatable instanceof TileImprovement) {
+            return ((TileImprovement) locatable).getType().isTileTypeAllowed(getType());
+        } else {
+            return false;
+        }
     }
 
     /**

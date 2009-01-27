@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Map.Position;
@@ -43,6 +44,9 @@ public class River {
     private static final Logger logger = Logger.getLogger(MapGenerator.class.getName());
 
     private static final TileType greatRiver = FreeCol.getSpecification().getTileType("model.tile.greatRiver");
+
+    private static final TileImprovementType riverType = 
+        FreeCol.getSpecification().getTileImprovementType("model.improvement.River");
 
     /**
      * Directions a river may flow in.
@@ -281,7 +285,7 @@ public class River {
      */
     public boolean flowFromSource(Map.Position position) {
         Tile tile = map.getTile(position);
-        if (!tile.getType().canHaveRiver()) {
+        if (!tile.getType().canHaveImprovement(riverType)) {
             // Mountains, ocean cannot have rivers
             logger.fine("Tile (" + tile.getType().getName() + ") at "
                         + position + " cannot have rivers.");
@@ -321,7 +325,7 @@ public class River {
                 continue;
             }
             // is the tile suitable for this river?
-            if (!nextTile.getType().canHaveRiver()) {
+            if (!nextTile.getType().canHaveImprovement(riverType)) {
                 // Mountains, ocean cannot have rivers
                 logger.fine("Tile (" + nextTile.getType().getName() + ") at "
                             + newPosition + " cannot have rivers.");

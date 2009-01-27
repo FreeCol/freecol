@@ -42,7 +42,6 @@ public final class TileType extends FreeColGameObjectType {
     private boolean forest;
     private boolean water;
     private boolean canSettle;
-    private boolean canHaveRiver;
 
     private int basicMoveCost;
     private int basicWorkTurns;
@@ -116,8 +115,14 @@ public final class TileType extends FreeColGameObjectType {
         return canSettle;
     }
 
-    public boolean canHaveRiver() {
-        return canHaveRiver;
+    /**
+     * Returns true if this TileType supports the given TileImprovementType.
+     *
+     * @param improvement a <code>TileImprovementType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean canHaveImprovement(TileImprovementType improvement) {
+        return (improvement != null && improvement.isTileTypeAllowed(this));
     }
 
     public int getBasicMoveCost() {
@@ -215,7 +220,6 @@ public final class TileType extends FreeColGameObjectType {
         water = getAttribute(in, "is-water", false);
         canSettle = getAttribute(in, "can-settle", !water);
         connected = getAttribute(in, "is-connected", false);
-        canHaveRiver = !(getAttribute(in, "no-river", water));
 
         if (!water && canSettle) {
             secondaryGoods = specification.getGoodsType(in.getAttributeValue(null, "secondary-goods"));
