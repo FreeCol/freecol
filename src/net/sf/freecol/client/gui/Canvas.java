@@ -1783,8 +1783,7 @@ public final class Canvas extends JDesktopPane {
      * @see Tile
      */
     public void showTilePanel(Tile tile) {
-        TilePanel tilePanel = new TilePanel(this);
-        tilePanel.initialize(tile);
+        TilePanel tilePanel = new TilePanel(this, tile);
 
         addAsFrame(tilePanel);
         tilePanel.requestFocus();

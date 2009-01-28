@@ -21,15 +21,17 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
-import java.awt.FlowLayout;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.BoxLayout;
 import javax.swing.ComponentInputMap;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -46,6 +48,9 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 
+import net.miginfocom.swing.MigLayout;
+
+
 /**
  * This panel is used to show information about a tile.
  */
@@ -56,62 +61,28 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
     private static final int OK = 0;
     private static final int COLOPEDIA = 1;
     private final Canvas canvas;
-
-    private final GoodsType[] goodsTypes;
-    private final int number;
-    
-    private final JPanel goodsPanel;
-    private final JLabel tileNameLabel;
-    private final JLabel ownerLabel;
-    private final JLabel regionLabel;
-    private final JButton okButton;
-    private final JButton colopediaButton;
+    private final JButton okButton = new JButton(Messages.message("ok"));
 
     private TileType tileType;
+
 
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent panel.
+     * @param tile a <code>Tile</code> value
      */
-    public TilePanel(Canvas parent) {
+    public TilePanel(Canvas parent, Tile tile) {
+
         canvas = parent;
+        tileType = tile.getType();
 
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        
-        tileNameLabel = new JLabel("", JLabel.CENTER);
-        tileNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(tileNameLabel);
+        setLayout(new MigLayout("wrap 1, insets 20 30 10 30", "[center]", ""));
 
-        regionLabel = new JLabel("", JLabel.CENTER);
-        regionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(regionLabel);
-
-        ownerLabel = new JLabel("", JLabel.CENTER);
-        ownerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(ownerLabel);
-
-        List<GoodsType> farmedGoods = FreeCol.getSpecification().getFarmedGoodsTypeList();
-        number = farmedGoods.size();
-
-        goodsPanel = new JPanel();
-        goodsPanel.setLayout(new FlowLayout());
-
-        goodsTypes = new GoodsType[number];
-        JLabel[] labels = new JLabel[number];
-        for (int k = 0; k < number; k++) {
-            goodsTypes[k] = farmedGoods.get(k);
-            labels[k] = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsTypes[k]));
-        }
-        
-        goodsPanel.setSize(goodsPanel.getPreferredSize());
-        add(goodsPanel);
-
-        colopediaButton = new JButton(Messages.message("menuBar.colopedia"));
+        JButton colopediaButton = new JButton(Messages.message("menuBar.colopedia"));
         colopediaButton.setActionCommand(String.valueOf(COLOPEDIA));
         colopediaButton.addActionListener(this);
         enterPressesWhenFocused(colopediaButton);
 
-        okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
         okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -128,54 +99,56 @@ public final class TilePanel extends FreeColDialog implements ActionListener {
         buttonPanel.add(okButton);
         add(buttonPanel);
 
+
+        String name = tile.getLabel() + " (" + tile.getX() + ", " + tile.getY() + ")";
+        add(new JLabel(name));
+
+        int width = canvas.getClient().getImageLibrary().getTerrainImageWidth(tileType);
+        int height = canvas.getClient().getImageLibrary().getTerrainImageHeight(tileType);
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        canvas.getGUI().displayColonyTile((Graphics2D) image.getGraphics(), tile.getMap(),
+                                          tile, 0, 0, null);
+        add(new JLabel(new ImageIcon(image)));
+
+        if (tile.getRegion() != null) {
+            add(new JLabel(tile.getRegion().getDisplayName()));
+        }
+        if (tile.getOwner() != null) {
+            String ownerName = tile.getOwner().getNationAsString();
+            if (ownerName != null) {
+                add(new JLabel(ownerName));
+            }
+        }
+
+        if (tileType != null) {
+            List<AbstractGoods> production = tileType.getProduction();
+            if (!production.isEmpty()) {
+                GoodsType goodsType = production.get(0).getType();
+                add(new JLabel(String.valueOf(tile.potential(goodsType, null)),
+                               canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType),
+                               JLabel.CENTER),
+                    "split " + production.size());
+                for (int index = 1; index < production.size(); index++) {
+                    goodsType = production.get(index).getType();
+                    add(new JLabel(String.valueOf(tile.potential(goodsType, null)),
+                                   canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType),
+                                   JLabel.CENTER));
+                }
+
+            }
+        }
+
+        add(okButton, "newline 30, split 2, align center");
+        add(colopediaButton);
+
+        setSize(getPreferredSize());
+
     }
 
 
     public void requestFocus() {
         okButton.requestFocus();
     }
-
-
-    /**
-     * Initializes the information that is being displayed on this panel.
-     * The information displayed will be based on the given tile.
-     *
-     * @param tile The Tile whose information should be displayed.
-     */
-    public void initialize(Tile tile) {
-        this.tileType = tile.getType();
-        String name = tile.getLabel() + " (" + tile.getX() + ", " +
-            tile.getY() + ")";
-        tileNameLabel.setText(name);
-        if (tile.getRegion() != null) {
-            regionLabel.setText(tile.getRegion().getDisplayName());
-        }
-        if (tile.getOwner() == null) {
-            ownerLabel.setText("");
-        } else {
-            String ownerName = tile.getOwner().getNationAsString();
-            if (ownerName == null) {
-                ownerLabel.setText("");
-            } else {
-                ownerLabel.setText(ownerName);
-            }
-        }
-        
-        goodsPanel.removeAll();
-        if (tileType == null) {
-            colopediaButton.setEnabled(false);
-        } else {
-            List<AbstractGoods> production = tileType.getProduction();
-            for (AbstractGoods goods : production) {
-                JLabel label = new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goods.getType()));
-                label.setText(String.valueOf(tile.potential(goods.getType(), null)));
-                goodsPanel.add(label);
-            }
-        }
-        setSize(getPreferredSize());
-
-    }
-
 
     /**
      * This function analyses an event and calls the right methods to take
