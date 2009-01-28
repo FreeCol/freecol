@@ -773,7 +773,8 @@ public final class InGameInputHandler extends InputHandler {
                 accepted = new ShowConfirmDialogSwingTask("indianDemand.food.text", "indianDemand.food.yes",
                                                           "indianDemand.food.no",
                                                           "%nation%", unit.getOwner().getNationAsString(),
-                                                          "%colony%", colony.getName()).confirm();
+                                                          "%colony%", colony.getName(),
+                                                          "%amount%", String.valueOf(goods.getAmount())).confirm();
             } else {
                 accepted = new ShowConfirmDialogSwingTask("indianDemand.other.text", "indianDemand.other.yes",
                                                           "indianDemand.other.no",
