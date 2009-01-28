@@ -1092,11 +1092,17 @@
       <required-goods id="model.goods.tools" value="72"/>
     </building-type>
     <building-type id="model.building.CarpenterHouse" basicProduction="3" workplaces="3" consumes="model.goods.lumber" produces="model.goods.hammers" sequence="2">
+      <ability id="model.ability.build">
+        <scope type="model.unit.wagonTrain"/>
+      </ability>
     </building-type>
     <building-type id="model.building.LumberMill"     basicProduction="6" workplaces="3" 
                    consumes="model.goods.lumber" produces="model.goods.hammers"
                    upgradesFrom="model.building.CarpenterHouse" required-population="3" sequence="2">
       <required-goods id="model.goods.hammers" value="52"/>
+      <ability id="model.ability.build">
+        <scope type="model.unit.wagonTrain"/>
+      </ability>
     </building-type>
     <building-type id="model.building.BlacksmithHouse" basicProduction="3" workplaces="3" consumes="model.goods.ore" produces="model.goods.tools" sequence="3">
       <ability id="model.ability.build">
