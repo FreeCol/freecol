@@ -2125,17 +2125,19 @@ public final class InGameController implements NetworkConstants {
                 switch (attacker.getOwner().getStance(enemy)) {
                 case CEASE_FIRE:
                     return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
-                                                                       "model.diplomacy.attack.confirm", "cancel",
+                                                                       "model.diplomacy.attack.confirm",
+                                                                       "cancel",
                                                                        "%replace%", enemy.getNationAsString());
                 case PEACE:
                     return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
-                                                                       "model.diplomacy.attack.confirm", "cancel",
+                                                                       "model.diplomacy.attack.confirm",
+                                                                       "cancel",
                                                                        "%replace%", enemy.getNationAsString());
                 case ALLIANCE:
-                    freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-                    freeColClient.getCanvas().showInformationMessage("model.diplomacy.attack.alliance",
-                                                                     "%replace%", enemy.getNationAsString());
-                    return false;
+                    return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.alliance",
+                                                                       "model.diplomacy.attack.confirm",
+                                                                       "cancel",
+                                                                       "%replace%", enemy.getNationAsString());
                 case WAR:
                     logger.finest("Player at war, no confirmation needed");
                     return true;

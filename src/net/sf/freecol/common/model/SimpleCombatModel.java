@@ -516,12 +516,7 @@ public class SimpleCombatModel implements CombatModel {
         Player attackingPlayer = attacker.getOwner();
         Player defendingPlayer = defender.getOwner();
 
-        if (attackingPlayer.getStance(defendingPlayer) == Stance.ALLIANCE) {
-            throw new IllegalStateException("Cannot attack allied players.");
-        }
-
         // make sure we are at war, unless one of both units is a privateer
-        //getOwner().isEuropean() && defendingPlayer.isEuropean() &&
         if (attacker.hasAbility("model.ability.piracy")) {
             defendingPlayer.setAttackedByPrivateers();
         } else if (!defender.hasAbility("model.ability.piracy")) {
