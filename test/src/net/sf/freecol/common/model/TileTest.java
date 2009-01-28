@@ -39,7 +39,8 @@ public class TileTest extends FreeColTestCase {
     TileType hills = spec().getTileType("model.tile.hills");
     TileType mountains = spec().getTileType("model.tile.mountains");
     TileType ocean = spec().getTileType("model.tile.ocean");
-        
+    TileType highSeas = spec().getTileType("model.tile.highSeas");
+
     TileType plainsForest = spec().getTileType("model.tile.mixedForest");
     TileType desertForest = spec().getTileType("model.tile.scrubForest");
     TileType grasslandForest = spec().getTileType("model.tile.coniferForest");
@@ -55,6 +56,11 @@ public class TileTest extends FreeColTestCase {
     TileImprovementType clearForest = spec().getTileImprovementType("model.improvement.ClearForest");
     TileImprovementType fishBonusLand = spec().getTileImprovementType("model.improvement.fishBonusLand");
     TileImprovementType fishBonusRiver = spec().getTileImprovementType("model.improvement.fishBonusRiver");
+
+    GoodsType sugar = spec().getGoodsType("model.goods.sugar");
+    GoodsType tobacco = spec().getGoodsType("model.goods.tobacco");
+    GoodsType lumber = spec().getGoodsType("model.goods.lumber");
+    GoodsType ore = spec().getGoodsType("model.goods.ore");
 
 
     public void testGetWorkAmount() {
@@ -196,38 +202,42 @@ public class TileTest extends FreeColTestCase {
 
     public void testCanHaveImprovement() {
 
-        assertTrue(plains.canHaveImprovement(river));
-        assertTrue(plains.canHaveImprovement(road));
-        assertTrue(plains.canHaveImprovement(plow));
+        for (TileType tileType : spec().getTileTypeList()) {
 
-        assertFalse(plains.canHaveImprovement(clearForest));
-        assertFalse(plains.canHaveImprovement(fishBonusLand));
-        assertFalse(plains.canHaveImprovement(fishBonusRiver));
+            if (tileType.isWater()) {
+                if (highSeas.equals(tileType)) {
+                    assertFalse(tileType.canHaveImprovement(fishBonusLand));
+                    assertFalse(tileType.canHaveImprovement(fishBonusRiver));
+                } else {
+                    assertTrue(tileType.canHaveImprovement(fishBonusLand));
+                    assertTrue(tileType.canHaveImprovement(fishBonusRiver));
+                }
+                assertFalse(tileType.canHaveImprovement(river));
+                assertFalse(tileType.canHaveImprovement(road));
+                assertFalse(tileType.canHaveImprovement(plow));
+                assertFalse(tileType.canHaveImprovement(clearForest));
+            } else {
+                if (tileType.isForested()) {
+                    assertTrue(tileType.canHaveImprovement(clearForest));
+                } else {
+                    assertFalse(tileType.canHaveImprovement(clearForest));
+                }
+                if (arctic.equals(tileType) || hills.equals(tileType)
+                    || mountains.equals(tileType)) {
+                    assertFalse(tileType.canHaveImprovement(river));
+                    assertFalse(tileType.canHaveImprovement(plow));
+                } else {
+                    assertTrue(tileType.canHaveImprovement(river));
+                    if (tileType.isForested()) {
+                        assertFalse(tileType.canHaveImprovement(plow));
+                    } else {
+                        assertTrue(tileType.canHaveImprovement(plow));
+                    }
+                }
 
-        assertFalse(arctic.canHaveImprovement(river));
-        assertTrue(arctic.canHaveImprovement(road));
-        assertFalse(arctic.canHaveImprovement(plow));
-
-        assertFalse(arctic.canHaveImprovement(clearForest));
-        assertFalse(arctic.canHaveImprovement(fishBonusLand));
-        assertFalse(arctic.canHaveImprovement(fishBonusRiver));
-
-        assertFalse(mountains.canHaveImprovement(river));
-        assertTrue(mountains.canHaveImprovement(road));
-        assertFalse(mountains.canHaveImprovement(plow));
-
-        assertFalse(mountains.canHaveImprovement(clearForest));
-        assertFalse(mountains.canHaveImprovement(fishBonusLand));
-        assertFalse(mountains.canHaveImprovement(fishBonusRiver));
-
-        assertFalse(ocean.canHaveImprovement(river));
-        assertFalse(ocean.canHaveImprovement(road));
-        assertFalse(ocean.canHaveImprovement(plow));
-
-        assertFalse(ocean.canHaveImprovement(clearForest));
-        assertTrue(ocean.canHaveImprovement(fishBonusLand));
-        assertTrue(ocean.canHaveImprovement(fishBonusRiver));
-
+                assertTrue(tileType.canHaveImprovement(road));
+            }
+        }
     }
 
 
@@ -310,11 +320,6 @@ public class TileTest extends FreeColTestCase {
         tile2.setType(spec().getTileType("model.tile.hills"));
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
-
-        GoodsType sugar = spec().getGoodsType("model.goods.sugar");
-        GoodsType tobacco = spec().getGoodsType("model.goods.tobacco");
-        GoodsType lumber = spec().getGoodsType("model.goods.lumber");
-        GoodsType ore = spec().getGoodsType("model.goods.ore");
 
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), river1.getType()));
         assertFalse(hasBonusFromSource(tile1.getProductionBonus(lumber, null), river1.getType()));
