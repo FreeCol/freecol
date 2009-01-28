@@ -936,7 +936,7 @@ public class TerrainGenerator {
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
                 Position position = map.getRandomLandPosition();
-                if (map.getTile(position).getType().canHaveImprovement(riverType)) {
+                if (!map.getTile(position).getType().canHaveImprovement(riverType)) {
                     continue;
                 }
                 // check the river source/spring is not too close to the ocean
