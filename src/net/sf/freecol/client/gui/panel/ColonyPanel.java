@@ -1620,7 +1620,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         @Override
         public void paintComponent(Graphics g) {
-            GUI colonyTileGUI = parent.getGUI();
+            GUI colonyTileGUI = parent.getColonyTileGUI();
             ImageLibrary lib = colonyTileGUI.getImageLibrary();
 
             g.setColor(Color.black);
@@ -1673,7 +1673,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     updateDescriptionLabel(unitLabel, true);
                 }
 
-                ImageLibrary lib = parent.getGUI().getImageLibrary();
+                ImageLibrary lib = parent.getColonyTileGUI().getImageLibrary();
 
                 if (colonyTile.isColonyCenterTile()) {
                     initializeAsCenterTile(lib);
