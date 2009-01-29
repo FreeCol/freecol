@@ -1752,6 +1752,9 @@ public final class GUI {
 
 
     public void paintBorders(Graphics2D g, Tile tile, int x, int y) {
+        if (tile == null) {
+            return;
+        }
         Player owner = tile.getOwner();
         if (displayBorders && owner != null) {
             Map map = tile.getMap();
