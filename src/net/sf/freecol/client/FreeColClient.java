@@ -58,13 +58,13 @@ import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
@@ -276,8 +276,7 @@ public final class FreeColClient {
         canvas = new Canvas(this, innerWindowSize, gui);
         changeWindowedMode(windowed);
 
-        UnitType galleonType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
-        frame.setIconImage(imageLibrary.getUnitImageIcon(galleonType).getImage());
+        frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
         
         SwingUtilities.invokeLater(new Runnable() {
         	public void run() {
