@@ -604,7 +604,7 @@ public final class FreeCol {
         }
         FreeColTcFile tcData;
         try {
-            tcData = new FreeColTcFile(new File(dataFolder, tc));
+            tcData = new FreeColTcFile(tc);
             try {
                 ResourceManager.setTcMapping(tcData.getResourceMapping());
             } finally {

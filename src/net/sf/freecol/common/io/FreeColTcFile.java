@@ -21,35 +21,46 @@ package net.sf.freecol.common.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.resources.ResourceMapping;
 
 /**
  * A Total Conversion (TC).
  */
-public class FreeColTcFile extends FreeColDataFile {
+public class FreeColTcFile extends FreeColModFile {
     
-    private static final String SPECIFICATION_FILE = "specification.xml";
-
     /**
      * Opens the given file for reading.
      * 
-     * @param file The file to be read.
+     * @param id The id of the TC to load.
      * @throws IOException if thrown while opening the file.
      */
-    public FreeColTcFile(File file) throws IOException {
-        super(file);
+    public FreeColTcFile(final String id) throws IOException {
+        super(id, new File(FreeCol.getDataDirectory(), id));
     }
     
     /**
-     * Gets the input stream to the specification.
-     * 
-     * @return An <code>InputStream</code> to the file
-     *      "specification.xml" within this data file.
-     * @throws IOException if thrown while opening the
-     *      input stream.
+     * {@inheritDoc}
      */
-    public InputStream getSpecificationInputStream() throws IOException {
-        return getInputStream(SPECIFICATION_FILE);
+    public ResourceMapping getResourceMapping() {
+        try {
+            final ModInfo info = getModInfo();
+            if (info.getParent() != null) {
+                final FreeColTcFile parentTcData = new FreeColTcFile(info.getParent());
+                try {
+                    final ResourceMapping rc = parentTcData.getResourceMapping();
+                    rc.addAll(super.getResourceMapping());
+                    return rc;
+                } finally {
+                    parentTcData.close();
+                }
+            } else {
+                return super.getResourceMapping();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     /**

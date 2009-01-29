@@ -21,6 +21,7 @@ package net.sf.freecol.common.io;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -209,6 +210,24 @@ public class FreeColDataFile {
                 supportOldSavegames.close();
             } catch (IOException e) {}
         }
+    }
+    
+    /**
+     * Returns a <code>FileFilter</code>.
+     * @return The <code>FileFilter</code>.
+     */
+    public FileFilter getFileFilter() {
+        return new FileFilter() {
+            public boolean accept(File f) {
+                final String name = f.getName();
+                for (String ending : getFileEndings()) {
+                    if (name.endsWith(ending)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
     }
     
     /**
