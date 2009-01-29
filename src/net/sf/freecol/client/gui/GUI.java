@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
@@ -31,6 +32,8 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.Stroke;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
@@ -156,6 +159,7 @@ public final class GUI {
     MESSAGE_COUNT = 3,
     MESSAGE_AGE = 30000; // The amount of time before a message gets deleted (in milliseconds).
 
+    private boolean displayBorders = false;
     private boolean displayGrid = false;
     private int displayTileText = 0;
     private GeneralPath gridPath = null;
@@ -1078,6 +1082,9 @@ public final class GUI {
         
         int yy = clipTopY;
 
+        Stroke oldStroke = g.getStroke();
+        g.setStroke(new BasicStroke(4));
+
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
             xx = getXOffset(clipLeftX, tileY);
@@ -1085,11 +1092,13 @@ public final class GUI {
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 displayBaseTile(g, map, map.getTile(tileX, tileY), xx, yy, true);
+                paintBorders(g, map.getTile(tileX, tileY), xx, yy);
                 xx += tileWidth;
             }
 
             yy += tileHeight / 2;
         }
+        g.setStroke(oldStroke);
 
         /*
         PART 2b
@@ -1741,6 +1750,45 @@ public final class GUI {
         }
     }    
 
+
+    public void paintBorders(Graphics2D g, Tile tile, int x, int y) {
+        Player owner = tile.getOwner();
+        if (displayBorders && owner != null) {
+            Map map = tile.getMap();
+            Tile otherTile = map.getNeighbourOrNull(Map.Direction.NE, tile);
+            int dx = lib.getTerrainImageWidth(tile.getType());
+            int dy = lib.getTerrainImageHeight(tile.getType());
+            Color oldColor = g.getColor();
+            g.setColor(new Color(owner.getColor().getRed(),
+                                 owner.getColor().getGreen(),
+                                 owner.getColor().getBlue()));
+            GeneralPath line = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+            if (otherTile.getOwner() != owner) {
+                line.moveTo(x + dx/2, y + 2);
+                line.lineTo(x + dx - 2, y + dy/2);
+            }
+            otherTile = map.getNeighbourOrNull(Map.Direction.SE, tile);
+            if (otherTile.getOwner() != owner) {
+                line.moveTo(x + dx - 2, y + dy/2);
+                line.lineTo(x + dx/2, y + dy - 2);
+            }
+            otherTile = map.getNeighbourOrNull(Map.Direction.SW, tile);
+            if (otherTile.getOwner() != owner) {
+                line.moveTo(x + dx/2, y + dy - 2);
+                line.lineTo(x + 2, y + dy/2);
+            }
+            otherTile = map.getNeighbourOrNull(Map.Direction.NW, tile);
+            if (otherTile.getOwner() != owner) {
+                line.moveTo(x + 2, y + dy/2);
+                line.lineTo(x + dx/2, y + 2);
+            }
+            g.draw(line);
+            g.setColor(oldColor);
+        }
+    }
+
+
+
     /**
      * Displays the given Tile onto the given Graphics2D object at the
      * location specified by the coordinates. Everything located on the
@@ -2284,6 +2332,16 @@ public final class GUI {
     */
     public void setDisplayGrid(boolean displayGrid) {
         this.displayGrid = displayGrid;
+    }
+
+
+    /**
+     * If set to <i>true</i> then a borders is drawn on the map.
+     * @param displayBorders <code>true</code> if the borders should be drawn
+     *       on the map and <code>false</code> otherwise.
+     */
+    public void setDisplayBorders(boolean displayBorders) {
+        this.displayBorders = displayBorders;
     }
 
 

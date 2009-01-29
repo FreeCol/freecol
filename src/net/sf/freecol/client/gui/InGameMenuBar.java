@@ -48,6 +48,7 @@ import net.sf.freecol.client.gui.action.ColopediaTerrainAction;
 import net.sf.freecol.client.gui.action.ColopediaUnitAction;
 import net.sf.freecol.client.gui.action.DeclareIndependenceAction;
 import net.sf.freecol.client.gui.action.DisbandUnitAction;
+import net.sf.freecol.client.gui.action.DisplayBordersAction;
 import net.sf.freecol.client.gui.action.DisplayGridAction;
 import net.sf.freecol.client.gui.action.DisplayTileEmptyAction;
 import net.sf.freecol.client.gui.action.DisplayTileNamesAction;
@@ -222,6 +223,7 @@ public class InGameMenuBar extends FreeColMenuBar {
 
         menu.add(getCheckBoxMenuItem(MapControlsAction.id));
         menu.add(getCheckBoxMenuItem(DisplayGridAction.id));
+        menu.add(getCheckBoxMenuItem(DisplayBordersAction.id));
         menu.add(getMenuItem(ToggleViewModeAction.id));
         menu.add(getCheckBoxMenuItem(ChangeWindowedModeAction.id));
 

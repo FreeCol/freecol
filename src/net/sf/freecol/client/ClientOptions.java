@@ -113,6 +113,11 @@ public class ClientOptions extends OptionMap {
     public static final String DISPLAY_GRID = "model.option.displayGrid";
 
     /**
+     * Whether to display borders by default or not.
+     */
+    public static final String DISPLAY_BORDERS = "model.option.displayBorders";
+
+    /**
      * What text to display in the tiles.
      */
     public static final String DISPLAY_TILE_TEXT = "model.option.displayTileText";

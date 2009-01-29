@@ -1790,6 +1790,8 @@
       <booleanOption id="model.option.displayMapControls" defaultValue="true"/>
       <!-- Whether to display the grid by default or not. -->
       <booleanOption id="model.option.displayGrid" defaultValue="false"/>
+      <!-- Whether to display borders by default or not. -->
+      <booleanOption id="model.option.displayBorders" defaultValue="false"/>
       <!-- Option for in tile text display -->
       <selectOption id="model.option.displayTileText" defaultValue="0" localizedLabels="true">
         <selectValue label="clientOptions.gui.displayTileText.empty" value="0"/>
