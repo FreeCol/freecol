@@ -616,12 +616,12 @@
       <echo message="Validating classic.xml."/>
       <schemavalidate
          noNamespaceFile="schema/specification-schema.xsd"
-         file="data/freecol/classic.xml">
+         file="data/classic/specification.xml">
       </schemavalidate>
       <echo message="Validating testing.xml."/>
       <schemavalidate
          noNamespaceFile="schema/specification-schema.xsd"
-         file="data/freecol/testing.xml">
+         file="data/testing/specification.xml">
       </schemavalidate>
     </target>
 
