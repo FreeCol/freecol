@@ -55,6 +55,7 @@ public class LanguageOption extends AbstractOption {
     private Map<String, String> languageNames = new HashMap<String, String>();
 
     private static final String[][] languageNamesHelper = {
+        {"arz", "\u0645\u0635\u0631\u064A"},
         {"nds", "Plattd\u00fc\u00fctsch"},
         {"pms", "Piemont\u00e9s"}
     };
