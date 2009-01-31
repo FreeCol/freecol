@@ -85,6 +85,9 @@ public class LanguageOption extends AbstractOption {
      */
      public LanguageOption(XMLStreamReader in) throws XMLStreamException {
          super(NO_ID);
+         if (languages.size() == 0) {
+             prepareLanguages();
+         }
          readFromXML(in);
      }   
 
