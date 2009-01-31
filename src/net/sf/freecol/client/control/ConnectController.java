@@ -346,7 +346,7 @@ public final class ConnectController {
     public void loadGame() {
         File file = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory());
         if (file != null) {
-        	FreeCol.setSaveDirectory(file.getParentFile());
+            //FreeCol.setSaveDirectory(file.getParentFile());
             loadGame(file);
         }
     }

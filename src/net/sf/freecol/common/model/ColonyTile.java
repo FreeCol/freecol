@@ -424,6 +424,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (type2 != null)
                 colony.addGoods(type2, getProductionOf(type2));
 
+        // TODO: why is this here?
         if (unit != null) {
             getWorkTile().setOwningSettlement(getColony());
         } else {

@@ -154,6 +154,8 @@ public final class FreeCol {
             FREECOL_REVISION = FREECOL_VERSION;
         }
 
+        // parse command line arguments
+        handleArgs(args);
         
         // Display splash screen:
         JWindow splash = null;
@@ -173,8 +175,6 @@ public final class FreeCol {
 
         Locale.setDefault(getLocale());
         
-        // parse command line arguments
-        handleArgs(args);
         
         if (javaCheck && !checkJavaVersion()) {
             removeSplash(splash);
@@ -489,7 +489,9 @@ public final class FreeCol {
         String freeColDirectoryName = "/".equals(System.getProperty("file.separator")) ?
             ".freecol" : "freecol";
 
-        mainUserDirectory = new File(System.getProperty("user.home"), freeColDirectoryName);
+        if (mainUserDirectory == null) {
+            mainUserDirectory = new File(System.getProperty("user.home"), freeColDirectoryName);
+        }
         if (mainUserDirectory.exists()) {
             if (mainUserDirectory.isFile()) {
                 System.out.println("Could not create " + freeColDirectoryName + " under "
@@ -500,7 +502,9 @@ public final class FreeCol {
         } else {
             mainUserDirectory.mkdir();
         }
-        saveDirectory = new File(mainUserDirectory, "save");
+        if (saveDirectory == null) {
+            saveDirectory = new File(mainUserDirectory, "save");
+        }
         if (saveDirectory.exists()) {
             if (saveDirectory.isFile()) {
                 System.out.println("Could not create freecol/save under "
@@ -668,6 +672,14 @@ public final class FreeCol {
                 i++;
                 if (i < args.length) {
                     tc = args[i];
+                } else {
+                    printUsage();
+                    System.exit(1);
+                }
+            } else if (args[i].equals("--home-directory")) {
+                i++;
+                if (i < args.length) {
+                    saveDirectory = new File(args[i]);
                 } else {
                     printUsage();
                     System.exit(1);
@@ -890,6 +902,8 @@ public final class FreeCol {
         System.out.println("Usage: java -Xmx512M -jar FreeCol.jar [OPTIONS]");
         System.out.println("");
         System.out.println("Options:");
+        System.out.println("--home-directory DIR");
+        System.out.println("  sets the FreeCol home directory, defaults to user home.");
         System.out.println("--default-locale=LANGUAGE[_COUNTRY[_VARIANT]]");
         System.out.println("  sets the default locale.");
         System.out.println("--freecol-data DIR");

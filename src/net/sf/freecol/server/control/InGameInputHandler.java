@@ -2235,6 +2235,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (workLocation == null) {
             throw new NullPointerException();
         }
+        if (!workLocation.canAdd(unit)) {
+            throw new IllegalStateException("Can not add " + unit.getName() + "(" + unit.getId()
+                                            + ") to " + workLocation.toString() + "(" 
+                                            + workLocation.getId() + ")");
+        }
         Location oldLocation = unit.getLocation();
         unit.work(workLocation);
         // For updating the number of colonist:
