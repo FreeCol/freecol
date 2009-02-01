@@ -679,7 +679,7 @@ public final class FreeCol {
             } else if (args[i].equals("--home-directory")) {
                 i++;
                 if (i < args.length) {
-                    saveDirectory = new File(args[i]);
+                    mainUserDirectory = new File(args[i]);
                 } else {
                     printUsage();
                     System.exit(1);
