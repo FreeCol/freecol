@@ -450,16 +450,6 @@ public class SimpleCombatModel implements CombatModel {
                             if (ability.appliesTo(equipment) && 
                                 settlement.canBuildEquipment(equipment)) {
                                 result.addAll(equipment.getModifierSet("model.modifier.defence"));
-                                /** Don't do this here. The method will be called in non-combat
-                                   situations.
-                                if (defender.getColony() != null) {
-                                    defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT,
-                                                             defender,
-                                                             "model.unit.automaticDefence",
-                                                             "%unit%", defender.getName(),
-                                                             "%colony%", defender.getColony().getName());
-                                }
-                                */
                             }
                         }
                     }
@@ -537,6 +527,33 @@ public class SimpleCombatModel implements CombatModel {
         Tile newTile = defender.getTile();
         //attacker.adjustTension(defender);
         Settlement settlement = newTile.getSettlement();
+
+        /*
+         * TODO: This is a bit clumsy. Should we make information like
+         * this part of the CombatResult?
+         */
+        if (!defender.isArmed() &&
+            (defender.getLocation() instanceof WorkLocation ||
+             defender.getLocation() instanceof IndianSettlement) &&
+            defender.getOwner().hasAbility("model.ability.automaticEquipment")) {
+            Set<Ability> autoDefence = defender.getOwner().getFeatureContainer()
+                .getAbilitySet("model.ability.automaticEquipment");
+            outer: for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {
+                if (defender.canBeEquippedWith(equipment)) {
+                    for (Ability ability : autoDefence) {
+                        if (ability.appliesTo(equipment) && 
+                            settlement.canBuildEquipment(equipment)) {
+                            defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT,
+                                                     defender,
+                                                     "model.unit.automaticDefence",
+                                                     "%unit%", defender.getName(),
+                                                     "%colony%", defender.getColony().getName());
+                            break outer;
+                        }
+                    }
+                }
+            }
+        }
 
         switch (result.type) {
         case EVADES:
