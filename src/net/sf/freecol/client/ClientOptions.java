@@ -19,11 +19,16 @@
 
 package net.sf.freecol.client;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.io.Mods;
+import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -32,6 +37,8 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.option.ListOption;
+import net.sf.freecol.common.option.ListOptionSelector;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.OptionMap;
 import net.sf.freecol.common.option.PercentageOption;
@@ -268,6 +275,9 @@ public class ClientOptions extends OptionMap {
      */
     public static final String MINIMAP_BACKGROUND_COLOR = "model.option.color.background";
 
+    public static final String USER_MODS ="userMods";
+    
+    /** 
     public static final String COLOR_BLACK = "black";
 
     public static final String COLOR_VERY_DARK_GRAY = "gray.dark.very";
@@ -435,10 +445,11 @@ public class ClientOptions extends OptionMap {
      */
     protected void addDefaultOptions() {
         Specification spec = Specification.getSpecification();
-
+        
         OptionGroup guiGroup = spec.getOptionGroup("clientOptions.gui");
         guiGroup.add(spec.getOptionGroup("clientOptions.minimap"));
         add(guiGroup);
+        
         add(spec.getOptionGroup("clientOptions.messages"));
 
         OptionGroup audioGroup = new OptionGroup("clientOptions.audio");
@@ -450,6 +461,36 @@ public class ClientOptions extends OptionMap {
         add(spec.getOptionGroup("clientOptions.savegames"));
         add(spec.getOptionGroup("clientOptions.warehouse"));
         add(spec.getOptionGroup("clientOptions.other"));
+        
+        final OptionGroup modsGroup = new OptionGroup("clientOptions.mods");
+        final ListOptionSelector<ModInfo> selector = new ListOptionSelector<ModInfo>() {
+            private Map<String, ModInfo> mods = null; 
+            private void init() {
+                if (mods == null) {
+                    final List<ModInfo> modInfos = Mods.getModInfos();
+                    mods = new HashMap<String, ModInfo>();
+                    for (ModInfo mi : modInfos) {
+                        mods.put(mi.getId(), mi);
+                    }
+                }
+            }
+            public String getId(ModInfo t) {
+                return t.getId();
+            }
+            public ModInfo getObject(String id) {
+                init();
+                return mods.get(id);
+            }
+            public List<ModInfo> getOptions() {
+                init();
+                return new ArrayList<ModInfo>(mods.values());
+            }
+            public String toString(ModInfo t) {
+                return t.getName();
+            }
+        };
+        new ListOption<ModInfo>(selector, USER_MODS, modsGroup);
+        add(modsGroup);
     }
 
     /**

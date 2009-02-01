@@ -46,6 +46,7 @@ import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.OptionGroup;
 import net.sf.freecol.common.option.PercentageOption;
@@ -123,6 +124,14 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
                 }
             } else if (o instanceof PercentageOption) {
                 final PercentageOptionUI soi = new PercentageOptionUI((PercentageOption) o, editable);
+                add(soi);
+                ou.add(soi);
+                buttonAdded = false;
+                if (!o.getId().equals(Option.NO_ID)) {
+                    optionUIs.put(o.getId(), soi);
+                }
+            } else if (o instanceof ListOption) {
+                final ListOptionUI soi = new ListOptionUI((ListOption) o, editable);
                 add(soi);
                 ou.add(soi);
                 buttonAdded = false;

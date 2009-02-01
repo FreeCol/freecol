@@ -26,7 +26,9 @@ import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Queue;
 import java.util.Random;
@@ -56,15 +58,21 @@ import net.sf.freecol.client.gui.sound.SoundLibrary;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.io.FreeColModFile;
+import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.LanguageOption;
+import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
+import net.sf.freecol.common.resources.ImageResource;
+import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;
 
 import org.w3c.dom.Element;
@@ -186,6 +194,17 @@ public final class FreeColClient {
                 && FreeCol.getClientOptionsFile().exists()) {
             clientOptions.load(FreeCol.getClientOptionsFile());
         }
+        
+        // TODO: Move this to a more suitable place:
+        final List<ModInfo> mods = ((ListOption) getClientOptions().getObject(ClientOptions.USER_MODS)).getValue();
+        final List<ResourceMapping> modResources = new ArrayList<ResourceMapping>(mods.size());
+        for (ModInfo mi : mods) {
+            modResources.add(new FreeColModFile(mi).getResourceMapping());
+        }
+        ResourceManager.setModMappings(modResources);
+        ResourceManager.update();
+        ResourceManager.preload(innerWindowSize);
+        
         actionManager = new ActionManager(this);
         if (!headless) {
             actionManager.initializeActions();
