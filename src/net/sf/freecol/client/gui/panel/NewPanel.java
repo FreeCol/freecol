@@ -42,11 +42,12 @@ import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
-* A panel filled with 'new game' items.
-*/
+ * A panel filled with 'new game' items.
+ */
 public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
@@ -150,51 +151,42 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         group.add(start);
         group.add(meta);
 
-        int numberOfRows = 13;
-        int[] widths = {21, 0, margin, 0, margin, 0, margin, 0, 6*margin, 0};
-        int[] heights = new int[2 * numberOfRows - 1];
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = margin;
-        }
-        heights[heights.length - 2] = 3 * margin;
+        setLayout(new MigLayout("wrap 4", "[15]", ""));
 
-        setLayout(new HIGLayout(widths, heights));
+        add(nameLabel, "skip, span, split 2");
+        add(name, "growx");
 
-        int row = 1;
-        add(nameLabel, higConst.rc(row, 8, "r"));
-        add(name, higConst.rc(row, 10));
-        row += 2;
-        add(single, higConst.rcwh(row, 1, 8, 1, "l"));
-        row += 2;
-        add(additionalNations, higConst.rcwh(row, 2, 3, 1, "l"));
-        row += 2;
-        add(selectAdvantages, higConst.rcwh(row, 2, 3, 1, "l"));
-        row += 2;
-        add(singlePlayerNoLabel, higConst.rcwh(row, 2, 3, 1, "l"));
-        add(singlePlayerNo, higConst.rc(row, 8));
-        row += 2;
-        add(meta, higConst.rcwh(row, 1, 8, 1, "l"));
-        row += 2;
-        add(join, higConst.rcwh(row, 1, 8, 1, "l"));
-        row += 2;
-        add(ipLabel, higConst.rc(row, 2));
-        add(server, higConst.rc(row, 4));
-        add(port1Label, higConst.rc(row, 6));
-        add(port1, higConst.rc(row, 8));
-        row += 2;
-        add(start, higConst.rcwh(row, 1, 8, 1, "l"));
-        row += 2;
-        add(port2Label, higConst.rcwh(row, 2, 3, 1, "l"));
-        add(port2, higConst.rc(row, 8));
-        add(publicServer, higConst.rc(row, 10, "l"));
-        row += 2;
-        add(multiPlayerNoLabel, higConst.rcwh(row, 2, 3, 1, "l"));
-        add(multiPlayerNo, higConst.rc(row, 8));
-        add(useAdvantages, higConst.rc(row, 10, "l"));
-        row += 2;
-        add(ok, higConst.rc(row, 8, "r"));
-        add(cancel, higConst.rc(row, 10, "l"));
+        add(single, "span");
 
+        add(additionalNations, "skip, span");
+
+        add(selectAdvantages, "skip, span");
+
+        add(singlePlayerNoLabel, "skip, span, split 2");
+        add(singlePlayerNo);
+
+        add(meta, "span");
+
+        add(join, "span");
+
+        add(ipLabel, "skip, split 2");
+        add(server);
+        add(port1Label, "span, split 2");
+        add(port1);
+
+        add(start, "span");
+
+        add(port2Label, "skip");
+        add(port2, "width 60:");
+
+        add(publicServer, "span");
+
+        add(multiPlayerNoLabel, "skip");
+        add(multiPlayerNo, "width 60:");
+        add(useAdvantages, "wrap 30");
+
+        add(ok, "span, split 2, align center");
+        add(cancel);
 
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
