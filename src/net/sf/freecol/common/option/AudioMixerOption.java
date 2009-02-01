@@ -46,7 +46,9 @@ public class AudioMixerOption extends AbstractOption {
 
     public static final String AUTO = Messages.message("clientOptions.audio.audioMixer.automatic");
 
-    private static final MixerWrapper DEFAULT = new MixerWrapper(AUTO, AudioSystem.getMixer(null).getMixerInfo());
+    private static final Mixer AUTODETECT_MIXER = AudioSystem.getMixer(null);
+    private static final MixerWrapper DEFAULT = new MixerWrapper(AUTO,
+            (AUTODETECT_MIXER != null) ? AUTODETECT_MIXER.getMixerInfo() : null);
 
     
     private static Comparator<MixerWrapper> audioMixerComparator = new Comparator<MixerWrapper>() {
