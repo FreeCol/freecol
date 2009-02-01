@@ -187,7 +187,7 @@ public final class GUI {
     private java.util.Map<Unit, Integer> unitsOutForAnimation; 
 
     private Font textFont = new Font("SansSerif", Font.BOLD, 20);
-
+    private Font hugeFont = new Font("SansSerif", Font.BOLD, 36);
 
     /**
     * The constructor to use.
@@ -518,6 +518,10 @@ public final class GUI {
         }
     }
 
+
+    public Font getTextFont() {
+        return textFont;
+    }
     
     /**
     * Gets the selected tile.
@@ -1256,12 +1260,19 @@ public final class GUI {
             
             final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
             final String nation = freeColClient.getGame().getCurrentPlayer().getNationAsString();
-            Image im = createStringImage(g, 
-                    Messages.message("waitingFor", "%nation%", nation),
-                    currentPlayerColor,
-                    640,
-                    18);
-                        
+            TextLayout layout = new TextLayout(Messages.message("waitingFor", "%nation%", nation),
+                                               hugeFont, g.getFontRenderContext());
+            BufferedImage im = new BufferedImage((int) layout.getBounds().getWidth(),
+                                                 (int) layout.getBounds().getHeight(),
+                                                 BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = im.createGraphics();
+            Shape outline = layout.getOutline(null);
+            g2d.translate(0, layout.getAscent());
+            g2d.setColor(currentPlayerColor);
+            g2d.fill(outline);
+            g2d.setColor(Color.BLACK);
+            g2d.draw(outline);
+ 
             final ImageIcon coatOfArmsIcon = lib.getCoatOfArmsImageIcon(freeColClient.getGame().getCurrentPlayer().getNation());
             final int cHeight = (coatOfArmsIcon != null) ? coatOfArmsIcon.getIconHeight() : 0;
             final int cWidth = (coatOfArmsIcon != null) ? coatOfArmsIcon.getIconWidth() : 0;
@@ -1292,20 +1303,39 @@ public final class GUI {
 
         // Don't edit the list of messages while I'm drawing them.
         synchronized (this) {
-            BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, size.width, 12);
-
-            yy = size.height - 300 - getMessageCount() * si.getHeight();// 200 ;
+            yy = 200 ;
             xx = 40;
 
+            Color oldColor = g.getColor();
+            AffineTransform oldTransform = g.getTransform();
+            g.translate(xx, yy);
             for (int i = 0; i < getMessageCount(); i++) {
                 GUIMessage message = getMessage(i);
-                g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), size.width, 12), xx, yy, null);
-                yy += si.getHeight();
+                TextLayout layout = new TextLayout(message.getMessage(), textFont, g.getFontRenderContext());
+                Shape outline = layout.getOutline(null);
+                g.setColor(message.getColor());
+                g.fill(outline);
+                g.setColor(Color.BLACK);
+                g.draw(outline);
+                g.translate(0, 20);
             }
+            // restore previous settings
+            g.setColor(oldColor);
+            g.setTransform(oldTransform);
         }
     }
 
-
+    /**
+     * Draws a string of a given color and with a black border around
+     * the glyphs.
+     *
+     * @param g a <code>Graphics2D</code> value
+     * @param text a <code>String</code> value
+     * @param color a <code>Color</code> value
+     * @param font a <code>Font</code> value
+     * @param x a <code>double</code> value
+     * @param y a <code>double</code> value
+     */
     public void drawOutlineString(Graphics2D g, String text, Color color, Font font, double x, double y) {
         Color oldColor = g.getColor();
         AffineTransform oldTransform = g.getTransform();
@@ -1353,26 +1383,7 @@ public final class GUI {
             return ResourceManager.getImage("path." + u.getPathTypeImage() + ".image");
         }
     }
-    
-    /**
-     * Gets an image to represent the path of the given <code>Unit</code>.
-     * 
-     * @param u The <code>Unit</code>
-     * @return The <code>Image</code>.
-     *
-    private Image getPathIllegalImage(Unit u) {
-        if (u == null || u.isNaval()) {
-            return (Image) UIManager.get("path.naval.illegal.image");
-        } else if (u.isMounted()) {
-            return (Image) UIManager.get("path.horse.illegal.image");
-        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
-            return (Image) UIManager.get("path.wagon.illegal.image");
-        } else {
-            return (Image) UIManager.get("path.foot.illegal.image");
-        }
-    }
-    */
-    
+
     /**
      * Gets an image to represent the path of the given <code>Unit</code>.
      * 
@@ -1387,119 +1398,18 @@ public final class GUI {
         }
     }
 
+
     /**
-    * Creates an image with a string of a given color and with 
-    * a black border around the glyphs.
-    *
-    * @param g A <code>Graphics</code>-object for getting a
-    *       <code>Font</code>.
-    * @param nameString The <code>String</code> to make an image of.
-    * @param color The <code>Color</code> to use when displaying 
-    *       the <code>nameString</code>.
-    * @param maxWidth The maximum width of the image. The size of 
-    *       the <code>Font</code> will be adjusted if the image gets 
-    *       larger than this value.
-    * @param preferredFontSize The preferred font size.
-    * @return The image that was created.
-    */
-    public BufferedImage createStringImage(Graphics2D g, String nameString, Color color, int maxWidth, int preferredFontSize) {
-        return createStringImage(null, g, nameString, color, maxWidth, preferredFontSize);
-    }
-    
-    /**
-     * Creates an image with a string of a given color and with 
-     * a black border around the glyphs.
+     * Draws a road, between the given points, on the provided <code>Graphics</code>.
+     * When you provide the same <code>seed</code> you will get the same road.
      *
-     * @param c A <code>JComponent</code>-object for getting a
-     *       <code>Font</code>.
-     * @param nameString The <code>String</code> to make an image of.
-     * @param color The <code>Color</code> to use when displaying 
-     *       the <code>nameString</code>.
-     * @param maxWidth The maximum width of the image. The size of 
-     *       the <code>Font</code> will be adjusted if the image gets 
-     *       larger than this value.
-     * @param preferredFontSize The preferred font size.
-     * @return The image that was created.
+     * @param g The <code>Graphics</code> to draw the road upon.
+     * @param seed The seed of the random generator that is creating the road.
+     * @param x1 The x-component of the first coordinate.
+     * @param y1 The y-component of the first coordinate.
+     * @param x2 The x-component of the second coordinate.
+     * @param y2 The y-component of the second coordinate.
      */
-    public BufferedImage createStringImage(JComponent c, String nameString, Color color, int maxWidth, int preferredFontSize) {
-        return createStringImage(c, null, nameString, color, maxWidth, preferredFontSize);
-    }    
-    
-    /**
-     * Creates an image with a string of a given color and with 
-     * a black border around the glyphs.
-     *
-     * @param c A <code>JComponent</code>-object for getting a
-     *       <code>Font</code>.
-     * @param g A <code>Graphics</code>-object for getting a
-     *       <code>Font</code>.
-     * @param nameString The <code>String</code> to make an image of.
-     * @param color The <code>Color</code> to use when displaying 
-     *       the <code>nameString</code>.
-     * @param maxWidth The maximum width of the image. The size of 
-     *       the <code>Font</code> will be adjusted if the image gets 
-     *       larger than this value.
-     * @param preferredFontSize The preferred font size.
-     * @return The image that was created.
-     */
-    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {        
-        if (color == null) {
-            logger.warning("createStringImage called with color null");
-            color = Color.WHITE;
-        }
-        Font nameFont = (c != null) ? c.getFont() : g.getFont();
-        FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
-        BufferedImage bi = null;
-
-        int fontSize = preferredFontSize;
-        do {
-            nameFont = nameFont.deriveFont(Font.BOLD, fontSize);            
-            nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
-            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
-            fontSize -= 2;
-        } while (bi.getWidth() > maxWidth);
-
-        Graphics2D big = bi.createGraphics();
-
-        big.setColor(color);
-        big.setFont(nameFont);
-        big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
-
-        int playerColor = color.getRGB();
-        for (int biX=0; biX<bi.getWidth(); biX++) {
-            for (int biY=0; biY<bi.getHeight(); biY++) {
-                int r = bi.getRGB(biX, biY);
-
-                if (r == playerColor) {
-                    continue;
-                }
-
-                for (int cX=-1; cX <=1; cX++) {
-                    for (int cY=-1; cY <=1; cY++) {
-                        if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
-                            bi.setRGB(biX, biY, getStringBorderColor(color).getRGB());
-                            continue;
-                        }
-                    }
-                }
-            }
-        }
-
-        return bi;
-    }
-
-
-    /**
-    * Draws a road, between the given points, on the provided <code>Graphics</code>.
-    * When you provide the same <code>seed</code> you will get the same road.
-    *
-    * @param g The <code>Graphics</code> to draw the road upon.
-    * @param seed The seed of the random generator that is creating the road.
-    * @param x1 The x-component of the first coordinate.
-    * @param y1 The y-component of the first coordinate.
-    * @param x2 The x-component of the second coordinate.
-    * @param y2 The y-component of the second coordinate.
-    */
     public void drawRoad(Graphics2D g, long seed, int x1, int y1, int x2, int y2) {
         final int MAX_CORR = 4;
         Color oldColor = g.getColor();

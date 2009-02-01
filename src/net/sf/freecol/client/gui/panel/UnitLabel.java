@@ -265,24 +265,12 @@ public final class UnitLabel extends JLabel implements ActionListener {
                                                       "%turns%", Integer.toString(unit.getTurnsForRepair()));
                 String underRepair1 = underRepair.substring(0, underRepair.indexOf('(')).trim();
                 String underRepair2 = underRepair.substring(underRepair.indexOf('(')).trim();
-                BufferedImage repairImage1 = parent.getGUI()
-                    .createStringImage((Graphics2D)g, underRepair1, Color.RED, getWidth(), 14);
-                BufferedImage repairImage2 = parent.getGUI()
-                    .createStringImage((Graphics2D)g, underRepair2, Color.RED, getWidth(), 14);
-                int textHeight = repairImage1.getHeight() + repairImage2.getHeight();
-                int leftIndent = Math.min(5, Math.min(getWidth() - repairImage1.getWidth(),
-                                                      getWidth() - repairImage2.getWidth()));
-                g.drawImage(repairImage1,
-                            leftIndent, // indent from left side of label (icon is placed at the left side)
-                            ((getHeight() - textHeight) / 2),
-                            null);
-                g.drawImage(repairImage2, 
-                            leftIndent, 
-                            ((getHeight() - textHeight) / 2) + repairImage1.getHeight(), 
-                            null);
+                g.setColor(Color.RED);
+                g.drawString(underRepair1, 0, 40);
+                g.drawString(underRepair2, 0, 60);
             }
         }
-	}
+    }
 
     /**
      * Analyzes an event and calls the right external methods to take care of
