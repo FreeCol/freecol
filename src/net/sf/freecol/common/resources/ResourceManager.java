@@ -49,6 +49,7 @@ public class ResourceManager {
      * Updates the resource mappings after making changes.
      */
     public static void update() {
+        preloadThread = null;
         createMergedContainer();
     }
     
@@ -95,15 +96,16 @@ public class ResourceManager {
      * Creates a merged container for easy access to resources.
      */
     private static void createMergedContainer() {
-        mergedContainer = new ResourceMapping();
-        mergedContainer.addAll(baseMapping);
-        mergedContainer.addAll(tcMapping);
-        mergedContainer.addAll(campaignMapping);
-        mergedContainer.addAll(scenarioMapping);
-        ListIterator<ResourceMapping> it = modMappings.listIterator();
+        ResourceMapping _mergedContainer = new ResourceMapping();
+        _mergedContainer.addAll(baseMapping);
+        _mergedContainer.addAll(tcMapping);
+        _mergedContainer.addAll(campaignMapping);
+        _mergedContainer.addAll(scenarioMapping);
+        ListIterator<ResourceMapping> it = modMappings.listIterator(modMappings.size()); 
         while (it.hasPrevious()) {
-            mergedContainer.addAll(it.previous());
+            _mergedContainer.addAll(it.previous());
         }
+        mergedContainer = _mergedContainer;
     }
 
     /**
@@ -122,6 +124,14 @@ public class ResourceManager {
         tcMapping = _tcMapping;
     }
 
+    /**
+     * Sets the mappings specified by mods.
+     * @param _modMappings A list of the mapping between IDs and files. 
+     */
+    public static void setModMappings(List<ResourceMapping> _modMappings) {
+        modMappings = _modMappings;
+    }
+    
     /**
      * Sets the mappings specified in a campaign.
      * @param _campaignMapping The mapping between IDs and files. 

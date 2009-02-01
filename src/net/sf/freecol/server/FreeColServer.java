@@ -585,7 +585,7 @@ public final class FreeColServer {
         try {
             XMLStreamWriter xsw;
             fos = new JarOutputStream(new FileOutputStream(file));
-            fos.putNextEntry(new JarEntry(file.getName().split("\\.")[0] + "/" + FreeColSavegameFile.SAVEGAME_FILE));
+            fos.putNextEntry(new JarEntry(file.getName().substring(0, file.getName().lastIndexOf('.')) + "/" + FreeColSavegameFile.SAVEGAME_FILE));
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
 
             xsw.writeStartDocument("UTF-8", "1.0");
@@ -681,10 +681,10 @@ public final class FreeColServer {
      */
     public String loadGame(File file) throws IOException, FreeColException {
         boolean doNotLoadAI = false;
-        FreeColSavegameFile fis = null;
+        XMLStreamReader xsr = null;
         try {
-            fis = new FreeColSavegameFile(file);
-            XMLStreamReader xsr = createXMLStreamReader(fis);
+            final FreeColSavegameFile fis = new FreeColSavegameFile(file);
+            xsr = createXMLStreamReader(fis);
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
             if (!Message.getFreeColProtocolVersion().equals(version)) {
@@ -779,9 +779,9 @@ public final class FreeColServer {
             logger.warning(sw.toString());
             throw new IOException(e.toString());
         } finally {
-            if (fis != null) {
-                fis.close();
-            }
+            try {
+                xsr.close();
+            } catch (Exception e) {}
         }
     }
 

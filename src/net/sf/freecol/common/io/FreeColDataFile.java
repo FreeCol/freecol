@@ -27,9 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,19 +49,7 @@ public class FreeColDataFile {
 
     /** The file this object represents. */
     private final File file;
-    
-    /**
-     * An open JarFile created using {@link #file} (only if {@link #file} is
-     * a ZIP-file).
-     */ 
-    private final JarFile jarFile;
-    
-    /**
-     * Used for keeping track of open files (only if {@link #file} is
-     * a directory). 
-     */    
-    private final List<InputStream> openStreams;
-    
+
     /**
      * A prefix string for the jar-entries (only if {@link #file} is
      * a ZIP-file).
@@ -74,15 +61,14 @@ public class FreeColDataFile {
      * an outdated savegame).
      */
     private final InputStream supportOldSavegames;
-
+    
     
     /**
      * Opens the given file for reading.
      * 
      * @param file The file to be read.
-     * @throws IOException if thrown while opening the file.
      */
-    public FreeColDataFile(File file) throws IOException {
+    public FreeColDataFile(File file) {
         if (!file.exists()) {
             for (String ending : getFileEndings()) {
                 final File tempFile = new File(file.getAbsolutePath() + ending);
@@ -94,40 +80,66 @@ public class FreeColDataFile {
         }
         
         this.file = file;
-        this.openStreams = new LinkedList<InputStream>();
         
         if (file.isDirectory()) {
-            this.jarFile = null;
             this.jarDirectory = null;
             this.supportOldSavegames = null;
         } else {
             // START SUPPORT OLD SAVEGAMES
-            FileInputStream fis = new FileInputStream(file);
-            this.openStreams.add(fis);
-            InputStream in = new BufferedInputStream(fis);
-            this.openStreams.add(in);
-            in.mark(10);
-            byte[] buf = new byte[5];
-            in.read(buf, 0, 5);
-            in.reset();
-            if ((new String(buf)).startsWith("PK")) {
-                // START KEEP
-                this.jarFile = new JarFile(file);
-                this.jarDirectory = file.getName().split("\\.")[0];
-                // END KEEP
-                this.supportOldSavegames = null;
-            } else { 
-                if (!(new String(buf)).equals("<?xml")) {
-                    in = new BufferedInputStream(new GZIPInputStream(in));
+            try {
+                InputStream in = new BufferedInputStream(new FileInputStream(file));
+                in.mark(10);
+                byte[] buf = new byte[5];
+                in.read(buf, 0, 5);
+                in.reset();
+                if ((new String(buf)).startsWith("PK")) {
+                    // START KEEP
+                    this.jarDirectory = findJarDirectory(file.getName().substring(0, file.getName().lastIndexOf('.')), file);
+                    // END KEEP
+                    this.supportOldSavegames = null;
+                } else { 
+                    if (!(new String(buf)).equals("<?xml")) {
+                        in = new BufferedInputStream(new GZIPInputStream(in));
+                    }
+                    this.supportOldSavegames = in;
+                    this.jarDirectory = null;
                 }
-                this.supportOldSavegames = in;
-                this.jarFile = null;
-                this.jarDirectory = null;
+            } catch (IOException e) {
+                throw new RuntimeException("IOException while trying to load a legacy savegame.", e);
             }
             // END SUPPORT OLD SAVEGAMES            
         }
     }
-
+    
+    /**
+     * Finds the directory within the zip-file in case the data file
+     * has been renamed.
+     * 
+     * @param expectedName The name the directory should have.
+     * @param file The zip-file.
+     * @return The name of the base directory in the zip-file.
+     */
+    private static String findJarDirectory(final String expectedName, File file) {
+        JarFile jf = null;
+        try {
+            jf = new JarFile(file);
+            final JarEntry entry = jf.entries().nextElement();
+            final String en = entry.getName();
+            final int index = (en.lastIndexOf('/') > 0) ? en.lastIndexOf('/') : en.length() - 1;
+            final String name = en.substring(0, index);
+            if (!name.equals(expectedName)) {
+                logger.warning("Expected directory '" + expectedName + "', but found '" + name + "' in data file.");
+            }
+            return name;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Exception while reading data file.", e);
+            return expectedName;
+        } finally {
+            try {
+                jf.close();
+            } catch (Exception e) {}
+        }
+    }
 
     /**
      * Returns an input stream for the specified resource.
@@ -138,21 +150,24 @@ public class FreeColDataFile {
      *      archive. 
      * @return
      */
-    public InputStream getInputStream(String filename) throws IOException {
+    protected InputStream getInputStream(String filename) throws IOException {
         if (supportOldSavegames != null) {
             return supportOldSavegames;
-        } else if (file.isDirectory()) {
-            final FileInputStream fis = new FileInputStream(new File(file, filename));
-            openStreams.add(fis);
-            final InputStream bis = new BufferedInputStream(fis);
-            openStreams.add(bis);
-            return bis;
         } else {
-            final InputStream fis = jarFile.getInputStream(jarFile.getJarEntry(jarDirectory + "/" + filename));
-            openStreams.add(fis);
-            final InputStream bis = new BufferedInputStream(fis);
-            openStreams.add(bis);
-            return bis;
+            return new BufferedInputStream(getURL(filename).openStream());
+        }
+    }
+    
+    private URL getURL(String filename) {
+        try {
+            if (file.isDirectory()) {
+                return new URL("file", null, (new File(file, filename)).getAbsolutePath());
+            } else {
+                return new URL("jar:file:" + file.getAbsoluteFile() + "!/" + jarDirectory + "/" + filename);
+            }
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
+            return null;
         }
     }
     
@@ -174,41 +189,13 @@ public class FreeColDataFile {
             Enumeration<?> pn = properties.propertyNames();
             while (pn.hasMoreElements()) {
                 final String key = (String) pn.nextElement();
-                final URL resourceLocator;
-                if (file.isDirectory()) {
-                    resourceLocator =  new URL("file", null, (new File(file, properties.getProperty(key))).getAbsolutePath());
-                } else {
-                    resourceLocator = new URL("jar:file:" + file.getAbsoluteFile() + "!/" + jarDirectory + "/" + properties.getProperty(key));
-                }
+                final URL resourceLocator = getURL(properties.getProperty(key));
                 rc.add(key, ResourceFactory.createResource(resourceLocator));
             }  
             return rc;
         } catch (IOException e) {
             logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
             return null;
-        }
-    }
-
-    /**
-     * Closes this data file by closing all input streams.
-     */
-    public void close() {
-        if (jarFile != null) {
-            try {
-                jarFile.close();
-            } catch (IOException e) {}
-        }
-        if (openStreams != null) {
-            for (InputStream is : openStreams) {
-                try {
-                    is.close();
-                } catch (IOException e) {}
-            }
-        }
-        if (supportOldSavegames != null) {
-            try {
-                supportOldSavegames.close();
-            } catch (IOException e) {}
         }
     }
     

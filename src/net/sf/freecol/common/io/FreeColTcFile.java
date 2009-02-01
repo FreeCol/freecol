@@ -36,25 +36,22 @@ public class FreeColTcFile extends FreeColModFile {
      * @param id The id of the TC to load.
      * @throws IOException if thrown while opening the file.
      */
-    public FreeColTcFile(final String id) throws IOException {
+    public FreeColTcFile(final String id) {
         super(id, new File(FreeCol.getDataDirectory(), id));
     }
     
     /**
      * {@inheritDoc}
      */
+    @Override
     public ResourceMapping getResourceMapping() {
         try {
-            final ModInfo info = getModInfo();
+            final ModDescriptor info = getModDescriptor();
             if (info.getParent() != null) {
                 final FreeColTcFile parentTcData = new FreeColTcFile(info.getParent());
-                try {
-                    final ResourceMapping rc = parentTcData.getResourceMapping();
-                    rc.addAll(super.getResourceMapping());
-                    return rc;
-                } finally {
-                    parentTcData.close();
-                }
+                final ResourceMapping rc = parentTcData.getResourceMapping();
+                rc.addAll(super.getResourceMapping());
+                return rc;
             } else {
                 return super.getResourceMapping();
             }
@@ -67,6 +64,7 @@ public class FreeColTcFile extends FreeColModFile {
      * File endings that are supported for this type of data file.
      * @return An array of: ".ftc" and ".zip".
      */
+    @Override
     protected String[] getFileEndings() {
         return new String[] {".ftc", ".zip"};
     }

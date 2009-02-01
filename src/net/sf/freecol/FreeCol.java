@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Locale;
 import java.util.jar.Attributes;
@@ -202,11 +203,11 @@ public final class FreeCol {
             try {
                 final FreeColServer freeColServer;
                 if (savegameFile != null) {
-                    FreeColSavegameFile fis = null;
+                    XMLStreamReader in = null;
                     try {
                         // Get suggestions for "singleplayer" and "public game" settings from the file:
-                        fis = new FreeColSavegameFile(savegameFile);
-                        XMLStreamReader in = FreeColServer.createXMLStreamReader(fis);
+                        final FreeColSavegameFile fis = new FreeColSavegameFile(savegameFile);
+                        in = FreeColServer.createXMLStreamReader(fis);
                         in.nextTag();
                         final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
                         final boolean defaultPublicServer;
@@ -225,9 +226,9 @@ public final class FreeCol {
                         System.exit(1);
                         return;
                     } finally {
-                        if (fis!=null) {
-                            fis.close();
-                        }
+                        try {
+                            in.close();
+                        } catch (Exception e) {}
                     }
                 } else {
                     try {
@@ -268,7 +269,6 @@ public final class FreeCol {
             } else {
                 preloadSize = new Dimension(bounds.width, bounds.height);
             }
-            ResourceManager.preload(preloadSize);
             try {
                 UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder, preloadSize));
             } catch (UnsupportedLookAndFeelException e) {
@@ -321,7 +321,7 @@ public final class FreeCol {
                 }
             }
 
-            freeColClient = new FreeColClient(windowed, windowSize, lib, musicLibrary, sfxLibrary);
+            freeColClient = new FreeColClient(windowed, preloadSize, lib, musicLibrary, sfxLibrary);
 
             if (savegameFile != null) {
                 final FreeColClient theFreeColClient = freeColClient;
@@ -594,37 +594,24 @@ public final class FreeCol {
     }
     
     public static boolean initializeResourceFolders() {
+        FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
+        ResourceManager.setBaseMapping(baseData.getResourceMapping());
         
-        try {
-            FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
-            try {
-                ResourceManager.setBaseMapping(baseData.getResourceMapping());
-            } finally {
-                baseData.close();
-            }
-        } catch (IOException e) {
-            System.err.println("Could not find base data directory.");
-            return false;
-        }
-        FreeColTcFile tcData;
-        try {
-            tcData = new FreeColTcFile(tc);
-            try {
-                ResourceManager.setTcMapping(tcData.getResourceMapping());
-            } finally {
-                tcData.close();
-            }
-        } catch (IOException e) {
-            System.err.println("Could not load: " + tc);
-            return false;
-        }
+        final FreeColTcFile tcData = new FreeColTcFile(tc);
+        ResourceManager.setTcMapping(tcData.getResourceMapping());
         
         // This needs to be initialized before ImageLibrary
+        InputStream si = null;
         try {
-            Specification.createSpecification(tcData.getSpecificationInputStream());
+            si = tcData.getSpecificationInputStream();
+            Specification.createSpecification(si);
         } catch (IOException e) {
             System.err.println("Could not load specification.xml for: " + tc);
             return false;
+        } finally {
+            try {
+                si.close();
+            } catch (Exception e) {}
         }
 
         ResourceManager.update();

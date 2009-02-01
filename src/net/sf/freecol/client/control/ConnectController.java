@@ -376,11 +376,11 @@ public final class ConnectController {
         final boolean singleplayer;
         final String name;
         final int port;
-        FreeColSavegameFile fis = null;
+        XMLStreamReader in = null;
         try {
             // Get suggestions for "singleplayer" and "public game" settings from the file:
-            fis = new FreeColSavegameFile(theFile);
-            XMLStreamReader in = FreeColServer.createXMLStreamReader(fis);
+            final FreeColSavegameFile fis = new FreeColSavegameFile(theFile);
+            in = FreeColServer.createXMLStreamReader(fis);
             in.nextTag();
             final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
             final boolean defaultPublicServer;
@@ -426,9 +426,9 @@ public final class ConnectController {
             SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
             return;
         } finally {
-            if (fis != null) {
-                fis.close();
-            }
+            try {
+                in.close();
+            } catch (Exception e) {}
         }
         
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {

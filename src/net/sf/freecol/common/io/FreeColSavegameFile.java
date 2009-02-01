@@ -52,6 +52,7 @@ public class FreeColSavegameFile extends FreeColDataFile {
      * File endings that are supported for this type of data file.
      * @return An array of: ".fsg" and ".zip".
      */
+    @Override
     protected String[] getFileEndings() {
         return new String[] {".fsg", ".zip"};
     }

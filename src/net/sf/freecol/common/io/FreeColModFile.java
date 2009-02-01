@@ -37,10 +37,11 @@ import net.sf.freecol.client.gui.i18n.Messages;
 public class FreeColModFile extends FreeColDataFile {
     
     private static final String SPECIFICATION_FILE = "specification.xml";
-    private static final String MOD_INFO_FILE = "mod.xml";
-    private static final String[] FILE_ENDINGS = new String[] {".fmd", ".zip"};
+    private static final String MOD_DESCRIPTOR_FILE = "mod.xml";
+    public static final String[] FILE_ENDINGS = new String[] {".fmd", ".zip"};
 
     private String id;
+    private final ModInfo modInfo;
     
     /**
      * Opens the given file for reading.
@@ -48,8 +49,18 @@ public class FreeColModFile extends FreeColDataFile {
      * @param id The id of the mod to load.
      * @throws IOException if thrown while opening the file.
      */
-    public FreeColModFile(final String id) throws IOException {
+    public FreeColModFile(final String id) {
         this(id, new File(FreeCol.getModsDirectory(), id));
+    }
+    
+    /**
+     * Opens the given file for reading.
+     * 
+     * @param mi An id object.
+     * @throws IOException if thrown while opening the file.
+     */
+    public FreeColModFile(final ModInfo mi) {
+        this(mi.getId());
     }
     
     /**
@@ -59,10 +70,11 @@ public class FreeColModFile extends FreeColDataFile {
      * @param file The file to be read.
      * @throws IOException if thrown while opening the file.
      */
-    protected FreeColModFile(final String id, final File file) throws IOException {
+    protected FreeColModFile(final String id, final File file) {
         super(file);
         
         this.id = id;
+        this.modInfo = new ModInfo(id);
     }
     
     /**
@@ -84,13 +96,13 @@ public class FreeColModFile extends FreeColDataFile {
      * @throws IOException if thrown while reading the
      *      "mod.xml" file.
      */
-    public ModInfo getModInfo() throws IOException {
+    protected ModDescriptor getModDescriptor() throws IOException {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         XMLStreamReader in = null;
         try {
-            in = xif.createXMLStreamReader(getModInfoInputStream());
+            in = xif.createXMLStreamReader(getModDescriptorInputStream());
             in.nextTag();
-            final ModInfo mi = new ModInfo(id, in);
+            final ModDescriptor mi = new ModDescriptor(in);
             return mi;
         } catch (XMLStreamException e) {
             final IOException e2 = new IOException("XMLStreamException.");
@@ -113,52 +125,47 @@ public class FreeColModFile extends FreeColDataFile {
      * @throws IOException if thrown while opening the
      *      input stream.
      */
-    private InputStream getModInfoInputStream() throws IOException {
-        return getInputStream(MOD_INFO_FILE);
+    private InputStream getModDescriptorInputStream() throws IOException {
+        return getInputStream(MOD_DESCRIPTOR_FILE);
     }
     
     /**
      * File endings that are supported for this type of data file.
      * @return An array of: ".fmd" and ".zip".
      */
+    @Override
     protected String[] getFileEndings() {
         return FILE_ENDINGS;
     }
     
+    /**
+     * Gets the ID of this mod.
+     * @return The ID of the mod.
+     */
+    public String getId() {
+        return id;
+    }
+    
+    public ModInfo getModInfo() {
+        return modInfo;
+    }
+        
     public static class ModInfo {
 
         private final String id;
-        private final String parent;
         
-        /**
-         * Initiates a new <code>ModInfo</code> from XML.
-         *
-         * @param id The mod to be loaded.
-         * @param in The input stream containing the XML.
-         * @throws XMLStreamException if a problem was encountered
-         *      during parsing.
-         */
-        protected ModInfo(final String id, XMLStreamReader in) throws XMLStreamException {
+        private ModInfo(final String id) {
             this.id = id;
-            this.parent = in.getAttributeValue(null, "parent");
         }
         
         /**
-         * Returns the id of the mod.
-         * @return The id.
+         * Gets the ID of this mod.
+         * @return The ID of the mod.
          */
         public String getId() {
             return id;
         }
-        
-        /**
-         * Gets the parent of the mod.
-         * @return
-         */
-        public String getParent() {
-            return parent;
-        }
-        
+
         /**
          * Gets the name of this mod.
          */
@@ -173,6 +180,39 @@ public class FreeColModFile extends FreeColDataFile {
         public String getShortDescription() {
             // TODO: Get the text from the properties-file within the mod.
             return Messages.message(getId() + ".shortDescription");
+        }
+        
+        /**
+         * Gets the name of this mod.
+         * @return The same as {@link #getName()}.
+         */
+        public String toString() {
+            return getName();
+        }
+    }
+    
+    protected static class ModDescriptor {
+
+        private final String parent;
+        
+        /**
+         * Initiates a new <code>ModInfo</code> from XML.
+         *
+         * @param id The mod to be loaded.
+         * @param in The input stream containing the XML.
+         * @throws XMLStreamException if a problem was encountered
+         *      during parsing.
+         */
+        protected ModDescriptor(XMLStreamReader in) throws XMLStreamException {
+            this.parent = in.getAttributeValue(null, "parent");
+        }
+        
+        /**
+         * Gets the parent of the mod.
+         * @return
+         */
+        public String getParent() {
+            return parent;
         }
     }
 }

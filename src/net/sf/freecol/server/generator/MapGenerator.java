@@ -147,11 +147,11 @@ public class MapGenerator implements IMapGenerator {
          * TODO-LATER: We are using same method in FreeColServer.
          *       Create a framework for loading games/maps.
          */
-        FreeColSavegameFile fis = null;
+        XMLStreamReader xsr = null;
         Game game = null;
         try {
-            fis = new FreeColSavegameFile(importFile);
-            XMLStreamReader xsr = FreeColServer.createXMLStreamReader(fis);
+            final FreeColSavegameFile fis = new FreeColSavegameFile(importFile);
+            xsr = FreeColServer.createXMLStreamReader(fis);
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
             if (!Message.getFreeColProtocolVersion().equals(version)) {
@@ -194,9 +194,9 @@ public class MapGenerator implements IMapGenerator {
             logger.warning(sw.toString());
             throw new FreeColException(e.toString());
         } finally {
-            if (fis != null) {
-                fis.close();
-            }
+            try {
+                xsr.close();
+            } catch (Exception e) {}
         }
         return game;
     }
