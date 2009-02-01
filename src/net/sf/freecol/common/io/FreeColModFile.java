@@ -171,7 +171,7 @@ public class FreeColModFile extends FreeColDataFile {
          */
         public String getName() {
             // TODO: Get the text from the properties-file within the mod.
-            return Messages.message(getId() + ".name");
+            return Messages.message("mod." + getId() + ".name");
         }
         
         /**
@@ -179,7 +179,7 @@ public class FreeColModFile extends FreeColDataFile {
          */
         public String getShortDescription() {
             // TODO: Get the text from the properties-file within the mod.
-            return Messages.message(getId() + ".shortDescription");
+            return Messages.message("mod." + getId() + ".shortDescription");
         }
         
         /**
