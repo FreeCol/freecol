@@ -40,7 +40,9 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Player;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * Finds a colony on the map.
@@ -69,27 +71,25 @@ public final class FindColonyDialog extends FreeColDialog implements ListSelecti
         int comparator = ClientOptions.COLONY_COMPARATOR_NAME;
         Collections.sort(knownColonies, ClientOptions.getColonyComparator(comparator));
 
-        HIGLayout layout = new HIGLayout(new int[] {0}, new int[] {0, 20, 0, 10, 0 });
-        layout.setColumnWeight(1, 1);
-        layout.setRowWeight(3, 1);
+        MigLayout layout = new MigLayout("wrap 1", "[align center]", "[]30[]30[]");
         setLayout(layout);
 
         JLabel header = new JLabel(Messages.message("menuBar.view.findColony"));
         header.setFont(smallHeaderFont);
-        add(header, higConst.rc(1, 1, ""));
+        add(header);
 
         colonyList = new JList(knownColonies.toArray(new Colony[knownColonies.size()]));
         JScrollPane listScroller = new JScrollPane(colonyList);
         listScroller.setPreferredSize(new Dimension(250, 250));
         colonyList.addListSelectionListener(this);
-        add(listScroller, higConst.rc(3, 1));
+        add(listScroller);
 
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     remove();
                 }
             });
-        add(okButton, higConst.rc(5, 1));
+        add(okButton);
 
         setSize(getPreferredSize());
     }

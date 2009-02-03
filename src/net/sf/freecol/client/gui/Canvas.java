@@ -2555,21 +2555,6 @@ public final class Canvas extends JDesktopPane {
         }
     }
 
-    public void findColony() {
-        String colonyName = showInputDialog("menuBar.view.findColony", "", "ok", null);
-        if (colonyName.length() > 0) {
-            for (Player player : freeColClient.getGame().getEuropeanPlayers()) {
-                for (Colony colony : player.getColonies()) {
-                    if (colonyName.equals(colony.getName())) {
-                        getGUI().setFocus(colony.getTile().getPosition());
-                        return;
-                    }
-                }
-            }
-            showInformationMessage("colonyNotFound", "%colony%", colonyName);
-        }
-    }
-
     /**
      * Closes all panels, changes the background and shows the main menu.
      */
