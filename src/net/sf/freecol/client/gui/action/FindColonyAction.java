@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.panel.FindColonyDialog;
 import net.sf.freecol.common.model.Player.PlayerType;
 
 /**
@@ -74,6 +76,7 @@ public class FindColonyAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getCanvas().findColony();
+        Canvas canvas = getFreeColClient().getCanvas();
+        canvas.showPanel(new FindColonyDialog(canvas), false);
     }
 }

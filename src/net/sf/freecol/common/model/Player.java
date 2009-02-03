@@ -501,7 +501,7 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public void divertModelMessages(FreeColGameObject source, FreeColGameObject newSource) {
         // Since we are changing the list, we need to copy it to be able
-        //to iterate through it
+        // to iterate through it
         List<ModelMessage> modelMessagesList = new ArrayList<ModelMessage>();
         modelMessagesList.addAll(modelMessages);
         

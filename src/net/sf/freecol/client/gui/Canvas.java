@@ -489,11 +489,24 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays a <code>FreeColPanel</code>.
-     * 
+     *
+     * @param panel a <code>FreeColPanel</code> value
      */
     public void showPanel(FreeColPanel panel) {
         closeMenus();
         addAsFrame(panel);
+        panel.requestFocus();
+    }
+
+    /**
+     * Displays a <code>FreeColPanel</code>.
+     *
+     * @param panel a <code>FreeColPanel</code> value
+     * @param centered a <code>boolean</code> value
+     */
+    public void showPanel(FreeColPanel panel, boolean centered) {
+        closeMenus();
+        addAsFrame(panel, false, centered);
         panel.requestFocus();
     }
 
@@ -2039,6 +2052,21 @@ public final class Canvas extends JDesktopPane {
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     private JInternalFrame addAsFrame(JComponent comp, boolean toolBox) {
+        return addAsFrame(comp, toolBox, true);
+    }
+
+    /**
+     * Adds a component on this Canvas inside a frame. Removes the
+     * statuspanel if visible (and <code>comp != statusPanel</code>).
+     * 
+     * @param comp The component to add to this ToEuropePanel.
+     * @param toolBox Should be set to true if the resulting frame
+     *      is used as a toolbox (that is: it should not be counted
+     *      as a frame).
+     * @param centered a <code>boolean</code> value
+     * @return The <code>JInternalFrame</code> that was created and added.
+     */
+    private JInternalFrame addAsFrame(JComponent comp, boolean toolBox, boolean centered) {
         final int FRAME_EMPTY_SPACE = 60;
 
         final JInternalFrame f = (toolBox) ? new ToolBoxFrame() : new JInternalFrame();
@@ -2091,7 +2119,12 @@ public final class Canvas extends JDesktopPane {
             height = Math.min(height, getHeight() - getMenuBarHeight());
         }
         f.setSize(width, height);
-        addCentered(f, MODAL_LAYER);
+        if (centered) {
+            addCentered(f, MODAL_LAYER);
+        } else {
+            f.setLocation(0, getMenuBarHeight());
+            add(f, MODAL_LAYER);
+        }
         f.setName(comp.getClass().getSimpleName());
 
         f.setFrameIcon(null);
