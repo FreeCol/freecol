@@ -1546,6 +1546,23 @@
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
     </european-nation-type>
+    <european-nation-type id="model.nationType.agriculture">
+      <modifier id="model.goods.food" type="additive" value="2"/>
+      <unit id="model.unit.expertFarmer" role="pioneer"/>
+      <unit id="model.unit.freeColonist" role="soldier"/>
+      <unit id="model.unit.caravel"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.electFoundingFather"/>
+    </european-nation-type>
+    <european-nation-type id="model.nationType.furTrapping">
+      <modifier id="model.goods.furs" type="additive" value="2"/>
+      <modifier id="model.goods.coats" type="additive" value="2"/>
+      <unit id="model.unit.expertFurTrapper" role="pioneer"/>
+      <unit id="model.unit.masterFurTrader" role="soldier"/>
+      <unit id="model.unit.caravel"/>
+      <ability id="model.ability.foundColony" value="true"/>
+      <ability id="model.ability.electFoundingFather"/>
+    </european-nation-type>
 
     <indian-nation-type id="model.nationType.apache" number-of-settlements="average"
                         aggression="high" type-of-settlement="indian_camp">
@@ -1698,10 +1715,10 @@
             nation-type="model.nationType.building" selectable="true"
             ref="model.nation.swedishREF"/>
     <nation id="model.nation.danish" color="#00ffff"
-            nation-type="model.nationType.trade" selectable="true"
+            nation-type="model.nationType.agriculture" selectable="true"
             ref="model.nation.danishREF"/>
     <nation id="model.nation.russian" color="#ffffff"
-            nation-type="model.nationType.immigration" selectable="true"
+            nation-type="model.nationType.furTrapping" selectable="true"
             ref="model.nation.russianREF"/>
     <nation id="model.nation.inca" color="#f4f0c4"
             nation-type="model.nationType.inca" />
