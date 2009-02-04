@@ -71,7 +71,7 @@ public final class FindColonyDialog extends FreeColDialog implements ListSelecti
         int comparator = ClientOptions.COLONY_COMPARATOR_NAME;
         Collections.sort(knownColonies, ClientOptions.getColonyComparator(comparator));
 
-        MigLayout layout = new MigLayout("wrap 1", "[align center]", "[]30[]30[]");
+        MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
         setLayout(layout);
 
         JLabel header = new JLabel(Messages.message("menuBar.view.findColony"));
@@ -82,7 +82,7 @@ public final class FindColonyDialog extends FreeColDialog implements ListSelecti
         JScrollPane listScroller = new JScrollPane(colonyList);
         listScroller.setPreferredSize(new Dimension(250, 250));
         colonyList.addListSelectionListener(this);
-        add(listScroller);
+        add(listScroller, "growx, growy");
 
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
