@@ -26,7 +26,7 @@ import net.sf.freecol.client.gui.Canvas;
 /**
  * Parent class for animations.
  */
-public abstract class Animation {
+abstract class Animation {
     
     private static final Logger logger = Logger.getLogger(Animation.class.getName());
     

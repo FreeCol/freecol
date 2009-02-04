@@ -37,7 +37,7 @@ import net.sf.freecol.common.model.Map.Direction;
 /**
  * Class for the animation of units movement.
  */
-public final class UnitMoveAnimation extends Animation {
+final class UnitMoveAnimation extends Animation {
     
     private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
     

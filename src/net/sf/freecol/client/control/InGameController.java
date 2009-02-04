@@ -43,7 +43,7 @@ import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.Canvas.MissionaryAction;
 import net.sf.freecol.client.gui.Canvas.ScoutAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
-import net.sf.freecol.client.gui.animation.UnitMoveAnimation;
+import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
@@ -1944,7 +1944,7 @@ public final class InGameController implements NetworkConstants {
                 ClientOptions.MOVE_ANIMATION_SPEED :
                 ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
             if (freeColClient.getClientOptions().getInteger(key) > 0) {
-                new UnitMoveAnimation(canvas, unit, direction).animate();
+                Animations.unitMove(canvas, unit, direction);
             }
         }
         
@@ -2377,7 +2377,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         
         // Animate the units movement
-        new UnitMoveAnimation(canvas, unit, direction).animate();
+        Animations.unitMove(canvas, unit, direction);
 
         Tile destinationTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         Unit destinationUnit = null;
