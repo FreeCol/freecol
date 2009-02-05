@@ -72,7 +72,11 @@ public class ResourceFactory {
     public static Resource createResource(URL url) {
         Resource r = getResource(url);
         if (r == null) {
-            r = new ImageResource(url);
+            if (url.getPath().endsWith(".sza")) {
+                r = new SZAResource(url);
+            } else {
+                r = new ImageResource(url);
+            }
             resources.put(url, new WeakReference<Resource>(r));
         }
         return r;

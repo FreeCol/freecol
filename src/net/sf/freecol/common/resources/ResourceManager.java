@@ -28,6 +28,7 @@ import java.util.ListIterator;
 import javax.swing.ImageIcon;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
 
 /**
@@ -85,6 +86,7 @@ public class ResourceManager {
                         return;
                     }
                     getImage(key);
+                    getSimpleZippedAnimation(key);
                 }
             }
         };
@@ -148,6 +150,40 @@ public class ResourceManager {
         scenarioMapping = _scenarioMapping;
     }
 
+    /**
+     * Returns the animation specified by the given name.
+     * 
+     * @param resource The name of the resource to return.
+     * @return The animation identified by <code>resource</code>
+     *      or <code>null</code> if there is no animation
+     *      identified by that name.
+     */
+    public static SimpleZippedAnimation getSimpleZippedAnimation(String resource) {
+        final Resource r = mergedContainer.get(resource);
+        if (!(r instanceof SZAResource)) {
+            return null;
+        }
+        return ((SZAResource) r).getSimpleZippedAnimation();
+    }
+    
+    /**
+     * Returns the animation specified by the given name.
+     * 
+     * @param resource The name of the resource to return.
+     * @param scale The size of the requested animation (with 1
+     *      being normal size, 2 twice the size, 0.5 half the
+     *      size etc). Rescaling will be performed unless using 1.
+     * @return The animation identified by <code>resource</code>
+     *      or <code>null</code> if there is no animation
+     *      identified by that name.
+     */
+    public static SimpleZippedAnimation getSimpleZippedAnimation(String resource, double scale) {
+        final Resource r = mergedContainer.get(resource);
+        if (!(r instanceof SZAResource)) {
+            return null;
+        }
+        return ((SZAResource) r).getSimpleZippedAnimation(scale);
+    }
 
     /**
      * Returns the image specified by the given name.
