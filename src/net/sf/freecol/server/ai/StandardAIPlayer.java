@@ -86,6 +86,7 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
+import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
 import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
@@ -672,6 +673,8 @@ public class StandardAIPlayer extends AIPlayer {
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
             getPlayer().resetArrears(goodsType);
         }
+        
+        //TODO: This seems to buy units the AIPlayer can't possibly use (see BR#2566180)
         if (getAIMain().getFreeColServer().isSingleplayer() && getPlayer().isEuropean() && !getPlayer().isREF() && getPlayer().isAI()
                 && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
@@ -845,6 +848,7 @@ public class StandardAIPlayer extends AIPlayer {
             }
             if (!aiUnit.getMission().isValid() || aiUnit.getMission() instanceof UnitWanderHostileMission
                     || aiUnit.getMission() instanceof UnitWanderMission
+                    || aiUnit.getMission() instanceof IdleAtColonyMission
             // || aiUnit.getMission() instanceof DefendSettlementMission
             // || aiUnit.getMission() instanceof UnitSeekAndDestroyMission
             ) {
@@ -1426,7 +1430,13 @@ public class StandardAIPlayer extends AIPlayer {
                 }
             }
             if (!aiUnit.hasMission()) {
-                aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
+                if (aiUnit.getUnit().isOffensiveUnit()) {
+                    aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
+                } else {
+                    //non-offensive units should take shelter in a nearby colony,
+                    //not try to be hostile
+                    aiUnit.setMission(new IdleAtColonyMission(getAIMain(), aiUnit));
+                }
             }
         }
     }

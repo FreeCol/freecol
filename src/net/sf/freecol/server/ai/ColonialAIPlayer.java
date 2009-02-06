@@ -88,6 +88,7 @@ import net.sf.freecol.server.ai.goal.ManageMissionariesGoal;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
 import net.sf.freecol.server.ai.mission.DefendSettlementMission;
+import net.sf.freecol.server.ai.mission.IdleAtColonyMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.ScoutingMission;
@@ -150,6 +151,7 @@ public class ColonialAIPlayer extends AIPlayer {
     public ColonialAIPlayer(AIMain aiMain, Element element) {
         super(aiMain, element.getAttribute("ID"));
         readFromXMLElement(element);
+        //TODO: setPlayer()?
     }
 
     /**
@@ -162,6 +164,7 @@ public class ColonialAIPlayer extends AIPlayer {
     public ColonialAIPlayer(AIMain aiMain, XMLStreamReader in) throws XMLStreamException {
         super(aiMain, in.getAttributeValue(null, "ID"));
         readFromXML(in);
+        //TODO: setPlayer()?
     }
 
 
@@ -586,6 +589,8 @@ public class ColonialAIPlayer extends AIPlayer {
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
             getPlayer().resetArrears(goodsType);
         }
+        
+        //TODO: This seems to buy units the AIPlayer can't possibly use (see BR#2566180)
         if (getAIMain().getFreeColServer().isSingleplayer() && getPlayer().isAI()
                 && getPlayer().getPlayerType() == PlayerType.COLONIAL) {
             Europe europe = getPlayer().getEurope();
@@ -728,6 +733,7 @@ public class ColonialAIPlayer extends AIPlayer {
             }
             if (!aiUnit.getMission().isValid() || aiUnit.getMission() instanceof UnitWanderHostileMission
                     || aiUnit.getMission() instanceof UnitWanderMission
+                    || aiUnit.getMission() instanceof IdleAtColonyMission
             // || aiUnit.getMission() instanceof DefendSettlementMission
             // || aiUnit.getMission() instanceof UnitSeekAndDestroyMission
             ) {
@@ -953,7 +959,13 @@ public class ColonialAIPlayer extends AIPlayer {
                 }
             }
             if (!aiUnit.hasMission()) {
-                aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
+                if (aiUnit.getUnit().isOffensiveUnit()) {
+                    aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
+                } else {
+                    //non-offensive units should take shelter in a nearby colony,
+                    //not try to be hostile
+                    aiUnit.setMission(new IdleAtColonyMission(getAIMain(), aiUnit));
+                }
             }
         }
     }
