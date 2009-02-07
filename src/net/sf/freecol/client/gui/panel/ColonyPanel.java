@@ -95,6 +95,7 @@ import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.resources.ResourceManager;
 
 import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This is a panel for the Colony display. It shows the units that are working
@@ -1155,7 +1156,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            setLayout(new GridLayout(0, 2, 6, 6));
             this.colonyPanel = colonyPanel;
         }
 
@@ -1193,18 +1194,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          */
         public final class ASingleBuildingPanel extends JPanel implements Autoscroll {
 
-            Building building;
+            private final Building building;
+            private final boolean canTeach;
+            private String buildingName;
 
-            ProductionLabel productionLabel;
-
-            public final int[] widths = { 64, 46, 46, 46, 78, 32, 78 };
-
-            public final int[] heights = { 20, 4, 40, 0, 0 };
-
-            public static final int labelColumn = 1;
-            public static final int unitColumn = 2;
-            public static final int productionColumn = 5;
-
+            private ProductionLabel productionInput = null;
+            private ProductionLabel productionOutput = null;;
 
             /**
              * Creates this ASingleBuildingPanel.
@@ -1212,98 +1207,70 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
+
                 this.building = building;
 
                 setBackground(Color.WHITE);
-                setLayout(new HIGLayout(widths, heights));
-                setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, LINK_COLOR),
-                                                             BorderFactory.createEmptyBorder(0, 0, 1, 0)));
+                setLayout(new MigLayout("fill", "", "[][]push[]"));
+
+                this.buildingName = building.getName();
+                if (building.getMaxUnits() == 0) {
+                    buildingName = "(" + building.getName() + ")";
+                }
+
+                canTeach = building.getType().hasAbility("model.ability.teach");
 
                 initialize();
             }
 
             public void initialize() {
-
-                JLabel arrow = new JLabel("\u2192");
-                arrow.setFont(hugeFont);
-
+   
                 removeAll();
-                //JLabel buildingLabel = new JLabel(new ImageIcon(building.getType().getImage()));
-                JLabel buildingName = new JLabel();
-                if (building.getMaxUnits() == 0) {
-                    buildingName.setText("(" + building.getName() + ")");
-                } else {
-                    buildingName.setText(building.getName());
-                }
-                add(buildingName, higConst.rcwh(1, labelColumn, widths.length, 1));
-                //add(buildingLabel, higConst.rc(1, labelColumn));
 
-                List<Unit> unitList = building.getUnitList();
-                for (int index = 0; index < unitList.size(); index++) {
-                    Unit unit = unitList.get(index);
-                    UnitLabel unitLabel = new UnitLabel(unit, parent, true);
+                add(new JLabel(buildingName), "span, align center");
+
+                if (building.getProductionNextTurn() == 0) {
+                    add(new JLabel(), "span");
+                } else {
+                    productionOutput = new ProductionLabel(building.getGoodsOutputType(),
+                                                           building.getProductionNextTurn(),
+                                                           building.getMaximumProduction(), parent);
+                    if (building.getGoodsInputNextTurn() == 0) {
+                        add(productionOutput, "span, align center");
+                    } else {
+                        productionInput = new ProductionLabel(building.getGoodsInputType(),
+                                                              building.getGoodsInputNextTurn(),
+                                                              building.getMaximumGoodsInput(), parent);
+                        JLabel arrow = new JLabel("\u2192");
+                        arrow.setFont(hugeFont);
+                        add(productionInput, "span, split 3, align center");
+                        add(arrow);
+                        add(productionOutput);
+                    }
+                }
+
+                for (Unit unit : building.getUnitList()) {
+                    UnitLabel unitLabel = new UnitLabel(unit, parent, false);
                     if (colonyPanel.isEditable()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                     }
-                    add(unitLabel, higConst.rc(3, unitColumn + index));
-                    if (building.getType().hasAbility("model.ability.teach")) {
-                        if (unit.getStudent() != null) {
-                            JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
-                                                         unit.getNeededTurnsOfTraining());
-                            add(progress, higConst.rc(4, unitColumn + index));
-                            UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
-                            studentLabel.setIgnoreLocation(true);
-                            add(studentLabel, higConst.rc(5, unitColumn + index));
-                        }
+                    if (canTeach && unit.getStudent() != null) {
+                        JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
+                                                     unit.getNeededTurnsOfTraining());
+                        progress.setBackground(Color.WHITE);
+                        progress.setOpaque(true);
+                        UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
+                        studentLabel.setIgnoreLocation(true);
+                        add(unitLabel);
+                        add(progress, "split 2, flowy");
+                        add(studentLabel);
+                    } else  {
+                        add(unitLabel, "span 2");
                     }
                 }
-
-                if (building.getGoodsInputNextTurn() != 0) {
-                    GoodsType inputType = building.getGoodsInputType();
-                    ProductionLabel inputLabel = new ProductionLabel(inputType,
-                                                                     building.getGoodsInputNextTurn(),
-                                                                     building.getMaximumGoodsInput(),
-                                                                     parent);
-                    inputLabel.setGoodsIcon(parent.getGUI().getImageLibrary()
-                                            .getScaledGoodsImageIcon(inputType, 0.8f));
-                    add(inputLabel, higConst.rc(3, productionColumn, ""));
-                    
-                    if (building.getGoodsInputType() != null) {
-                        add(arrow, higConst.rc(3, productionColumn + 1, ""));
-                    }
-                }
-                productionLabel = new ProductionLabel(building.getGoodsOutputType(),
-                                                      building.getProductionNextTurn(),
-                                                      building.getMaximumProduction(), parent);
-                add(productionLabel, higConst.rc(3, productionColumn + 2, ""));
 
                 setSize(getPreferredSize());
-            }
-
-            public void autoscroll(Point p) {
-                JViewport vp = (JViewport) colonyPanel.buildingsPanel.getParent();
-                if (getLocation().y + p.y - vp.getViewPosition().y < SCROLL_AREA_HEIGHT) {
-                    vp.setViewPosition(new Point(vp.getViewPosition().x, Math.max(
-                            vp.getViewPosition().y - SCROLL_SPEED, 0)));
-                } else if (getLocation().y + p.y - vp.getViewPosition().y >= vp.getHeight() - SCROLL_AREA_HEIGHT) {
-                    vp.setViewPosition(new Point(vp.getViewPosition().x, Math.min(
-                            vp.getViewPosition().y + SCROLL_SPEED, colonyPanel.buildingsPanel.getHeight()
-                                    - vp.getHeight())));
-                }
-            }
-
-            public Insets getAutoscrollInsets() {
-                Rectangle r = getBounds();
-                return new Insets(r.x, r.y, r.width, r.height);
-            }
-
-            public Building getBuilding() {
-                return building;
-            }
-
-            public void updateProductionLabel() {
-                initialize();
             }
 
             /**
@@ -1334,6 +1301,32 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 }
             }
 
+
+
+            public void autoscroll(Point p) {
+                JViewport vp = (JViewport) colonyPanel.buildingsPanel.getParent();
+                if (getLocation().y + p.y - vp.getViewPosition().y < SCROLL_AREA_HEIGHT) {
+                    vp.setViewPosition(new Point(vp.getViewPosition().x, Math.max(
+                                                                                  vp.getViewPosition().y - SCROLL_SPEED, 0)));
+                } else if (getLocation().y + p.y - vp.getViewPosition().y >= vp.getHeight() - SCROLL_AREA_HEIGHT) {
+                    vp.setViewPosition(new Point(vp.getViewPosition().x, Math.min(
+                                                                                  vp.getViewPosition().y + SCROLL_SPEED, colonyPanel.buildingsPanel.getHeight()
+                                                                                  - vp.getHeight())));
+                }
+            }
+
+            public Insets getAutoscrollInsets() {
+                Rectangle r = getBounds();
+                return new Insets(r.x, r.y, r.width, r.height);
+            }
+
+            public Building getBuilding() {
+                return building;
+            }
+
+            public void updateProductionLabel() {
+                initialize();
+            }
 
 
             /**
