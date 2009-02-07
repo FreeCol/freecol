@@ -2185,7 +2185,9 @@ public final class InGameController implements NetworkConstants {
         Element attackElement = Message.createNewRootElement("attack");
         attackElement.setAttribute("unit", unit.getId());
         attackElement.setAttribute("direction", direction.toString());
-
+        
+        Animations.unitAttack(freeColClient.getCanvas(), unit, direction);
+        
         // Get the result of the attack from the server:
         Element attackResultElement = client.ask(attackElement);
         if (attackResultElement != null && 
