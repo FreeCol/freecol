@@ -1192,14 +1192,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * This panel is a single line (one building) in the
          * <code>BuildingsPanel</code>.
          */
-        public final class ASingleBuildingPanel extends JPanel implements Autoscroll {
-
-            private final Building building;
-            private final boolean canTeach;
-            private String buildingName;
-
-            private ProductionLabel productionInput = null;
-            private ProductionLabel productionOutput = null;;
+        public final class ASingleBuildingPanel extends BuildingPanel implements Autoscroll {
 
             /**
              * Creates this ASingleBuildingPanel.
@@ -1207,101 +1200,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * @param building The building to display information from.
              */
             public ASingleBuildingPanel(Building building) {
-
-                this.building = building;
-
-                setBackground(Color.WHITE);
-                setLayout(new MigLayout("fill", "", "[][]push[]"));
-
-                this.buildingName = building.getName();
-                if (building.getMaxUnits() == 0) {
-                    buildingName = "(" + building.getName() + ")";
-                }
-
-                canTeach = building.getType().hasAbility("model.ability.teach");
-
-                initialize();
+                super(building, parent);
             }
 
             public void initialize() {
-   
-                removeAll();
-
-                add(new JLabel(buildingName), "span, align center");
-
-                if (building.getProductionNextTurn() == 0) {
-                    add(new JLabel(), "span");
-                } else {
-                    productionOutput = new ProductionLabel(building.getGoodsOutputType(),
-                                                           building.getProductionNextTurn(),
-                                                           building.getMaximumProduction(), parent);
-                    if (building.getGoodsInputNextTurn() == 0) {
-                        add(productionOutput, "span, align center");
-                    } else {
-                        productionInput = new ProductionLabel(building.getGoodsInputType(),
-                                                              building.getGoodsInputNextTurn(),
-                                                              building.getMaximumGoodsInput(), parent);
-                        JLabel arrow = new JLabel("\u2192");
-                        arrow.setFont(hugeFont);
-                        add(productionInput, "span, split 3, align center");
-                        add(arrow);
-                        add(productionOutput);
-                    }
-                }
-
-                for (Unit unit : building.getUnitList()) {
-                    UnitLabel unitLabel = new UnitLabel(unit, parent, false);
-                    if (colonyPanel.isEditable()) {
+                super.initialize();
+                if (colonyPanel.isEditable()) {
+                    for (UnitLabel unitLabel : getUnitLabels()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                     }
-                    if (canTeach && unit.getStudent() != null) {
-                        JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
-                                                     unit.getNeededTurnsOfTraining());
-                        progress.setBackground(Color.WHITE);
-                        progress.setOpaque(true);
-                        UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
-                        studentLabel.setIgnoreLocation(true);
-                        add(unitLabel);
-                        add(progress, "split 2, flowy");
-                        add(studentLabel);
-                    } else  {
-                        add(unitLabel, "span 2");
-                    }
-                }
-
-                setSize(getPreferredSize());
-            }
-
-            /**
-             * Paints this component.
-             * 
-             * @param g The graphics context in which to paint.
-             */
-            public void paintComponent(Graphics g) {
-                int width = getWidth();
-                int height = getHeight();
-
-                Image bgImage = ResourceManager.getImage(building.getType().getId() + ".image");
-                if (bgImage != null) {
-                    g.drawImage(bgImage, 0, 0, this);
-                } else {
-                    Image tempImage = ResourceManager.getImage("BackgroundImage");
-
-                    if (tempImage != null) {
-                        for (int x = 0; x < width; x += tempImage.getWidth(null)) {
-                            for (int y = 0; y < height; y += tempImage.getHeight(null)) {
-                                g.drawImage(tempImage, x, y, null);
-                            }
-                        }
-                    } else {
-                        g.setColor(getBackground());
-                        g.fillRect(0, 0, width, height);
-                    }
                 }
             }
-
-
 
             public void autoscroll(Point p) {
                 JViewport vp = (JViewport) colonyPanel.buildingsPanel.getParent();
@@ -1318,14 +1228,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             public Insets getAutoscrollInsets() {
                 Rectangle r = getBounds();
                 return new Insets(r.x, r.y, r.width, r.height);
-            }
-
-            public Building getBuilding() {
-                return building;
-            }
-
-            public void updateProductionLabel() {
-                initialize();
             }
 
 
@@ -1350,9 +1252,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel) comp).getUnit();
 
-                        if (building.canAdd(unit)) {
+                        if (getBuilding().canAdd(unit)) {
                             oldParent.remove(comp);
-                            inGameController.work(unit, building);
+                            inGameController.work(unit, getBuilding());
                             updateBuildingBox();
                             updateWarehouse();
                         } else {
