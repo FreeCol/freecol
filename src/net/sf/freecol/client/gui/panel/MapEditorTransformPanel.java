@@ -41,6 +41,7 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
@@ -205,7 +206,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
         public void transform(Tile t) {
             t.setType(tileType);
-            t.setLostCityRumour(false);
+            t.removeLostCityRumour();
         }
     }
 
@@ -297,7 +298,12 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     private class LostCityRumourTransform extends MapTransform {
         public void transform(Tile t) {
-            t.setLostCityRumour(!t.hasLostCityRumour());
+            LostCityRumour rumour = t.getLostCityRumour();
+            if (rumour == null) {
+                t.add(new LostCityRumour(t.getGame(), t));
+            } else {
+                t.removeLostCityRumour();
+            }
         }
     }
 }

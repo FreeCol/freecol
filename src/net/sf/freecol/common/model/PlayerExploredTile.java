@@ -66,6 +66,7 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     // All known TileItems
     private Resource resource;
+    private LostCityRumour lostCityRumour;
     private List<TileImprovement> improvements;
     private TileImprovement road;
     private TileImprovement river;
@@ -80,7 +81,6 @@ public class PlayerExploredTile extends FreeColGameObject {
 
     private Unit missionary = null;
 
-    private boolean lostCityRumour;
     private boolean connected = false;
 
     private Tile tile;
@@ -119,6 +119,7 @@ public class PlayerExploredTile extends FreeColGameObject {
             improvements = tic.getImprovements();
             road = tic.getRoad();
             river = tic.getRiver();
+            lostCityRumour = tic.getLostCityRumour();
         } else {
             improvements = Collections.emptyList();
         }
@@ -160,16 +161,20 @@ public class PlayerExploredTile extends FreeColGameObject {
         return resource;
     }
 
+    public LostCityRumour getLostCityRumour() {
+        return lostCityRumour;
+    }
+
     public List<TileImprovement> getImprovements() {
         return improvements;
     }
 
-    public void setLostCityRumour(boolean lostCityRumour) {
+    public void setLostCityRumour(LostCityRumour lostCityRumour) {
         this.lostCityRumour = lostCityRumour;
     }
 
     public boolean hasLostCityRumour() {
-        return lostCityRumour;
+        return lostCityRumour != null;
     }
 
     public void setConnected(boolean connected) {
@@ -278,9 +283,6 @@ public class PlayerExploredTile extends FreeColGameObject {
         if (!explored) {
             out.writeAttribute("explored", Boolean.toString(explored));
         }
-        if (tile.hasLostCityRumour()) {
-            out.writeAttribute("lostCityRumour", Boolean.toString(lostCityRumour));
-        }
         if (tile.getOwner() != owner && owner != null) {
             out.writeAttribute("owner", owner.getId());
         }
@@ -308,6 +310,9 @@ public class PlayerExploredTile extends FreeColGameObject {
         if (tile.hasResource()) {
             resource.toXML(out, player, showAll, toSavedGame);
         }
+        if (tile.hasLostCityRumour()) {
+            lostCityRumour.toXML(out, player, showAll, toSavedGame);
+        }
         for (TileImprovement t : improvements) { 
             t.toXML(out, player, showAll, toSavedGame);
         }
@@ -331,8 +336,6 @@ public class PlayerExploredTile extends FreeColGameObject {
         explored = getAttribute(in, "explored", true);
         colonyUnitCount = getAttribute(in, "colonyUnitCount", 0);
         colonyStockadeLevel = getAttribute(in, "colonyStockadeLevel", 0);
-        lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(),
-                                      tile.hasLostCityRumour());
         connected = getAttribute(in, "connected", false);
 
         owner = getFreeColGameObject(in, "owner", Player.class, tile.getOwner());
@@ -366,6 +369,14 @@ public class PlayerExploredTile extends FreeColGameObject {
                     resource = new Resource(getGame(), in);
                 }
                 tileItemContainer.addTileItem(resource);
+            } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
+                LostCityRumour lostCityRumour = (LostCityRumour) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+                if (lostCityRumour != null) {
+                    lostCityRumour.readFromXML(in);
+                } else {
+                    lostCityRumour = new LostCityRumour(getGame(), in);
+                }
+                tileItemContainer.addTileItem(lostCityRumour);
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
                 if (ti != null) {

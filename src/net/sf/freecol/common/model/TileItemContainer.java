@@ -43,7 +43,18 @@ import org.w3c.dom.Element;
  */
 public class TileItemContainer extends FreeColGameObject {
 
-    private static final Logger logger = Logger.getLogger(Location.class.getName());
+    /**
+     * TODO: can this be cleaned up? Do we really need to distinguish
+     * between TileImprovements and other TileItems? Do we really need
+     * the "quick pointers"? In other words, would performance be too
+     * bad otherwise?
+     *
+     * Can we assume that there will only be a single TileItem of any
+     * type in the container? If so, we could use a HashMap, or
+     * EnumMap for storage.
+     */
+
+    private static final Logger logger = Logger.getLogger(TileItemContainer.class.getName());
 
     /** The list of TileItems stored in this <code>TileItemContainer</code>. */
     private List<TileImprovement> improvements = new ArrayList<TileImprovement>();
@@ -55,6 +66,11 @@ public class TileItemContainer extends FreeColGameObject {
 
     /** The owner of this <code>TileItemContainer</code>. */
     private Tile tile;
+
+    /**
+     * Describe lostCityRumour here.
+     */
+    private LostCityRumour lostCityRumour = null;
 
     // ------------------------------------------------------------ constructor
 
@@ -89,6 +105,7 @@ public class TileItemContainer extends FreeColGameObject {
         resource = pet.getResource();
         road = pet.getRoad();
         river = pet.getRiver();
+        lostCityRumour = pet.getLostCityRumour();
     }
 
     /**
@@ -175,6 +192,28 @@ public class TileItemContainer extends FreeColGameObject {
         return river;
     }
 
+    public boolean hasLostCityRumour() {
+        return lostCityRumour != null;
+    }
+
+    /**
+     * Get the <code>LostCityRumour</code> value.
+     *
+     * @return a <code>LostCityRumour</code> value
+     */
+    public final LostCityRumour getLostCityRumour() {
+        return lostCityRumour;
+    }
+
+    /**
+     * Set the <code>LostCityRumour</code> value.
+     *
+     * @param newLostCityRumour The new LostCityRumour value.
+     */
+    public final void setLostCityRumour(final LostCityRumour newLostCityRumour) {
+        this.lostCityRumour = newLostCityRumour;
+    }
+
     public Resource getResource() {
         return resource;
     }
@@ -194,6 +233,7 @@ public class TileItemContainer extends FreeColGameObject {
         improvements.clear();
         road = null;
         river = null;
+        lostCityRumour = null;
     }
 
     /**
@@ -361,6 +401,13 @@ public class TileItemContainer extends FreeColGameObject {
             }
             resource = (Resource) t;
             return t;
+        } else if (t instanceof LostCityRumour) {
+            // Disposes existing lostCityRumour and replaces with new one
+            if (lostCityRumour != null) {
+                lostCityRumour.dispose();
+            }
+            lostCityRumour = (LostCityRumour) t;
+            return t;
         } else if (t instanceof TileImprovement) {
             TileImprovement improvement = (TileImprovement) t;
             // Check all improvements to find any to replace
@@ -406,6 +453,9 @@ public class TileItemContainer extends FreeColGameObject {
         if (t instanceof Resource && resource == t) {
             resource = null;
             return t;
+        } else if (t instanceof LostCityRumour && lostCityRumour == t) {
+            lostCityRumour = null;
+            return t;
         } else if (t instanceof TileImprovement) {
             if (river == t) {
                 river = null;
@@ -431,6 +481,11 @@ public class TileItemContainer extends FreeColGameObject {
             Resource ticR = tic.getResource();
             Resource r = new Resource(getGame(), tile, ticR.getType());
             r.setQuantity(ticR.getQuantity());
+            addTileItem(r);
+        }
+        if (tic.hasLostCityRumour()) {
+            LostCityRumour ticR = tic.getLostCityRumour();
+            LostCityRumour r = new LostCityRumour(getGame(), tile, ticR.getType(), ticR.getName());
             addTileItem(r);
         }
         for (TileImprovement ti : tic.getImprovements()) {
@@ -460,6 +515,8 @@ public class TileItemContainer extends FreeColGameObject {
     public boolean contains(TileItem t) {
         if (t instanceof Resource) {
             return ((Resource) t) == resource;
+        } else if (t instanceof LostCityRumour) {
+            return ((LostCityRumour) t) == lostCityRumour;
         } else if (t instanceof TileImprovement) {
             return (improvements.indexOf(t) >= 0);
         }
@@ -586,6 +643,9 @@ public class TileItemContainer extends FreeColGameObject {
         if (hasResource()) {
             resource.toXML(out, player, showAll, toSavedGame);
         }
+        if (hasLostCityRumour()) {
+            lostCityRumour.toXML(out, player, showAll, toSavedGame);
+        }
 
         Iterator<TileImprovement> ti = getImprovementIterator();
         while (ti.hasNext()) {
@@ -617,6 +677,13 @@ public class TileItemContainer extends FreeColGameObject {
                     resource = new Resource(getGame(), in);
                 } else {
                     resource.readFromXML(in);
+                }
+            } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
+                lostCityRumour = (LostCityRumour) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (lostCityRumour == null) {
+                    lostCityRumour = new LostCityRumour(getGame(), in);
+                } else {
+                    lostCityRumour.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
                 TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));

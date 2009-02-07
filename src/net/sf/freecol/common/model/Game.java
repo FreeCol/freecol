@@ -94,9 +94,6 @@ public class Game extends FreeColGameObject {
 
     private FreeColGameObjectListener freeColGameObjectListener;
 
-    /** The lost city rumour class. */
-    private final static LostCityRumour lostCityRumour = new LostCityRumour();
-
     /**
      * The combat model this game uses. At the moment, the only combat
      * model available is the SimpleCombatModel, which strives to
@@ -366,15 +363,6 @@ public class Game extends FreeColGameObject {
      */
     public final void setCombatModel(final CombatModel newCombatModel) {
         this.combatModel = newCombatModel;
-    }
-
-    /**
-     * Returns this game's LostCityRumour.
-     * 
-     * @return This game's LostCityRumour.
-     */
-    public LostCityRumour getLostCityRumour() {
-        return lostCityRumour;
     }
 
     /**

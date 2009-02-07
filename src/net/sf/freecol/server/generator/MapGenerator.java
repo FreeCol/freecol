@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
@@ -241,7 +242,7 @@ public class MapGenerator implements IMapGenerator {
                 final Position p = importTile.getPosition();
                 if (map.isValid(p)) {
                     final Tile t = map.getTile(p);
-                    t.setLostCityRumour(importTile.hasLostCityRumour());
+                    t.add(importTile.getLostCityRumour());
                 }
             }
         } else {
@@ -270,7 +271,7 @@ public class MapGenerator implements IMapGenerator {
                             && t.getSettlement() == null
                             && t.getUnitCount() == 0) { 
                         counter++;
-                        t.setLostCityRumour(true);
+                        t.add(new LostCityRumour(t.getGame(), t));
                         break;
                     }
                 }

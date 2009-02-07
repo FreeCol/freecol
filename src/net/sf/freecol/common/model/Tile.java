@@ -59,8 +59,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     private TileType type;
     
-    private boolean lostCityRumour = false;
-
     private int x, y;
 
     /** The player that consider this tile to be their land. */
@@ -123,8 +121,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         super(game);
 
         this.type = type;
-
-        lostCityRumour = false;
 
         x = locX;
         y = locY;
@@ -744,6 +740,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Returns <code>true</code> if this Tile has a lostCityRumour on it.
+     * 
+     * @return <code>true</code> if this Tile has a lostCityRumour on it.
+     */
+    public boolean hasLostCityRumour() {
+        return tileItemContainer != null && getTileItemContainer().hasLostCityRumour();
+    }
+
+    /**
      * Returns <code>true</code> if this Tile has a road.
      * 
      * @return <code>true</code> if this Tile has a road.
@@ -833,6 +838,26 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Returns the lost city rumour on this <code>Tile</code> if any
+     * @return a <code>LostCityRumour</code> value
+     */
+    public LostCityRumour getLostCityRumour() {
+        if (tileItemContainer == null) {
+            return null;
+        } else {
+            return tileItemContainer.getLostCityRumour();
+        }
+    }
+
+    /**
+     * Removes the lost city rumour from this <code>Tile</code> if there
+     * is one.
+     */
+    public void removeLostCityRumour() {
+        tileItemContainer.removeTileItem(tileItemContainer.getLostCityRumour());
+    }
+
+    /**
      * Returns the style of a river <code>TileImprovement</code> on this <code>Tile</code>.
      * 
      * @return an <code>int</code> value
@@ -889,7 +914,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public void setSettlement(Settlement s) {
         settlement = s;
         owningSettlement = s;
-        setLostCityRumour(false);
         updatePlayerExploredTiles();
     }
 
@@ -1006,39 +1030,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public Position getPosition() {
         return new Position(x, y);
-    }
-
-    /**
-     * Returns true if there is a lost city rumour on this tile.
-     * 
-     * @return True or false.
-     */
-    public boolean hasLostCityRumour() {
-        return lostCityRumour;
-    }
-
-    /**
-     * Sets the lost city rumour for this tile.
-     * 
-     * @param rumour If <code>true</code> then this <code>Tile</code> will
-     *            have a lost city rumour. The type of rumour will be determined
-     *            by the server.
-     */
-    public void setLostCityRumour(boolean rumour) {
-        lostCityRumour = rumour;
-        
-        if (!isLand() && rumour) {
-            logger.warning("Setting lost city rumour to Ocean.");
-            // Get the first land type from TileTypeList
-            for (TileType t : FreeCol.getSpecification().getTileTypeList()) {
-                if (!t.isWater()) {
-                    setType(t);
-                    break;
-                }
-            }
-        }
-        
-        updatePlayerExploredTiles();
     }
 
     /**
@@ -1536,12 +1527,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         writeAttribute(out, "type", getType());
         writeAttribute(out, "region", getRegion());
 
-        boolean lostCity = (pet == null) ? lostCityRumour : pet.hasLostCityRumour();
-        if (lostCity) {
-            // this is hardly ever the case
-            out.writeAttribute("lostCityRumour", Boolean.toString(lostCity));
-        }
-
         if (connected && !type.isConnected()) {
             out.writeAttribute("connected", Boolean.toString(true));
         }
@@ -1674,7 +1659,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             type = FreeCol.getSpecification().getTileType(typeString);
         }
 
-        lostCityRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(), false);
+        // compatibility mode
+        boolean needsRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(), false);
+
         connected = getAttribute(in, "connected", false);
         owner = getFreeColGameObject(in, "owner", Player.class, null);
         region = getFreeColGameObject(in, "region", Region.class, null);
@@ -1737,6 +1724,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (!settlementSent && settlement != null) {
             settlement.dispose();
         }
+
+        // compatibility mode
+        if (needsRumour) {
+            add(new LostCityRumour(getGame(), this));
+        }
+
     }
 
     /**
@@ -1802,7 +1795,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         pet.getTileItemInfo(tileItemContainer);
 
-        pet.setLostCityRumour(lostCityRumour);
         pet.setConnected(connected);
         pet.setOwner(owner);
 

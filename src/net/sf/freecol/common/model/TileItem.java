@@ -107,7 +107,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable, N
      * Returns the <code>Tile</code> where this <code>TileItem</code> is located,
      * or <code>null</code> if it's location is <code>Europe</code>.
      *
-     * @return The Tile where this Unit is located. Or null if
+     * @return The Tile where this TileItem is located. Or null if
      * its location is Europe.
      */
     public Tile getTile() {

@@ -1077,7 +1077,7 @@ public final class InGameInputHandler extends InputHandler {
             throw new IllegalArgumentException("Unit is null.");
         }
         Tile tile = unit.getTile();
-        tile.setLostCityRumour(false);
+        tile.removeLostCityRumour();
         
         // center on the explorer
         freeColClient.getGUI().setFocusImmediately(tile.getPosition());

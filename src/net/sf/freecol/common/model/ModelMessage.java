@@ -211,8 +211,6 @@ public class ModelMessage extends FreeColObject {
             newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.bells");
             break;
         case LOST_CITY_RUMOUR:
-            newDisplay = new LostCityRumour();
-            break;
         case UNIT_IMPROVED:
         case UNIT_DEMOTED:
         case UNIT_LOST:
