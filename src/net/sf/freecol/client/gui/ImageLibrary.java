@@ -237,6 +237,7 @@ public final class ImageLibrary extends ImageProvider {
         scaledLibrary.expertMissionChips = scaleChips(expertMissionChips, scalingFactor);
         */
         scaledLibrary.alarmChips = new EnumMap<Tension.Level, Image>(alarmChips);
+        scaledLibrary.alarmChipsUnvisited = new EnumMap<Tension.Level, Image>(alarmChipsUnvisited);
         scaledLibrary.colorChips = new HashMap<Color, Image>(colorChips);
         scaledLibrary.missionChips = new HashMap<Color, Image>(missionChips);
         scaledLibrary.expertMissionChips = new HashMap<Color, Image>(expertMissionChips);
