@@ -24,11 +24,11 @@ import java.awt.Rectangle;
 import java.util.logging.Logger;
 
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -37,27 +37,20 @@ import net.sf.freecol.common.model.Map.Direction;
 /**
  * Class for the animation of units movement.
  */
-final class UnitMoveAnimation extends Animation {
+final class UnitMoveAnimation {
     
     private static final Logger logger = Logger.getLogger(UnitMoveAnimation.class.getName());
     
+    /*
+     * Display delay between one frame and another, in milliseconds.
+     * 33ms == 30 fps
+     */
+    private static final int ANIMATION_DELAY = 33;
+
+    private final Canvas canvas;
     private final Unit unit;
     private final Location currentLocation;
     private final Tile destinationTile;
-    private final Point destinationPoint;
-    private Point currentPoint;
-    
-    private JLabel unitLabel;
-    private static final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
-    
-    // Movement variables & constants
-    private final int signalX; // If X is increasing or decreasing
-    private final int signalY; // If Y is increasing or decreasing
-    private final int movementRatio;
-    private static final int X_RATIO = 2;
-    private static final int Y_RATIO = 1;
-    
-    private int distanceToTarget;
     
     
     /**
@@ -77,126 +70,77 @@ final class UnitMoveAnimation extends Animation {
      * @param destinationTile The Tile where the Unit will be moving to.
      */
     public UnitMoveAnimation(Canvas canvas, Unit unit, Tile destinationTile) {
-        super(canvas);
+        this.canvas = canvas;
         this.unit = unit;
         this.destinationTile = destinationTile;
-        this.currentLocation = unit.getLocation();
-        
+        this.currentLocation = unit.getLocation();        
+    }
+    
+    public void animate() {
+        final GUI gui = canvas.getGUI();
         final String key = (canvas.getClient().getMyPlayer() == unit.getOwner()) ?
                 ClientOptions.MOVE_ANIMATION_SPEED
                 : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
         final int movementSpeed = canvas.getClient().getClientOptions().getInteger(key);
+        final int movementRatio = (int) (Math.pow(2, movementSpeed+1) * gui.getImageLibrary().getScalingFactor());
+        final Point currP = gui.getTilePosition(unit.getTile());
+        final Point destP = gui.getTilePosition(destinationTile);
         
-        GUI gui = canvas.getGUI();
-        
-        Point currP = gui.getTilePosition(unit.getTile());
-        Point destP = gui.getTilePosition(destinationTile);
-        if (currP != null && destP != null && movementSpeed > 0) {
-            
-            this.movementRatio = (int) (Math.pow(2, movementSpeed)*canvas.getGUI().getImageLibrary().getScalingFactor());
-            
-            unitLabel = gui.getUnitLabel(unit);
-            currentPoint = gui.getUnitLabelPositionInTile(unitLabel, currP);
-            destinationPoint = gui.getUnitLabelPositionInTile(unitLabel, destP);
-            unitLabel.setLocation(currentPoint);
-            
-            canvas.add(unitLabel, UNIT_LABEL_LAYER, false);
-            
-            if (currentPoint.getX() == destinationPoint.getX())
-                signalX = 0;
-            else
-                signalX = currentPoint.getX() > destinationPoint.getX() ? -1 : 1;
-            
-            if (currentPoint.getY() == destinationPoint.getY())
-                signalY = 0;
-            else
-                signalY = currentPoint.getY() > destinationPoint.getY() ? -1 : 1;
-            
-            distanceToTarget = distance(destinationPoint, currentPoint);
-            
-        } else {
-            // Unit is offscreen or animation is off - no need to animate
-            logger.finest("Unit is offscreen or animation is off - no need to animate.");
-            currentPoint = destinationPoint = null;
-            signalX = signalY = 0;
-            distanceToTarget = 0;
-            movementRatio = 0;
+        if (currP == null || destP == null || movementSpeed <= 0) {
+            return;
         }
-    }
-
-    /**
-     * Moves the Unit towards its destination point one step.
-     */
-    protected void readyNextFrame() {
         
-        logger.finest("Calculating and setting the new unit location.");
+        final Rectangle bounds = getAnimationArea();
+        
+        canvas.getGUI().executeWithUnitOutForAnimation(unit, new OutForAnimationCallback() {
+            public void executeWithUnitOutForAnimation(final JLabel unitLabel) {                    
+                final Point currentPoint = gui.getUnitLabelPositionInTile(unitLabel, currP);
+                final Point destinationPoint = gui.getUnitLabelPositionInTile(unitLabel, destP);
                 
-        // Calculating the new coordinates for the unit            
-        currentPoint.x += signalX*X_RATIO*movementRatio;        
-        currentPoint.y += signalY*Y_RATIO*movementRatio;
-        
-        //Setting new location
-        unitLabel.setLocation(currentPoint);
-    }
-    
-    @Override
-    public void animate() {
-        final UnitMoveAnimation self = this;
-        canvas.getGUI().executeWithUnitOutForAnimation(unit, new Runnable() {
-            public void run() {
+                final double xratio = gui.getTileWidth() / gui.getTileHeight();
+                final int signalX = (currentPoint.getX() == destinationPoint.getX()) ? 0
+                        : (currentPoint.getX() > destinationPoint.getX()) ? -1 : 1;
+                final int signalY = (currentPoint.getY() == destinationPoint.getY()) ? 0
+                        : (currentPoint.getY() > destinationPoint.getY()) ? -1 : 1;
                 // Painting the whole screen once to get rid of disposed dialog-boxes.
                 canvas.paintImmediately(canvas.getBounds());
-                try {
-                    self.animateFromSuper();
-                } finally {
-                    canvas.remove(unitLabel, false);
-                }                
+                while (!currentPoint.equals(destinationPoint)) {
+                    long time = System.currentTimeMillis();
+                    
+                    currentPoint.x += signalX*xratio*movementRatio;
+                    currentPoint.y += signalY*movementRatio;
+                    if (signalX == -1 && currentPoint.x < destinationPoint.x) {
+                        currentPoint.x = destinationPoint.x;
+                    } else if (signalX == 1 && currentPoint.x > destinationPoint.x) {
+                        currentPoint.x = destinationPoint.x;
+                    }
+                    if (signalY == -1 && currentPoint.y < destinationPoint.y) {
+                        currentPoint.y = destinationPoint.y;
+                    } else if (signalY == 1 && currentPoint.y > destinationPoint.y) {
+                        currentPoint.y = destinationPoint.y;
+                    }
+                    
+                    //Setting new location
+                    unitLabel.setLocation(currentPoint);
+                    canvas.paintImmediately(bounds);
+                    
+                    // Time it took to draw the next frame - should be discounted from the animation delay
+                    time = ANIMATION_DELAY - System.currentTimeMillis() + time;
+                    if (time > 0) {
+                        try {
+                            Thread.sleep(time);
+                        } catch (InterruptedException ex) {
+                            //ignore
+                        }
+                    }
+                }
             }
         });
     }
-    
-    /**
-     * Temporary hack to call super's animate.
-     */
-    protected void animateFromSuper() {
-        super.animate();
-    }
-    
-    protected int distance(Point p1, Point p2) {
-        return Math.abs(p1.x-p2.x) + Math.abs(p1.y-p2.y);
-    }
-
-    protected boolean isFinished() {
-        if (currentPoint != null && destinationPoint != null) {
-            int newDistanceToTarget = distance(currentPoint, destinationPoint);
-            if (newDistanceToTarget > distanceToTarget) {
-                // when moving 8 or 16 pixels at a time, we may not reach the exact destination point.
-                // checking we have not overshot the destination (the distance to target is now increasing)
-                distanceToTarget = 0;
-                return true;
-            } else if (newDistanceToTarget == 0 ) {
-                // reached the exact target
-                distanceToTarget = newDistanceToTarget;
-                return true;
-            } else {
-                // the distance is still decreasing
-                distanceToTarget = newDistanceToTarget;
-                return false;
-            }
-        } else {
-            distanceToTarget = 0;
-            return true;
-        }
-    }
 
     protected Rectangle getAnimationArea() {
-        Rectangle r1 = canvas.getGUI().getTileBounds(currentLocation.getTile());
-        Rectangle r2 = canvas.getGUI().getTileBounds(destinationTile);
+        final Rectangle r1 = canvas.getGUI().getTileBounds(currentLocation.getTile());
+        final Rectangle r2 = canvas.getGUI().getTileBounds(destinationTile);
         return r1.union(r2);
     }
-    
-    protected Rectangle getDirtyAnimationArea() {
-        return getAnimationArea();
-    }
-
 }

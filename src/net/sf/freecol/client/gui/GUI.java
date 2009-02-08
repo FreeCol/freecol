@@ -25,7 +25,6 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -35,10 +34,8 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -54,7 +51,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.UIManager;
@@ -184,7 +180,8 @@ public final class GUI {
     private JLabel greyLayer;
     private JLabel waitingForMsg;
     
-    private java.util.Map<Unit, Integer> unitsOutForAnimation; 
+    private java.util.Map<Unit, Integer> unitsOutForAnimation;
+    private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
     private Font textFont = new Font("SansSerif", Font.BOLD, 20);
     private Font hugeFont = new Font("SansSerif", Font.BOLD, 36);
@@ -203,6 +200,7 @@ public final class GUI {
         setImageLibrary(lib);
         
         unitsOutForAnimation = new HashMap<Unit, Integer>();
+        unitsOutForAnimationLabels = new HashMap<Unit, JLabel>();
 
         inGame = false;
         logger.info("GUI created.");
@@ -238,23 +236,28 @@ public final class GUI {
      * @param unit The unit to be hidden.
      * @param r The code to be executed.
      */
-    public void executeWithUnitOutForAnimation(final Unit unit, Runnable r) {
-        enterUnitOutForAnimation(unit);
+    public void executeWithUnitOutForAnimation(final Unit unit, final OutForAnimationCallback r) {
+        final JLabel unitLabel = enterUnitOutForAnimation(unit);
         try {
-            r.run();
+            r.executeWithUnitOutForAnimation(unitLabel);
         } finally {
             releaseUnitOutForAnimation(unit);
         }
     }
     
-    private void enterUnitOutForAnimation(final Unit unit) {
+    private JLabel enterUnitOutForAnimation(final Unit unit) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
             i = 1;
+            final JLabel unitLabel = getUnitLabel(unit);
+            unitsOutForAnimationLabels.put(unit, unitLabel);
+            final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
+            freeColClient.getCanvas().add(unitLabel, UNIT_LABEL_LAYER, false);
         } else {
             i++;
         }
         unitsOutForAnimation.put(unit, i);
+        return unitsOutForAnimationLabels.get(unit);
     }
     
     private void releaseUnitOutForAnimation(final Unit unit) {
@@ -264,6 +267,7 @@ public final class GUI {
         }
         if (i == 1) {
             unitsOutForAnimation.remove(unit);
+            freeColClient.getCanvas().remove(unitsOutForAnimationLabels.remove(unit), false);
         } else {
             i--;
             unitsOutForAnimation.put(unit, i); 
@@ -2457,8 +2461,8 @@ public final class GUI {
      */
     public Point getUnitLabelPositionInTile(JLabel unitLabel, Point tileP) {
         if (tileP != null) {
-            int labelX = tileP.x;
-            int labelY = (tileP.y + getTileHeight() / 2) - unitLabel.getHeight() / 2 -
+            int labelX = tileP.x + getTileWidth() / 2 - unitLabel.getWidth() / 2;
+            int labelY = tileP.y + getTileHeight() / 2 - unitLabel.getHeight() / 2 -
                         (int) (UNIT_OFFSET * lib.getScalingFactor());
             
             return new Point(labelX, labelY);
@@ -2472,9 +2476,9 @@ public final class GUI {
      * @param unit The unit to be drawn
      * @return A JLabel object with the unit's image. The JLabel has location 0,0
      */
-    public JLabel getUnitLabel(Unit unit) {
-        Image unitImg = lib.getUnitImageIcon(unit).getImage();
-        Image chipImg = getOccupationIndicatorImage(unit);
+    private JLabel getUnitLabel(Unit unit) {
+        final Image unitImg = lib.getUnitImageIcon(unit).getImage();
+        final Image chipImg = getOccupationIndicatorImage(unit);
         
         final int width = tileWidth/2 + unitImg.getWidth(null)/2;
         final int height = unitImg.getHeight(null);
@@ -2482,15 +2486,16 @@ public final class GUI {
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
         
-        final int unitX = width - unitImg.getWidth(null);
+        final int unitX = (width - unitImg.getWidth(null)) / 2;
         g.drawImage(unitImg, unitX, 0, null);
         
-        final int chipX = ((int)(STATE_OFFSET_X * lib.getScalingFactor()));
-        final int chipY = (int) (((height / 2 + UNIT_OFFSET*lib.getScalingFactor())) - tileHeight / 2);
-        g.drawImage(chipImg, chipX, chipY, null);
+        //final int chipX = ((int) (STATE_OFFSET_X * lib.getScalingFactor()));
+        //final int chipY = (int) (((height / 2 + UNIT_OFFSET*lib.getScalingFactor())) - tileHeight / 2);
+        //g.drawImage(chipImg, chipX, chipY, null);
         
-        JLabel label = new JLabel(new ImageIcon(img));
-        label.setBounds(0, 0, width, height);
+        final JLabel label = new JLabel(new ImageIcon(img));
+        label.setSize(width, height);
+        label.setLocation(getUnitLabelPositionInTile(label, getTilePosition(unit.getTile())));
         return label;
     }
     

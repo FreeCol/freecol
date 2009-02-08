@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.animation;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.logging.Logger;
 
@@ -29,6 +28,7 @@ import javax.swing.JLayeredPane;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.io.sza.AnimationEvent;
 import net.sf.freecol.common.io.sza.ImageAnimationEvent;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
@@ -50,7 +50,6 @@ public final class UnitImageAnimation {
     
     private final Location currentLocation;
     
-    private JLabel unitLabel;
     private static final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
     
     
@@ -63,52 +62,39 @@ public final class UnitImageAnimation {
      */
     public UnitImageAnimation(Canvas canvas, Unit unit, SimpleZippedAnimation animation, Direction direction) {
         this.canvas = canvas;
-        
         this.unit = unit;
         this.direction = direction;
         this.currentLocation = unit.getLocation();
         this.animation = animation;
-                
-        final GUI gui = canvas.getGUI();
-        
-        Point currP = gui.getTilePosition(unit.getTile());
-        if (currP != null) {
-            unitLabel = gui.getUnitLabel(unit);
-            unitLabel.setSize(gui.getTileWidth(), gui.getTileHeight());
-            unitLabel.setLocation(gui.getUnitLabelPositionInTile(unitLabel, currP));
-        } else {
-            // Unit is offscreen  - no need to animate
-        }
     }
     
     public void animate() {
+        final GUI gui = canvas.getGUI();
+        if (gui.getTilePosition(unit.getTile()) == null) {
+            return;
+        }
         // Painting the whole screen once to get rid of disposed dialog-boxes.
         canvas.paintImmediately(canvas.getBounds());
-        canvas.getGUI().executeWithUnitOutForAnimation(unit, new Runnable() {
-            public void run() {
-                try {
-                    canvas.add(unitLabel, UNIT_LABEL_LAYER, false);
-                    for (AnimationEvent event : animation) {
-                        long time = System.nanoTime();
-                        if (event instanceof ImageAnimationEvent) {
-                            final ImageAnimationEvent ievent = (ImageAnimationEvent) event;
-                            final ImageIcon icon = (ImageIcon) unitLabel.getIcon();
-                            icon.setImage(ievent.getImage());
-                            canvas.paintImmediately(getDirtyAnimationArea());
-                            
-                            time = ievent.getDurationInMs() - (System.nanoTime() - time) / 1000000;
-                            if (time > 0) {
-                                try {
-                                    Thread.sleep(time);
-                                } catch (InterruptedException ex) {
-                                    //ignore
-                                }
+        canvas.getGUI().executeWithUnitOutForAnimation(unit, new OutForAnimationCallback() {
+            public void executeWithUnitOutForAnimation(final JLabel unitLabel) {
+                for (AnimationEvent event : animation) {
+                    long time = System.nanoTime();
+                    if (event instanceof ImageAnimationEvent) {
+                        final ImageAnimationEvent ievent = (ImageAnimationEvent) event;
+                        final ImageIcon icon = (ImageIcon) unitLabel.getIcon();
+                        icon.setImage(ievent.getImage());
+                        canvas.paintImmediately(getDirtyAnimationArea());
+
+                        time = ievent.getDurationInMs() - (System.nanoTime() - time) / 1000000;
+                        if (time > 0) {
+                            try {
+                                Thread.sleep(time);
+                            } catch (InterruptedException ex) {
+                                //ignore
                             }
                         }
                     }
-                } finally {
-                    canvas.remove(unitLabel, false);
-                }                
+                }             
             }
         });
     }
