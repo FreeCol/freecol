@@ -768,10 +768,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         final int usedFish = colony.getFoodConsumptionByType(Goods.FISH);
         final int usedCorn = Math.max(usedFood - usedFish, 0);
         
-        if( usedFish == 0 ) {
-            productionPanel.add(new ProductionLabel(Goods.FOOD, usedFood, parent));
+        if (usedFish == 0) {
+            ProductionLabel label = new ProductionLabel(Goods.FOOD, usedFood, parent);
+            label.setToolTipPrefix(Messages.message("totalProduction"));
+            productionPanel.add(label);
         } else {
-            productionPanel.add(new ProductionMultiplesLabel(Goods.FOOD, usedCorn, Goods.FISH, usedFish, parent));
+            ProductionMultiplesLabel label = new ProductionMultiplesLabel(Goods.FOOD, usedCorn,
+                                                                          Goods.FISH, usedFish, parent);
+            label.setToolTipPrefix(Messages.message("totalProduction"));
+            productionPanel.add(label);
         }
         
         int remainingCorn = foodFarmsProduction - usedCorn;
@@ -781,6 +786,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         remainingCorn = Math.min(surplusFood, remainingCorn);		//(surplusFood < 0) ? surplusFood : remainingCorn;
         ProductionMultiplesLabel surplusLabel = new ProductionMultiplesLabel(Goods.FOOD, remainingCorn, Goods.FISH, remainingFish, parent);
         surplusLabel.setDrawPlus(true);
+        surplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
         productionPanel.add(surplusLabel);
 
         if( horsesProduced != 0 ) {			// Skip the horses label if there is no stock
@@ -789,9 +795,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             productionPanel.add(horseLabel);
         }
 
-        productionPanel.add(new ProductionLabel(Goods.BELLS, bells, parent));
+        ProductionLabel bellsLabel = new ProductionLabel(Goods.BELLS, bells, parent);
+        bellsLabel.setToolTipPrefix(Messages.message("totalProduction"));
+        productionPanel.add(bellsLabel);
         int surplusBells = bells - colony.getBellUpkeep();
-        productionPanel.add(new ProductionLabel(Goods.BELLS, surplusBells, parent));
+        ProductionLabel bellsSurplusLabel = new ProductionLabel(Goods.BELLS, surplusBells, parent);
+        bellsSurplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
+        productionPanel.add(bellsSurplusLabel);
         
         productionPanel.add(new ProductionLabel(Goods.CROSSES, crosses, parent));
         productionPanel.revalidate();

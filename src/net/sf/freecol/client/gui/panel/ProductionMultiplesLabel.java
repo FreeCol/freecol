@@ -36,6 +36,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.util.Utils;
 
 /**
  * The ProductionLabel represents Goods that are produced in a
@@ -69,7 +70,6 @@ public final class ProductionMultiplesLabel extends JComponent {
     /**
      * The type of goods being produced.
      */
-//    private GoodsType goodsType;
     private GoodsType goodsType[];
 
     /**
@@ -100,6 +100,11 @@ public final class ProductionMultiplesLabel extends JComponent {
      * used to Show stored items in ReportColonyPanel
      */
     private int stockNumber = -1;
+
+    /**
+     * Describe toolTipPrefix here.
+     */
+    private String toolTipPrefix = null;
 
     /**
      * Creates a new <code>ProductionLabel</code> instance.
@@ -161,16 +166,13 @@ public final class ProductionMultiplesLabel extends JComponent {
         totalProduction = 0;
     	
         if (goodsType != null) {
-        	goodsIcon = new ImageIcon[goodsType.length];
-        	StringBuffer toolTipText = new StringBuffer();
-        	for( int ii=0; ii < goodsType.length; ii++ ) {
+            goodsIcon = new ImageIcon[goodsType.length];
+            for (int ii=0; ii < goodsType.length; ii++) {
                 goodsIcon[ii] = parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType[ii]);
-                if( ii > 0 ) toolTipText.append(", ");
-                toolTipText.append( amount[ii] ).append(" ").append(goodsType[ii].getName());
                 totalProduction += amount[ii];
-        	}
+            }
             compressedWidth = getMaximumIconWidth()*2;
-            setToolTipText(toolTipText.toString());
+            updateToolTipText();
         }
         
         if (totalProduction < 0) {
@@ -179,7 +181,25 @@ public final class ProductionMultiplesLabel extends JComponent {
             setForeground(Color.WHITE);
         }
     }
-    
+
+    /**
+     * Get the <code>ToolTipPrefix</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getToolTipPrefix() {
+        return toolTipPrefix;
+    }
+
+    /**
+     * Set the <code>ToolTipPrefix</code> value.
+     *
+     * @param newToolTipPrefix The new ToolTipPrefix value.
+     */
+    public void setToolTipPrefix(final String newToolTipPrefix) {
+        this.toolTipPrefix = newToolTipPrefix;
+        updateToolTipText();
+    }
 
     /**
      * Returns the parent Canvas object.
@@ -245,7 +265,23 @@ public final class ProductionMultiplesLabel extends JComponent {
     public void setProduction(final int newProduction) {
     	logger.warning("RESETTING ProductionMultiplesLabel's value generally instead of specifically to: "+ newProduction);
         this.totalProduction = newProduction;
-        setToolTipText(String.valueOf(this.totalProduction) + " " + goodsType[0].getName());	// TODO can error out!
+        updateToolTipText();
+    }
+
+    private void updateToolTipText() {
+        if (goodsType == null || goodsType.length == 0 || totalProduction == 0) {
+            setToolTipText(null);
+        } else {
+            String[] parts = new String[goodsType.length];
+            for (int index = 0; index < goodsType.length; index++) {
+                parts[index] = Goods.toString(goodsType[index], production[index]);
+            }
+            String text = Utils.join(", ", parts);
+            if (toolTipPrefix != null) {
+                text = toolTipPrefix + " " + text;
+            }
+            setToolTipText(text);
+        }
     }
 
     /**

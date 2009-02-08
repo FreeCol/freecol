@@ -169,9 +169,17 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     *         <br>15 Cotton
     */
     public String toString() {
+        return toString(this);
+    }
+
+    public static String toString(Goods goods) {
+        return toString(goods.getType(), goods.getAmount());
+    }
+
+    public static String toString(GoodsType goodsType, int amount) {
         return Messages.message("model.goods.goodsAmount",
-                                "%goods%", getName(),
-                                "%amount%", String.valueOf(getAmount()));
+                                "%goods%", goodsType.getName(),
+                                "%amount%", String.valueOf(amount));
     }
 
     /**

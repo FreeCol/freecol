@@ -99,6 +99,11 @@ public final class ProductionLabel extends JComponent {
     private int stockNumber = -1;
 
     /**
+     * Describe toolTipPrefix here.
+     */
+    private String toolTipPrefix = null;
+
+    /**
      * Creates a new <code>ProductionLabel</code> instance.
      *
      * @param goods a <code>Goods</code> value
@@ -146,10 +151,28 @@ public final class ProductionLabel extends JComponent {
         }
         if (goodsType != null) {
             setGoodsIcon(parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType));
-            setToolTipText(String.valueOf(amount) + " " + goodsType.getName());
+            updateToolTipText();
         }
     }
-    
+
+    /**
+     * Get the <code>ToolTipPrefix</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getToolTipPrefix() {
+        return toolTipPrefix;
+    }
+
+    /**
+     * Set the <code>ToolTipPrefix</code> value.
+     *
+     * @param newToolTipPrefix The new ToolTipPrefix value.
+     */
+    public void setToolTipPrefix(final String newToolTipPrefix) {
+        this.toolTipPrefix = newToolTipPrefix;
+        updateToolTipText();
+    }
 
     /**
      * Returns the parent Canvas object.
@@ -213,8 +236,18 @@ public final class ProductionLabel extends JComponent {
      */
     public void setProduction(final int newProduction) {
         this.production = newProduction;
-        if (goodsType != null) { // goodsType is null for Schoolhouse
-            setToolTipText(String.valueOf(production) + " " + goodsType.getName());
+        updateToolTipText();
+    }
+
+    private void updateToolTipText() {
+        if (goodsType == null || production == 0) {
+            setToolTipText(null);
+        } else {
+            String text = Goods.toString(goodsType, production);
+            if (toolTipPrefix != null) {
+                text = toolTipPrefix + " " + text;
+            }
+            setToolTipText(text);
         }
     }
 
