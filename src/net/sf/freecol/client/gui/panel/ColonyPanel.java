@@ -94,7 +94,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.resources.ResourceManager;
 
-import cz.autel.dmi.HIGLayout;
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -215,6 +214,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         productionPanel = new JPanel();
         productionPanel.setOpaque(false);
+        productionPanel.setBorder(BorderFactory.createEtchedBorder());
         outsideColonyPanel = new OutsideColonyPanel(this);
         inPortPanel = new InPortPanel();
         warehousePanel = new WarehousePanel(this);
@@ -302,7 +302,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         // manual border corrections
         Border correctBorder = BorderFactory.createEmptyBorder(0, BORDER_CORRECT, 0, BORDER_CORRECT);
-        productionPanel.setBorder(correctBorder);
+        //productionPanel.setBorder(correctBorder);
         solLabel.setBorder(correctBorder);
         unloadButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, unloadButton.getBorder()));
         fillButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, fillButton.getBorder()));
@@ -342,44 +342,28 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         addMouseListener(new MouseAdapter() {
         });
 
-        int[] widths = { 125, 125, margin, 138, margin, 215, margin, 204 };
-        int[] heights = { 0, // colony select box
-                margin, 225, // colony tiles and buildings
-                margin, 28, // hammers label, same size as tools label
-                margin, 28, // tools label, same size as hammers label
-                margin, 120, // port and cargo panels
-                margin, 140, // warehouse
-                margin, 0 // buttons
-        };
-        setLayout(new HIGLayout(widths, heights));
+        setLayout(new MigLayout("fill, wrap 4", "[250:][150:][300:][300:]", ""));
 
-        int row = 1;
-        add(nameBox, higConst.rcwh(row, 1, 8, 1, ""));
-        row += 2;
-        add(tilesScroll, higConst.rcwh(row, 1, 4, 1));
-        add(buildingsScroll, higConst.rcwh(row, 6, 3, 1));
-        row += 2;
-        add(productionPanel, higConst.rcwh(row, 1, 4, 1, "tl"));
-        add(buildingBox, higConst.rc(row, 6));
-        add(hammersLabel, higConst.rc(row, 8));
-        row += 2;
-        add(solLabel, higConst.rcwh(row, 1, 4, 1));
-        add(buyBuilding, higConst.rc(row, 6));
-        add(toolsLabel, higConst.rc(row, 8));
-        row += 2;
-        add(inPortScroll, higConst.rcwh(row, 1, 2, 1));
-        add(cargoScroll, higConst.rcwh(row, 4, 3, 1));
-        add(outsideColonyScroll, higConst.rcwh(row, 8, 1, 3));
-        row += 2;
-        add(warehouseScroll, higConst.rcwh(row, 1, 6, 1));
-        row += 2;
-        add(unloadButton, higConst.rc(row, 1, "l"));
-        add(fillButton, higConst.rc(row, 2, "l"));
-        add(warehouseButton, higConst.rc(row, 4, "l"));
-        add(renameButton, higConst.rc(row, 6, "r"));
-        add(exitButton, higConst.rc(row, 8, "r"));
+        add(tilesScroll, "span 2, width 396:, height 220:, growx");
+        add(buildingsScroll, "span 2 6, width 600:, grow 200");
+        add(nameBox, "span 2, growx");
+        add(productionPanel, "span 2, grow");
+        add(solLabel, "span 2");
+        add(buildingBox, "width 250!");
+        add(hammersLabel);
+        add(buyBuilding);
+        add(toolsLabel);
+        add(inPortScroll, "grow");
+        add(cargoScroll, "span 2, grow");
+        add(outsideColonyScroll, "span 1 2, grow");
+        add(warehouseScroll, "span 3, growx, height 140:");
+        add(unloadButton, "span, split 5, align center");
+        add(fillButton);
+        add(warehouseButton);
+        add(renameButton);
+        add(exitButton);
 
-        setSize(getPreferredSize());
+        setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
 
     }
 
@@ -1156,7 +1140,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            setLayout(new GridLayout(0, 2, 6, 6));
+            setLayout(new GridLayout(0, 3, 6, 6));
             this.colonyPanel = colonyPanel;
         }
 
