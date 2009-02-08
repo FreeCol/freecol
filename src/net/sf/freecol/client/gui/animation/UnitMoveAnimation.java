@@ -104,6 +104,7 @@ final class UnitMoveAnimation {
                         : (currentPoint.getY() > destinationPoint.getY()) ? -1 : 1;
                 // Painting the whole screen once to get rid of disposed dialog-boxes.
                 canvas.paintImmediately(canvas.getBounds());
+                int dropFrames = 0;
                 while (!currentPoint.equals(destinationPoint)) {
                     long time = System.currentTimeMillis();
                     
@@ -120,18 +121,24 @@ final class UnitMoveAnimation {
                         currentPoint.y = destinationPoint.y;
                     }
                     
-                    //Setting new location
-                    unitLabel.setLocation(currentPoint);
-                    canvas.paintImmediately(bounds);
-                    
-                    // Time it took to draw the next frame - should be discounted from the animation delay
-                    time = ANIMATION_DELAY - System.currentTimeMillis() + time;
-                    if (time > 0) {
-                        try {
-                            Thread.sleep(time);
-                        } catch (InterruptedException ex) {
-                            //ignore
+                    if (dropFrames <= 0) {
+                        unitLabel.setLocation(currentPoint);
+                        canvas.paintImmediately(bounds);
+                        
+                        final int timeTaken = (int) (System.currentTimeMillis() - time);
+                        final int waitTime = ANIMATION_DELAY - timeTaken;
+                        if (waitTime > 0) {
+                            try {
+                                Thread.sleep(waitTime);
+                            } catch (InterruptedException ex) {
+                                //ignore
+                            }
+                            dropFrames = 0;
+                        } else {
+                            dropFrames = timeTaken / ANIMATION_DELAY - 1;
                         }
+                    } else {
+                        dropFrames--;
                     }
                 }
             }
