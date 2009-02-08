@@ -24,6 +24,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
@@ -281,6 +282,11 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         final Map map = freeColClient.getGame().getMap();
         final ImageProvider imageProvider = freeColClient.getGUI().getImageLibrary();
 
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING,
+                           RenderingHints.VALUE_RENDER_QUALITY);
+ 	  	
         /* Fill the rectangle with solid black */
         g.setColor(Color.BLACK);
         g.fillRect(x, y, width, height);

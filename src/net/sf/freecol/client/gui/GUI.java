@@ -25,19 +25,17 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -51,6 +49,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.UIManager;
@@ -182,9 +181,6 @@ public final class GUI {
     
     private java.util.Map<Unit, Integer> unitsOutForAnimation;
     private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
-
-    private Font textFont = new Font("SansSerif", Font.BOLD, 20);
-    private Font hugeFont = new Font("SansSerif", Font.BOLD, 36);
 
     /**
     * The constructor to use.
@@ -522,10 +518,6 @@ public final class GUI {
         }
     }
 
-
-    public Font getTextFont() {
-        return textFont;
-    }
     
     /**
     * Gets the selected tile.
@@ -999,8 +991,8 @@ public final class GUI {
                         g.drawOval(p.x + tileWidth/2, p.y + tileHeight/2, 10, 10);
                     }                
                     if (temp.getTurns() > 0) {
-                        drawOutlineString(g, Integer.toString(temp.getTurns()), textColor, textFont,
-                                           p.x + tileWidth/2, p.y + tileHeight/2);
+                        BufferedImage stringImage = createStringImage(g, Integer.toString(temp.getTurns()), textColor, tileWidth, 12);
+                        g.drawImage(stringImage, p.x + (tileWidth - stringImage.getWidth(null))/2, p.y + (tileHeight - stringImage.getHeight()) / 2, null);
                     }
                 }                    
                 temp = temp.next;
@@ -1026,11 +1018,6 @@ public final class GUI {
     private void displayMap(Graphics2D g) {
         Rectangle clipBounds = g.getClipBounds();
         Map map = freeColClient.getGame().getMap();
-
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                           RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING,
-                           RenderingHints.VALUE_RENDER_QUALITY);
 
         /*
         PART 1
@@ -1197,11 +1184,11 @@ public final class GUI {
         }
 
         /*
-          PART 3
-          ======
-          Display the colony names.
+        PART 3
+        ======
+        Display the colony names.
         */
-
+        //xx = 0;
         yy = clipTopY;
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
@@ -1212,10 +1199,13 @@ public final class GUI {
                 Tile tile = map.getTile(tileX, tileY);
                 if (tile != null && tile.getSettlement() instanceof Colony) {
                     Colony colony = (Colony) tile.getSettlement();
-                    double x = xx + lib.getTerrainImageWidth(tile.getType())/2;
-                    double y = yy + lib.getTerrainImageHeight(tile.getType());
-                    drawOutlineString(g, colony.getName(), colony.getOwner().getColor(),
-                                       textFont, x, y);
+                    BufferedImage stringImage =
+                        createColonyNameImage(g, colony,
+                                              lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
+                    g.drawImage(stringImage, 
+                                xx + (lib.getTerrainImageWidth(tile.getType()) - 
+                                      stringImage.getWidth())/2 + 1,
+                                yy + (lib.getSettlementImage(colony).getHeight(null) + 1), null);
                 }
                 xx += tileWidth;
             }
@@ -1264,19 +1254,12 @@ public final class GUI {
             
             final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
             final String nation = freeColClient.getGame().getCurrentPlayer().getNationAsString();
-            TextLayout layout = new TextLayout(Messages.message("waitingFor", "%nation%", nation),
-                                               hugeFont, g.getFontRenderContext());
-            BufferedImage im = new BufferedImage((int) layout.getBounds().getWidth(),
-                                                 (int) layout.getBounds().getHeight(),
-                                                 BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2d = im.createGraphics();
-            Shape outline = layout.getOutline(null);
-            g2d.translate(0, layout.getAscent());
-            g2d.setColor(currentPlayerColor);
-            g2d.fill(outline);
-            g2d.setColor(Color.BLACK);
-            g2d.draw(outline);
- 
+            Image im = createStringImage(g, 
+                    Messages.message("waitingFor", "%nation%", nation),
+                    currentPlayerColor,
+                    640,
+                    18);
+                        
             final ImageIcon coatOfArmsIcon = lib.getCoatOfArmsImageIcon(freeColClient.getGame().getCurrentPlayer().getNation());
             final int cHeight = (coatOfArmsIcon != null) ? coatOfArmsIcon.getIconHeight() : 0;
             final int cWidth = (coatOfArmsIcon != null) ? coatOfArmsIcon.getIconWidth() : 0;
@@ -1307,52 +1290,17 @@ public final class GUI {
 
         // Don't edit the list of messages while I'm drawing them.
         synchronized (this) {
-            yy = 200 ;
+            BufferedImage si = createStringImage(g, "getSizes", Color.WHITE, size.width, 12);
+
+            yy = size.height - 300 - getMessageCount() * si.getHeight();// 200 ;
             xx = 40;
 
-            Color oldColor = g.getColor();
-            AffineTransform oldTransform = g.getTransform();
-            g.translate(xx, yy);
             for (int i = 0; i < getMessageCount(); i++) {
                 GUIMessage message = getMessage(i);
-                TextLayout layout = new TextLayout(message.getMessage(), textFont, g.getFontRenderContext());
-                Shape outline = layout.getOutline(null);
-                g.setColor(message.getColor());
-                g.fill(outline);
-                g.setColor(Color.BLACK);
-                g.draw(outline);
-                g.translate(0, 20);
+                g.drawImage(createStringImage(g, message.getMessage(), message.getColor(), size.width, 12), xx, yy, null);
+                yy += si.getHeight();
             }
-            // restore previous settings
-            g.setColor(oldColor);
-            g.setTransform(oldTransform);
         }
-    }
-
-    /**
-     * Draws a string of a given color and with a black border around
-     * the glyphs.
-     *
-     * @param g a <code>Graphics2D</code> value
-     * @param text a <code>String</code> value
-     * @param color a <code>Color</code> value
-     * @param font a <code>Font</code> value
-     * @param x a <code>double</code> value
-     * @param y a <code>double</code> value
-     */
-    public void drawOutlineString(Graphics2D g, String text, Color color, Font font, double x, double y) {
-        Color oldColor = g.getColor();
-        AffineTransform oldTransform = g.getTransform();
-        TextLayout layout = new TextLayout(text, font, g.getFontRenderContext());
-        Shape outline = layout.getOutline(null);
-        g.translate(x - layout.getBounds().getWidth()/2, y + layout.getBounds().getHeight()/2);
-        g.setColor(color);
-        g.fill(outline);
-        g.setColor(Color.BLACK);
-        g.draw(outline);
-        // restore previous settings
-        g.setColor(oldColor);
-        g.setTransform(oldTransform);
     }
     
     /**
@@ -1387,7 +1335,26 @@ public final class GUI {
             return ResourceManager.getImage("path." + u.getPathTypeImage() + ".image");
         }
     }
-
+    
+    /**
+     * Gets an image to represent the path of the given <code>Unit</code>.
+     * 
+     * @param u The <code>Unit</code>
+     * @return The <code>Image</code>.
+     *
+    private Image getPathIllegalImage(Unit u) {
+        if (u == null || u.isNaval()) {
+            return (Image) UIManager.get("path.naval.illegal.image");
+        } else if (u.isMounted()) {
+            return (Image) UIManager.get("path.horse.illegal.image");
+        } else if (u.getType() == Unit.WAGON_TRAIN || u.getType() == Unit.TREASURE_TRAIN || u.getType() == Unit.ARTILLERY || u.getType() == Unit.DAMAGED_ARTILLERY) {
+            return (Image) UIManager.get("path.wagon.illegal.image");
+        } else {
+            return (Image) UIManager.get("path.foot.illegal.image");
+        }
+    }
+    */
+    
     /**
      * Gets an image to represent the path of the given <code>Unit</code>.
      * 
@@ -1402,18 +1369,127 @@ public final class GUI {
         }
     }
 
+    /**
+    * Creates an image with a string of a given color and with 
+    * a black border around the glyphs.
+    *
+    * @param g A <code>Graphics</code>-object for getting a
+    *       <code>Font</code>.
+    * @param nameString The <code>String</code> to make an image of.
+    * @param color The <code>Color</code> to use when displaying 
+    *       the <code>nameString</code>.
+    * @param maxWidth The maximum width of the image. The size of 
+    *       the <code>Font</code> will be adjusted if the image gets 
+    *       larger than this value.
+    * @param preferredFontSize The preferred font size.
+    * @return The image that was created.
+    */
+    public BufferedImage createStringImage(Graphics2D g, String nameString, Color color, int maxWidth, int preferredFontSize) {
+        return createStringImage(null, g, nameString, color, maxWidth, preferredFontSize);
+    }
+    
+    /**
+     * Creates an image with a string of a given color and with 
+     * a black border around the glyphs.
+     *
+     * @param c A <code>JComponent</code>-object for getting a
+     *       <code>Font</code>.
+     * @param nameString The <code>String</code> to make an image of.
+     * @param color The <code>Color</code> to use when displaying 
+     *       the <code>nameString</code>.
+     * @param maxWidth The maximum width of the image. The size of 
+     *       the <code>Font</code> will be adjusted if the image gets 
+     *       larger than this value.
+     * @param preferredFontSize The preferred font size.
+     * @return The image that was created.
+     */
+    public BufferedImage createStringImage(JComponent c, String nameString, Color color, int maxWidth, int preferredFontSize) {
+        return createStringImage(c, null, nameString, color, maxWidth, preferredFontSize);
+    }    
+    
+    /**
+     * Creates an image with a string of a given color and with 
+     * a black border around the glyphs.
+     *
+     * @param c A <code>JComponent</code>-object for getting a
+     *       <code>Font</code>.
+     * @param g A <code>Graphics</code>-object for getting a
+     *       <code>Font</code>.
+     * @param nameString The <code>String</code> to make an image of.
+     * @param color The <code>Color</code> to use when displaying 
+     *       the <code>nameString</code>.
+     * @param maxWidth The maximum width of the image. The size of 
+     *       the <code>Font</code> will be adjusted if the image gets 
+     *       larger than this value.
+     * @param preferredFontSize The preferred font size.
+     * @return The image that was created.
+     */
+    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {        
+        if (color == null) {
+            logger.warning("createStringImage called with color null");
+            color = Color.WHITE;
+        }
+        Font nameFont = (c != null) ? c.getFont() : g.getFont();
+        FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
+        BufferedImage bi = null;
+
+        int fontSize = preferredFontSize;
+        do {
+            nameFont = nameFont.deriveFont(Font.BOLD, fontSize);            
+            nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
+            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
+            fontSize -= 2;
+        } while (bi.getWidth() > maxWidth);
+
+        Graphics2D big = bi.createGraphics();
+
+        big.setColor(color);
+        big.setFont(nameFont);
+        big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
+
+        int playerColor = color.getRGB();
+        for (int biX=0; biX<bi.getWidth(); biX++) {
+            for (int biY=0; biY<bi.getHeight(); biY++) {
+                int r = bi.getRGB(biX, biY);
+
+                if (r == playerColor) {
+                    continue;
+                }
+
+                for (int cX=-1; cX <=1; cX++) {
+                    for (int cY=-1; cY <=1; cY++) {
+                        if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
+                            bi.setRGB(biX, biY, getStringBorderColor(color).getRGB());
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+
+        return bi;
+    }
+
+    private BufferedImage createColonyNameImage(Graphics g, Colony colony,
+                                                int maxWidth, int preferredFontSize) {        
+        return createStringImage((Graphics2D) g,
+                colony.getName(),
+                colony.getOwner().getColor(),
+                maxWidth,
+                preferredFontSize);
+    }
 
     /**
-     * Draws a road, between the given points, on the provided <code>Graphics</code>.
-     * When you provide the same <code>seed</code> you will get the same road.
-     *
-     * @param g The <code>Graphics</code> to draw the road upon.
-     * @param seed The seed of the random generator that is creating the road.
-     * @param x1 The x-component of the first coordinate.
-     * @param y1 The y-component of the first coordinate.
-     * @param x2 The x-component of the second coordinate.
-     * @param y2 The y-component of the second coordinate.
-     */
+    * Draws a road, between the given points, on the provided <code>Graphics</code>.
+    * When you provide the same <code>seed</code> you will get the same road.
+    *
+    * @param g The <code>Graphics</code> to draw the road upon.
+    * @param seed The seed of the random generator that is creating the road.
+    * @param x1 The x-component of the first coordinate.
+    * @param y1 The y-component of the first coordinate.
+    * @param x2 The x-component of the second coordinate.
+    * @param y2 The y-component of the second coordinate.
+    */
     public void drawRoad(Graphics2D g, long seed, int x1, int y1, int x2, int y2) {
         final int MAX_CORR = 4;
         Color oldColor = g.getColor();
@@ -1948,11 +2024,11 @@ public final class GUI {
                             theColor = Color.WHITE;
                         break;
                         }
-                        drawOutlineString(g, populationString, theColor, textFont,
-                                          x + lib.getTerrainImageWidth(tile.getType())/2,
-                                          y + lib.getTerrainImageHeight(tile.getType())/2);
+
+                        BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
+                        g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getTerrainImageHeight(tile.getType()) - stringImage.getHeight()) / 2) + 1, null);
                     }
-                    //g.setColor(Color.BLACK);
+                    g.setColor(Color.BLACK);
                 } else if (settlement instanceof IndianSettlement) {
                     IndianSettlement indianSettlement = (IndianSettlement) settlement;
                     Image settlementImage = lib.getSettlementImage(settlement);
@@ -1994,6 +2070,7 @@ public final class GUI {
 
                     g.setColor(Color.BLACK);
                     if (indianSettlement.isCapital()) {
+                        // TODO: make this look nicer
                         g.drawString("*",
                                      x + (STATE_OFFSET_X * lib.getScalingFactor()) + TEXT_OFFSET_X + 1,
                                      y + (int) (STATE_OFFSET_Y * lib.getScalingFactor()) + TEXT_OFFSET_Y + 2);
@@ -2087,25 +2164,76 @@ public final class GUI {
      * (in pixels).
      */
     private void displayOptionalValues(Graphics2D g, Map map, Tile tile, int x, int y) {
-
-        String text = null;
-
         switch (displayTileText) {
         case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
             if (tile.getName() != null) {
-                text = tile.getName();
+                String tileName = tile.getName();
+                g.setColor(Color.BLACK);
+                int b = getBreakingPoint(tileName);
+                if (b == -1) {
+                    g.drawString(tileName, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileName, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
+                    */
+                } else {
+                    g.drawString(tileName.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                    g.drawString(tileName.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileName.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileName.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                       stringImage = createStringImage(g, tileName.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
+                    */
+                }
             }
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_OWNERS:
             if (tile.getOwner() != null) {
-                text = tile.getOwner().getNationAsString();
+                String tileOwner = tile.getOwner().getNationAsString();
+                g.setColor(Color.BLACK);
+                int b = getBreakingPoint(tileOwner);
+                if (b == -1) {
+                    g.drawString(tileOwner, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
+                    */
+                } else {
+                    g.drawString(tileOwner.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                    g.drawString(tileOwner.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(tileOwner.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                       stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
+                    */
+                }
             }
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
             if (tile.getRegion() != null) {
-                text = tile.getRegion().getDisplayName();
+                String regionString = tile.getRegion().getDisplayName();
+                g.setColor(Color.BLACK);
+                int b = getBreakingPoint(regionString);
+                if (b == -1) {
+                    g.drawString(regionString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString))/2, y + (lib.getTerrainImageHeight(tile.getType())/2));
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileOwner, Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - stringImage.getHeight()/2, null);
+                    */
+                } else {
+                    g.drawString(regionString.substring(0, b), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString.substring(0, b)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 - (g.getFontMetrics().getAscent()*2)/3);
+                    g.drawString(regionString.substring(b+1), x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(regionString.substring(b+1)))/2, y + lib.getTerrainImageHeight(tile.getType())/2 + (g.getFontMetrics().getAscent()*2)/3);
+                    /* Takes to much resources:
+                       BufferedImage stringImage = createStringImage(g, tileOwner.substring(0, b), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - (stringImage.getHeight()) - 5, null);
+                       stringImage = createStringImage(g, tileOwner.substring(b+1), Color.BLACK, lib.getTerrainImageWidth(tile.getType().getIndex()), 10);
+                       g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType().getIndex()) - stringImage.getWidth())/2 + 1, y + lib.getTerrainImageHeight(tile.getType().getIndex())/2 - 5, null);
+                    */
+                }
             }
             break;
         default:
@@ -2113,35 +2241,17 @@ public final class GUI {
             break;
         }
         
+
+        /*
+        if (tile.getPosition().equals(selectedTile)) {
+            g.drawImage(lib.getMiscImage(ImageLibrary.UNIT_SELECT), x, y, null);
+        }*/
+
         g.setColor(Color.BLACK);
-        if (text != null) {
-            int b = getBreakingPoint(text);
-            if (b == -1) {
-                g.drawString(text,
-                             x + (lib.getTerrainImageWidth(tile.getType())
-                                  - g.getFontMetrics().stringWidth(text))/2,
-                             y + (lib.getTerrainImageHeight(tile.getType())/2));
-            } else {
-                g.drawString(text.substring(0, b),
-                             x + (lib.getTerrainImageWidth(tile.getType())
-                                  - g.getFontMetrics().stringWidth(text.substring(0, b)))/2,
-                             y + lib.getTerrainImageHeight(tile.getType())/2
-                             - (g.getFontMetrics().getAscent()*2)/3);
-                g.drawString(text.substring(b+1),
-                             x + (lib.getTerrainImageWidth(tile.getType())
-                                  - g.getFontMetrics().stringWidth(text.substring(b+1)))/2,
-                             y + lib.getTerrainImageHeight(tile.getType())/2
-                             + (g.getFontMetrics().getAscent()*2)/3);
-            }
-        }
 
         if (displayCoordinates) {
             String posString = tile.getX() + ", " + tile.getY();
-            g.drawString(posString,
-                         x + (lib.getTerrainImageWidth(tile.getType())
-                              - g.getFontMetrics().stringWidth(posString))/2,
-                         y + (lib.getTerrainImageHeight(tile.getType())
-                              - g.getFontMetrics().getAscent())/2);
+            g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
         }
         if (displayColonyValue && tile.isExplored() && tile.isLand()) {
             String valueString;
@@ -2150,11 +2260,7 @@ public final class GUI {
             } else {
                 valueString = Integer.toString(displayColonyValuePlayer.getColonyValue(tile));
             }
-            g.drawString(valueString,
-                         x + (lib.getTerrainImageWidth(tile.getType())
-                              - g.getFontMetrics().stringWidth(valueString))/2,
-                         y + (lib.getTerrainImageHeight(tile.getType())
-                              - g.getFontMetrics().getAscent())/2);
+            g.drawString(valueString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(valueString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
         }
     }
 
