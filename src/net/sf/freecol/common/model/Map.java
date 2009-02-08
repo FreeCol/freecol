@@ -1069,6 +1069,26 @@ public class Map extends FreeColGameObject {
             return tiles[0].length;
         }
     }
+    
+    /**
+     * Returns the direction a unit needs to move in
+     * order to get from <code>t1</code> to <code>t2</code>
+     * 
+     * @param t1 The tile to move from.
+     * @param t2 The target tile if moving from <code>t1</code>
+     *      in the direction returned by this method.
+     * @return The direction you need to move from <code>t1</code>
+     *      in order to reach <code>t2</code>, or null if the two
+     *      specified tiles are not neighbours. 
+     */
+    public Direction getDirection(Tile t1, Tile t2) {
+        for (Direction d : Direction.values()) {
+            if (getNeighbourOrNull(d, t1) == t2) {
+                return d;
+            }
+        }
+        return null;
+    }
 
     /**
      * Returns the neighbouring Tile of the given Tile in the given direction.

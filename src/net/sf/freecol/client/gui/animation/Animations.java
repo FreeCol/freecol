@@ -1,8 +1,12 @@
 package net.sf.freecol.client.gui.animation;
 
+import javax.swing.JLabel;
+
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.OutForAnimationCallback;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
@@ -41,13 +45,25 @@ public class Animations {
      * 
      * @param canvas The canvas where the animation should be drawn.
      * @param unit The attacking unit.
-     * @param direction The direction of the attack
+     * @param defender The defending unit.
      */
-    public static void unitAttack(Canvas canvas, Unit unit, Direction direction) {
-        final SimpleZippedAnimation animation = getAnimation(canvas, unit, direction, "attack");
-        if (animation != null) {
-            new UnitImageAnimation(canvas, unit, animation, direction).animate();
-        }
+    public static void unitAttack(final Canvas canvas, final Unit attacker, final Unit defender) {
+        final GUI gui = canvas.getGUI();
+        final Map map = attacker.getGame().getMap();
+        final Direction direction = map.getDirection(attacker.getTile(), defender.getTile());
+        
+        gui.executeWithUnitOutForAnimation(attacker, new OutForAnimationCallback() {
+            public void executeWithUnitOutForAnimation(final JLabel attackerLabel) {
+                gui.executeWithUnitOutForAnimation(defender, new OutForAnimationCallback() {
+                    public void executeWithUnitOutForAnimation(final JLabel defenderLabel) {
+                        final SimpleZippedAnimation animation = getAnimation(canvas, attacker, direction, "attack");
+                        if (animation != null) {
+                            new UnitImageAnimation(canvas, attacker, animation, direction).animate();
+                        }
+                    }
+                });
+            }
+        });
     }
     
     private static SimpleZippedAnimation getAnimation(Canvas canvas, Unit unit, Direction direction, String animation) {

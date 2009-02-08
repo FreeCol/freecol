@@ -2186,8 +2186,6 @@ public final class InGameController implements NetworkConstants {
         attackElement.setAttribute("unit", unit.getId());
         attackElement.setAttribute("direction", direction.toString());
         
-        Animations.unitAttack(freeColClient.getCanvas(), unit, direction);
-        
         // Get the result of the attack from the server:
         Element attackResultElement = client.ask(attackElement);
         if (attackResultElement != null && 
@@ -2247,6 +2245,8 @@ public final class InGameController implements NetworkConstants {
             } else if (unit.isMounted()) {
                 freeColClient.playSound(SoundEffect.ATTACK_DRAGOON);
             }
+            
+            Animations.unitAttack(freeColClient.getCanvas(), unit, defender);
 
             try {
                 game.getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold, repairLocation);
