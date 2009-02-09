@@ -20,6 +20,8 @@
 package net.sf.freecol.client.gui;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
@@ -349,14 +351,20 @@ public class InGameMenuBar extends FreeColMenuBar {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                             RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
+                             RenderingHints.VALUE_RENDER_QUALITY);
+ 	  	
         String displayString = Messages.message("menuBar.statusLine",
                                                 "%gold%", Integer.toString(freeColClient.getMyPlayer().getGold()),
                                                 "%tax%", Integer.toString(freeColClient.getMyPlayer().getTax()),
                                                 "%score%", Integer.toString(freeColClient.getMyPlayer().getScore()),
                                                 "%year%", freeColClient.getGame().getTurn().toString());
-        Rectangle2D displayStringBounds = g.getFontMetrics().getStringBounds(displayString, g);
+        Rectangle2D displayStringBounds = g2d.getFontMetrics().getStringBounds(displayString, g);
         int y = 15 + getInsets().top;
-        g.drawString(displayString, getWidth() - 10 - (int) displayStringBounds.getWidth(), y);
+        g2d.drawString(displayString, getWidth() - 10 - (int) displayStringBounds.getWidth(), y);
     }
 
 }
