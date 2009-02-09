@@ -23,10 +23,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.font.TextLayout;
+import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -472,23 +469,11 @@ public final class ProductionLabel extends JComponent {
             if (maximumProduction > production && production > 0) {
                 number = number + "/" + String.valueOf(maximumProduction);
             }
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                 RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-                                 RenderingHints.VALUE_RENDER_QUALITY);
-
-            TextLayout layout = new TextLayout(number, parent.getGUI().getTextFont(),
-                                               g2d.getFontRenderContext());
-            Shape outline = layout.getOutline(null);
-            double textOffset = leftOffset + (coverage - layout.getBounds().getWidth())/2;
-            double heightOffset = (goodsIcon.getIconHeight() - layout.getBounds().getHeight())/2
-                + layout.getAscent();
-            g2d.setColor(getForeground());
-            g2d.translate(textOffset, heightOffset);
-            g2d.fill(outline);
-            g2d.setColor(Color.BLACK);
-            g2d.draw(outline);
+            BufferedImage stringImage = parent.getGUI().createStringImage(this, number, getForeground(), width, 12);
+            int textOffset = leftOffset + (coverage - stringImage.getWidth())/2;
+            textOffset = (textOffset >= 0) ? textOffset : 0;
+            g.drawImage(stringImage, textOffset,
+                    goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
         }
     }
 
