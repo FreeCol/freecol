@@ -9,6 +9,7 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -47,7 +48,10 @@ public class Animations {
      * @param unit The attacking unit.
      * @param defender The defending unit.
      */
-    public static void unitAttack(final Canvas canvas, final Unit attacker, final Unit defender) {
+    public static void unitAttack(final Canvas canvas,
+            final Unit attacker,
+            final Unit defender,
+            final CombatResultType result) {
         final GUI gui = canvas.getGUI();
         final Map map = attacker.getGame().getMap();
         final Direction direction = map.getDirection(attacker.getTile(), defender.getTile());
@@ -56,9 +60,15 @@ public class Animations {
             public void executeWithUnitOutForAnimation(final JLabel attackerLabel) {
                 gui.executeWithUnitOutForAnimation(defender, new OutForAnimationCallback() {
                     public void executeWithUnitOutForAnimation(final JLabel defenderLabel) {
-                        final SimpleZippedAnimation animation = getAnimation(canvas, attacker, direction, "attack");
-                        if (animation != null) {
-                            new UnitImageAnimation(canvas, attacker, animation, direction).animate();
+                        final SimpleZippedAnimation attackerAnimation = getAnimation(canvas, attacker, direction, "attack");
+                        if (attackerAnimation != null) {
+                            new UnitImageAnimation(canvas, attacker, attackerAnimation, direction).animate();
+                        }
+                        if (!result.isSuccess()) {
+                            final SimpleZippedAnimation defenderAnimation = getAnimation(canvas, defender, direction.getReverseDirection(), "attack");
+                            if (defenderAnimation != null) {
+                                new UnitImageAnimation(canvas, defender, defenderAnimation, direction).animate();
+                            }
                         }
                     }
                 });

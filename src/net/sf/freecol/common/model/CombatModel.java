@@ -24,8 +24,30 @@ import java.util.Set;
 public interface CombatModel {
 
     public static enum CombatResultType {
-        GREAT_LOSS, LOSS, EVADES, WIN,
-            GREAT_WIN, DONE_SETTLEMENT }
+        GREAT_LOSS(false),
+        LOSS(false),
+        EVADES(false),
+        WIN(true),
+        GREAT_WIN(true),
+        DONE_SETTLEMENT(true);
+        
+        private final boolean success;
+        
+        private CombatResultType(boolean success) {
+            this.success = success;
+        }
+        
+        /**
+         * Returns if this combat result was a success
+         * for the attacking unit.
+         * 
+         * @return <code>true</code> if the attack was a
+         *      success and <code>false</code> otherwise.
+         */
+        public boolean isSuccess() {
+            return success;
+        }
+    }
 
     public class CombatResult {
         public CombatResultType type;

@@ -2580,7 +2580,7 @@ public final class GUI {
     /**
      * Draw the unit's image and occupation indicator in one JLabel object.
      * @param unit The unit to be drawn
-     * @return A JLabel object with the unit's image. The JLabel has location 0,0
+     * @return A JLabel object with the unit's image.
      */
     private JLabel getUnitLabel(Unit unit) {
         final Image unitImg = lib.getUnitImageIcon(unit).getImage();
@@ -2601,7 +2601,11 @@ public final class GUI {
         
         final JLabel label = new JLabel(new ImageIcon(img));
         label.setSize(width, height);
-        label.setLocation(getUnitLabelPositionInTile(label, getTilePosition(unit.getTile())));
+        if (unit.getTile() != null && getTilePosition(unit.getTile()) != null) {
+            label.setLocation(getUnitLabelPositionInTile(label, getTilePosition(unit.getTile())));
+        } else {
+            label.setVisible(false);
+        }
         return label;
     }
     
