@@ -19,23 +19,15 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.dnd.Autoscroll;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JViewport;
+import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Building;
@@ -49,49 +41,34 @@ import net.miginfocom.swing.MigLayout;
  */
 public class BuildingPanel extends JPanel {
 
-    private static final Font arrowFont = new Font("Dialog", Font.BOLD, 24);
-
     private final Canvas parent;
 
     private final Building building;
-    private final boolean canTeach;
-    private String buildingName;
 
-    private ProductionLabel productionInput = null;
     private ProductionLabel productionOutput = null;;
 
     private List<UnitLabel> unitLabels = new ArrayList<UnitLabel>();
 
     /**
-     * Creates this ASingleBuildingPanel.
+     * Creates this BuildingPanel.
      * 
      * @param building The building to display information from.
+     * @param parent a <code>Canvas</code> value
      */
     public BuildingPanel(Building building, Canvas parent) {
 
         this.building = building;
         this.parent = parent;
 
-        setBackground(Color.WHITE);
-        setLayout(new MigLayout("fill", "", "[][]push[]"));
-
-        this.buildingName = building.getName();
-        if (building.getMaxUnits() == 0) {
-            buildingName = "(" + building.getName() + ")";
-        }
-
-        canTeach = building.getType().hasAbility("model.ability.teach");
-
+        setToolTipText(" ");
+        setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
         initialize();
     }
 
     public void initialize() {
    
-
         removeAll();
         unitLabels.clear();
-
-        add(new JLabel(buildingName), "span, align center");
 
         if (building.getProductionNextTurn() == 0) {
             add(new JLabel(), "span");
@@ -99,36 +76,13 @@ public class BuildingPanel extends JPanel {
             productionOutput = new ProductionLabel(building.getGoodsOutputType(),
                                                    building.getProductionNextTurn(),
                                                    building.getMaximumProduction(), parent);
-            if (building.getGoodsInputNextTurn() == 0) {
-                add(productionOutput, "span, align center");
-            } else {
-                productionInput = new ProductionLabel(building.getGoodsInputType(),
-                                                      building.getGoodsInputNextTurn(),
-                                                      building.getMaximumGoodsInput(), parent);
-                JLabel arrow = new JLabel("\u2192");
-                arrow.setFont(arrowFont);
-                add(productionInput, "span, split 3, align center");
-                add(arrow);
-                add(productionOutput);
-            }
+            add(productionOutput, "span, align center");
         }
 
         for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(unit, parent, false);
+            UnitLabel unitLabel = new UnitLabel(unit, parent, true);
             unitLabels.add(unitLabel);
-            if (canTeach && unit.getStudent() != null) {
-                JLabel progress = new JLabel(unit.getTurnsOfTraining() + "/" +
-                                             unit.getNeededTurnsOfTraining());
-                progress.setBackground(Color.WHITE);
-                progress.setOpaque(true);
-                UnitLabel studentLabel = new UnitLabel(unit.getStudent(), parent, true);
-                studentLabel.setIgnoreLocation(true);
-                add(unitLabel);
-                add(progress, "split 2, flowy");
-                add(studentLabel);
-            } else  {
-                add(unitLabel, "span 2");
-            }
+            add(unitLabel);
         }
 
         setSize(getPreferredSize());
@@ -140,8 +94,8 @@ public class BuildingPanel extends JPanel {
      * @param g The graphics context in which to paint.
      */
     public void paintComponent(Graphics g) {
-        int width = getWidth();
-        int height = getHeight();
+        int width = 128;
+        int height = 96;
 
         Image bgImage = ResourceManager.getImage(building.getType().getId() + ".image");
         if (bgImage != null) {
@@ -173,6 +127,11 @@ public class BuildingPanel extends JPanel {
     public List<UnitLabel> getUnitLabels() {
         return unitLabels;
     }
+
+    public JToolTip createToolTip() {
+        return new BuildingPopup(building, parent);
+    }
+
 }
 
 

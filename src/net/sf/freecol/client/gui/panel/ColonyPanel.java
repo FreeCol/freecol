@@ -342,14 +342,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         addMouseListener(new MouseAdapter() {
         });
 
-        setLayout(new MigLayout("fill, wrap 4", "[250:][150:][300:][300:]", ""));
+        setLayout(new MigLayout("fill, wrap 4", "[240:][150:][300:][300:]", ""));
 
         add(tilesScroll, "span 2, width 396:, height 220:, growx");
         add(buildingsScroll, "span 2 6, width 600:, grow 200");
         add(nameBox, "span 2, growx");
-        add(productionPanel, "span 2, grow");
+        add(productionPanel, "span 2, height 48:, grow");
         add(solLabel, "span 2");
-        add(buildingBox, "width 250!");
+        add(buildingBox, "width 240!");
         add(hammersLabel);
         add(buyBuilding);
         add(toolsLabel);
@@ -1150,7 +1150,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            setLayout(new GridLayout(0, 3, 6, 6));
+            setLayout(new GridLayout(0, 5));
             this.colonyPanel = colonyPanel;
         }
 
