@@ -1673,7 +1673,21 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             } else if (goodsForBuilding.contains(building.getGoodsOutputType())) {
                 buildings1.add(building);
             } else {
-                buildings2.add(building);
+                int index = -1;
+                GoodsType outputType = building.getGoodsOutputType();
+                if (outputType != null) {
+                    for (int i = 0; i < buildings2.size(); i++) {
+                        if (outputType.equals(buildings2.get(i).getGoodsInputType())) {
+                            index = i;
+                        }
+                    }
+                }
+                if (index == -1) {
+                    buildings2.add(building);
+                } else {
+                    // insert before consumer
+                    buildings2.add(index, building);
+                }
             }
         }
 
