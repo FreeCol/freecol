@@ -1915,7 +1915,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (location instanceof ColonyTile){
                 // the unit is leaving a colony tile reset the
                 // ownership of the tile, so that others may claim it
-                ((ColonyTile)location).getWorkTile().setOwner(null);
+                if (((ColonyTile)location).getWorkTile() != null) {
+                    ((ColonyTile)location).getWorkTile().setOwner(null);
+                }
             }
             location.remove(this);
         }
