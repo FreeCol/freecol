@@ -129,7 +129,7 @@ public class BuildingPanel extends JPanel {
     }
 
     public JToolTip createToolTip() {
-        return new BuildingPopup(building, parent);
+        return new BuildingToolTip(building, parent);
     }
 
 }
