@@ -1291,7 +1291,10 @@ public class Player extends FreeColGameObject implements Nameable {
                 Iterator<Position> positionIterator = getGame().getMap().getWholeMapIterator();
                 while (positionIterator.hasNext()) {
                     Map.Position p = positionIterator.next();
-                    canSeeTiles[p.getX()][p.getY()] = hasExplored(getGame().getMap().getTile(p));
+                    Tile tile = getGame().getMap().getTile(p);
+                    if (tile != null) {
+                        canSeeTiles[p.getX()][p.getY()] = hasExplored(tile);
+                    }
                 }
             } else {
                 Iterator<Unit> unitIterator = getUnitIterator();
