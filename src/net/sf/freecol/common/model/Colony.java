@@ -753,7 +753,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return
      */
     public int getBellUpkeep() {
-    	return getUnitCount() - 2;
+    	return Math.max(0, getUnitCount() - 2);
     }
 
     /**
