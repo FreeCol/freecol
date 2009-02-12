@@ -354,6 +354,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 colony.firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
                                           new AbstractGoods(output, 0),
                                           new AbstractGoods(output, 1));
+                firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
+                                   new AbstractGoods(output, 0),
+                                   new AbstractGoods(output, 1));
             }
         }
     }
@@ -385,6 +388,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                     colony.firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
                                               new AbstractGoods(output, 1),
                                               new AbstractGoods(output, 0));
+                    firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
+                                       new AbstractGoods(output, 1),
+                                       new AbstractGoods(output, 0));
                 }
             }
         } else {

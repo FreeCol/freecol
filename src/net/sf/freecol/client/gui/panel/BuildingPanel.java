@@ -22,6 +22,9 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Graphics;
 import java.awt.Image;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +42,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel represents a single building in a Colony.
  */
-public class BuildingPanel extends JPanel {
+public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     private final Canvas parent;
 
@@ -59,6 +62,8 @@ public class BuildingPanel extends JPanel {
 
         this.building = building;
         this.parent = parent;
+
+        building.addPropertyChangeListener(this);
 
         setToolTipText(" ");
         setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
@@ -86,6 +91,8 @@ public class BuildingPanel extends JPanel {
         }
 
         setSize(getPreferredSize());
+        revalidate();
+        repaint();
     }
 
     /**
@@ -130,6 +137,10 @@ public class BuildingPanel extends JPanel {
 
     public JToolTip createToolTip() {
         return new BuildingToolTip(building, parent);
+    }
+
+    public void propertyChange(PropertyChangeEvent eventt) {
+        initialize();
     }
 
 }

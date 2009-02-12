@@ -19,24 +19,29 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Religious Report.
  */
-public final class ReportReligiousPanel extends ReportPanel {
+public final class ReportReligiousPanel extends ReportPanel implements ActionListener {
 
-
-    private final ReportProductionPanel religiousReportPanel;
 
     /**
      * The constructor that will add the items to this panel.
@@ -45,35 +50,56 @@ public final class ReportReligiousPanel extends ReportPanel {
     public ReportReligiousPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.religion"));
 
-        int[] widths = new int[] {0};
-        int[] heights = new int[] {0, 12, 0};
-        reportPanel.setLayout(new HIGLayout(widths, heights));
-        religiousReportPanel = new ReportProductionPanel(Goods.CROSSES, getCanvas(), this);
+        reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
     }
 
     /**
      * Prepares this panel to be displayed.
      */
     public void initialize() {
+
         Player player = getCanvas().getClient().getMyPlayer();
 
-        // Display Panel
-        reportPanel.removeAll();
-        religiousReportPanel.initialize();
-        
-        JPanel summaryPanel = new JPanel();
-        summaryPanel.setOpaque(false);
-        summaryPanel.add(new JLabel(Messages.message("crosses")));
-        int crosses = player.getCrosses();
-        int required = player.getCrossesRequired();
-        int production = religiousReportPanel.getTotalProduction();
-
+        reportPanel.add(new JLabel(Messages.message("crosses")));
         FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), Goods.CROSSES);
-        progressBar.update(0, required, crosses, production);
-        summaryPanel.add(progressBar);
+        reportPanel.add(progressBar, "wrap");
 
-        reportPanel.add(summaryPanel, higConst.rc(1, 1));
-        reportPanel.add(religiousReportPanel, higConst.rc(3, 1));
+        List<Colony> colonies = player.getColonies();
+        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+
+        int production = 0;
+        for (Colony colony : colonies) {
+            reportPanel.add(createColonyButton(colony), "split 2, flowy, align center");
+            reportPanel.add(new BuildingPanel(colony.getBuildingForProducing(Goods.CROSSES), getCanvas()));
+            production += colony.getProductionOf(Goods.CROSSES);
+        }
+
+        progressBar.update(0, player.getCrossesRequired(), player.getCrosses(), production);
+
     }
+
+
+    private JButton createColonyButton(Colony colony) {
+        JButton button = FreeColPanel.getLinkButton(colony.getName(), null, colony.getId());
+        button.addActionListener(this);
+        return button;
+    }
+
+    /**
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (command.equals(Integer.toString(ReportPanel.OK))) {
+            getCanvas().remove(this);
+        } else {
+            FreeColGameObject object = getCanvas().getClient().getGame().getFreeColGameObject(command);
+            getCanvas().showColonyPanel((Colony) object);
+        }
+    }
+
 }
 
