@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -458,10 +459,14 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
                         if (unit.getDestination() != null) {
                             String messageID = unit.isNaval() ? "sailingTo" : "goingTo";
                             String destination = unit.getDestination().getLocationName();
+                            TradeRoute tradeRoute = unit.getTradeRoute();
+                            String routeNote = "";
+                            if (tradeRoute != null) routeNote = " (" + tradeRoute.getName() + ")";
                             unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" + 
                                                      Messages.message(messageID, "%location%",
-                                                                      destination) +
-                                                     "</html>");
+                                                                      destination)
+                                                     
+                                                     + routeNote + "</html>");
                         }
                         // this is necessary because UnitLabel deselects carriers
                         unitLabel.setSelected(true);
