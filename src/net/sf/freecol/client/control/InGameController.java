@@ -98,6 +98,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
 
@@ -363,7 +364,7 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Renames a <code>Renameable</code>.
+     * Renames a <code>Nameable</code>.
      * 
      * @param object The object to rename.
      */
@@ -374,30 +375,36 @@ public final class InGameController implements NetworkConstants {
 
         String name = null;
         if (object instanceof Colony) {
-            name = freeColClient.getCanvas().showInputDialog("renameColony.text", object.getName(), "renameColony.yes",
+            name = freeColClient.getCanvas().showInputDialog("renameColony.text",
+                                                             object.getName(),
+                                                             "renameColony.yes",
                                                              "renameColony.no");
-            if (name==null || name.length()==0) {
-                // user canceled 
-                return;
-            } else if (freeColClient.getMyPlayer().getColony(name) != null) {
+            if (name == null || name.length() == 0) {
+                return; // user cancelled
+            }
+            if (freeColClient.getMyPlayer().getColony(name) != null) {
                 // colony name must be unique (per Player)
                 freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
                                                                  "%name%", name);
                 return;
             }
         } else if (object instanceof Unit) {
-            name = freeColClient.getCanvas().showInputDialog("renameUnit.text", object.getName(), "renameUnit.yes",
+            name = freeColClient.getCanvas().showInputDialog("renameUnit.text",
+                                                             object.getName(),
+                                                             "renameUnit.yes",
                                                              "renameUnit.no");
+            if (name == null || name.length() == 0) {
+                return; // user cancelled
+            }
         } else {
+            logger.warning("Tried to rename an unsupported Nameable: "
+                           + object.toString());
             return;
         }
 
-        object.setName(name);
-        Element renameElement = Message.createNewRootElement("rename");
-        renameElement.setAttribute("nameable", ((FreeColGameObject) object).getId());
-        renameElement.setAttribute("name", name);
+        Element renameElement = new RenameMessage(((FreeColGameObject) object).getId(), name).toXMLElement();
         freeColClient.getClient().sendAndWait(renameElement);
-
+        object.setName(name);
     }
 
     /**

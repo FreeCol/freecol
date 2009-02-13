@@ -78,6 +78,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.option.BooleanOption;
@@ -442,12 +443,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return getREFUnits(connection, element);
             }
         });
-        register("rename", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return rename(connection, element);
-            }
-        });
+        register(RenameMessage.getXMLElementTagName(),
+             new CurrentPlayerNetworkRequestHandler() {
+                 @Override
+                 public Element handle(Player player, Connection connection, Element element) {
+                     RenameMessage message = new RenameMessage(getGame(), element);
+                     return message.handle(freeColServer, player, connection);
+                 }
+             });
         register("getNewTradeRoute", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return getNewTradeRoute(connection, element);
@@ -2794,23 +2797,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
-    /**
-     * Handles a "rename"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element rename(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Nameable object = (Nameable) getGame().getFreeColGameObject(element.getAttribute("nameable"));
-        if (!(object instanceof Ownable) || ((Ownable) object).getOwner() != player) {
-            throw new IllegalStateException("Not the owner of the nameable.");
-        }
-        object.setName(element.getAttribute("name"));
-        return null;
-    }
-    
     /**
      * Handles a "getTransaction"-message.
      * 
