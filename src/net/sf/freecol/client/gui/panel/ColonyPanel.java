@@ -148,7 +148,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private final ColonyCargoPanel cargoPanel;
 
-    private final TitledBorder cargoBorder;
+    //private final TitledBorder cargoBorder;
 
     private final WarehousePanel warehousePanel;
 
@@ -216,12 +216,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         productionPanel.setOpaque(false);
         productionPanel.setBorder(BorderFactory.createEtchedBorder());
         outsideColonyPanel = new OutsideColonyPanel(this);
+        outsideColonyPanel.setToolTipText(Messages.message("outsideColony"));
         inPortPanel = new InPortPanel();
+        inPortPanel.setToolTipText(Messages.message("inPort"));
         warehousePanel = new WarehousePanel(this);
+        warehousePanel.setToolTipText(Messages.message("goods"));
         tilePanel = new TilePanel(this);
+        tilePanel.setToolTipText(Messages.message("surroundingArea"));
         buildingsPanel = new BuildingsPanel(this);
+        buildingsPanel.setToolTipText(Messages.message("buildings"));
         cargoPanel = new ColonyCargoPanel(parent);
         cargoPanel.setParentPanel(this);
+        cargoPanel.setToolTipText(Messages.message("cargoOnCarrier"));
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         pressListener = new DragListener(this);
@@ -230,7 +236,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         outsideColonyPanel.setLayout(new GridLayout(0, 2));
         inPortPanel.setLayout(new GridLayout(0, 2));
         cargoPanel.setLayout(new GridLayout(1, 0));
-        warehousePanel.setLayout(new GridLayout(2, 8));
+        warehousePanel.setLayout(new GridLayout(1, 0));
 
         solLabel = new JLabel(Messages.message("sonsOfLiberty") + ": 0%, " + Messages.message("tory") + ": 100%");
         hammersLabel = new FreeColProgressBar(parent, Goods.HAMMERS);
@@ -286,19 +292,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         buildingsScroll.setAutoscrolls(true);
 
         /** Borders */
-        tilesScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory
-                .createEmptyBorder(), Messages.message("surroundingArea")), new BevelBorder(BevelBorder.LOWERED)));
-        buildingsScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory
-                .createEmptyBorder(), Messages.message("buildings")), BorderFactory.createEtchedBorder()));
-        warehouseScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory
-                .createEmptyBorder(), Messages.message("goods")), BorderFactory.createEtchedBorder()));
-        cargoBorder = BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), Messages
-                .message("cargoOnCarrier"));
-        cargoScroll.setBorder(BorderFactory.createCompoundBorder(cargoBorder, BorderFactory.createEtchedBorder()));
-        inPortScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory
-                .createEmptyBorder(), Messages.message("inPort")), BorderFactory.createEtchedBorder()));
-        outsideColonyScroll.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(BorderFactory
-                .createEmptyBorder(), Messages.message("outsideColony")), BorderFactory.createEtchedBorder()));
+        tilesScroll.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        buildingsScroll.setBorder(BorderFactory.createEtchedBorder());
+        warehouseScroll.setBorder(BorderFactory.createEtchedBorder());
+        cargoScroll.setBorder(BorderFactory.createEtchedBorder());
+        inPortScroll.setBorder(BorderFactory.createEtchedBorder());
+        outsideColonyScroll.setBorder(BorderFactory.createEtchedBorder());
 
         // manual border corrections
         Border correctBorder = BorderFactory.createEmptyBorder(0, BORDER_CORRECT, 0, BORDER_CORRECT);
@@ -344,10 +343,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         setLayout(new MigLayout("fill, wrap 4", "[240:][150:][300:][300:]", ""));
 
-        add(tilesScroll, "span 2, width 396:, height 220:, growx");
-        add(buildingsScroll, "span 2 6, width 600:, grow 200");
-        add(nameBox, "span 2, growx");
-        add(productionPanel, "span 2, height 48:, grow");
+        add(productionPanel, "span, split 2, height 48:");
+        add(nameBox);
+        add(tilesScroll, "span 2, width 396!, height 220!");
+        add(buildingsScroll, "span 2 4, width 600:, grow 200");
         add(solLabel, "span 2");
         add(buildingBox, "width 240!");
         add(hammersLabel);
@@ -355,8 +354,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(toolsLabel);
         add(inPortScroll, "grow");
         add(cargoScroll, "span 2, grow");
-        add(outsideColonyScroll, "span 1 2, grow");
-        add(warehouseScroll, "span 3, growx, height 140:");
+        add(outsideColonyScroll, "grow");
+        add(warehouseScroll, "span, height 60!, growx");
         add(unloadButton, "span, split 5, align center");
         add(fillButton);
         add(warehouseButton);
@@ -569,12 +568,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             Unit carrier = cargoPanel.getCarrier();
             cargoPanel.getParent().setEnabled(true);
             int spaceLeft = carrier.getSpaceLeft();
+            /*
             cargoBorder.setTitle(Messages.message("cargoOnCarrierLong", 
                     "%name%", carrier.getName(),
                     "%space%", String.valueOf(spaceLeft)));
+            */
         } else {
             cargoPanel.getParent().setEnabled(false);
-            cargoBorder.setTitle(Messages.message("cargoOnCarrier"));
+            //cargoBorder.setTitle(Messages.message("cargoOnCarrier"));
         }
     }
 
