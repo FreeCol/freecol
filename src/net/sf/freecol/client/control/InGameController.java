@@ -95,6 +95,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -472,11 +473,8 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element buildColonyElement = Message.createNewRootElement("buildColony");
-        buildColonyElement.setAttribute("name", name);
-        buildColonyElement.setAttribute("unit", unit.getId());
-
-        Element reply = client.ask(buildColonyElement);
+        Element request = new BuildColonyMessage(name, unit.getId()).toXMLElement();
+        Element reply = client.ask(request);
 
         if (reply.getTagName().equals("buildColonyConfirmed")) {
             freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);

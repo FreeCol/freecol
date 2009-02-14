@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -233,12 +234,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return moveToAmerica(connection, element);
             }
         });
-        register("buildColony", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return buildColony(connection, element);
-            }
-        });
+        register(BuildColonyMessage.getXMLElementTagName(),
+             new CurrentPlayerNetworkRequestHandler() {
+                 @Override
+                 public Element handle(Player player, Connection connection, Element element) {
+                     BuildColonyMessage message = new BuildColonyMessage(getGame(), element);
+                     return message.handle(freeColServer, player, connection);
+                 }
+             });
         register("recruitUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -2098,41 +2101,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles a "buildColony"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param buildColonyElement The element containing the request.
-     */
-    private Element buildColony(Connection connection, Element buildColonyElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        String name = buildColonyElement.getAttribute("name");
-        Unit unit = (Unit) getGame().getFreeColGameObject(buildColonyElement.getAttribute("unit"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (unit.canBuildColony()) {
-            Colony colony = new Colony(getGame(), player, name, unit.getTile());
-            Element reply = Message.createNewRootElement("buildColonyConfirmed");
-            reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
-            Element updateElement = reply.getOwnerDocument().createElement("update");
-            int range = colony.getLineOfSight();
-            if (range > unit.getLineOfSight()) {
-                for (Tile t : getGame().getMap().getSurroundingTiles(unit.getTile(), range)) {
-                    updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
-                }
-            }
-            updateElement.appendChild(unit.getTile().toXMLElement(player, reply.getOwnerDocument()));
-            reply.appendChild(updateElement);
-            unit.buildColony(colony);
-            sendUpdatedTileToAll(unit.getTile(), player);
-            return reply;
-        } else {
-            logger.warning("A client is requesting to build a colony, but the operation is not permitted! (unsynchronized?)");
-            return null;
-        }
-    }
-
-    /**
      * Handles a "recruitUnitInEurope"-request from a client.
      * 
      * @param connection The connection the message came from.
@@ -3248,7 +3216,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
-    private void sendUpdatedTileToAll(Tile newTile, Player player) {
+    public void sendUpdatedTileToAll(Tile newTile, Player player) {
         // TODO: can Player be null?
         Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
