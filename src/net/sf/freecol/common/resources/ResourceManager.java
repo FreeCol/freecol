@@ -45,13 +45,20 @@ public class ResourceManager {
     private static ResourceMapping mergedContainer;
     
     private static volatile Thread preloadThread = null;
+    
+    private static volatile boolean dirty = false;
+    
+    private static Dimension lastWindowSize;
+    
 
     /**
      * Updates the resource mappings after making changes.
      */
-    public static void update() {
+    private static void update() {
+        dirty = false;
         preloadThread = null;
         createMergedContainer();
+        preload(lastWindowSize);
     }
     
     /**
@@ -66,6 +73,11 @@ public class ResourceManager {
      * @param windowSize
      */
     public static void preload(final Dimension windowSize) {
+        lastWindowSize = windowSize;
+        if (dirty) {
+            update();
+            return; // preload will be called from update
+        }
         getImage("CanvasBackgroundImage", windowSize);
         getImage("TitleImage");
         getImage("BackgroundImage");
@@ -78,6 +90,11 @@ public class ResourceManager {
      *      full screen size images.
      */
     public static void startBackgroundPreloading(final Dimension windowSize) {
+        lastWindowSize = windowSize;
+        if (dirty) {
+            update();
+            return; // startBackgroundPreloading will be called from update
+        }
         preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
             public void run() {
                 getImage("EuropeBackgroundImage", windowSize);
@@ -116,6 +133,7 @@ public class ResourceManager {
      */
     public static void setBaseMapping(ResourceMapping _baseMapping) {
         baseMapping = _baseMapping;
+        dirty = true;
     }
 
     /**
@@ -124,6 +142,7 @@ public class ResourceManager {
      */
     public static void setTcMapping(ResourceMapping _tcMapping) {
         tcMapping = _tcMapping;
+        dirty = true;
     }
 
     /**
@@ -132,6 +151,7 @@ public class ResourceManager {
      */
     public static void setModMappings(List<ResourceMapping> _modMappings) {
         modMappings = _modMappings;
+        dirty = true;
     }
     
     /**
@@ -140,6 +160,7 @@ public class ResourceManager {
      */
     public static void setCampaignMapping(ResourceMapping _campaignMapping) {
         campaignMapping = _campaignMapping;
+        dirty = true;
     }
 
     /**
@@ -148,6 +169,7 @@ public class ResourceManager {
      */
     public static void setScenarioMapping(ResourceMapping _scenarioMapping) {
         scenarioMapping = _scenarioMapping;
+        dirty = true;
     }
 
     /**
@@ -159,6 +181,9 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static SimpleZippedAnimation getSimpleZippedAnimation(String resource) {
+        if (dirty) {
+            update();
+        }
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof SZAResource)) {
             return null;
@@ -178,6 +203,9 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static SimpleZippedAnimation getSimpleZippedAnimation(String resource, double scale) {
+        if (dirty) {
+            update();
+        }
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof SZAResource)) {
             return null;
@@ -194,6 +222,9 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static Image getImage(String resource) {
+        if (dirty) {
+            update();
+        }
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof ImageResource)) {
             return null;
@@ -212,7 +243,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(String resource, double scale) {        
+    public static Image getImage(String resource, double scale) {
+        if (dirty) {
+            update();
+        }
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof ImageResource)) {
             return null;
@@ -230,7 +264,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(String resource, Dimension size) {        
+    public static Image getImage(String resource, Dimension size) {
+        if (dirty) {
+            update();
+        }
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof ImageResource)) {
             return null;
@@ -250,6 +287,9 @@ public class ResourceManager {
      *      identified by that name.
      */
     public static Image getGrayscaleImage(String resource, Dimension size) {
+        if (dirty) {
+            update();
+        }
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof ImageResource)) {
             return null;
@@ -268,7 +308,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getGrayscaleImage(String resource, double scale) {        
+    public static Image getGrayscaleImage(String resource, double scale) {
+        if (dirty) {
+            update();
+        }
         final Resource r = mergedContainer.get(resource);
         if (!(r instanceof ImageResource)) {
             return null;
@@ -288,6 +331,9 @@ public class ResourceManager {
      * @see #getImage(String)
      */
     public static ImageIcon getImageIcon(String resource) {
+        if (dirty) {
+            update();
+        }
         Image im = getImage(resource);
         return (im != null) ? new ImageIcon(im) : null;
     }

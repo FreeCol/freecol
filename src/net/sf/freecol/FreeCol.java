@@ -90,7 +90,7 @@ public final class FreeCol {
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
-    private static final String FREECOL_VERSION = "svn-20081230";
+    private static final String FREECOL_VERSION = "0.9.0-svn";
     private static String FREECOL_REVISION;
     
     private static final String MIN_JDK_VERSION = "1.5";
@@ -219,7 +219,7 @@ public final class FreeCol {
                         }
                         in.close();
                         
-                        freeColServer = new FreeColServer(savegameFile, defaultPublicServer, defaultSingleplayer, serverPort, serverName);
+                        freeColServer = new FreeColServer(fis, defaultPublicServer, defaultSingleplayer, serverPort, serverName);
                     } catch (Exception e) {
                         removeSplash(splash);
                         System.out.println("Could not load savegame.");
@@ -614,7 +614,6 @@ public final class FreeCol {
             } catch (Exception e) {}
         }
 
-        ResourceManager.update();
         return true;
     }
 

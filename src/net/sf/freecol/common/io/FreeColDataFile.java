@@ -23,6 +23,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -193,6 +194,8 @@ public class FreeColDataFile {
                 rc.add(key, ResourceFactory.createResource(resourceLocator));
             }  
             return rc;
+        } catch (FileNotFoundException e) {
+            return null;
         } catch (IOException e) {
             logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
             return null;

@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
@@ -444,13 +445,15 @@ public final class ConnectController {
         Runnable loadGameJob = new Runnable() {
             public void run() {
                 FreeColServer freeColServer = null;
-                try {                    
-                    freeColServer = new FreeColServer(theFile, publicServer, singleplayer, port, name);
+                try {
+                    final FreeColSavegameFile savegame = new FreeColSavegameFile(theFile);
+                    freeColServer = new FreeColServer(savegame, publicServer, singleplayer, port, name);
                     freeColClient.setFreeColServer(freeColServer);
                     final String username = freeColServer.getOwner();
                     freeColClient.setSingleplayer(singleplayer);
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
+                            ResourceManager.setScenarioMapping(savegame.getResourceMapping());
                             login(username, "127.0.0.1", FreeCol.getDefaultPort());
                             canvas.closeStatusPanel();
                         }
@@ -514,6 +517,9 @@ public final class ConnectController {
             logger.warning("Could not close connection!");
         }
 
+        ResourceManager.setScenarioMapping(null);
+        ResourceManager.setCampaignMapping(null);
+        
         if (!freeColClient.isHeadless()) {
             freeColClient.getGUI().setInGame(false);
         }
@@ -545,6 +551,8 @@ public final class ConnectController {
             server.getController().shutdown();
             freeColClient.setFreeColServer(null);
 
+            ResourceManager.setScenarioMapping(null);
+            ResourceManager.setCampaignMapping(null);
             freeColClient.getGUI().setInGame(false);
             freeColClient.setGame(null);
             freeColClient.setMyPlayer(null);

@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -267,7 +268,7 @@ public final class MapEditorController {
             public void run() {
                 FreeColServer freeColServer = null;
                 try {                    
-                    freeColServer = new FreeColServer(theFile, false, false, 0, "MapEditor");
+                    freeColServer = new FreeColServer(new FreeColSavegameFile(theFile), false, false, 0, "MapEditor");
                     freeColClient.setFreeColServer(freeColServer);
                     freeColClient.setGame(freeColServer.getGame());
                     SwingUtilities.invokeLater( new Runnable() {

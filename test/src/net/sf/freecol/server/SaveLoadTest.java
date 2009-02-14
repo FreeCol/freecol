@@ -22,6 +22,7 @@ package net.sf.freecol.server;
 import java.io.File;
 
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.generator.IMapGenerator;
@@ -37,7 +38,7 @@ public class SaveLoadTest extends FreeColTestCase {
         // start a new server and read the file back
         FreeColServer server = ServerTestHelper.startServer(false, true);
         try {
-            server.loadGame(file);
+            server.loadGame(new FreeColSavegameFile(file));
         } catch (Exception e) {
             fail();
         }

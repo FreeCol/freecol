@@ -202,7 +202,6 @@ public final class FreeColClient {
             modResources.add(new FreeColModFile(mi).getResourceMapping());
         }
         ResourceManager.setModMappings(modResources);
-        ResourceManager.update();
         ResourceManager.preload(innerWindowSize);
         
         actionManager = new ActionManager(this);

@@ -234,7 +234,7 @@ public final class FreeColServer {
      * Starts a new server in a specified mode and with a specified port and
      * loads the game from the given file.
      * 
-     * @param file The file where the game data is located.
+     * @param savegame The file where the game data is located.
      * 
      * @param publicServer This value should be set to <code>true</code> in
      *            order to appear on the meta server's listing.
@@ -252,7 +252,7 @@ public final class FreeColServer {
      * 
      * @throws FreeColException if the savegame could not be loaded.
      */
-    public FreeColServer(File file, boolean publicServer, boolean singleplayer, int port, String name)
+    public FreeColServer(final FreeColSavegameFile savegame, boolean publicServer, boolean singleplayer, int port, String name)
             throws IOException, FreeColException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
@@ -274,7 +274,7 @@ public final class FreeColServer {
             throw e;
         }
         try {
-            owner = loadGame(file);
+            owner = loadGame(savegame);
         } catch (FreeColException e) {
             server.shutdown();
             throw e;
@@ -670,7 +670,7 @@ public final class FreeColServer {
     /**
      * Loads a game.
      * 
-     * @param file The file where the game data is located.
+     * @param fis The file where the game data is located.
      * @return The username of the player saving the game.
      * @throws IOException If a problem was encountered while trying to open,
      *             read or close the file.
@@ -679,11 +679,10 @@ public final class FreeColServer {
      *                parser.
      * @exception FreeColException if the savegame contains incompatible data.
      */
-    public String loadGame(File file) throws IOException, FreeColException {
+    public String loadGame(final FreeColSavegameFile fis) throws IOException, FreeColException {
         boolean doNotLoadAI = false;
         XMLStreamReader xsr = null;
         try {
-            final FreeColSavegameFile fis = new FreeColSavegameFile(file);
             xsr = createXMLStreamReader(fis);
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");

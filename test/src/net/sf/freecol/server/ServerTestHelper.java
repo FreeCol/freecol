@@ -18,20 +18,21 @@
  */
 package net.sf.freecol.server;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
-
-import static junit.framework.Assert.fail;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 
 public final class ServerTestHelper {
 
@@ -64,7 +65,7 @@ public final class ServerTestHelper {
   public static FreeColServer startServer(File file, boolean publicServer, boolean singleplayer, int port, String name) {
     FreeColServer server = null;
     try {
-      server = new FreeColServer(file, publicServer, singleplayer, port, name);
+      server = new FreeColServer(new FreeColSavegameFile(file), publicServer, singleplayer, port, name);
     } catch (NoRouteToServerException e) {
       fail(e.getMessage());
     } catch (FreeColException e) {
