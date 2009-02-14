@@ -36,12 +36,22 @@ import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
  */
 public class ResourceManager {
     
+    /*
+     * The following fields are mappings from resource IDs
+     * to resources. A mapping is defined within a specific
+     * context. See the comment on each field's setter for
+     * more information: 
+     */
     private static ResourceMapping baseMapping;
     private static ResourceMapping tcMapping;
     private static ResourceMapping campaignMapping;
     private static ResourceMapping scenarioMapping;
     private static List<ResourceMapping> modMappings = new LinkedList<ResourceMapping>();
 
+    /*
+     * All the mappings above merged into this single
+     * ResourceMapping according to precendence.
+     */
     private static ResourceMapping mergedContainer;
     
     private static volatile Thread preloadThread = null;
@@ -50,38 +60,73 @@ public class ResourceManager {
     
     private static Dimension lastWindowSize;
     
+    
+    /**
+     * Sets the mappings specified in the date/base-directory
+     * @param _baseMapping The mapping between IDs and files. 
+     */
+    public static void setBaseMapping(final ResourceMapping _baseMapping) {
+        baseMapping = _baseMapping;
+        dirty = true;
+    }
 
     /**
-     * Updates the resource mappings after making changes.
+     * Sets the mappings specified for a Total Conversion (TC).
+     * @param _tcMapping The mapping between IDs and files. 
      */
-    private static void update() {
-        dirty = false;
-        preloadThread = null;
-        createMergedContainer();
-        preload(lastWindowSize);
+    public static void setTcMapping(final ResourceMapping _tcMapping) {
+        tcMapping = _tcMapping;
+        dirty = true;
+    }
+
+    /**
+     * Sets the mappings specified by mods.
+     * @param _modMappings A list of the mapping between IDs and files. 
+     */
+    public static void setModMappings(final List<ResourceMapping> _modMappings) {
+        modMappings = _modMappings;
+        dirty = true;
     }
     
+    /**
+     * Sets the mappings specified in a campaign.
+     * @param _campaignMapping The mapping between IDs and files. 
+     */
+    public static void setCampaignMapping(final ResourceMapping _campaignMapping) {
+        campaignMapping = _campaignMapping;
+        dirty = true;
+    }
+
+    /**
+     * Sets the mappings specified in a scenario.
+     * @param _scenarioMapping The mapping between IDs and files. 
+     */
+    public static void setScenarioMapping(final ResourceMapping _scenarioMapping) {
+        scenarioMapping = _scenarioMapping;
+        dirty = true;
+    }
+
     /**
      * Preload resources. This method is intended to
      * be called when starting the application, as
      * it blocks until resources needed for the first
      * panels have been loaded.
      * 
-     * After that, it calls {@link #startBackgroundPreloading(Dimension)}
-     * so that other resources can be loading in the background.
+     * It also ensures that the
+     * {@link #startBackgroundPreloading(Dimension) background preloading thread}
+     * is started.
      *  
      * @param windowSize
      */
     public static void preload(final Dimension windowSize) {
-        lastWindowSize = windowSize;
-        if (dirty) {
-            update();
-            return; // preload will be called from update
+        if (lastWindowSize != windowSize) {
+            dirty = true;
         }
+        lastWindowSize = windowSize;
+        updateIfDirty(); // starts: startBackgroundPreloading
         getImage("CanvasBackgroundImage", windowSize);
         getImage("TitleImage");
         getImage("BackgroundImage");
-        startBackgroundPreloading(windowSize);
     }
     
     /**
@@ -92,12 +137,15 @@ public class ResourceManager {
     public static void startBackgroundPreloading(final Dimension windowSize) {
         lastWindowSize = windowSize;
         if (dirty) {
-            update();
+            updateIfDirty();
             return; // startBackgroundPreloading will be called from update
         }
         preloadThread = new Thread(FreeCol.CLIENT_THREAD+"Resource loader") {
             public void run() {
-                getImage("EuropeBackgroundImage", windowSize);
+                if (windowSize != null) {
+                    getImage("EuropeBackgroundImage", windowSize);
+                    getImage("CanvasBackgroundImage", windowSize);
+                }
                 for (String key : mergedContainer.getResources().keySet()) {
                     if (preloadThread != this) {
                         return;
@@ -111,6 +159,18 @@ public class ResourceManager {
         preloadThread.start();
     }
     
+    /**
+     * Updates the resource mappings after making changes.
+     */
+    private static void updateIfDirty() {
+        if (dirty) {
+            dirty = false;
+            preloadThread = null;
+            createMergedContainer();
+            startBackgroundPreloading(lastWindowSize);
+        }
+    }
+
     /**
      * Creates a merged container for easy access to resources.
      */
@@ -126,50 +186,22 @@ public class ResourceManager {
         }
         mergedContainer = _mergedContainer;
     }
-
-    /**
-     * Sets the mappings specified in the date/base-directory
-     * @param _baseMapping The mapping between IDs and files. 
-     */
-    public static void setBaseMapping(ResourceMapping _baseMapping) {
-        baseMapping = _baseMapping;
-        dirty = true;
-    }
-
-    /**
-     * Sets the mappings specified for a Total Conversion (TC).
-     * @param _tcMapping The mapping between IDs and files. 
-     */
-    public static void setTcMapping(ResourceMapping _tcMapping) {
-        tcMapping = _tcMapping;
-        dirty = true;
-    }
-
-    /**
-     * Sets the mappings specified by mods.
-     * @param _modMappings A list of the mapping between IDs and files. 
-     */
-    public static void setModMappings(List<ResourceMapping> _modMappings) {
-        modMappings = _modMappings;
-        dirty = true;
-    }
     
     /**
-     * Sets the mappings specified in a campaign.
-     * @param _campaignMapping The mapping between IDs and files. 
+     * Returns the resource of the given type.
+     * @param <T> The type of the resource to get.
+     * @param resourceId The resource to get.
+     * @param type The type of the resource to get.
+     * @return The resource if there is one with the given
+     *      resourceId and type, or else <code>null</code>.
      */
-    public static void setCampaignMapping(ResourceMapping _campaignMapping) {
-        campaignMapping = _campaignMapping;
-        dirty = true;
-    }
-
-    /**
-     * Sets the mappings specified in a scenario.
-     * @param _scenarioMapping The mapping between IDs and files. 
-     */
-    public static void setScenarioMapping(ResourceMapping _scenarioMapping) {
-        scenarioMapping = _scenarioMapping;
-        dirty = true;
+    private static <T> T getResource(final String resourceId, final Class<T> type) {
+        final Resource r = mergedContainer.get(resourceId);
+        if (type.isInstance(r)) {
+            return type.cast(r);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -180,15 +212,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no animation
      *      identified by that name.
      */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(String resource) {
-        if (dirty) {
-            update();
-        }
-        final Resource r = mergedContainer.get(resource);
-        if (!(r instanceof SZAResource)) {
-            return null;
-        }
-        return ((SZAResource) r).getSimpleZippedAnimation();
+    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource) {
+        updateIfDirty();
+        final SZAResource r = getResource(resource, SZAResource.class);
+        return (r != null) ? r.getSimpleZippedAnimation() : null;
     }
     
     /**
@@ -202,15 +229,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no animation
      *      identified by that name.
      */
-    public static SimpleZippedAnimation getSimpleZippedAnimation(String resource, double scale) {
-        if (dirty) {
-            update();
-        }
-        final Resource r = mergedContainer.get(resource);
-        if (!(r instanceof SZAResource)) {
-            return null;
-        }
-        return ((SZAResource) r).getSimpleZippedAnimation(scale);
+    public static SimpleZippedAnimation getSimpleZippedAnimation(final String resource, final double scale) {
+        updateIfDirty();
+        final SZAResource r = getResource(resource, SZAResource.class);
+        return (r != null) ? r.getSimpleZippedAnimation(scale) : null;
     }
 
     /**
@@ -221,15 +243,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(String resource) {
-        if (dirty) {
-            update();
-        }
-        final Resource r = mergedContainer.get(resource);
-        if (!(r instanceof ImageResource)) {
-            return null;
-        }
-        return ((ImageResource) r).getImage();
+    public static Image getImage(final String resource) {
+        updateIfDirty();
+        final ImageResource r = getResource(resource, ImageResource.class);
+        return (r != null) ? r.getImage() : null;
     }
     
     /**
@@ -243,15 +260,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(String resource, double scale) {
-        if (dirty) {
-            update();
-        }
-        final Resource r = mergedContainer.get(resource);
-        if (!(r instanceof ImageResource)) {
-            return null;
-        }
-        return ((ImageResource) r).getImage(scale);
+    public static Image getImage(final String resource, final double scale) {
+        updateIfDirty();
+        final ImageResource r = getResource(resource, ImageResource.class);
+        return (r != null) ? r.getImage(scale) : null;
     }
     
     /**
@@ -264,15 +276,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getImage(String resource, Dimension size) {
-        if (dirty) {
-            update();
-        }
-        final Resource r = mergedContainer.get(resource);
-        if (!(r instanceof ImageResource)) {
-            return null;
-        }
-        return ((ImageResource) r).getImage(size);
+    public static Image getImage(final String resource, final Dimension size) {
+        updateIfDirty();
+        final ImageResource r = getResource(resource, ImageResource.class);
+        return (r != null) ? r.getImage(size) : null;
     }
     
     /**
@@ -286,15 +293,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getGrayscaleImage(String resource, Dimension size) {
-        if (dirty) {
-            update();
-        }
-        final Resource r = mergedContainer.get(resource);
-        if (!(r instanceof ImageResource)) {
-            return null;
-        }
-        return ((ImageResource) r).getGrayscaleImage(size);
+    public static Image getGrayscaleImage(final String resource, final Dimension size) {
+        updateIfDirty();
+        final ImageResource r = getResource(resource, ImageResource.class);
+        return (r != null) ? r.getGrayscaleImage(size) : null;
     }
     
     /**
@@ -308,15 +310,10 @@ public class ResourceManager {
      *      or <code>null</code> if there is no image
      *      identified by that name.
      */
-    public static Image getGrayscaleImage(String resource, double scale) {
-        if (dirty) {
-            update();
-        }
-        final Resource r = mergedContainer.get(resource);
-        if (!(r instanceof ImageResource)) {
-            return null;
-        }
-        return ((ImageResource) r).getGrayscaleImage(scale);
+    public static Image getGrayscaleImage(final String resource, final double scale) {
+        updateIfDirty();
+        final ImageResource r = getResource(resource, ImageResource.class);
+        return (r != null) ? r.getGrayscaleImage(scale) : null;
     }
 
     /**
@@ -330,11 +327,9 @@ public class ResourceManager {
      *      by that name.
      * @see #getImage(String)
      */
-    public static ImageIcon getImageIcon(String resource) {
-        if (dirty) {
-            update();
-        }
-        Image im = getImage(resource);
+    public static ImageIcon getImageIcon(final String resource) {
+        updateIfDirty();
+        final Image im = getImage(resource);
         return (im != null) ? new ImageIcon(im) : null;
     }
 }
