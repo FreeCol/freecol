@@ -73,11 +73,11 @@ public class DebugCrossBugAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getMyPlayer().updateCrossesRequired();
+        freeColClient.getMyPlayer().updateImmigrationRequired();
         if (freeColClient.getFreeColServer() != null) {
             Iterator<Player> pi = freeColClient.getFreeColServer().getGame().getPlayerIterator();
             while (pi.hasNext()) {
-                pi.next().updateCrossesRequired();
+                pi.next().updateImmigrationRequired();
             }
         }
     }

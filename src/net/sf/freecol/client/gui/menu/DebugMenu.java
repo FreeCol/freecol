@@ -90,11 +90,11 @@ public class DebugMenu extends JMenu {
         debugFixMenu.add(crossBug);
         crossBug.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                freeColClient.getMyPlayer().updateCrossesRequired();
+                freeColClient.getMyPlayer().updateImmigrationRequired();
                 if (freeColClient.getFreeColServer() != null) {
                     Iterator<Player> pi = freeColClient.getFreeColServer().getGame().getPlayerIterator();
                     while (pi.hasNext()) {
-                        pi.next().updateCrossesRequired();
+                        pi.next().updateImmigrationRequired();
                     }
                 }
             }
@@ -227,9 +227,9 @@ public class DebugMenu extends JMenu {
             giveBells.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     for (Colony c : freeColClient.getMyPlayer().getColonies()) {
-                        c.addBells(100);
+                        c.addLiberty(100);
                         Colony sc = (Colony) freeColClient.getFreeColServer().getGame().getFreeColGameObject(c.getId());
-                        sc.addBells(100);
+                        sc.addLiberty(100);
                     }
                 }
             });

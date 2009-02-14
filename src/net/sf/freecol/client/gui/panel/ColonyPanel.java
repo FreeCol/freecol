@@ -798,7 +798,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         ProductionLabel bellsLabel = new ProductionLabel(Goods.BELLS, bells, parent);
         bellsLabel.setToolTipPrefix(Messages.message("totalProduction"));
         productionPanel.add(bellsLabel);
-        int surplusBells = bells - colony.getBellUpkeep();
+        int surplusBells = bells - colony.getConsumption(Goods.BELLS);
         ProductionLabel bellsSurplusLabel = new ProductionLabel(Goods.BELLS, surplusBells, parent);
         bellsSurplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
         productionPanel.add(bellsSurplusLabel);

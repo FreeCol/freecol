@@ -433,4 +433,12 @@ public class FeatureContainer {
         }
     }
 
+    public boolean containsAbilityKey(String key) {
+        return abilities.containsKey(key);
+    }
+
+    public boolean containsModifierKey(String key) {
+        return modifiers.containsKey(key);
+    }
+
 }

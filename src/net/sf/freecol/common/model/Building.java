@@ -529,9 +529,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             colony.removeGoods(goodsInputType, goodsInput);
         }
         colony.addGoods(goodsOutputType, goodsOutput);
-        if (goodsOutputType.isPlayerAccumulated()) {
-            getOwner().increment(goodsOutputType, goodsOutput);
-        }
 
         if (getUnitCount() > 0) {
             final int experience = goodsOutput / getUnitCount();

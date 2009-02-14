@@ -207,10 +207,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
             add(createColonyButton(colonyIndex), higConst.rc(row, colonyColumn));
 
             // production
-            int newValue = colony.getProductionOf(goodsType);
-            if (goodsType == Goods.BELLS) {
-                newValue -= colony.getBellUpkeep();
-            }
+            int newValue = colony.getProductionNetOf(goodsType);
             totalProduction += newValue;
             Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
             GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
@@ -272,7 +269,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
                 add(newLabel, higConst.rc(row, toryColumn));
 
                 if (newValue > 0 && percentage < 50) {
-                    int required = (Colony.BELLS_PER_REBEL * count) / 2;
+                    int required = (Colony.LIBERTY_PER_REBEL * count) / 2;
                     int turns = required / newValue;
                     if (required % newValue > 0) {
                         turns++;
@@ -286,7 +283,7 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
                     add(newLabel, higConst.rc(row, percent50Column));
                 }
                 if (newValue > 0 && percentage < 100) {
-                    int required = Colony.BELLS_PER_REBEL * count;
+                    int required = Colony.LIBERTY_PER_REBEL * count;
                     int turns = required / newValue;
                     if (required % newValue > 0) {
                         turns++;

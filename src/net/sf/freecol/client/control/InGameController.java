@@ -3719,7 +3719,7 @@ public final class InGameController implements NetworkConstants {
         Element reply = client.ask(emigrateUnitInEuropeElement);
 
         if (reply == null || !reply.getTagName().equals("emigrateUnitInEuropeConfirmed")) {
-            logger.warning("Could not recruit unit: " + myPlayer.getCrosses() + "/" + myPlayer.getCrossesRequired());
+            logger.warning("Could not recruit unit: " + myPlayer.getImmigration() + "/" + myPlayer.getImmigrationRequired());
             throw new IllegalStateException();
         }
 

@@ -1898,8 +1898,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else if (action.equals("heresy")) {
             Element reply = Message.createNewRootElement("missionaryReply");
             sendRemoveUnitToAll(unit, player);
-            double random = Math.random() * settlement.getMissionary().getOwner().getCrosses() /
-                (unit.getOwner().getCrosses() + 1);
+            double random = Math.random() * settlement.getMissionary().getOwner().getImmigration() /
+                (unit.getOwner().getImmigration() + 1);
             if (settlement.getMissionary().hasAbility("model.ability.expertMissionary")) {
                 random += 0.2;
             }

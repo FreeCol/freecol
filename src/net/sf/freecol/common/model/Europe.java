@@ -233,8 +233,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         unit.getOwner().modifyGold(-getRecruitPrice());
         incrementRecruitPrice();
         unit.setLocation(this);
-        unit.getOwner().updateCrossesRequired();
-        unit.getOwner().reduceCrosses();
+        unit.getOwner().updateImmigrationRequired();
+        unit.getOwner().reduceImmigration();
 
         setRecruitable(slot, newRecruitable);
     }
@@ -247,20 +247,20 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * @param unit The recruited unit.
      * @param newRecruitable The recruitable that will fill the now empty slot.
      * @exception IllegalArgumentException If <code>unit == null</code>.
-     * @exception IllegalStateException If there is not enough crosses to
+     * @exception IllegalStateException If there is not enough immigration to
      *                emigrate the <code>Unit</code>.
      */
     public void emigrate(int slot, Unit unit, UnitType newRecruitable) {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         } else if (!unit.getOwner().checkEmigrate()) {
-            throw new IllegalStateException("Not enough crosses to emigrate unit: " + unit.getOwner().getCrosses()
-                    + "/" + unit.getOwner().getCrossesRequired());
+            throw new IllegalStateException("Not enough immigration to emigrate unit: " + unit.getOwner().getImmigration()
+                    + "/" + unit.getOwner().getImmigrationRequired());
         }
 
         unit.setLocation(this);
-        unit.getOwner().updateCrossesRequired();
-        unit.getOwner().reduceCrosses();
+        unit.getOwner().updateImmigrationRequired();
+        unit.getOwner().reduceImmigration();
 
         if (!unit.getOwner().hasAbility("model.ability.selectRecruit")) {
             addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit, "model.europe.emigrate",
@@ -492,9 +492,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * @return The current price of the recruit in this <code>Europe</code>.
      */
     public int getRecruitPrice() {
-        int required = owner.getCrossesRequired();
-        int crosses = owner.getCrosses();
-        int difference = Math.max(required - crosses, 0);
+        int required = owner.getImmigrationRequired();
+        int immigration = owner.getImmigration();
+        int difference = Math.max(required - immigration, 0);
         return Math.max((recruitPrice * difference) / required, recruitLowerCap);
     }
 

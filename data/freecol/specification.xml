@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.14 -->
+<!-- specification version 0.15 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -76,10 +76,12 @@
     </goods-type>
     <goods-type id="model.goods.fish" is-farmed="true" storable="false"
                 stored-as="model.goods.food" is-food="true" />
-    <goods-type id="model.goods.bells" is-farmed="false"
-                ignore-limit="true" storable="false" player-accumulated="true"/>
-    <goods-type id="model.goods.crosses" is-farmed="false"
-                ignore-limit="true" storable="false" player-accumulated="true"/>
+    <goods-type id="model.goods.bells" is-farmed="false" ignore-limit="true" storable="false">
+      <modifier id="model.modifier.liberty" type="multiplicative" value="1"/>
+    </goods-type>
+    <goods-type id="model.goods.crosses" is-farmed="false" ignore-limit="true" storable="false">
+      <modifier id="model.modifier.immigration" type="multiplicative" value="1"/>
+    </goods-type>
     <goods-type id="model.goods.hammers" is-farmed="false"
                 made-from="model.goods.lumber" ignore-limit="true" storable="false" price="20"/>
   </goods-types>

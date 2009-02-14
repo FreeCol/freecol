@@ -27,6 +27,7 @@ public class ColonyTest extends FreeColTestCase {
     BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
     BuildingType warehouseExpansionType = FreeCol.getSpecification().getBuildingType("model.building.WarehouseExpansion");
     BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
+    BuildingType townHallType = FreeCol.getSpecification().getBuildingType("model.building.TownHall");
     BuildingType carpenterHouseType =  FreeCol.getSpecification().getBuildingType("model.building.CarpenterHouse");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
@@ -119,12 +120,79 @@ public class ColonyTest extends FreeColTestCase {
         int initialHammers = 0;
         colony.addGoods(lumberGoodsType, initialLumber);
         
-        assertEquals("Wrong initial lumber quantity, ",initialLumber,colony.getGoodsCount(lumberGoodsType));
-        assertEquals("Colony should not be building nothing, ", BuildableType.NOTHING, colony.getCurrentlyBuilding());
-        assertTrue("Colony shoud be able to produce work (hammers)",colony.getProductionOf(hammerGoodsType)>0);
-        assertEquals("Colony shold not have any work production(hammers) initially, ",initialHammers,colony.getGoodsCount(hammerGoodsType));
+        assertEquals("Wrong initial lumber quantity, ",
+                     initialLumber, colony.getGoodsCount(lumberGoodsType));
+        assertEquals("Colony should not be building nothing, ",
+                     BuildableType.NOTHING, colony.getCurrentlyBuilding());
+        assertTrue("Colony shoud be able to produce work (hammers)",
+                   colony.getProductionOf(hammerGoodsType) > 0);
+        assertEquals("Colony shold not have any work production(hammers) initially, ",
+                     initialHammers, colony.getGoodsCount(hammerGoodsType));
         colony.newTurn();
-        assertEquals("Colony shold not have any work production(hammers) after, ",initialHammers,colony.getGoodsCount(hammerGoodsType));
-        assertEquals("Wrong final lumber quantity, ",initialLumber,colony.getGoodsCount(lumberGoodsType));
+        assertEquals("Colony shold not have any work production(hammers) after, ",
+                     initialHammers, colony.getGoodsCount(hammerGoodsType));
+        assertEquals("Wrong final lumber quantity, ",
+                     initialLumber, colony.getGoodsCount(lumberGoodsType));
+    }
+
+
+
+    public void testLibertyAndImmigration() {
+
+        int population = 3;
+
+        Game game = getGame();
+        game.setMap(getTestMap(plainsType,true));
+        Colony colony = getStandardColony(population);
+        
+        Building townHall = new Building(getGame(), colony, townHallType);
+        colony.addBuilding(townHall);
+        Unit statesman = colony.getUnitList().get(0);
+        statesman.setLocation(null);
+        townHall.add(statesman);
+
+        Building church = new Building(getGame(), colony, churchType);
+        colony.addBuilding(church);
+        church.upgrade();
+        Unit preacher = colony.getUnitList().get(1);
+        preacher.setLocation(null);
+        church.add(preacher);
+
+        colony.newTurn();
+        assertEquals(population, colony.getUnitCount());
+        assertEquals(4, colony.getProductionOf(Goods.BELLS));
+        assertEquals(population - 2, colony.getConsumption(Goods.BELLS));
+
+        int bells = colony.getProductionOf(Goods.BELLS) - colony.getConsumption(Goods.BELLS);
+        assertEquals(bells, colony.getProductionNetOf(Goods.BELLS));
+        assertEquals(bells, colony.getGoodsCount(Goods.BELLS));
+        assertEquals(bells, colony.getLiberty());
+
+        colony.addGoods(Goods.BELLS, 7);
+        bells += 7;
+        assertEquals(bells, colony.getGoodsCount(Goods.BELLS));
+        assertEquals(bells, colony.getLiberty());
+
+        colony.removeGoods(Goods.BELLS, 5);
+        bells -= 5;
+        assertEquals(bells, colony.getGoodsCount(Goods.BELLS));
+        assertEquals(bells, colony.getLiberty());
+
+        int crosses = colony.getProductionOf(Goods.CROSSES) - colony.getConsumption(Goods.CROSSES);
+        assertEquals(crosses, colony.getProductionNetOf(Goods.CROSSES));
+        assertEquals(crosses, colony.getGoodsCount(Goods.CROSSES));
+        assertEquals(crosses, colony.getImmigration());
+
+        colony.addGoods(Goods.CROSSES, 7);
+        crosses += 7;
+        assertEquals(crosses, colony.getGoodsCount(Goods.CROSSES));
+        assertEquals(crosses, colony.getImmigration());
+
+        colony.removeGoods(Goods.CROSSES, 5);
+        crosses -= 5;
+        assertEquals(crosses, colony.getGoodsCount(Goods.CROSSES));
+        assertEquals(crosses, colony.getImmigration());
+
+
     }
 }

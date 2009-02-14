@@ -120,9 +120,9 @@ public final class RecruitDialog extends FreeColDialog implements ActionListener
             }
             int turns = 100;
             if (production > 0) {
-                int crossesRequired = (player.getCrossesRequired() - player.getCrosses());
-                turns = crossesRequired / production;
-                if (crossesRequired % production > 0) {
+                int immigrationRequired = (player.getImmigrationRequired() - player.getImmigration());
+                turns = immigrationRequired / production;
+                if (immigrationRequired % production > 0) {
                     turns++;
                 }
             }

@@ -58,11 +58,6 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     private boolean storable;
 
-    /**
-     * Whether this type of goods is accumulated by the Player.
-     */
-    private boolean playerAccumulated;
-
     private GoodsType madeFrom;
     private GoodsType makes;
     private GoodsType storedAs;
@@ -255,22 +250,23 @@ public final class GoodsType extends FreeColGameObjectType {
         this.tradeGoods = newTradeGoods;
     }
 
+
     /**
-     * Get the <code>PlayerAccumulated</code> value.
+     * Whether this type of goods produces liberty points.
      *
      * @return a <code>boolean</code> value
      */
-    public boolean isPlayerAccumulated() {
-        return playerAccumulated;
+    public boolean isLibertyGoodsType() {
+        return getFeatureContainer().containsModifierKey("model.modifier.liberty");
     }
 
     /**
-     * Set the <code>PlayerAccumulated</code> value.
+     * Whether this type of goods causes immigration.
      *
-     * @param newPlayerAccumulated The new PlayerAccumulated value.
+     * @return a <code>boolean</code> value
      */
-    public void setPlayerAccumulated(final boolean newPlayerAccumulated) {
-        this.playerAccumulated = newPlayerAccumulated;
+    public boolean isImmigrationGoodsType() {
+        return getFeatureContainer().containsModifierKey("model.modifier.liberty");
     }
 
     /**
@@ -330,7 +326,6 @@ public final class GoodsType extends FreeColGameObjectType {
         newWorldGoods = getAttribute(in, "new-world-goods", false);
         breedingNumber = getAttribute(in, "breeding-number", NO_BREEDING);
         price = getAttribute(in, "price", NO_PRICE);
-        playerAccumulated = getAttribute(in, "player-accumulated", false);
 
         madeFrom = specification.getType(in, "made-from", GoodsType.class, null);
         if (madeFrom != null) {

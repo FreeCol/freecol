@@ -74,7 +74,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
             production += colony.getProductionOf(Goods.CROSSES);
         }
 
-        progressBar.update(0, player.getCrossesRequired(), player.getCrosses(), production);
+        progressBar.update(0, player.getImmigrationRequired(), player.getImmigration(), production);
 
     }
 

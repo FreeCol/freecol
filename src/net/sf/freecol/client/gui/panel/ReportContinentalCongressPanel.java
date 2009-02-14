@@ -92,7 +92,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             JLabel currentFatherLabel = new JLabel(father.getName());
             currentFatherLabel.setToolTipText(father.getDescription());
             summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
-            int bells = player.getBells();
+            int bells = player.getLiberty();
             int required = player.getTotalFoundingFatherCost();
             int production = productionPanel.getTotalProduction();
 

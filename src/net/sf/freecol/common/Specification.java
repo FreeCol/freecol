@@ -96,6 +96,8 @@ public final class Specification {
     private final List<GoodsType> farmedGoodsTypeList;
     private final List<GoodsType> foodGoodsTypeList;
     private final List<GoodsType> newWorldGoodsTypeList;
+    private final List<GoodsType> libertyGoodsTypeList;
+    private final List<GoodsType> immigrationGoodsTypeList;
 
     private final List<ResourceType> resourceTypeList;
 
@@ -159,6 +161,8 @@ public final class Specification {
         foodGoodsTypeList = new ArrayList<GoodsType>();
         farmedGoodsTypeList = new ArrayList<GoodsType>();
         newWorldGoodsTypeList = new ArrayList<GoodsType>();
+        libertyGoodsTypeList = new ArrayList<GoodsType>();
+        immigrationGoodsTypeList = new ArrayList<GoodsType>();
 
         resourceTypeList = new ArrayList<ResourceType>();
         tileTypeList = new ArrayList<TileType>();
@@ -209,6 +213,12 @@ public final class Specification {
                         }
                         if (goodsType.isNewWorldGoodsType()) {
                             newWorldGoodsTypeList.add(goodsType);
+                        }
+                        if (goodsType.isLibertyGoodsType()) {
+                            libertyGoodsTypeList.add(goodsType);
+                        }
+                        if (goodsType.isImmigrationGoodsType()) {
+                            immigrationGoodsTypeList.add(goodsType);
                         }
                         if (goodsType.isStorable()) {
                             storableTypes++;
@@ -671,6 +681,14 @@ public final class Specification {
 
     public List<GoodsType> getNewWorldGoodsTypeList() {
         return newWorldGoodsTypeList;
+    }
+
+    public List<GoodsType> getLibertyGoodsTypeList() {
+        return libertyGoodsTypeList;
+    }
+
+    public List<GoodsType> getImmigrationGoodsTypeList() {
+        return immigrationGoodsTypeList;
     }
 
     /**
