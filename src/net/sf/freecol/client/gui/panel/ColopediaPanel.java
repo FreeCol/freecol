@@ -157,7 +157,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         setCancelComponent(ok);
         add(ok, BorderLayout.SOUTH);
 
-        setSize(850, 600);
+        setSize(getPreferredSize());
+
     }
     
     @Override
@@ -167,8 +168,9 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     
     @Override
     public Dimension getPreferredSize() {
-        return getMinimumSize();
+        return new Dimension(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
     }
+
 
     /**
      * Prepares this panel to be displayed.
@@ -1192,10 +1194,18 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             int prow = 1;
             int pcolumn = 1;
             for (Modifier productionBonus : bonusList) {
-                GoodsType goodsType = Specification.getSpecification().getGoodsType(productionBonus.getId());
-                String bonus = getModifierAsString(productionBonus);
-                productionPanel.add(getGoodsButton(goodsType, bonus),
-                                    higConst.rc(prow, pcolumn));
+                try {
+                    GoodsType goodsType = Specification.getSpecification().getGoodsType(productionBonus.getId());
+                    String bonus = getModifierAsString(productionBonus);
+                    productionPanel.add(getGoodsButton(goodsType, bonus),
+                                        higConst.rc(prow, pcolumn));
+                } catch(Exception e) {
+                    // not a production bonus
+                    String bonus = productionBonus.getName()
+                        + ": " + getModifierAsString(productionBonus);
+                    productionPanel.add(new JLabel(bonus),
+                                        higConst.rc(prow, pcolumn));
+                }
                 pcolumn += 2;
                 if (pcolumn == 11) {
                     pcolumn = 1;
@@ -1203,7 +1213,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
                 }
             }
 
-            detailPanel.add(new JLabel(Messages.message("colopedia.unit.productionBonus")),
+            detailPanel.add(new JLabel(Messages.message("colopedia.buildings.modifiers")),
                             higConst.rc(row, leftColumn));
             detailPanel.add(productionPanel, higConst.rc(row, rightColumn));
             row += 2;
