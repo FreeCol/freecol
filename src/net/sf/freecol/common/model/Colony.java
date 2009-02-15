@@ -1932,6 +1932,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
             out.writeAttribute("tories", Integer.toString(tories));
             out.writeAttribute("oldTories", Integer.toString(oldTories));
+            out.writeAttribute("liberty", Integer.toString(liberty));
+            out.writeAttribute("immigration", Integer.toString(immigration));
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
             if (!BuildableType.NOTHING.equals(getCurrentlyBuilding())) {
                 out.writeAttribute("currentlyBuilding", getCurrentlyBuilding().getId());
@@ -1980,6 +1982,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);
         tories = getAttribute(in, "tories", 0);
         oldTories = getAttribute(in, "oldTories", 0);
+        liberty = getAttribute(in, "liberty", 0);
+        immigration = getAttribute(in, "immigration", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
         setCurrentlyBuilding(FreeCol.getSpecification().getType(in, "currentlyBuilding", BuildableType.class, 
                                                                 BuildableType.NOTHING));
