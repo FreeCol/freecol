@@ -80,6 +80,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.option.BooleanOption;
@@ -127,11 +128,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return getVacantEntryLocation(connection, element);
             }
         });
-        register("setDestination", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return setDestination(connection, element);
-            }
-        });
+        register(SetDestinationMessage.getXMLElementTagName(),
+            new NetworkRequestHandler() {
+                public Element handle(Connection connection, Element element) {
+                    SetDestinationMessage message = new SetDestinationMessage(getGame(), element);
+                    return message.handle(freeColServer, connection);
+                }
+            });
         register("move", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -2742,27 +2745,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(unit.toXMLElement(player,reply.getOwnerDocument()));
         }
         return reply;
-    }
-
-    /**
-     * Handles a "setDestination"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element setDestination(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not the owner of the unit.");
-        }
-        Location destination = null;
-        if (element.hasAttribute("destination")) {
-            destination = (Location) getGame().getFreeColGameObject(element.getAttribute("destination"));
-        }
-        unit.setDestination(destination);
-        return null;
     }
 
     /**

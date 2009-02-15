@@ -100,6 +100,7 @@ import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
 
@@ -715,22 +716,17 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Sets the destination of the given unit and send the server a message for this action.
+     * Sets the destination of the given unit and send the server
+     * a message for this action.
      * 
      * @param unit The <code>Unit</code>.
      * @param destination The <code>Location</code>.
      * @see Unit#setDestination(Location)
      */
     public void setDestination(Unit unit, Location destination) {
-        Element setDestinationElement = Message.createNewRootElement("setDestination");
-        setDestinationElement.setAttribute("unit", unit.getId());
-        if (destination != null) {
-            setDestinationElement.setAttribute("destination", destination.getId());
-        }
-
-        unit.setDestination(destination);
-
+        Element setDestinationElement = new SetDestinationMessage(unit, destination).toXMLElement();
         freeColClient.getClient().sendAndWait(setDestinationElement);
+        unit.setDestination(destination);
     }
 
     /**
