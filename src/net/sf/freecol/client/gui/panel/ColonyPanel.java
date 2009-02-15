@@ -214,7 +214,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         productionPanel = new JPanel();
         productionPanel.setOpaque(false);
-        productionPanel.setBorder(BorderFactory.createEtchedBorder());
         outsideColonyPanel = new OutsideColonyPanel(this);
         outsideColonyPanel.setToolTipText(Messages.message("outsideColony"));
         inPortPanel = new InPortPanel();
@@ -233,7 +232,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         pressListener = new DragListener(this);
         releaseListener = new DropListener();
 
-        outsideColonyPanel.setLayout(new GridLayout(0, 2));
+        outsideColonyPanel.setLayout(new GridLayout(0, 8));
         inPortPanel.setLayout(new GridLayout(0, 2));
         cargoPanel.setLayout(new GridLayout(1, 0));
         warehousePanel.setLayout(new GridLayout(1, 0));
@@ -277,7 +276,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         JScrollPane tilesScroll = new JScrollPane(tilePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         JScrollPane buildingsScroll = new JScrollPane(buildingsPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         buildingsScroll.getVerticalScrollBar().setUnitIncrement( 16 );
 
         // Make the colony label
@@ -343,8 +342,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         setLayout(new MigLayout("fill, wrap 4", "[240:][150:][300:][300:]", ""));
 
-        add(productionPanel, "span, split 2, height 48:");
-        add(nameBox);
+        add(nameBox, "span 2, width 396:, height 48:");
+        add(productionPanel, "span, align center");
         add(tilesScroll, "span 2, width 396!, height 220!");
         add(buildingsScroll, "span 2 4, width 600:, grow 200");
         add(solLabel, "span 2");
@@ -353,8 +352,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(buyBuilding);
         add(toolsLabel);
         add(inPortScroll, "grow");
-        add(cargoScroll, "span 2, grow");
-        add(outsideColonyScroll, "grow");
+        add(cargoScroll, "grow");
+        add(outsideColonyScroll, "span 2, grow");
         add(warehouseScroll, "span, height 60!, growx");
         add(unloadButton, "span, split 5, align center");
         add(fillButton);
