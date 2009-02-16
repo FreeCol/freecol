@@ -27,6 +27,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -97,6 +98,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             SKILLS, BUILDINGS, FATHERS, NATIONS, NATION_TYPES }
 
     private static final Font arrowFont = new Font("Dialog", Font.BOLD, 24);
+    private static final DecimalFormat modifierFormat = 
+        new DecimalFormat("0.##");
 
     private static final String OK = "OK";
     private static final String ROOT = "ROOT";
@@ -1362,7 +1365,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     public String getModifierAsString(Modifier modifier) {
-        String bonus = getModifierFormat().format(modifier.getValue());
+        String bonus = modifierFormat.format(modifier.getValue());
         switch(modifier.getType()) {
         case ADDITIVE:
             if (modifier.getValue() > 0) {
