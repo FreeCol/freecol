@@ -405,7 +405,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        freeColClient.getClient().sendAndWait(new RenameMessage(object, name).toXMLElement());
+        freeColClient.getClient().sendAndWait(new RenameMessage((FreeColGameObject) object, name).toXMLElement());
         object.setName(name);
     }
 
