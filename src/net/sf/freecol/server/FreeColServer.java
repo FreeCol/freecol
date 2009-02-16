@@ -1118,6 +1118,34 @@ public final class FreeColServer {
         }
     }
 
+    /**
+     * Get a unit by ID, validating the ID as much as possible.  Designed for
+     * message unpacking where the ID should not be trusted.
+     *
+     * @param unitId The ID of the unit to be found.
+     * @param serverPlayer The <code>ServerPlayer</code> to whom the unit must belong.
+     *
+     * @return The unit corresponding to the unitId argument.
+     * @throws IllegalStateException on failure to validate the unitId in any way.
+     *         In the worst case this may be indicative of a malign client.
+     */
+    public Unit getUnitSafely(String unitId, ServerPlayer serverPlayer) {
+        Game game = serverPlayer.getGame();
+        Unit unit;
+
+        if (unitId == null || unitId.length() == 0) {
+            throw new IllegalStateException("ID must not be empty.");
+        }
+        if (!(game.getFreeColGameObject(unitId) instanceof Unit)) {
+            throw new IllegalStateException("Not a unit ID: " + unitId);
+        }
+        unit = (Unit) game.getFreeColGameObject(unitId);
+        if (unit.getOwner() != serverPlayer) {
+            throw new IllegalStateException("Not the owner of unit: " + unitId);
+        }
+        return unit;
+    }
+
 
     /**
      * Adds a new AIPlayer to the Game.

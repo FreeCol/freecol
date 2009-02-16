@@ -103,6 +103,7 @@ import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
+import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -1127,8 +1128,7 @@ public final class InGameController implements NetworkConstants {
     
     private void updateCurrentStop(Unit unit) {
         // Set destination to next stop's location
-        Element updateCurrentStopElement = Message.createNewRootElement("updateCurrentStop");
-        updateCurrentStopElement.setAttribute("unit", unit.getId());
+        Element updateCurrentStopElement = new UpdateCurrentStopMessage(unit).toXMLElement();
         freeColClient.getClient().sendAndWait(updateCurrentStopElement);
         
         Stop stop = unit.nextStop();

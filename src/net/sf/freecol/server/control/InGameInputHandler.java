@@ -83,6 +83,7 @@ import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
+import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
@@ -477,11 +478,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return assignTradeRoute(connection, element);
             }
         });
-        register("updateCurrentStop", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return updateCurrentStop(connection, element);
-            }
-        });
+        register(UpdateCurrentStopMessage.getXMLElementTagName(),
+             new NetworkRequestHandler() {
+                 public Element handle(Connection connection, Element element) {
+                     UpdateCurrentStopMessage message = new UpdateCurrentStopMessage(getGame(), element);
+                     return message.handle(freeColServer, connection);
+                 }
+             });
         register("diplomaticTrade", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return diplomaticTrade(connection, element);
@@ -727,27 +730,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             routes.add(serverTradeRoute);
         }
         player.setTradeRoutes(routes);
-        return null;
-    }
-
-    /**
-     * Handles a "updateCurrentStop"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element updateCurrentStop(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        } else if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        
-        unit.nextStop();
         return null;
     }
 
@@ -3230,7 +3212,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * logger.warning("Could not send message to: " + enemyPlayer.getName() + "
      * with connection " + enemyPlayer.getConnection()); } } }
      */
-    
+
     private Element getServerStatistics(Connection connection, Element request) {
         StatisticsMessage m = new StatisticsMessage(getGame(), getFreeColServer().getAIMain());
         Element reply = m.toXMLElement();
