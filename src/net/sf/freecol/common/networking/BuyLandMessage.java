@@ -24,66 +24,76 @@ import org.w3c.dom.Element;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
-
 import net.sf.freecol.server.FreeColServer;
 
-public class BuyLandMessage extends Message {
 
+/**
+ * The message sent when the client requests buying land.
+ */
+public class BuyLandMessage extends Message {
     /**
-     * Describe tile here.
+     * The tile to buy.
      */
     private Tile tile;
 
+    /**
+     * Create a new <code>BuyLandMessage</code> with the supplied tile.
+     *
+     * @param tile The <code>Tile</code> to buy.
+     */
     public BuyLandMessage(Tile tile) {
         this.tile = tile;
     }
 
-
+    /**
+     * Create a new <code>BuyLandMessage</code> from a supplied element.
+     *
+     * @param game The <code>Game</code> this message belongs to.
+     * @param element The <code>Element</code> to use to create the message.
+     */
     public BuyLandMessage(Game game, Element element) {
-        tile = (Tile) game.getFreeColGameObject(element.getAttribute("tile"));
-    }
-
-
-    /**
-     * Get the <code>Tile</code> value.
-     *
-     * @return a <code>Tile</code> value
-     */
-    public final Tile getTile() {
-        return tile;
+        this.tile = (Tile) game.getFreeColGameObject(element.getAttribute("tile"));
     }
 
     /**
-     * Set the <code>Tile</code> value.
+     * Handle a "buyLand"-message.
      *
-     * @param newTile The new Tile value.
+     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param player The <code>Player</code> the message applies to.
+     * @param connection The <code>Connection</code> the message was received on.
+     *
+     * @return Null.
+     * @throws IllegalStateException if there is a problem with the message arguments.
      */
-    public final void setTile(final Tile newTile) {
-        this.tile = newTile;
-    }
-
     public Element handle(FreeColServer server, Player player, Connection connection) {
-
         if (tile == null) {
             throw new IllegalStateException("Tile must not be 'null'.");
         } else if (tile.getOwner() == null) {
             tile.setOwner(player);
         } else if (tile.getOwner().isEuropean()) {
             throw new IllegalStateException("Can not buy land from European players!");
-        } else {
-            player.buyLand(tile);
         }
+        player.buyLand(tile);
         return null;
     }
 
+    /**
+     * Convert this BuyLandMessage to XML.
+     *
+     * @return The XML representation of this message.
+     */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("tile", tile.getId());
         return result;
     }
 
+    /**
+     * The tag name of the root element representing this object.
+     *
+     * @return "buyLand".
+     */
     public static String getXMLElementTagName() {
         return "buyLand";
     }
-
 }

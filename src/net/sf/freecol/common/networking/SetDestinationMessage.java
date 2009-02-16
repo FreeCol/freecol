@@ -33,7 +33,6 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The message sent when the client requests setting a unit destination.
  */
 public class SetDestinationMessage extends Message {
-
     /**
      * The ID of the unit whose destination is to be set.
      **/
@@ -71,31 +70,19 @@ public class SetDestinationMessage extends Message {
     /**
      * Handle a "setDestination"-message.
      *
+     * @param server The <code>FreeColServer</code> which is handling the message.
      * @param connection The <code>Connection</code> the message was received on.
-     * @param element The element containing the request.
      *
      * @return Null.
-     * @throw IllegalStateException if there is a problem with the message
-     *        arguments..
+     * @throws IllegalStateException if there is a problem with the message arguments.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = serverPlayer.getGame();
-        Unit unit;
+        Unit unit = server.getUnitSafely(unitId, serverPlayer);
         Location destination;
 
-        if (unitId == null || unitId.length() == 0) {
-            throw new IllegalStateException("unitId must not be empty.");
-        }
-        if (!(game.getFreeColGameObject(unitId) instanceof Unit)) {
-            throw new IllegalStateException("Not a unit ID: " + unitId);
-        }
-        unit = (Unit) game.getFreeColGameObject(unitId);
-        if (unit.getOwner() != serverPlayer) {
-            throw new IllegalStateException("Not the owner of building unit: "
-                                            + unitId);
-        }
-        if (destinationId == null) {
+        if (destinationId == null || destinationId.length() == 0) {
             destination = null;
         } else if (!(game.getFreeColGameObject(destinationId) instanceof Location)) {
             throw new IllegalStateException("Not a location ID: " + destinationId);

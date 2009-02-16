@@ -25,76 +25,95 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
-
 import net.sf.freecol.server.FreeColServer;
 
-public class StealLandMessage extends Message {
 
+/**
+ * The message sent when the client requests stealing land.
+ */
+public class StealLandMessage extends Message {
     /**
-     * Describe tile here.
+     * The tile to steal.
      */
     private Tile tile;
 
     /**
-     * Describe colony here.
+     * The colony that is stealing land.
      */
     private Colony colony;
 
 
+    /**
+     * Create a new <code>StealLandMessage</code> with the supplied tile and colony.
+     *
+     * @param tile The <code>Tile</code> to steal.
+     * @param colony The <code>Colony</code> that is stealing.
+     */
     public StealLandMessage(Tile tile, Colony colony) {
         this.tile = tile;
         this.colony = colony;
     }
 
-
+    /**
+     * Create a new <code>BuyLandMessage</code> from a supplied element.
+     *
+     * @param game The <code>Game</code> this message belongs to.
+     * @param element The <code>Element</code> to use to create the message.
+     */
     public StealLandMessage(Game game, Element element) {
         tile = (Tile) game.getFreeColGameObject(element.getAttribute("tile"));
         String colonyID = element.getAttribute("colony");
-        if (colonyID != null) {
-            colony = (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
-        }
+        colony = (colonyID == null) ? null
+            : (Colony) game.getFreeColGameObject(element.getAttribute("colony"));
     }
-
 
     /**
      * Get the <code>Tile</code> value.
      *
      * @return a <code>Tile</code> value
-     */
     public final Tile getTile() {
         return tile;
     }
+     */
 
     /**
      * Set the <code>Tile</code> value.
      *
      * @param newTile The new Tile value.
-     */
     public final void setTile(final Tile newTile) {
         this.tile = newTile;
     }
+     */
 
     /**
      * Get the <code>Colony</code> value.
      *
      * @return a <code>Colony</code> value
-     */
     public final Colony getColony() {
         return colony;
     }
+     */
 
     /**
      * Set the <code>Colony</code> value.
      *
      * @param newColony The new Colony value.
-     */
     public final void setColony(final Colony newColony) {
         this.colony = newColony;
     }
+     */
 
-
+    /**
+     * Handle a "stealLand"-message.
+     *
+     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param player The <code>Player</code> the message applies to.
+     * @param connection The <code>Connection</code> the message was received on.
+     *
+     * @return Null.
+     * @throws IllegalStateException if there is a problem with the message arguments.
+     */
     public Element handle(FreeColServer server, Player player, Connection connection) {
-
         if (tile.getOwner() != null && tile.getOwner().isEuropean()) {
             throw new IllegalStateException("Can not steal land from European players!");
         }
@@ -102,6 +121,11 @@ public class StealLandMessage extends Message {
         return null;
     }
 
+    /**
+     * Convert this StealLandMessage to XML.
+     *
+     * @return The XML representation of this message.
+     */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("tile", tile.getId());
@@ -111,8 +135,12 @@ public class StealLandMessage extends Message {
         return result;
     }
 
+    /**
+     * The tag name of the root element representing this object.
+     *
+     * @return "stealLand".
+     */
     public static String getXMLElementTagName() {
         return "stealLand";
     }
-
 }

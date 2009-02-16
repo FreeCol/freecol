@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import org.w3c.dom.Element;
 
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
@@ -33,7 +34,6 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The message sent when renaming a FreeColGameObject.
  */
 public class RenameMessage extends Message {
-
     /**
      * The id of the object to be renamed.
      */
@@ -48,11 +48,11 @@ public class RenameMessage extends Message {
      * Create a new <code>RenameMessage</code> with the
      * supplied name.
      *
-     * @param id The id of the object to rename.
+     * @param object The <code>FreeColGameObject</code> to rename.
      * @param newName The new name for the object.
      */
-    public RenameMessage(String id, String newName) {
-        this.id = id;
+    public RenameMessage(FreeColGameObject object, String newName) {
+        this.id = object.getId();
         this.newName = newName;
     }
 
@@ -71,20 +71,21 @@ public class RenameMessage extends Message {
     /**
      * Handle a "rename"-message.
      *
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param player The <code>Player</code> who has declared independence.
-     * @param element The element containing the request.
+     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param player The <code>Player</code> the message applies to.
+     * @param connection The <code>Connection</code> the message was received on.
      *
      * @return Null.
+     * @throws IllegalStateException if there is problem with the message arguments.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
-        ServerPlayer serverplayer = server.getPlayer(connection);
+        ServerPlayer serverPlayer = server.getPlayer(connection);
         Nameable object = (Nameable) player.getGame().getFreeColGameObject(id);
         if (object == null) {
-            throw new IllegalStateException("Tried to rename an object with id " + id + " which could not be found");
+            throw new IllegalStateException("Tried to rename an object with id "
+                                            + id + " which could not be found");
         }
-        if (!(object instanceof Ownable) || ((Ownable) object).getOwner() != player) {
+        if (!(object instanceof Ownable) || ((Ownable) object).getOwner() != serverPlayer) {
             throw new IllegalStateException("Not the owner of the nameable.");
         }
         object.setName(newName);

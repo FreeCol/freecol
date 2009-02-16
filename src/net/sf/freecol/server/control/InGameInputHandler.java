@@ -129,13 +129,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return getVacantEntryLocation(connection, element);
             }
         });
-        register(SetDestinationMessage.getXMLElementTagName(),
-            new NetworkRequestHandler() {
-                public Element handle(Connection connection, Element element) {
-                    SetDestinationMessage message = new SetDestinationMessage(getGame(), element);
-                    return message.handle(freeColServer, connection);
-                }
-            });
+        register(SetDestinationMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return new SetDestinationMessage(getGame(), element).handle(freeColServer, connection);
+            }
+        });
         register("move", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -238,14 +236,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return moveToAmerica(connection, element);
             }
         });
-        register(BuildColonyMessage.getXMLElementTagName(),
-             new CurrentPlayerNetworkRequestHandler() {
-                 @Override
-                 public Element handle(Player player, Connection connection, Element element) {
-                     BuildColonyMessage message = new BuildColonyMessage(getGame(), element);
-                     return message.handle(freeColServer, player, connection);
-                 }
-             });
+        register(BuildColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new BuildColonyMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
         register("recruitUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -393,15 +389,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         register(BuyLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                BuyLandMessage message = new BuyLandMessage(getGame(), element);
-                return message.handle(freeColServer, player, connection);
+                return new BuyLandMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(StealLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                StealLandMessage message = new StealLandMessage(getGame(), element);
-                return message.handle(freeColServer, player, connection);
+                return new StealLandMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("payForBuilding", new CurrentPlayerNetworkRequestHandler() {
@@ -450,14 +444,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return getREFUnits(connection, element);
             }
         });
-        register(RenameMessage.getXMLElementTagName(),
-             new CurrentPlayerNetworkRequestHandler() {
-                 @Override
-                 public Element handle(Player player, Connection connection, Element element) {
-                     RenameMessage message = new RenameMessage(getGame(), element);
-                     return message.handle(freeColServer, player, connection);
-                 }
-             });
+        register(RenameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new RenameMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
         register("getNewTradeRoute", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return getNewTradeRoute(connection, element);
@@ -478,13 +470,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return assignTradeRoute(connection, element);
             }
         });
-        register(UpdateCurrentStopMessage.getXMLElementTagName(),
-             new NetworkRequestHandler() {
-                 public Element handle(Connection connection, Element element) {
-                     UpdateCurrentStopMessage message = new UpdateCurrentStopMessage(getGame(), element);
-                     return message.handle(freeColServer, connection);
-                 }
-             });
+        register(UpdateCurrentStopMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return new UpdateCurrentStopMessage(getGame(), element).handle(freeColServer, connection);
+            }
+        });
         register("diplomaticTrade", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return diplomaticTrade(connection, element);

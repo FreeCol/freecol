@@ -31,7 +31,6 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The message sent updating a unit's current stop.
  */
 public class UpdateCurrentStopMessage extends Message {
-
     /**
      * The id of the unit whose stop is to be updated.
      */
@@ -61,8 +60,8 @@ public class UpdateCurrentStopMessage extends Message {
     /**
      * Handle a "updateCurrentStop"-message.
      *
-     * @param connection The <code>Connection</code> the message was received on.
      * @param server The <code>FreeColServer</code> handling the message.
+     * @param connection The <code>Connection</code> the message was received on.
      *
      * @return Null.
      */

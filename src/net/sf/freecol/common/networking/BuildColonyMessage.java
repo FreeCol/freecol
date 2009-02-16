@@ -52,11 +52,11 @@ public class BuildColonyMessage extends Message {
      * and building unit.
      *
      * @param colonyName The name for the new colony.
-     * @param builderId The ID of the building <code>Unit</code>.
+     * @param builder The <code>Unit</code> to do the building.
      */
-    public BuildColonyMessage(String colonyName, String builderId) {
+    public BuildColonyMessage(String colonyName, Unit builder) {
         this.colonyName = colonyName;
-        this.builderId = builderId;
+        this.builderId = builder.getId();
     }
 
     /**
@@ -73,38 +73,25 @@ public class BuildColonyMessage extends Message {
     /**
      * Handle a "buildColony"-message.
      *
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param server The <code>FreeColServer</code> that is handling the request.
      * @param player The <code>Player</code> building the colony.
-     * @param element The element containing the request.
+     * @param connection The <code>Connection</code> the message was received on.
      *
      * @return Null if the build is not permitted, otherwise an element
      *         defining the new colony and updating its surrounding tiles.
-     * @throw IllegalStateException if there is a problem with the message
-     *        arguments..
+     * @throws IllegalStateException if there is a problem with the message
+     *         arguments..
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Unit unit;
+        Unit unit = server.getUnitSafely(builderId, serverPlayer);
 
         if (colonyName == null || colonyName.length() == 0) {
             throw new IllegalStateException("ColonyName must not be empty.");
-        }
-        if (player.getColony(colonyName) != null) {
+        } else if (player.getColony(colonyName) != null) {
             throw new IllegalStateException("Duplicate colony name.");
-        }
-        if (builderId == null || builderId.length() == 0) {
-            throw new IllegalStateException("BuilderId must not be empty.");
-        }
-        if (!(game.getFreeColGameObject(builderId) instanceof Unit)) {
-            throw new IllegalStateException("Not a unit ID: " + builderId);
-        }
-        unit = (Unit) player.getGame().getFreeColGameObject(builderId);
-        if (unit.getOwner() != serverPlayer) {
-            throw new IllegalStateException("Not the owner of building unit: "
-                                            + builderId);
-        }
-        if (!unit.canBuildColony()) {
+        } else if (!unit.canBuildColony()) {
             logger.warning("BuildColony request for " + colonyName
                            + " with unit " + builderId
                            + " is not permitted!");

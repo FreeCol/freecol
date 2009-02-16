@@ -405,8 +405,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element renameElement = new RenameMessage(((FreeColGameObject) object).getId(), name).toXMLElement();
-        freeColClient.getClient().sendAndWait(renameElement);
+        freeColClient.getClient().sendAndWait(new RenameMessage(object, name).toXMLElement());
         object.setName(name);
     }
 
@@ -475,9 +474,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element request = new BuildColonyMessage(name, unit.getId()).toXMLElement();
-        Element reply = client.ask(request);
-
+        Element reply = client.ask(new BuildColonyMessage(name, unit).toXMLElement());
         if (reply.getTagName().equals("buildColonyConfirmed")) {
             freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
             Element updateElement = getChildElement(reply, "update");
@@ -725,8 +722,7 @@ public final class InGameController implements NetworkConstants {
      * @see Unit#setDestination(Location)
      */
     public void setDestination(Unit unit, Location destination) {
-        Element setDestinationElement = new SetDestinationMessage(unit, destination).toXMLElement();
-        freeColClient.getClient().sendAndWait(setDestinationElement);
+        freeColClient.getClient().sendAndWait(new SetDestinationMessage(unit, destination).toXMLElement());
         unit.setDestination(destination);
     }
 
@@ -1128,8 +1124,7 @@ public final class InGameController implements NetworkConstants {
     
     private void updateCurrentStop(Unit unit) {
         // Set destination to next stop's location
-        Element updateCurrentStopElement = new UpdateCurrentStopMessage(unit).toXMLElement();
-        freeColClient.getClient().sendAndWait(updateCurrentStopElement);
+        freeColClient.getClient().sendAndWait(new UpdateCurrentStopMessage(unit).toXMLElement());
         
         Stop stop = unit.nextStop();
         // go to next stop, unit can already be there waiting to load
