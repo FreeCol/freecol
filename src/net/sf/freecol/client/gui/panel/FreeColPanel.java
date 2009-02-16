@@ -195,8 +195,6 @@ public class FreeColPanel extends JPanel {
         JTextPane textPane = new JTextPane();
         textPane.setOpaque(false);
         textPane.setEditable(false);
-        textPane.putClientProperty(com.sun.java.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY,
-                                   Boolean.TRUE);
 
         StyledDocument doc = textPane.getStyledDocument();
         //Initialize some styles.
@@ -233,8 +231,6 @@ public class FreeColPanel extends JPanel {
         textArea.setWrapStyleWord(true);
         textArea.setFocusable(false);
         textArea.setFont(defaultFont);
-        textArea.putClientProperty(com.sun.java.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY,
-                                   Boolean.TRUE);
         // necessary because of resizing
         textArea.setSize(textArea.getPreferredSize());
         return textArea;
