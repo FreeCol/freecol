@@ -59,6 +59,7 @@ public final class TilePopup extends JPopupMenu {
     public static final int UNITS_IN_OTHER_MENUS = 19;
 
     private final Canvas canvas;
+    private final FreeColClient freeColClient;
     private final GUI gui;
 
     private boolean hasAnItem = false;
@@ -78,6 +79,7 @@ public final class TilePopup extends JPopupMenu {
                                "%y%", String.valueOf(tile.getY())));
 
         this.canvas = canvas;
+        this.freeColClient = freeColClient;
         this.gui = gui;
 
         final Unit activeUnit = gui.getActiveUnit();
@@ -296,6 +298,16 @@ public final class TilePopup extends JPopupMenu {
             });
 
         add(menuItem);
+
+        menuItem = new JMenuItem(Messages.message("rename"));
+        menuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    freeColClient.getInGameController().rename(colony);
+                }
+            });
+
+        add(menuItem);
+
         hasAnItem = true;
     }
 

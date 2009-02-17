@@ -176,8 +176,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private JButton fillButton = new JButton(Messages.message("fill"));
 
-    private JButton renameButton = new JButton(Messages.message("rename"));
-
     private JButton warehouseButton = new JButton(Messages.message("warehouseDialog.name"));
 
     private static final Font hugeFont = new Font("Dialog", Font.BOLD, 24);
@@ -306,7 +304,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         fillButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, fillButton.getBorder()));
         exitButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, exitButton.getBorder()));
         warehouseButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, warehouseButton.getBorder()));
-        renameButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, renameButton.getBorder()));
         buyBuilding.setBorder(BorderFactory.createCompoundBorder(correctBorder, buyBuilding.getBorder()));
         hammersLabel.setBorder(BorderFactory.createCompoundBorder(correctBorder, hammersLabel.getBorder()));
         toolsLabel.setBorder(BorderFactory.createCompoundBorder(correctBorder, toolsLabel.getBorder()));
@@ -316,21 +313,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         exitButton.setActionCommand(String.valueOf(EXIT));
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
         fillButton.setActionCommand(String.valueOf(FILL));
-        renameButton.setActionCommand(String.valueOf(RENAME));
         warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
         
         enterPressesWhenFocused(buyBuilding);
         enterPressesWhenFocused(exitButton);
         enterPressesWhenFocused(unloadButton);
         enterPressesWhenFocused(fillButton);
-        enterPressesWhenFocused(renameButton);
         enterPressesWhenFocused(warehouseButton);
 
         buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);
         unloadButton.addActionListener(this);
         fillButton.addActionListener(this);
-        renameButton.addActionListener(this);
         warehouseButton.addActionListener(this);
 
         selectedUnit = null;
@@ -358,7 +352,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(unloadButton, "span, split 5, align center");
         add(fillButton);
         add(warehouseButton);
-        add(renameButton);
         add(exitButton);
 
         setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
@@ -438,7 +431,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         buyBuilding.setEnabled(isEditable());
         unloadButton.setEnabled(isEditable());
         fillButton.setEnabled(isEditable());
-        renameButton.setEnabled(isEditable());
         warehouseButton.setEnabled(isEditable());
         buildingBox.setEnabled(isEditable());
         nameBox.setEnabled(isEditable());
@@ -849,10 +841,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 break;
             case UNLOAD:
                 unload();
-                break;
-            case RENAME:
-                freeColClient.getInGameController().rename(getColony());
-                updateNameBox();
                 break;
             case WAREHOUSE:
                 if (freeColClient.getCanvas().showWarehouseDialog(colony)) {
