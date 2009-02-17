@@ -81,6 +81,7 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
+import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
@@ -485,9 +486,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return selectFromFountainYouth(connection, element);
             }
         });
-        register("spySettlement", new NetworkRequestHandler() {
+        register(SpySettlementMessage.getXMLElementTagName(), new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
-                return spySettlement(connection, element);
+                return new SpySettlementMessage(getGame(), element).handle(freeColServer, connection);
             }
         });
         register("abandonColony", new NetworkRequestHandler() {
@@ -810,56 +811,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             if (accept != null && accept.equals("accept")) {
                 agreement.makeTrade();
             }
-        }
-        return reply;
-    }
-
-    /**
-     * Handles an "spySettlement"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param spyElement The element containing the request.
-     * @exception IllegalArgumentException If the data format of the message is
-     *                invalid.
-     * @exception IllegalStateException If the request is not accepted by the
-     *                model.
-     */
-    private Element spySettlement(Connection connection, Element spyElement) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        // Get parameters:
-        Unit unit = (Unit) getGame().getFreeColGameObject(spyElement.getAttribute("unit"));
-        Direction direction = Enum.valueOf(Direction.class, spyElement.getAttribute("direction"));
-        // Test the parameters:
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + spyElement.getAttribute("unit"));
-        }
-        if (unit.getTile() == null) {
-            throw new IllegalArgumentException("'Unit' is not on the map: " + unit.toString());
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-        if (newTile == null) {
-            throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
-                    + spyElement.getAttribute("unit"));
-        }
-        Settlement settlement = newTile.getSettlement();
-        if (settlement == null) {
-            throw new IllegalArgumentException("There is no settlement in direction " + direction + " from unit with ID "
-                    + spyElement.getAttribute("unit"));
-        }
-        
-        Element reply = Message.createNewRootElement("foreignColony");
-        if (settlement instanceof Colony) {
-            reply.appendChild(((Colony) settlement).toXMLElement(player, reply.getOwnerDocument(), true, false));
-        } else if (settlement instanceof IndianSettlement) {
-            reply.appendChild(((IndianSettlement) settlement).toXMLElement(player, reply.getOwnerDocument(), true, false));
-        }
-        for(Unit foreignUnit : newTile.getUnitList()) {
-            reply.appendChild(foreignUnit.toXMLElement(player, reply.getOwnerDocument(), true, false));
         }
         return reply;
     }

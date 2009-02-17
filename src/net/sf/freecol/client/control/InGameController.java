@@ -101,6 +101,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
+import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
@@ -1252,10 +1253,7 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
-        Element spyElement = Message.createNewRootElement("spySettlement");
-        spyElement.setAttribute("unit", unit.getId());
-        spyElement.setAttribute("direction", String.valueOf(direction));
-        Element reply = freeColClient.getClient().ask(spyElement);
+        Element reply = freeColClient.getClient().ask(new SpySettlementMessage(unit, direction).toXMLElement());
         if (reply != null) {
             settlement.readFromXMLElement((Element) reply.getFirstChild());
         }
@@ -1306,11 +1304,7 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         Colony colony = game.getMap().getNeighbourOrNull(direction,
                                                          unit.getTile()).getColony();
-
-        Element spyElement = Message.createNewRootElement("spySettlement");
-        spyElement.setAttribute("unit", unit.getId());
-        spyElement.setAttribute("direction", String.valueOf(direction));
-        Element reply = freeColClient.getClient().ask(spyElement);
+        Element reply = freeColClient.getClient().ask(new SpySettlementMessage(unit, direction).toXMLElement());
         if (reply != null) {
             unit.setMovesLeft(0);
             NodeList childNodes = reply.getChildNodes();
