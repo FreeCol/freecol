@@ -1359,8 +1359,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         textArea.setWrapStyleWord(true);
         textArea.setFocusable(false);
         textArea.setFont(defaultFont);
-        textArea.putClientProperty(com.sun.java.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY,
-                                   Boolean.TRUE);
         return textArea;
     }
 
