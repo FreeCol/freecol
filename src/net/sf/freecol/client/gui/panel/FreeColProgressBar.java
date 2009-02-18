@@ -41,19 +41,12 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public class FreeColProgressBar extends JPanel {
 
-
-
-    private static final Color PRIMARY_1 = new Color(122, 109, 82), BG_COLOR_SELECT = new Color(255, 244, 195),
-            PRIMARY_3 = new Color(203, 182, 136)
-            // ,SECONDARY_1 = new Color(10, 10, 10),
-            // DISABLED_COLOR = new Color(166, 144, 95),
-            // BG_COLOR = new Color(216, 194, 145)
-            ;
+    private static final Color PRIMARY_1 = new Color(122, 109, 82);
 
     // The minimum value of the progress bar
     private int min = 0;
 
-    // The minimum value of the progress bar
+    // The maximum value of the progress bar
     private int max = 100;
 
     // The current value of the progress bar
@@ -187,7 +180,6 @@ public class FreeColProgressBar extends JPanel {
             if (dvalue > width) {
                 dvalue = width;
             }
-            //g2d.setColor(PRIMARY_3);
             g2d.setColor(new Color(0, 0, 0, 70));
             g2d.fillRect(getInsets().left, getInsets().top, dvalue, height);
         }
@@ -199,7 +191,6 @@ public class FreeColProgressBar extends JPanel {
                 if (dstep + dvalue > width) {
                     dstep = width - dvalue;
                 }
-                //g2d.setColor(BG_COLOR_SELECT);
                 g2d.setColor(new Color(0, 0, 0, 40));
                 g2d.fillRect(getInsets().left + dvalue, getInsets().top, dstep, height);
             }
@@ -207,22 +198,16 @@ public class FreeColProgressBar extends JPanel {
 
         String stepSignal = (step < 0) ? "-" : "+"; 
         String progressString = String.valueOf(value) + stepSignal + Math.abs(step) + "/" + max;
-        String turnsString = "";
-        if (max > value) {
-            if (step > 0) {
-                // There is progress, find how many turns necessary with current production
-                int turns = (max - value) / step;
-                if ((max - value) % step > 0) {
-                    turns++;
-                }
-                turnsString = " (" + turns + " " + Messages.message("turns") + ")";
+        String turnsString = Messages.message("notApplicable.short");
+        if (max > value && step > 0) {
+            // There is progress, find how many turns necessary with current production
+            int turns = (max - value) / step;
+            if ((max - value) % step > 0) {
+                turns++;
             }
-            else {
-                // No progress, or even negative progress, impossible to determine
-                turnsString = " (" + Messages.message("turns") + ": N/A)";
-            }
+            turnsString = Integer.toString(turns);
         }
-        progressString += turnsString;
+        progressString += " " + Messages.message("turnsToComplete.short", "%number%", turnsString);
         
         int stringWidth = g2d.getFontMetrics().stringWidth(progressString);
         int stringHeight = g2d.getFontMetrics().getAscent() + g2d.getFontMetrics().getDescent();
@@ -233,7 +218,6 @@ public class FreeColProgressBar extends JPanel {
             g2d.drawImage(image, restWidth / 2, (getHeight() - iconHeight) / 2, null);
         }
 
-        //g2d.setColor(PRIMARY_1);
         g2d.setColor(Color.BLACK);
         g2d.drawString(progressString, restWidth / 2 + iconWidth, getHeight() / 2 + stringHeight / 4);
 

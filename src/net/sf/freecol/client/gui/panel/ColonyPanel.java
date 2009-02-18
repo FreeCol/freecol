@@ -61,6 +61,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -128,17 +129,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private InGameController inGameController;
 
-    private final JLabel solLabel;
-
-    private final FreeColProgressBar hammersLabel;
-
-    private final FreeColProgressBar toolsLabel;
+    private final JLabel rebelLabel, bonusLabel, royalistLabel;
 
     private final JPanel productionPanel;
-
-    private final JComboBox buildingBox;
-
-    private final ActionListener buildingBoxListener;
 
     private final JComboBox nameBox;
 
@@ -169,8 +162,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private UnitLabel selectedUnit;
 
     private JButton exitButton = new JButton(Messages.message("close"));
-
-    private JButton buyBuilding = new JButton(Messages.message("colonyPanel.buyBuilding"));
 
     private JButton unloadButton = new JButton(Messages.message("unload"));
 
@@ -235,31 +226,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         cargoPanel.setLayout(new GridLayout(1, 0));
         warehousePanel.setLayout(new GridLayout(1, 0));
 
-        solLabel = new JLabel(Messages.message("sonsOfLiberty") + ": 0%, " + Messages.message("tory") + ": 100%");
-        hammersLabel = new FreeColProgressBar(parent, Goods.HAMMERS);
-        toolsLabel = new FreeColProgressBar(parent, Goods.TOOLS);
-
-        buildingBox = new JComboBox();
-
-        buildingBoxListener = new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    getClient().getInGameController()
-                        .setCurrentlyBuilding(getColony(), ((BuildableType) buildingBox.getSelectedItem()));
-                    updateProgressLabel();
-                }};
-
-        buildingBox.setRenderer(new ListCellRenderer() {
-                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-                                                              boolean cellHasFocus) {
-                    BuildableType type = (BuildableType) value;
-                    String requirements = type.getGoodsRequiredAsString();
-                    if ("".equals(requirements)) {
-                        return new JLabel(type.getName());
-                    } else {
-                        return new JLabel(new String(type.getName() + " (" + requirements + ")"));
-                    }
-                }
-            });
+        rebelLabel = new JLabel(Messages.message("colonyPanel.rebelLabel"));
+        bonusLabel = new JLabel(Messages.message("colonyPanel.bonusLabel"));
+        royalistLabel = new JLabel(Messages.message("colonyPanel.royalistLabel"));
 
         JScrollPane outsideColonyScroll = new JScrollPane(outsideColonyPanel,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -299,29 +268,21 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         // manual border corrections
         Border correctBorder = BorderFactory.createEmptyBorder(0, BORDER_CORRECT, 0, BORDER_CORRECT);
         //productionPanel.setBorder(correctBorder);
-        solLabel.setBorder(correctBorder);
+        //solLabel.setBorder(correctBorder);
         unloadButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, unloadButton.getBorder()));
         fillButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, fillButton.getBorder()));
         exitButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, exitButton.getBorder()));
         warehouseButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, warehouseButton.getBorder()));
-        buyBuilding.setBorder(BorderFactory.createCompoundBorder(correctBorder, buyBuilding.getBorder()));
-        hammersLabel.setBorder(BorderFactory.createCompoundBorder(correctBorder, hammersLabel.getBorder()));
-        toolsLabel.setBorder(BorderFactory.createCompoundBorder(correctBorder, toolsLabel.getBorder()));
-        buildingBox.setBorder(BorderFactory.createCompoundBorder(correctBorder, buildingBox.getBorder()));
-
-        buyBuilding.setActionCommand(String.valueOf(BUY_BUILDING));
         exitButton.setActionCommand(String.valueOf(EXIT));
         unloadButton.setActionCommand(String.valueOf(UNLOAD));
         fillButton.setActionCommand(String.valueOf(FILL));
         warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
         
-        enterPressesWhenFocused(buyBuilding);
         enterPressesWhenFocused(exitButton);
         enterPressesWhenFocused(unloadButton);
         enterPressesWhenFocused(fillButton);
         enterPressesWhenFocused(warehouseButton);
 
-        buyBuilding.addActionListener(this);
         exitButton.addActionListener(this);
         unloadButton.addActionListener(this);
         fillButton.addActionListener(this);
@@ -334,20 +295,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         addMouseListener(new MouseAdapter() {
         });
 
-        setLayout(new MigLayout("fill, wrap 4", "[240:][150:][300:][300:]", ""));
+        setLayout(new MigLayout("fill, wrap 2", "", ""));
 
-        add(nameBox, "span 2, width 396:, height 48:");
-        add(productionPanel, "span, align center");
-        add(tilesScroll, "span 2, width 396!, height 220!");
-        add(buildingsScroll, "span 2 4, width 600:, grow 200");
-        add(solLabel, "span 2");
-        add(buildingBox, "width 240!");
-        add(hammersLabel);
-        add(buyBuilding);
-        add(toolsLabel);
-        add(inPortScroll, "grow");
-        add(cargoScroll, "grow");
-        add(outsideColonyScroll, "span 2, grow");
+        add(nameBox, "growx, height 48:");
+        add(productionPanel, "align center");
+        add(tilesScroll, "width 390!, height 200!, top");
+        add(buildingsScroll, "span 1 3, grow 200");
+        add(rebelLabel, "split 3");
+        add(bonusLabel, "gap left push, gap right push");
+        add(royalistLabel);
+        add(inPortScroll, "grow, height 60:");
+        add(cargoScroll, "grow, height 60:");
+        add(outsideColonyScroll, "grow, height 60:");
         add(warehouseScroll, "span, height 60!, growx");
         add(unloadButton, "span, split 5, align center");
         add(fillButton);
@@ -405,6 +364,13 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         setColony(colony);
         this.game = game;
 
+        rebelLabel.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getId()
+                                                                  + ".coat-of-arms.image", 0.5)));
+        rebelLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
+        royalistLabel.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getRefId()
+                                                                     + ".coat-of-arms.image", 0.5)));
+        royalistLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+
         // Set listeners and transfer handlers
         outsideColonyPanel.removeMouseListener(releaseListener);
         inPortPanel.removeMouseListener(releaseListener);
@@ -428,11 +394,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         // Enable/disable widgets
-        buyBuilding.setEnabled(isEditable());
         unloadButton.setEnabled(isEditable());
         fillButton.setEnabled(isEditable());
         warehouseButton.setEnabled(isEditable());
-        buildingBox.setEnabled(isEditable());
         nameBox.setEnabled(isEditable());
 
         //
@@ -510,11 +474,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         tilePanel.initialize();
 
-        updateBuildingBox();
         updateNameBox();
         updateProductionPanel();
         updateSoLLabel();
-        updateProgressLabel();
 
     }
 
@@ -579,13 +541,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             logger.warning("Colony panel has 'null' colony.");
             return;
         }
-        solLabel.setText(Messages.message("colonyPanel.solLabel",
-                                          "%solPercent%", Integer.toString(getColony().getSoL()),
-                                          "%solNumber%", Integer.toString(getColony().getMembers()),
-                                          "%toryPercent%", Integer.toString(getColony().getTory()),
-                                          "%toryNumber%", Integer.toString(getColony().getUnitCount() -
-                                                                           getColony().getMembers()),
-                                          "%bonus%", Integer.toString(getColony().getProductionBonus())));
+        rebelLabel.setText(Messages.message("colonyPanel.rebelLabel", "%number%",
+                                            Integer.toString(getColony().getSoL())));
+        //"%solNumber%", Integer.toString(getColony().getMembers()),
+        bonusLabel.setText(Messages.message("colonyPanel.bonusLabel", "%number%",
+                                            Integer.toString(getColony().getProductionBonus())));
+        royalistLabel.setText(Messages.message("colonyPanel.royalistLabel", "%number%",
+                                               Integer.toString(getColony().getTory())));
+        //"%toryNumber%", Integer.toString(getColony().getUnitCount() - getColony().getMembers()),
     }
 
     public void updateNameBox() {
@@ -620,26 +583,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
     }
 
-    public void updateBuildingBox() {
-        buildingBox.removeActionListener(buildingBoxListener);
-        buildingBox.removeAllItems();
-        buildingBox.addItem(BuildableType.NOTHING);
-
-        BuildableType currentlyBuilding = getColony().getCurrentlyBuilding();
-        List<BuildableType> buildableTypes = new ArrayList<BuildableType>(FreeCol.getSpecification().getBuildingTypeList());
-        buildableTypes.addAll(FreeCol.getSpecification().getUnitTypeList());
-        for (BuildableType buildableType : buildableTypes) {
-            if (getColony().canBuild(buildableType)) {
-                buildingBox.addItem(buildableType);
-                if (buildableType == currentlyBuilding) {
-                    buildingBox.setSelectedIndex(buildingBox.getItemCount() - 1);
-                }
-            }
-        }
-        buildingBox.addActionListener(buildingBoxListener);
-        updateProgressLabel();
-    }
-
     public void updateWarehouse() {
         warehousePanel.initialize();
     }
@@ -663,56 +606,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         buildingsPanel.revalidate();
     }
 
-
-    /**
-     * Updates the building progress label.
-     */
-    private void updateProgressLabel() {
-        if (getColony() == null) {
-            // Apparently this can happen
-            return;
-        }
-        if (getColony().getCurrentlyBuilding() == BuildableType.NOTHING) {
-            hammersLabel.update(0, 0, 0, 0);
-            toolsLabel.update(0, 0, 0, 0);
-            buyBuilding.setEnabled(false);
-        } else {
-            final int hammers = getColony().getGoodsCount(Goods.HAMMERS);
-            final int tools = getColony().getGoodsCount(Goods.TOOLS);
-            final int nextHammers = getColony().getBuildingForProducing(Goods.HAMMERS).getProductionNextTurn();
-            int nextTools = getColony().getBuildingForProducing(Goods.TOOLS).getProductionNextTurn();
-
-            // subtract the tools used for production
-            GoodsType produced = Goods.TOOLS.getProducedMaterial();
-            if (produced != null) {
-                nextTools -= getColony().getProductionNextTurn(produced);
-            }
-            int hammersNeeded = 0, toolsNeeded = 0;
-            /** TODO: make this more generic */
-            for (AbstractGoods requiredGoods : getColony().getCurrentlyBuilding().getGoodsRequired()) {
-                if (requiredGoods.getType() == Goods.HAMMERS) {
-                    hammersNeeded = Math.max(requiredGoods.getAmount(), 0);
-                } else if (requiredGoods.getType() == Goods.TOOLS) {
-                    toolsNeeded = Math.max(requiredGoods.getAmount(), 0);
-                }
-            }
-            hammersLabel.update(0, hammersNeeded, hammers, nextHammers);
-            toolsLabel.update(0, toolsNeeded, tools, nextTools);
-
-            // The buy button should only be active if:
-            //    - the panel is active,
-            //    - the building isn't finished,
-            //    - the player has enough money
-            int price = getColony().getPriceForBuilding();
-            if (getColony().getCurrentlyBuilding() instanceof BuildingType) {
-                buyBuilding.setText(Messages.message("colonyPanel.buyBuilding"));
-            } else if (getColony().getCurrentlyBuilding() instanceof UnitType) {
-                buyBuilding.setText(Messages.message("colonyPanel.buyUnit"));
-            }
-            buyBuilding.setEnabled(isEditable() && price > 0 &&
-                                   price <= freeColClient.getMyPlayer().getGold());
-        }
-    }
 
     private void updateOutsideColonyPanel() {
         if (getColony() == null) {
@@ -1072,7 +965,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 return;
             }
             updateProductionPanel();
-            updateBuildingBox();
             updateSoLLabel();
             updateOutsideColonyPanel();
         } else if (event.getChild() instanceof GoodsLabel) {
@@ -1104,9 +996,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 updateProductionPanel();
             }
             // Either Tools or units previously working on building materials
-            //may have been loaded into the carrier, so we need to also update
-            //the progress labels
-            updateProgressLabel();
+            // may have been loaded into the carrier, so we need to also update
+            // the progress labels
             
             updateCargoLabel();
             refresh();
@@ -1138,7 +1029,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            setLayout(new GridLayout(0, 5));
+            setLayout(new GridLayout(0, 4));
             this.colonyPanel = colonyPanel;
         }
 
@@ -1167,6 +1058,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 aSingleBuildingPanel.setOpaque(false);
                 add(aSingleBuildingPanel);
             }
+            add(new BuildingSitePanel(colony, parent));
         }
 
 
@@ -1237,7 +1129,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         if (getBuilding().canAdd(unit)) {
                             oldParent.remove(comp);
                             inGameController.work(unit, getBuilding());
-                            updateBuildingBox();
                             updateWarehouse();
                         } else {
                             return null;
@@ -1331,7 +1222,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
                     oldParent.remove(comp);
                     updateBuildingsPanel();
-                    updateBuildingBox();
                     updateProductionPanel();
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
@@ -1686,7 +1576,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
                             updateDescriptionLabel((UnitLabel) comp, true);
 
-                            updateBuildingBox();
                             updateWarehouse();
                             updateBuildingsPanel();
                             updateProductionPanel();

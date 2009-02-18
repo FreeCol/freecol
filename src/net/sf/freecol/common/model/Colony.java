@@ -66,7 +66,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         POPULATION_CHANGE,
         PRODUCTION_CHANGE,
         BONUS_CHANGE,
-        WAREHOUSE_CHANGE
+        WAREHOUSE_CHANGE,
+        BUILD_QUEUE_CHANGE
     }
 
     /** The name of the colony. */
@@ -787,13 +788,16 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param buildable The type of building to be built.
      */
     public void setCurrentlyBuilding(BuildableType buildable) {
+        List<BuildableType> oldBuildQueue = new ArrayList<BuildableType>(buildQueue);
         // There should not be more than one entry of a building type
-        if(buildable instanceof BuildingType){
-            if(buildQueue.contains(buildable)){
+        if (buildable instanceof BuildingType) {
+            if (buildQueue.contains(buildable)){
                 buildQueue.remove(buildable);
             }
         }
         buildQueue.add(0, buildable);
+        firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
+                           oldBuildQueue, buildQueue);
     }
 
     /**
@@ -804,6 +808,38 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             setCurrentlyBuilding(BuildableType.NOTHING);
         }
     }
+
+    /**
+     * Returns how many turns it would take to build the given
+     * <code>BuildableType</code>. Returns -1 if no result can be
+     * calculated.
+     *
+     * @param buildable a <code>BuildableType</code> value
+     * @return an <code>int</code> value
+     */
+    public int getTurnsToComplete(BuildableType buildable) {
+        int result = -1;
+        for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
+            int amountNeeded = requiredGoods.getAmount();
+            int amountAvailable = getGoodsCount(requiredGoods.getType());
+            if (amountAvailable < amountNeeded) {
+                int amountProduced = getBuildingForProducing(requiredGoods.getType())
+                    .getProductionNextTurn();
+                if (amountProduced <= 0) {
+                    return -1;
+                } else {
+                    int amountRemaining = amountNeeded - amountAvailable;
+                    int eta = amountRemaining / amountProduced;
+                    if (amountRemaining % amountProduced != 0) {
+                        eta++;
+                    }
+                    result = Math.max(result, eta);
+                }
+            }
+        }
+        return result;
+    }
+
 
     /**
      * Get the <code>BuildQueue</code> value.
@@ -820,7 +856,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param newBuildQueue The new BuildQueue value.
      */
     public void setBuildQueue(final List<BuildableType> newBuildQueue) {
-        this.buildQueue = newBuildQueue;
+        List<BuildableType> oldBuildQueue = buildQueue;
+        buildQueue = newBuildQueue;
+        firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
+                           oldBuildQueue, newBuildQueue);
     }
 
 

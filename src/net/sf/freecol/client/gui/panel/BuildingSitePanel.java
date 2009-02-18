@@ -22,6 +22,8 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -34,7 +36,12 @@ import javax.swing.JPanel;
 import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -43,55 +50,58 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel represents a single building in a Colony.
  */
-public class BuildingPanel extends JPanel implements PropertyChangeListener {
+public class BuildingSitePanel extends JPanel implements PropertyChangeListener {
 
     private final Canvas parent;
 
-    private final Building building;
+    private final Colony colony;
 
-    private ProductionLabel productionOutput = null;;
-
-    private List<UnitLabel> unitLabels = new ArrayList<UnitLabel>();
+    private BuildableType buildable;
 
     /**
-     * Creates this BuildingPanel.
+     * Creates this ColonyPanel.
      * 
-     * @param building The building to display information from.
+     * @param colony The colony to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public BuildingPanel(Building building, Canvas parent) {
+    public BuildingSitePanel(final Colony colony, final Canvas parent) {
 
-        this.building = building;
+        this.colony = colony;
         this.parent = parent;
 
-        building.addPropertyChangeListener(this);
+        colony.addPropertyChangeListener(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
+                                         this);
+        addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    BuildQueuePanel queuePanel = new BuildQueuePanel(parent);
+                    queuePanel.initialize(colony);
+                    parent.showSubPanel(queuePanel);
+                }
+            });
 
         setToolTipText(" ");
-        setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));
+        setLayout(new MigLayout("fill", "", ""));
+
         initialize();
     }
 
     public void initialize() {
    
         removeAll();
-        unitLabels.clear();
 
-        if (building.getProductionNextTurn() == 0) {
-            add(new JLabel(), "span");
-        } else {
-            productionOutput = new ProductionLabel(building.getGoodsOutputType(),
-                                                   building.getProductionNextTurn(),
-                                                   building.getMaximumProduction(), parent);
-            add(productionOutput, "span, align center");
+        buildable = colony.getCurrentlyBuilding();
+
+        if (buildable != BuildableType.NOTHING) {
+            JLabel turnsLabel = new JLabel(Messages.message("notApplicable.short"));
+            turnsLabel.setBackground(Color.WHITE);
+            turnsLabel.setOpaque(true);
+            int turnsLeft = colony.getTurnsToComplete(buildable);
+            if (turnsLeft > 0) {
+                turnsLabel.setText(Integer.toString(turnsLeft));
+            }
+            add(turnsLabel, "align center, wrap");
         }
 
-        for (Unit unit : building.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(unit, parent, true);
-            unitLabels.add(unitLabel);
-            add(unitLabel);
-        }
-
-        setSize(getPreferredSize());
         revalidate();
         repaint();
     }
@@ -105,11 +115,18 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         int width = 128;
         int height = 96;
 
-        Image bgImage = ResourceManager.getImage(building.getType().getId() + ".image");
+ 
+        Image bgImage = ResourceManager.getImage("model.building.BuildingSite.image");
+        if (buildable != BuildableType.NOTHING) {
+            bgImage = ResourceManager.getImage(buildable.getId() + ".image");
+        }
+ 
         if (bgImage != null) {
             g.drawImage(bgImage, 0, 0, this);
+            /*
             g.setColor(new Color(255, 255, 255, 100));
             g.fillRect(0, 0, width, height);
+            */
         } else {
             Image tempImage = ResourceManager.getImage("BackgroundImage");
 
@@ -126,20 +143,8 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         }
     }
 
-    public Building getBuilding() {
-        return building;
-    }
-
-    public void updateProductionLabel() {
-        initialize();
-    }
-
-    public List<UnitLabel> getUnitLabels() {
-        return unitLabels;
-    }
-
     public JToolTip createToolTip() {
-        return new BuildingToolTip(building, parent);
+        return new BuildingSiteToolTip(colony, parent);
     }
 
     public void propertyChange(PropertyChangeEvent event) {

@@ -29,9 +29,14 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JLabel;
@@ -55,26 +60,29 @@ import net.sf.freecol.common.model.BuildQueue;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ResourceManager;
 
-import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
-public class BuildQueuePanel extends ReportPanel {
+
+public class BuildQueuePanel extends FreeColPanel implements ActionListener {
+
+    private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
 
     private final BuildQueueTransferHandler buildQueueHandler = new BuildQueueTransferHandler();
 
     private BuildQueue finished, current, units, buildings;
     private Colony colony; 
 
-    private GridLayout gridLayout = new GridLayout(0, 2);
-
     public BuildQueuePanel(Canvas parent) {
-        super(parent, Messages.message("buildQueue"));
+        super(parent, new MigLayout("wrap 3", "", ""));
     }
 
     public void initialize(Colony colony) {
+
         this.colony = colony;
 
-        reportPanel.removeAll();
+        removeAll();
 
         current = new BuildQueue(colony.getBuildQueue());
 
@@ -117,33 +125,46 @@ public class BuildQueuePanel extends ReportPanel {
         buildingList.setCellRenderer(cellRenderer);
 
         JScrollPane buildQueueView = new JScrollPane(buildQueueList);
-        buildQueueView.setPreferredSize(new Dimension(240, 400));
+        buildQueueView.setPreferredSize(new Dimension(260, 400));
         JPanel buildQueuePanel = new JPanel();
         buildQueuePanel.setLayout(new BorderLayout());
         buildQueuePanel.add(buildQueueView, BorderLayout.CENTER);
         buildQueuePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         JScrollPane unitView = new JScrollPane(unitList);
-        unitView.setPreferredSize(new Dimension(240, 400));
+        unitView.setPreferredSize(new Dimension(260, 400));
         JPanel unitPanel = new JPanel();
         unitPanel.setLayout(new BorderLayout());
         unitPanel.add(unitView, BorderLayout.CENTER);
         unitPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
         JScrollPane buildingView = new JScrollPane(buildingList);
-        buildingView.setPreferredSize(new Dimension(240, 400));
+        buildingView.setPreferredSize(new Dimension(260, 400));
         JPanel buildingPanel = new JPanel();
         buildingPanel.setLayout(new BorderLayout());
         buildingPanel.add(buildingView, BorderLayout.CENTER);
         buildingPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
-        reportPanel.add(buildQueuePanel);
-        reportPanel.add(unitPanel);
-        reportPanel.add(buildingPanel);
-        //setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+        JLabel headLine = new JLabel(Messages.message("colonyPanel.buildQueue"));
+        headLine.setFont(bigHeaderFont);
 
-        gridLayout.setHgap(5);
+        JButton ok = new JButton(Messages.message("ok"));
+        ok.setActionCommand("ok");
+        ok.addActionListener(this);
 
+        JButton buyBuilding = new JButton(Messages.message("colonyPanel.buyBuilding"));
+        buyBuilding.setActionCommand("buy");
+        buyBuilding.addActionListener(this);
+
+        add(headLine, "span 3, align center, wrap 40");
+        add(new JLabel(Messages.message("menuBar.colopedia.unit")), "align center");
+        add(new JLabel(Messages.message("colonyPanel.buildQueue")), "align center");
+        add(new JLabel(Messages.message("menuBar.colopedia.building")), "align center");
+        add(unitPanel);
+        add(buildQueuePanel);
+        add(buildingPanel, "wrap 20");
+        add(buyBuilding, "span, split 2, align center");
+        add(ok);
     }
 
 
@@ -166,16 +187,15 @@ public class BuildQueuePanel extends ReportPanel {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        int action = Integer.valueOf(command).intValue();
-        if (action == OK) {
-            /*
-            getCanvas().getClient().getInGameController().setBuildQueue(colony, colony.getBuildQueue());
-            getCanvas().getColonyPanel().updateBuildingBox();
-            getCanvas().getColonyPanel().updateProgressLabel();
-            */
+        if ("ok".equals(command)) {
+            colony.setBuildQueue(current.getBuildableTypes());
             getCanvas().remove(this);
+        } else if ("buy".equals(command)) {
+            colony.setBuildQueue(current.getBuildableTypes());
+            getCanvas().getClient().getInGameController().payForBuilding(colony);
+            getCanvas().updateGoldLabel();
         } else {
-            logger.warning("Invalid ActionCommand: " + action);
+            logger.warning("Invalid ActionCommand: " + command);
         }
     }
 
@@ -247,7 +267,6 @@ public class BuildQueuePanel extends ReportPanel {
 	    if (preferredIndex < 0) {
 		preferredIndex = maxIndex; 
 	    } else {
-		preferredIndex++;
 		if (preferredIndex > maxIndex) {
 		    preferredIndex = maxIndex;
 		}
@@ -396,11 +415,6 @@ public class BuildQueuePanel extends ReportPanel {
 
     class BuildQueueCellRenderer implements ListCellRenderer {
 
-        private final int[] widths = new int[] {0, 5, 0};
-        private final int[] heights = new int[] {83};
-
-        HIGLayout layout = new HIGLayout(widths, heights);
-
         public BuildQueueCellRenderer() {
         }
 
@@ -412,38 +426,37 @@ public class BuildQueuePanel extends ReportPanel {
         {
             BuildableType item = (BuildableType) value;
 
-            JPanel itemPanel = new JPanel(layout);
+            JPanel itemPanel = new JPanel(new MigLayout("", "", ""));
             JLabel imageLabel = new JLabel();
             ImageLibrary library = getCanvas().getGUI().getImageLibrary();
-            if (value instanceof UnitType) {
-                imageLabel = new JLabel(library.scaleIcon(library.getUnitImageIcon((UnitType) value), 0.66f));
-                itemPanel.add(imageLabel, higConst.rc(1, 1));
-            } else if (value instanceof BuildingType) {
-                BuildingType building = (BuildingType) value;
-                GoodsType outputType = building.getProducedGoodsType();
-                if (outputType != null) {
-                    JPanel goodsPanel = new JPanel();
-                    Image goodsImage = library.getGoodsImage(outputType);
-                    ImageIcon imageIcon = new ImageIcon(library.scaleImage(goodsImage, 0.66f));
-                    for (int gindex = 0; gindex < building.getLevel(); gindex++) {
-                        goodsPanel.add(new JLabel(imageIcon));
+            Image buildableImage = ResourceManager.getImage(item.getId() + ".image");
+            if (buildableImage != null) {
+                buildableImage = buildableImage.getScaledInstance(-1, 48, Image.SCALE_SMOOTH);
+                imageLabel = new JLabel(new ImageIcon(buildableImage));
+            }
+            itemPanel.add(imageLabel, "span 1 2");
+            itemPanel.add(new JLabel(item.getName()), "wrap");
+
+            List<AbstractGoods> goodsRequired = item.getGoodsRequired();
+            int size = goodsRequired.size();
+            if (size > 0) {
+                AbstractGoods goods = goodsRequired.get(0);
+                JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()), 
+                                               library.getScaledGoodsImageIcon(goods.getType(), 0.66f),
+                                               SwingConstants.CENTER);
+                if (size == 1) {
+                    itemPanel.add(goodsLabel);
+                } else {
+                    itemPanel.add(goodsLabel, "split " + size);
+                    for (int i = 1; i < size; i++) {
+                        goods = goodsRequired.get(i);
+                        goodsLabel = new JLabel(Integer.toString(goods.getAmount()),
+                                                library.getScaledGoodsImageIcon(goods.getType(), 0.66f),
+                                                SwingConstants.CENTER);
+                        itemPanel.add(goodsLabel);
                     }
-                    if (isSelected) {
-                        goodsPanel.setOpaque(false);
-                    }
-                    itemPanel.add(goodsPanel, higConst.rc(1, 1));
                 }
             }
-            JPanel costs = new JPanel(gridLayout);
-            costs.setBorder(BorderFactory.createTitledBorder(item.getName()));
-            costs.setOpaque(false);
-            for (AbstractGoods goodsRequired : item.getGoodsRequired()) {
-                Image goodsImage = library.getGoodsImage(goodsRequired.getType());
-                ImageIcon imageIcon = new ImageIcon(library.scaleImage(goodsImage, 0.66f));
-                costs.add(new JLabel(String.valueOf(goodsRequired.getAmount()),
-                                     imageIcon, SwingConstants.CENTER));
-            }
-            itemPanel.add(costs, higConst.rc(1, 3));
             if (isSelected) {
                 itemPanel.setOpaque(false);
             }

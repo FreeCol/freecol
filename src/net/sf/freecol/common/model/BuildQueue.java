@@ -159,6 +159,10 @@ public class BuildQueue extends FreeColObject implements ListModel {
         return model.iterator();
     }
 
+    public List<BuildableType> getBuildableTypes() {
+        return model;
+    }
+
     // ListModel
     public int getSize() {
         return model.size();
