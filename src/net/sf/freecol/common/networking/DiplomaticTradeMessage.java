@@ -306,6 +306,7 @@ public class DiplomaticTradeMessage extends Message {
 
         if (!serverPlayer.hasContacted(settlementPlayer)) {
             serverPlayer.setContacted(settlementPlayer, true);
+            settlementPlayer.setContacted(serverPlayer, true);
         }
         unit.setMovesLeft(0);
         // Loop sending proposal and counter proposal until one side rejects
