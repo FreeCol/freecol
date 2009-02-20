@@ -2031,8 +2031,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             
             // update players contact information with one another
             if (!otherPlayer.hasContacted(thisUnitOwner)) {
-                otherPlayer.setContacted(thisUnitOwner, true);
                 thisUnitOwner.setContacted(otherPlayer, true);
+                otherPlayer.setContacted(thisUnitOwner, true);
             }
             
             // If the settlement is an indian settlement,
