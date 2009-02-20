@@ -97,6 +97,7 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
+import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.RenameMessage;
@@ -1253,44 +1254,19 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
+        // TODO: should the client be getting full details on the settlement?
         Element reply = freeColClient.getClient().ask(new SpySettlementMessage(unit, direction).toXMLElement());
         if (reply != null) {
             settlement.readFromXMLElement((Element) reply.getFirstChild());
         }
+        if (settlement == null) return;
 
         DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
         if (agreement != null) {
             unit.setMovesLeft(0);
-            String nation = agreement.getRecipient().getNationAsString();
-            reply = null;
-            
-            do {
-                Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
-                diplomaticElement.setAttribute("unit", unit.getId());
-                diplomaticElement.setAttribute("direction", String.valueOf(direction));
-                diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
-                reply = freeColClient.getClient().ask(diplomaticElement);
-                
-                if (reply != null) {
-                    String accept = reply.getAttribute("accept");
-                    if ("accept".equals(accept)) {
-                        freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerAccepted",
-                                                                         "%nation%", nation);
-                        agreement.makeTrade();
-                        return;
-                    } else {
-                        Element childElement = (Element) reply.getFirstChild();
-                        DiplomaticTrade proposal = new DiplomaticTrade(freeColClient.getGame(), childElement);
-                        agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, proposal);
-                    }
-                } else if (agreement.isAccept()) {
-                    // We have accepted the contra-proposal
-                    agreement.makeTrade();
-                    return;
-                }
-            } while (reply != null);
-            freeColClient.getCanvas().showInformationMessage("negotiationDialog.offerRejected",
-                                                             "%nation%", nation);
+            // Do not wait for response, if the trade is valid and accepted or countered
+            // it will be handled by InGameInputHandler.diplomaticTrade()
+            freeColClient.getClient().send(new DiplomaticTradeMessage(unit, direction, agreement).toXMLElement());
         }
     }
 

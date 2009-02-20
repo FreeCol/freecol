@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
@@ -311,18 +312,16 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      * @param connection The connection the message was received on.
      * @param element The element (root element in a DOM-parsed XML tree) that
      *            holds all the information.
+     * @return Either the original message with "accept" set, or null on rejection.
      */
     private Element diplomaticTrade(DummyConnection connection, Element element) {
         // TODO: make an informed decision
-        NodeList childElements = element.getChildNodes();
-        Element childElement = (Element) childElements.item(0);
-        DiplomaticTrade agreement = new DiplomaticTrade(freeColServer.getGame(), childElement);
-        boolean accept = getAIPlayer().acceptDiplomaticTrade(agreement);
+        DiplomaticTradeMessage message = new DiplomaticTradeMessage(freeColServer.getGame(), element);
+        boolean accept = getAIPlayer().acceptDiplomaticTrade(message.getAgreement());
 
         if (accept) {
-            Element reply = Message.createNewRootElement("diplomaticTrade");
-            reply.setAttribute("accept", "accept");
-            return reply;
+            message.setAccept();
+            return message.toXMLElement();
         } else {
             return null;
         }

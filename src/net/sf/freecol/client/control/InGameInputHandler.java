@@ -63,6 +63,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.Utils;
 
@@ -668,57 +669,43 @@ public final class InGameInputHandler extends InputHandler {
         return null;
     }
 
-
     /**
-     * Handles a "diplomaticTrade"-request. Returns either an "accept"
-     * element, if the offer was accepted, or "null", if it was not.
+     * Handles a "diplomaticTrade"-request.
      * 
-     * @param element The element (root element in a DOM-parsed XML
-     * tree) that holds all the information.
+     * @param element The element (root element in a DOM-parsed XML tree)
+     *        containing a "diplomaticTrade"-message.
+     * @return If the message informs of an acceptance or rejection then return null.
+     *         If the message is a proposal, then on accept return the original message
+     *         with "accept" set, on reject return null, otherwise return the
+     *         original message containing a counter proposal.
      */
     private Element diplomaticTrade(Element element) {
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                                               + element.getAttribute("unit"));
-        }
-        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
-        Tile tile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-        if (tile == null) {
-            throw new IllegalArgumentException("Could not find 'Tile' in direction " +
-                                               direction);
-        }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null) {
-            throw new IllegalArgumentException("No settlement on 'Tile' " +
-                                               tile.getId());
-        }
-        
-        NodeList childElements = element.getChildNodes();
-        Element childElement = (Element) childElements.item(0);
-        DiplomaticTrade proposal = new DiplomaticTrade(getGame(), childElement);
-        
-        if (proposal.isAccept()) {
+        DiplomaticTradeMessage message = new DiplomaticTradeMessage(getGame(), element);
+        if (message.isReject()) {
+            String nation = message.getOtherNationName();
+            new ShowInformationMessageSwingTask("negotiationDialog.offerRejected",
+                                                "%nation%", nation).show();
+        } else if (message.isAccept()) {
+            String nation = message.getOtherNationName();
             new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted",
-                                                "%nation%", unit.getOwner().getNationAsString()).show();
-            proposal.makeTrade();
+                                                "%nation%", nation).show();
+            message.getAgreement().makeTrade();
         } else {
-            DiplomaticTrade agreement = new ShowNegotiationDialogSwingTask(unit, settlement, proposal).select();
+            DiplomaticTrade agreement = message.getAgreement();
+            agreement = new ShowNegotiationDialogSwingTask(message.getUnit(),
+                                                           message.getSettlement(),
+                                                           agreement).select();
             if (agreement != null) {
-                Element diplomaticElement = Message.createNewRootElement("diplomaticTrade");
+                message.setAgreement(agreement);
                 if (agreement.isAccept()) {
-                    diplomaticElement.setAttribute("accept", "accept");
-                } else {
-                    diplomaticElement.setAttribute("unit", unit.getId());
-                    diplomaticElement.setAttribute("direction", String.valueOf(direction));
-                    diplomaticElement.appendChild(agreement.toXMLElement(null, diplomaticElement.getOwnerDocument()));
+                    message.setAccept();
+                    agreement.makeTrade();
                 }
-                return diplomaticElement;
+                return message.toXMLElement();
             }
         }
         return null;
     }
-
 
     /**
      * Handles an "deliverGift"-request.

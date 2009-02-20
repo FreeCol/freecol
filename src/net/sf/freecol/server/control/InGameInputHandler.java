@@ -76,6 +76,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -476,9 +477,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new UpdateCurrentStopMessage(getGame(), element).handle(freeColServer, connection);
             }
         });
-        register("diplomaticTrade", new NetworkRequestHandler() {
+        register(DiplomaticTradeMessage.getXMLElementTagName(), new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
-                return diplomaticTrade(connection, element);
+                return new DiplomaticTradeMessage(getGame(), element).handle(freeColServer, connection);
             }
         });
         register("selectFromFountainYouth", new NetworkRequestHandler() {
@@ -758,61 +759,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.setTradeRoute(tradeRoute);
         }
         return null;
-    }
-
-    /**
-     * Handles a "diplomaticTrade"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element diplomaticTrade(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                                               + element.getAttribute("unit"));
-        }
-        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
-        Tile tile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-        if (tile == null) {
-            throw new IllegalArgumentException("Could not find 'Tile' in direction " +
-                                               direction);
-        }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null) {
-            throw new IllegalArgumentException("No settlement on 'Tile' " +
-                                               tile.getId());
-        }
-        unit.setMovesLeft(0);
-        
-        NodeList childElements = element.getChildNodes();
-        Element childElement = (Element) childElements.item(0);
-        DiplomaticTrade agreement = new DiplomaticTrade(getGame(), childElement);
-        if (agreement.getSender() != player) {
-            throw new IllegalArgumentException("Sender of 'DiplomaticTrade' message is not " +
-                                               "player " + player.getName());
-        }
-        if (agreement.isAccept()) {
-            agreement.makeTrade();
-        }
-        ServerPlayer enemyPlayer = (ServerPlayer) agreement.getRecipient();
-        Element reply = null;
-        try {
-            reply = enemyPlayer.getConnection().ask(element);
-        } catch (IOException e) {
-            logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                           + enemyPlayer.getConnection());
-        }
-        if (reply != null) {
-            String accept = reply.getAttribute("accept");
-            if (accept != null && accept.equals("accept")) {
-                agreement.makeTrade();
-            }
-        }
-        return reply;
     }
 
     /**
