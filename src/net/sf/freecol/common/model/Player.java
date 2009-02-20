@@ -1184,7 +1184,7 @@ public class Player extends FreeColGameObject implements Nameable {
             } else if (!isEuropean()) {
                 tension.put(player, new Tension(0));
             }
-            stance.put(player.getId(), Stance.PEACE);
+            changeRelationWithPlayer(player, Stance.PEACE);
         }
         if (!contacted) {
             stance.remove(player.getId());

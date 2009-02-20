@@ -304,6 +304,9 @@ public class DiplomaticTradeMessage extends Message {
                                                + " does not match Settlement owner: " + settlementPlayer);
         }
 
+        if (!serverPlayer.hasContacted(settlementPlayer)) {
+            serverPlayer.setContacted(settlementPlayer, true);
+        }
         unit.setMovesLeft(0);
         // Loop sending proposal and counter proposal until one side rejects
         // (null reply), or accepts (agreement is marked as accepted),
