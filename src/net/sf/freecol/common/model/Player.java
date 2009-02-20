@@ -1139,7 +1139,6 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         if (contacted && !hasContacted(player)) {
-            stance.put(player.getId(), Stance.PEACE);
             history.add(new HistoryEvent(getGame().getTurn().getNumber(),
                                          HistoryEvent.Type.MEET_NATION,
                                          "%nation%", player.getNationAsString()));
@@ -1185,7 +1184,7 @@ public class Player extends FreeColGameObject implements Nameable {
             } else if (!isEuropean()) {
                 tension.put(player, new Tension(0));
             }
-
+            stance.put(player.getId(), Stance.PEACE);
         }
         if (!contacted) {
             stance.remove(player.getId());
