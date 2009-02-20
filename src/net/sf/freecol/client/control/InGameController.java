@@ -3191,7 +3191,8 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the foreign colony lies.
      */
     private void scoutForeignColony(Unit unit, Direction direction) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getGame().getCurrentPlayer();
+        if (player != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
@@ -3201,8 +3202,11 @@ public final class InGameController implements NetworkConstants {
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         Colony colony = tile.getColony();
 
-        ScoutAction userAction = canvas.showScoutForeignColonyDialog(colony, unit);
+        if (colony != null && !player.hasContacted(colony.getOwner())) {
+            player.setContacted(colony.getOwner(), true);
+        }
 
+        ScoutAction userAction = canvas.showScoutForeignColonyDialog(colony, unit);
         switch (userAction) {
         case CANCEL:
             break;
