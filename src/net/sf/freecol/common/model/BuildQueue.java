@@ -69,7 +69,8 @@ public class BuildQueue extends FreeColObject implements ListModel {
         // empty constructor
     }
 
-    public BuildQueue(Object[] values) {
+    public BuildQueue(Colony colony, Object[] values) {
+        this.colony = colony;
         for (Object value : values) {
             BuildableType item = (BuildableType) value;
             model.add(item);
@@ -81,7 +82,8 @@ public class BuildQueue extends FreeColObject implements ListModel {
         }
     }
 
-    public BuildQueue(Iterable<BuildableType> buildableTypes) {
+    public BuildQueue(Colony colony, Iterable<BuildableType> buildableTypes) {
+        this.colony = colony;
         for (BuildableType buildableType : buildableTypes) {
             model.add(buildableType);
             if (buildableType instanceof UnitType) {
@@ -333,16 +335,27 @@ public class BuildQueue extends FreeColObject implements ListModel {
      * @return an <code>int</code> value
      */
     public int findMinimumIndex(UnitType unitType) {
-        if (unitType.getAbilitiesRequired().isEmpty()) {
-            return 0;
+
+        int index = -1;
+        if (colony.hasAbility("model.ability.build", unitType)) {
+            index = 0;
         } else {
-            int index = -1;
+            for (int newIndex = 0; newIndex < model.size(); newIndex++) {
+                BuildableType buildableType = model.get(newIndex);
+                if (buildableType.hasAbility("model.ability.build", unitType)) {
+                    index = newIndex + 1;
+                    break;
+                }
+            }
+        }
+
+        if (index < 0 || unitType.getAbilitiesRequired().isEmpty()) {
+            return index;
+        } else {
             loop: for (Entry<String, Boolean> entry : unitType.getAbilitiesRequired().entrySet()) {
                 if (colony != null &&
                     colony.hasAbility(entry.getKey()) == entry.getValue()) {
-                    if (index < 0) {
-                        index = 0;
-                    }
+                    continue loop;
                 } else if (definedOnlyByBuildingType(entry.getKey())) {
                     for (int newIndex = 0; newIndex < model.size(); newIndex++) {
                         BuildableType buildableType = model.get(newIndex);
@@ -353,6 +366,7 @@ public class BuildQueue extends FreeColObject implements ListModel {
                             }
                         }
                     }
+                    System.out.println("returning index: " + index);
                     // none of the buildings has the required ability
                     return -1;
                 }
@@ -420,6 +434,9 @@ public class BuildQueue extends FreeColObject implements ListModel {
                     return false;
                 }
             } else if (item instanceof UnitType) {
+                if (!featureContainer.hasAbility("model.ability.build", item)) {
+                    return false;
+                }
                 for (Entry<String, Boolean> entry : ((UnitType) item).getAbilitiesRequired().entrySet()) {
                     if (definedOnlyByBuildingType(entry.getKey()) && 
                         featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {

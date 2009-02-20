@@ -84,7 +84,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
 
         removeAll();
 
-        current = new BuildQueue(colony.getBuildQueue());
+        current = new BuildQueue(colony, colony.getBuildQueue());
 
         finished = new BuildQueue();
         for (Building building : colony.getBuildings()) {
@@ -338,7 +338,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
 	    if (comp instanceof JList) {
 		source = (JList) comp;
 		indices = source.getSelectedIndices();
-		BuildQueue buildQueue = new BuildQueue(source.getSelectedValues());
+		BuildQueue buildQueue = new BuildQueue(colony, source.getSelectedValues());
 		return new BuildQueueTransferable(buildQueue);
 	    } else {
 		return null;

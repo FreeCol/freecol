@@ -2153,9 +2153,21 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return a <code>boolean</code> value
      */
     public boolean hasAbility(String id) {
+        return hasAbility(id, null);
+    }
+
+    /**
+     * Returns true if the Colony, or its owner has the ability
+     * identified by <code>id</code>.
+     *
+     * @param id a <code>String</code> value
+     * @param type a <code>FreeColGameObjectType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id, FreeColGameObjectType type) {
         HashSet<Ability> colonyAbilities = 
-            new HashSet<Ability>(featureContainer.getAbilitySet(id, null, getGame().getTurn()));
-        Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, null, getGame().getTurn());
+            new HashSet<Ability>(featureContainer.getAbilitySet(id, type, getGame().getTurn()));
+        Set<Ability> playerAbilities = owner.getFeatureContainer().getAbilitySet(id, type, getGame().getTurn());
         colonyAbilities.addAll(playerAbilities);
         return FeatureContainer.hasAbility(colonyAbilities);
     }
@@ -2172,11 +2184,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public boolean canBombardEnemyShip(){
     	// only sea-side colonies can bombard
     	if(isLandLocked()){
-    		return false;
+            return false;
     	}
     	// does not have the buildings that give such abilities
     	if(!hasAbility("model.ability.bombardShips")){
-    		return false;
+            return false;
     	}
     	return true;
     }
