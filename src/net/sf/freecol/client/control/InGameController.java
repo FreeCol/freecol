@@ -1255,10 +1255,12 @@ public final class InGameController implements NetworkConstants {
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
         // TODO: should the client be getting full details on the settlement?
-        Element reply = freeColClient.getClient().ask(new SpySettlementMessage(unit, direction).toXMLElement());
-        if (reply != null) {
-            settlement.readFromXMLElement((Element) reply.getFirstChild());
-        }
+        // AFAICT it does not need it, so comment out and look to remove
+        // Element reply = freeColClient.getClient().ask(new SpySettlementMessage(unit, direction).toXMLElement());
+        // if (reply != null) {
+        //    settlement.readFromXMLElement((Element) reply.getFirstChild());
+        //}
+
         if (settlement == null) return;
 
         DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
