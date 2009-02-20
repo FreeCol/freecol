@@ -2554,7 +2554,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 }
             }
             Stance stance = enemyPlayer.getStance(player);
-            if (stance == null) {
+            if (stance == Stance.UNCONTACTED) {
                 stance = Stance.PEACE;
             }
             enemyElement.setAttribute("numberOfColonies", String.valueOf(numberOfColonies));

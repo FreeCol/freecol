@@ -289,8 +289,8 @@ public class ContactTest extends FreeColTestCase {
 
         assertFalse(french.hasContacted(dutch));
         assertFalse(dutch.hasContacted(french));
-        assertNull(french.getStance(dutch));
-        assertNull(dutch.getStance(french));
+        assertEquals(Stance.UNCONTACTED, french.getStance(dutch));
+        assertEquals(Stance.UNCONTACTED, dutch.getStance(french));
 
     }
 

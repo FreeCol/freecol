@@ -145,11 +145,12 @@ public abstract class NewAIPlayer extends AIObject {
      */
     protected void determineStances() {
         logger.finest("Entering method determineStances");
+        Player player = getPlayer();
         for (Player p : getGame().getPlayers()) {
             if (p != player) {
                 Stance stance = getPlayer().getStance(p);
                 Tension tension = getPlayer().getTension(p);
-                if (stance != null && tension != null) {
+                if (stance != Stance.UNCONTACTED && tension != null) {
                     if (p.getREFPlayer() == getPlayer() && p.getPlayerType() == PlayerType.REBEL) {
                         tension.modify(1000);
                     }

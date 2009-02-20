@@ -217,14 +217,14 @@ public class IndianBringGiftMission extends Mission {
      *         with regard to the tension towards the target player.
      */
     public static boolean isValidMission(Player owner, Player targetPlayer) {
-        Stance stance = owner.getStance(targetPlayer);
-        if (stance == null) {
-            return false;
-        } else {
-            return (stance != Stance.WAR && stance != Stance.CEASE_FIRE) &&
-                owner.getTension(targetPlayer).getLevel() != null && 
-                owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.HAPPY) <= 0;
+        switch (owner.getStance(targetPlayer)) {
+        case UNCONTACTED: case WAR: case CEASE_FIRE:
+            break;
+        case PEACE: case ALLIANCE:
+            return owner.getTension(targetPlayer).getLevel() != null
+                && owner.getTension(targetPlayer).getLevel().compareTo(Tension.Level.HAPPY) <= 0;
         }
+        return false;
     }
 
     /**

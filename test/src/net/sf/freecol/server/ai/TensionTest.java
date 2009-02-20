@@ -80,7 +80,7 @@ public class TensionTest extends FreeColTestCase {
         Tension tension = indian.getTension(european);
         Stance stance = indian.getStance(european);
         assertNull(tension);
-        assertNull(stance);
+        assertEquals(Stance.UNCONTACTED, stance);
         assertFalse(indian.hasContacted(european));
         
         // create an Indian settlement
@@ -112,7 +112,7 @@ public class TensionTest extends FreeColTestCase {
         tension = indian.getTension(european);
         stance = indian.getStance(european);
         assertNotNull(tension);
-        assertNotNull(stance);
+        assertEquals(Stance.PEACE, stance);
         
         // create 2 unarmed european units next to the indianSettlement
         UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
@@ -129,7 +129,6 @@ public class TensionTest extends FreeColTestCase {
         tension = indian.getTension(european);
         stance = indian.getStance(european);
         assertNotNull(tension);
-        assertNotNull(stance);
         assertEquals(Tension.TENSION_ADD_LAND_TAKEN, tension.getValue());
         assertEquals(Stance.PEACE, stance);
         
@@ -141,7 +140,6 @@ public class TensionTest extends FreeColTestCase {
             tension = indian.getTension(european);
             stance = indian.getStance(european);
             assertNotNull(tension);
-            assertNotNull(stance);
             assertEquals(Tension.TENSION_ADD_LAND_TAKEN, tension.getValue());
             assertEquals(Stance.PEACE, stance);
             

@@ -792,7 +792,7 @@ public final class NegotiationDialog extends FreeColDialog implements ActionList
         	Stance stance = source.getStance(target);
             if (stance != Stance.WAR) stanceBox.addItem(new StanceItem(Stance.WAR));
             if (stance == Stance.WAR) stanceBox.addItem(new StanceItem(Stance.CEASE_FIRE));
-            if (stance != Stance.PEACE) stanceBox.addItem(new StanceItem(Stance.PEACE));
+            if (stance != Stance.PEACE && stance != Stance.UNCONTACTED) stanceBox.addItem(new StanceItem(Stance.PEACE));
             if (stance != Stance.ALLIANCE) stanceBox.addItem(new StanceItem(Stance.ALLIANCE));
             if (negotiationDialog.hasPeaceOffer()) {
                 stanceBox.setSelectedItem(new StanceItem(negotiationDialog.getStance()));

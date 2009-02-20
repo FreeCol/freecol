@@ -92,7 +92,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Constants for describing the stance towards a player.
      */
     public static enum Stance {
-        WAR, CEASE_FIRE, PEACE, ALLIANCE
+        UNCONTACTED, WAR, CEASE_FIRE, PEACE, ALLIANCE
     }
 
 
@@ -1122,11 +1122,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         the given nation.
      */
     public boolean hasContacted(Player player) {
-        if (player == null) {
-            return true;
-        } else {
-            return stance.containsKey(player.getId());
-        }
+        return getStance(player) != Stance.UNCONTACTED;
     }
 
     /**
@@ -2310,11 +2306,9 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The stance.
      */
     public Stance getStance(Player player) {
-        if (player == null) {
-            return Stance.PEACE;
-        } else {
-            return stance.get(player.getId());
-        }
+        return (player == null || stance.get(player.getId()) == null)
+            ? Stance.UNCONTACTED
+            : stance.get(player.getId());
     }
 
     /**
@@ -2351,6 +2345,9 @@ public class Player extends FreeColGameObject implements Nameable {
         if (newStance == Stance.CEASE_FIRE && oldStance != Stance.WAR) {
             throw new IllegalStateException("Cease fire can only be declared when at war.");
         }
+        if (newStance == Stance.UNCONTACTED) {
+            throw new IllegalStateException("Attempt to set UNCONTACTED stance");
+        }
         stance.put(player.getId(), newStance);
     }
 
@@ -2365,15 +2362,11 @@ public class Player extends FreeColGameObject implements Nameable {
         // Set stance
         setStance(player, newStance);
 
-        // For now on, consider null as PEACE
-        // This may happen with the REF
-        if(oldStance == null){
-            oldStance = Stance.PEACE;
-        }
-        
         // Update tension
         int modifier = 0;
         switch(newStance){
+        case UNCONTACTED:
+            throw new IllegalStateException("Attempt to set UNCONTACTED stance");
         case PEACE:
             if(oldStance == Stance.WAR){
                 modifier = Tension.CEASE_FIRE_MODIFIER + Tension.PEACE_TREATY_MODIFIER;
@@ -2400,6 +2393,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
             if(newStance == Stance.WAR){
                 switch(oldStance){
+                case UNCONTACTED:
                 case PEACE:
                     modifier = Tension.TENSION_ADD_DECLARE_WAR_FROM_PEACE;
                     break;

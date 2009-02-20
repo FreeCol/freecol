@@ -223,19 +223,18 @@ public final class Monarch extends FreeColGameObject {
                 if (!enemy.isEuropean() || enemy.isREF()) {
                     continue;
                 }
-                if (player.hasContacted(enemy)) {
-                    switch (player.getStance(enemy)) {
-                    case WAR:
-                        atWar = true;
-                        break;
-                    case PEACE:
-                    case CEASE_FIRE:
-                        canDeclareWar = true;
-                        break;
-                    case ALLIANCE:
-                        // we can neither have nor declare war.
-                        break;
-                    }
+                switch (player.getStance(enemy)) {
+                case UNCONTACTED:
+                    break;
+                case WAR:
+                    atWar = true;
+                    break;
+                case PEACE: case CEASE_FIRE:
+                    canDeclareWar = true;
+                    break;
+                case ALLIANCE:
+                    // we can neither have nor declare war.
+                    break;
                 }
             }
         }

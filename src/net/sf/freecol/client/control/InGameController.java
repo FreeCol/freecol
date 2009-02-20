@@ -2092,54 +2092,46 @@ public final class InGameController implements NetworkConstants {
      * @return true to attack, false to abort.
      */
     private boolean confirmHostileAction(Unit attacker, Tile target) {
-        if (!attacker.hasAbility("model.ability.piracy")) {
-            Player enemy;
-            if (target.getSettlement() != null) {
-                enemy = target.getSettlement().getOwner();
-            } else {
-                Unit defender = target.getDefendingUnit(attacker);
-                if (defender == null) {
-                    logger.warning("Attacking, but no defender - will try!");
-                    return true;
-                }
-                if (defender.hasAbility("model.ability.piracy")) {
-                    // Privateers can be attacked and remain at peace
-                    return true;
-                }
-                enemy = defender.getOwner();
-            }
-            // TODO: this really should not be necessary
-            if (attacker.getOwner().getStance(enemy) == null) {
-                return true;
-            } else {
-                switch (attacker.getOwner().getStance(enemy)) {
-                case CEASE_FIRE:
-                    return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
-                                                                       "model.diplomacy.attack.confirm",
-                                                                       "cancel",
-                                                                       "%replace%", enemy.getNationAsString());
-                case PEACE:
-                    return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
-                                                                       "model.diplomacy.attack.confirm",
-                                                                       "cancel",
-                                                                       "%replace%", enemy.getNationAsString());
-                case ALLIANCE:
-                    return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.alliance",
-                                                                       "model.diplomacy.attack.confirm",
-                                                                       "cancel",
-                                                                       "%replace%", enemy.getNationAsString());
-                case WAR:
-                    logger.finest("Player at war, no confirmation needed");
-                    return true;
-                default:
-                    logger.warning("Unknown stance " + attacker.getOwner().getStance(enemy));
-                    return true;
-                }
-            }
-        } else {
+        if (attacker.hasAbility("model.ability.piracy")) {
             // Privateers can attack and remain at peace
             return true;
         }
+        Player enemy;
+        if (target.getSettlement() != null) {
+            enemy = target.getSettlement().getOwner();
+        } else {
+            Unit defender = target.getDefendingUnit(attacker);
+            if (defender == null) {
+                logger.warning("Attacking, but no defender - will try!");
+                return true;
+            }
+            if (defender.hasAbility("model.ability.piracy")) {
+                // Privateers can be attacked and remain at peace
+                return true;
+            }
+            enemy = defender.getOwner();
+        }
+        switch (attacker.getOwner().getStance(enemy)) {
+        case UNCONTACTED: case PEACE:
+            return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
+                                                               "model.diplomacy.attack.confirm",
+                                                               "cancel",
+                                                               "%replace%", enemy.getNationAsString());
+        case WAR:
+            logger.finest("Player at war, no confirmation needed");
+            break;
+        case CEASE_FIRE:
+            return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
+                                                               "model.diplomacy.attack.confirm",
+                                                               "cancel",
+                                                               "%replace%", enemy.getNationAsString());
+        case ALLIANCE:
+            return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.alliance",
+                                                               "model.diplomacy.attack.confirm",
+                                                               "cancel",
+                                                               "%replace%", enemy.getNationAsString());
+        }
+        return true;
     }
 
     /**
