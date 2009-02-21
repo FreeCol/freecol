@@ -122,7 +122,7 @@ public class DetermineHighSeasAction extends FreeColAction {
         final JTextField inputD = new JTextField(Integer.toString(DEFAULT_distToLandFromHighSeas), COLUMNS);
         final JTextField inputM = new JTextField(Integer.toString(DEFAULT_maxDistanceToEdge), COLUMNS);
 
-        final FreeColDialog inputDialog = new FreeColDialog()  {
+        final FreeColDialog<Parameters> inputDialog = new FreeColDialog<Parameters>()  {
             public void requestFocus() {
                 inputD.requestFocus();
             }
@@ -183,7 +183,7 @@ public class DetermineHighSeasAction extends FreeColAction {
 
         inputDialog.setSize(inputDialog.getPreferredSize());
 
-        return (Parameters) canvas.showFreeColDialog(inputDialog);
+        return canvas.showFreeColDialog(inputDialog);
     }
     
     private class Parameters {

@@ -779,10 +779,10 @@ public final class Canvas extends JDesktopPane {
      * @param freeColDialog The dialog to be displayed
      * @return The {@link FreeColDialog#getResponse reponse} returned by the dialog.
      */
-    public Object showFreeColDialog(FreeColDialog freeColDialog) {
+    public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog) {
         addAsFrame(freeColDialog);
         freeColDialog.requestFocus();
-        Object response = freeColDialog.getResponse();
+        T response = freeColDialog.getResponse();
         remove(freeColDialog);
 
         return response;
@@ -809,7 +809,7 @@ public final class Canvas extends JDesktopPane {
             logger.warning("could not find message with id: " + text + ", " + okText + " or " + cancelText + ".");
         }
 
-        FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(text, okText, cancelText);
+        FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(text, okText, cancelText);
         addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
 
@@ -1136,22 +1136,22 @@ public final class Canvas extends JDesktopPane {
      */
     public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
         int arrears = europe.getOwner().getArrears(goods.getType());
-        FreeColDialog boycottedGoodsDialog = FreeColDialog
+        FreeColDialog<ChoiceItem<BoycottAction>> boycottedGoodsDialog = FreeColDialog
             .createChoiceDialog(Messages.message("boycottedGoods.text", 
                                                  "%goods%", goods.getName(), 
                                                  "%europe%", europe.getName(),
                                                  "%amount%", String.valueOf(arrears)),
                                 null,
-                                new ChoiceItem(Messages.message("boycottedGoods.payArrears"),
-                                               BoycottAction.PAY_ARREARS),
-                                new ChoiceItem(Messages.message("boycottedGoods.dumpGoods"),
-                                               BoycottAction.DUMP_CARGO),
-                                new ChoiceItem(Messages.message("cancel"),
-                                               BoycottAction.CANCEL));
+                                new ChoiceItem<BoycottAction>(Messages.message("boycottedGoods.payArrears"),
+                                                              BoycottAction.PAY_ARREARS),
+                                new ChoiceItem<BoycottAction>(Messages.message("boycottedGoods.dumpGoods"),
+                                                              BoycottAction.DUMP_CARGO),
+                                new ChoiceItem<BoycottAction>(Messages.message("cancel"),
+                                                              BoycottAction.CANCEL));
         addAsFrame(boycottedGoodsDialog);
-        ChoiceItem response = (ChoiceItem) boycottedGoodsDialog.getResponse();
+        ChoiceItem<BoycottAction> response = boycottedGoodsDialog.getResponse();
         remove(boycottedGoodsDialog);
-        return (BoycottAction) response.getObject();
+        return response.getObject();
     }
 
     /**
@@ -1187,22 +1187,22 @@ public final class Canvas extends JDesktopPane {
                                      "%goods3%", settlement.getWantedGoods()[2].getName()));
         text.append("\n\n");
     
-        FreeColDialog scoutDialog = FreeColDialog
+        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog = FreeColDialog
             .createChoiceDialog(text.toString(), null,
-                                new ChoiceItem(Messages.message("scoutSettlement.speak"),
-                                               ScoutAction.INDIAN_SETTLEMENT_SPEAK),
-                                new ChoiceItem(Messages.message("scoutSettlement.tribute"),
-                                               ScoutAction.INDIAN_SETTLEMENT_TRIBUTE),
-                                new ChoiceItem(Messages.message("scoutSettlement.attack"),
-                                               ScoutAction.INDIAN_SETTLEMENT_ATTACK),
-                                new ChoiceItem(Messages.message("cancel"),
-                                               ScoutAction.CANCEL));
+                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.speak"),
+                                                            ScoutAction.INDIAN_SETTLEMENT_SPEAK),
+                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.tribute"),
+                                                            ScoutAction.INDIAN_SETTLEMENT_TRIBUTE),
+                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.attack"),
+                                                            ScoutAction.INDIAN_SETTLEMENT_ATTACK),
+                                new ChoiceItem<ScoutAction>(Messages.message("cancel"),
+                                                            ScoutAction.CANCEL));
 
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
-        ChoiceItem responseItem = (ChoiceItem) scoutDialog.getResponse();
-        ScoutAction response = (ScoutAction) responseItem.getObject();
+        ChoiceItem<ScoutAction> responseItem = scoutDialog.getResponse();
+        ScoutAction response = responseItem.getObject();
 
         remove(scoutDialog);
 
@@ -1227,21 +1227,21 @@ public final class Canvas extends JDesktopPane {
                                            "%unit%", unit.getName(), 
                                            "%colony%", colony.getName());
 
-        FreeColDialog scoutDialog = FreeColDialog
+        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog = FreeColDialog
         .createChoiceDialog(mainText, null,
-                            new ChoiceItem(Messages.message("scoutColony.negotiate"), 
-                                           ScoutAction.FOREIGN_COLONY_NEGOTIATE),
-                            new ChoiceItem(Messages.message("scoutColony.spy"),
-                                           ScoutAction.FOREIGN_COLONY_SPY),
-                            new ChoiceItem(Messages.message("scoutColony.attack"),
-                                           ScoutAction.FOREIGN_COLONY_ATTACK),
-                            new ChoiceItem(Messages.message("cancel"),
-                                           ScoutAction.CANCEL));
+                            new ChoiceItem<ScoutAction>(Messages.message("scoutColony.negotiate"), 
+                                                        ScoutAction.FOREIGN_COLONY_NEGOTIATE),
+                            new ChoiceItem<ScoutAction>(Messages.message("scoutColony.spy"),
+                                                        ScoutAction.FOREIGN_COLONY_SPY),
+                            new ChoiceItem<ScoutAction>(Messages.message("scoutColony.attack"),
+                                                        ScoutAction.FOREIGN_COLONY_ATTACK),
+                            new ChoiceItem<ScoutAction>(Messages.message("cancel"),
+                                                        ScoutAction.CANCEL));
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
-        ChoiceItem responseItem = (ChoiceItem) scoutDialog.getResponse();
-        ScoutAction response = (ScoutAction) responseItem.getObject();
+        ChoiceItem<ScoutAction> responseItem = scoutDialog.getResponse();
+        ScoutAction response = responseItem.getObject();
 
         remove(scoutDialog);
 
@@ -1265,19 +1265,19 @@ public final class Canvas extends JDesktopPane {
         String introText = Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
                 "%nation%", settlement.getOwner().getNationAsString());
 
-        FreeColDialog armedUnitDialog = FreeColDialog
+        FreeColDialog<ChoiceItem<ScoutAction>> armedUnitDialog = FreeColDialog
             .createChoiceDialog(introText, null,
-                                new ChoiceItem(Messages.message("scoutSettlement.tribute"),
-                                               ScoutAction.INDIAN_SETTLEMENT_TRIBUTE),
-                                new ChoiceItem(Messages.message("scoutSettlement.attack"),
-                                               ScoutAction.INDIAN_SETTLEMENT_ATTACK),
-                                new ChoiceItem(Messages.message("cancel"),
-                                               ScoutAction.CANCEL));
+                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.tribute"),
+                                                            ScoutAction.INDIAN_SETTLEMENT_TRIBUTE),
+                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.attack"),
+                                                            ScoutAction.INDIAN_SETTLEMENT_ATTACK),
+                                new ChoiceItem<ScoutAction>(Messages.message("cancel"),
+                                                            ScoutAction.CANCEL));
         addAsFrame(armedUnitDialog);
         armedUnitDialog.requestFocus();
 
-        ChoiceItem responseItem = (ChoiceItem) armedUnitDialog.getResponse();
-        ScoutAction response = (ScoutAction) responseItem.getObject();
+        ChoiceItem<ScoutAction> responseItem = armedUnitDialog.getResponse();
+        ScoutAction response = responseItem.getObject();
 
         remove(armedUnitDialog);
 
@@ -1307,16 +1307,20 @@ public final class Canvas extends JDesktopPane {
         introText.append("\n\n");
         introText.append(Messages.message("missionarySettlement.question"));
 
-        ChoiceItem establish = new ChoiceItem(Messages.message("missionarySettlement.establish"),
-                MissionaryAction.ESTABLISH_MISSION);
-        ChoiceItem heresy = new ChoiceItem(Messages.message("missionarySettlement.heresy"),
-                MissionaryAction.DENOUNCE_HERESY);
-        ChoiceItem incite = new ChoiceItem(Messages.message("missionarySettlement.incite"),
-                MissionaryAction.INCITE_INDIANS);
-        ChoiceItem cancel = new ChoiceItem(Messages.message("cancel"),
-                MissionaryAction.CANCEL);
+        ChoiceItem<MissionaryAction> establish =
+            new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.establish"),
+                                             MissionaryAction.ESTABLISH_MISSION);
+        ChoiceItem<MissionaryAction> heresy =
+            new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.heresy"),
+                                             MissionaryAction.DENOUNCE_HERESY);
+        ChoiceItem<MissionaryAction> incite =
+            new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.incite"),
+                                             MissionaryAction.INCITE_INDIANS);
+        ChoiceItem<MissionaryAction> cancel =
+            new ChoiceItem<MissionaryAction>(Messages.message("cancel"),
+                                             MissionaryAction.CANCEL);
 
-        FreeColDialog missionaryDialog;
+        FreeColDialog<ChoiceItem<MissionaryAction>> missionaryDialog;
         if (settlement.getMissionary() == null) {
             // no missionary yet, we can establish a new religious mission
             missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null,
@@ -1330,8 +1334,8 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(missionaryDialog);
         missionaryDialog.requestFocus();
 
-        ChoiceItem responseItem = (ChoiceItem) missionaryDialog.getResponse();
-        MissionaryAction response = (MissionaryAction) responseItem.getObject();
+        ChoiceItem<MissionaryAction> responseItem = missionaryDialog.getResponse();
+        MissionaryAction response = responseItem.getObject();
         ArrayList<Object> returnValue = new ArrayList<Object>();
         // TODO: Find a solution so that we can use a more specialized list.
         returnValue.add(response);
@@ -1339,12 +1343,13 @@ public final class Canvas extends JDesktopPane {
         remove(missionaryDialog);
 
         if (MissionaryAction.INCITE_INDIANS.equals(response)) {
-            FreeColDialog inciteDialog = FreeColDialog.createInciteDialog(freeColClient.getGame().getEuropeanPlayers(),
-                    freeColClient.getMyPlayer());
+            FreeColDialog<Player> inciteDialog =
+                FreeColDialog.createInciteDialog(freeColClient.getGame().getEuropeanPlayers(),
+                                                 freeColClient.getMyPlayer());
             addAsFrame(inciteDialog);
             inciteDialog.requestFocus();
 
-            Player response2 = (Player) inciteDialog.getResponse();
+            Player response2 = inciteDialog.getResponse();
             if (response2 != null) {
                 returnValue.add(response2);
             } else {

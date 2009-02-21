@@ -23,23 +23,10 @@ package net.sf.freecol.client.gui.panel;
  * Can be used as a single choice for the
  * {@link FreeColDialog#createChoiceDialog(String, String, ChoiceItem...) choice dialog}.
  */
-public class ChoiceItem {
+public class ChoiceItem<T> {
 
     private String text;
-    private Object object;
-
-    /**
-     * Creates a new <code>ChoiceItem</code> with the
-     * object beeing a <code>new Integer(choice)</code>.
-     *
-     * @param text The text that should be used to represent
-     *        this choice.
-     * @param choice An <code>int</code> identifying this choice.
-     */
-    public ChoiceItem(String text, int choice) {
-        this(text, new Integer(choice));
-    }
-
+    private T object;
 
     /**
      * Creates a new <code>ChoiceItem</code> with the
@@ -50,7 +37,7 @@ public class ChoiceItem {
      * @param object The <code>Object</code> contained by this
      *        choice.
      */
-    public ChoiceItem(String text, Object object) {
+    public ChoiceItem(String text, T object) {
         this.text = text;
         this.object = object;
     }
@@ -63,7 +50,7 @@ public class ChoiceItem {
      * @param object The <code>Object</code> contained by this
      *        choice.
      */
-    public ChoiceItem(Object object) {
+    public ChoiceItem(T object) {
         this.text = object.toString();
         this.object = object;
     }
@@ -73,7 +60,7 @@ public class ChoiceItem {
      * Gets the <code>Object</code> contained by this choice.
      * @return The <code>Object</code>.
      */
-    public Object getObject() {
+    public T getObject() {
         return object;
     }
 

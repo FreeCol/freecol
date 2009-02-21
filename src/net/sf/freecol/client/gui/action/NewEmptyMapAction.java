@@ -115,7 +115,7 @@ public class NewEmptyMapAction extends MapboardAction {
         final JTextField inputWidth = new JTextField(Integer.toString(DEFAULT_WIDTH), COLUMNS);
         final JTextField inputHeight = new JTextField(Integer.toString(DEFAULT_HEIGHT), COLUMNS);
 
-        final FreeColDialog inputDialog = new FreeColDialog()  {
+        final FreeColDialog<MapSize> inputDialog = new FreeColDialog<MapSize>()  {
             public void requestFocus() {
                 inputWidth.requestFocus();
             }
@@ -176,7 +176,7 @@ public class NewEmptyMapAction extends MapboardAction {
 
         inputDialog.setSize(inputDialog.getPreferredSize());
 
-        return (MapSize) canvas.showFreeColDialog(inputDialog);
+        return canvas.showFreeColDialog(inputDialog);
     }
     
     private class MapSize {
