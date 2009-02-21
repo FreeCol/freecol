@@ -895,11 +895,16 @@ public final class InGameController extends Controller {
         return unitsList;
     }
     
-    public boolean createMission(IndianSettlement settlement,Unit missionary){
-        settlement.setMissionary(missionary);
-        
-        //TODO: make possibility of indians refusing the mission 
-        return true;
+    public boolean createMission(IndianSettlement settlement, Unit missionary) {
+        Tension tension = settlement.getAlarm(missionary.getOwner());
+        if (tension != null) {
+            switch (tension.getLevel()) {
+            case HAPPY: case CONTENT: case DISPLEASED:
+                settlement.setMissionary(missionary);
+                return true;
+            }
+        }
+        return false;
     }
 
     private void bombardEnemyShips(ServerPlayer currentPlayer) {
