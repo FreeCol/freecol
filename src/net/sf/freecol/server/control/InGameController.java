@@ -25,6 +25,8 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -123,6 +125,16 @@ public final class InGameController extends Controller {
             Element gameEndedElement = Message.createNewRootElement("gameEnded");
             gameEndedElement.setAttribute("winner", winner.getId());
             freeColServer.getServer().sendToAll(gameEndedElement, null);
+            
+            // TODO: Remove when the server can properly revert to a pre-game state:
+            if (FreeCol.getFreeColClient() == null) {
+                new Timer(true).schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        System.exit(0);
+                    }
+                }, 20000);
+            }
             return;
         }
         
