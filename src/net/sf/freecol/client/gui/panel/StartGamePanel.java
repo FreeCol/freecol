@@ -56,7 +56,8 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * The panel where you choose your nation and color and connected players are
@@ -199,30 +200,16 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         tableScroll.getViewport().setOpaque(false);
         tableScroll.getColumnHeader().setOpaque(false);
 
-        int[] widths = { 400, margin, 300 };
-        int[] heights = { 200, margin, 0, margin, 0, margin, 0, margin, 0 };
-        setLayout(new HIGLayout(widths, heights));
+        setLayout(new MigLayout("wrap 2", "", ""));
 
-        int row = 1;
-        int leftColumn = 1;
-        int rightColumn = 3;
-
-        add(tableScroll, higConst.rc(row, leftColumn));
-        add(chatScroll, higConst.rcwh(row, rightColumn, 1, 3));
-        row += 2;
-
-        add(mapGeneratorOptions, higConst.rc(row, leftColumn));
-        row += 2;
-
-        add(gameOptions, higConst.rc(row, leftColumn));
-        add(chat, higConst.rc(row, rightColumn));
-        row += 2;
-
-        add(readyBox, higConst.rc(row, leftColumn));
-        row += 2;
-
-        add(start, higConst.rc(row, leftColumn, "r"));
-        add(cancel, higConst.rc(row, rightColumn, "l"));
+        add(tableScroll);
+        add(chatScroll, "spany 2, w 40%, grow");
+        add(mapGeneratorOptions, "grow");
+        add(gameOptions, "grow");
+        add(chat, "grow");
+        add(readyBox, "span");
+        add(start, "span, split 2, tag ok");
+        add(cancel, "tag cancel");
 
         start.setActionCommand(String.valueOf(START));
         cancel.setActionCommand(String.valueOf(CANCEL));

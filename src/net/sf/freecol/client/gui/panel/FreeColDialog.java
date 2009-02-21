@@ -53,7 +53,9 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
+
 import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -211,14 +213,20 @@ public class FreeColDialog extends FreeColPanel {
 
         enterPressesWhenFocused(firstButton);
 
-        choiceDialog.setLayout(new BorderLayout(10, 10));
+        choiceDialog.setLayout(new MigLayout("", "", ""));
         JTextArea textArea = getDefaultTextArea(text);
 
-        //int height = textArea.getMinimumSize().height + cancelButton.getMinimumSize().height + 40;
+        choiceDialog.add(textArea, "wrap");
 
-        choiceDialog.add(textArea, BorderLayout.NORTH);
-
-        JPanel objectsPanel = new JPanel(new GridLayout(objects.length, 1, 10, 10));
+        int columns = 1;
+             if ((objects.length % 4) == 0 && objects.length > 12) columns = 4;
+        else if ((objects.length % 3) == 0 && objects.length > 6)  columns = 3;
+        else if ((objects.length % 2) == 0 && objects.length > 4)  columns = 2;
+        
+        else if (objects.length > 21) columns = 4;
+        else if (objects.length > 10) columns = 2;
+        
+        JPanel objectsPanel = new JPanel(new GridLayout(0, columns, 10, 10));
         objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), 
                                                   new EmptyBorder(10, 20, 10, 20)));
 
@@ -229,7 +237,6 @@ public class FreeColDialog extends FreeColPanel {
                 }
             });
         objectsPanel.add(firstButton);
-        //height += firstButton.getMinimumSize().height;
 
         for (int i = 1; i < objects.length; i++) {
             final Object object = objects[i];
@@ -242,24 +249,24 @@ public class FreeColDialog extends FreeColPanel {
             enterPressesWhenFocused(objectButton);
             objectsPanel.add(objectButton);
         }
+        JScrollPane scrollPane = new JScrollPane(objectsPanel,
+                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        choiceDialog.add(scrollPane, "wrap 20");
+
         if (cancelText != null) {
             final JButton cancelButton = new JButton();           
             cancelButton.setText(cancelText);
-            enterPressesWhenFocused(cancelButton);            
             cancelButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         choiceDialog.setResponse(null);
                     }
                 });
-            choiceDialog.add(cancelButton, BorderLayout.SOUTH);
+            choiceDialog.add(cancelButton, "tag cancel");
             choiceDialog.setCancelComponent(cancelButton);
+            enterPressesWhenFocused(cancelButton);            
         }
-        JScrollPane scrollPane = new JScrollPane(objectsPanel,
-                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        choiceDialog.add(scrollPane, BorderLayout.CENTER);
 
-        //choiceDialog.setSize(width, height);
         choiceDialog.setSize(choiceDialog.getPreferredSize());
 
         return choiceDialog;
@@ -281,19 +288,6 @@ public class FreeColDialog extends FreeColPanel {
     }
 
     public static FreeColDialog createConfirmDialog(String[] texts, ImageIcon[] images, String okText, String cancelText) {
-
-        // create the OK button early so that the dialog may refer to it
-        final JButton  okButton = new JButton();
-
-        // create the dialog
-        final FreeColDialog  confirmDialog = new FreeColDialog() {
-
-            public void requestFocus() {
-
-                okButton.requestFocus();
-            }
-        };
-        confirmDialog.setLayout(new HIGLayout(new int[] {0}, new int[] {0, margin, 0}));
 
         int margin = 10;
         int[] widths = {0, margin, 0};
@@ -323,6 +317,20 @@ public class FreeColDialog extends FreeColPanel {
             mainPanel.add(getDefaultTextArea(texts[i]), higConst.rc(row, textColumn));
             row += 2;
         }
+
+        // create the OK button early so that the dialog may refer to it
+        final JButton  okButton = new JButton();
+
+        // create the dialog
+        final FreeColDialog  confirmDialog = new FreeColDialog() {
+
+            public void requestFocus() {
+
+                okButton.requestFocus();
+            }
+        };
+        confirmDialog.setLayout(new MigLayout("", "", ""));
+        confirmDialog.add(mainPanel, "wrap 20");
 
         // decide on some mnemonics for the actions
         char  okButtonMnemonic = '\0';
@@ -376,19 +384,11 @@ public class FreeColDialog extends FreeColPanel {
 
         // build the button panel
         JButton cancelButton = new JButton(cancelAction);
-        JPanel buttonPanel = new JPanel( new FlowLayout(FlowLayout.CENTER) );
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-
+        confirmDialog.add(okButton, "split 2, tag ok");
+        confirmDialog.add(cancelButton, "tag cancel");
+        confirmDialog.setCancelComponent(cancelButton);
         enterPressesWhenFocused(okButton);
         enterPressesWhenFocused(cancelButton);
-        
-        // finish building the dialog
-        confirmDialog.add(mainPanel, higConst.rc(1, 1));
-        confirmDialog.add(buttonPanel, higConst.rc(3, 1));
-        confirmDialog.setSize(confirmDialog.getPreferredSize());
-        confirmDialog.setCancelComponent(cancelButton);
 
         return confirmDialog;
     }

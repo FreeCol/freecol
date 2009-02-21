@@ -100,7 +100,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
 
         if (tempImage != null) {
             JLabel logoLabel = new JLabel(new ImageIcon(tempImage));
-            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,2,2), new BevelBorder(BevelBorder.LOWERED)));
+            logoLabel.setBorder(new CompoundBorder(new EmptyBorder(2,2,0,2), new BevelBorder(BevelBorder.LOWERED)));
             add(logoLabel, BorderLayout.CENTER);
         }
 
@@ -112,7 +112,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         buttons.add(optionsButton);
         buttons.add(quitButton);
 
-        buttons.setBorder(new EmptyBorder(5, 25, 20, 25));        
+        buttons.setBorder(new EmptyBorder(25, 25, 25, 25));        
         buttons.setOpaque(false);
 
         add(buttons, BorderLayout.SOUTH);

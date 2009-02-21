@@ -185,8 +185,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         add(multiPlayerNo, "width 60:");
         add(useAdvantages, "wrap 30");
 
-        add(ok, "span, split 2, align center");
-        add(cancel);
+        add(ok, "span, split 2, tag ok");
+        add(cancel, "tag cancel");
 
         ok.setActionCommand(String.valueOf(OK));
         cancel.setActionCommand(String.valueOf(CANCEL));
