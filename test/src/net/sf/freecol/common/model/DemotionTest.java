@@ -131,6 +131,9 @@ public class DemotionTest extends FreeColTestCase {
         Unit dragoon = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
         dragoon.equipWith(muskets, true);
         dragoon.equipWith(horses, true);
+        dragoon.newTurn();
+        assertEquals(12, dragoon.getInitialMovesLeft());
+        assertEquals(12, dragoon.getMovesLeft());
         Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
         soldier.equipWith(muskets, true);
 
@@ -140,6 +143,8 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(tile1, dragoon.getTile());
         assertEquals(1, dragoon.getEquipment().size());
         assertEquals(muskets, dragoon.getEquipment().get(0));
+        assertEquals(3, dragoon.getInitialMovesLeft());
+        assertEquals(3, dragoon.getMovesLeft());
 
         method.invoke(combatModel, dragoon, soldier);
         assertEquals(colonistType, dragoon.getType());
