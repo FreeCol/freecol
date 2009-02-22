@@ -185,7 +185,7 @@ public final class ReportColonyPanel extends ReportPanel {
         
         BuildableType currentType = colony.getCurrentlyBuilding();
         JLabel buildableLabel = new JLabel(currentType.getName());
-        if (currentType == BuildableType.NOTHING) {
+        if (currentType == null) {
             buildableLabel.setForeground(Color.RED);
         } else {
             buildableLabel.setForeground(Color.GRAY);

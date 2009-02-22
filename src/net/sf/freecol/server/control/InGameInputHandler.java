@@ -286,10 +286,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return workImprovement(connection, element);
             }
         });
-        register("setCurrentlyBuilding", new CurrentPlayerNetworkRequestHandler() {
+        register("setBuildQueue", new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return setCurrentlyBuilding(connection, element);
+                return setBuildQueue(connection, element);
             }
         });
         register("changeState", new CurrentPlayerNetworkRequestHandler() {
@@ -2211,24 +2211,26 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles a "setCurrentlyBuilding"-request from a client.
+     * Handles a "setBuildQueue"-request from a client.
      * 
      * @param connection The connection the message came from.
-     * @param setCurrentlyBuildingElement The element containing the request.
+     * @param setBuildQueueElement The element containing the request.
      */
-    private Element setCurrentlyBuilding(Connection connection, Element setCurrentlyBuildingElement) {
+    private Element setBuildQueue(Connection connection, Element setBuildQueueElement) {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Colony colony = (Colony) getGame().getFreeColGameObject(setCurrentlyBuildingElement.getAttribute("colony"));
+        Colony colony = (Colony) getGame().getFreeColGameObject(setBuildQueueElement.getAttribute("colony"));
         if (colony.getOwner() != player) {
             throw new IllegalStateException("Not your colony!");
         }
-        String typeString = setCurrentlyBuildingElement.getAttribute("type");
-        BuildableType type = null;
-        if (typeString.equals("model.buildableType.nothing"))
-            type = BuildableType.NOTHING;
-        else
-            type = (BuildableType) FreeCol.getSpecification().getType(typeString);
-        colony.setCurrentlyBuilding(type);
+        List<BuildableType> buildQueue = new ArrayList<BuildableType>();
+        NodeList children = setBuildQueueElement.getChildNodes();
+        for (int index = 0; index < children.getLength(); index++) {
+            String id = ((Element) children.item(index)).getAttribute("ID");
+            buildQueue.add((BuildableType) Specification.getSpecification().getType(id));
+        }
+
+        colony.setBuildQueue(buildQueue);
+        // TODO: what is the following line for?
         sendUpdatedTileToAll(colony.getTile(), player);
         return null;
     }

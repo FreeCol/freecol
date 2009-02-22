@@ -38,7 +38,6 @@ public class ColonyTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
     	
     	Colony colony = getStandardColony();
-        assertEquals("Colony should no be building nothing",BuildableType.NOTHING,colony.getCurrentlyBuilding());
     	    	
     	colony.setCurrentlyBuilding(warehouseType);
     	assertEquals("Colony should be building a warehouse",warehouseType,colony.getCurrentlyBuilding());
@@ -52,20 +51,18 @@ public class ColonyTest extends FreeColTestCase {
         game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getStandardColony();
-        // Building queue is never empty, always has a last entry = BuildableType.NOTHING
-        assertEquals("Building queue have 1 entry",1,colony.getBuildQueue().size());
                 
         colony.setCurrentlyBuilding(warehouseType);
-        assertEquals("Building queue should have 2 entries",2,colony.getBuildQueue().size());
+        assertEquals("Building queue should have 1 entry", 1, colony.getBuildQueue().size());
         
         colony.setCurrentlyBuilding(warehouseType);
-        assertEquals("Building queue should still have 2 entries",2,colony.getBuildQueue().size());
+        assertEquals("Building queue should still have 1 entry", 1, colony.getBuildQueue().size());
         
         colony.setCurrentlyBuilding(churchType);
-        assertEquals("Building queue should have 3 entries",3,colony.getBuildQueue().size());
+        assertEquals("Building queue should have 2 entries", 2, colony.getBuildQueue().size());
         
         colony.setCurrentlyBuilding(warehouseType);
-        assertEquals("Building queue should still have 3 entries",3,colony.getBuildQueue().size());
+        assertEquals("Building queue should still have 2 entries", 2, colony.getBuildQueue().size());
     }
     
     public void testBuildQueueAcceptsUnitDoubles() {
@@ -73,14 +70,12 @@ public class ColonyTest extends FreeColTestCase {
         game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getStandardColony();
-        // Building queue is never empty, always has a last entry = BuildableType.NOTHING
-        assertEquals("Building queue have 1 entry",1,colony.getBuildQueue().size());
                 
         colony.setCurrentlyBuilding(wagonTrainType);
-        assertEquals("Building queue should have 2 entries",2,colony.getBuildQueue().size());
+        assertEquals("Building queue should have 1 entry", 1, colony.getBuildQueue().size());
                 
         colony.setCurrentlyBuilding(wagonTrainType);
-        assertEquals("Building queue should have 3 entries",3,colony.getBuildQueue().size());
+        assertEquals("Building queue should have 2 entries", 2, colony.getBuildQueue().size());
     }
     
     /**
@@ -102,8 +97,6 @@ public class ColonyTest extends FreeColTestCase {
         colony.checkBuildableComplete();
         assertTrue("Colony should have warehouse",colony.getWarehouse().getType() == warehouseType);
         
-        // Verify that upgrade is next to build
-        assertEquals("Colony should not be building nothing", BuildableType.NOTHING, colony.getCurrentlyBuilding()); 
     }
     
     public void testNoBuildingMaterialsProductionWhenBuildingNothing(){
@@ -122,8 +115,6 @@ public class ColonyTest extends FreeColTestCase {
         
         assertEquals("Wrong initial lumber quantity, ",
                      initialLumber, colony.getGoodsCount(lumberGoodsType));
-        assertEquals("Colony should not be building nothing, ",
-                     BuildableType.NOTHING, colony.getCurrentlyBuilding());
         assertTrue("Colony shoud be able to produce work (hammers)",
                    colony.getProductionOf(hammerGoodsType) > 0);
         assertEquals("Colony shold not have any work production(hammers) initially, ",

@@ -73,8 +73,7 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
                                          this);
         addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
-                    BuildQueuePanel queuePanel = new BuildQueuePanel(parent);
-                    queuePanel.initialize(colony);
+                    BuildQueuePanel queuePanel = new BuildQueuePanel(colony, parent);
                     parent.showSubPanel(queuePanel);
                 }
             });
@@ -91,7 +90,7 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
 
         buildable = colony.getCurrentlyBuilding();
 
-        if (buildable != BuildableType.NOTHING) {
+        if (buildable != null) {
             JLabel turnsLabel = new JLabel(Messages.message("notApplicable.short"));
             turnsLabel.setBackground(Color.WHITE);
             turnsLabel.setOpaque(true);
@@ -117,7 +116,7 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
 
  
         Image bgImage = ResourceManager.getImage("model.building.BuildingSite.image");
-        if (buildable != BuildableType.NOTHING) {
+        if (buildable != null) {
             bgImage = ResourceManager.getImage(buildable.getId() + ".image");
         }
  

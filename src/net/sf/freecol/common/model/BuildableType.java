@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
@@ -34,11 +35,11 @@ import net.sf.freecol.common.util.Utils;
 /**
  * Contains information on buildable types.
  */
-public class BuildableType extends FreeColGameObjectType {
+public abstract class BuildableType extends FreeColGameObjectType {
 
     public static final int UNDEFINED = Integer.MIN_VALUE;
 
-    public static final BuildableType NOTHING = new BuildableType("model.buildableType.nothing");
+    public static final String NOTHING = "model.buildableType.nothing";
     
     /**
      * The minimum population that a Colony needs in order to build
@@ -54,15 +55,6 @@ public class BuildableType extends FreeColGameObjectType {
      * Stores the abilities required by this Type.
      */
     private final HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
-    
-    public BuildableType() {
-        // empty constructor, class is abstract except for BuildableType.NOTHING
-    }
-
-    private BuildableType(String id) {
-        setId(id);
-    }
-
     public String getGoodsRequiredAsString() {
         if (goodsRequired == null || goodsRequired.isEmpty()) {
             return "";
@@ -134,14 +126,17 @@ public class BuildableType extends FreeColGameObjectType {
         return requiredAbilities;
     }
 
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        // the class is basically abstract, except for BuildableType.NOTHING
-    }
-
     protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
         super.readFromXML(in, specification);
-
     }
+
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+            throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
+        out.writeAttribute("ID", getId());
+        out.writeEndElement();
+    }
+
 
     protected FreeColObject readChild(XMLStreamReader in, Specification specification)
         throws XMLStreamException {

@@ -66,7 +66,7 @@ public class BuildingSiteToolTip extends JToolTip {
                                         "%buildable%", buildable.getName())),
             "span, align center");
 
-        if (buildable == BuildableType.NOTHING) {
+        if (buildable == null) {
             add(FreeColPanel.getDefaultTextArea(Messages.message("colonyPanel.clickToBuild")),
                 "span, align center");
         } else {

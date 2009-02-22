@@ -176,7 +176,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 addBuilding(new Building(getGame(), this, buildingType));
             }
         }
-        setCurrentlyBuilding(BuildableType.NOTHING);
     }
 
     /**
@@ -779,7 +778,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return The type of building currently being built.
      */
     public BuildableType getCurrentlyBuilding() {
-        return buildQueue.get(0);
+        if (buildQueue.isEmpty()) {
+            return null;
+        } else {
+            return buildQueue.get(0);
+        }
     }
 
     /**
@@ -798,15 +801,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         buildQueue.add(0, buildable);
         firePropertyChange(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
                            oldBuildQueue, buildQueue);
-    }
-
-    /**
-     * Sets the type of building to None, so no building is done.
-     */
-    public void stopBuilding() {
-        if (getCurrentlyBuilding() != BuildableType.NOTHING) {
-            setCurrentlyBuilding(BuildableType.NOTHING);
-        }
     }
 
     /**
@@ -1163,7 +1157,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (goodsType.isStorable()) {
             BuildableType currentBuildable = getCurrentlyBuilding();
             if (currentBuildable != null &&
-                currentBuildable != BuildableType.NOTHING &&
                 currentBuildable.getGoodsRequired().isEmpty() == false) {
                 boolean willBeFinished = true;
                 int possiblyUsed = 0;
@@ -1223,7 +1216,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return a <code>boolean</code> value
      */
     public boolean canBuild(BuildableType buildableType) {
-        if (buildableType == null || buildableType == BuildableType.NOTHING) {
+        if (buildableType == null) {
             return false;
         } else if (buildableType.getGoodsRequired().isEmpty()) {
             return false;
@@ -1362,15 +1355,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     "%building%", buildable.getName());
             buildQueue.remove(0);
             
-            // sanitation
+            // warn player that no build queue is empty
             if (buildQueue.isEmpty()) {
-                buildQueue.add(BuildableType.NOTHING);
-            }
-            // warn player that no suitable replacement was found
-            if (buildQueue.size()==1 && buildQueue.get(0)==BuildableType.NOTHING) {
                 addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
-                        "model.colony.cannotBuild", 
-                        "%colony%", getName());
+                                "model.colony.cannotBuild", 
+                                "%colony%", getName());
             }
         }
     }
@@ -1458,7 +1447,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         }
 
         BuildableType currentlyBuilding = getCurrentlyBuilding();
-        if (currentlyBuilding != BuildingType.NOTHING) {
+        if (currentlyBuilding != null) {
             for (AbstractGoods goods : currentlyBuilding.getGoodsRequired()) {
                 if (goods.getType().equals(goodsType) && amount < goods.getAmount()) {
                     result.add(Messages.message("model.colony.buildableNeedsGoods",
@@ -1797,7 +1786,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         } else {
             // something is preventing construction
             BuildableType currentlyBuilding = getCurrentlyBuilding();
-            if ((currentlyBuilding == null || currentlyBuilding == BuildableType.NOTHING)) {
+            if ((currentlyBuilding == null)) {
                 for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
                     if (goodsType.isBuildingMaterial() &&
                         !goodsType.isStorable() &&
@@ -1974,9 +1963,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             out.writeAttribute("liberty", Integer.toString(liberty));
             out.writeAttribute("immigration", Integer.toString(immigration));
             out.writeAttribute("productionBonus", Integer.toString(productionBonus));
-            if (!BuildableType.NOTHING.equals(getCurrentlyBuilding())) {
-                out.writeAttribute("currentlyBuilding", getCurrentlyBuilding().getId());
-            }
             out.writeAttribute("landLocked", Boolean.toString(landLocked));
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
@@ -1994,6 +1980,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             for (WorkLocation workLocation : getWorkLocations()) {
                 ((FreeColGameObject) workLocation).toXML(out, player, showAll, toSavedGame);
             }
+            toListElement("buildQueue", buildQueue, out);
         } else {
             out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
             if (getStockade() != null) {
@@ -2024,8 +2011,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         liberty = getAttribute(in, "liberty", 0);
         immigration = getAttribute(in, "immigration", 0);
         productionBonus = getAttribute(in, "productionBonus", 0);
-        setCurrentlyBuilding(FreeCol.getSpecification().getType(in, "currentlyBuilding", BuildableType.class, 
-                                                                BuildableType.NOTHING));
         landLocked = getAttribute(in, "landLocked", true);
         if (!landLocked) {
             featureContainer.addAbility(HAS_PORT);
@@ -2084,6 +2069,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     // found no matching modifier
                     featureContainer.addModifier(modifier);
                 }
+            } else if ("buildQueue".equals(in.getLocalName())) {
+                buildQueue = readFromListElement("buildQueue", in, BuildableType.class);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
                 in.nextTag();

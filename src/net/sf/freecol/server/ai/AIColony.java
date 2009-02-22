@@ -448,7 +448,7 @@ public class AIColony extends AIObject {
         final boolean needsPioneer = (TileImprovementPlans.size() > 0 || unequippedHardyPioneer != null
                 && PioneeringMission.isValid(unequippedHardyPioneer));
         int toolsRequiredForBuilding = 0;
-        if (colony.getCurrentlyBuilding() != BuildableType.NOTHING) {
+        if (colony.getCurrentlyBuilding() != null) {
             toolsRequiredForBuilding = getToolsRequired(colony.getCurrentlyBuilding());
         }
         if (colony.getProductionNetOf(Goods.TOOLS) == 0 && (colony.getGoodsCount(Goods.TOOLS) < 20 && needsPioneer)
@@ -795,7 +795,7 @@ public class AIColony extends AIObject {
      */
     public int getAvailableGoods(GoodsType goodsType) {
         int materialsRequiredForBuilding = 0;
-        if (colony.getCurrentlyBuilding() != BuildableType.NOTHING) {
+        if (colony.getCurrentlyBuilding() != null) {
             for (AbstractGoods materials : colony.getCurrentlyBuilding().getGoodsRequired()) {
                 if (materials.getType() == goodsType) {
                     materialsRequiredForBuilding = materials.getAmount();
@@ -1215,7 +1215,7 @@ public class AIColony extends AIObject {
         // temporarily move units from carpenter to blacksmith if the current building needs no lumber but more tools
         // TODO: mine ore if needed
         BuildableType nowbuilding = colony.getCurrentlyBuilding();
-        if (nowbuilding != BuildableType.NOTHING &&
+        if (nowbuilding != null &&
             getHammersRequired(nowbuilding) <= colony.getGoodsCount(Goods.HAMMERS) &&
             getToolsRequired(nowbuilding) > colony.getGoodsCount(Goods.TOOLS)) {
             Building carpenter = colony.getBuildingForProducing(Goods.HAMMERS);

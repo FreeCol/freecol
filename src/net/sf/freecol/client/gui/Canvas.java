@@ -1760,13 +1760,6 @@ public final class Canvas extends JDesktopPane {
         colonyPanel.requestFocus();
     }
 
-    public void showBuildQueuePanel(Colony colony) {
-        BuildQueuePanel buildQueuePanel = new BuildQueuePanel(this);
-        buildQueuePanel.initialize(colony);
-        addAsFrame(buildQueuePanel);
-        buildQueuePanel.requestFocus();
-    }
-
     /**
      * Displays the indian settlement panel of the given
      * <code>IndianSettlement</code>.

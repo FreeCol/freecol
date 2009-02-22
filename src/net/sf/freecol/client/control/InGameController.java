@@ -2922,9 +2922,8 @@ public final class InGameController implements NetworkConstants {
      * Changes the current construction project of a <code>Colony</code>.
      * 
      * @param colony The <code>Colony</code>
-     * @param type The new type of building to build.
      */
-    public void setCurrentlyBuilding(Colony colony, BuildableType type) {
+    public void setBuildQueue(Colony colony, List<BuildableType> buildQueue) {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
@@ -2932,13 +2931,14 @@ public final class InGameController implements NetworkConstants {
 
         Client client = freeColClient.getClient();
 
-        colony.setCurrentlyBuilding(type);
+        colony.setBuildQueue(buildQueue);
 
-        Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
-        setCurrentlyBuildingElement.setAttribute("colony", colony.getId());
-        setCurrentlyBuildingElement.setAttribute("type", type.getId());
-
-        client.sendAndWait(setCurrentlyBuildingElement);
+        Element setBuildQueueElement = Message.createNewRootElement("setBuildQueue");
+        setBuildQueueElement.setAttribute("colony", colony.getId());
+        for (BuildableType buildableType : buildQueue) {
+            setBuildQueueElement.appendChild(buildableType.toXMLElement(null, setBuildQueueElement.getOwnerDocument()));
+        }
+        client.sendAndWait(setBuildQueueElement);
     }
 
     /**
