@@ -458,19 +458,29 @@ public class ColonialAIPlayer extends AIPlayer {
         }
 
         boolean accept = false;
-        if (stance == Stance.PEACE) {
-            if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace") &&
-                value >= 0) {
+        switch (stance) {
+        case UNCONTACTED:
+            accept = false;
+            break;
+        case WAR: // always accept war without cost
+            accept = value >= 0;
+            break;
+        case CEASE_FIRE:
+            accept = value >= 500;
+            break;
+        case PEACE:
+            if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace")
+                && value >= 0) {
                 // TODO: introduce some kind of counter in order to avoid
                 // Benjamin Franklin exploit
                 accept = true;
             } else if (value >= 1000) {
                 accept = true;
             }
-        } else if (getPlayer().getStance(agreement.getSender()).compareTo(Stance.PEACE) >= 0) {
-            if (value > 100) {
-                accept = true;
-            }
+            break;
+        case ALLIANCE:
+            accept = value >= 2000;
+            break;
         }
 
         logger.info("Trade value is " + value + ", accept is " + accept);
