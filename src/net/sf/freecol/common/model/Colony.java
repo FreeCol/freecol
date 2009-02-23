@@ -547,7 +547,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param goods a <code>Goods</code> value
      */
     public void removeGoods(AbstractGoods goods) {
-        removeGoods(goods.getType());
+        removeGoods(goods.getType(), goods.getAmount());
     }
 
     /**
