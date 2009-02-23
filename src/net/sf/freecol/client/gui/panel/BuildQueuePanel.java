@@ -77,7 +77,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
 
     public BuildQueuePanel(Colony colony, Canvas parent) {
 
-        super(parent, new MigLayout("wrap 3", "[260:][260:][260:]", "[][][400:][]"));
+        super(parent, new MigLayout("wrap 3", "[260:][260:][260:]", "[][][300:400:][]"));
         this.colony = colony;
 
         DefaultListModel current = new DefaultListModel();
@@ -268,6 +268,12 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
                 if (transferData instanceof List) {
                     for (Object object : (List) transferData) {
                         if (object instanceof BuildableType) {
+                            if ((object instanceof BuildingType
+                                 && target == unitList)
+                                || (object instanceof UnitType
+                                    && target == buildingList)) {
+                                return false;
+                            }
                             buildQueue.add((BuildableType) object);
                         }
                     }
