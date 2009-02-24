@@ -2070,13 +2070,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     featureContainer.addModifier(modifier);
                 }
             } else if ("buildQueue".equals(in.getLocalName())) {
-                System.out.println("found build Queue for colony " + getName());
                 buildQueue.clear();
                 int size = getAttribute(in, ARRAY_SIZE, 0);
                 if (size > 0) {
                     for (int x = 0; x < size; x++) {
                         String typeId = in.getAttributeValue(null, "x" + Integer.toString(x));
-                        System.out.println(typeId);
                         buildQueue.add((BuildableType) Specification.getSpecification().getType(typeId));
                     }
                 }
