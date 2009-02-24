@@ -2929,16 +2929,15 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Client client = freeColClient.getClient();
-
         colony.setBuildQueue(buildQueue);
 
         Element setBuildQueueElement = Message.createNewRootElement("setBuildQueue");
         setBuildQueueElement.setAttribute("colony", colony.getId());
-        for (BuildableType buildableType : buildQueue) {
-            setBuildQueueElement.appendChild(buildableType.toXMLElement(null, setBuildQueueElement.getOwnerDocument()));
+        setBuildQueueElement.setAttribute("size", Integer.toString(buildQueue.size()));
+        for (int x = 0; x < buildQueue.size(); x++) {
+            setBuildQueueElement.setAttribute("x" + Integer.toString(x), buildQueue.get(x).getId());
         }
-        client.sendAndWait(setBuildQueueElement);
+        freeColClient.getClient().sendAndWait(setBuildQueueElement);
     }
 
     /**

@@ -2223,10 +2223,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException("Not your colony!");
         }
         List<BuildableType> buildQueue = new ArrayList<BuildableType>();
-        NodeList children = setBuildQueueElement.getChildNodes();
-        for (int index = 0; index < children.getLength(); index++) {
-            String id = ((Element) children.item(index)).getAttribute("ID");
-            buildQueue.add((BuildableType) Specification.getSpecification().getType(id));
+        int size = Integer.parseInt(setBuildQueueElement.getAttribute("size"));
+        for (int x = 0; x < size; x++) {
+            String typeId = setBuildQueueElement.getAttribute("x" + Integer.toString(x));
+            buildQueue.add((BuildableType) Specification.getSpecification().getType(typeId));
         }
 
         colony.setBuildQueue(buildQueue);

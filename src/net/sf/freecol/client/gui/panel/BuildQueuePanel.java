@@ -46,6 +46,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -218,12 +219,13 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
+        InGameController controller = getCanvas().getClient().getInGameController();
         if (OK.equals(command)) {
-            colony.setBuildQueue(getBuildableTypes(buildQueueList));
+            controller.setBuildQueue(colony, getBuildableTypes(buildQueueList));
             getCanvas().remove(this);
         } else if (BUY.equals(command)) {
-            colony.setBuildQueue(getBuildableTypes(buildQueueList));
-            getCanvas().getClient().getInGameController().payForBuilding(colony);
+            controller.setBuildQueue(colony, getBuildableTypes(buildQueueList));
+            controller.payForBuilding(colony);
             getCanvas().updateGoldLabel();
         } else {
             logger.warning("Invalid ActionCommand: " + command);

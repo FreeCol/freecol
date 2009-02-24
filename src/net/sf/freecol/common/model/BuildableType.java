@@ -130,14 +130,6 @@ public abstract class BuildableType extends FreeColGameObjectType {
         super.readFromXML(in, specification);
     }
 
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-        out.writeStartElement(getXMLElementTagName());
-        out.writeAttribute("ID", getId());
-        out.writeEndElement();
-    }
-
-
     protected FreeColObject readChild(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         String childName = in.getLocalName();
