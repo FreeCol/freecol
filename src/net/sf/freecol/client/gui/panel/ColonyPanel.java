@@ -141,8 +141,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private final ColonyCargoPanel cargoPanel;
 
-    //private final TitledBorder cargoBorder;
-
     private final WarehousePanel warehousePanel;
 
     private final TilePanel tilePanel;
@@ -157,7 +155,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private Colony colony;
 
-    private Game game;
+    //private Game game;
 
     private UnitLabel selectedUnit;
 
@@ -250,7 +248,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         nameBox = new JComboBox();
         nameBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                initialize((Colony) nameBox.getSelectedItem(), getGame());
+                initialize((Colony) nameBox.getSelectedItem());
             }
         });
         nameBox.setFont(smallHeaderFont);
@@ -265,27 +263,20 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         inPortScroll.setBorder(BorderFactory.createEtchedBorder());
         outsideColonyScroll.setBorder(BorderFactory.createEtchedBorder());
 
-        // manual border corrections
-        Border correctBorder = BorderFactory.createEmptyBorder(0, BORDER_CORRECT, 0, BORDER_CORRECT);
-        //productionPanel.setBorder(correctBorder);
-        //solLabel.setBorder(correctBorder);
-        unloadButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, unloadButton.getBorder()));
-        fillButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, fillButton.getBorder()));
-        exitButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, exitButton.getBorder()));
-        warehouseButton.setBorder(BorderFactory.createCompoundBorder(correctBorder, warehouseButton.getBorder()));
         exitButton.setActionCommand(String.valueOf(EXIT));
-        unloadButton.setActionCommand(String.valueOf(UNLOAD));
-        fillButton.setActionCommand(String.valueOf(FILL));
-        warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
-        
         enterPressesWhenFocused(exitButton);
-        enterPressesWhenFocused(unloadButton);
-        enterPressesWhenFocused(fillButton);
-        enterPressesWhenFocused(warehouseButton);
-
         exitButton.addActionListener(this);
+
+        unloadButton.setActionCommand(String.valueOf(UNLOAD));
+        enterPressesWhenFocused(unloadButton);
         unloadButton.addActionListener(this);
+
+        fillButton.setActionCommand(String.valueOf(FILL));
+        enterPressesWhenFocused(fillButton);
         fillButton.addActionListener(this);
+        
+        warehouseButton.setActionCommand(String.valueOf(WAREHOUSE));
+        enterPressesWhenFocused(warehouseButton);
         warehouseButton.addActionListener(this);
 
         selectedUnit = null;
@@ -317,15 +308,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     }
 
-    /**
-     * Get the parent canvas, added for inner classes.
-     * 
-     * @return parent canvas.
-     */
-    private Canvas getParentCanvas() {
-        return this.parent;
-    }
-
     @Override
     public void requestFocus() {
         exitButton.requestFocus();
@@ -346,23 +328,20 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * @param game The <code>Game</code> in which the given
      *            <code>Colony</code> is a part of.
      */
-    public void initialize(Colony colony, Game game) {
-        initialize(colony, game, null);
+    public void initialize(Colony colony) {
+        initialize(colony, null);
     }
 
     /**
      * Initialize the data on the window.
      * 
      * @param colony The <code>Colony</code> to be displayed.
-     * @param game The <code>Game</code> in which the given
-     *            <code>Colony</code> is a part of.
      * @param preSelectedUnit This <code>Unit</code> will be selected if it is
      *            not <code>null</code> and it is a carrier located in the
      *            given <code>Colony</code>.
      */
-    public void initialize(final Colony colony, Game game, Unit preSelectedUnit) {
+    public void initialize(final Colony colony, Unit preSelectedUnit) {
         setColony(colony);
-        this.game = game;
 
         rebelLabel.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getId()
                                                                   + ".coat-of-arms.image", 0.5)));
@@ -482,9 +461,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     public void reinitialize() {
         if (selectedUnit != null) {
-            initialize(getColony(), game, selectedUnit.getUnit());
+            initialize(getColony(), selectedUnit.getUnit());
         } else {
-            initialize(getColony(), game, null);
+            initialize(getColony(), null);
         }
     }
 
@@ -668,8 +647,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         final int remainingFish = foodFishProduction  - usedFish;
 
         int surplusFood = foodProduction - humanFoodConsumption - horsesProduced;
-        remainingCorn = Math.min(surplusFood, remainingCorn);		//(surplusFood < 0) ? surplusFood : remainingCorn;
-        ProductionMultiplesLabel surplusLabel = new ProductionMultiplesLabel(Goods.FOOD, remainingCorn, Goods.FISH, remainingFish, parent);
+        remainingCorn = Math.min(surplusFood, remainingCorn);
+        ProductionMultiplesLabel surplusLabel =
+            new ProductionMultiplesLabel(Goods.FOOD, remainingCorn, Goods.FISH, remainingFish, parent);
         surplusLabel.setDrawPlus(true);
         surplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
         productionPanel.add(surplusLabel);
@@ -934,15 +914,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     		this.colony.addPropertyChangeListener(Colony.ColonyChangeEvent.BONUS_CHANGE.toString(), this);
     	}
         editable = colony.getOwner() == freeColClient.getMyPlayer();
-    }
-
-    /**
-     * Returns the current <code>Game</code>.
-     * 
-     * @return The current <code>Game</code>.
-     */
-    public final Game getGame() {
-        return game;
     }
 
     /*
@@ -1318,19 +1289,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             return c;
         }
 
-        /* This is never called, since we never remove
-           GoodsLabels from the WarehousePanel!
-        @Override
-        public void remove(Component comp) {
-            if (comp instanceof GoodsLabel) {
-                super.remove(comp);
-                revalidate();
-                colonyPanel.getCargoPanel().revalidate();
-                updateProductionPanel();
-            }
-        }
-        */
-
         public void initialize() {
             removeAll();
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
@@ -1365,7 +1323,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         public TilePanel(ColonyPanel colonyPanel) {
             this.colonyPanel = colonyPanel;
             setBackground(Color.BLACK);
-            // setOpaque(false);
             setBorder(null);
             setLayout(null);
         }
@@ -1389,6 +1346,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         public void paintComponent(Graphics g) {
             GUI colonyTileGUI = parent.getColonyTileGUI();
             ImageLibrary lib = colonyTileGUI.getImageLibrary();
+            Game game = colony.getGame();
 
             g.setColor(Color.black);
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -1415,7 +1373,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * itself is not visible, however the content of the component is (i.e.
          * the people working and the production)
          */
-        public final class ASingleTilePanel extends JPanel {
+        public final class ASingleTilePanel extends JPanel implements PropertyChangeListener {
 
             private ColonyTile colonyTile;
 
@@ -1424,21 +1382,32 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
                 this.colonyTile = colonyTile;
 
+                colonyTile.addPropertyChangeListener(this);
+
                 setOpaque(false);
+                TileType tileType = colonyTile.getTile().getType();
+                // Size and position:
+                ImageLibrary lib = parent.getColonyTileGUI().getImageLibrary();
+                setSize(lib.getTerrainImageWidth(tileType), lib.getTerrainImageHeight(tileType));
+                setLocation(((2 - x) + y) * lib.getTerrainImageWidth(tileType) / 2,
+                            (x + y) * lib.getTerrainImageHeight(tileType) / 2);
+                initialize();
+            }
+                
+            private void initialize() {
 
-                updateDescriptionLabel();
-
+                UnitLabel unitLabel = null;
                 if (colonyTile.getUnit() != null) {
                     Unit unit = colonyTile.getUnit();
-                    UnitLabel unitLabel = new UnitLabel(unit, parent);
+                    unitLabel = new UnitLabel(unit, parent);
                     if (colonyPanel.isEditable()) {
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
                     }
                     add(unitLabel);
 
-                    updateDescriptionLabel(unitLabel, true);
                 }
+                updateDescriptionLabel(unitLabel, true);
 
                 ImageLibrary lib = parent.getColonyTileGUI().getImageLibrary();
 
@@ -1451,11 +1420,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     addMouseListener(releaseListener);
                 }
 
-                TileType tileType = colonyTile.getTile().getType();
-                // Size and position:
-                setSize(lib.getTerrainImageWidth(tileType), lib.getTerrainImageHeight(tileType));
-                setLocation(((2 - x) + y) * lib.getTerrainImageWidth(tileType) / 2,
-                            (x + y) * lib.getTerrainImageHeight(tileType) / 2);
+                revalidate();
+                repaint();
             }
 
             /**
@@ -1619,6 +1585,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     updateDescriptionLabel((UnitLabel) comp, false);
                 }
                 super.remove(comp);
+            }
+
+    
+            public void propertyChange(PropertyChangeEvent event){
+                System.out.println("firing initialize");
+                initialize();
             }
 
             /**

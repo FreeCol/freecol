@@ -93,7 +93,7 @@
             deprecation="off"
             source="${java.target.version}"
             target="${java.target.version}">
-          <!-- <compilerarg value="-Xlint"/> -->
+          <compilerarg value="-Xlint:unchecked"/>
           <compilerarg value="-g"/>
         </javac>
     </target>

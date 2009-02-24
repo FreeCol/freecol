@@ -1755,7 +1755,7 @@ public final class Canvas extends JDesktopPane {
     public void showColonyPanel(Colony colony) {
         freeColClient.getGUI().stopBlinking();
         ColonyPanel colonyPanel = new ColonyPanel(this, freeColClient);
-        colonyPanel.initialize(colony, freeColClient.getGame());
+        colonyPanel.initialize(colony);
         addAsFrame(colonyPanel);
         colonyPanel.requestFocus();
     }

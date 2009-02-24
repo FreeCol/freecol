@@ -297,6 +297,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             throw new IllegalArgumentException("Cannot add locatable to this location: there is a unit here already!");
         }
 
+        Unit oldUnit = getUnit();
         Unit u = (Unit) locatable;
 
         getWorkTile().takeOwnership(u.getOwner(), getColony());
@@ -310,6 +311,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         } else {
             getWorkTile().setOwningSettlement(null);
         }
+        firePropertyChange("unit", oldUnit, u);
     }
     
 
@@ -326,9 +328,11 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return;
         }
 
-        getUnit().setMovesLeft(0);
+        Unit oldUnit = getUnit();
+        oldUnit.setMovesLeft(0);
         getWorkTile().setOwningSettlement(null);
         setUnit(null);
+        firePropertyChange("unit", oldUnit, null);
     }
 
     public List<Unit> getUnitList() {
