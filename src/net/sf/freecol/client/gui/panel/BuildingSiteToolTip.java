@@ -62,19 +62,19 @@ public class BuildingSiteToolTip extends JToolTip {
         setLayout(new MigLayout("fill", "", ""));
 
         BuildableType buildable = colony.getCurrentlyBuilding();
-        add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
-                                        "%buildable%", buildable.getName())),
-            "span, align center");
-
         if (buildable == null) {
             add(FreeColPanel.getDefaultTextArea(Messages.message("colonyPanel.clickToBuild")),
                 "span, align center");
         } else {
             int turnsToComplete = colony.getTurnsToComplete(buildable);
             String turns = Messages.message("notApplicable.short");
-            if (turnsToComplete > 0) {
+            if (turnsToComplete >= 0) {
                 turns = Integer.toString(turnsToComplete);
             }
+            add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
+                                            "%buildable%", buildable.getName())),
+                "span, align center");
+
             add(new JLabel(Messages.message("turnsToComplete.long",
                                             "%number%", turns)),
                 "span, align center");
