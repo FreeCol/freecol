@@ -45,7 +45,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * Dialog for setting some options when loading a game.
  */
-public final class LoadingSavegameDialog extends FreeColDialog implements ActionListener {
+public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implements ActionListener {
     private static final Logger logger = Logger.getLogger(LoadingSavegameDialog.class.getName());
 
 
@@ -195,11 +195,11 @@ public final class LoadingSavegameDialog extends FreeColDialog implements Action
             switch (Integer.valueOf(command).intValue()) {
             case OK:
                 parent.remove(this);
-                setResponse(new Boolean(true));
+                setResponse(Boolean.TRUE);
                 break;
             case CANCEL:
                 parent.remove(this);
-                setResponse(new Boolean(false));
+                setResponse(Boolean.FALSE);
                 break;
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");

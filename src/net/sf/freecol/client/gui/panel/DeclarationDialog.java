@@ -46,7 +46,7 @@ import net.sf.freecol.common.util.Utils;
 /**
  * This panel displays the signing of the Declaration of Independence.
  */
-public final class DeclarationDialog extends FreeColDialog {
+public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
 
 

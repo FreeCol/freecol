@@ -36,7 +36,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 import cz.autel.dmi.HIGLayout;
 
-public class InformationDialog extends FreeColDialog {
+public class InformationDialog extends FreeColDialog<Boolean> {
 
     public static final int leftMargin = 10;
     public static final int rightMargin = 10;
@@ -99,7 +99,7 @@ public class InformationDialog extends FreeColDialog {
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                setResponse(null);
+                setResponse(Boolean.FALSE);
             }
         });
 

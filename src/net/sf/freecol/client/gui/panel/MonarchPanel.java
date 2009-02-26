@@ -38,7 +38,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel is used to show information about a tile.
  */
-public final class MonarchPanel extends FreeColDialog implements ActionListener {
+public final class MonarchPanel extends FreeColDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(MonarchPanel.class.getName());
 

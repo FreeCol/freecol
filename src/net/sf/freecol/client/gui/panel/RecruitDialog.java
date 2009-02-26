@@ -41,7 +41,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * The panel that allows a user to recruit people in Europe.
  */
-public final class RecruitDialog extends FreeColDialog implements ActionListener {
+public final class RecruitDialog extends FreeColDialog<Integer> implements ActionListener {
 
     private static Logger logger = Logger.getLogger(RecruitDialog.class.getName());
 

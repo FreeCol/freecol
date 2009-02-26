@@ -43,7 +43,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * {@link FreeColClient#isMapEditor() map editor mode}.
  * 
  */
-public final class RiverStylePanel extends FreeColDialog implements ActionListener {
+public final class RiverStylePanel extends FreeColDialog<Integer> implements ActionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStylePanel.class.getName());

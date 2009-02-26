@@ -37,7 +37,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel is displayed when an imporantant event in the game has happened.
  */
-public final class EventPanel extends FreeColDialog implements ActionListener {
+public final class EventPanel extends FreeColDialog<Boolean> implements ActionListener {
 
 
 
@@ -129,7 +129,7 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
             imageLabel.setIcon(new ImageIcon(image));
             header.setText(Messages.message("model.region.pacific.discover"));
         } else {
-            setResponse(new Boolean(false));
+            setResponse(Boolean.FALSE);
         }
         setSize(getPreferredSize());
     }
@@ -145,7 +145,7 @@ public final class EventPanel extends FreeColDialog implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                setResponse(new Boolean(true));
+                setResponse(Boolean.TRUE);
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

@@ -41,7 +41,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel is used to show information about an Indian settlement.
  */
-public final class IndianSettlementPanel extends FreeColDialog implements ActionListener {
+public final class IndianSettlementPanel extends FreeColDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(IndianSettlementPanel.class.getName());
 
@@ -159,7 +159,7 @@ public final class IndianSettlementPanel extends FreeColDialog implements Action
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                setResponse(new Boolean(true));
+                setResponse(Boolean.TRUE);
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

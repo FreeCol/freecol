@@ -37,7 +37,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * The panel that allows a user to choose which unit will emigrate from Europe.
  */
-public final class EmigrationPanel extends FreeColDialog implements ActionListener {
+public final class EmigrationPanel extends FreeColDialog<Integer> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(EmigrationPanel.class.getName());
 

@@ -1508,9 +1508,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         if (price > 0) {
                             Player player = colonyTile.getWorkTile().getOwner();
                             ChoiceItem[] choices = {
-                                    new ChoiceItem(Messages.message("indianLand.pay").replaceAll("%amount%",
-                                            Integer.toString(price)), 1),
-                                    new ChoiceItem(Messages.message("indianLand.take"), 2) };
+                                new ChoiceItem<Integer>(Messages.message("indianLand.pay").replaceAll("%amount%", Integer.toString(price)), 1),
+                                new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2)
+                            };
                             ChoiceItem ci = (ChoiceItem) parent.
                                 showChoiceDialog(Messages.message("indianLand.text",
                                                                   "%player%", player.getNationAsString()),

@@ -45,7 +45,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * Asks the user if he's sure he wants to quit.
  */
-public final class WarehouseDialog extends FreeColDialog implements ActionListener {
+public final class WarehouseDialog extends FreeColDialog<Boolean> implements ActionListener {
     private static final Logger logger = Logger.getLogger(WarehouseDialog.class.getName());
 
 

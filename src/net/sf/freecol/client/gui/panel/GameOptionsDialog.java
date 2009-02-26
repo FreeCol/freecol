@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.GameOptions;
 /**
  * Dialog for changing the {@link net.sf.freecol.common.model.GameOptions}.
  */
-public final class GameOptionsDialog extends FreeColDialog implements ActionListener {
+public final class GameOptionsDialog extends FreeColDialog<Boolean> implements ActionListener {
     private static final Logger logger = Logger.getLogger(GameOptionsDialog.class.getName());
 
 
@@ -180,13 +180,13 @@ public final class GameOptionsDialog extends FreeColDialog implements ActionList
                 ui.updateOption();
                 freeColClient.getPreGameController().sendGameOptions();
                 parent.remove(this);
-                setResponse(new Boolean(true));
+                setResponse(Boolean.TRUE);
                 break;
             case CANCEL:
                 ui.rollback();
                 ui.unregister();
                 parent.remove(this);
-                setResponse(new Boolean(false));
+                setResponse(Boolean.FALSE);
                 break;
             case SAVE:
                 FileFilter[] filters = new FileFilter[] { FreeColDialog.getFGOFileFilter(),

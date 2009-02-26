@@ -45,7 +45,7 @@ import net.sf.freecol.client.gui.option.OptionMapUI;
 /**
 * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
 */
-public final class ClientOptionsDialog extends FreeColDialog implements ActionListener {
+public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements ActionListener {
     private static final Logger logger = Logger.getLogger(ClientOptionsDialog.class.getName());
 
 
@@ -153,7 +153,7 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
                     if (freeColClient.getCanvas().getJMenuBar() != null) {
                         freeColClient.getCanvas().resetFreeColMenuBar();
                     }
-                    setResponse(new Boolean(true));
+                    setResponse(Boolean.TRUE);
                     
                     // Immediately redraw the minimap if that was updated.
                     MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.id);
@@ -165,7 +165,7 @@ public final class ClientOptionsDialog extends FreeColDialog implements ActionLi
                     ui.rollback();
                     ui.unregister();
                     parent.remove(this);
-                    setResponse(new Boolean(false));
+                    setResponse(Boolean.FALSE);
                     break;
                 case RESET:
                     ui.reset();

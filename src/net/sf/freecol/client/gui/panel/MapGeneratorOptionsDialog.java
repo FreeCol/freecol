@@ -50,7 +50,7 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
  * Dialog for changing the
  * {@link net.sf.freecol.server.generator.MapGeneratorOptions}.
  */
-public final class MapGeneratorOptionsDialog extends FreeColDialog implements ActionListener {
+public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(MapGeneratorOptionsDialog.class.getName());
 

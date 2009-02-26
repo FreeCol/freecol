@@ -245,7 +245,7 @@ public class DebugMenu extends JMenu {
                     List<ChoiceItem> fathers = new ArrayList<ChoiceItem>();
                     for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
                         if (!player.hasFather(father)) {
-                            fathers.add(new ChoiceItem(father.getName(), father));
+                            fathers.add(new ChoiceItem<FoundingFather>(father.getName(), father));
                         }
                     }
                     ChoiceItem[] choices = fathers.toArray(new ChoiceItem[fathers.size()]);

@@ -33,7 +33,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 /**
  * This is the panel that pops up when an error needs to be reported.
  */
-public final class ErrorPanel extends FreeColDialog implements ActionListener {
+public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionListener {
 
 
 
@@ -155,7 +155,7 @@ public final class ErrorPanel extends FreeColDialog implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
                 // parent.closeErrorPanel();
-                setResponse(new Boolean(true));
+                setResponse(Boolean.TRUE);
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

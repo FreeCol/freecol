@@ -42,7 +42,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * Allows the user to edit trade routes.
  */
-public final class TradeRouteDialog extends FreeColDialog implements ActionListener {
+public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(TradeRouteDialog.class.getName());
     
@@ -212,7 +212,7 @@ public final class TradeRouteDialog extends FreeColDialog implements ActionListe
                     routes.add((TradeRoute) listModel.getElementAt(index));
                 }
                 getCanvas().getClient().getInGameController().setTradeRoutes(routes);
-                setResponse(tradeRoutes.getSelectedValue());
+                setResponse((TradeRoute) tradeRoutes.getSelectedValue());
                 break;
             case CANCEL:
                 getCanvas().remove(this);

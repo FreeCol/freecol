@@ -26,6 +26,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
@@ -46,7 +47,7 @@ import net.sf.freecol.common.model.Unit;
  *
  * @see SimpleCombatModel#attack(Unit, Unit, CombatModel#CombatResult, int)
  */
-public final class CaptureGoodsDialog extends FreeColDialog implements ActionListener {
+public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> implements ActionListener {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(CaptureGoodsDialog.class.getName());
 

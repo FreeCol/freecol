@@ -657,10 +657,10 @@ public final class InGameController implements NetworkConstants {
             PathNode path = map.findPathToEurope(unit, unit.getTile());
             if (path != null) {
                 int turns = path.getTotalTurns();
-                destinations.add(new ChoiceItem(player.getEurope().getName() + " (" + turns + ")", player.getEurope()));
+                destinations.add(new ChoiceItem<Europe>(player.getEurope().getName() + " (" + turns + ")", player.getEurope()));
             } else if (unit.getTile() != null
                        && (unit.getTile().canMoveToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
-                destinations.add(new ChoiceItem(player.getEurope().getName() + " (0)", player.getEurope()));
+                destinations.add(new ChoiceItem<Europe>(player.getEurope().getName() + " (0)", player.getEurope()));
             }
         }
 
@@ -677,7 +677,7 @@ public final class InGameController implements NetworkConstants {
                         && p.getTile().getSettlement() != inSettlement) {
                         Settlement s = p.getTile().getSettlement();
                         int turns = p.getTurns();
-                        destinations.add(new ChoiceItem(s.toString() + " (" + turns + ")", s));
+                        destinations.add(new ChoiceItem<Settlement>(s.toString() + " (" + turns + ")", s));
                     }
                     return false;
                 }
@@ -1546,8 +1546,8 @@ public final class InGameController implements NetworkConstants {
                         "%gold%", Integer.toString(gold));
                 ChoiceItem ci = (ChoiceItem) canvas
                 .showChoiceDialog(text, Messages.message("buy.cancel"),
-                        new ChoiceItem(Messages.message("buy.takeOffer"), 1),
-                        new ChoiceItem(Messages.message("buy.moreGold"), 2));
+                        new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), 1),
+                        new ChoiceItem<Integer>(Messages.message("buy.moreGold"), 2));
                 
                 // player cancelled goods choice, return to goods to sale dialog
                 if (ci == null) {
@@ -1630,9 +1630,9 @@ public final class InGameController implements NetworkConstants {
                                            "%gold%", Integer.toString(gold));
             ChoiceItem offerReply = (ChoiceItem) canvas.showChoiceDialog(text, 
                                   Messages.message("trade.cancel"), 
-                                  new ChoiceItem(Messages.message("trade.takeOffer"), 1),
-                                  new ChoiceItem(Messages.message("trade.moreGold"), 2),
-                                  new ChoiceItem(Messages.message("trade.gift", "%goods%", goods.getName()), 0));
+                                  new ChoiceItem<Integer>(Messages.message("trade.takeOffer"), 1),
+                                  new ChoiceItem<Integer>(Messages.message("trade.moreGold"), 2),
+                                  new ChoiceItem<Integer>(Messages.message("trade.gift", "%goods%", goods.getName()), 0));
             
             if (offerReply == null) { // == Trade aborted by the player.
                 return false;
@@ -1751,8 +1751,8 @@ public final class InGameController implements NetworkConstants {
                                                "%gold%", Integer.toString(gold));
                 ChoiceItem ci = (ChoiceItem) canvas
                     .showChoiceDialog(text, Messages.message("buy.cancel"),
-                                      new ChoiceItem(Messages.message("buy.takeOffer"), 1),
-                                      new ChoiceItem(Messages.message("buy.moreGold"), 2));
+                                      new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), 1),
+                                      new ChoiceItem<Integer>(Messages.message("buy.moreGold"), 2));
                 if (ci == null) { // == Trade aborted by the player.
                     return;
                 }
@@ -2823,9 +2823,9 @@ public final class InGameController implements NetworkConstants {
                     .showChoiceDialog(Messages.message("indianLand.text",
                                                        "%player%", nation.getName()),
                                       Messages.message("indianLand.cancel"),
-                                      new ChoiceItem(Messages.message("indianLand.pay" ,"%amount%",
+                                      new ChoiceItem<Integer>(Messages.message("indianLand.pay" ,"%amount%",
                                                                       Integer.toString(price)), 1),
-                                      new ChoiceItem(Messages.message("indianLand.take"), 2));
+                                      new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
                 if (ci == null) {
                     return;
                 } else if (ci.getChoice() == 1) {

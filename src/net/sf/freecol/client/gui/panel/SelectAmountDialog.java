@@ -39,7 +39,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * The panel that allows a user to recruit people in Europe.
  */
-public final class SelectAmountDialog extends FreeColDialog implements ActionListener {
+public final class SelectAmountDialog extends FreeColDialog<Integer> implements ActionListener {
 
 
 
@@ -153,7 +153,7 @@ public final class SelectAmountDialog extends FreeColDialog implements ActionLis
     public void actionPerformed(ActionEvent event) {
         Object item = comboBox.getSelectedItem();
         if (item instanceof Integer) {
-            setResponse(item);
+            setResponse((Integer) item);
         } else if (item instanceof String) {
             try {
                 setResponse(Integer.valueOf((String) item));

@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.Unit;
 
 import cz.autel.dmi.HIGLayout;
 
-public class PreCombatDialog extends FreeColDialog {
+public class PreCombatDialog extends FreeColDialog<Boolean> {
 
     public static final Modifier BASE_DEFENCE_MODIFIER =
         new Modifier("modifiers.baseDefence", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
@@ -105,7 +105,7 @@ public class PreCombatDialog extends FreeColDialog {
 
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    setResponse(false);
+                    setResponse(Boolean.FALSE);
                 }
             });
 

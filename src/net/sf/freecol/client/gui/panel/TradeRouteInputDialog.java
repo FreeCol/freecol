@@ -60,7 +60,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * Allows the user to edit trade routes.
  */
-public final class TradeRouteInputDialog extends FreeColDialog implements ActionListener {
+public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(TradeRouteInputDialog.class.getName());
 

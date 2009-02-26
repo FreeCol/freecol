@@ -54,7 +54,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel is used to show information about a tile.
  */
-public final class TilePanel extends FreeColDialog implements ActionListener {
+public final class TilePanel extends FreeColDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(TilePanel.class.getName());
 

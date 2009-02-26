@@ -43,7 +43,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * This panel is used to show information about a tile.
  */
-public final class DumpCargoDialog extends FreeColDialog implements ActionListener {
+public final class DumpCargoDialog extends FreeColDialog<Boolean> implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(DumpCargoDialog.class.getName());
 
@@ -149,10 +149,10 @@ public final class DumpCargoDialog extends FreeColDialog implements ActionListen
                         inGameController.unloadCargo(goodsList.get(index));
                     }
                 }
-                setResponse(new Boolean(true));
+                setResponse(Boolean.TRUE);
                 break;
             case CANCEL:
-                setResponse(new Boolean(false));
+                setResponse(Boolean.FALSE);
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

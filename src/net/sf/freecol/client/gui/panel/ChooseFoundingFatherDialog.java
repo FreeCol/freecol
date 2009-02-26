@@ -48,7 +48,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  * 
  * @see FoundingFather
  */
-public final class ChooseFoundingFatherDialog extends FreeColDialog implements ActionListener {
+public final class ChooseFoundingFatherDialog extends FreeColDialog<Integer> implements ActionListener {
     private static final Logger logger = Logger.getLogger(ChooseFoundingFatherDialog.class.getName());
 
     @SuppressWarnings("unused")

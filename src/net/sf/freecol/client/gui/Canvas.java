@@ -201,7 +201,7 @@ public final class Canvas extends JDesktopPane {
      * To save the most recently open dialog in Europe
      * (<code>RecruitDialog</code>, <code>PurchaseDialog</code>, <code>TrainDialog</code>)
      */
-    private FreeColDialog europeOpenDialog = null;
+    private FreeColDialog<Integer> europeOpenDialog = null;
 
     private final FreeColClient freeColClient;
 
@@ -1677,7 +1677,7 @@ public final class Canvas extends JDesktopPane {
             logger.warning("Canvas.showEuropeDialog: Invalid europeDialogType");
         }
         
-        FreeColDialog localDialog = null;
+        FreeColDialog<Integer> localDialog = null;
 
         // Open new Dialog
         switch (europeAction) {
@@ -1784,13 +1784,13 @@ public final class Canvas extends JDesktopPane {
     public ChoiceItem showIndianSettlementTradeDlg(boolean showBuy, boolean showSell, boolean showGift){
         ArrayList<ChoiceItem> choices = new ArrayList<ChoiceItem>();
         if(showBuy){
-            choices.add(new ChoiceItem(Messages.message("tradeProposition.toBuy"), 1));
+            choices.add(new ChoiceItem<Integer>(Messages.message("tradeProposition.toBuy"), 1));
         }
         if(showSell){
-            choices.add(new ChoiceItem(Messages.message("tradeProposition.toSell"), 2));
+            choices.add(new ChoiceItem<Integer>(Messages.message("tradeProposition.toSell"), 2));
         }
         if(showGift){
-            choices.add(new ChoiceItem(Messages.message("tradeProposition.toGift"), 3));
+            choices.add(new ChoiceItem<Integer>(Messages.message("tradeProposition.toGift"), 3));
         }
         
         ChoiceItem choice = (ChoiceItem) showChoiceDialog(Messages.message("tradeProposition.welcome"), 

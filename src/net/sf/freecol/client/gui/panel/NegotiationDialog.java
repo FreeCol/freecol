@@ -65,7 +65,7 @@ import cz.autel.dmi.HIGLayout;
 /**
  * The panel that allows negotiations between players.
  */
-public final class NegotiationDialog extends FreeColDialog implements ActionListener {
+public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> implements ActionListener {
 
 
 
