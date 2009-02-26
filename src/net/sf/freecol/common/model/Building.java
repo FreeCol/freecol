@@ -351,9 +351,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             // TOO: can we cheaply report the real change?
             GoodsType output = getGoodsOutputType();
             if (output != null) {
-                colony.firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
-                                          new AbstractGoods(output, 0),
-                                          new AbstractGoods(output, 1));
                 firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
                                    new AbstractGoods(output, 0),
                                    new AbstractGoods(output, 1));
@@ -385,9 +382,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 // TODO: can we cheaply report the real change?
                 GoodsType output = getGoodsOutputType();
                 if (output != null) {
-                    colony.firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
-                                              new AbstractGoods(output, 1),
-                                              new AbstractGoods(output, 0));
                     firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(),
                                        new AbstractGoods(output, 1),
                                        new AbstractGoods(output, 0));

@@ -69,8 +69,9 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
         this.colony = colony;
         this.parent = parent;
 
-        colony.addPropertyChangeListener(ColonyChangeEvent.BUILD_QUEUE_CHANGE.toString(),
-                                         this);
+        // we are interested in changes to the build queue, as well as
+        // changes to the warehouse and the colony's production bonus
+        colony.addPropertyChangeListener(this);
         addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
                     BuildQueuePanel queuePanel = new BuildQueuePanel(colony, parent);

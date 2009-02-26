@@ -150,6 +150,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             road.setVirtual(true);
             tile.add(road);
         }
+
+        ColonyTile colonyTile = new ColonyTile(game, this, tile);
+        colonyTile.addPropertyChangeListener(this);
+        colonyTiles.add(colonyTile);
         for (Direction direction : Direction.values()) {
             Tile t = map.getNeighbourOrNull(direction, tile);
             if (t == null) {
@@ -158,7 +162,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             if (t.getOwner() == null) {
                 t.setOwner(owner);
             }
-            colonyTiles.add(new ColonyTile(game, this, t));
+            colonyTile = new ColonyTile(game, this, t);
+            colonyTile.addPropertyChangeListener(this);
+            colonyTiles.add(colonyTile);
             if (t.getType().isWater()) {
                 landLocked = false;
             }
@@ -166,14 +172,15 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (!landLocked) {
             featureContainer.addAbility(HAS_PORT);
         }
-        colonyTiles.add(new ColonyTile(game, this, tile));
+        Building building;
         List<BuildingType> buildingTypes = FreeCol.getSpecification().getBuildingTypeList();
         for (BuildingType buildingType : buildingTypes) {
-            if (buildingType.getUpgradesFrom() == null &&
-                buildingType.getGoodsRequired().isEmpty()) {
-                addBuilding(new Building(getGame(), this, buildingType));
-            } else if (isFree(buildingType)) {
-                addBuilding(new Building(getGame(), this, buildingType));
+            if ((buildingType.getUpgradesFrom() == null
+                 && buildingType.getGoodsRequired().isEmpty())
+                || isFree(buildingType)) {
+                building = new Building(getGame(), this, buildingType);
+                building.addPropertyChangeListener(this);
+                addBuilding(building);
             }
         }
     }
@@ -1925,9 +1932,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     public void propertyChange(PropertyChangeEvent event) {
-        if (GoodsContainer.CARGO_CHANGE.equals(event.getPropertyName())) {
+        // TODO: fix this messy string handling
+        if (GoodsContainer.CARGO_CHANGE.toString().equals(event.getPropertyName())) {
             firePropertyChange(ColonyChangeEvent.WAREHOUSE_CHANGE.toString(),
                                event.getOldValue(), event.getNewValue());
+        } else if (ColonyChangeEvent.PRODUCTION_CHANGE.toString().equals(event.getPropertyName())) {
+            firePropertyChange(event.getPropertyName(), event.getOldValue(),
+                               event.getNewValue());
         }
     }
 
@@ -2046,16 +2057,20 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
                 ColonyTile ct = (ColonyTile) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (ct == null) {
-                    colonyTiles.add(new ColonyTile(getGame(), in));
+                    ct = new ColonyTile(getGame(), in);
+                    ct.addPropertyChangeListener(this);
+                    colonyTiles.add(ct);
                 } else {
                     ct.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(Building.getXMLElementTagName())) {
-                Building b = (Building) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (b == null) {
-                    addBuilding(new Building(getGame(), in));
+                Building building = (Building) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+                if (building == null) {
+                    building = new Building(getGame(), in);
+                    building.addPropertyChangeListener(this);
+                    addBuilding(building);
                 } else {
-                    b.readFromXML(in);
+                    building.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 GoodsContainer gc = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
