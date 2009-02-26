@@ -362,38 +362,62 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Returns the building for producing the given type of goods.
+     * Collect the buildings for producing the given type of goods.
      * 
      * @param goodsType The type of goods.
-     * @return The <code>Building</code> which produces the given type of
-     *         goods, or <code>null</code> if such a building cannot be found.
+     * @return A <code>List</code> of <code>Building</code>s which produce
+     *         the given type of goods.
      */
-    public Building getBuildingForProducing(GoodsType goodsType) {
-        // TODO: it should search for more than one building?
-        for (Building building : buildingMap.values()) {
+    public List<Building> getBuildingsForProducing(GoodsType goodsType) {
+        List<Building> buildings = new ArrayList<Building>();
+        for (Building building : getBuildings()) {
             if (building.getGoodsOutputType() == goodsType) {
-                return building;
+                buildings.add(building);
             }
         }
-        return null;
+        return buildings;
     }
 
-    /** COMEBACKHEREs
-     * Returns the colony's existing building for the given goods type.
+    /**
+     * Collect the buildings for consuming the given type of goods.
      * 
-     * @param goodsType The goods type.
-     * @return The Building for the <code>goodsType</code>, or
-     *         <code>null</code> if not exists or not fully built.
+     * @param goodsType The type of goods.
+     * @return A <code>List</code> of <code>Building</code>s which consume
+     *         the given type of goods.
      * @see Goods
      */
-    public Building getBuildingForConsuming(GoodsType goodsType) {
-        // TODO: it should search for more than one building?
-        for (Building building : buildingMap.values()) {
+    public List<Building> getBuildingsForConsuming(GoodsType goodsType) {
+        List<Building> buildings = new ArrayList<Building>();
+        for (Building building : getBuildings()) {
             if (building.getGoodsInputType() == goodsType) {
-                return building;
+                buildings.add(building);
             }
         }
-        return null;
+        return buildings;
+    }
+
+    /**
+     * Find a building for producing the given type of goods.
+     *
+     * @param goodsType The type of goods.
+     * @return A <code>Building</code> which produces the given type of goods,
+     *         or <code>null</code> if such a building can not be found.
+     */
+    public Building getBuildingForProducing(GoodsType goodsType) {
+        List<Building> buildings = getBuildingsForProducing(goodsType);
+        return (buildings.isEmpty()) ? null : buildings.get(0);
+    }
+
+    /**
+     * Find a building for consuming the given type of goods.
+     *
+     * @param goodsType The type of goods.
+     * @return A <code>Building</code> which consumes the given type of goods,
+     *         or <code>null</code> if such a building can not be found.
+     */
+    public Building getBuildingForConsuming(GoodsType goodsType) {
+        List<Building> buildings = getBuildingsForConsuming(goodsType);
+        return (buildings.isEmpty()) ? null : buildings.get(0);
     }
 
     /**
