@@ -843,7 +843,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return an <code>int</code> value
      */
     public int getTurnsToComplete(BuildableType buildable) {
-        int result = -1;
+        int result = 0;
         for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
             int amountNeeded = requiredGoods.getAmount();
             int amountAvailable = getGoodsCount(requiredGoods.getType());
