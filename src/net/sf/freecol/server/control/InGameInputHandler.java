@@ -76,7 +76,9 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DiplomaticTradeMessage;
+import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -334,16 +336,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return cashInTreasureTrain(connection, element);
             }
         });
-        register("getTransaction", new CurrentPlayerNetworkRequestHandler() {
+        register(GetTransactionMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return getTransactionSession(connection, element);
+                return new GetTransactionMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("closeTransaction", new CurrentPlayerNetworkRequestHandler() {
+        register(CloseTransactionMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return closeTransactionSession(connection, element);
+                return new CloseTransactionMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("tradeProposition", new CurrentPlayerNetworkRequestHandler() {
@@ -2618,71 +2620,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return reply;
     }
 
-    /**
-     * Handles a "getTransaction"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element getTransactionSession(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
-        
-        checkGeneralCondForTradeQuery(element, player, unit, settlement, null);
-        
-        InGameController controller = (InGameController) getFreeColServer().getController();     
-        
-        // if starting a transaction session, the unit needs movement points
-        if (!controller.isTransactionSessionOpen(unit, settlement) &&
-            unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
-        }
-        
-        java.util.Map<String,Object> session = controller.getTransactionSession(unit,settlement);
-        
-        // Sets unit moves to zero to avoid cheating
-        // If no action was done, the moves will be restored when closing the session
-        unit.setMovesLeft(0);
-        
-        Element reply = Message.createNewRootElement("getTransactionAnswer");
-        reply.setAttribute("canBuy", ((Boolean) session.get("canBuy")).toString());
-        reply.setAttribute("canSell",((Boolean) session.get("canSell")).toString());
-        reply.setAttribute("canGift",((Boolean) session.get("canGift")).toString());
-        reply.setAttribute("hasSpaceLeft",((Boolean) session.get("hasSpaceLeft")).toString());
-        
-        return reply;
-    }
-    
-    /**
-     * Handles a "closeTransaction"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element closeTransactionSession(Connection connection, Element element) {
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
-        
-        InGameController controller = getFreeColServer().getInGameController();
-        
-        if(!controller.isTransactionSessionOpen(unit,settlement)){
-            throw new IllegalStateException("Trying to close a non-existing session");
-        }
-        java.util.Map<String,Object> session = controller.getTransactionSession(unit,settlement);
-        // restore unit movements if no action made
-        boolean isActionTaken = ((Boolean)(session.get("actionTaken"))).booleanValue();
-        if(! isActionTaken){
-                Integer unitMoves = (Integer) session.get("unitMoves");
-                unit.setMovesLeft(unitMoves);
-        }
-        controller.closeTransactionSession(unit,settlement);
-        
-        return null;
-    }
-    
     /**
      * Checks general conditions for several types of trade queries
      * 

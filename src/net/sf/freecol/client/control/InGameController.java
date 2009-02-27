@@ -97,7 +97,9 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
+import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DiplomaticTradeMessage;
+import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.RenameMessage;
@@ -1447,12 +1449,8 @@ public final class InGameController implements NetworkConstants {
     }
 
     private java.util.Map<String,Boolean> getTransactionSession(Unit unit, Settlement settlement){
-        Element transactionElement = Message.createNewRootElement("getTransaction");
-        transactionElement.setAttribute("unit", unit.getId());
-        transactionElement.setAttribute("settlement", settlement.getId());
-
-        Client client = freeColClient.getClient();
-        Element reply = client.ask(transactionElement);
+        Element transactionElement = new GetTransactionMessage(unit, settlement).toXMLElement();
+        Element reply = freeColClient.getClient().ask(transactionElement);
 
         if (reply == null || !reply.getTagName().equals("getTransactionAnswer")) {
             logger.warning("Illegal reply to getTransaction.");
@@ -1469,11 +1467,7 @@ public final class InGameController implements NetworkConstants {
     }
 
     private void closeTransactionSession(Unit unit, Settlement settlement){
-        Element transactionElement = Message.createNewRootElement("closeTransaction");
-        transactionElement.setAttribute("unit", unit.getId());
-        transactionElement.setAttribute("settlement", settlement.getId());
-
-        freeColClient.getClient().ask(transactionElement);
+        freeColClient.getClient().ask(new CloseTransactionMessage(unit, settlement).toXMLElement());
     }
     
     private ArrayList<Goods> getGoodsForSaleInIndianSettlement(Unit unit, Settlement settlement){
