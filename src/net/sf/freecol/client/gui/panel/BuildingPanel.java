@@ -68,6 +68,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         building.addPropertyChangeListener(this);
         GoodsType inputType = building.getGoodsInputType();
         if (inputType != null) {
+            // get notified of production changes and warehouse changes
             building.getColony().addPropertyChangeListener(inputType.getId(), this);
         }
 

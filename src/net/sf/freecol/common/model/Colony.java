@@ -1916,6 +1916,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     public void propertyChange(PropertyChangeEvent event) {
+        firePropertyChange(event.getPropertyName(),
+                           event.getOldValue(), event.getNewValue());
+        /*
         Object source = event.getSource();
         if (source.equals(goodsContainer)) {
             // stored amount of some goods has changed
@@ -1926,6 +1929,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             firePropertyChange(event.getPropertyName(), event.getOldValue(),
                                event.getNewValue());
         }
+        */
     }
 
 

@@ -495,9 +495,11 @@ public final class DragListener extends MouseAdapter {
                     if (parentPanel instanceof CargoPanel) {
                         CargoPanel cargoPanel = (CargoPanel) parentPanel;
                         cargoPanel.initialize();
+                        /*
                         if (cargoPanel.getParentPanel() instanceof ColonyPanel) {
                             ((ColonyPanel) cargoPanel.getParentPanel()).updateWarehouse();
                         }
+                        */
                     }
                     parentPanel.revalidate();
                 }

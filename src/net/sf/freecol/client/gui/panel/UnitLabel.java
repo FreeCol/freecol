@@ -314,11 +314,13 @@ public final class UnitLabel extends JLabel implements ActionListener {
 	    break;
 	case WORK_TILE:
 	    GoodsType goodsType = FreeCol.getSpecification().getGoodsType(arg);
-	    // Move unit to best producing ColonyTile
-	    ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, goodsType);
 	    // Change workType first for the benefit of change listeners
 	    inGameController.changeWorkType(unit, goodsType);
-	    inGameController.work(unit, bestTile);
+	    // Move unit to best producing ColonyTile
+	    ColonyTile bestTile = unit.getColony().getVacantColonyTileFor(unit, goodsType);
+            if (bestTile != unit.getLocation()) {
+                inGameController.work(unit, bestTile);
+            }
 	    break;
 	case WORK_BUILDING:
 	    BuildingType buildingType = FreeCol.getSpecification().getBuildingType(arg);
