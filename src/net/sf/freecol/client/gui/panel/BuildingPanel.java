@@ -35,6 +35,7 @@ import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -65,6 +66,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         this.parent = parent;
 
         building.addPropertyChangeListener(this);
+        GoodsType inputType = building.getGoodsInputType();
+        if (inputType != null) {
+            building.getColony().addPropertyChangeListener(inputType.getId(), this);
+        }
 
         setToolTipText(" ");
         setLayout(new MigLayout("", "[32][32][32]", "[32][44]"));

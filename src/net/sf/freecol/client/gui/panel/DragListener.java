@@ -41,6 +41,7 @@ import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -215,8 +216,9 @@ public final class DragListener extends MouseAdapter {
         List<GoodsType> farmedGoods = Specification.getSpecification().getFarmedGoodsTypeList();
         // Work in Field - automatically find the best location
         for (GoodsType goodsType : farmedGoods) {
-            int maxpotential = colony.getVacantColonyTileProductionFor(tempUnit, goodsType);
-            if (maxpotential > 0) {
+            ColonyTile bestTile = colony.getVacantColonyTileFor(tempUnit, goodsType);
+            if (bestTile != null) {
+                int maxpotential = bestTile.getProductionOf(tempUnit, goodsType);
                 UnitType expert = Specification.getSpecification().getExpertForProducing(goodsType);
                 JMenuItem menuItem = new JMenuItem(Messages.message(goodsType.getId() + ".workAs",
                                                                     "%amount%",

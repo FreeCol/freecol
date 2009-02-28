@@ -48,7 +48,6 @@ public class GoodsContainer extends FreeColGameObject {
     public static final int CARGO_SIZE = 100;
     public static final String STORED_GOODS_TAG = "storedGoods";
     public static final String OLD_STORED_GOODS_TAG = "oldStoredGoods";
-    public static final String CARGO_CHANGE = "CARGO_CHANGE";
 
     /** The list of Goods stored in this <code>GoodsContainer</code>. */
     private Map<GoodsType, Integer> storedGoods = new HashMap<GoodsType, Integer>();
@@ -143,8 +142,7 @@ public class GoodsContainer extends FreeColGameObject {
         } else {
             storedGoods.put(type, newAmount);
         }
-        firePropertyChange(CARGO_CHANGE, new AbstractGoods(type, oldAmount),
-                           new AbstractGoods(type, newAmount));
+        firePropertyChange(type.getId(), oldAmount, newAmount);
     }
     
     /**
@@ -177,8 +175,7 @@ public class GoodsContainer extends FreeColGameObject {
             removedGoods = new Goods(getGame(), parent, type, oldAmount);
             storedGoods.remove(type);
         }
-        firePropertyChange(CARGO_CHANGE, new AbstractGoods(type, oldAmount),
-                           new AbstractGoods(type, newAmount));
+        firePropertyChange(type.getId(), oldAmount, newAmount);
         return removedGoods;
     }
 
@@ -204,8 +201,7 @@ public class GoodsContainer extends FreeColGameObject {
         } else {
             storedGoods.put(goodsType, newAmount);
         }
-        firePropertyChange(CARGO_CHANGE, new AbstractGoods(goodsType, oldAmount),
-                           new AbstractGoods(goodsType, newAmount));
+        firePropertyChange(goodsType.getId(), oldAmount, newAmount);
     }        
 
     /**

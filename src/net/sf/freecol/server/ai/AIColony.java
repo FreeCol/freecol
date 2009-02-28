@@ -267,32 +267,32 @@ public class AIColony extends AIObject {
         }
 
         /*
-        Iterator<TileImprovementPlan> tiIterator = TileImprovementPlans.iterator();
-        boolean centerTileFound = false;
-        while (tiIterator.hasNext()) {
-            TileImprovementPlan ti = tiIterator.next();
-            if (ti.getTarget() == colony.getTile()) {
-                if (!colony.getTile().canBePlowed()) {
-                    ti.dispose();
-                    tiIterator.remove();
-                }
-                centerTileFound = true;
-                break;
-            }
-        }
-        if (!centerTileFound && colony.getTile().canBePlowed()) {
-            TileImprovementPlans.add(new TileImprovementPlan(getAIMain(), colony.getTile(), TileImprovementPlan.PLOW, 15));
-        }
+          Iterator<TileImprovementPlan> tiIterator = TileImprovementPlans.iterator();
+          boolean centerTileFound = false;
+          while (tiIterator.hasNext()) {
+          TileImprovementPlan ti = tiIterator.next();
+          if (ti.getTarget() == colony.getTile()) {
+          if (!colony.getTile().canBePlowed()) {
+          ti.dispose();
+          tiIterator.remove();
+          }
+          centerTileFound = true;
+          break;
+          }
+          }
+          if (!centerTileFound && colony.getTile().canBePlowed()) {
+          TileImprovementPlans.add(new TileImprovementPlan(getAIMain(), colony.getTile(), TileImprovementPlan.PLOW, 15));
+          }
         */
 
         Collections.sort(TileImprovementPlans, new Comparator<TileImprovementPlan>() {
-            public int compare(TileImprovementPlan o, TileImprovementPlan p) {
-                Integer i = o.getValue();
-                Integer j = p.getValue();
+                public int compare(TileImprovementPlan o, TileImprovementPlan p) {
+                    Integer i = o.getValue();
+                    Integer j = p.getValue();
 
-                return j.compareTo(i);
-            }
-        });
+                    return j.compareTo(i);
+                }
+            });
     }
 
     /**
@@ -311,7 +311,7 @@ public class AIColony extends AIObject {
      * @return True if it was successfully deleted, false otherwise 
      */
     public boolean removeTileImprovementPlan(TileImprovementPlan plan){
-    	return TileImprovementPlans.remove(plan);
+        return TileImprovementPlans.remove(plan);
     }
     
     /**
@@ -325,13 +325,13 @@ public class AIColony extends AIObject {
             WorkLocationPlan wlp = rit.next();
             // Do not use tiles taken by other colonies:
             if (wlp.getWorkLocation() instanceof ColonyTile
-                    && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().getSettlement() != null) {
+                && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().getSettlement() != null) {
                 rit.remove();
             }
             // Do not request fishermen unless Docks have been completed:
             if (wlp.getWorkLocation() instanceof ColonyTile
-                    && !((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
-                    && !colony.hasAbility("model.ability.produceInWater")) {
+                && !((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
+                && !colony.hasAbility("model.ability.produceInWater")) {
                 // TODO: Check if docks are currently being built (and a carpenter with lumber is available)
                 rit.remove();
             }
@@ -446,19 +446,19 @@ public class AIColony extends AIObject {
         // We might need more tools for a building or a pioneer:
         AIUnit unequippedHardyPioneer = getUnequippedHardyPioneer();
         final boolean needsPioneer = (TileImprovementPlans.size() > 0 || unequippedHardyPioneer != null
-                && PioneeringMission.isValid(unequippedHardyPioneer));
+                                      && PioneeringMission.isValid(unequippedHardyPioneer));
         int toolsRequiredForBuilding = 0;
         if (colony.getCurrentlyBuilding() != null) {
             toolsRequiredForBuilding = getToolsRequired(colony.getCurrentlyBuilding());
         }
         if (colony.getProductionNetOf(Goods.TOOLS) == 0 && (colony.getGoodsCount(Goods.TOOLS) < 20 && needsPioneer)
-                || toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) {
+            || toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) {
             int goodsWishValue = AIGoods.TOOLS_FOR_COLONY_PRIORITY
-                    + AIGoods.TOOLS_FOR_IMPROVEMENT
-                    * TileImprovementPlans.size()
-                    + ((unequippedHardyPioneer != null) ? AIGoods.TOOLS_FOR_PIONEER : 0)
-                    + ((toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) ? AIGoods.TOOLS_FOR_BUILDING
-                            + (toolsRequiredForBuilding - colony.getGoodsCount(Goods.TOOLS)) : 0);
+                + AIGoods.TOOLS_FOR_IMPROVEMENT
+                * TileImprovementPlans.size()
+                + ((unequippedHardyPioneer != null) ? AIGoods.TOOLS_FOR_PIONEER : 0)
+                + ((toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) ? AIGoods.TOOLS_FOR_BUILDING
+                   + (toolsRequiredForBuilding - colony.getGoodsCount(Goods.TOOLS)) : 0);
             boolean goodsOrdered = false;
             for (Wish w : wishes) {
                 if (w instanceof GoodsWish) {
@@ -482,12 +482,12 @@ public class AIColony extends AIObject {
         disposeUnwantedWishes(newWishes);        
 
         Collections.sort(wishes, new Comparator<Wish>() {
-            public int compare(Wish o, Wish p) {
-                Integer i = o.getValue();
-                Integer j = p.getValue();
-                return j.compareTo(i);
-            }
-        });
+                public int compare(Wish o, Wish p) {
+                    Integer i = o.getValue();
+                    Integer j = p.getValue();
+                    return j.compareTo(i);
+                }
+            });
 
     }
 
@@ -666,16 +666,16 @@ public class AIColony extends AIObject {
             }
             // Only export muskets if we do not have room for them:
             if (goodsType == Goods.MUSKETS
-                    && (colony.getProductionOf(Goods.MUSKETS) == 0 || colony.getGoodsCount(Goods.MUSKETS) < colony
-                            .getWarehouseCapacity()
-                            - colony.getProductionOf(Goods.MUSKETS))) {
+                && (colony.getProductionOf(Goods.MUSKETS) == 0 || colony.getGoodsCount(Goods.MUSKETS) < colony
+                    .getWarehouseCapacity()
+                    - colony.getProductionOf(Goods.MUSKETS))) {
                 continue;
             }
             // Only export horses if we do not have room for them:
             if (goodsType == Goods.HORSES
-                    && (colony.getProductionOf(Goods.HORSES) == 0 || colony.getGoodsCount(Goods.HORSES) < colony
-                            .getWarehouseCapacity()
-                            - colony.getProductionOf(Goods.HORSES))) {
+                && (colony.getProductionOf(Goods.HORSES) == 0 || colony.getGoodsCount(Goods.HORSES) < colony
+                    .getWarehouseCapacity()
+                    - colony.getProductionOf(Goods.HORSES))) {
                 continue;
             }
 
@@ -719,7 +719,7 @@ public class AIColony extends AIObject {
                         }
                     }
                     if (ag != null && ag.getGoods() != null && ag.getGoods().getType() == goodsType
-                            && ag.getGoods().getLocation() == colony) {
+                        && ag.getGoods().getLocation() == colony) {
                         alreadyAdded.add(ag);
                     }
                 }
@@ -734,7 +734,7 @@ public class AIColony extends AIObject {
                         int goodsAmount = Math.min(100, amountRemaining);
                         oldGoods.getGoods().setAmount(goodsAmount);
                         if (amountRemaining >= colony.getWarehouseCapacity()
-                                && oldGoods.getTransportPriority() < AIGoods.IMPORTANT_DELIVERY) {
+                            && oldGoods.getTransportPriority() < AIGoods.IMPORTANT_DELIVERY) {
                             oldGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
                         } else if (goodsAmount == 100 && oldGoods.getTransportPriority() < AIGoods.FULL_DELIVERY) {
                             oldGoods.setTransportPriority(AIGoods.FULL_DELIVERY);
@@ -744,9 +744,9 @@ public class AIColony extends AIObject {
                     } else if (oldGoods.getGoods().getAmount() > amountRemaining) {
                         if (amountRemaining == 0) {
                             if (oldGoods.getTransport() != null
-                                    && oldGoods.getTransport().getMission() instanceof TransportMission) {
+                                && oldGoods.getTransport().getMission() instanceof TransportMission) {
                                 ((TransportMission) oldGoods.getTransport().getMission())
-                                        .removeFromTransportList(oldGoods);
+                                .removeFromTransportList(oldGoods);
                             }
                             oldGoods.dispose();
                         } else {
@@ -762,7 +762,7 @@ public class AIColony extends AIObject {
                 while (amountRemaining > 0) {
                     if (amountRemaining >= 100) {
                         AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, 100, getColony().getOwner()
-                                .getEurope());
+                                                       .getEurope());
                         if (amountRemaining >= colony.getWarehouseCapacity()) {
                             newGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
                         } else {
@@ -772,7 +772,7 @@ public class AIColony extends AIObject {
                         amountRemaining -= 100;
                     } else {
                         AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, amountRemaining, getColony()
-                                .getOwner().getEurope());
+                                                       .getOwner().getEurope());
                         newAIGoods.add(newGoods);
                         amountRemaining = 0;
                     }
@@ -878,13 +878,13 @@ public class AIColony extends AIObject {
         List<Unit> units = new ArrayList<Unit>();
         List<WorkLocationPlan> workLocationPlans = colonyPlan.getWorkLocationPlans();
         Collections.sort(workLocationPlans, new Comparator<WorkLocationPlan>() {
-            public int compare(WorkLocationPlan o, WorkLocationPlan p) {
-                Integer i = o.getProductionOf(o.getGoodsType());
-                Integer j = p.getProductionOf(p.getGoodsType());
+                public int compare(WorkLocationPlan o, WorkLocationPlan p) {
+                    Integer i = o.getProductionOf(o.getGoodsType());
+                    Integer j = p.getProductionOf(p.getGoodsType());
 
-                return j.compareTo(i);
-            }
-        });
+                    return j.compareTo(i);
+                }
+            });
 
         // Remove all colonists from the colony:
         Iterator<Unit> ui = colony.getUnitIterator();
@@ -906,12 +906,12 @@ public class AIColony extends AIObject {
                     WorkLocationPlan wlp = wlpIterator.next();
                     WorkLocation wl = wlp.getWorkLocation();
                     if (unit.getType().getExpertProduction() == wlp.getGoodsType()
-                            && wlp.getWorkLocation().canAdd(unit)
-                            && (wlp.getGoodsType() != Goods.FOOD || !((ColonyTile) wl).getWorkTile().isLand()
-                                && unit.getType().getExpertProduction().equals(Goods.FISH)
-                                && colony.hasAbility("model.ability.produceInWater")
-                                || ((ColonyTile) wl).getWorkTile().isLand()
-                                && !unit.getType().getExpertProduction().equals(Goods.FISH))) {
+                        && wlp.getWorkLocation().canAdd(unit)
+                        && (wlp.getGoodsType() != Goods.FOOD || !((ColonyTile) wl).getWorkTile().isLand()
+                            && unit.getType().getExpertProduction().equals(Goods.FISH)
+                            && colony.hasAbility("model.ability.produceInWater")
+                            || ((ColonyTile) wl).getWorkTile().isLand()
+                            && !unit.getType().getExpertProduction().equals(Goods.FISH))) {
                         //use work() instead of setLocation()
                         //to make sure that unitState is properly updated!
                         unit.work(wlp.getWorkLocation());
@@ -933,7 +933,7 @@ public class AIColony extends AIObject {
                 WorkLocationPlan wlp = workLocationPlans.get(i);
                 WorkLocation wl = wlp.getWorkLocation();
                 if (wlp.getGoodsType() == Goods.FOOD
-                        && (((ColonyTile) wl).getWorkTile().isLand()
+                    && (((ColonyTile) wl).getWorkTile().isLand()
                         || colony.hasAbility("model.ability.produceInWater"))) {
                     Unit bestUnit = null;
                     int bestProduction = 0;
@@ -941,10 +941,10 @@ public class AIColony extends AIObject {
                     while (unitIterator.hasNext()) {
                         Unit unit = unitIterator.next();
                         int production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
-                                Goods.FOOD);
+                                                                                              Goods.FOOD);
                         if (production > 1
-                                && (bestUnit == null || production > bestProduction || production == bestProduction
-                                        && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
+                            && (bestUnit == null || production > bestProduction || production == bestProduction
+                                && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
                             bestUnit = unit;
                             bestProduction = production;
                         }
@@ -975,12 +975,12 @@ public class AIColony extends AIObject {
                             WorkLocation location = wlp.getWorkLocation();
                             if (location instanceof ColonyTile) {
                                 production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
-                                        wlp.getGoodsType());
+                                                                                                  wlp.getGoodsType());
                             } else if (location instanceof Building) {
                                 production = ((Building) location).getUnitProductivity(unit);
                             }
                             if (bestUnit == null || production > bestProduction || production == bestProduction
-                                    && unit.getSkillLevel() < bestUnit.getSkillLevel()) {
+                                && unit.getSkillLevel() < bestUnit.getSkillLevel()) {
                                 bestUnit = unit;
                                 bestProduction = production;
                             }
@@ -1018,8 +1018,8 @@ public class AIColony extends AIObject {
                                     ColonyTile bpct = (ColonyTile) bestPick;
                                     int bestPickProduction = bpct.getProductionOf(bpct.getUnit(), Goods.FOOD);
                                     if (uProduction > bestPickProduction
-                                            || (uProduction == bestPickProduction && u.getSkillLevel() < bpct.getUnit()
-                                                    .getSkillLevel())) {
+                                        || (uProduction == bestPickProduction && u.getSkillLevel() < bpct.getUnit()
+                                            .getSkillLevel())) {
                                         bestPick = wl;
                                     }
                                 }
@@ -1032,8 +1032,8 @@ public class AIColony extends AIObject {
                         }
                     } else { // wl instanceof Building
                         if (bestPick == null
-                                || (bestPick instanceof Building && ((Building) wl).getProduction() < ((Building) bestPick)
-                                        .getProduction())) {
+                            || (bestPick instanceof Building && ((Building) wl).getProduction() < ((Building) bestPick)
+                                .getProduction())) {
                             bestPick = wl;
                         }
                     }
@@ -1118,37 +1118,39 @@ public class AIColony extends AIObject {
         // is no room for.
         List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsList) {
-        	int production = colony.getProductionNetOf(goodsType);
-        	int in_stock = colony.getGoodsCount(goodsType);
-        	if (Goods.FOOD != goodsType && production + in_stock > colony.getWarehouseCapacity()) {
-        		Iterator<Unit> unitIterator = colony.getUnitIterator();
-        		int waste = production + in_stock - colony.getWarehouseCapacity();
-        		while (unitIterator.hasNext() && waste > 0){
-        			Unit unit = unitIterator.next();
-        			if (unit.getWorkType() == goodsType) {
+            int production = colony.getProductionNetOf(goodsType);
+            int in_stock = colony.getGoodsCount(goodsType);
+            if (Goods.FOOD != goodsType && production + in_stock > colony.getWarehouseCapacity()) {
+                Iterator<Unit> unitIterator = colony.getUnitIterator();
+                int waste = production + in_stock - colony.getWarehouseCapacity();
+                while (unitIterator.hasNext() && waste > 0){
+                    Unit unit = unitIterator.next();
+                    if (unit.getWorkType() == goodsType) {
                         final Location oldLocation = unit.getLocation();
-        				unit.putOutsideColony();
-        				boolean working = false;
-        				waste = colony.getGoodsCount(goodsType) + colony.getProductionNetOf(goodsType)
-        					    - colony.getWarehouseCapacity();
-        				int best = 0;
+                        unit.putOutsideColony();
+                        boolean working = false;
+                        waste = colony.getGoodsCount(goodsType) + colony.getProductionNetOf(goodsType)
+                            - colony.getWarehouseCapacity();
+                        int best = 0;
                         for (GoodsType goodsType2 : goodsList) {
                             if (!goodsType2.isFarmed())
                                 continue;
-        					int production2 = colony.getVacantColonyTileProductionFor(unit, goodsType2);
-        					if (production2 > best && production2 + colony.getGoodsCount(goodsType2)
-        							+ colony.getProductionNetOf(goodsType2) < colony.getWarehouseCapacity()){
-        						if (working){
-        						    unit.putOutsideColony();
-        						}
-        						unit.work(colony.getVacantColonyTileFor(unit, goodsType2));
-                    unit.setWorkType(goodsType2);
-        						best = production2;
-        						working = true;
-        					}
-        				}
-        				if (!working){
-        					//units.add(unit);
+                            ColonyTile bestTile = colony.getVacantColonyTileFor(unit, goodsType2);
+                            int production2 = (bestTile == null ? 0 :
+                                               bestTile.getProductionOf(unit, goodsType2));
+                            if (production2 > best && production2 + colony.getGoodsCount(goodsType2)
+                                + colony.getProductionNetOf(goodsType2) < colony.getWarehouseCapacity()){
+                                if (working){
+                                    unit.putOutsideColony();
+                                }
+                                unit.work(bestTile);
+                                unit.setWorkType(goodsType2);
+                                best = production2;
+                                working = true;
+                            }
+                        }
+                        if (!working){
+                            //units.add(unit);
                             /*
                              * Keep the unit inside the colony. Units outside
                              * colonies are assigned Missions.
@@ -1158,10 +1160,10 @@ public class AIColony extends AIObject {
                             //If not, this will be fixed by setLocation(),
                             //resulting in a logger warning.
                             unit.setLocation(oldLocation);
-        				}
-        			}
-        		}
-        	}
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -1170,7 +1172,7 @@ public class AIColony extends AIObject {
             WorkLocationPlan wlp = workLocationPlans.get(i);
             WorkLocation wl = wlp.getWorkLocation();
             if (wlp.getGoodsType() == Goods.FOOD
-                    && (((ColonyTile) wl).getWorkTile().isLand()
+                && (((ColonyTile) wl).getWorkTile().isLand()
                     || colony.hasAbility("model.ability.produceInWater"))) {
                 Unit bestUnit = null;
                 int bestProduction = 0;
@@ -1178,10 +1180,10 @@ public class AIColony extends AIObject {
                 while (unitIterator.hasNext()) {
                     Unit unit = unitIterator.next();
                     int production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
-                            Goods.FOOD);
+                                                                                          Goods.FOOD);
                     if (production > 1
-                            && (bestUnit == null || production > bestProduction || production == bestProduction
-                                    && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
+                        && (bestUnit == null || production > bestProduction || production == bestProduction
+                            && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
                         bestUnit = unit;
                         bestProduction = production;
                     }
@@ -1209,12 +1211,12 @@ public class AIColony extends AIObject {
 
         // FIXME: should be executed just once, when the custom house is built
         /*if (colony.hasAbility("model.ability.export")) {
-            colony.setExports(Goods.SILVER, true);
-            colony.setExports(Goods.RUM, true);
-            colony.setExports(Goods.CIGARS, true);
-            colony.setExports(Goods.CLOTH, true);
-            colony.setExports(Goods.COATS, true);
-        }*/
+          colony.setExports(Goods.SILVER, true);
+          colony.setExports(Goods.RUM, true);
+          colony.setExports(Goods.CIGARS, true);
+          colony.setExports(Goods.CLOTH, true);
+          colony.setExports(Goods.COATS, true);
+          }*/
 
         // temporarily move units from carpenter to blacksmith if the current building needs no lumber but more tools
         // TODO: mine ore if needed

@@ -221,7 +221,17 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     public void setUnit(Unit unit) {
         Unit oldUnit = getUnit();
         this.unit = unit;
-        firePropertyChange(Colony.ColonyChangeEvent.PRODUCTION_CHANGE.toString(), oldUnit, unit);
+        if (oldUnit != null) {
+            GoodsType workType = oldUnit.getWorkType();
+            firePropertyChange(workType.getId(), getProductionOf(oldUnit, workType), null);
+        }
+        if (unit != null) {
+            GoodsType workType = unit.getWorkType();
+            // SOMEHOW, workType was null in unit tests
+            if (workType != null) {
+                firePropertyChange(workType.getId(), null, getProductionOf(unit, workType));
+            }
+        }
     }
 
 

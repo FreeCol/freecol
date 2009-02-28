@@ -1237,9 +1237,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 if (comp instanceof GoodsLabel) {
                     comp.getParent().remove(comp);
                     ((GoodsLabel) comp).setSmall(false);
-                    // adding goods may affect production
-                    updateBuildingsPanel(((GoodsLabel) comp).getGoods().getType());
-                    //updateProductionPanel();
                     reinitialize();
                     return comp;
                 }
@@ -1533,10 +1530,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     }
                 }
 
-                removeAll();
-                Component c = super.add(comp);
-                //refresh();
-                return c;
+                /*
+                 * At this point, the panel has already been updated
+                 * via the property change listener.
+                 *
+                 removeAll();
+                 Component c = super.add(comp);
+                 refresh();
+                */
+                return comp;
             }
     
             public void propertyChange(PropertyChangeEvent event) {
@@ -1596,6 +1598,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     
     public void propertyChange(PropertyChangeEvent e){        
 
+        System.out.println("colony panel: " + e.getPropertyName() + " " + e.getSource());
         if (!isShowing()){
             return;
         } else if (getColony() == null || e.getSource() != getColony()) {

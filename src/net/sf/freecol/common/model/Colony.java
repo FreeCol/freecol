@@ -137,7 +137,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public Colony(Game game, Player owner, String name, Tile tile) {
         super(game, owner, tile);
         goodsContainer = new GoodsContainer(game, this);
-        goodsContainer.addPropertyChangeListener(GoodsContainer.CARGO_CHANGE, this);
+        goodsContainer.addPropertyChangeListener(this);
         this.name = name;
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
@@ -1136,22 +1136,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Returns the production of a vacant <code>ColonyTile</code> where the
-     * given <code>unit</code> produces the maximum output of the given
-     * <code>goodsType</code>.
-     * 
-     * @param unit The <code>Unit</code> to find the highest possible
-     *            <code>ColonyTile</code>-production for.
-     * @param goodsType The type of goods that should be produced.
-     * @return The highest possible production on a vacant
-     *         <code>ColonyTile</code> for the given goods and the given unit.
-     */
-    public int getVacantColonyTileProductionFor(Unit unit, GoodsType goodsType) {
-        ColonyTile bestPick = getVacantColonyTileFor(unit, goodsType);
-        return bestPick == null ? 0 : bestPick.getProductionOf(unit, goodsType);
-    }
-
-    /**
      * Returns how much of a Good will be produced by this colony this turn
      * 
      * @param goodsType The goods' type.
@@ -1932,11 +1916,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     public void propertyChange(PropertyChangeEvent event) {
-        // TODO: fix this messy string handling
-        if (GoodsContainer.CARGO_CHANGE.toString().equals(event.getPropertyName())) {
-            firePropertyChange(ColonyChangeEvent.WAREHOUSE_CHANGE.toString(),
+        Object source = event.getSource();
+        if (source.equals(goodsContainer)) {
+            // stored amount of some goods has changed
+            firePropertyChange(event.getPropertyName(),
                                event.getOldValue(), event.getNewValue());
-        } else if (ColonyChangeEvent.PRODUCTION_CHANGE.toString().equals(event.getPropertyName())) {
+        } else if (source instanceof WorkLocation) {
+            // production of some goods has changed
             firePropertyChange(event.getPropertyName(), event.getOldValue(),
                                event.getNewValue());
         }
@@ -2079,7 +2065,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                         goodsContainer.removePropertyChangeListener(this);
                     }
                     goodsContainer = new GoodsContainer(getGame(), this, in);
-                    goodsContainer.addPropertyChangeListener(GoodsContainer.CARGO_CHANGE, this);
+                    goodsContainer.addPropertyChangeListener(this);
                 } else {
                     goodsContainer.readFromXML(in);
                 }
