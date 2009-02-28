@@ -195,7 +195,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         productionPanel = new JPanel();
         productionPanel.setOpaque(false);
 
-        outsideColonyPanel = new OutsideColonyPanel(this);
+        outsideColonyPanel = new OutsideColonyPanel();
         outsideColonyPanel.setToolTipText(Messages.message("outsideColony"));
         outsideColonyPanel.setLayout(new GridLayout(0, 8));
 
@@ -375,7 +375,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         cargoPanel.removeAll();
         warehousePanel.removeAll();
-        outsideColonyPanel.removeAll();
+        //outsideColonyPanel.removeAll();
         inPortPanel.removeAll();
         tilePanel.removeAll();
 
@@ -402,7 +402,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
 
             if (!unit.isCarrier()) {
-                outsideColonyPanel.add(unitLabel, false);
+                //outsideColonyPanel.add(unitLabel, false);
             } else {
                 TradeRoute tradeRoute;
                 if ((tradeRoute = unit.getTradeRoute()) != null) {
@@ -448,14 +448,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         updateProductionPanel();
         updateSoLLabel();
 
-    }
 
-    public void reinitialize() {
-        if (selectedUnit != null) {
-            initialize(getColony(), selectedUnit.getUnit());
-        } else {
-            initialize(getColony(), null);
-        }
+        outsideColonyPanel.setColony(colony);
+
     }
 
     /**
@@ -463,13 +458,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * carrier with some cargo.
      */
     private void updateCarrierButtons() {
-        System.out.println("calling update carrier buttons");
         unloadButton.setEnabled(false);
         fillButton.setEnabled(false);
         if (isEditable() && selectedUnit != null) {
             Unit unit = selectedUnit.getUnit();
             if (unit != null && unit.isCarrier() && unit.getSpaceLeft() < unit.getType().getSpace()) {
-                System.out.println("updating carrier buttons");
                 unloadButton.setEnabled(true);
                 for (Goods goods : unit.getGoodsList()) {
                     if (getColony().getGoodsCount(goods.getType()) > 0) {
@@ -478,27 +471,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Updates the label that is placed above the cargo panel. It shows the name
-     * of the unit whose cargo is displayed and the amount of space left on that
-     * unit.
-     */
-    private void updateCargoLabel() {
-        if ( cargoPanel.getCarrier() != null) {
-            Unit carrier = cargoPanel.getCarrier();
-            cargoPanel.getParent().setEnabled(true);
-            int spaceLeft = carrier.getSpaceLeft();
-            /*
-            cargoBorder.setTitle(Messages.message("cargoOnCarrierLong", 
-                    "%name%", carrier.getName(),
-                    "%space%", String.valueOf(spaceLeft)));
-            */
-        } else {
-            cargoPanel.getParent().setEnabled(false);
-            //cargoBorder.setTitle(Messages.message("cargoOnCarrier"));
         }
     }
 
@@ -551,29 +523,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     
     private void sortColonies(List<Colony> colonies) {
         Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
-    }
-
-    private void updateOutsideColonyPanel() {
-        if (getColony() == null) {
-            // Apparently this can happen
-            return;
-        }
-        outsideColonyPanel.removeAll();
-        Tile tile = getColony().getTile();
-        Iterator<Unit> tileUnitIterator = tile.getUnitIterator();
-        while (tileUnitIterator.hasNext()) {
-            Unit unit = tileUnitIterator.next();
-
-            UnitLabel unitLabel = new UnitLabel(unit, parent);
-            if (isEditable()) {
-                unitLabel.setTransferHandler(defaultTransferHandler);
-                unitLabel.addMouseListener(pressListener);
-            }
-
-            if (!unit.isCarrier()) {
-                outsideColonyPanel.add(unitLabel, false);
-            }
-        }
     }
 
     public void updateProductionPanel() {
@@ -702,19 +651,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();
                 inGameController.unloadCargo(goods);
-                updateCargoPanel();
-                updateCargoLabel();
-                getCargoPanel().revalidate();
             }
             Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit newUnit = unitIterator.next();
                 inGameController.leaveShip(newUnit);
-                updateCargoPanel();
-                updateCargoLabel();
-                updateOutsideColonyPanel();
-                outsideColonyPanel.revalidate();
-                getCargoPanel().revalidate();
             }
         }
         unloadButton.setEnabled(false);
@@ -733,8 +674,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 if (goods.getAmount() < 100 && colony.getGoodsCount(goods.getType()) > 0) {
                     int amount = Math.min(100 - goods.getAmount(), colony.getGoodsCount(goods.getType()));
                     inGameController.loadCargo(new Goods(goods.getGame(), colony, goods.getType(), amount), unit);
-                    updateCargoPanel();
-                    getCargoPanel().revalidate();
                 }
             }
         }
@@ -791,6 +730,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         if (selectedUnit != unitLabel) {
             if (selectedUnit != null) {
                 selectedUnit.setSelected(false);
+                selectedUnit.getUnit().removePropertyChangeListener(this);
             }
             selectedUnit = unitLabel;
             if (unitLabel == null) {
@@ -798,15 +738,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             } else {
                 cargoPanel.setCarrier(unitLabel.getUnit());
                 unitLabel.setSelected(true);
+                unitLabel.getUnit().addPropertyChangeListener(this);
             }
-            updateCargoLabel();
-            //updateCarrierButtons();
-            cargoPanel.revalidate();
         }
-    }
-
-    private void updateCargoPanel() {
-        cargoPanel.initialize();
     }
 
     /**
@@ -875,28 +809,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * This panel shows the content of a carrier in the colony
      */
     public final class ColonyCargoPanel extends CargoPanel {
+
         public ColonyCargoPanel(Canvas parent) {
             super(parent, false);
-        }
-
-        /*
-        @Override
-        public Component add(Component comp, boolean editState) {
-            Component result = super.add(comp, editState);
-            // Either Tools or units previously working on building materials
-            // may have been loaded into the carrier, so we need to also update
-            // the progress labels
-            
-            updateCargoLabel();
-            refresh();
-            return result;
-        }
-        */
-        
-        @Override
-        public void remove(Component comp) {
-            super.remove(comp);
-            updateCargoLabel();
         }
 
         @Override
@@ -1031,10 +946,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 return null;
             }
 
-            public void remove(Component comp) {
-                super.remove(comp);
-                updateProductionLabel();
-            }
         }
     }
 
@@ -1042,21 +953,47 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * A panel that holds UnitsLabels that represent Units that are standing in
      * front of a colony.
      */
-    public final class OutsideColonyPanel extends JPanel {
+    public final class OutsideColonyPanel extends JPanel implements PropertyChangeListener {
 
-        private final ColonyPanel colonyPanel;
+        private Colony colony;
 
-        /**
-         * Creates this OutsideColonyPanel.
-         * 
-         * @param colonyPanel The panel that holds this OutsideColonyPanel.
-         */
-        public OutsideColonyPanel(ColonyPanel colonyPanel) {
-            this.colonyPanel = colonyPanel;
+        public void setColony(Colony newColony) {
+            if (colony != null) {
+                colony.getTile().removePropertyChangeListener(this);
+            }
+            this.colony = newColony;
+            if (colony != null) {
+                colony.getTile().addPropertyChangeListener(Tile.UNIT_CHANGE, this);
+            }
+            initialize();
+        }
+
+        public void initialize() {
+            
+            removeAll();
+            if (colony == null) {
+                return;
+            }
+
+            Tile colonyTile = colony.getTile();
+            for (Unit unit : colonyTile.getUnitList()) {
+
+                UnitLabel unitLabel = new UnitLabel(unit, parent);
+                if (isEditable()) {
+                    unitLabel.setTransferHandler(defaultTransferHandler);
+                    unitLabel.addMouseListener(pressListener);
+                }
+
+                if (!unit.isCarrier()) {
+                    add(unitLabel, false);
+                }
+            }
+            revalidate();
+            repaint();
         }
 
         public Colony getColony() {
-            return colonyPanel.getColony();
+            return colony;
         }
 
         @Override
@@ -1105,6 +1042,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             Component c = add(comp);
             return c;
         }
+
+        public void propertyChange(PropertyChangeEvent event) {
+            initialize();
+        }
+
     }
 
     /**
@@ -1112,16 +1054,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * waiting in the port of the colony.
      */
     public final class InPortPanel extends JPanel {
-        /**
-         * Adds a component to this InPortPanel.
-         * 
-         * @param comp The component to add to this InPortPanel.
-         * @return The component argument.
-         */
-        @Override
-        public Component add(Component comp) {
-            return super.add(comp);
-        }
 
         @Override
         public String getUIClassID() {
@@ -1189,7 +1121,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 if (comp instanceof GoodsLabel) {
                     comp.getParent().remove(comp);
                     ((GoodsLabel) comp).setSmall(false);
-                    reinitialize();
                     return comp;
                 }
                 logger.warning("An invalid component got dropped on this WarehousePanel.");
@@ -1382,10 +1313,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 }
             }
 
-            public ColonyTile getColonyTile() {
-                return colonyTile;
-            }
-
             /**
              * Adds a component to this CargoPanel and makes sure that the unit
              * or good that the component represents gets modified so that it is
@@ -1441,11 +1368,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                                 inGameController.changeWorkType(unit, workType);
                             }
 
-                            updateDescriptionLabel((UnitLabel) comp, true);
+                            //updateDescriptionLabel((UnitLabel) comp, true);
 
                             ((UnitLabel) comp).setSmall(false);
 
-                            colonyPanel.updateSoLLabel();
+                            //colonyPanel.updateSoLLabel();
                         } else {
                             // could not add the unit on the tile
                             Settlement s = colonyTile.getWorkTile().getOwningSettlement();
@@ -1535,21 +1462,23 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     
     public void propertyChange(PropertyChangeEvent e){        
 
-        System.out.println("colony panel: " + e.getPropertyName() + " " + e.getSource());
         if (!isShowing() || getColony() == null) {
             return;
     	}
         String property = e.getPropertyName();
 
-        if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
+        if (Unit.CARGO_CHANGE.equals(property)) {
+            updateCarrierButtons();
+        } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
+            updateSoLLabel();
+        } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
             ModelMessage msg = getColony().checkForGovMgtChangeMessage();
             if (msg != null){
                 parent.showInformationMessage(msg.getId(), msg.getDisplay(), msg.getData());
             }
+            updateSoLLabel();
         } else if (property.startsWith("model.goods.")) {
             updateProductionPanel();
-            // doesn't quite work yet
-            updateCarrierButtons();
         } else {
             logger.warning("Unknown property change event: " + e.getPropertyName());
         }

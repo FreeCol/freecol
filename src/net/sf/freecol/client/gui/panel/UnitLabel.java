@@ -305,10 +305,12 @@ public final class UnitLabel extends JLabel implements ActionListener {
 	    inGameController.assignTeacher(unit, teacher);
 	    Component uc = getParent();
 	    while (uc != null) {
+                /*
 		if (uc instanceof ColonyPanel) {
 		    ((ColonyPanel) uc).reinitialize();
 		    break;
 		}
+                */
 		uc = uc.getParent();
 	    }
 	    break;
@@ -361,7 +363,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                     parent.remove(uc);
                     parent.getClient().getActionManager().update();
                 } else {
-                    ((ColonyPanel) uc).reinitialize();
+                    // ((ColonyPanel) uc).reinitialize();
                 }
 
                 break;

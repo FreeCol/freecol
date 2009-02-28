@@ -78,6 +78,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public static final int TURNS_TO_SAIL = Specification.getSpecification().getIntegerOption(
             "model.option.turnsToSail").getValue();
 
+    public static final String CARGO_CHANGE = "CARGO_CHANGE";
+
     /**
      * A state a Unit can have.
      */
@@ -1662,10 +1664,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     units = new ArrayList<Unit>();
                 } 
                 units.add((Unit) locatable);
+                firePropertyChange(CARGO_CHANGE, null, locatable);
             }
             spendAllMoves();
         } else if (locatable instanceof Goods && canCarryGoods()) {
             goodsContainer.addGoods((Goods) locatable);
+            firePropertyChange(CARGO_CHANGE, null, locatable);
             if (getSpaceLeft() < 0) {
                 throw new IllegalStateException("Not enough space for the given locatable!");
             }
@@ -1686,9 +1690,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             throw new IllegalArgumentException("Locatable must not be 'null'.");
         } else if (locatable instanceof Unit && canCarryUnits()) {
             units.remove(locatable);
+            firePropertyChange(CARGO_CHANGE, locatable, null);
             spendAllMoves();
         } else if (locatable instanceof Goods && canCarryGoods()) {
             goodsContainer.removeGoods((Goods) locatable);
+            firePropertyChange(CARGO_CHANGE, locatable, null);
             spendAllMoves();
         } else {
             logger.warning("Tried to remove a 'Locatable' from a non-carrier unit.");

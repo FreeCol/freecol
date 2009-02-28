@@ -57,6 +57,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
     private static final String UNITS_TAG_NAME = "units";
 
+    public static final String UNIT_CHANGE = "UNIT_CHANGE";
+
     private TileType type;
     
     private int x, y;
@@ -1145,6 +1147,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     units = new ArrayList<Unit>();
                 } 
                 units.add((Unit) locatable);
+                firePropertyChange(UNIT_CHANGE, null, locatable);
             }
         } else if (locatable instanceof TileItem) {
             if (tileItemContainer == null) {
@@ -1166,7 +1169,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             boolean removed = units.remove(locatable);
-            if (!removed) {
+            if (removed) {
+                firePropertyChange(UNIT_CHANGE, locatable, null);
+            } else {
                 logger.warning("Unit with ID " + ((Unit) locatable).getId() +
                                " could not be removed from " + this.toString() + " with ID " +
                                getId());

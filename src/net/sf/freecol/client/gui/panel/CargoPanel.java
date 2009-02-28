@@ -126,11 +126,11 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
      */
     public void setCarrier(final Unit newCarrier) {
         if (carrier != null) {
-            carrier.getGoodsContainer().removePropertyChangeListener(this);
+            carrier.removePropertyChangeListener(this);
         }
         this.carrier = newCarrier;
         if (carrier != null) {
-            carrier.getGoodsContainer().addPropertyChangeListener(this);
+            carrier.addPropertyChangeListener(Unit.CARGO_CHANGE, this);
         }
         initialize();
     }
