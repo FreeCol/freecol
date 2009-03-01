@@ -19,7 +19,6 @@ public class ListOption<T> extends AbstractOption {
 
     private ListOptionSelector<T> selector;
     private List<T> value;
-    private Class<T> type;
 
     /**
      * Creates a new <code>ListOption</code>.

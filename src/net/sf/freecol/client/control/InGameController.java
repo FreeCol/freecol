@@ -654,15 +654,15 @@ public final class InGameController implements NetworkConstants {
         final Player player = freeColClient.getMyPlayer();
         Map map = freeColClient.getGame().getMap();
 
-        final ArrayList<ChoiceItem> destinations = new ArrayList<ChoiceItem>();
+        final ArrayList<ChoiceItem<Location>> destinations = new ArrayList<ChoiceItem<Location>>();
         if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
             PathNode path = map.findPathToEurope(unit, unit.getTile());
             if (path != null) {
                 int turns = path.getTotalTurns();
-                destinations.add(new ChoiceItem<Europe>(player.getEurope().getName() + " (" + turns + ")", player.getEurope()));
+                destinations.add(new ChoiceItem<Location>(player.getEurope().getName() + " (" + turns + ")", player.getEurope()));
             } else if (unit.getTile() != null
                        && (unit.getTile().canMoveToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
-                destinations.add(new ChoiceItem<Europe>(player.getEurope().getName() + " (0)", player.getEurope()));
+                destinations.add(new ChoiceItem<Location>(player.getEurope().getName() + " (0)", player.getEurope()));
             }
         }
 
@@ -679,7 +679,7 @@ public final class InGameController implements NetworkConstants {
                         && p.getTile().getSettlement() != inSettlement) {
                         Settlement s = p.getTile().getSettlement();
                         int turns = p.getTurns();
-                        destinations.add(new ChoiceItem<Settlement>(s.toString() + " (" + turns + ")", s));
+                        destinations.add(new ChoiceItem<Location>(s.toString() + " (" + turns + ")", s));
                     }
                     return false;
                 }
@@ -690,16 +690,13 @@ public final class InGameController implements NetworkConstants {
             }, Integer.MAX_VALUE);
 
         Canvas canvas = freeColClient.getCanvas();
-        ChoiceItem choice = (ChoiceItem) canvas
-            .showChoiceDialog(Messages.message("selectDestination.text"),
-                              Messages.message("selectDestination.cancel"),
-                              destinations.toArray(new ChoiceItem[destinations.size()]));
-        if (choice == null) {
+        Location destination = canvas.showChoiceDialog(Messages.message("selectDestination.text"),
+                                                       Messages.message("selectDestination.cancel"),
+                                                       destinations);
+        if (destination == null) {
             // user aborted
             return;
         }
-
-        Location destination = (Location) choice.getObject();
 
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             setDestination(unit, destination);
@@ -1402,10 +1399,10 @@ public final class InGameController implements NetworkConstants {
         boolean canGift = transactionSession.get("canGift");
         
         // Show main dialog
-        ChoiceItem tradeType = canvas.showIndianSettlementTradeDlg(canBuy,canSell,canGift);
+        Integer tradeType = canvas.showIndianSettlementTradeDlg(canBuy,canSell,canGift);
         while(tradeType != null){
             boolean tradeFinished = false;
-            switch(tradeType.getChoice()){
+            switch(tradeType.intValue()){
                 case 1:
                     tradeFinished = attemptBuyFromIndianSettlement(unit, settlement);
                     if(tradeFinished){
@@ -1498,21 +1495,22 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         
         // Get list of goods for sale
-        ArrayList<Goods> goodsOffered = getGoodsForSaleInIndianSettlement(unit, settlement);
+        List<ChoiceItem<Goods>> goodsOffered = new ArrayList<ChoiceItem<Goods>>();
+        for (Goods goods : getGoodsForSaleInIndianSettlement(unit, settlement)) {
+            goodsOffered.add(new ChoiceItem<Goods>(goods));
+        }
                 
         Client client = freeColClient.getClient();
-        ChoiceItem choice = null;
-        do{
+        Goods goods = null;
+        do {
             // Show dialog with goods for sale
-            choice = (ChoiceItem) canvas.showChoiceDialog(Messages.message("buyProposition.text"),
-                                  Messages.message("buyProposition.cancel"),
-                                  goodsOffered.iterator());
+            goods = canvas.showChoiceDialog(Messages.message("buyProposition.text"),
+                                            Messages.message("buyProposition.cancel"),
+                                            goodsOffered);
             
-            if (choice == null) { // == Trade aborted by the player, cancel buy attempt
+            if (goods == null) { // == Trade aborted by the player, cancel buy attempt
                 return false;
             }
-            
-            Goods goods = (Goods) choice.getObject();
             
             // Get price for chosen good from server
             Element buyPropositionElement = Message.createNewRootElement("buyProposition");
@@ -1538,17 +1536,17 @@ public final class InGameController implements NetworkConstants {
                         "%nation%", settlement.getOwner().getNationAsString(),
                         "%goods%", goods.getName(),
                         "%gold%", Integer.toString(gold));
-                ChoiceItem ci = (ChoiceItem) canvas
-                .showChoiceDialog(text, Messages.message("buy.cancel"),
-                        new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), 1),
-                        new ChoiceItem<Integer>(Messages.message("buy.moreGold"), 2));
+                List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
+                choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), 1));
+                choices.add(new ChoiceItem<Integer>(Messages.message("buy.moreGold"), 2));
+                Integer ci = canvas.showChoiceDialog(text, Messages.message("buy.cancel"), choices);
                 
                 // player cancelled goods choice, return to goods to sale dialog
                 if (ci == null) {
                     break;
                 }
                 // process player choice
-                switch(ci.getChoice()){
+                switch(ci.intValue()){
                     case 1:
                         // Accepts price, makes purchase
                         buyFromSettlement(unit, (IndianSettlement) settlement, goods, gold);
@@ -1570,7 +1568,7 @@ public final class InGameController implements NetworkConstants {
                          throw new IllegalStateException();
                 }
             }
-        }while(choice != null);
+        } while(goods != null);
         // This should not happen
         logger.warning("Unexpected situation");
         return false;
@@ -1580,22 +1578,21 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         
         // show buy dialog
-        ChoiceItem choice = (ChoiceItem) canvas.showChoiceDialog(Messages.message("tradeProposition.text"),
-                          Messages.message("tradeProposition.cancel"),
-                          unit.getGoodsIterator());
+        Goods choice = canvas.showSimpleChoiceDialog(Messages.message("tradeProposition.text"),
+                                                     Messages.message("tradeProposition.cancel"),
+                                                     unit.getGoodsList());
         
         if (choice == null) { // == Trade aborted by the player.
             return false;
         }
         
         Client client = freeColClient.getClient();
-        Goods goods = (Goods) choice.getObject();
 
         // Send initial proposal to server
         Element tradePropositionElement = Message.createNewRootElement("tradeProposition");
         tradePropositionElement.setAttribute("unit", unit.getId());
         tradePropositionElement.setAttribute("settlement", settlement.getId());
-        tradePropositionElement.appendChild(goods.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
+        tradePropositionElement.appendChild(choice.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
 
         Element reply = client.ask(tradePropositionElement);
         while (reply != null) {
@@ -1607,7 +1604,7 @@ public final class InGameController implements NetworkConstants {
             
             // Indian do not need the goods, refuse and end trade
             if (gold == NO_NEED_FOR_THE_GOODS) {
-                canvas.showInformationMessage("noNeedForTheGoods", "%goods%", goods.getName());
+                canvas.showInformationMessage("noNeedForTheGoods", "%goods%", choice.getName());
                 return true;
             }
             
@@ -1620,26 +1617,27 @@ public final class InGameController implements NetworkConstants {
             // Show proposal for goods
             String text = Messages.message("trade.text",
                                            "%nation%", settlement.getOwner().getNationAsString(),
-                                           "%goods%", goods.getName(),
+                                           "%goods%", choice.getName(),
                                            "%gold%", Integer.toString(gold));
-            ChoiceItem offerReply = (ChoiceItem) canvas.showChoiceDialog(text, 
-                                  Messages.message("trade.cancel"), 
-                                  new ChoiceItem<Integer>(Messages.message("trade.takeOffer"), 1),
-                                  new ChoiceItem<Integer>(Messages.message("trade.moreGold"), 2),
-                                  new ChoiceItem<Integer>(Messages.message("trade.gift", "%goods%", goods.getName()), 0));
-            
+            List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
+            choices.add(new ChoiceItem<Integer>(Messages.message("trade.takeOffer"), 1));
+            choices.add(new ChoiceItem<Integer>(Messages.message("trade.moreGold"), 2));
+            choices.add(new ChoiceItem<Integer>(Messages.message("trade.gift", "%goods%", 
+                                                                 choice.getName()), 0));
+            Integer offerReply = canvas.showChoiceDialog(text, Messages.message("trade.cancel"), choices);
+
             if (offerReply == null) { // == Trade aborted by the player.
                 return false;
             }
             
-            switch(offerReply.getChoice()){
+            switch(offerReply.intValue()){
                 case 0:
                     // decide to make a gift of the goods
-                    deliverGiftToSettlement(unit, settlement, goods);
+                    deliverGiftToSettlement(unit, settlement, choice);
                     return true;
                 case 1:
                     // deal accepted
-                    sellToSettlement(unit, settlement, goods, gold);
+                    sellToSettlement(unit, settlement, choice, gold);
                     return true;
                 case 2:
                     // ask for more money
@@ -1654,7 +1652,7 @@ public final class InGameController implements NetworkConstants {
             tradePropositionElement = Message.createNewRootElement("tradeProposition");
             tradePropositionElement.setAttribute("unit", unit.getId());
             tradePropositionElement.setAttribute("settlement", settlement.getId());
-            tradePropositionElement.appendChild(goods.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
+            tradePropositionElement.appendChild(choice.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
             tradePropositionElement.setAttribute("gold", Integer.toString(gold));
 
             reply = client.ask(tradePropositionElement);
@@ -1806,15 +1804,14 @@ public final class InGameController implements NetworkConstants {
         }
 
         // no goods were chosen as gift, show dialog to decide
-        if(goods == null){
-            ChoiceItem choice = (ChoiceItem) canvas.showChoiceDialog(Messages.message("gift.text"),
-                    Messages.message("tradeProposition.cancel"),
-                    unit.getGoodsIterator());
+        if (goods == null){
+            goods = canvas.showSimpleChoiceDialog(Messages.message("gift.text"),
+                                                  Messages.message("tradeProposition.cancel"),
+                                                  unit.getGoodsList());
             
-            if (choice == null) { // == Trade aborted by the player.
+            if (goods == null) { // == Trade aborted by the player.
                 return false;
             }
-            goods = (Goods) choice.getObject();
         }
         
         // Send gift proposal to server
@@ -2352,14 +2349,12 @@ public final class InGameController implements NetworkConstants {
             } else if (choices.size() == 0) {
                 throw new IllegalStateException();
             } else {
-                ChoiceItem choice = (ChoiceItem) canvas
-                    .showChoiceDialog(Messages.message("embark.text"),
-                                      Messages.message("embark.cancel"),
-                                      choices.iterator());
-                if (choice == null) { // == user cancelled
+                destinationUnit = canvas.showSimpleChoiceDialog(Messages.message("embark.text"),
+                                                                Messages.message("embark.cancel"),
+                                                                choices);
+                if (destinationUnit == null) { // == user cancelled
                     return;
                 }
-                destinationUnit = (Unit) choice.getObject();
             }
         }
 
@@ -2813,16 +2808,17 @@ public final class InGameController implements NetworkConstants {
             int price = unit.getOwner().getLandPrice(unit.getTile());
             if (price > 0) {
                 Player nation = unit.getTile().getOwner();
-                ChoiceItem ci = (ChoiceItem) freeColClient.getCanvas()
+                List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
+                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay" ,"%amount%",
+                                                                     Integer.toString(price)), 1));
+                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
+                Integer ci = freeColClient.getCanvas()
                     .showChoiceDialog(Messages.message("indianLand.text",
                                                        "%player%", nation.getName()),
-                                      Messages.message("indianLand.cancel"),
-                                      new ChoiceItem<Integer>(Messages.message("indianLand.pay" ,"%amount%",
-                                                                      Integer.toString(price)), 1),
-                                      new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
+                                      Messages.message("indianLand.cancel"), choices);
                 if (ci == null) {
                     return;
-                } else if (ci.getChoice() == 1) {
+                } else if (ci.intValue() == 1) {
                     if (price > freeColClient.getMyPlayer().getGold()) {
                         freeColClient.getCanvas().errorMessage("notEnoughGold");
                         return;

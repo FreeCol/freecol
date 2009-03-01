@@ -25,6 +25,7 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -281,15 +282,15 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     t.setResource(resList.get(0));
                     return;
                 default:
-                    ChoiceItem[] choices = new ChoiceItem[resList.size()];
-                    for (int index = 0; index < choices.length; index++) {
-                        ResourceType resType = resList.get(index);
-                        choices[index] = new ChoiceItem<ResourceType>(resType.getName(), resType);
+                    List<ChoiceItem<ResourceType>> choices = new ArrayList<ChoiceItem<ResourceType>>();
+                    for (ResourceType resType : resList) {
+                        choices.add(new ChoiceItem<ResourceType>(resType.getName(), resType));
                     }
-                    ChoiceItem choice = (ChoiceItem) getCanvas().showChoiceDialog("ok", "cancel", choices);
+                    ResourceType choice = getCanvas().showChoiceDialog(Messages.message("ok"),
+                                                                       Messages.message("cancel"),
+                                                                       choices);
                     if (choice != null) {
-                        ResourceType resourceType = (ResourceType) choice.getObject();
-                        t.setResource(resourceType);
+                        t.setResource(choice);
                     }
                 }
             }

@@ -1334,25 +1334,24 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         int price = unit.getOwner().getLandPrice(colonyTile.getWorkTile());
                         if (price > 0) {
                             Player player = colonyTile.getWorkTile().getOwner();
-                            ChoiceItem[] choices = {
-                                new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
-                                                                         Integer.toString(price)), 1),
-                                new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2)
-                            };
-                            ChoiceItem ci = (ChoiceItem) parent.
+                            List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
+                            choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
+                                                                                 Integer.toString(price)), 1));
+                            choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
+                            Integer ci = parent.
                                 showChoiceDialog(Messages.message("indianLand.text",
                                                                   "%player%", player.getNationAsString()),
                                                  Messages.message("indianLand.cancel"), choices);
                             if (ci == null) {
                                 return null;
-                            } else if (ci.getChoice() == 1) {
+                            } else if (ci.intValue() == 1) {
                                 if (price > freeColClient.getMyPlayer().getGold()) {
                                     parent.errorMessage("notEnoughGold");
                                     return null;
                                 }
 
                                 inGameController.buyLand(colonyTile.getWorkTile());
-                            } else if (ci.getChoice() == 2) {
+                            } else if (ci.intValue() == 2) {
                                 inGameController.stealLand(colonyTile.getWorkTile(), colony);
                             }
                         }

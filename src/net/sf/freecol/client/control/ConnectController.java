@@ -201,12 +201,12 @@ public final class ConnectController {
 
         List<String> vacantPlayers = getVacantPlayers(host, port);
         if (vacantPlayers != null) {
-            ChoiceItem choice = (ChoiceItem) canvas
-                .showChoiceDialog(Messages.message("connectController.choicePlayer"),
-                                  Messages.message("cancel"),
-                                  vacantPlayers.iterator());
+            String choice = canvas
+                .showSimpleChoiceDialog(Messages.message("connectController.choicePlayer"),
+                                        Messages.message("cancel"),
+                                        vacantPlayers);
             if (choice != null) {
-                username = (String) choice.getObject();
+                username = choice;
             } else {
                 return;
             }

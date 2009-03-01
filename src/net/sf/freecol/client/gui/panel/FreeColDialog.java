@@ -197,14 +197,14 @@ public class FreeColDialog<T> extends FreeColPanel {
     * @see ChoiceItem
     */
     public static <T> FreeColDialog<ChoiceItem<T>> createChoiceDialog(String text, String cancelText, 
-                                                                      ChoiceItem<T>... objects) {
+                                                                      List<ChoiceItem<T>> choices) {
 
-        if (objects.length == 0) {
+        if (choices.isEmpty()) {
             throw new IllegalArgumentException("Can not create choice dialog with 0 choices!");
         }
 
         final JButton firstButton;
-        firstButton = new JButton(objects[0].toString());
+        firstButton = new JButton(choices.get(0).toString());
 
         final FreeColDialog<ChoiceItem<T>> choiceDialog = new FreeColDialog<ChoiceItem<T>>() {
             public void requestFocus() {
@@ -220,27 +220,26 @@ public class FreeColDialog<T> extends FreeColPanel {
         choiceDialog.add(textArea, "wrap");
 
         int columns = 1;
-             if ((objects.length % 4) == 0 && objects.length > 12) columns = 4;
-        else if ((objects.length % 3) == 0 && objects.length > 6)  columns = 3;
-        else if ((objects.length % 2) == 0 && objects.length > 4)  columns = 2;
+             if ((choices.size() % 4) == 0 && choices.size() > 12) columns = 4;
+        else if ((choices.size() % 3) == 0 && choices.size() > 6)  columns = 3;
+        else if ((choices.size() % 2) == 0 && choices.size() > 4)  columns = 2;
         
-        else if (objects.length > 21) columns = 4;
-        else if (objects.length > 10) columns = 2;
+        else if (choices.size() > 21) columns = 4;
+        else if (choices.size() > 10) columns = 2;
         
-        JPanel objectsPanel = new JPanel(new GridLayout(0, columns, 10, 10));
-        objectsPanel.setBorder(new CompoundBorder(objectsPanel.getBorder(), 
+        JPanel choicesPanel = new JPanel(new GridLayout(0, columns, 10, 10));
+        choicesPanel.setBorder(new CompoundBorder(choicesPanel.getBorder(), 
                                                   new EmptyBorder(10, 20, 10, 20)));
 
-        final ChoiceItem<T> firstObject = objects[0];
+        final ChoiceItem<T> firstObject = choices.get(0);
         firstButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     choiceDialog.setResponse(firstObject);
                 }
             });
-        objectsPanel.add(firstButton);
+        choicesPanel.add(firstButton);
 
-        for (int i = 1; i < objects.length; i++) {
-            final ChoiceItem<T> object = objects[i];
+        for (final ChoiceItem<T> object : choices) {
             final JButton objectButton = new JButton(object.toString());
             objectButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
@@ -248,9 +247,9 @@ public class FreeColDialog<T> extends FreeColPanel {
                 }
             });
             enterPressesWhenFocused(objectButton);
-            objectsPanel.add(objectButton);
+            choicesPanel.add(objectButton);
         }
-        JScrollPane scrollPane = new JScrollPane(objectsPanel,
+        JScrollPane scrollPane = new JScrollPane(choicesPanel,
                                                  JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         choiceDialog.add(scrollPane, "wrap 20");

@@ -242,16 +242,14 @@ public class DebugMenu extends JMenu {
         addFather.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Player player = freeColClient.getMyPlayer();
-                    List<ChoiceItem> fathers = new ArrayList<ChoiceItem>();
+                    List<ChoiceItem<FoundingFather>> fathers = new ArrayList<ChoiceItem<FoundingFather>>();
                     for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
                         if (!player.hasFather(father)) {
                             fathers.add(new ChoiceItem<FoundingFather>(father.getName(), father));
                         }
                     }
-                    ChoiceItem[] choices = fathers.toArray(new ChoiceItem[fathers.size()]);
-                    ChoiceItem response = (ChoiceItem) freeColClient.getCanvas()
-                        .showChoiceDialog("Select Founding Father", "cancel", choices);
-                    FoundingFather fatherToAdd = (FoundingFather) response.getObject();
+                    FoundingFather fatherToAdd = freeColClient.getCanvas()
+                        .showChoiceDialog("Select Founding Father", "cancel", fathers);
                     player.addFather(fatherToAdd);
                     Player serverPlayer = (Player) freeColClient.getFreeColServer().getGame().
                         getFreeColGameObject(player.getId());

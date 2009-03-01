@@ -1136,18 +1136,19 @@ public final class Canvas extends JDesktopPane {
      */
     public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
         int arrears = europe.getOwner().getArrears(goods.getType());
+        List<ChoiceItem<BoycottAction>> choices = new ArrayList<ChoiceItem<BoycottAction>>();
+        choices.add(new ChoiceItem<BoycottAction>(Messages.message("boycottedGoods.payArrears"),
+                                                  BoycottAction.PAY_ARREARS));
+        choices.add(new ChoiceItem<BoycottAction>(Messages.message("boycottedGoods.dumpGoods"),
+                                                  BoycottAction.DUMP_CARGO));
+        choices.add(new ChoiceItem<BoycottAction>(Messages.message("cancel"),
+                                                  BoycottAction.CANCEL));
         FreeColDialog<ChoiceItem<BoycottAction>> boycottedGoodsDialog = FreeColDialog
             .createChoiceDialog(Messages.message("boycottedGoods.text", 
                                                  "%goods%", goods.getName(), 
                                                  "%europe%", europe.getName(),
                                                  "%amount%", String.valueOf(arrears)),
-                                null,
-                                new ChoiceItem<BoycottAction>(Messages.message("boycottedGoods.payArrears"),
-                                                              BoycottAction.PAY_ARREARS),
-                                new ChoiceItem<BoycottAction>(Messages.message("boycottedGoods.dumpGoods"),
-                                                              BoycottAction.DUMP_CARGO),
-                                new ChoiceItem<BoycottAction>(Messages.message("cancel"),
-                                                              BoycottAction.CANCEL));
+                                null, choices);
         addAsFrame(boycottedGoodsDialog);
         ChoiceItem<BoycottAction> response = boycottedGoodsDialog.getResponse();
         remove(boycottedGoodsDialog);
@@ -1186,17 +1187,19 @@ public final class Canvas extends JDesktopPane {
                                      "%goods2%", settlement.getWantedGoods()[1].getName(),
                                      "%goods3%", settlement.getWantedGoods()[2].getName()));
         text.append("\n\n");
-    
-        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog = FreeColDialog
-            .createChoiceDialog(text.toString(), null,
-                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.speak"),
-                                                            ScoutAction.INDIAN_SETTLEMENT_SPEAK),
-                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.tribute"),
-                                                            ScoutAction.INDIAN_SETTLEMENT_TRIBUTE),
-                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.attack"),
-                                                            ScoutAction.INDIAN_SETTLEMENT_ATTACK),
-                                new ChoiceItem<ScoutAction>(Messages.message("cancel"),
-                                                            ScoutAction.CANCEL));
+
+        List<ChoiceItem<ScoutAction>> choices = new ArrayList<ChoiceItem<ScoutAction>>();
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.speak"),
+                                                ScoutAction.INDIAN_SETTLEMENT_SPEAK));
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.tribute"),
+                                                ScoutAction.INDIAN_SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.attack"),
+                                                ScoutAction.INDIAN_SETTLEMENT_ATTACK));
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("cancel"),
+                                                ScoutAction.CANCEL));    
+        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog = 
+            FreeColDialog.createChoiceDialog(text.toString(), null, choices);
+
 
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
@@ -1226,17 +1229,17 @@ public final class Canvas extends JDesktopPane {
         String mainText = Messages.message("scoutColony.text", 
                                            "%unit%", unit.getName(), 
                                            "%colony%", colony.getName());
-
-        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog = FreeColDialog
-        .createChoiceDialog(mainText, null,
-                            new ChoiceItem<ScoutAction>(Messages.message("scoutColony.negotiate"), 
-                                                        ScoutAction.FOREIGN_COLONY_NEGOTIATE),
-                            new ChoiceItem<ScoutAction>(Messages.message("scoutColony.spy"),
-                                                        ScoutAction.FOREIGN_COLONY_SPY),
-                            new ChoiceItem<ScoutAction>(Messages.message("scoutColony.attack"),
-                                                        ScoutAction.FOREIGN_COLONY_ATTACK),
-                            new ChoiceItem<ScoutAction>(Messages.message("cancel"),
-                                                        ScoutAction.CANCEL));
+        List<ChoiceItem<ScoutAction>> choices = new ArrayList<ChoiceItem<ScoutAction>>();
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.negotiate"), 
+                                                ScoutAction.FOREIGN_COLONY_NEGOTIATE));
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.spy"),
+                                                ScoutAction.FOREIGN_COLONY_SPY));
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.attack"),
+                                                ScoutAction.FOREIGN_COLONY_ATTACK));
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("cancel"),
+                                                ScoutAction.CANCEL));
+        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog =
+            FreeColDialog.createChoiceDialog(mainText, null, choices);
         addAsFrame(scoutDialog);
         scoutDialog.requestFocus();
 
@@ -1265,14 +1268,15 @@ public final class Canvas extends JDesktopPane {
         String introText = Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
                 "%nation%", settlement.getOwner().getNationAsString());
 
-        FreeColDialog<ChoiceItem<ScoutAction>> armedUnitDialog = FreeColDialog
-            .createChoiceDialog(introText, null,
-                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.tribute"),
-                                                            ScoutAction.INDIAN_SETTLEMENT_TRIBUTE),
-                                new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.attack"),
-                                                            ScoutAction.INDIAN_SETTLEMENT_ATTACK),
-                                new ChoiceItem<ScoutAction>(Messages.message("cancel"),
-                                                            ScoutAction.CANCEL));
+        List<ChoiceItem<ScoutAction>> choices = new ArrayList<ChoiceItem<ScoutAction>>();
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.tribute"),
+                                                ScoutAction.INDIAN_SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.attack"),
+                                                ScoutAction.INDIAN_SETTLEMENT_ATTACK));
+        choices.add(new ChoiceItem<ScoutAction>(Messages.message("cancel"),
+                                                ScoutAction.CANCEL));
+        FreeColDialog<ChoiceItem<ScoutAction>> armedUnitDialog =
+            FreeColDialog.createChoiceDialog(introText, null, choices);
         addAsFrame(armedUnitDialog);
         armedUnitDialog.requestFocus();
 
@@ -1307,28 +1311,23 @@ public final class Canvas extends JDesktopPane {
         introText.append("\n\n");
         introText.append(Messages.message("missionarySettlement.question"));
 
-        ChoiceItem<MissionaryAction> establish =
-            new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.establish"),
-                                             MissionaryAction.ESTABLISH_MISSION);
-        ChoiceItem<MissionaryAction> heresy =
-            new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.heresy"),
-                                             MissionaryAction.DENOUNCE_HERESY);
-        ChoiceItem<MissionaryAction> incite =
-            new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.incite"),
-                                             MissionaryAction.INCITE_INDIANS);
-        ChoiceItem<MissionaryAction> cancel =
-            new ChoiceItem<MissionaryAction>(Messages.message("cancel"),
-                                             MissionaryAction.CANCEL);
+        List<ChoiceItem<MissionaryAction>> choices = new ArrayList<ChoiceItem<MissionaryAction>>();
+        choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.establish"),
+                                                     MissionaryAction.ESTABLISH_MISSION));
+        choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.incite"),
+                                                     MissionaryAction.INCITE_INDIANS));
+        choices.add(new ChoiceItem<MissionaryAction>(Messages.message("cancel"),
+                                                     MissionaryAction.CANCEL));
 
         FreeColDialog<ChoiceItem<MissionaryAction>> missionaryDialog;
         if (settlement.getMissionary() == null) {
             // no missionary yet, we can establish a new religious mission
-            missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null,
-                    establish, incite, cancel);
+            missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null, choices);
         } else {
             // we can denounce it as heresy
-            missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null,
-                    heresy, incite, cancel);
+            choices.add(0, new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.heresy"),
+                                                            MissionaryAction.DENOUNCE_HERESY));
+            missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null, choices);
         }
 
         addAsFrame(missionaryDialog);
@@ -1457,17 +1456,23 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param text The text that explains the choice for the user.
      * @param cancelText The text displayed on the "cancel"-button.
-     * @param iterator The <code>Iterator</code> containing the objects to
+     * @param choices The <code>List</code> containing the ChoiceItems to
      *            create buttons for.
      * @return The chosen object, or <i>null</i> for the cancel-button.
      */
-    public Object showChoiceDialog(String text, String cancelText, Iterator<?> iterator) {
-        ArrayList<ChoiceItem> a = new ArrayList<ChoiceItem>();
-        while (iterator.hasNext()) {
-            a.add(new ChoiceItem(iterator.next()));
-        }
+    public <T> T showChoiceDialog(String text, String cancelText, List<ChoiceItem<T>> choices) {
 
-        return showChoiceDialog(text, cancelText, a.toArray(new ChoiceItem[0]));
+        FreeColDialog<ChoiceItem<T>> choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, choices);
+        if (choiceDialog.getHeight() > getHeight() / 3) {
+            choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
+        }
+        addAsFrame(choiceDialog);
+        choiceDialog.requestFocus();
+
+        ChoiceItem<T> response = choiceDialog.getResponse();
+        remove(choiceDialog);
+
+        return response.getObject();
     }
 
     /**
@@ -1476,22 +1481,17 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param text The text that explains the choice for the user.
      * @param cancelText The text displayed on the "cancel"-button.
-     * @param objects The array containing the objects to create buttons for.
+     * @param objects The List containing the objects to create buttons for.
      * @return The chosen object, or <i>null</i> for the cancel-button.
      */
-    public Object showChoiceDialog(String text, String cancelText, ChoiceItem... objects) {
+    public <T> T showSimpleChoiceDialog(String text, String cancelText, List<T> objects) {
 
-        FreeColDialog choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, objects);
-        if (choiceDialog.getHeight() > getHeight() / 3) {
-            choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
+        List<ChoiceItem<T>> choices = new ArrayList<ChoiceItem<T>>();
+        for (T object : objects) {
+            choices.add(new ChoiceItem<T>(object));
         }
-        addAsFrame(choiceDialog);
-        choiceDialog.requestFocus();
 
-        Object response = choiceDialog.getResponse();
-        remove(choiceDialog);
-
-        return response;
+        return showChoiceDialog(text, cancelText, choices);
     }
 
     /**
@@ -1781,8 +1781,8 @@ public final class Canvas extends JDesktopPane {
 
     }
 
-    public ChoiceItem showIndianSettlementTradeDlg(boolean showBuy, boolean showSell, boolean showGift){
-        ArrayList<ChoiceItem> choices = new ArrayList<ChoiceItem>();
+    public Integer showIndianSettlementTradeDlg(boolean showBuy, boolean showSell, boolean showGift){
+        ArrayList<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
         if(showBuy){
             choices.add(new ChoiceItem<Integer>(Messages.message("tradeProposition.toBuy"), 1));
         }
@@ -1793,9 +1793,9 @@ public final class Canvas extends JDesktopPane {
             choices.add(new ChoiceItem<Integer>(Messages.message("tradeProposition.toGift"), 3));
         }
         
-        ChoiceItem choice = (ChoiceItem) showChoiceDialog(Messages.message("tradeProposition.welcome"), 
-                          Messages.message("tradeProposition.cancel"), 
-                          choices.toArray(new ChoiceItem[0]));
+        Integer choice = showChoiceDialog(Messages.message("tradeProposition.welcome"), 
+                                          Messages.message("tradeProposition.cancel"), 
+                                          choices);
         
         return choice;
     }
