@@ -50,12 +50,6 @@ public final class ReportHighScoresPanel extends ReportPanel {
      */
     public ReportHighScoresPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.game.highScores"));
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
         // Display Panel
         reportPanel.removeAll();
 

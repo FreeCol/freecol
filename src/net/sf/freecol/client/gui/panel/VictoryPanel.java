@@ -116,17 +116,17 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-            	if(parent.getClient().retire()){
-            		parent.showInformationMessage("highscores.new");
-            		parent.showReportPanel(ReportHighScoresPanel.class.getName());
-            	}
+                if(parent.getClient().retire()){
+                    parent.showInformationMessage("highscores.new");
+                    parent.showPanel(new ReportHighScoresPanel(parent));
+                }
                 parent.quit();
                 break;
             case CONTINUE:
-            	if(parent.getClient().retire()){
-            		parent.showInformationMessage("highscores.new");
-            		parent.showReportPanel(ReportHighScoresPanel.class.getName());
-            	}
+                if(parent.getClient().retire()){
+                    parent.showInformationMessage("highscores.new");
+                    parent.showPanel(new ReportHighScoresPanel(parent));
+                }
                 parent.getClient().continuePlaying();
                 parent.remove(this);
                 break;

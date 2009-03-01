@@ -62,13 +62,6 @@ public final class ReportColonyPanel extends ReportPanel {
      */
     public ReportColonyPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.colony"));
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    @Override
-    public void initialize() {
         Player player = getCanvas().getClient().getMyPlayer();
         colonies = player.getColonies();
 
@@ -184,10 +177,12 @@ public final class ReportColonyPanel extends ReportPanel {
         }
         
         BuildableType currentType = colony.getCurrentlyBuilding();
-        JLabel buildableLabel = new JLabel(currentType.getName());
+        JLabel buildableLabel = new JLabel();
         if (currentType == null) {
+            buildableLabel.setText(Messages.message("nothing"));
             buildableLabel.setForeground(Color.RED);
         } else {
+            buildableLabel.setText(currentType.getName());
             buildableLabel.setForeground(Color.GRAY);
         }
         buildingPanel.add(buildableLabel);

@@ -82,12 +82,6 @@ public final class ReportProductionPanel extends JPanel implements ActionListene
         this.reportPanel = reportPanel;
 
         setOpaque(false);
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
         Player player = parent.getClient().getMyPlayer();
         
         int columns = 3;

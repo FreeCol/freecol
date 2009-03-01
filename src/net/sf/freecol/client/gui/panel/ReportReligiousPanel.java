@@ -51,13 +51,6 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         super(parent, Messages.message("menuBar.report.religion"));
 
         reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
-
         Player player = getCanvas().getClient().getMyPlayer();
 
         reportPanel.add(new JLabel(Messages.message("crosses")));

@@ -51,15 +51,7 @@ public final class ReportIndianPanel extends ReportPanel {
      */
     public ReportIndianPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.indian"));
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
         Player player = getCanvas().getClient().getMyPlayer();
-        // Display Panel
-        reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(0, 1));
         for (Player opponent : getCanvas().getClient().getGame().getPlayers()) {
             buildIndianAdvisorPanel(player, opponent);

@@ -30,15 +30,13 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public final class ReportCargoPanel extends ReportPanel {
 
-    private static ReportUnitPanel reportUnitPanel;
-
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
     public ReportCargoPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.cargo"));
-        reportUnitPanel = new ReportUnitPanel(ReportUnitPanel.ReportType.CARGO, true, getCanvas(), this);
+        reportPanel.add(new ReportUnitPanel(ReportUnitPanel.ReportType.CARGO, true, getCanvas(), this));
     }
 
     @Override
@@ -51,12 +49,4 @@ public final class ReportCargoPanel extends ReportPanel {
         return getMinimumSize();
     }
     
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
-        reportPanel.removeAll();
-        reportUnitPanel.initialize();
-        reportPanel.add(reportUnitPanel);
-    }
 }

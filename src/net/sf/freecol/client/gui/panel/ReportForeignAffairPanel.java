@@ -50,12 +50,6 @@ public final class ReportForeignAffairPanel extends ReportPanel {
      */
     public ReportForeignAffairPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.foreign"));
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(0, 2));

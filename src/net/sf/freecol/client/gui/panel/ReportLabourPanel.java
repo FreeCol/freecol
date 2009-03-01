@@ -88,7 +88,8 @@ public final class ReportLabourPanel extends ReportPanel {
     public ReportLabourPanel(Canvas parent) {
         this(parent, null);
 
-        this.labourData = new LabourData(getCanvas().getClient());
+        labourData = new LabourData(parent.getClient());
+        initialize();
     }
 
     /**
@@ -103,6 +104,7 @@ public final class ReportLabourPanel extends ReportPanel {
 
         headerRow.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(headerRow);
+        initialize();
     }
 
     @Override

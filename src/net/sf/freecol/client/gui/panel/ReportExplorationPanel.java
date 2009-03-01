@@ -17,7 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionListener;
@@ -61,12 +60,7 @@ public final class ReportExplorationPanel extends ReportPanel {
      */
     public ReportExplorationPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.exploration"));
-    }
 
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
         // Display Panel
         reportPanel.removeAll();
 

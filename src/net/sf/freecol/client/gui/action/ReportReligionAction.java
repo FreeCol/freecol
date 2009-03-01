@@ -72,6 +72,6 @@ public class ReportReligionAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showReportPanel(ReportReligiousPanel.class.getName());
+        freeColClient.getCanvas().showPanel(new ReportReligiousPanel(freeColClient.getCanvas()));
     }
 }

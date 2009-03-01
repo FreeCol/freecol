@@ -1547,54 +1547,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Shows a report panel.
-     * 
-     * @param classname The class name of the report panel to be displayed.
-     */
-    public void showReportPanel(String classname) {
-        ReportPanel reportPanel = null;
-        if ("net.sf.freecol.client.gui.panel.ReportReligiousPanel".equals(classname)) {
-            reportPanel = new ReportReligiousPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportLabourPanel".equals(classname)) {
-            reportPanel = new ReportLabourPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportForeignAffairPanel".equals(classname)) {
-            reportPanel = new ReportForeignAffairPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportIndianPanel".equals(classname)) {
-            reportPanel = new ReportIndianPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportTurnPanel".equals(classname)) {
-            reportPanel = new ReportTurnPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportContinentalCongressPanel".equals(classname)) {
-            reportPanel = new ReportContinentalCongressPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportTradePanel".equals(classname)) {
-            reportPanel = new ReportTradePanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportMilitaryPanel".equals(classname)) {
-            reportPanel = new ReportMilitaryPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportNavalPanel".equals(classname)) {
-            reportPanel = new ReportNavalPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportCargoPanel".equals(classname)) {
-            reportPanel = new ReportCargoPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportColonyPanel".equals(classname)) {
-            reportPanel = new ReportColonyPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportRequirementsPanel".equals(classname)) {
-            reportPanel = new ReportRequirementsPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportExplorationPanel".equals(classname)) {
-            reportPanel = new ReportExplorationPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportHistoryPanel".equals(classname)) {
-            reportPanel = new ReportHistoryPanel(this);
-        } else if ("net.sf.freecol.client.gui.panel.ReportHighScoresPanel".equals(classname)) {
-            reportPanel = new ReportHighScoresPanel(this);
-        } else {
-            logger.warning("Request for Report panel could not be processed.  Name=" + classname);
-        }
-
-        if (reportPanel != null) {
-            reportPanel.initialize();
-            addAsFrame(reportPanel);
-            reportPanel.requestFocus();
-        }
-    }
-
-    /**
      * Shows a panel where the player may choose the next founding father to
      * recruit.
      * 
@@ -2545,7 +2497,7 @@ public final class Canvas extends JDesktopPane {
     public void retire() {
         if (showConfirmDialog("retireDialog.areYouSure.text", "ok", "cancel")) {
             if (freeColClient.retire()) {
-                showReportPanel(ReportHighScoresPanel.class.getName());
+                showPanel(new ReportHighScoresPanel(this));
             }
             // TODO: quit as soon as panel has been closed
             //freeColClient.quit();

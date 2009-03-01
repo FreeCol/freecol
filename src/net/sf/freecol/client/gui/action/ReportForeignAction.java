@@ -74,6 +74,6 @@ public class ReportForeignAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showReportPanel(ReportForeignAffairPanel.class.getName());
+        freeColClient.getCanvas().showPanel(new ReportForeignAffairPanel(freeColClient.getCanvas()));
     }
 }

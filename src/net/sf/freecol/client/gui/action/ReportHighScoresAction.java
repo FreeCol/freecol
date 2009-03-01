@@ -68,6 +68,6 @@ public class ReportHighScoresAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showReportPanel(ReportHighScoresPanel.class.getName());
+        freeColClient.getCanvas().showPanel(new ReportHighScoresPanel(freeColClient.getCanvas()));
     }
 }

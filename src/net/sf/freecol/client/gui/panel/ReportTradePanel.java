@@ -104,22 +104,6 @@ public final class ReportTradePanel extends ReportPanel {
                 storableGoods.add(goodsType);
             }
         }
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(900, 750);
-    }
-
-    @Override
-    protected Border createBorder() {
-        return new EmptyBorder(0, 20, 20, 20);
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
         Player player = getCanvas().getClient().getMyPlayer();
         Market market = player.getMarket();
 
@@ -328,4 +312,15 @@ public final class ReportTradePanel extends ReportPanel {
             getCanvas().showColonyPanel(colonies.get(action));
         }
     }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return new Dimension(900, 750);
+    }
+
+    @Override
+    protected Border createBorder() {
+        return new EmptyBorder(0, 20, 20, 20);
+    }
+
 }

@@ -39,8 +39,6 @@ import cz.autel.dmi.HIGLayout;
  */
 public final class ReportContinentalCongressPanel extends ReportPanel {
 
-
-
     static final String title = Messages.message("report.continentalCongress.title");
 
     static final String none = Messages.message("report.continentalCongress.none");
@@ -69,16 +67,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         fatherPanel = new JPanel(new GridLayout(0, 4));
         fatherPanel.setOpaque(false);
         productionPanel = new ReportProductionPanel(Goods.BELLS, getCanvas(), this);
-    }
 
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
         Player player = getCanvas().getClient().getMyPlayer();
 
         // Display Panel
-        productionPanel.initialize();
         summaryPanel.removeAll();
         fatherPanel.removeAll();
         reportPanel.removeAll();

@@ -142,12 +142,6 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         player = parent.getClient().getMyPlayer();
         setOpaque(false);
         detailPanel.setOpaque(false);
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     */
-    public void initialize() {
         gatherData();
 
         int rowsREF = (reportType == ReportType.CARGO ? 0 : 1);
@@ -171,6 +165,7 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
 
         detailPanelRow = row;
         add(detailButton, higConst.rc(row, labelColumn, "tl"));
+        doLayout();
     }
 
     private void showDetails() {
