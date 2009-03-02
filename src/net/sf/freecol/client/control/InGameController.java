@@ -100,6 +100,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
+import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.Message;
@@ -279,12 +280,9 @@ public final class InGameController implements NetworkConstants {
                                             Messages.message("ok"), Messages.message("cancel"));
         player.setIndependentNationName(nationName);
 
-        Element declareIndependenceElement = Message.createNewRootElement("declareIndependence");
-        declareIndependenceElement.setAttribute("independentNationName", nationName);
-        Element reply = freeColClient.getClient().ask(declareIndependenceElement);
-        if(reply == null){
-            NullPointerException e = new NullPointerException("Failed to receive reply to \"declareIndependence\" message");
-            throw e;
+        Element reply = freeColClient.getClient().ask(new DeclareIndependenceMessage(nationName).toXMLElement());
+        if (reply == null) {
+            throw new NullPointerException("Failed to receive reply to \"declareIndependence\" message");
         }
         NodeList childNodes = reply.getChildNodes();
         Element playerElement = (Element) childNodes.item(0);

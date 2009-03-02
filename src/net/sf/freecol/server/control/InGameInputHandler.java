@@ -77,6 +77,7 @@ import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
+import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.Message;
@@ -420,10 +421,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return setGoodsLevels(connection, element);
             }
         });
-        register("declareIndependence", new CurrentPlayerNetworkRequestHandler() {
+        register(DeclareIndependenceMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return declareIndependence(connection, element);
+                return new DeclareIndependenceMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("giveIndependence", new CurrentPlayerNetworkRequestHandler() {
@@ -2424,31 +2425,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.cashInTreasureTrain();
         sendUpdatedTileToAll(oldTile, player);
         return null;
-    }
-
-    /**
-     * Handles a "declareIndependence"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element declareIndependence(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        String nationName = element.getAttribute("independentNationName");
-        player.setIndependentNationName(nationName);
-
-        ServerPlayer refPlayer = getFreeColServer().getInGameController().createREFPlayer(player);
-        List<Unit> refUnits = getFreeColServer().getInGameController().createREFUnits(player, refPlayer);
-        
-        Element reply = Message.createNewRootElement("update");
-        reply.appendChild(refPlayer.toXMLElement(null, reply.getOwnerDocument()));
-        for (Unit unit : refUnits) {
-            reply.appendChild(unit.toXMLElement(null, reply.getOwnerDocument()));
-        }
-        
-        player.declareIndependence();
-        return reply;
     }
 
     /**
