@@ -326,14 +326,11 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
     }
 
     private JPanel createREFPanel() {
-        Element refUnits = parent.getClient().getInGameController().getREFUnits();
+        List<AbstractUnit> refUnits = parent.getClient().getInGameController().getREFUnits();
         List<AbstractUnit> navalUnits = new ArrayList<AbstractUnit>();
         List<AbstractUnit> landUnits = new ArrayList<AbstractUnit>();
         if (refUnits != null) {
-            NodeList childElements = refUnits.getChildNodes();
-            for (int index = 0; index < childElements.getLength(); index++) {
-                AbstractUnit unit = new AbstractUnit();
-                unit.readFromXMLElement((Element) childElements.item(index));
+            for (AbstractUnit unit : refUnits) {
                 if (unit.getUnitType().hasAbility("model.ability.navalUnit")) {
                     navalUnits.add(unit);
                 } else {

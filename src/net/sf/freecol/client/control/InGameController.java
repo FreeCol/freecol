@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +53,7 @@ import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -3831,15 +3833,27 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Gathers information about the REF.
+     * @return a <code>List</code> value
      */
-    public Element getREFUnits() {
+    public List<AbstractUnit> getREFUnits() {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return null;
+            return Collections.emptyList();
         }
 
         Element reply = freeColClient.getClient().ask(Message.createNewRootElement("getREFUnits"));
-        return reply;
+        if (reply == null) {
+            return Collections.emptyList();
+        } else {
+            List<AbstractUnit> result = new ArrayList<AbstractUnit>();
+            NodeList childElements = reply.getChildNodes();
+            for (int index = 0; index < childElements.getLength(); index++) {
+                AbstractUnit unit = new AbstractUnit();
+                unit.readFromXMLElement((Element) childElements.item(index));
+                result.add(unit);
+            }
+            return result;
+        }
     }
 
     /**
