@@ -104,7 +104,6 @@ public final class ReportLabourPanel extends ReportPanel {
 
         headerRow.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(headerRow);
-        initialize();
     }
 
     @Override
