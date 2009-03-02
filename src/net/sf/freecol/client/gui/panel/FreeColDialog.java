@@ -238,6 +238,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                 }
             });
         choicesPanel.add(firstButton);
+        choices.remove(0);
 
         for (final ChoiceItem<T> object : choices) {
             final JButton objectButton = new JButton(object.toString());
