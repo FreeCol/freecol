@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.server.ai.AIUnit;
 
 public class DebugMenu extends JMenu {
@@ -257,6 +258,19 @@ public class DebugMenu extends JMenu {
                 }
             });
 
+        // random number generator
+        final JMenuItem rng = new JMenuItem("Step random number generator");
+        rng.setOpaque(false);
+        rng.setMnemonic(KeyEvent.VK_X);
+        this.add(rng);
+        rng.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    PseudoRandom rnd = freeColClient.getGame().getModelController().getPseudoRandom();
+                    while(canvas.showConfirmDialog("menuBar.debug.stepRandomNumberGenerator",
+                                                   "more", "ok",
+                                                   "%value%", Integer.toString(rnd.nextInt(100))));
+                }
+            });
 
         this.addSeparator();
 
