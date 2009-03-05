@@ -715,10 +715,16 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element deliverGift(Element element) {
         Element unitElement = Message.getChildElement(element, Unit.getXMLElementTagName());
+        Unit unit = null;
 
-        Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-        unit.readFromXMLElement(unitElement);
-
+        if (unitElement != null) {
+            unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
+            if (unit == null) {
+                unit = new Unit(getGame(), unitElement);
+            } else {
+                unit.readFromXMLElement(unitElement);
+            }
+        }
         Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
         Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
 
