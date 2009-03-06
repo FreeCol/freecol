@@ -102,6 +102,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         repaint();
     }
 
+    public void removePropertyChangeListeners() {
+        building.removePropertyChangeListener(this);
+    }
+
     /**
      * Paints this component.
      * 

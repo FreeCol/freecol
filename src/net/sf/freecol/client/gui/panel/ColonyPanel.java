@@ -692,6 +692,19 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
 
             parent.remove(this);
+
+            // remove property listeners
+            if (colony != null) {
+                colony.removePropertyChangeListener(this);
+                colony.getTile().removePropertyChangeListener(outsideColonyPanel);
+                colony.getGoodsContainer().removePropertyChangeListener(warehousePanel);
+            }
+            if (getSelectedUnit() != null) {
+                getSelectedUnit().removePropertyChangeListener(this);
+            }
+            buildingsPanel.removePropertyChangeListeners();
+            tilePanel.removePropertyChangeListeners();
+
             if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
                 freeColClient.getInGameController().nextModelMessage();
                 Unit activeUnit = parent.getGUI().getActiveUnit();
@@ -864,6 +877,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 add(aSingleBuildingPanel);
             }
             add(new BuildingSitePanel(colony, parent));
+        }
+
+        public void removePropertyChangeListeners() {
+            for (Component component : getComponents()) {
+                if (component instanceof ASingleBuildingPanel) {
+                    ((ASingleBuildingPanel) component).removePropertyChangeListeners();
+                }
+            }
         }
 
 
@@ -1173,6 +1194,15 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             }
         }
 
+
+        public void removePropertyChangeListeners() {
+            for (Component component : getComponents()) {
+                if (component instanceof ASingleTilePanel) {
+                    ((ASingleTilePanel) component).removePropertyChangeListeners();
+                }
+            }
+        }
+
         @Override
         public void paintComponent(Graphics g) {
             GUI colonyTileGUI = parent.getColonyTileGUI();
@@ -1281,6 +1311,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     sl.setSize(lib.getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
                     add(sl);
                 }
+            }
+
+            public void removePropertyChangeListeners() {
+                colonyTile.removePropertyChangeListener(this);
             }
 
             /**
