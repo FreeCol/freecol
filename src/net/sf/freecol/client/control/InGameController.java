@@ -48,6 +48,7 @@ import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
@@ -286,7 +287,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getMyPlayer().declareIndependence();
         freeColClient.getActionManager().update();
 
-        canvas.showDeclarationDialog();
+        canvas.showFreeColDialog(new DeclarationDialog(canvas, freeColClient));
         nextModelMessage();
     }
 

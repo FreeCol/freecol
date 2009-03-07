@@ -538,21 +538,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a <code>FreeColDialog</code>.
-     *
-     * @param dialog a <code>FreeColDialog</code> value
-     * @return an <code>T</code> value
-     */
-    public <T> T showDialog(FreeColDialog<T> dialog) {
-        addAsFrame(dialog);
-        dialog.requestFocus();
-        T response = dialog.getResponse();
-        remove(dialog);
-        return response;
-    }
-
-
-    /**
      * Displays a <code>ModelMessage</code> in a modal dialog. The message is
      * displayed in this way:
      * 
@@ -749,26 +734,6 @@ public final class Canvas extends JDesktopPane {
             return (image != null) ? new ImageIcon(image) : null;
         }
     }
-
-    /**
-     * Shows the <code>DeclarationDialog</code>.
-     * 
-     * @see DeclarationDialog
-     */
-    // TODO: shouldn't this be a simple panel? The return value isn't used.
-    public void showDeclarationDialog() {
-        DeclarationDialog declarationDialog = new DeclarationDialog(this, freeColClient);
-
-        declarationDialog.initialize();
-
-        addAsFrame(declarationDialog);
-        declarationDialog.requestFocus();
-
-        declarationDialog.getResponseBoolean();
-        remove(declarationDialog);
-
-    }
-
 
     /**
      * Displays the given dialog.

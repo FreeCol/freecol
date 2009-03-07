@@ -48,8 +48,6 @@ import net.sf.freecol.common.util.Utils;
  */
 public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
-
-
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DeclarationDialog.class.getName());
 
