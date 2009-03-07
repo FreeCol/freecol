@@ -1099,6 +1099,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public void initialize() {
+            // get notified of warehouse changes
+            colony.getGoodsContainer().addPropertyChangeListener(this);
+            update();
+            revalidate();
+            repaint();
+        }
+
+        private void update() {
             removeAll();
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
@@ -1111,11 +1119,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     add(goodsLabel, false);
                 }
             }
-
-            // get notified of warehouse changes
-            colony.getGoodsContainer().addPropertyChangeListener(this);
-            revalidate();
-            repaint();
         }
 
         @Override
@@ -1154,7 +1157,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
 
         public void propertyChange(PropertyChangeEvent event) {
-            initialize();
+            update();
         }
 
     }
