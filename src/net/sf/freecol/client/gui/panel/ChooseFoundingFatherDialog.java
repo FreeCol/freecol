@@ -48,26 +48,29 @@ import net.sf.freecol.common.resources.ResourceManager;
  * 
  * @see FoundingFather
  */
-public final class ChooseFoundingFatherDialog extends FreeColDialog<Integer> implements ActionListener {
+public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFather> implements ActionListener {
+
     private static final Logger logger = Logger.getLogger(ChooseFoundingFatherDialog.class.getName());
-
-    @SuppressWarnings("unused")
-    private final Canvas parent;
-
-    //    private ArrayList<FoundingFatherPanel> foundingFatherPanels = new ArrayList<FoundingFatherPanel>();
 
     private final JTabbedPane tb;
 
     private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
 
+    private final List<FoundingFather> possibleFathers;
 
     /**
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
+     * @param possibleFoundingFathers The founding fathers which can
+     *        be selected. The length of the array is the same as the
+     *        number of <code>FoundingFather</code> categories and the
+     *        values identifies a <code>FoundingFather</code> to be
+     *        picked in each of those categories.
      */
-    public ChooseFoundingFatherDialog(Canvas parent) {
-        this.parent = parent;
+    public ChooseFoundingFatherDialog(Canvas parent, List<FoundingFather> possibleFoundingFathers) {
+
+        possibleFathers = possibleFoundingFathers;
         chooseFoundingFatherDialog = this;
 
         setFocusCycleRoot(false);
@@ -75,23 +78,12 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<Integer> imp
         setOpaque(false);
 
         tb = new JTabbedPane(JTabbedPane.TOP);
-    }
 
-    /**
-     * Prepares this panel to be displayed.
-     * 
-     * @param possibleFoundingFathers The founding fathers which can be
-     *            selected. The length of the array is the same as the number of
-     *            <code>FoundingFather</code> categories and the values
-     *            identifies a <code>FoundingFather</code> to be picked in
-     *            each of those categories.
-     */
-    public void initialize(List<FoundingFather> possibleFoundingFathers) {
         boolean hasSelectedTab = false;
         for (int index = 0; index < possibleFoundingFathers.size(); index++) {
             FoundingFather father = possibleFoundingFathers.get(index);
             FoundingFatherPanel panel = new FoundingFatherPanel(father.getType());
-            panel.initialize(father, index);
+            panel.initialize(father);
             tb.addTab(father.getTypeAsString(), null, panel, null);
             if (!hasSelectedTab && panel.isEnabled()) {
                 tb.setSelectedIndex(index);
@@ -113,13 +105,14 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<Integer> imp
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        try {
-            setResponse(Integer.valueOf(command).intValue());
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
-            setResponse(null);
+        String id = event.getActionCommand();
+        for (FoundingFather father : possibleFathers) {
+            if (father.getId().equals(id)) {
+                setResponse(father);
+                return;
+            }
         }
+        setResponse(null);
     }
 
 
@@ -234,7 +227,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<Integer> imp
          * @param father The founding father to be displayed or
          *            <code>-1</code> if there is none.
          */
-        public void initialize(FoundingFather father, int index) {
+        public void initialize(FoundingFather father) {
             this.foundingFather = father;
 
             if (father != null) {
@@ -242,7 +235,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<Integer> imp
                 description.setText(father.getDescription());
                 text.setText("\n" + "[" + father.getBirthAndDeath() + "] "
                         + father.getText());
-                ok.setActionCommand(String.valueOf(index));
+                ok.setActionCommand(father.getId());
             }
         }
 

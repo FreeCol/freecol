@@ -401,7 +401,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 }
                 break;
             case GAME_OPTIONS:
-                parent.showGameOptionsDialog(freeColClient.isAdmin());
+                parent.showFreeColDialog(new GameOptionsDialog(parent, freeColClient, freeColClient.isAdmin()));
                 break;
             case MAP_GENERATOR_OPTIONS:
                 parent.showMapGeneratorOptionsDialog(freeColClient.isAdmin());

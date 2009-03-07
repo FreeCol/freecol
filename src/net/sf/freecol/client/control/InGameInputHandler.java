@@ -33,6 +33,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -1666,7 +1667,8 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            return getFreeColClient().getCanvas().showChooseFoundingFatherDialog(choices);
+            Canvas canvas = getFreeColClient().getCanvas();
+            return canvas.showFreeColDialog(new ChooseFoundingFatherDialog(canvas, choices));
         }
 
         /**

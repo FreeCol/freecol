@@ -875,24 +875,6 @@ public final class Canvas extends JDesktopPane {
      * @return <code>true</code> if the game options have been modified, and
      *         <code>false</code> otherwise.
      */
-    public boolean showGameOptionsDialog(boolean editable) {
-        GameOptionsDialog gameOptionsDialog = new GameOptionsDialog(this, freeColClient);
-        gameOptionsDialog.initialize(editable);
-
-        // addCentered(gameOptionsDialog, GAME_OPTIONS_LAYER);
-        // gameOptionsDialog.requestFocus();
-
-        addAsFrame(gameOptionsDialog);
-        gameOptionsDialog.requestFocus();
-
-        boolean r = gameOptionsDialog.getResponseBoolean();
-
-        remove(gameOptionsDialog);
-
-        // remove(gameOptionsDialog);
-
-        return r;
-    }
 
     /**
      * Gets the <code>LoadingSavegameDialog</code>.
@@ -1485,32 +1467,6 @@ public final class Canvas extends JDesktopPane {
         colopediaPanel.initialize(panelType, objectType);
         addAsFrame(colopediaPanel);
         colopediaPanel.requestFocus();
-    }
-
-    /**
-     * Shows a panel where the player may choose the next founding father to
-     * recruit.
-     * 
-     * @param possibleFoundingFathers The different founding fathers the player
-     *            may choose.
-     * @return The founding father the player has chosen.
-     * @see net.sf.freecol.common.model.FoundingFather
-     */
-    public FoundingFather showChooseFoundingFatherDialog(List<FoundingFather> possibleFoundingFathers) {
-        closeStatusPanel();
-
-        ChooseFoundingFatherDialog chooseFoundingFatherDialog = new ChooseFoundingFatherDialog(this);
-
-        chooseFoundingFatherDialog.initialize(possibleFoundingFathers);
-
-        addAsFrame(chooseFoundingFatherDialog);
-        chooseFoundingFatherDialog.requestFocus();
-
-        int response = chooseFoundingFatherDialog.getResponseInt();
-
-        remove(chooseFoundingFatherDialog);
-
-        return possibleFoundingFathers.get(response);
     }
 
     /**
