@@ -50,6 +50,7 @@ import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.PreCombatDialog;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
@@ -2102,7 +2103,9 @@ public final class InGameController implements NetworkConstants {
             Settlement settlementOrNull = target.getSettlement();
             // Don't tell the player how a settlement is defended!
             Unit defenderOrNull = settlementOrNull != null ? null : target.getDefendingUnit(attacker);
-            return freeColClient.getCanvas().showPreCombatDialog(attacker, defenderOrNull, settlementOrNull);
+            Canvas canvas = freeColClient.getCanvas();
+            return canvas.showFreeColDialog(new PreCombatDialog(attacker, defenderOrNull,
+                                                                settlementOrNull, canvas));
         }
         return true;
     }

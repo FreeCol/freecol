@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Font;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -42,7 +44,7 @@ import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
 
-import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
 public class PreCombatDialog extends FreeColDialog<Boolean> {
 
@@ -62,25 +64,6 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         } else {
             defence = sortModifiers(combatModel.getDefensiveModifiers(attacker, defender));
         }
-
-        int numberOfModifiers = Math.max(offence.size(), defence.size());
-        int extraRows = 4; // title, icon, result, buttons
-        int numberOfRows = 2 * (numberOfModifiers + extraRows) - 1;
-
-        int[] widths = {-6, 20, -8, 0, 40, -1, 20, -3, 0};
-        int[] heights = new int[numberOfRows];
-        int offenceLabelColumn = 1;
-        int offenceValueColumn = 3;
-        int offencePercentageColumn = 4;
-        int defenceLabelColumn = 6;
-        int defenceValueColumn = 8;
-        int defencePercentageColumn = 9;
-
-        for (int index = 1; index < numberOfRows; index += 2) {
-            heights[index] = margin;
-        }
-
-
         final JButton okButton = new JButton();
 
         Action okAction = new AbstractAction(Messages.message("ok")) {
@@ -91,7 +74,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         okButton.setAction(okAction);
         okButton.requestFocus();
 
-        Action  cancelAction = new AbstractAction(Messages.message("cancel")) {
+        Action cancelAction = new AbstractAction(Messages.message("cancel")) {
                 public void actionPerformed( ActionEvent event ) {
                     setResponse( Boolean.FALSE );
                 }
@@ -101,123 +84,63 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         enterPressesWhenFocused(okButton);
         enterPressesWhenFocused(cancelButton);
         
-        setLayout(new HIGLayout(widths, heights));
-
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     setResponse(Boolean.FALSE);
                 }
             });
 
-        //Modifier modifier;
-        int row = 1;
+        setLayout(new MigLayout("wrap 6", "[sg label]20[sg value, right]1px[sg percent]40" 
+                                + "[sg label]20[sg value, right]1px[sg percent]", ""));
 
         // left hand side: attacker
+        // right hand side: defender
         String attackerName = Messages.message("model.unit.nationUnit",
                                                "%nation%", attacker.getOwner().getNationAsString(),
                                                "%unit%", attacker.getName());
-        add(new JLabel(attackerName),
-            higConst.rc(row, offenceLabelColumn));
-        row += 2;
-        add(new UnitLabel(attacker, parent, false, true),
-            higConst.rcwh(row, offenceLabelColumn, 3, 1));
-        row += 2;
-        for (Modifier modifier : offence) {
-            FreeColGameObjectType source = modifier.getSource();
-            String sourceName;
-            if (source == null) {
-                sourceName = "???";
-            } else {
-                sourceName = source.getName();
-            }
-            add(new JLabel(sourceName), higConst.rc(row, offenceLabelColumn));
-            String bonus = getModifierFormat().format(modifier.getValue());
-            switch(modifier.getType()) {
-            case ADDITIVE:
-                if (modifier.getValue() > 0) {
-                    bonus = "+" + bonus;
-                }
-                break;
-            case PERCENTAGE:
-                if (modifier.getValue() > 0) {
-                    bonus = "+" + bonus;
-                }
-                add(new JLabel("%"), higConst.rc(row, offencePercentageColumn));
-                break;
-            case MULTIPLICATIVE:
-                bonus = "\u00D7" + bonus;
-                break;
-            default:
-            }                
-            add(new JLabel(bonus), higConst.rc(row, offenceValueColumn, "r"));
-            row += 2;
-        }
-        int finalResultRow = row;
+        JLabel attackerLabel = new UnitLabel(attacker, parent, false, true);
 
-        row = 1;
-        // right hand side: defender
-        if (defender != null) {
-            String defenderName = Messages.message("model.unit.nationUnit",
-                                                   "%nation%", defender.getOwner().getNationAsString(),
-                                                   "%unit%", defender.getName());
-            add(new JLabel(defenderName),
-                higConst.rc(row, defenceLabelColumn));
-            row += 2;
-            add(new UnitLabel(defender, parent, false, true),
-                higConst.rcwh(row, defenceLabelColumn, 3, 1));
-            row += 2;
-        } else {
-            String defenderName;
+        String defenderName;
+        JLabel defenderLabel;
+        if (defender == null) {
             if (settlement instanceof Colony) {
                 defenderName = ((Colony) settlement).getName();
             } else {
                 defenderName = Messages.message("indianSettlement", 
                                                 "%nation%", settlement.getOwner().getNationAsString());
             }
-            add(new JLabel(defenderName),
-                higConst.rc(row, defenceLabelColumn));
-            row += 2;
-            add(new JLabel(parent.getImageIcon(settlement, false)),
-                higConst.rcwh(row, defenceLabelColumn, 3, 1));
-            row += 2;
+            defenderLabel = new JLabel(parent.getImageIcon(settlement, false));
+        } else {
+            defenderName = Messages.message("model.unit.nationUnit",
+                                            "%nation%", defender.getOwner().getNationAsString(),
+                                            "%unit%", defender.getName());
+            defenderLabel = new UnitLabel(defender, parent, false, true);
         }
 
-        for (Modifier modifier : defence) {
-            FreeColGameObjectType source = modifier.getSource();
-            String sourceString = null;
-            if (source == null) {
-                sourceString = "???";
+
+        add(new JLabel(attackerName), "span 3, align center");
+        add(new JLabel(defenderName), "span 3, align center");
+        add(attackerLabel, "span 3, align center");
+        add(defenderLabel, "span 3, align center");
+        add(new JSeparator(JSeparator.HORIZONTAL), "newline, span 3, growx");
+        add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
+
+        Iterator<Modifier> offenceModifiers = offence.iterator();
+        Iterator<Modifier> defenceModifiers = defence.iterator();
+
+        while (offenceModifiers.hasNext() || defenceModifiers.hasNext()) {
+            int skip = 0;
+            boolean hasOffence = offenceModifiers.hasNext();
+            if (hasOffence) {
+                if (!addModifier(offenceModifiers.next(), true, 0)) {
+                    skip = 1;
+                }
             } else {
-                sourceString = Messages.message(source.getName());
+                skip = 3;
             }
-            add(new JLabel(sourceString),
-                higConst.rc(row, defenceLabelColumn));
-            String bonus = getModifierFormat().format(modifier.getValue());
-            if (modifier.getValue() == Modifier.UNKNOWN) {
-                bonus = "???";
+            if (defenceModifiers.hasNext()) {
+                addModifier(defenceModifiers.next(), !hasOffence, skip);
             }
-            switch(modifier.getType()) {
-            case ADDITIVE:
-                if (modifier.getValue() > 0) {
-                    bonus = "+" + bonus;
-                }
-                break;
-            case PERCENTAGE:
-                if (modifier.getValue() > 0) {
-                    bonus = "+" + bonus;
-                }
-                add(new JLabel("%"), higConst.rc(row, defencePercentageColumn));
-                break;
-            case MULTIPLICATIVE:
-                bonus = "\u00D7" + bonus;
-                break;
-            default:
-            }                
-            add(new JLabel(bonus), higConst.rc(row, defenceValueColumn, "r"));
-            row += 2;
-        }
-        if (row < finalResultRow) {
-            row = finalResultRow;
         }
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
@@ -225,30 +148,74 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         float offenceResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), offence);
         JLabel finalOffenceLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
         finalOffenceLabel.setFont(bigFont);
-        add(finalOffenceLabel, higConst.rc(row, offenceLabelColumn));
+
+        add(new JSeparator(JSeparator.HORIZONTAL), "newline, span 3, growx");
+        add(new JSeparator(JSeparator.HORIZONTAL), "span 3, growx");
+        add(finalOffenceLabel);
         JLabel finalOffenceResult = new JLabel(getModifierFormat().format(offenceResult));
         finalOffenceResult.setFont(bigFont);
-        add(finalOffenceResult, higConst.rc(row, offenceValueColumn, "r"));
+        add(finalOffenceResult);
 
         float defenceResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), defence);
         JLabel finalDefenceLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
         finalDefenceLabel.setFont(bigFont);
-        add(finalDefenceLabel,
-            higConst.rc(row, defenceLabelColumn));
+        add(finalDefenceLabel, "skip");
         JLabel finalDefenceResult = new JLabel(getModifierFormat().format(defenceResult));
         if (defenceResult == Modifier.UNKNOWN) {
             finalDefenceResult.setText("???");
         }
         finalDefenceResult.setFont(bigFont);
-        add(finalDefenceResult, higConst.rc(row, defenceValueColumn, "r"));
+        add(finalDefenceResult);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-        add(buttonPanel, higConst.rcwh(heights.length, 1, widths.length, 1));
+        add(okButton, "newline 20, span, split 2, tag ok");
+        add(cancelButton, "tag cancel");
+
         setSize(getPreferredSize());
 
+    }
+
+    private boolean addModifier(Modifier modifier, boolean newline, int skip) {
+        String constraint = null;
+        if (newline) {
+            constraint = "newline";
+        }
+        if (skip > 0) {
+            if (constraint == null) {
+                constraint = "skip " + skip;
+            } else {
+                constraint += ", skip " + skip;
+            }
+        }
+        FreeColGameObjectType source = modifier.getSource();
+        String sourceName = "???";
+        if (source != null) {
+            sourceName = source.getName();
+        }
+        add(new JLabel(sourceName), constraint);
+        String bonus = getModifierFormat().format(modifier.getValue());
+        boolean percent = false;
+        switch(modifier.getType()) {
+        case ADDITIVE:
+            if (modifier.getValue() > 0) {
+                bonus = "+" + bonus;
+            }
+            break;
+        case PERCENTAGE:
+            if (modifier.getValue() > 0) {
+                bonus = "+" + bonus;
+            }
+            percent = true;
+            break;
+        case MULTIPLICATIVE:
+            bonus = "\u00D7" + bonus;
+            break;
+        default:
+        }                
+        add(new JLabel(bonus));
+        if (percent) {
+            add(new JLabel("%"));
+        }
+        return percent;
     }
 
 

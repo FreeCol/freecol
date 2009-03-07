@@ -783,27 +783,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>showPreCombatDialog</code>.
-     * 
-     * @param attacker an <code>Unit</code> value
-     * @param defender an <code>Unit</code> value
-     * @param settlement a <code>Settlement</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean showPreCombatDialog(Unit attacker, Unit defender, Settlement settlement) {
-
-        FreeColDialog preCombatDialog = new PreCombatDialog(attacker, defender, settlement, this);
-        addAsFrame(preCombatDialog);
-        preCombatDialog.requestFocus();
-
-        boolean response = preCombatDialog.getResponseBoolean();
-
-        remove(preCombatDialog);
-
-        return response;
-    }
-
-    /**
      * Displays a dialog with a text and a ok/cancel option.
      * 
      * @param messages The messages that explains the choice for the user.
