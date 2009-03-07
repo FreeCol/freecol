@@ -538,20 +538,17 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>SelectAmountDialog</code>.
-     * @param goodsType an <code>int</code> value
-     * @param available an <code>int</code> value
-     * @param needToPay a <code>boolean</code> value
-     * @return an <code>int</code> value
+     * Displays a <code>FreeColDialog</code>.
+     *
+     * @param dialog a <code>FreeColDialog</code> value
+     * @return an <code>T</code> value
      */
-    public int showSelectAmountDialog(GoodsType goodsType, int available, boolean needToPay) {
-        SelectAmountDialog dialog = new SelectAmountDialog(this, goodsType, available, needToPay);
-        dialog.initialize();
+    public <T> T showDialog(FreeColDialog<T> dialog) {
         addAsFrame(dialog);
         dialog.requestFocus();
-        int amount = dialog.getResponseInt();
+        T response = dialog.getResponse();
         remove(dialog);
-        return amount;
+        return response;
     }
 
 

@@ -34,22 +34,22 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * The panel that allows a user to recruit people in Europe.
  */
 public final class SelectAmountDialog extends FreeColDialog<Integer> implements ActionListener {
 
-
-
     private static Logger logger = Logger.getLogger(SelectAmountDialog.class.getName());
 
     private static final int SELECT_CANCEL = -1;
 
-    private final JButton cancel, ok;
+    private static final int[] amounts = {20, 40, 50, 60, 80, 100};
 
-    private final JPanel buttonPanel;
+    private final JButton cancel, ok;
 
     private final JTextArea question;
 
@@ -77,7 +77,6 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
             int price = parent.getClient().getMyPlayer().getMarket().costToBuy(goodsType);
             available = Math.min(available, gold/price);
         }
-        int[] amounts = {20, 40, 50, 60, 80, 100};
 
         Vector<Integer> values = new Vector<Integer>();
         for (int index = 0; index < amounts.length; index++) {
@@ -106,42 +105,19 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
             });
         setCancelComponent(cancel);
 
-        buttonPanel = new JPanel();
-        buttonPanel.add(ok);
-        buttonPanel.add(cancel);
+        setLayout(new MigLayout("wrap 1", "", ""));
 
-        initialize();
+        add(question);
+        add(comboBox, "wrap 20, growx");
+        add(ok, "span, split 2, tag ok");
+        add(cancel, "tag cancel");
+        
+        setSize(getPreferredSize());
 
     }
 
     public void requestFocus() {
         cancel.requestFocus();
-    }
-
-    /**
-     * Updates this panel's labels so that the information it displays is up to
-     * date.
-     */
-    public void initialize() {
-
-        int[] widths = new int[] { 0 };
-        int[] heights = new int[5];
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = margin;
-        }
-        setLayout(new HIGLayout(widths, heights));
-
-        int row = 1;
-        int column = 1;
-
-        add(question, higConst.rc(row, column));
-        row += 2;
-        add(comboBox, higConst.rc(row, column));
-        row += 2;
-        add(buttonPanel, higConst.rc(row, column));
-
-        setSize(getPreferredSize());
-
     }
 
     /**

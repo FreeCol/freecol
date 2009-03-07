@@ -89,6 +89,7 @@ public final class FindColonyDialog extends FreeColDialog implements ListSelecti
                     remove();
                 }
             });
+        enterPressesWhenFocused(okButton);
         add(okButton);
 
         setSize(getPreferredSize());

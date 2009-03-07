@@ -414,7 +414,7 @@ public final class DefaultTransferHandler extends TransferHandler {
     * Displays an input dialog box where the user should specify a goods transfer amount.
     */
     private int getAmount(GoodsType goodsType, int available, boolean needToPay) {
-        return canvas.showSelectAmountDialog(goodsType, available, needToPay);
+        return canvas.showDialog(new SelectAmountDialog(canvas, goodsType, available, needToPay));
     }
 
 
