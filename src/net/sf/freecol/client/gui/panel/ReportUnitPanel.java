@@ -235,12 +235,24 @@ public final class ReportUnitPanel extends JPanel implements ActionListener {
         revalidate();
     }
 
-    private int getCount(HashMap<UnitType, Integer> hash, UnitType unitType) {
+    public int getCount(HashMap<UnitType, Integer> hash, UnitType unitType) {
         Integer count = hash.get(unitType);
         if (count != null) {
             return count.intValue();
         } else { 
             return 0;
+        }
+    }
+
+    public int getCount(UnitType unitType, Role role) {
+        switch(role) {
+        case SOLDIER:
+            return getCount(soldiers, unitType);
+        case DRAGOON:
+            return getCount(dragoons, unitType);
+        case DEFAULT:
+        default:
+            return getCount(others, unitType);
         }
     }
 

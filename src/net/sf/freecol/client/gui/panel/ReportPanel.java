@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -27,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -37,14 +39,15 @@ import javax.swing.border.Border;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * This panel displays a report.
  */
 public class ReportPanel extends FreeColPanel implements ActionListener {
-
-
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
 
@@ -150,8 +153,23 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * 
      * @return A unit type comparator.
      */
-    public Comparator<Unit> getUnitTypeComparator() {
+    public static Comparator<Unit> getUnitTypeComparator() {
         return unitTypeComparator;
+    }
+
+    public JLabel createUnitTypeLabel(AbstractUnit unit) {
+        return createUnitTypeLabel(unit.getUnitType(), unit.getRole(), unit.getNumber());
+    }
+
+    public JLabel createUnitTypeLabel(UnitType unitType, Role role, int count) {
+        ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, role, count == 0);
+        JLabel unitLabel = new JLabel(getLibrary().getScaledImageIcon(unitIcon, 0.66f));
+        unitLabel.setText(String.valueOf(count));
+        if (count == 0) {
+            unitLabel.setForeground(Color.GRAY);
+        }
+        unitLabel.setToolTipText(Unit.getName(unitType, role));
+        return unitLabel;
     }
 
     /**
