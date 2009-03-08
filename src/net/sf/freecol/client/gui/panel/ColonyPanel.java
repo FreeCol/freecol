@@ -626,8 +626,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 unload();
                 break;
             case WAREHOUSE:
-                if (freeColClient.getCanvas().showWarehouseDialog(colony)) {
-                    warehousePanel.initialize();
+                Canvas canvas = freeColClient.getCanvas();
+                if (canvas.showFreeColDialog(new WarehouseDialog(canvas, colony))) {
+                    warehousePanel.update();
                 }
                 break;
             case FILL:

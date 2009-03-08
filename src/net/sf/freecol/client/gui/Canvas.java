@@ -453,25 +453,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>WarehouseDialog</code>.
-     * 
-     * @param colony the colony for which to show the WarehouseDialog.
-     * @see WarehouseDialog
-     */
-    public boolean showWarehouseDialog(Colony colony) {
-        WarehouseDialog warehouseDialog = new WarehouseDialog(this);
-        warehouseDialog.initialize(colony);
-
-        // TODO: Not a standard dialog, special treatment for now.
-        addAsFrame(warehouseDialog);
-        warehouseDialog.requestFocus();
- 
-        boolean response = warehouseDialog.getResponseBoolean();
-        remove(warehouseDialog);
-        return response;
-    }
-
-    /**
      * Displays the <code>NegotiationDialog</code>.
      * 
      * @see NegotiationDialog
