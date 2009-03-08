@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.Canvas.MissionaryAction;
 import net.sf.freecol.client.gui.Canvas.ScoutAction;
+import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -1388,18 +1389,18 @@ public final class InGameController implements NetworkConstants {
         boolean canGift = transactionSession.get("canGift");
         
         // Show main dialog
-        Integer tradeType = canvas.showIndianSettlementTradeDlg(canBuy,canSell,canGift);
+        TradeAction tradeType = canvas.showIndianSettlementTradeDialog(canBuy,canSell,canGift);
         while(tradeType != null){
             boolean tradeFinished = false;
-            switch(tradeType.intValue()){
-                case 1:
+            switch(tradeType){
+                case BUY:
                     tradeFinished = attemptBuyFromIndianSettlement(unit, settlement);
                     if(tradeFinished){
                         actionTaken = true;
                         canBuy = false;
                     }
                     break;
-                case 2:
+                case SELL:
                     tradeFinished = attemptSellToIndianSettlement(unit,settlement);
                     if(tradeFinished){
                         actionTaken = true;
@@ -1409,7 +1410,7 @@ public final class InGameController implements NetworkConstants {
                         canBuy  = transactionSession.get("canBuy") && unit.getSpaceLeft() != 0;
                     }
                     break;
-                case 3:
+                case GIFT:
                     tradeFinished = deliverGiftToSettlement(unit, settlement, null);
                     if(tradeFinished){
                         actionTaken = true;
@@ -1425,7 +1426,7 @@ public final class InGameController implements NetworkConstants {
                 break;
             }
             // Still has options for trade, show the main menu again
-            tradeType = canvas.showIndianSettlementTradeDlg(canBuy,canSell,canGift);            
+            tradeType = canvas.showIndianSettlementTradeDialog(canBuy,canSell,canGift);            
         }
         closeTransactionSession(unit,settlement);
         // no action taken, restore movement points

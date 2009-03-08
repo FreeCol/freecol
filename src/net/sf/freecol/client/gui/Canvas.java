@@ -191,6 +191,14 @@ public final class Canvas extends JDesktopPane {
         DUMP_CARGO
     }
 
+    public static enum TradeAction {
+        CANCEL,
+        BUY,
+        SELL,
+        GIFT
+    }
+
+
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
 
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
@@ -1574,21 +1582,24 @@ public final class Canvas extends JDesktopPane {
 
     }
 
-    public Integer showIndianSettlementTradeDlg(boolean showBuy, boolean showSell, boolean showGift){
-        ArrayList<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-        if(showBuy){
-            choices.add(new ChoiceItem<Integer>(Messages.message("tradeProposition.toBuy"), 1));
+    public TradeAction showIndianSettlementTradeDialog(boolean showBuy, boolean showSell, boolean showGift) {
+        ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<ChoiceItem<TradeAction>>();
+        if (showBuy){
+            choices.add(new ChoiceItem<TradeAction>(Messages.message("tradeProposition.toBuy"),
+                                                    TradeAction.BUY));
         }
-        if(showSell){
-            choices.add(new ChoiceItem<Integer>(Messages.message("tradeProposition.toSell"), 2));
+        if (showSell){
+            choices.add(new ChoiceItem<TradeAction>(Messages.message("tradeProposition.toSell"),
+                                                    TradeAction.SELL));
         }
-        if(showGift){
-            choices.add(new ChoiceItem<Integer>(Messages.message("tradeProposition.toGift"), 3));
+        if (showGift){
+            choices.add(new ChoiceItem<TradeAction>(Messages.message("tradeProposition.toGift"),
+                                                    TradeAction.GIFT));
         }
         
-        Integer choice = showChoiceDialog(Messages.message("tradeProposition.welcome"), 
-                                          Messages.message("tradeProposition.cancel"), 
-                                          choices);
+        TradeAction choice = showChoiceDialog(Messages.message("tradeProposition.welcome"), 
+                                              Messages.message("tradeProposition.cancel"), 
+                                              choices);
         
         return choice;
     }
