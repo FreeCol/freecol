@@ -1540,43 +1540,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>TradeRouteDialog</code>. Does not return from this
-     * method before the panel is closed.
-     */
-    public TradeRoute showTradeRouteDialog(TradeRoute selectedRoute) {
-        TradeRouteDialog tradeRouteDialog = new TradeRouteDialog(this);
-        tradeRouteDialog.initialize();
-        tradeRouteDialog.setSelectedRoute(selectedRoute);
-
-        addAsFrame(tradeRouteDialog);
-        tradeRouteDialog.requestFocus();
-
-        TradeRoute response = (TradeRoute) tradeRouteDialog.getResponse();
-
-        remove(tradeRouteDialog);
-
-        return response;
-    }
-
-    /**
-     * Displays the <code>TradeRouteInputDialog</code>. Does not return from
-     * this method before the panel is closed.
-     */
-    public boolean showTradeRouteInputDialog(TradeRoute route) {
-        TradeRouteInputDialog tradeRouteInputDialog = new TradeRouteInputDialog(this);
-        tradeRouteInputDialog.initialize(route);
-
-        addAsFrame(tradeRouteInputDialog);
-        tradeRouteInputDialog.requestFocus();
-
-        boolean response = tradeRouteInputDialog.getResponseBoolean();
-
-        remove(tradeRouteInputDialog);
-
-        return response;
-    }
-
-    /**
      * Displays the colony panel of the given <code>Colony</code>.
      * 
      * @param colony The colony whose panel needs to be displayed.

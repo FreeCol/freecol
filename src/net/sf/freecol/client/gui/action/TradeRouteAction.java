@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 
 /**
  * An action for editing trade routes.
@@ -69,6 +71,7 @@ public class TradeRouteAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */    
     public void actionPerformed(ActionEvent e) {
-        getFreeColClient().getCanvas().showTradeRouteDialog(null);
+        Canvas canvas = getFreeColClient().getCanvas();
+        canvas.showFreeColDialog(new TradeRouteDialog(canvas, null));
     }
 }

@@ -52,6 +52,7 @@ import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -3727,8 +3728,9 @@ public final class InGameController implements NetworkConstants {
      * @param unit The unit to assign a trade route to.
      */
     public void assignTradeRoute(Unit unit) {
-        assignTradeRoute(unit,
-                         freeColClient.getCanvas().showTradeRouteDialog(unit.getTradeRoute()));
+        Canvas canvas = freeColClient.getCanvas();
+        TradeRoute tradeRoute = canvas.showFreeColDialog(new TradeRouteDialog(canvas, unit.getTradeRoute()));
+        assignTradeRoute(unit, tradeRoute);
     }
 
     public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {

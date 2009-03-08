@@ -37,7 +37,9 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * Allows the user to edit trade routes.
@@ -56,9 +58,6 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
     private final JButton removeRouteButton = new JButton(Messages.message("traderouteDialog.removeRoute"));
     private final JButton deassignRouteButton = new JButton(Messages.message("traderouteDialog.deassignRoute"));
 
-    private final JPanel tradeRoutePanel = new JPanel();
-    private final JPanel buttonPanel = new JPanel();
-    
     private final DefaultListModel listModel = new DefaultListModel();
     private final JList tradeRoutes = new JList(listModel);
     private final JScrollPane tradeRouteView = new JScrollPane(tradeRoutes);
@@ -67,30 +66,23 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
-    public TradeRouteDialog(final Canvas parent) {
+    public TradeRouteDialog(final Canvas parent, TradeRoute selectedRoute) {
+
         super(parent);
 
-        tradeRoutePanel.setOpaque(false);
-
         ok.setActionCommand(Action.OK.toString());
-        cancel.setActionCommand(Action.CANCEL.toString());
-        deassignRouteButton.setActionCommand(Action.DEASSIGN.toString());
-        
         ok.addActionListener(this);
+        enterPressesWhenFocused(ok);
+
+        cancel.setActionCommand(Action.CANCEL.toString());
         cancel.addActionListener(this);
-        deassignRouteButton.addActionListener(this);
-
-        ok.setMnemonic('y');
-        cancel.setMnemonic('n');
-
-        deassignRouteButton.setToolTipText(Messages.message("traderouteDialog.deassign.tooltip"));
-
-        FreeColPanel.enterPressesWhenFocused(cancel);
-        FreeColPanel.enterPressesWhenFocused(ok);
-        FreeColPanel.enterPressesWhenFocused(deassignRouteButton);
-
+        enterPressesWhenFocused(cancel);
         setCancelComponent(cancel);
-        //ok.setActionCommand(String.valueOf(OK));
+
+        deassignRouteButton.addActionListener(this);
+        deassignRouteButton.setToolTipText(Messages.message("traderouteDialog.deassign.tooltip"));
+        deassignRouteButton.setActionCommand(Action.DEASSIGN.toString());
+        enterPressesWhenFocused(deassignRouteButton);
 
         tradeRoutes.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
@@ -104,9 +96,8 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                     Player player = parent.getClient().getMyPlayer();
                     TradeRoute newRoute = parent.getClient().getModelController().getNewTradeRoute(player);
                     newRoute.setName(Messages.message("traderouteDialog.newRoute"));
-                    if (parent.showTradeRouteInputDialog(newRoute)) {
+                    if (parent.showFreeColDialog(new TradeRouteInputDialog(parent, newRoute))) {
                         listModel.addElement(newRoute);
-                        //tradeRoutes.revalidate();
                     }
                 }
             });
@@ -114,7 +105,8 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         // button for editing TradeRoute
         editRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    parent.showTradeRouteInputDialog((TradeRoute) tradeRoutes.getSelectedValue());
+                    parent.showFreeColDialog(new TradeRouteInputDialog(parent, 
+                        (TradeRoute) tradeRoutes.getSelectedValue()));
                 }
             });
 
@@ -125,62 +117,35 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                 }
             });
 
-        int[] widths = {0};
-        int[] heights = {0, margin, 0, margin, 0};
-        setLayout(new HIGLayout(widths, heights));
-
-        buttonPanel.add(ok);
-        buttonPanel.add(cancel);
-        buttonPanel.add(deassignRouteButton);
-        buttonPanel.setOpaque(false);
-
-        add(getDefaultHeader(Messages.message("traderouteDialog.name")),
-            higConst.rc(1, 1));
-        add(tradeRoutePanel, higConst.rc(3, 1));
-        add(buttonPanel, higConst.rc(5, 1));
-
-    }
-
-    public void initialize() {
-
         Player player = getCanvas().getClient().getMyPlayer();
 
-        tradeRoutePanel.removeAll();
-
-        listModel.removeAllElements();
         for (TradeRoute route : player.getTradeRoutes()) {
             listModel.addElement(route);
         }
 
+        if (selectedRoute != null) {
+            tradeRoutes.setSelectedValue(selectedRoute, true);
+        }
         updateButtons();
 
-        int widths[] = {240, margin, 0};
-        int heights[] = {120, 0, margin, 0, margin, 0, 120};
-        int listColumn = 1;
-        int buttonColumn = 3;
+        setLayout(new MigLayout("wrap 2", "", ""));
 
-        tradeRoutePanel.setLayout(new HIGLayout(widths, heights));
+        add(getDefaultHeader(Messages.message("traderouteDialog.name")),
+            "span, align center");
+  
+        add(tradeRouteView, "height 400:");
+        add(newRouteButton, "split 3, flowy, growx");
+        add(editRouteButton, "growx");
+        add(removeRouteButton, "growx");
 
-        int row = 1;
-        tradeRoutePanel.add(tradeRouteView, higConst.rcwh(row, listColumn, 1, heights.length));
-        row ++;
-
-        tradeRoutePanel.add(newRouteButton, higConst.rc(row, buttonColumn));
-        row += 2;
-
-        tradeRoutePanel.add(editRouteButton, higConst.rc(row, buttonColumn));
-        row += 2;
-
-        tradeRoutePanel.add(removeRouteButton, higConst.rc(row, buttonColumn));
+        add(ok, "newline 20, span, split 3, tag ok");
+        add(cancel, "tag cancel");
+        add(deassignRouteButton);
 
         setSize(getPreferredSize());
 
     }
     
-    public void setSelectedRoute(TradeRoute selectedRoute) {
-        tradeRoutes.setSelectedValue(selectedRoute, true);
-    }
-
     public void requestFocus() {
         ok.requestFocus();
     }
@@ -189,9 +154,11 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         if (tradeRoutes.getSelectedIndex() == -1) {
             editRouteButton.setEnabled(false);
             removeRouteButton.setEnabled(false);
+            deassignRouteButton.setEnabled(false);
         } else {
             editRouteButton.setEnabled(true);
             removeRouteButton.setEnabled(true);
+            deassignRouteButton.setEnabled(true);
         }
     }
 
@@ -203,31 +170,25 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
     */
     public void actionPerformed(ActionEvent event) {
         Action action = Enum.valueOf(Action.class, event.getActionCommand());
-        try {
-            switch (action) {
-            case OK:
-                getCanvas().remove(this);
-                ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
-                for (int index = 0; index < listModel.getSize(); index++) {
-                    routes.add((TradeRoute) listModel.getElementAt(index));
-                }
-                getCanvas().getClient().getInGameController().setTradeRoutes(routes);
-                setResponse((TradeRoute) tradeRoutes.getSelectedValue());
-                break;
-            case CANCEL:
-                getCanvas().remove(this);
-                setResponse(null);
-                break;
-            case DEASSIGN:
-                getCanvas().remove(this);
-                setResponse(TradeRoute.NO_TRADE_ROUTE);
-                break;
-            default:
-                logger.warning("Invalid ActionCommand: invalid number.");
+        switch (action) {
+        case OK:
+            getCanvas().remove(this);
+            ArrayList<TradeRoute> routes = new ArrayList<TradeRoute>();
+            for (int index = 0; index < listModel.getSize(); index++) {
+                routes.add((TradeRoute) listModel.getElementAt(index));
             }
-        }
-        catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+            getCanvas().getClient().getInGameController().setTradeRoutes(routes);
+            setResponse((TradeRoute) tradeRoutes.getSelectedValue());
+            break;
+        case CANCEL:
+            getCanvas().remove(this);
+            setResponse(null);
+            break;
+        case DEASSIGN:
+            getCanvas().remove(this);
+            setResponse(TradeRoute.NO_TRADE_ROUTE);
+            break;
         }
     }
+
 }

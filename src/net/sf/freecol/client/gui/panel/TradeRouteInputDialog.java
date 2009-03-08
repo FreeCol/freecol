@@ -55,7 +55,9 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TradeRoute.Stop;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * Allows the user to edit trade routes.
@@ -75,10 +77,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     private final JButton addStopButton = new JButton(Messages.message("traderouteDialog.addStop"));
 
     private final JButton removeStopButton = new JButton(Messages.message("traderouteDialog.removeStop"));
-
-    private final JPanel tradeRoutePanel = new JPanel();
-
-    private final JPanel buttonPanel = new JPanel();
 
     private final CargoHandler cargoHandler = new CargoHandler();
 
@@ -110,23 +108,18 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * 
      * @param parent The parent of this panel.
      */
-    public TradeRouteInputDialog(final Canvas parent) {
+    public TradeRouteInputDialog(final Canvas parent, TradeRoute newRoute) {
         super(parent);
 
-        tradeRoutePanel.setOpaque(false);
+        originalRoute = newRoute;
 
         ok.setActionCommand(String.valueOf(OK));
-        cancel.setActionCommand(String.valueOf(CANCEL));
-
         ok.addActionListener(this);
+        enterPressesWhenFocused(ok);
+
+        cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
-
-        ok.setMnemonic('y');
-        cancel.setMnemonic('n');
-
-        FreeColPanel.enterPressesWhenFocused(cancel);
-        FreeColPanel.enterPressesWhenFocused(ok);
-
+        enterPressesWhenFocused(cancel);
         setCancelComponent(cancel);
 
         goodsPanel = new GoodsPanel();
@@ -145,15 +138,14 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             public void actionPerformed(ActionEvent e) {
                 int startIndex = -1;
                 int endIndex = -1;
-                if (destinationSelector.getSelectedIndex()==0 ) {   // All colonies + Europe
-                    startIndex=1;
-                    endIndex=destinationSelector.getItemCount()-1;  // will use inverted order
+                if (destinationSelector.getSelectedIndex() == 0 ) {   // All colonies + Europe
+                    startIndex = 1;
+                    endIndex = destinationSelector.getItemCount() - 1;  // will use inverted order
                 } else {
-                    startIndex=destinationSelector.getSelectedIndex();  // just 1 colony
-                    endIndex=startIndex;
+                    startIndex = destinationSelector.getSelectedIndex();  // just 1 colony
+                    endIndex = startIndex;
                 }
-                for(int i=startIndex;i<=endIndex;i++)
-                {
+                for (int i = startIndex; i <= endIndex; i++) {
                     Stop stop = originalRoute.new Stop((Location) destinationSelector.getItemAt(i) );
                     for (Component comp : cargoPanel.getComponents()) {
                         CargoLabel label = (CargoLabel) comp;
@@ -184,33 +176,27 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
             }
         });
 
-        int[] widths = { 0 };
-        int[] heights = { 0, margin, 0, margin, 0 };
-        setLayout(new HIGLayout(widths, heights));
+        setLayout(new MigLayout("wrap 3", "[][fill][fill]", ""));
 
-        buttonPanel.add(ok);
-        buttonPanel.add(cancel);
-        buttonPanel.setOpaque(false);
-        add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")), higConst.rc(1, 1));
-        add(tradeRoutePanel, higConst.rc(3, 1));
-        add(buttonPanel, higConst.rc(5, 1));
+        add(getDefaultHeader(Messages.message("traderouteDialog.editRoute")),
+            "span, align center");
+        add(tradeRouteView, "span 1 5, grow");
+        add(nameLabel);
+        add(tradeRouteName);        
+        add(destinationLabel);
+        add(destinationSelector);
+        add(goodsPanel, "span");
+        add(cargoPanel, "span, height 80:");
+        add(addStopButton);
+        add(removeStopButton);
+        add(ok, "newline 20, span, split 2, tag ok");
+        add(cancel, "tag cancel");
 
-    }
-
-    public void initialize(TradeRoute newRoute) {
-        originalRoute = newRoute;
         TradeRoute tradeRoute = newRoute.clone();
 
         Player player = getCanvas().getClient().getMyPlayer();
 
-        // remove all items from lists and panels
-        destinationSelector.removeAllItems();
-        tradeRoutePanel.removeAll();
-        cargoPanel.removeAll();
-        listModel.removeAllElements();
-
         // combo box for selecting destination
-        
         destinationSelector.addItem(Messages.message("report.allColonies", "%number%", ""));
         if (player.getEurope() != null) {
             destinationSelector.addItem(player.getEurope());
@@ -236,34 +222,6 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
         // set name of trade route
         tradeRouteName.setText(tradeRoute.getName());
-
-        int widths[] = { 240, 3 * margin, 0, margin, 0 };
-        int heights[] = { 0, 3 * margin, 0, margin, 0, margin, 80, margin, 0 };
-        int listColumn = 1;
-        int labelColumn = 3;
-        int valueColumn = 5;
-
-        tradeRoutePanel.setLayout(new HIGLayout(widths, heights));
-
-        int row = 1;
-        tradeRoutePanel.add(tradeRouteView, higConst.rcwh(row, listColumn, 1, heights.length));
-        tradeRoutePanel.add(nameLabel, higConst.rc(row, labelColumn));
-        tradeRoutePanel.add(tradeRouteName, higConst.rc(row, valueColumn));
-        row += 2;
-
-        tradeRoutePanel.add(destinationLabel, higConst.rc(row, labelColumn));
-        tradeRoutePanel.add(destinationSelector, higConst.rc(row, valueColumn));
-        row += 2;
-
-        tradeRoutePanel.add(goodsPanel, higConst.rcwh(row, labelColumn, 3, 1));
-        row += 2;
-
-        tradeRoutePanel.add(cargoPanel, higConst.rcwh(row, labelColumn, 3, 1));
-        row += 2;
-
-        tradeRoutePanel.add(addStopButton, higConst.rc(row, labelColumn));
-        tradeRoutePanel.add(removeStopButton, higConst.rc(row, valueColumn));
-        row += 2;
 
         setSize(getPreferredSize());
 
@@ -363,7 +321,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     public class GoodsPanel extends JPanel {
 
         public GoodsPanel() {
-            super(new GridLayout(5, 5, margin, margin));
+            super(new GridLayout(0, 5, margin, margin));
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
                     CargoLabel label = new CargoLabel(goodsType);
