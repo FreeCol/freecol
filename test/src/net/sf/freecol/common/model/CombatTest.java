@@ -52,6 +52,7 @@ public class CombatTest extends FreeColTestCase {
 
     EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
     EquipmentType horses = spec().getEquipmentType("model.equipment.horses");
+    EquipmentType tools = spec().getEquipmentType("model.equipment.tools");
     EquipmentType indianMuskets = spec().getEquipmentType("model.equipment.indian.muskets");
     EquipmentType indianHorses = spec().getEquipmentType("model.equipment.indian.horses");
     EquipmentType[] dragoonEquipment = new EquipmentType[] { horses, muskets };
@@ -547,6 +548,33 @@ public class CombatTest extends FreeColTestCase {
         for (Modifier defenceModifier : indianHorses.getModifierSet("model.modifier.defence")) {
             assertTrue(defenceModifiers.contains(defenceModifier));
         }
+    }
+    
+    public void testPionnerDiesNotLosesEquipment() {
+    	Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Tile tile1 = map.getTile(5, 8);       
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(french, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        Unit pionner = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
+        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
+
+        soldier.equipWith(muskets, true);
+        soldier.equipWith(horses, true);
+        soldier.setMovesLeft(1);
+        pionner.equipWith(tools, true);
+
+        combatModel.attack(soldier, pionner, victory, 0, null);
+        assertTrue("Pionner should be dead",pionner.isDisposed());
     }
 
 }

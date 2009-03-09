@@ -421,6 +421,7 @@
     </equipment-type>
     <equipment-type id="model.equipment.tools" maximum-count="5" role="pioneer">
       <ability id="model.ability.improveTerrain" value="true"/>
+      <ability id="model.ability.disposeOnCombatLoss" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
       <required-goods id="model.goods.tools" value="20"/>
     </equipment-type>
