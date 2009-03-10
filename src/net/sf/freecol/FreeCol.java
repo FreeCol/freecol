@@ -66,6 +66,13 @@ import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.server.FreeColServer;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 
 /**
  * This class is responsible for handling the command-line arguments
@@ -133,6 +140,10 @@ public final class FreeCol {
     private static Level logLevel = Level.INFO;
 
     private static boolean checkIntegrity = false;
+
+    private static final Options options = new Options();
+
+
 
     private FreeCol() {
         // Hide constructor
@@ -640,178 +651,205 @@ public final class FreeCol {
      * @param args The command-line arguments.
      */
     private static void handleArgs(String[] args) {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("--freecol-data")) {
-                i++;
-                if (i < args.length) {
-                    dataFolder = args[i];
+        // create the command line parser
+        CommandLineParser parser = new PosixParser();
 
-                    // append a file separator to the data folder if necessary
-                    if ( ! dataFolder.endsWith(FILE_SEP)) {
-                        dataFolder += FILE_SEP;
-                    }
-                } else {
-                    printUsage();
-                    System.exit(1);
+        // create the Options
+        options.addOption(OptionBuilder.withLongOpt("freecol-data")
+                          .withDescription(Messages.message("cli.freecol-data"))
+                          .withArgName(Messages.message("cli.arg.directory"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("tc")
+                          .withDescription(Messages.message("cli.tc"))
+                          .withArgName(Messages.message("cli.arg.name"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("home-directory")
+                          .withDescription(Messages.message("cli.home-directory"))
+                          .withArgName(Messages.message("cli.arg.directory"))
+                          .withType(new File("dummy"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("log-console")
+                          .withDescription(Messages.message("cli.log-console"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("log-level")
+                          .withDescription(Messages.message("cli.log-level"))
+                          .withArgName(Messages.message("cli.arg.loglevel"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("no-java-check")
+                          .withDescription(Messages.message("cli.no-java-check"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("windowed")
+                          .withDescription(Messages.message("cli.windowed"))
+                          .withArgName(Messages.message("cli.arg.dimensions"))
+                          .hasOptionalArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("default-locale")
+                          .withDescription(Messages.message("cli.default-locale"))
+                          .withArgName(Messages.message("cli.arg.locale"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("no-memory-check")
+                          .withDescription(Messages.message("cli.no-memory-check"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("no-sound")
+                          .withDescription(Messages.message("cli.no-sound"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("usage")
+                          .withDescription(Messages.message("cli.help"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("help")
+                          .withDescription(Messages.message("cli.help"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("version")
+                          .withDescription(Messages.message("cli.version"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("debug")
+                          .withDescription(Messages.message("cli.debug"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("private")
+                          .withDescription(Messages.message("cli.private"))
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("server")
+                          .withDescription(Messages.message("cli.server"))
+                          .withArgName(Messages.message("cli.arg.port"))
+                          .hasOptionalArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("load-savegame")
+                          .withDescription(Messages.message("cli.load-savegame"))
+                          .withArgName(Messages.message("cli.arg.file"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("server-name")
+                          .withDescription(Messages.message("cli.server-name"))
+                          .withArgName(Messages.message("cli.arg.name"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("splash")
+                          .withDescription(Messages.message("cli.splash"))
+                          .withArgName(Messages.message("cli.arg.file"))
+                          .hasArg()
+                          .create());
+        options.addOption(OptionBuilder.withLongOpt("check-savegame")
+                          .withDescription(Messages.message("cli.check-savegame"))
+                          .create());
+        // TODO: remove option when AI is no longer experimental
+        options.addOption(OptionBuilder.withLongOpt("experimentalAI")
+                          .withDescription(Messages.message("cli.experimentalAI"))
+                          .create());
+
+        try {
+            // parse the command line arguments
+            CommandLine line = parser.parse(options, args);
+            if (line.hasOption("freecol-data")) {
+                dataFolder = line.getOptionValue("freecol-data");
+                if (!dataFolder.endsWith(FILE_SEP)) {
+                    dataFolder += FILE_SEP;
                 }
-            } else if (args[i].equals("--tc")) {
-                i++;
-                if (i < args.length) {
-                    tc = args[i];
-                } else {
-                    printUsage();
-                    System.exit(1);
-                }
-            } else if (args[i].equals("--home-directory")) {
-                i++;
-                if (i < args.length) {
-                    mainUserDirectory = new File(args[i]);
-                } else {
-                    printUsage();
-                    System.exit(1);
-                }
-            } else if (args[i].equals("--log-console")) {
+            }
+            if (line.hasOption("tc")) {
+                tc = line.getOptionValue("tc");
+            }
+            if (line.hasOption("home-directory")) {
+                mainUserDirectory = (File) line.getOptionObject("home-directory");
+            }
+            if (line.hasOption("log-console")) {
                 consoleLogging = true;
                 initLogging();
-            } else if (args[i].equals("--log-level")) {
-                i++;
-                if (i < args.length) {
-                    String logLevelString = args[i].toUpperCase();
-                    try {
-                        logLevel = Level.parse(logLevelString);
-                        initLogging();
-                    } catch (IllegalArgumentException e) {
-                        printUsage();
-                        System.exit(1);
-                    }
-                } else {
+            }
+            if (line.hasOption("log-level")) {
+                String logLevelString = line.getOptionValue("log-level").toUpperCase();
+                try {
+                    logLevel = Level.parse(logLevelString);
+                    initLogging();
+                } catch (IllegalArgumentException e) {
                     printUsage();
                     System.exit(1);
                 }
-            } else if (args[i].equals("--no-java-check")) {
+            }
+            if (line.hasOption("no-java-check")) {
                 javaCheck = false;
-            } else if (args[i].length() >= 10 && args[i].substring(0, 10).equals("--windowed")) {
-                if (args[i].length() > 10 && args[i].charAt(10) != ' ') {
-                    // TODO: Check if the input values are legal.
-                    try {
-                        int x = 0;
-                        int j = 10;
-                        
-                        if (args[i].charAt(10) == '=') {
-                            j++;
-                        }
-
-                        for (; args[i].charAt(j) != 'x'; j++) {
-                            x *= 10;
-                            x += Character.digit(args[i].charAt(j), 10);
-                        }
-
-                        int y = 0;
-                        for (j++; j < args[i].length() && args[i].charAt(j) != ' '; j++) {
-                            y *= 10;
-                            y += Character.digit(args[i].charAt(j), 10);
-                        }
-                        windowSize = new Dimension(x, y);
-                    } catch (Exception e) {
+            }
+            if (line.hasOption("windowed")) {
+                windowed = true;
+                String dimensions = line.getOptionValue("windowed");
+                if (dimensions != null) {
+                    String[] xy = dimensions.split("[^0-9]");
+                    if (xy.length == 2) {
+                        windowSize = new Dimension(Integer.parseInt(xy[0]), Integer.parseInt(xy[1]));
+                    } else {
                         printUsage();
                         System.exit(1);
                     }
-                } else if (args[i].length() != 10) {
-                    printUsage();
-                    System.exit(1);
                 }
-                
-                windowed = true;
-            } else if (args[i].length() > 16 && args[i].substring(0, 16).equals("--default-locale")) {
-                if (args[i].charAt(16) == '=') {
-                    // slightly ugly: strip encoding from LC_MESSAGES
-                    String languageID = args[i].substring(17);
-                    int index = languageID.indexOf('.');
-                    if (index > 0) {
-                        languageID = languageID.substring(0, index);
-                    }
-                    Locale.setDefault(LanguageOption.getLocale(languageID));
-                } else {
-                    printUsage();
-                    System.exit(1);
+            }
+            if (line.hasOption("default-locale")) {
+                // slightly ugly: strip encoding from LC_MESSAGES
+                String languageID = line.getOptionValue("default-locale");
+                int index = languageID.indexOf('.');
+                if (index > 0) {
+                    languageID = languageID.substring(0, index);
                 }
-            } else if (args[i].equals("--no-sound")) {
+                Locale.setDefault(LanguageOption.getLocale(languageID));
+            }
+            if (line.hasOption("no-sound")) {
                 sound = false;
-            } else if (args[i].equals("--no-memory-check")) {
+            }
+            if (line.hasOption("no-memory-check")) {
                 memoryCheck = false;
-            } else if (args[i].equals("--usage") || args[i].equals("--help")) {
+            }
+            if (line.hasOption("help") || line.hasOption("usage")) {
                 printUsage();
                 System.exit(0);
-            } else if (args[i].equals("--version")) {
+            }
+            if (line.hasOption("version")) {
                 System.out.println("FreeCol " + getVersion());
                 System.exit(0);
-            } else if (args[i].equals("--debug")) {
+            }
+            if (line.hasOption("debug")) {
                 inDebugMode = true;
-            } else if (args[i].equals("--server")) {
+            }
+            if (line.hasOption("server")) {
                 standAloneServer = true;
-                i++;
-                if (i >= args.length) {
-                    printUsage();
-                    System.out.println("You will need to specify a port number when using the \"--server\" option.");
-                    System.exit(1);
-                }
-
+                String arg = line.getOptionValue("server");
                 try {
-                    serverPort = Integer.parseInt(args[i]);
+                    serverPort = Integer.parseInt(arg);
                 } catch (NumberFormatException nfe) {
-                    printUsage();
-                    System.out.println("The text after the \"--server\" option should be a valid port number.");
+                    System.out.println(Messages.message("cli.error.port", "%string%", arg));
                     System.exit(1);
                 }
-            } else if (args[i].equals("--private")) {
+            }
+            if (line.hasOption("private")) {
                 publicServer = false;
-            } else if (args[i].equals("--load-savegame")) {
-                i++;
-                if (i < args.length) {
-                    setSavegame(args[i]);
-                } else {
-                    printUsage();
-                    System.exit(1);
-                }
-            } else if (args[i].equals("--server-help")) {
-                printServerUsage();
-                System.exit(0);
-            } else if (args[i].equals("--server-name")) {
-                if (!standAloneServer) {
-                    printServerUsage();
-                    System.exit(1);
-                }
-                i++;
-                if (i >= args.length) {
-                    printUsage();
-                    System.out.println("You will need to specify a name when using the \"--server-name\" option.");
-                    System.exit(1);
-                }
-                serverName = args[i];
-            } else if (args[i].startsWith("--splash")) {
-                // Ignore - already handled;
-            } else if (args[i].equals("--check-savegame")) {
-                // Debugging aid, checks the integrity of the specified save
-                // game, and exits with corresponding status
-                i++;
-                if (i < args.length) {
-                    setSavegame(args[i]);
-                } else {
-                    printUsage();
-                    System.exit(1);
-                }
+            }
+            if (line.hasOption("check-savegame")) {
+                setSavegame(line.getOptionValue("load-savegame"));
                 checkIntegrity = true;
                 standAloneServer = true;
                 serverPort = DEFAULT_PORT;
-            } else if (args[i].equals("--experimentalAI")) {
-                usesExperimentalAI = true;
-            } else {
-                printUsage();
-                System.exit(1);
             }
+            if (line.hasOption("load-savegame")) {
+                setSavegame(line.getOptionValue("load-savegame"));
+            }
+            if (line.hasOption("server-name")) {
+                serverName = line.getOptionValue("server-name");
+            }
+        } catch(ParseException e) {
+            System.out.println("\n" + e.getMessage() + "\n");
+            printUsage();
+            System.exit(1);
         }
+
     }
 
+
+    private static void printUsage() {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("java -Xmx 128M -jar freecol.jar [OPTIONS]", options);
+    }
 
     /**
      * Gets the current version of game.
@@ -861,66 +899,4 @@ public final class FreeCol {
         return usesExperimentalAI;
     }
 
-    /**
-     * Prints the command-line usage for the server options.
-     */
-    private static void printServerUsage() {
-        System.out.println("Usage: java -Xmx512M -jar FreeCol.jar --server PORT [OPTIONS]");
-        System.out.println("");
-        System.out.println("Starts a stand-alone server on the specifed port");
-        System.out.println("");
-        System.out.println("Options:");
-        System.out.println("--server-name NAME");
-        System.out.println("  specifies a custom name for the server");
-        System.out.println("--load-savegame SAVEGAME_FILE");
-        System.out.println("  loads the given savegame.");
-        System.out.println("--no-java-check");
-        System.out.println("  skips the java version check");        
-        System.out.println();
-    }
-
-
-    /**
-     * Prints the command-line usage (the 'help' for command-line
-     * arguments).
-     */
-    private static void printUsage() {
-        System.out.println("Usage: java -Xmx512M -jar FreeCol.jar [OPTIONS]");
-        System.out.println("");
-        System.out.println("Options:");
-        System.out.println("--home-directory DIR");
-        System.out.println("  sets the FreeCol home directory, defaults to user home.");
-        System.out.println("--default-locale=LANGUAGE[_COUNTRY[_VARIANT]]");
-        System.out.println("  sets the default locale.");
-        System.out.println("--freecol-data DIR");
-        System.out.println("  DIR should be the directory with FreeCol's data files, it");
-        System.out.println("  has a subdirectory called 'images'");
-        System.out.println("--load-savegame SAVEGAME_FILE");
-        System.out.println("  loads the given savegame.");
-        System.out.println("--log-level=LOGLEVEL");
-        System.out.println("  sets the log-level to LOGLEVEL.");
-        System.out.println("--no-java-check");
-        System.out.println("  skips the java version check");
-        System.out.println("--no-memory-check");
-        System.out.println("  skips the memory check");        
-        System.out.println("--no-sound");
-        System.out.println("  runs FreeCol without sound");
-        System.out.println("--server PORT");
-        System.out.println("  starts a stand-alone server on the specifed port");
-        System.out.println("--private");
-        System.out.println("  starts a private server (not published to the metaserver)");
-        System.out.println("--server-help");
-        System.out.println("  displays a help screen for the more advanced server options");
-        System.out.println("--splash[=SPLASH_IMAGE_FILE]");
-        System.out.println("  displays a splash screen while loading the game");
-        System.out.println("--tc NAME");
-        System.out.println("  Loads the total conversion with the given NAME");
-        System.out.println("--usage");
-        System.out.println("  displays this help screen");
-        System.out.println("--version");
-        System.out.println("  displays the version number");
-        System.out.println("--windowed[[=]WIDTHxHEIGHT]");
-        System.out.println("  runs FreeCol in windowed mode instead of full screen mode");
-        System.out.println();
-    }
 }
