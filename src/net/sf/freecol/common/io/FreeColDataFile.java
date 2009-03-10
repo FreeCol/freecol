@@ -182,7 +182,14 @@ public class FreeColDataFile {
     public ResourceMapping getResourceMapping() {
         try {
             final Properties properties = new Properties();
-            properties.load(getInputStream(RESOURCES_PROPERTIES_FILE));
+            final InputStream is = getInputStream(RESOURCES_PROPERTIES_FILE);
+            try {
+                properties.load(is);
+            } finally {
+                try {
+                    is.close();
+                } catch (Exception e) {}
+            }
             ResourceMapping rc = new ResourceMapping();
             if (supportOldSavegames != null) {
                 return rc;
