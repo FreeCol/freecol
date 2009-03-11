@@ -103,6 +103,7 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
+import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DiplomaticTradeMessage;
@@ -297,13 +298,13 @@ public final class InGameController implements NetworkConstants {
     /**
      * Sends a public chat message.
      * 
-     * @param message The chat message.
+     * @param message The text of the message.
      */
     public void sendChat(String message) {
-        Element chatElement = Message.createNewRootElement("chat");
-        chatElement.setAttribute("message", message);
-        chatElement.setAttribute("privateChat", "false");
-        freeColClient.getClient().sendAndWait(chatElement);
+        ChatMessage chatMessage = new ChatMessage(freeColClient.getMyPlayer(),
+                                                  message,
+                                                  Boolean.FALSE);
+        freeColClient.getClient().sendAndWait(chatMessage.toXMLElement());
     }
 
     /**

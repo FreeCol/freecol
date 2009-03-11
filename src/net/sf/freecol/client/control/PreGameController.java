@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
@@ -180,16 +181,15 @@ public final class PreGameController {
 
 
     /**
-    * Sends a chat message.
-    * @param message The message as plain text.
-    */
+     * Sends a chat message.
+     *
+     * @param message The text of the message.
+     */
     public void chat(String message) {
-        Element chatElement = Message.createNewRootElement("chat");
-        chatElement.setAttribute("senderName", freeColClient.getMyPlayer().getName());
-        chatElement.setAttribute("message", message);
-        chatElement.setAttribute("privateChat", "false");
-
-        freeColClient.getClient().send(chatElement);
+        ChatMessage chatMessage = new ChatMessage(freeColClient.getMyPlayer(),
+                                                  message,
+                                                  Boolean.FALSE);
+        freeColClient.getClient().send(chatMessage.toXMLElement());
     }
     
 

@@ -37,6 +37,8 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
@@ -208,18 +210,18 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
     }
     
     /**
-    * Handles a "chat"-message.
-    *
-    * @param element The element (root element in a DOM-parsed XML tree) that
-    *                holds all the information.
-    */
+     * Handles a "chat"-message.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     * @return Null.
+     */
     private Element chat(Element element)  {
-        String senderName = element.getAttribute("senderName");
-        String message = element.getAttribute("message");
-        boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
-
-        getFreeColClient().getCanvas().getStartGamePanel().displayChat(senderName, message, privateChat);
-
+        ChatMessage chatMessage = new ChatMessage(getGame(), element);
+        Canvas canvas = getFreeColClient().getCanvas();
+        canvas.getStartGamePanel().displayChat(chatMessage.getPlayer().getName(),
+                                               chatMessage.getMessage(),
+                                               chatMessage.isPrivate());
         return null;
     }
 

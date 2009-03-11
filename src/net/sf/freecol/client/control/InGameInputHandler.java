@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -584,12 +585,14 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element chat(Element element) {
-        final Player sender = (Player) getGame().getFreeColGameObjectSafely(element.getAttribute("sender"));
-        final String message = element.getAttribute("message");
-        final boolean privateChat = Boolean.valueOf(element.getAttribute("privateChat")).booleanValue();
+        final ChatMessage chatMessage = new ChatMessage(getGame(), element);
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                getFreeColClient().getCanvas().displayChatMessage(sender, message, privateChat);
+                Canvas canvas = getFreeColClient().getCanvas();
+                canvas.displayChatMessage(chatMessage.getPlayer(),
+                                          chatMessage.getMessage(),
+                                          chatMessage.isPrivate());
             }
         });
         return null;

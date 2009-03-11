@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -60,16 +61,21 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
      * 
      * @param freeColServer The main server object.
      */
-    public InputHandler(FreeColServer freeColServer) {
+    public InputHandler(final FreeColServer freeColServer) {
         super(freeColServer);
         // All sub-classes are forced to implement this one
         register("logout", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return logout(connection, element);
-            }
-        });
+                public Element handle(Connection connection, Element element) {
+                    return logout(connection, element);
+                }
+            });
         register("disconnect", new DisconnectHandler());
-        register("chat", new ChatHandler());
+        register("chat", new NetworkRequestHandler() {
+                public Element handle(Connection connection, Element element) {
+                    return new ChatMessage(freeColServer.getGame(),
+                                           element).handle(freeColServer, connection);
+                }
+            });
         register("getRandomNumbers", new GetRandomNumbersHandler());
     }
 
@@ -265,20 +271,6 @@ public abstract class InputHandler extends FreeColServerHolder implements Messag
 
         private void logDisconnect(Connection connection, ServerPlayer player) {
             logger.info("Disconnection by: " + connection + ((player != null) ? " (" + player.getName() + ") " : ""));
-        }
-    }
-
-    private class ChatHandler implements NetworkRequestHandler {
-        public Element handle(Connection connection, Element element) {
-            ServerPlayer player = getFreeColServer().getPlayer(connection);
-            if (player != null) {
-                element.setAttribute("sender", player.getId());
-            }
-            Server server = getFreeColServer().getServer();
-            if (server != null) {
-                server.sendToAll(element, connection);
-            }
-            return null;
         }
     }
 }
