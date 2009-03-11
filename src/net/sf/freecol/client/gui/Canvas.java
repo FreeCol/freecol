@@ -1384,7 +1384,7 @@ public final class Canvas extends JDesktopPane {
         ChoiceItem<T> response = choiceDialog.getResponse();
         remove(choiceDialog);
 
-        return response.getObject();
+        return (response == null) ? null : response.getObject();
     }
 
     /**
