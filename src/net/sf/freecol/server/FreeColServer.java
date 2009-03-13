@@ -106,7 +106,14 @@ public final class FreeColServer {
     private static final int NUMBER_OF_HIGH_SCORES = 10;
     private static final String HIGH_SCORE_FILE = "HighScores.xml";
 
+    /**
+     * The save game format used for saving games.
+     */
     public static final int SAVEGAME_VERSION = 1;
+
+    /**
+     * The oldest save game format that can still be loaded.
+     */
     public static final int MINIMUM_SAVEGAME_VERSION = 1;
 
     /** Constant for storing the state of the game. */
@@ -691,7 +698,12 @@ public final class FreeColServer {
             final String version = xsr.getAttributeValue(null, "version");
             int savegameVersion = 0;
             try {
-                savegameVersion = Integer.parseInt(version);
+                // TODO: remove this compatibility code BEFORE releasing 0.9
+                if (version.equals("0.1.4")) {
+                    savegameVersion = 1;
+                } else {
+                    savegameVersion = Integer.parseInt(version);
+                }
             } catch(Exception e) {
                 throw new FreeColException("incompatibleVersions");
             }
