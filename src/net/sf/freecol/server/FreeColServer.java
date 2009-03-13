@@ -106,6 +106,9 @@ public final class FreeColServer {
     private static final int NUMBER_OF_HIGH_SCORES = 10;
     private static final String HIGH_SCORE_FILE = "HighScores.xml";
 
+    public static final int SAVEGAME_VERSION = 1;
+    public static final int MINIMUM_SAVEGAME_VERSION = 1;
+
     /** Constant for storing the state of the game. */
     public static enum GameState {STARTING_GAME, IN_GAME, ENDING_GAME}
 
@@ -596,7 +599,7 @@ public final class FreeColServer {
             xsw.writeAttribute("owner", username);
             xsw.writeAttribute("publicServer", Boolean.toString(publicServer));
             xsw.writeAttribute("singleplayer", Boolean.toString(singleplayer));
-            xsw.writeAttribute("version", Message.getFreeColProtocolVersion());
+            xsw.writeAttribute("version", Integer.toString(SAVEGAME_VERSION));
             xsw.writeAttribute("randomState", _pseudoRandom.getState());
             // Add server side model information:
             xsw.writeStartElement("serverObjects");
@@ -686,7 +689,13 @@ public final class FreeColServer {
             xsr = createXMLStreamReader(fis);
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
-            if (!Message.getFreeColProtocolVersion().equals(version)) {
+            int savegameVersion = 0;
+            try {
+                savegameVersion = Integer.parseInt(version);
+            } catch(Exception e) {
+                throw new FreeColException("incompatibleVersions");
+            }
+            if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
                 throw new FreeColException("incompatibleVersions");
             }
             String randomState = xsr.getAttributeValue(null, "randomState");
