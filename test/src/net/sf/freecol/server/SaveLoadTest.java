@@ -30,13 +30,23 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class SaveLoadTest extends FreeColTestCase {
+    
+    FreeColServer server = null;
+    
+    public void tearDown(){
+        if(server != null){
+            // must make sure that the server is stopped
+            ServerTestHelper.stopServer(server);
+            server = null;
+        }
+    }
 
     public void testDelayedLoading() {
         
         File file = ServerTestHelper.createRandomSaveGame();
         
         // start a new server and read the file back
-        FreeColServer server = ServerTestHelper.startServer(false, true);
+        server = ServerTestHelper.startServer(false, true);
         try {
             server.loadGame(new FreeColSavegameFile(file));
         } catch (Exception e) {
@@ -46,8 +56,6 @@ public class SaveLoadTest extends FreeColTestCase {
         assertNotNull(server.getGame().getMap());
         file.delete();
         assertFalse(file.exists());
-        
-        ServerTestHelper.stopServer(server);
     }
 
     public void testImmediateLoading() {
@@ -55,13 +63,11 @@ public class SaveLoadTest extends FreeColTestCase {
         File file = ServerTestHelper.createRandomSaveGame();
         
         // start a new server and read the file back
-        FreeColServer server = ServerTestHelper.startServer(file, false, true);
+        server = ServerTestHelper.startServer(file, false, true);
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
         file.delete();
         assertFalse(file.exists());
-        
-        ServerTestHelper.stopServer(server);
     }
     
     public void testImport() {
@@ -69,7 +75,7 @@ public class SaveLoadTest extends FreeColTestCase {
         File file = ServerTestHelper.createRandomSaveGame();
         
         // start a new server and import the file
-        FreeColServer server = ServerTestHelper.startServer(false, true);
+        server = ServerTestHelper.startServer(false, true);
         IMapGenerator mapGenerator = server.getMapGenerator();
         mapGenerator.getMapGeneratorOptions().setFile(MapGeneratorOptions.IMPORT_FILE, file);
         Controller c = server.getController();
@@ -79,15 +85,13 @@ public class SaveLoadTest extends FreeColTestCase {
         try {
             pgc.startGame();
         } catch (FreeColException e) {
-            ServerTestHelper.stopServer(server);
-            fail();
+            fail(e.getMessage());
         }
+
         assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
         assertNotNull(server.getGame());
         assertNotNull(server.getGame().getMap());
         file.delete();
         assertFalse(file.exists());
-        
-        ServerTestHelper.stopServer(server);
     }
 }

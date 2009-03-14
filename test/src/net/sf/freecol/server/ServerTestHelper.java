@@ -114,8 +114,6 @@ public final class ServerTestHelper {
     // stop the server
     Controller c = server.getController();
     assertNotNull(c);
-    assertTrue(c instanceof InGameController);
-    InGameController ic = (InGameController) c;
-    ic.shutdown();
+    c.shutdown();
   }
 }
