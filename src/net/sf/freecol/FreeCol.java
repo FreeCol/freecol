@@ -64,6 +64,7 @@ import net.sf.freecol.common.logging.DefaultHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.option.LanguageOption;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
 
 import org.apache.commons.cli.CommandLine;
@@ -214,11 +215,12 @@ public final class FreeCol {
             try {
                 final FreeColServer freeColServer;
                 if (savegameFile != null) {
-                    XMLStreamReader in = null;
+                    XMLStream xs = null;
                     try {
                         // Get suggestions for "singleplayer" and "public game" settings from the file:
                         final FreeColSavegameFile fis = new FreeColSavegameFile(savegameFile);
-                        in = FreeColServer.createXMLStreamReader(fis);
+                        xs = FreeColServer.createXMLStreamReader(fis);
+                        final XMLStreamReader in = xs.getXMLStreamReader();
                         in.nextTag();
                         final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
                         final boolean defaultPublicServer;
@@ -228,7 +230,7 @@ public final class FreeCol {
                         } else {
                             defaultPublicServer = false;
                         }
-                        in.close();
+                        xs.close();
                         
                         freeColServer = new FreeColServer(fis, defaultPublicServer, defaultSingleplayer, serverPort, serverName);
                     } catch (Exception e) {
@@ -237,9 +239,7 @@ public final class FreeCol {
                         System.exit(1);
                         return;
                     } finally {
-                        try {
-                            in.close();
-                        } catch (Exception e) {}
+                        xs.close();
                     }
                 } else {
                     try {

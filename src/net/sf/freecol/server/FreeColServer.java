@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -71,6 +70,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
+import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.control.Controller;
@@ -650,31 +650,17 @@ public final class FreeColServer {
     }
 
     /**
-     * Creates a <code>XMLStreamReader</code> for reading the given file.
+     * Creates a <code>XMLStream</code> for reading the given file.
      * Compression is automatically detected.
      * 
      * @param fis The file to be read.
-     * @return The <code>XMLStreamReader</code>.
+     * @return The <code>XMLStreamr</code>.
      * @exception IOException if thrown while loading the game or if a
      *                <code>XMLStreamException</code> have been thrown by the
      *                parser.
      */
-    public static XMLStreamReader createXMLStreamReader(FreeColSavegameFile fis) throws IOException {
-        try {
-            InputStream in = fis.getSavegameInputStream();
-            XMLInputFactory xif = XMLInputFactory.newInstance();        
-            return xif.createXMLStreamReader(in);
-        } catch (XMLStreamException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new IOException("XMLStreamException.");
-        } catch (NullPointerException e) {
-            StringWriter sw = new StringWriter();
-            e.printStackTrace(new PrintWriter(sw));
-            logger.warning(sw.toString());
-            throw new NullPointerException("NullPointerException.");
-        }
+    public static XMLStream createXMLStreamReader(FreeColSavegameFile fis) throws IOException {
+        return new XMLStream(fis.getSavegameInputStream());
     }
 
     /**
@@ -691,9 +677,10 @@ public final class FreeColServer {
      */
     public String loadGame(final FreeColSavegameFile fis) throws IOException, FreeColException {
         boolean doNotLoadAI = false;
-        XMLStreamReader xsr = null;
+        XMLStream xs = null;
         try {
-            xsr = createXMLStreamReader(fis);
+            xs = createXMLStreamReader(fis);
+            final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
             int savegameVersion = 0;
@@ -780,7 +767,7 @@ public final class FreeColServer {
                     player.setConnected(true);
                 }
             }
-            xsr.close();
+            xs.close();
             // Later, we might want to modify loaded savegames:
             return owner;
         } catch (XMLStreamException e) {
@@ -799,9 +786,7 @@ public final class FreeColServer {
             logger.warning(sw.toString());
             throw new IOException(e.toString());
         } finally {
-            try {
-                xsr.close();
-            } catch (Exception e) {}
+            xs.close();
         }
     }
 

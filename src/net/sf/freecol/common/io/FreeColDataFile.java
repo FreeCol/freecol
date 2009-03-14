@@ -22,18 +22,17 @@ package net.sf.freecol.common.io;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
 
 import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceMapping;
@@ -56,12 +55,6 @@ public class FreeColDataFile {
      * a ZIP-file).
      */
     private final String jarDirectory;
-
-    /**
-     * A inputstream directly to a savegame (only if {@link file} is
-     * an outdated savegame).
-     */
-    private final InputStream supportOldSavegames;
     
     
     /**
@@ -84,31 +77,8 @@ public class FreeColDataFile {
         
         if (file.isDirectory()) {
             this.jarDirectory = null;
-            this.supportOldSavegames = null;
         } else {
-            // START SUPPORT OLD SAVEGAMES
-            try {
-                InputStream in = new BufferedInputStream(new FileInputStream(file));
-                in.mark(10);
-                byte[] buf = new byte[5];
-                in.read(buf, 0, 5);
-                in.reset();
-                if ((new String(buf)).startsWith("PK")) {
-                    // START KEEP
-                    this.jarDirectory = findJarDirectory(file.getName().substring(0, file.getName().lastIndexOf('.')), file);
-                    // END KEEP
-                    this.supportOldSavegames = null;
-                } else { 
-                    if (!(new String(buf)).equals("<?xml")) {
-                        in = new BufferedInputStream(new GZIPInputStream(in));
-                    }
-                    this.supportOldSavegames = in;
-                    this.jarDirectory = null;
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("IOException while trying to load a legacy savegame.", e);
-            }
-            // END SUPPORT OLD SAVEGAMES            
+            this.jarDirectory = findJarDirectory(file.getName().substring(0, file.getName().lastIndexOf('.')), file);
         }
     }
     
@@ -152,11 +122,9 @@ public class FreeColDataFile {
      * @return
      */
     protected InputStream getInputStream(String filename) throws IOException {
-        if (supportOldSavegames != null) {
-            return supportOldSavegames;
-        } else {
-            return new BufferedInputStream(getURL(filename).openStream());
-        }
+        final URLConnection connection = getURL(filename).openConnection();
+        connection.setDefaultUseCaches(false);
+        return new BufferedInputStream(connection.getInputStream());
     }
     
     private URL getURL(String filename) {
@@ -191,9 +159,6 @@ public class FreeColDataFile {
                 } catch (Exception e) {}
             }
             ResourceMapping rc = new ResourceMapping();
-            if (supportOldSavegames != null) {
-                return rc;
-            }
             Enumeration<?> pn = properties.propertyNames();
             while (pn.hasMoreElements()) {
                 final String key = (String) pn.nextElement();

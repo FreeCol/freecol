@@ -41,7 +41,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.FreeColException;
@@ -55,6 +54,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
@@ -377,11 +377,12 @@ public final class ConnectController {
         final boolean singleplayer;
         final String name;
         final int port;
-        XMLStreamReader in = null;
+        XMLStream xs = null;
         try {
             // Get suggestions for "singleplayer" and "public game" settings from the file:
             final FreeColSavegameFile fis = new FreeColSavegameFile(theFile);
-            in = FreeColServer.createXMLStreamReader(fis);
+            xs = FreeColServer.createXMLStreamReader(fis);
+            final XMLStreamReader in = xs.getXMLStreamReader();
             in.nextTag();
             final boolean defaultSingleplayer = Boolean.valueOf(in.getAttributeValue(null, "singleplayer")).booleanValue();
             final boolean defaultPublicServer;
@@ -391,8 +392,7 @@ public final class ConnectController {
             } else {
                 defaultPublicServer = false;
             }
-            in.close();
-            
+            xs.close();
             final int sgo = freeColClient.getClientOptions().getInteger(ClientOptions.SHOW_SAVEGAME_SETTINGS);
             if (sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_ALWAYS
                     || !defaultSingleplayer && sgo == ClientOptions.SHOW_SAVEGAME_SETTINGS_MULTIPLAYER) {
@@ -427,9 +427,7 @@ public final class ConnectController {
             SwingUtilities.invokeLater( new ErrorJob("server.couldNotStart") );
             return;
         } finally {
-            try {
-                in.close();
-            } catch (Exception e) {}
+            xs.close();
         }
         
         if (freeColClient.getFreeColServer() != null && freeColClient.getFreeColServer().getServer().getPort() == port) {

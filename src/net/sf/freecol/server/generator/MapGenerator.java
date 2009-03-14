@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
+import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
@@ -148,11 +149,12 @@ public class MapGenerator implements IMapGenerator {
          * TODO-LATER: We are using same method in FreeColServer.
          *       Create a framework for loading games/maps.
          */
-        XMLStreamReader xsr = null;
+        XMLStream xs = null;
         Game game = null;
         try {
             final FreeColSavegameFile fis = new FreeColSavegameFile(importFile);
-            xsr = FreeColServer.createXMLStreamReader(fis);
+            xs = FreeColServer.createXMLStreamReader(fis);
+            final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
             if (!Message.getFreeColProtocolVersion().equals(version)) {
@@ -178,7 +180,7 @@ public class MapGenerator implements IMapGenerator {
                     game.checkIntegrity();
                 }
             }
-            xsr.close();
+            xs.close();
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));
@@ -195,9 +197,7 @@ public class MapGenerator implements IMapGenerator {
             logger.warning(sw.toString());
             throw new FreeColException(e.toString());
         } finally {
-            try {
-                xsr.close();
-            } catch (Exception e) {}
+            xs.close();
         }
         return game;
     }
