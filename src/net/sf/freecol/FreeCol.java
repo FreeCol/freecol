@@ -735,6 +735,8 @@ public final class FreeCol {
                           .create());
         options.addOption(OptionBuilder.withLongOpt("check-savegame")
                           .withDescription(Messages.message("cli.check-savegame"))
+                          .withArgName(Messages.message("cli.arg.file"))
+                          .hasArg()
                           .create());
         // TODO: remove option when AI is no longer experimental
         options.addOption(OptionBuilder.withLongOpt("experimentalAI")
