@@ -50,11 +50,6 @@ public class Nation extends FreeColGameObjectType {
     private boolean selectable;
 
     /**
-     * Describe classic here.
-     */
-    private boolean classic;
-
-    /**
      * Describe refId here.
      */
     private String refId;
@@ -172,24 +167,6 @@ public class Nation extends FreeColGameObjectType {
         this.selectable = newSelectable;
     }
 
-    /**
-     * Get the <code>Classic</code> value.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public final boolean isClassic() {
-        return classic;
-    }
-
-    /**
-     * Set the <code>Classic</code> value.
-     *
-     * @param newClassic The new Classic value.
-     */
-    public final void setClassic(final boolean newClassic) {
-        this.classic = newClassic;
-    }
-
     public String toString() {
         return getName();
     }
@@ -199,7 +176,6 @@ public class Nation extends FreeColGameObjectType {
         setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));
         type = specification.getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
-        classic = getAttribute(in, "classic", false);
         refId = getAttribute(in, "ref", null);
         anthem = in.getAttributeValue(null, "anthem");
    }

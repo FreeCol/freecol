@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.15 -->
+<!-- specification version 0.16 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -1608,14 +1608,17 @@
 
   <nations>
     <nation id="model.nation.dutch" color="#ff9d3c" anthem="anthem_dutch"
-            nation-type="model.nationType.trade" selectable="true" classic="true"
+            nation-type="model.nationType.trade" selectable="true"
             ref="model.nation.dutchREF"/>
     <nation id="model.nation.french" color="#0000ff" anthem="anthem_french"
-            nation-type="model.nationType.cooperation" selectable="true" classic="true" ref="model.nation.frenchREF"/>
+            nation-type="model.nationType.cooperation" selectable="true"
+            ref="model.nation.frenchREF"/>
     <nation id="model.nation.english" color="#ff0000" anthem="anthem_english"
-            nation-type="model.nationType.immigration" selectable="true" classic="true" ref="model.nation.englishREF"/>
+            nation-type="model.nationType.immigration" selectable="true"
+            ref="model.nation.englishREF"/>
     <nation id="model.nation.spanish" color="#ffff00" anthem="anthem_spanish"
-            nation-type="model.nationType.conquest" selectable="true" classic="true" ref="model.nation.spanishREF"/>
+            nation-type="model.nationType.conquest" selectable="true"
+            ref="model.nation.spanishREF"/>
     <nation id="model.nation.portuguese" color="#00ff00"
             nation-type="model.nationType.naval" selectable="true" ref="model.nation.portugueseREF"/>
     <nation id="model.nation.swedish" color="#ff00ff"

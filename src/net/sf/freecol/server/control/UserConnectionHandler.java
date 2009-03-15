@@ -214,8 +214,6 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
                     // we don't really need this
                     NationOptions.getDefaults().toXML(out);
                 } else {
-                    System.out.println(freeColServer.getNationOptions());
-
                     freeColServer.getNationOptions().toXML(out);
                 }
                 freeColServer.getGame().toXML(out, player);
@@ -279,7 +277,6 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             out.writeStartElement("loginConfirmed");
             out.writeAttribute("admin", (admin ? "true" : "false"));
             out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
-            System.out.println(freeColServer.getNationOptions());
             freeColServer.getNationOptions().toXML(out);
             freeColServer.getGame().toXML(out, newPlayer);
             freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);

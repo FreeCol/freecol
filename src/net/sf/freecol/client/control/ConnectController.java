@@ -167,7 +167,6 @@ public final class ConnectController {
 
         freeColClient.setSingleplayer(true);
         nationOptions = login(username, "127.0.0.1", port);
-                        System.out.println(nationOptions);
 
         if (nationOptions != null) {
             freeColClient.getPreGameController().setReady(true);
@@ -263,7 +262,6 @@ public final class ConnectController {
 
                 in.nextTag();
                 nationOptions.readFromXMLImpl(in);
-                        System.out.println(nationOptions);
                 Game game = new Game(freeColClient.getModelController(), in, username);
                 
                 // this completes the client's view of the spec with options obtained from the server difficulty

@@ -116,13 +116,11 @@ public final class Specification {
     private final List<Nation> nations;
     private final List<Nation> europeanNations;
     private final List<Nation> REFNations;
-    private final List<Nation> classicNations;
     private final List<Nation> indianNations;
 
     private final List<NationType> nationTypes;
     private final List<EuropeanNationType> europeanNationTypes;
     private final List<EuropeanNationType> REFNationTypes;
-    private final List<EuropeanNationType> classicNationTypes;
     private final List<IndianNationType> indianNationTypes;
 
     private final List<EquipmentType> equipmentTypes;
@@ -178,13 +176,11 @@ public final class Specification {
         nations = new ArrayList<Nation>();
         europeanNations = new ArrayList<Nation>();
         REFNations = new ArrayList<Nation>();
-        classicNations = new ArrayList<Nation>();
         indianNations = new ArrayList<Nation>();
 
         nationTypes = new ArrayList<NationType>();
         europeanNationTypes = new ArrayList<EuropeanNationType>();
         REFNationTypes = new ArrayList<EuropeanNationType>();
-        classicNationTypes = new ArrayList<EuropeanNationType>();
         indianNationTypes = new ArrayList<IndianNationType>();
 
         equipmentTypes = new ArrayList<EquipmentType>();
@@ -341,10 +337,6 @@ public final class Specification {
                                 REFNations.add(nation);
                             } else {
                                 europeanNations.add(nation);
-                            }
-                            if (nation.isClassic()) {
-                                classicNations.add(nation);
-                                classicNationTypes.add((EuropeanNationType) nation.getType());
                             }
                         } else {
                             indianNations.add(nation);
@@ -840,10 +832,6 @@ public final class Specification {
         return indianNationTypes;
     }
 
-    public List<EuropeanNationType> getClassicNationTypes() {
-        return classicNationTypes;
-    }
-
     public int numberOfNationTypes() {
         return nationTypes.size();
     }
@@ -860,10 +848,6 @@ public final class Specification {
 
     public Nation getNation(String id) {
         return (Nation) getType(id);
-    }
-
-    public List<Nation> getClassicNations() {
-        return classicNations;
     }
 
     public List<Nation> getEuropeanNations() {

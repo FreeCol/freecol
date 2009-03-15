@@ -189,8 +189,6 @@ public final class SpecificationTest extends TestCase {
 
         Specification spec = Specification.getSpecification();
 
-        List<Nation> classicNations = spec.getClassicNations();
-        assertEquals(4, classicNations.size());
         List<Nation> europeanNations = spec.getEuropeanNations();
         assertEquals(8, europeanNations.size());
         List<Nation> indianNations = spec.getIndianNations();
@@ -204,10 +202,6 @@ public final class SpecificationTest extends TestCase {
 
         Specification spec = Specification.getSpecification();
 
-        List<EuropeanNationType> classicNationTypes = spec.getClassicNationTypes();
-        assertEquals(4, classicNationTypes.size());
-        List<EuropeanNationType> europeanNationTypes = spec.getEuropeanNationTypes();
-        assertTrue(classicNationTypes.size() <= europeanNationTypes.size());
         List<IndianNationType> indianNationTypes = spec.getIndianNationTypes();
         assertEquals(8, indianNationTypes.size());
         List<EuropeanNationType> REFNationTypes = spec.getREFNationTypes();
