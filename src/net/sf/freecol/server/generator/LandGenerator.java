@@ -327,7 +327,7 @@ public class LandGenerator {
         for (Direction direction : adjacentDirections) {
             Position n = Map.getAdjacent(p, direction);
             if (Map.isValid(n, width, height)) {
-                gl(n.getX(), n.getY());
+                growLand(n.getX(), n.getY());
             }
         }
     }
@@ -341,7 +341,7 @@ public class LandGenerator {
      * that has been set to land by #setLand(int,int), and may recursively call
      * setLand for the current position.
      */                   
-    private void gl(int i, int j) {
+    private void growLand(int i, int j) {
         if (map[i][j]) {
             return;
         }
