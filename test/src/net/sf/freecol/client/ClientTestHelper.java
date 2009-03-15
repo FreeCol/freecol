@@ -24,7 +24,8 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.server.FreeColServer;
-import static junit.framework.Assert.assertTrue;
+import net.sf.freecol.server.NationOptions;
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 
 public class ClientTestHelper {
@@ -42,8 +43,8 @@ public class ClientTestHelper {
             client.setFreeColServer(freeColServer);
             client.setSingleplayer(true);
             client.setHeadless(true);
-            boolean loggedIn = connectController.login(username, "127.0.0.1", port);
-            assertTrue(loggedIn);
+            NationOptions nationOptions = connectController.login(username, "127.0.0.1", port);
+            assertNotNull(nationOptions);
             client.getPreGameController().setReady(true);
             //client.getClientOptions().putOption(new RangeOption(ClientOptions.ANIMATION_SPEED, 0));
             //assertEquals(0, client.getClientOptions().getInt(ClientOptions.ANIMATION_SPEED));

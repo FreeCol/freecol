@@ -36,6 +36,7 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.NationOptions;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
 
@@ -209,8 +210,14 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
                 out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
                 out.writeAttribute("startGame", "true");
                 out.writeAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
-                out.writeAttribute("advantages", Integer.toString(freeColServer.getAdvantages()));
-                out.writeAttribute("additionalNations", Boolean.toString(freeColServer.getAdditionalNations()));
+                if (freeColServer.getNationOptions() == null) {
+                    // we don't really need this
+                    NationOptions.getDefaults().toXML(out);
+                } else {
+                    System.out.println(freeColServer.getNationOptions());
+
+                    freeColServer.getNationOptions().toXML(out);
+                }
                 freeColServer.getGame().toXML(out, player);
                 freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
                 out.writeEndElement();
@@ -272,8 +279,8 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             out.writeStartElement("loginConfirmed");
             out.writeAttribute("admin", (admin ? "true" : "false"));
             out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
-            out.writeAttribute("advantages", Integer.toString(freeColServer.getAdvantages()));
-            out.writeAttribute("additionalNations", Boolean.toString(freeColServer.getAdditionalNations()));
+            System.out.println(freeColServer.getNationOptions());
+            freeColServer.getNationOptions().toXML(out);
             freeColServer.getGame().toXML(out, newPlayer);
             freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
             out.writeEndElement();

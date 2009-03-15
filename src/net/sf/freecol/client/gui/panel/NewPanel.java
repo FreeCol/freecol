@@ -42,6 +42,7 @@ import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
+import net.sf.freecol.server.NationOptions;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -51,8 +52,6 @@ import net.miginfocom.swing.MigLayout;
 public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
-
-    private static final int CLASSIC_PLAYER_NO = 4;
 
     private static final int    OK = 0,
                                 CANCEL = 1,
@@ -71,15 +70,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                                 meta;
     private final JLabel        ipLabel,
         port1Label,
-        port2Label,
-        singlePlayerNoLabel,
-        multiPlayerNoLabel;
-    private final JCheckBox     publicServer,
-        additionalNations,
-        selectAdvantages,
-        useAdvantages;
+        port2Label;
 
-    private final JSpinner singlePlayerNo, multiPlayerNo;
+    private final JCheckBox     publicServer;
 
     private final Canvas        parent;
 
@@ -105,36 +98,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         ipLabel = new JLabel( Messages.message("host") );
         port1Label = new JLabel( Messages.message("port") );
         port2Label = new JLabel( Messages.message("startServerOnPort") );
-        singlePlayerNoLabel = new JLabel(Messages.message("singlePlayerNo"));
-        multiPlayerNoLabel = new JLabel(Messages.message("multiPlayerNo"));
 
         publicServer = new JCheckBox( Messages.message("publicServer") );
-        additionalNations = new JCheckBox(Messages.message("additionalNations"));
-        additionalNations.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    if (!additionalNations.isSelected()) {
-                        int players = ((Integer) singlePlayerNo.getValue()).intValue();
-                        if (players > CLASSIC_PLAYER_NO) {
-                            singlePlayerNo.setValue(CLASSIC_PLAYER_NO);
-                        }
-                    }
-                }
-            });
-
-        selectAdvantages = new JCheckBox(Messages.message("selectAdvantages"));
-        useAdvantages = new JCheckBox(Messages.message("useAdvantages"));
-
-        singlePlayerNo = new JSpinner(new SpinnerNumberModel(CLASSIC_PLAYER_NO, 1, 8, 1));
-        singlePlayerNo.addChangeListener(new ChangeListener() {
-                public void stateChanged(ChangeEvent e) {
-                    int players = ((Integer) singlePlayerNo.getValue()).intValue();
-                    if (players > 4) {
-                        additionalNations.setSelected(true);
-                    }
-                }
-            });
-        multiPlayerNo = new JSpinner(new SpinnerNumberModel(CLASSIC_PLAYER_NO, 2, 8, 1));
-
         name = new JTextField( System.getProperty("user.name", Messages.message("defaultPlayerName")) );
         name.setColumns(20);
 
@@ -158,12 +123,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
         add(single, "span");
 
-        add(additionalNations, "skip, span");
-
-        add(selectAdvantages, "skip, span");
-
-        add(singlePlayerNoLabel, "skip, span, split 2");
-        add(singlePlayerNo);
 
         add(meta, "span");
 
@@ -180,10 +139,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         add(port2, "width 60:");
 
         add(publicServer, "span");
-
-        add(multiPlayerNoLabel, "skip");
-        add(multiPlayerNo, "width 60:");
-        add(useAdvantages, "wrap 30");
 
         add(ok, "span, split 2, tag ok");
         add(cancel, "tag cancel");
@@ -231,29 +186,18 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private void setEnabledComponents() {
         if (single.isSelected()) {
-            setSinglePlayerOptions(true);
             setJoinGameOptions(false);
             setServerOptions(false);
         } else if (join.isSelected()) {
-            setSinglePlayerOptions(false);
             setJoinGameOptions(true);
             setServerOptions(false);
         } else if (start.isSelected()) {
-            setSinglePlayerOptions(false);
             setJoinGameOptions(false);
             setServerOptions(true);
         } else if (meta.isSelected()) {
-            setSinglePlayerOptions(false);
             setJoinGameOptions(false);
             setServerOptions(false);
         }
-    }
-
-    private void setSinglePlayerOptions(boolean enabled) {
-        additionalNations.setEnabled(enabled);
-        selectAdvantages.setEnabled(enabled);
-        singlePlayerNoLabel.setEnabled(enabled);
-        singlePlayerNo.setEnabled(enabled);
     }
 
     private void setJoinGameOptions(boolean enabled) {
@@ -267,9 +211,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         port2Label.setEnabled(enabled);
         port2.setEnabled(enabled);
         publicServer.setEnabled(enabled);
-        multiPlayerNoLabel.setEnabled(enabled);
-        multiPlayerNo.setEnabled(enabled);
-        useAdvantages.setEnabled(enabled);
     }
         
 
@@ -285,14 +226,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
                     if (single.isSelected()) {
-                        int players = ((Integer) singlePlayerNo.getValue()).intValue();
-                        int advantages = AdvantageCellRenderer.FIXED;
-                        if (selectAdvantages.isSelected()) {
-                            advantages = AdvantageCellRenderer.SELECTABLE;
-                        }
-                        connectController.startSingleplayerGame(name.getText(), players, 
-                                                                additionalNations.isSelected(),
-                                                                advantages);
+                        NationOptions nationOptions = parent.showFreeColDialog(new NationOptionsDialog(parent));
+                        connectController.startSingleplayerGame(name.getText(), nationOptions);
                     } else if (join.isSelected()) {
                         int port;
 
@@ -314,13 +249,9 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                             port2Label.setForeground(Color.red);
                             break;
                         }
-                        int players = ((Integer) singlePlayerNo.getValue()).intValue();
-                        int advantages = AdvantageCellRenderer.NONE;
-                        if (useAdvantages.isSelected()) {
-                            advantages = AdvantageCellRenderer.SELECTABLE;
-                        }
+                        NationOptions nationOptions = parent.showFreeColDialog(new NationOptionsDialog(parent));
                         connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(), port,
-                                                               players, advantages);
+                                                               nationOptions);
                     } else if (meta.isSelected()) {
                         ArrayList<ServerInfo> serverList = connectController.getServerList();
                         if (serverList != null) {

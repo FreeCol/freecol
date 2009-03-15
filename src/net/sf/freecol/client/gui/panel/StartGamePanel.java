@@ -55,6 +55,8 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.server.NationOptions;
+import net.sf.freecol.server.NationOptions.Advantages;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import net.miginfocom.swing.MigLayout;
@@ -72,10 +74,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
 
     public static final int NAME_COLUMN = 0, NATION_COLUMN = 1, ADVANTAGE_COLUMN = 2, COLOR_COLUMN = 3;
-
-    private final Canvas parent;
-
-    private final FreeColClient freeColClient;
 
     private Game game;
 
@@ -98,9 +96,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     private JButton gameOptions;
 
     private JButton mapGeneratorOptions;
-
-    private int advantages;
-
 
     private class HeaderRenderer implements TableCellRenderer {
 
@@ -158,12 +153,11 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
-     * @param freeColClient The main controller object for the client
      */
-    public StartGamePanel(Canvas parent, FreeColClient freeColClient) {
-        this.parent = parent;
-        this.freeColClient = freeColClient;
+    public StartGamePanel(final Canvas parent) {
+        super(parent);
 
+        FreeColClient freeColClient = parent.getClient();
         JButton cancel = new JButton(Messages.message("cancel"));
 
         JScrollPane chatScroll, tableScroll;
@@ -233,36 +227,24 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatArea.setWrapStyleWord(true);
 
         setSize(getPreferredSize());
-
-    }
-
-    public void requestFocus() {
-        start.requestFocus();
     }
 
     /**
-     * Initializes the data that is displayed in this panel.
-     * 
+     * Describe <code>initialize</code> method here.
+     *
      * @param singlePlayerGame <code>true</code> if the user wants to start a
      *            single player game, <code>false</code> otherwise.
-     * @param additionalNations whether to allow additional nations
-     * @param advantages the type of advantages used
+     * @param nationOptions a <code>NationOptions</code> value
      */
-    public void initialize(boolean singlePlayerGame, boolean additionalNations, int advantages) {
+    public void initialize(boolean singlePlayerGame, NationOptions nationOptions) {
         this.singlePlayerGame = singlePlayerGame;
+        FreeColClient freeColClient = getCanvas().getClient();
         game = freeColClient.getGame();
         thisPlayer = freeColClient.getMyPlayer();
 
-        this.advantages = advantages;
+        Nation[] nations = nationOptions.getEuropeanNations().toArray(new Nation[0]);
 
-        Nation[] nations;
-        if (additionalNations) {
-            nations = FreeCol.getSpecification().getEuropeanNations().toArray(new Nation[] {});
-        } else {
-            nations = FreeCol.getSpecification().getClassicNations().toArray(new Nation[] {});
-        }
-
-        tableModel.setData(game.getPlayers(), thisPlayer, advantages);
+        tableModel.setData(game.getPlayers(), thisPlayer, nationOptions.getNationalAdvantages());
 
         JLabel playerLabel = new JLabel(Messages.message("player"));
         JButton nationButton = new JButton(Messages.message("nation"));
@@ -271,13 +253,13 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         nationButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    parent.showColopediaPanel(PanelType.NATIONS);
+                    getCanvas().showColopediaPanel(PanelType.NATIONS);
                 }
             });
 
         advantageButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    parent.showColopediaPanel(PanelType.NATION_TYPES);
+                    getCanvas().showColopediaPanel(PanelType.NATION_TYPES);
                 }
             });
 
@@ -293,12 +275,12 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         nationsColumn.setHeaderRenderer(renderer);
 
         TableColumn advantagesColumn = table.getColumnModel().getColumn(ADVANTAGE_COLUMN);
-        if (advantages == AdvantageCellRenderer.SELECTABLE) {
+        if (nationOptions.getNationalAdvantages() == Advantages.SELECTABLE) {
             advantagesColumn.setCellEditor(new AdvantageCellEditor());
         }
         advantagesColumn.setCellRenderer(new AdvantageCellRenderer());
         ((AdvantageCellRenderer) table.getColumnModel().getColumn(ADVANTAGE_COLUMN).getCellRenderer())
-        .setData(game.getPlayers(), thisPlayer, advantages);
+        .setData(game.getPlayers(), thisPlayer, nationOptions.getNationalAdvantages());
         advantagesColumn.setHeaderRenderer(renderer);
         
         ((ColorCellEditor) table.getColumnModel().getColumn(COLOR_COLUMN).getCellEditor())
@@ -321,11 +303,16 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     }
 
+    public void requestFocus() {
+        start.requestFocus();
+    }
+
     /**
      * Updates the map generator options displayed on this panel.
      */
     public void updateMapGeneratorOptions() {
-        freeColClient.getPreGameController().getMapGeneratorOptions().getObject(MapGeneratorOptions.MAP_SIZE);
+        getCanvas().getClient().getPreGameController().getMapGeneratorOptions()
+            .getObject(MapGeneratorOptions.MAP_SIZE);
     }
 
     /**
@@ -357,7 +344,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         table.setEnabled(enabled);
 
         if (enabled) {
-            start.setEnabled(freeColClient.isAdmin());
+            start.setEnabled(getCanvas().getClient().isAdmin());
         }
 
         gameOptions.setEnabled(enabled);
@@ -375,36 +362,36 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         try {
             switch (Integer.valueOf(command).intValue()) {
             case START:
-                // The ready flag was set to false for single player mode in
-                // order
-                // to allow the player to change whatever he wants.
+                // The ready flag was set to false for single player
+                // mode in order to allow the player to change
+                // whatever he wants.
                 if (singlePlayerGame) {
                     thisPlayer.setReady(true);
                 }
 
-                freeColClient.getPreGameController().requestLaunch();
+                getCanvas().getClient().getPreGameController().requestLaunch();
                 break;
             case CANCEL:
-                freeColClient.getConnectController().quitGame(true);
-                parent.remove(this);
-                parent.showPanel(new NewPanel(parent));
+                getCanvas().getClient().getConnectController().quitGame(true);
+                getCanvas().remove(this);
+                getCanvas().showPanel(new NewPanel(getCanvas()));
                 break;
             case READY:
-                freeColClient.getPreGameController().setReady(readyBox.isSelected());
+                getCanvas().getClient().getPreGameController().setReady(readyBox.isSelected());
                 refreshPlayersTable();
                 break;
             case CHAT:
                 if (chat.getText().trim().length() > 0) {
-                    freeColClient.getPreGameController().chat(chat.getText());
-                    displayChat(freeColClient.getMyPlayer().getName(), chat.getText(), false);
+                    getCanvas().getClient().getPreGameController().chat(chat.getText());
+                    displayChat(getCanvas().getClient().getMyPlayer().getName(), chat.getText(), false);
                     chat.setText("");
                 }
                 break;
             case GAME_OPTIONS:
-                parent.showFreeColDialog(new GameOptionsDialog(parent, freeColClient, freeColClient.isAdmin()));
+                getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getCanvas().getClient(), getCanvas().getClient().isAdmin()));
                 break;
             case MAP_GENERATOR_OPTIONS:
-                parent.showMapGeneratorOptionsDialog(freeColClient.isAdmin());
+                getCanvas().showMapGeneratorOptionsDialog(getCanvas().getClient().isAdmin());
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");
@@ -454,7 +441,7 @@ class PlayersTableModel extends AbstractTableModel {
 
     private final PreGameController preGameController;
 
-    private int advantages;
+    private Advantages advantages;
 
     private static final String[] columnNames = {
         Messages.message("player"),
@@ -486,8 +473,9 @@ class PlayersTableModel extends AbstractTableModel {
      * @param myPlayers The players to use in the table.
      * @param owningPlayer The player running the client that is displaying the
      *            table.
+     * @param advantages 
      */
-    public void setData(List<Player> myPlayers, Player owningPlayer, int advantages) {
+    public void setData(List<Player> myPlayers, Player owningPlayer, Advantages advantages) {
         players = myPlayers;
         thisPlayer = owningPlayer;
         this.advantages = advantages;
@@ -592,12 +580,11 @@ class PlayersTableModel extends AbstractTableModel {
             // Column 0 can't be updated.
 
             if (column == StartGamePanel.NATION_COLUMN) {
-                //Nation nation = FreeCol.getSpecification().getNation(((Integer) value).intValue());
                 Nation nation = (Nation) value;
                 preGameController.setNation(nation);
                 preGameController.setColor(nation.getColor());
                 fireTableCellUpdated(row, StartGamePanel.COLOR_COLUMN);
-                if (advantages == AdvantageCellRenderer.FIXED) {
+                if (advantages == Advantages.FIXED) {
                     preGameController.setNationType(nation.getType());
                     fireTableCellUpdated(row, StartGamePanel.ADVANTAGE_COLUMN);
                 }

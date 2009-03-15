@@ -34,6 +34,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.server.NationOptions.Advantages;
 
 /**
 * A table cell renderer that should be used to display the chosen nation in a table.
@@ -42,15 +43,13 @@ import net.sf.freecol.common.model.Player;
 public final class AdvantageCellRenderer implements TableCellRenderer {
 
 
-    public static final int NONE = 0, FIXED = 1, SELECTABLE = 2;
-
     private static Vector<EuropeanNationType> europeans = 
         new Vector<EuropeanNationType>(FreeCol.getSpecification().getEuropeanNationTypes());
     private static final JComboBox standardNationsComboBox = new JComboBox(europeans);
 
     private List<Player> players;
     private Player thisPlayer;
-    private int advantages;
+    private Advantages advantages;
 
     /**
     * The default constructor.
@@ -64,8 +63,9 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
     *
     * @param players The players that should be rendered in the table.
     * @param owningPlayer The player running the client that is displaying the table.
+    * @param advantages Indicates whether advantages can be selected.
     */
-    public void setData(List<Player> players, Player owningPlayer, int advantages) {
+    public void setData(List<Player> players, Player owningPlayer, Advantages advantages) {
         this.players = players;
         thisPlayer = owningPlayer;
         this.advantages = advantages;

@@ -135,6 +135,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.server.NationOptions;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
@@ -274,7 +275,7 @@ public final class Canvas extends JDesktopPane {
         setLayout(null);
 
         mainPanel = new MainPanel(this, freeColClient);
-        startGamePanel = new StartGamePanel(this, freeColClient);
+        startGamePanel = new StartGamePanel(this);
         serverListPanel = new ServerListPanel(this, freeColClient, freeColClient.getConnectController());
         europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
         statusPanel = new StatusPanel(this);
@@ -430,12 +431,12 @@ public final class Canvas extends JDesktopPane {
      *            game, 'false' otherwise.
      * @see StartGamePanel
      */
-    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode, int players,
-                                   int advantages, boolean additionalNations) {
+    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode,
+                                   NationOptions nationOptions) {
         closeMenus();
 
         if (game != null && player != null) {
-            startGamePanel.initialize(singlePlayerMode, additionalNations, advantages);
+            startGamePanel.initialize(singlePlayerMode, nationOptions);
             addAsFrame(startGamePanel);
             startGamePanel.requestFocus();
         } else {

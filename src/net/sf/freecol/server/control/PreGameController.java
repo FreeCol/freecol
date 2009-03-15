@@ -99,12 +99,8 @@ public final class PreGameController extends Controller {
         freeColServer.setAIMain(aiMain);
         game.setFreeColGameObjectListener(aiMain);
 
-        List<Nation> nations = new ArrayList<Nation>();
-        int numberOfPlayers = freeColServer.getNumberOfPlayers() - game.getPlayers().size();
-        if (numberOfPlayers > 0) {
-            nations.addAll(game.getVacantNations().subList(0, numberOfPlayers));
-        }
-        nations.addAll(FreeCol.getSpecification().getIndianNations());
+        List<Nation> nations = new ArrayList<Nation>(freeColServer.getNationOptions().getEuropeanNations());
+        nations.addAll(freeColServer.getNationOptions().getNativeNations());
 
         // Add AI players
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));

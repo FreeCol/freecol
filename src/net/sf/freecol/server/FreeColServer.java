@@ -156,15 +156,16 @@ public final class FreeColServer {
     /** The name of this server. */
     private String name;
 
-    private int numberOfPlayers;
-    private int advantages;
-    private boolean additionalNations;
-
     /** The provider for random numbers */
     private final ServerPseudoRandom _pseudoRandom = new ServerPseudoRandom();
 
     /** Did the integrity check succeed */
     private boolean integrity = false;
+
+    /**
+     * Describe nationOptions here.
+     */
+    private NationOptions nationOptions;
 
     /**
      * The high scores on this server.
@@ -198,31 +199,23 @@ public final class FreeColServer {
      *             will be logged by this class).
      * 
      */
-    
     public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name)
         throws IOException, NoRouteToServerException {
-        this(publicServer, singleplayer, port, name, 4, 0, false);
+        this(publicServer, singleplayer, port, name, NationOptions.getDefaults());
     }
 
-    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name, int players,
-                         int advantages, boolean additionalNations)
-        throws IOException, NoRouteToServerException {
+    public FreeColServer(boolean publicServer, boolean singleplayer, int port, String name,
+                         NationOptions nationOptions) throws IOException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
-        this.numberOfPlayers = players;
-        this.additionalNations = additionalNations;
-        this.advantages = advantages;
+        this.nationOptions = nationOptions;
 
         modelController = new ServerModelController(this);
         game = new Game(modelController);
-        if (additionalNations) {
-            game.setVacantNations(new ArrayList<Nation>(FreeCol.getSpecification().getEuropeanNations()));
-        } else {
-            game.setVacantNations(new ArrayList<Nation>(FreeCol.getSpecification().getClassicNations()));
-        }
-        game.setMaximumPlayers(players);
+        game.setVacantNations(new ArrayList<Nation>(nationOptions.getEuropeanNations()));
+        game.setMaximumPlayers(nationOptions.getEuropeanNations().size());
         mapGenerator = new MapGenerator();
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
@@ -262,12 +255,15 @@ public final class FreeColServer {
      * 
      * @throws FreeColException if the savegame could not be loaded.
      */
-    public FreeColServer(final FreeColSavegameFile savegame, boolean publicServer, boolean singleplayer, int port, String name)
+    public FreeColServer(final FreeColSavegameFile savegame, boolean publicServer, 
+                         boolean singleplayer, int port, String name)
             throws IOException, FreeColException, NoRouteToServerException {
         this.publicServer = publicServer;
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
+        this.nationOptions = nationOptions;
+
         mapGenerator = new MapGenerator();
         modelController = new ServerModelController(this);
         userConnectionHandler = new UserConnectionHandler(this);
@@ -296,7 +292,8 @@ public final class FreeColServer {
         }
 
         // Apply the difficulty level
-        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));        
+        Specification.getSpecification().applyDifficultyLevel(game.getGameOptions()
+                                                              .getInteger(GameOptions.DIFFICULTY));        
 
         updateMetaServer(true);
         startMetaServerUpdateThread();
@@ -414,30 +411,21 @@ public final class FreeColServer {
     }
 
     /**
-     * Return the type of advantages used.
+     * Get the <code>NationOptions</code> value.
      *
-     * @return a <code>int</code> value
+     * @return a <code>NationOptions</code> value
      */
-    public int getAdvantages() {
-        return advantages;
+    public NationOptions getNationOptions() {
+        return nationOptions;
     }
 
     /**
-     * Describe <code>getAdditionalNations</code> method here.
+     * Set the <code>NationOptions</code> value.
      *
-     * @return a <code>boolean</code> value
+     * @param newNationOptions The new NationOptions value.
      */
-    public boolean getAdditionalNations() {
-        return additionalNations;
-    }
-
-    /**
-     * Returns the number of players.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getNumberOfPlayers() {
-        return numberOfPlayers;
+    public void setNationOptions(final NationOptions newNationOptions) {
+        this.nationOptions = newNationOptions;
     }
 
     /**
