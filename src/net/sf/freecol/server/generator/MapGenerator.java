@@ -157,7 +157,18 @@ public class MapGenerator implements IMapGenerator {
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
             final String version = xsr.getAttributeValue(null, "version");
-            if (!Message.getFreeColProtocolVersion().equals(version)) {
+            int savegameVersion = 0;
+            try {
+                // TODO: remove this compatibility code BEFORE releasing 0.9
+                if (version.equals("0.1.4")) {
+                    savegameVersion = 1;
+                } else {
+                    savegameVersion = Integer.parseInt(version);
+                }
+            } catch(Exception e) {
+                throw new FreeColException("incompatibleVersions");
+            }
+            if (savegameVersion < FreeColServer.MINIMUM_SAVEGAME_VERSION) {
                 throw new FreeColException("incompatibleVersions");
             }
             ArrayList<Object> serverObjects = null;
