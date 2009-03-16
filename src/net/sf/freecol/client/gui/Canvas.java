@@ -33,7 +33,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Logger;
@@ -204,7 +203,7 @@ public final class Canvas extends JDesktopPane {
 
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
 
-    private static final int EXIT = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3, UNLOAD = 4;
+    //private static final int EXIT = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3, UNLOAD = 4;
 
     /**
      * To save the most recently open dialog in Europe
@@ -641,7 +640,7 @@ public final class Canvas extends JDesktopPane {
         if ((source instanceof Europe && !europePanel.isShowing())
                 || (source instanceof Colony || source instanceof WorkLocation)) {
 
-            FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(messageText, messageIcon, okText,
+            FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(messageText, messageIcon, okText,
                     cancelText);
             addAsFrame(confirmDialog);
             confirmDialog.requestFocus();
@@ -806,7 +805,7 @@ public final class Canvas extends JDesktopPane {
             images[i] = getImageIcon(messages[i].getDisplay(), false);
         }
 
-        FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(texts, images, okText, cancelText);
+        FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(texts, images, okText, cancelText);
         addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
 
@@ -978,7 +977,7 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColDialog
      */
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
-        FreeColDialog loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
+        FreeColDialog<File> loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
 
         addAsFrame(loadDialog);
         loadDialog.requestFocus();
@@ -1028,7 +1027,7 @@ public final class Canvas extends JDesktopPane {
      * @see FreeColDialog
      */
     public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
-        FreeColDialog saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters, defaultName);
+        FreeColDialog<File> saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters, defaultName);
         addAsFrame(saveDialog);
         saveDialog.requestFocus();
 
@@ -1290,7 +1289,7 @@ public final class Canvas extends JDesktopPane {
         message = message.replaceAll("%player%", enemy.getName());
         message = message.replaceAll("%amount%", String.valueOf(amount));
 
-        FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message, Messages.message("yes"), Messages
+        FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(message, Messages.message("yes"), Messages
                 .message("no"));
         addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
@@ -1324,7 +1323,7 @@ public final class Canvas extends JDesktopPane {
             logger.warning("could not find message with id: " + text + ", " + okText + " or " + cancelText + ".");
         }
 
-        FreeColDialog inputDialog = FreeColDialog.createInputDialog(text, defaultValue, okText, cancelText);
+        FreeColDialog<String> inputDialog = FreeColDialog.createInputDialog(text, defaultValue, okText, cancelText);
         addAsFrame(inputDialog);
         inputDialog.requestFocus();
 
