@@ -2250,7 +2250,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         equipment.clear();
         setMovesLeft(0);
-        role = Role.DEFAULT;
+        setRole();
     }
 
     private void dumpEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
@@ -2694,6 +2694,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             default:
                 role = type.getRole();
             }
+        }
+        if (getState() == UnitState.IMPROVING && role != Role.PIONEER) {
+            setStateUnchecked(UnitState.ACTIVE);
+            setMovesLeft(0);
         }
     }
 
