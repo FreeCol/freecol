@@ -221,18 +221,6 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         panel.setPreferredSize(new Dimension(300, (data.size()+2)*17));
         return panel;
     }
-
-    private String serializeStats(String title, HashMap<String, Long> stats) {
-        String message = title+"\n";
-        long total = 0;
-        for (String s :stats.keySet()) {
-            Long value = stats.get(s);
-            message += s+": "+value.toString()+"\n";
-            total += value;
-        }
-        message += "Total: "+total+"\n";
-        return message;
-    }
     
     /**
     * This function analyzes an event and calls the right methods to take

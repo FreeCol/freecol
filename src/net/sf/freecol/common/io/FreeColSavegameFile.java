@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.util.logging.Logger;
 
 /**
- * Representes a FreeCol savegame.
+ * Represents a FreeCol savegame.
  */
 public class FreeColSavegameFile extends FreeColDataFile {
     private static final Logger logger = Logger.getLogger(FreeColSavegameFile.class.getName());

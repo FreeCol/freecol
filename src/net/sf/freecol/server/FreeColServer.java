@@ -262,7 +262,7 @@ public final class FreeColServer {
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
-        this.nationOptions = nationOptions;
+        //this.nationOptions = nationOptions;
 
         mapGenerator = new MapGenerator();
         modelController = new ServerModelController(this);

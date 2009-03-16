@@ -159,7 +159,6 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
 
             this.colony = colony;
             this.goodsType = goodsType;
-            int goodsIndex = goodsType.getIndex();
 
             setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);

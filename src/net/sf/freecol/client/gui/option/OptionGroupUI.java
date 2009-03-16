@@ -63,7 +63,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
 
 
 
-    /** The horisontal gap between components in this <code>OptionGroupUI</code>. */
+    /** The horizontal gap between components in this <code>OptionGroupUI</code>. */
     public static final int H_GAP = 10;
 
     private final OptionUpdater[] optionUpdaters;
