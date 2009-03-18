@@ -890,6 +890,7 @@ public class SimpleCombatModel implements CombatModel {
         Tile newTile = settlement.getTile();
         ModelController modelController = attacker.getGame().getModelController();
         SettlementType settlementType = ((IndianNationType) enemy.getNationType()).getTypeOfSettlement();
+        String settlementName = settlement.getName();
         settlement.dispose();
 
         enemy.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
@@ -923,7 +924,7 @@ public class SimpleCombatModel implements CombatModel {
 
             attacker.addModelMessage(attacker, ModelMessage.MessageType.COMBAT_RESULT,
                                      "model.unit.indianTreasure",
-                                     "%indian%", enemy.getNationAsString(),
+                                     "%settlement%", settlementName,
                                      "%amount%", Integer.toString(tTrain.getTreasureAmount()));
         }
         int atrocities = Player.SCORE_SETTLEMENT_DESTROYED;
@@ -939,7 +940,8 @@ public class SimpleCombatModel implements CombatModel {
         attacker.getOwner().getHistory()
             .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
                                   HistoryEvent.Type.DESTROY_SETTLEMENT,
-                                  "%nation%", enemy.getNationAsString()));
+                                  "%nation%", enemy.getNationAsString(),
+                                  "%settlement%", settlementName));
         if (enemy.getSettlements().isEmpty()) {
             attacker.getOwner().getHistory()
                 .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),

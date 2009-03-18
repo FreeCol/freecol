@@ -504,7 +504,7 @@ public class FreeColTestCase extends TestCase {
     			}
     		}
     		
-    		IndianSettlement camp = new IndianSettlement(game,indianPlayer,settlementTile,isCapital,skillToTeach,isVisited,residentMissionary);
+    		IndianSettlement camp = new IndianSettlement(game, indianPlayer, settlementTile, indianPlayer.getDefaultSettlementName(isCapital), isCapital, skillToTeach, isVisited, residentMissionary);
             
     		// Add braves
             for(int i=0; i < initialBravesInCamp; i++){

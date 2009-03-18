@@ -195,7 +195,7 @@ public class BuildColonyMission extends Mission {
             }
             if (getUnit().canBuildColony() && target == getUnit().getTile() && getUnit().getMovesLeft() > 0) {
                 Element buildColonyElement = Message.createNewRootElement("buildColony");
-                buildColonyElement.setAttribute("name", unit.getOwner().getDefaultColonyName());
+                buildColonyElement.setAttribute("name", unit.getOwner().getDefaultSettlementName(false));
                 buildColonyElement.setAttribute("unit", unit.getId());
 
                 try {

@@ -380,7 +380,7 @@ public final class InGameController implements NetworkConstants {
             if (name == null || name.length() == 0) {
                 return; // user cancelled
             }
-            if (freeColClient.getMyPlayer().getColony(name) != null) {
+            if (freeColClient.getMyPlayer().getSettlement(name) != null) {
                 // colony name must be unique (per Player)
                 freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
                                                                  "%name%", name);
@@ -458,11 +458,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         String name = freeColClient.getCanvas().showInputDialog("nameColony.text",
-                                                                freeColClient.getMyPlayer().getDefaultColonyName(), "nameColony.yes", "nameColony.no");
+                                                                freeColClient.getMyPlayer().getDefaultSettlementName(false), "nameColony.yes", "nameColony.no");
 
         if (name == null) { // The user canceled the action.
             return;
-        } else if (freeColClient.getMyPlayer().getColony(name) != null) {
+        } else if (freeColClient.getMyPlayer().getSettlement(name) != null) {
             // colony name must be unique (per Player)
             freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
                                                              "%name%", name);
@@ -2250,6 +2250,7 @@ public final class InGameController implements NetworkConstants {
             	ModelMessage message = new ModelMessage(indianPlayer,
                          "indianSettlement.capitalBurned",
                          new String[][] {
+                             {"%name%", indianPlayer.getDefaultSettlementName(true)},
                              {"%nation%", indianPlayer.getNationAsString()}},
                          ModelMessage.MessageType.COMBAT_RESULT);
             	freeColClient.getMyPlayer().addModelMessage(message);

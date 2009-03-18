@@ -70,9 +70,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         BUILD_QUEUE_CHANGE
     }
 
-    /** The name of the colony. */
-    private String name;
-
     /** A list of ColonyTiles. */
     private final List<ColonyTile> colonyTiles = new ArrayList<ColonyTile>();
 
@@ -135,10 +132,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param tile The location of the <code>Colony</code>.
      */
     public Colony(Game game, Player owner, String name, Tile tile) {
-        super(game, owner, tile);
+        super(game, owner, name, tile);
         goodsContainer = new GoodsContainer(game, this);
         goodsContainer.addPropertyChangeListener(this);
-        this.name = name;
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
         final Map map = game.getMap();
@@ -780,7 +776,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
         }
         if (defender == null) {
-            throw new IllegalStateException("Colony " + name + " contains no units!");
+            throw new IllegalStateException("Colony " + getName() + " contains no units!");
         } else {
             return defender;
         }
@@ -1016,25 +1012,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     @Override
     public String toString() {
-        return name;
-    }
-
-    /**
-     * Gets the name of this <code>Colony</code>.
-     * 
-     * @return The name as a <code>String</code>.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name of this <code>Colony</code>.
-     * 
-     * @param newName The new name of this Colony.
-     */
-    public void setName(String newName) {
-        this.name = newName;
+        return getName();
     }
 
     /**
@@ -1043,7 +1021,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return The name of this location.
      */
     public String getLocationName() {
-        return name;
+        return getName();
     }
     
     /**
@@ -1977,7 +1955,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         out.writeStartElement(getXMLElementTagName());
         // Add attributes:
         out.writeAttribute("ID", getId());
-        out.writeAttribute("name", name);
+        out.writeAttribute("name", getName());
         out.writeAttribute("owner", owner.getId());
         out.writeAttribute("tile", tile.getId());
         if (getGame().isClientTrusted() || showAll || player == getOwner()) {
@@ -2025,7 +2003,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     @Override
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
-        name = in.getAttributeValue(null, "name");
+        setName(in.getAttributeValue(null, "name"));
         owner = getFreeColGameObject(in, "owner", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
         owner.addSettlement(this);
@@ -2109,7 +2087,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 }
                 in.nextTag();
             } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + name);
+                logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + getName());
                 in.nextTag();
             }
         }

@@ -138,6 +138,7 @@ public class IndianSettlement extends Settlement {
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param player The <code>Player</code> owning this settlement.
+     * @param name The name for this settlement.
      * @param tile The location of the <code>IndianSettlement</code>.
      * @param isCapital True if settlement is tribe's capital
      * @param learnableSkill The skill that can be learned by Europeans at this settlement.
@@ -145,9 +146,10 @@ public class IndianSettlement extends Settlement {
      * @param missionary The missionary in this settlement (or null).
      * @exception IllegalArgumentException if an invalid tribe or kind is given
      */
-    public IndianSettlement(Game game, Player player, Tile tile, boolean isCapital,
+    public IndianSettlement(Game game, Player player, Tile tile, String name,
+                            boolean isCapital,
                             UnitType learnableSkill, Set<Player> isVisited, Unit missionary) {
-        super(game, player, tile);
+        super(game, player, name, tile);
 
         if (tile == null) {
             throw new IllegalArgumentException("Parameter 'tile' must not be 'null'.");
@@ -213,11 +215,7 @@ public class IndianSettlement extends Settlement {
      * @return The name of this settlement.
      */
     public String getLocationName() {
-        if (isCapital()){
-            return Messages.message("indianCapital", "%nation%", getOwner().getNationAsString());
-        } else {
-            return Messages.message("indianSettlement", "%nation%", getOwner().getNationAsString());
-        }
+        return getName();
     }
 
     /**
@@ -1267,6 +1265,7 @@ public class IndianSettlement extends Settlement {
 
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("tile", tile.getId());
+        out.writeAttribute("name", getName());
         out.writeAttribute("owner", owner.getId());
         out.writeAttribute("lastTribute", Integer.toString(lastTribute));
         out.writeAttribute("isCapital", Boolean.toString(isCapital));
@@ -1351,6 +1350,10 @@ public class IndianSettlement extends Settlement {
             owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
         }
         isCapital = getAttribute(in, "isCapital", false);
+        // TODO: >=0.8.2, setName(in.getAttributeValue(null, "name"))
+        String name = in.getAttributeValue(null, "name");
+        if (name == null) name = owner.getDefaultSettlementName(isCapital);
+        setName(name);
 
         owner.addSettlement(this);
         featureContainer.addModifier(Settlement.DEFENCE_MODIFIER);

@@ -322,23 +322,19 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Returns the first <code>Colony</code> with the given name.
+     * Returns the first <code>Settlement</code> with the given name.
      * 
-     * @param name The name of the <code>Colony</code>.
-     * @return The <code>Colony</code> or <code>null</code> if there is no
-     *         known <code>Colony</code> with the specified name (the colony
+     * @param name The name of the <code>Settlement</code>.
+     * @return The <code>Settlement</code> or <code>null</code> if there is no
+     *         known <code>Settlement</code> with the specified name (the settlement
      *         might not be visible to a client).
      */
-    public Colony getColony(String name) {
+    public Settlement getSettlement(String name) {
         Iterator<Player> pit = getPlayerIterator();
         while (pit.hasNext()) {
             Player p = pit.next();
-            if (p.isEuropean()) {
-                Colony result = p.getColony(name);
-                if (result != null) {
-                    return result;
-                }
-            }
+            Settlement settlement = p.getSettlement(name);
+            if (settlement != null) return settlement;
         }
         return null;
     }

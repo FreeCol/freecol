@@ -1087,6 +1087,7 @@ public final class Canvas extends JDesktopPane {
         text.append("\n\n");
         text.append(Messages.message("scoutSettlement.greetings",
                                      "%nation%", settlement.getOwner().getNationAsString(),
+                                     "%settlement%", settlement.getName(),
                                      "%number%", String.valueOf(settlement.getOwner().getNumberOfSettlements())));
         text.append(" ");
         if (settlement.getLearnableSkill() != null) {
@@ -1221,7 +1222,8 @@ public final class Canvas extends JDesktopPane {
                                                     .message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
                      "%nation%", settlement.getOwner().getNationAsString()));
         introText.append("\n\n");
-        introText.append(Messages.message("missionarySettlement.question"));
+        introText.append(Messages.message("missionarySettlement.question",
+                                          "%settlement%", settlement.getName()));
 
         List<ChoiceItem<MissionaryAction>> choices = new ArrayList<ChoiceItem<MissionaryAction>>();
         choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.establish"),

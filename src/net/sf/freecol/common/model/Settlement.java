@@ -59,6 +59,9 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     /** The <code>Player</code> owning this <code>Settlement</code>. */
     protected Player owner;
 
+    /** The name of the Settlement. */
+    private String name;
+
     /** The <code>Tile</code> where this <code>Settlement</code> is located. */
     protected Tile tile;
     
@@ -75,12 +78,14 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      *
      * @param game The <code>Game</code> in which this object belong.
      * @param owner The owner of this <code>Settlement</code>.
+     * @param name The name for this <code>Settlement</code>.
      * @param tile The location of the <code>Settlement</code>.    
      */
-    public Settlement(Game game, Player owner, Tile tile) {
+    public Settlement(Game game, Player owner, String name, Tile tile) {
         super(game);
-        this.tile = tile;
         this.owner = owner;
+        this.name = name;
+        this.tile = tile;
 
         featureContainer.addModifier(DEFENCE_MODIFIER);
         
@@ -148,6 +153,25 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         super(game, id);
     }
     
+
+    /**
+     * Gets the name of this <code>Settlement</code>.
+     *
+     * @return The name as a <code>String</code>.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the name of this <code>Settlement</code>.
+     *
+     * @param newName The new name.
+     */
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
 
     /**
      * Describe <code>getFeatureContainer</code> method here.

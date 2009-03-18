@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -206,7 +207,7 @@ public class Player extends FreeColGameObject implements Nameable {
     private int immigrationRequired = 12;
 
     // No need for a persistent storage of these variables:
-    private int colonyNameIndex = 0;
+    private int settlementNameIndex = 0;
     private EnumMap<RegionType, Integer> regionNameIndex = new EnumMap<RegionType, Integer>(RegionType.class);
 
     private Location entryLocation;
@@ -648,6 +649,22 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Returns the <code>Colony</code> with the given name.
+     *
+     * @param name The name of the <code>Colony</code>.
+     * @return The <code>Colony</code> or <code>null</code> if this player
+     *         does not have a <code>Colony</code> with the specified name.
+     */
+    public Colony getColony(String name) {
+        for (Colony colony : getColonies()) {
+            if (colony.getName().equals(name)) {
+                return colony;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns a list of all IndianSettlements this player owns.
      *
      * @return The indian settlements this player owns.
@@ -665,19 +682,29 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns the <code>Colony</code> with the given name.
+     * Returns the <code>IndianSettlement</code> with the given name.
      *
-     * @param name The name of the <code>Colony</code>.
-     * @return The <code>Colony</code> or <code>null</code> if this player
-     *         does not have a <code>Colony</code> with the specified name.
+     * @param name The name of the <code>IndianSettlement</code>.
+     * @return The <code>IndianSettlement</code> or <code>null</code> if this player
+     *         does not have a <code>IndianSettlement</code> with the specified name.
      */
-    public Colony getColony(String name) {
-        for (Colony colony : getColonies()) {
-            if (colony.getName().equals(name)) {
-                return colony;
+    public IndianSettlement getIndianSettlement(String name) {
+        for (IndianSettlement settlement : getIndianSettlements()) {
+            if (settlement.getName().equals(name)) {
+                return settlement;
             }
         }
         return null;
+    }
+
+    /**
+     * Find a <code>Settlement</code> by name.
+     *
+     * @param name The name of the <code>Settlement</code>.
+     * @return The <code>Settlement</code>, or <code>null</code> if not found.
+     **/
+    public Settlement getSettlement(String name) {
+        return (isIndian()) ? getIndianSettlement(name) : getColony(name);
     }
 
     /**
@@ -1001,26 +1028,64 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Creates a unique colony name. This is done by fetching a new default
-     * colony name from the list of default names.
+     * Creates a unique settlement name. This is done by fetching a new default
+     * settlement name from the list of default names.
      *
-     * @return A <code>String</code> containing a new unused colony name from
+     * @param capital True if the name should be the national capital.
+     *
+     * @return A <code>String</code> containing a new unused name from
      *         the list, if any is available, and otherwise an automatically
      *         generated name.
      */
-    public String getDefaultColonyName() {
-        String prefix = nationID + ".newColonyName.";
+    public String getDefaultSettlementName(boolean capital) {
+        String prefix = nationID + ".settlementName.";
         String name;
 
-        while (Messages.containsKey(prefix + Integer.toString(colonyNameIndex))) {
-            name = Messages.message(prefix + Integer.toString(colonyNameIndex));
-            colonyNameIndex++;
-            if (getGame().getColony(name) == null) return name;
+        if (capital) return Messages.message(prefix + "0");
+
+        if (isIndian()) {
+            // TODO: Until the native names are in some sensible order, choose
+            // at random.  When they are fixed, remove this and use the European
+            // method below.
+            PseudoRandom random = getGame().getModelController().getPseudoRandom();
+            int upper = 100;
+            int lower = 1;
+            int i, n = 0;
+
+            for (i = 0; i < 5; i++) { // try at random five times
+                n = random.nextInt(upper - lower) + lower;
+                if (!Messages.containsKey(prefix + Integer.toString(n))) {
+                    if (n == lower) break;
+                    upper = n;
+                    continue;
+                }
+                name = Messages.message(prefix + Integer.toString(n));
+                if (getSettlement(name) == null) return name;
+            }
+            for (i = n+1; i < upper; i++) { // search up from last try
+                if (!Messages.containsKey(prefix + Integer.toString(i))) break;
+                name = Messages.message(prefix + Integer.toString(i));
+                if (getSettlement(name) == null) return name;
+            }
+            for (i = n-1; i > 0; i--) { // search down from last try
+                if (!Messages.containsKey(prefix + Integer.toString(i))) continue;
+                name = Messages.message(prefix + Integer.toString(i));
+                if (getSettlement(name) == null) return name;
+            }
+        } else {
+            while (Messages.containsKey(prefix + Integer.toString(settlementNameIndex))) {
+                name = Messages.message(prefix + Integer.toString(settlementNameIndex));
+                settlementNameIndex++;
+                if (getSettlement(name) == null) return name;
+            }
         }
+
+        // Fallback method
+        String fallback = (isIndian()) ? "Settlement" : "Colony";
         do {
-            name = Messages.message("Colony") + colonyNameIndex;
-            colonyNameIndex++;
-        } while (getColony(name) != null);
+            name = Messages.message(fallback) + settlementNameIndex;
+            settlementNameIndex++;
+        } while (getGame().getSettlement(name) != null);
         return name;
     }
 

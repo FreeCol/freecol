@@ -103,12 +103,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         String defenderName;
         JLabel defenderLabel;
         if (defender == null) {
-            if (settlement instanceof Colony) {
-                defenderName = ((Colony) settlement).getName();
-            } else {
-                defenderName = Messages.message("indianSettlement", 
-                                                "%nation%", settlement.getOwner().getNationAsString());
-            }
+            defenderName = settlement.getName();
             defenderLabel = new JLabel(parent.getImageIcon(settlement, false));
         } else {
             defenderName = Messages.message("model.unit.nationUnit",

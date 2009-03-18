@@ -1197,15 +1197,16 @@ public final class GUI {
             // Column per column; start at the left side
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile tile = map.getTile(tileX, tileY);
-                if (tile != null && tile.getSettlement() instanceof Colony) {
-                    Colony colony = (Colony) tile.getSettlement();
+                if (tile != null && tile.getSettlement() != null
+                    && tile.getSettlement().getName() != null) {
+                    Settlement settlement = tile.getSettlement();
                     BufferedImage stringImage =
-                        createColonyNameImage(g, colony,
-                                              lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
+                        createSettlementNameImage(g, settlement,
+                                                  lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
                     g.drawImage(stringImage, 
                                 xx + (lib.getTerrainImageWidth(tile.getType()) - 
                                       stringImage.getWidth())/2 + 1,
-                                yy + (lib.getSettlementImage(colony).getHeight(null) + 1), null);
+                                yy + (lib.getSettlementImage(settlement).getHeight(null) + 1), null);
                 }
                 xx += tileWidth;
             }
@@ -1470,11 +1471,11 @@ public final class GUI {
         return bi;
     }
 
-    private BufferedImage createColonyNameImage(Graphics g, Colony colony,
+    private BufferedImage createSettlementNameImage(Graphics g, Settlement settlement,
                                                 int maxWidth, int preferredFontSize) {        
         return createStringImage((Graphics2D) g,
-                colony.getName(),
-                colony.getOwner().getColor(),
+                settlement.getName(),
+                settlement.getOwner().getColor(),
                 maxWidth,
                 preferredFontSize);
     }
