@@ -50,8 +50,6 @@ public class Game extends FreeColGameObject {
 
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
-    protected int playerIndex = 0;
-
     /** 
      * A virtual player to use with enemy privateers 
      */
@@ -1062,14 +1060,6 @@ public class Game extends FreeColGameObject {
      */
     public boolean equals(Object o) {
         return this == o;
-    }
-
-    /**
-     * Returns an increasing number that can be used when creating players.
-     * @return The next player index
-     */
-    public int getNextPlayerIndex() {
-        return playerIndex++;
     }
     
     /**
