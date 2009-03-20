@@ -201,7 +201,7 @@ public final class InGameController extends Controller {
                     updateElement.setAttribute("amount", String.valueOf(-amountToRemove));
                     newPlayer.getConnection().send(updateElement);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.warning("Could not send message to: " + newPlayer.getName() +
                                " with connection " + newPlayer.getConnection());
             }
