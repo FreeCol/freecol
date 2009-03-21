@@ -249,10 +249,15 @@ public class FreeColDialog<T> extends FreeColPanel {
             enterPressesWhenFocused(objectButton);
             choicesPanel.add(objectButton);
         }
-        JScrollPane scrollPane = new JScrollPane(choicesPanel,
-                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        choiceDialog.add(scrollPane, "newline 20");
+        if (choices.size() > 20) {
+            JScrollPane scrollPane = new JScrollPane(choicesPanel,
+                                                     JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                                     JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            choiceDialog.add(scrollPane, "newline 20");
+        } else {
+            choicesPanel.setOpaque(false);
+            choiceDialog.add(choicesPanel, "newline 20");
+        }
 
         if (cancelText != null) {
             final JButton cancelButton = new JButton();           
