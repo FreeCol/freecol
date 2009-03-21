@@ -38,7 +38,8 @@ import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel is used to show information about a tile.
@@ -103,12 +104,7 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
         goodsList = unit.getGoodsList();
         checkBoxes = new ArrayList<JCheckBox>(goodsList.size());
 
-        int[] widths = { 0 };
-        int[] heights = new int[2 * goodsList.size() + 1];
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = margin;
-        }
-        setLayout(new HIGLayout(widths, heights));
+        setLayout(new MigLayout("wrap 1", "", ""));
 
         int row = 1;
         ImageLibrary library = parent.getGUI().getImageLibrary();
@@ -119,15 +115,11 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
                                                //library.getGoodsImageIcon(goods.getType()),
                                                true);
             checkBoxes.add(checkBox);
-            add(checkBox, higConst.rc(row, 1));
-            row += 2;
+            add(checkBox);
         }
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-        add(buttonPanel, higConst.rc(row, 1));
+        add(okButton, "newline 20, span, split 2, tag ok");
+        add(cancelButton, "tag cancel");
 
         setSize(getPreferredSize());
     }
