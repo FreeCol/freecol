@@ -64,7 +64,9 @@ import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.resources.ResourceManager;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This is a panel for the Europe display. It shows the ships in Europe and
@@ -198,13 +200,14 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         StyleConstants.setBold(attributes, true);
         log.setParagraphAttributes(attributes, true);
 
+        /*
         toAmericaPanel.setBackground(Color.WHITE);
         toEuropePanel.setBackground(Color.WHITE);
         inPortPanel.setBackground(Color.WHITE);
         docksPanel.setBackground(Color.WHITE);
         cargoPanel.setBackground(Color.WHITE);
-
         exitButton.setForeground(Color.WHITE);
+        */
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
@@ -273,56 +276,30 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         inPortPanel.setOpaque(false);
         logScroll.getViewport().setOpaque(false);
         log.setOpaque(false);
+        /*
         recruitButton.setOpaque(false);
         purchaseButton.setOpaque(false);
         trainButton.setOpaque(false);
         exitButton.setOpaque(false);
         unloadButton.setOpaque(false);
+        */
 
-        int[] widths = { 0, 315, margin, 103, margin, 198, margin, 0, 0 };
-        int[] heights = {
-            30, // top margin
-            // sailing to America, sailing to Europe
-            39, margin, // recruit button
-            39, margin, // buy button
-            39, margin, // train button
-            39, margin, // unload button
-            116, margin, // in port
-            75, 39, margin, // cargo
-            75, 39, margin, // market
-            120, margin // log
-        };
-
-        HIGLayout layout = new HIGLayout(widths, heights);
-        layout.setRowWeight(1, 1);
-        layout.setRowWeight(heights.length, 1);
-        layout.setColumnWeight(1, 1);
-        layout.setColumnWeight(widths.length, 1);
-        setLayout(layout);
-
-        int row = 2;
-        add(toAmericaScroll, higConst.rcwh(row, 2, 1, 7));
-        add(toEuropeScroll, higConst.rcwh(row, 4, 3, 7));
-        add(recruitButton, higConst.rc(row, 8));
-        row += 2;
-        add(purchaseButton, higConst.rc(row, 8));
-        row += 2;
-        add(trainButton, higConst.rc(row, 8));
-        row += 2;
-        add(unloadButton, higConst.rc(row, 8));
-        row += 2;
-        add(inPortScroll, higConst.rcwh(row, 2, 3, 1));
-        add(docksScroll, higConst.rcwh(row, 6, 1, 4));
-        row += 2;
-        add(cargoScroll, higConst.rcwh(row, 2, 3, 2));
-        row += 1;
-        add(sailButton, higConst.rc(row, 8));
-        row += 2;
-        add(marketScroll, higConst.rcwh(row, 2, 5, 2));
-        row += 1;
-        add(exitButton, higConst.rc(row, 8));
-        row += 2;
-        add(logScroll, higConst.rcwh(row, 2, 6, 1));
+        setLayout(new MigLayout("wrap 3, fill, align center, insets 30",
+                                "[fill][fill][fill, grow 0]", 
+                                "[align top][align top][align top]"));
+        add(toAmericaScroll, "width 315:, height 150:, grow");
+        add(toEuropeScroll, "width 315:, height 150:, grow");
+        add(recruitButton, "split 4, flowy");
+        add(purchaseButton);
+        add(trainButton);
+        add(unloadButton);
+        add(inPortScroll, "split 2, flowy, grow, width 315:");
+        add(cargoScroll, "grow, width 315:");
+        add(docksScroll, "grow, width 315:, height 150:");
+        add(sailButton);
+        add(marketScroll, "span 2, growx");
+        add(exitButton);
+        add(logScroll, "span, height 40:");
 
         setBorder(null);
 
