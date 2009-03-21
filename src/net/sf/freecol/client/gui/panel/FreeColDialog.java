@@ -54,7 +54,6 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 
-import cz.autel.dmi.HIGLayout;
 import net.miginfocom.swing.MigLayout;
 
 
@@ -214,10 +213,10 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         enterPressesWhenFocused(firstButton);
 
-        choiceDialog.setLayout(new MigLayout("", "", ""));
+        choiceDialog.setLayout(new MigLayout("fillx, wrap 1", "[align center]", ""));
         JTextArea textArea = getDefaultTextArea(text);
 
-        choiceDialog.add(textArea, "wrap");
+        choiceDialog.add(textArea);
 
         int columns = 1;
              if ((choices.size() % 4) == 0 && choices.size() > 12) columns = 4;
@@ -253,7 +252,7 @@ public class FreeColDialog<T> extends FreeColPanel {
         JScrollPane scrollPane = new JScrollPane(choicesPanel,
                                                  JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                                  JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        choiceDialog.add(scrollPane, "wrap 20");
+        choiceDialog.add(scrollPane, "newline 20");
 
         if (cancelText != null) {
             final JButton cancelButton = new JButton();           
@@ -263,7 +262,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                         choiceDialog.setResponse(null);
                     }
                 });
-            choiceDialog.add(cancelButton, "tag cancel");
+            choiceDialog.add(cancelButton, "newline 20, tag cancel");
             choiceDialog.setCancelComponent(cancelButton);
             enterPressesWhenFocused(cancelButton);            
         }
@@ -331,73 +330,6 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         return confirmDialog;
     }
-
-    /**
-    * Creates a dialog that asks the user which player he wants the indians to attack.
-    * All the players will be shown as options (not including the current player of course).
-    * The possible responses are Player objects that that represent a player that should be
-    * attacked.
-    *
-    * @param allPlayers All players in the game.
-    * @param thisUser The current player.
-    *
-    * @return The FreeColDialog that asks the question to the user.
-    */
-    public static FreeColDialog<Player> createInciteDialog(List<Player> allPlayers, Player thisUser) {
-        String mainText = Messages.message("missionarySettlement.inciteQuestion");
-
-        final JTextArea question = getDefaultTextArea(mainText);
-        ArrayList<Player> players = new ArrayList<Player>();
-        final JButton cancel = new JButton(Messages.message("missionarySettlement.cancel"));
-
-        for (Player p : allPlayers) {
-            if (!(p.equals(thisUser) || p.isREF())) {
-                players.add(p);
-            }
-        }
-
-        final FreeColDialog<Player> inciteDialog = new FreeColDialog<Player>() {
-            public void requestFocus() {
-                cancel.requestFocus();
-            }
-        };
-
-        int[] widths = {0};
-        int[] heights = new int[2 * players.size() + 3];
-        for (int index = 0; index <= players.size(); index++) {
-            heights[2 * index + 1] = margin;
-        }
-
-        inciteDialog.setLayout(new HIGLayout(widths, heights));
-
-        int textColumn = 1;
-        int row = 1;
-        inciteDialog.add(question, higConst.rc(row, textColumn));
-        row += 2;
-
-        for (final Player p : players) {
-            JButton button = new JButton(p.getNationAsString());
-            button.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    inciteDialog.setResponse(p);
-                }
-            });
-            inciteDialog.add(button, higConst.rc(row, textColumn));
-            row += 2;
-        }
-
-        cancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                inciteDialog.setResponse(null);
-            }
-        });
-        inciteDialog.add(cancel, higConst.rc(row, textColumn));
-
-        inciteDialog.setSize(inciteDialog.getPreferredSize());
-
-        return inciteDialog;
-    }
-
 
     /**
     * Creates a new <code>FreeColDialog</code> with a text field and a ok/cancel option.

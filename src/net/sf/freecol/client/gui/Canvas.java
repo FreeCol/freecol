@@ -1256,21 +1256,22 @@ public final class Canvas extends JDesktopPane {
         remove(missionaryDialog);
 
         if (MissionaryAction.INCITE_INDIANS.equals(response)) {
-            FreeColDialog<Player> inciteDialog =
-                FreeColDialog.createInciteDialog(freeColClient.getGame().getEuropeanPlayers(),
-                                                 freeColClient.getMyPlayer());
-            addAsFrame(inciteDialog);
-            inciteDialog.requestFocus();
-
-            Player response2 = inciteDialog.getResponse();
-            if (response2 != null) {
-                returnValue.add(response2);
-            } else {
+            List<Player> enemies = new ArrayList<Player>(freeColClient.getGame().getEuropeanPlayers());
+            enemies.remove(freeColClient.getMyPlayer());
+            List<ChoiceItem<Player>> enemyChoices = new ArrayList<ChoiceItem<Player>>();
+            for (Player enemy : enemies) {
+                enemyChoices.add(new ChoiceItem<Player>(enemy.getNationAsString(), enemy));
+            }
+            Player enemy = showChoiceDialog(Messages.message("missionarySettlement.inciteQuestion"),
+                                            Messages.message("missionarySettlement.cancel"),
+                                            enemyChoices);
+            if (enemy == null) {
                 returnValue.clear();
                 returnValue.add(MissionaryAction.CANCEL);
+            } else {
+                returnValue.add(enemy);
             }
 
-            remove(inciteDialog);
         }
 
         return returnValue;
