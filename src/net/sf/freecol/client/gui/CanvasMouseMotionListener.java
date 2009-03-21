@@ -54,7 +54,9 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     private ScrollThread scrollThread;
 
     // private static final int SCROLLSPACE = 3;
-    private static final int SCROLLSPACE = 100;
+    private static final int DRAG_SCROLLSPACE = 100;
+	
+	private static final int AUTO_SCROLLSPACE = 1;
 
 
     /**
@@ -78,16 +80,15 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
      * @param e The MouseEvent that holds all the information.
      */
     public void mouseMoved(MouseEvent e) {
-        /*
-         * if (e.getComponent().isEnabled()) { scroll(e.getX(), e.getY()); }
-         * else if (scrollThread != null) { scrollThread.stopScrolling();
-         * scrollThread = null; }
-         */
-        if (scrollThread != null) {
+      
+    	if (e.getComponent().isEnabled() && 
+   			canvas.getClient().getClientOptions().getBoolean(ClientOptions.AUTO_SCROLL)) {
+				auto_scroll(e.getX(), e.getY());
+        } else if (scrollThread != null) {
             scrollThread.stopScrolling();
             scrollThread = null;
         }
-         
+
         if (gui.isGotoStarted()) {
             if (gui.getActiveUnit() == null) {
                 gui.stopGoto();
@@ -113,63 +114,8 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             }
         }
     }
-
-    private void scroll(int x, int y) {
-        if (!canvas.getClient().getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
-            return;
-        }
-        /*
-         * if (y < canvas.getMenuBarHeight()) { if (scrollThread != null) {
-         * scrollThread.stopScrolling(); scrollThread = null; } return; } else
-         * if (y < canvas.getMenuBarHeight() + SCROLLSPACE) { y -=
-         * canvas.getMenuBarHeight(); }
-         */
-        Direction direction;
-        if ((x < SCROLLSPACE) && (y < SCROLLSPACE)) {
-            // Upper-Left
-            direction = Direction.NW;
-        } else if ((x >= gui.getWidth() - SCROLLSPACE) && (y < SCROLLSPACE)) {
-            // Upper-Right
-            direction = Direction.NE;
-        } else if ((x >= gui.getWidth() - SCROLLSPACE) && (y >= gui.getHeight() - SCROLLSPACE)) {
-            // Bottom-Right
-            direction = Direction.SE;
-        } else if ((x < SCROLLSPACE) && (y >= gui.getHeight() - SCROLLSPACE)) {
-            // Bottom-Left
-            direction = Direction.SW;
-        } else if (y < SCROLLSPACE) {
-            // Top
-            direction = Direction.N;
-        } else if (x >= gui.getWidth() - SCROLLSPACE) {
-            // Right
-            direction = Direction.E;
-        } else if (y >= gui.getHeight() - SCROLLSPACE) {
-            // Bottom
-            direction = Direction.S;
-        } else if (x < SCROLLSPACE) {
-            // Left
-            direction = Direction.W;
-        } else {
-            // Center
-            if (scrollThread != null) {
-                scrollThread.stopScrolling();
-                scrollThread = null;
-            }
-            return;
-        }
-
-        if (scrollThread != null) {
-            // continue scrolling in a (perhaps new) direction
-            scrollThread.setDirection(direction);
-        } else {
-            // start scrolling in a direction
-            scrollThread = new ScrollThread(map, gui);
-            scrollThread.setDirection(direction);
-            scrollThread.start();
-        }
-    }
-
-    /**
+	
+	/**
      * Invoked when the mouse has been dragged.
      * 
      * @param e The MouseEvent that holds all the information.
@@ -177,8 +123,9 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
     public void mouseDragged(MouseEvent e) {
         Map.Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
 
-        if (e.getComponent().isEnabled()) {
-            scroll(e.getX(), e.getY());
+        if (e.getComponent().isEnabled() &&
+			 canvas.getClient().getClientOptions().getBoolean(ClientOptions.MAP_SCROLL_ON_DRAG)) {
+				drag_scroll(e.getX(), e.getY());
         } else if (scrollThread != null) {
             scrollThread.stopScrolling();
             scrollThread = null;
@@ -215,7 +162,68 @@ public final class CanvasMouseMotionListener implements MouseMotionListener {
             }
         }
     }
+	
+	private void auto_scroll(int x, int y){
+		scroll(x, y, AUTO_SCROLLSPACE);
+	}
+	
+	private void drag_scroll(int x, int y){
+		scroll(x, y, DRAG_SCROLLSPACE);
+	}
 
+	private void scroll(int x, int y, int scrollspace) {
+		
+		/*
+         * if (y < canvas.getMenuBarHeight()) { if (scrollThread != null) {
+         * scrollThread.stopScrolling(); scrollThread = null; } return; } else
+         * if (y < canvas.getMenuBarHeight() + SCROLLSPACE) { y -=
+         * canvas.getMenuBarHeight(); }
+         */
+		
+		Direction direction;
+        if ((x < scrollspace) && (y < scrollspace)) {
+            // Upper-Left
+            direction = Direction.NW;
+        } else if ((x >= gui.getWidth() - scrollspace) && (y < scrollspace)) {
+            // Upper-Right
+            direction = Direction.NE;
+        } else if ((x >= gui.getWidth() - scrollspace) && (y >= gui.getHeight() - scrollspace)) {
+            // Bottom-Right
+            direction = Direction.SE;
+        } else if ((x < scrollspace) && (y >= gui.getHeight() - scrollspace)) {
+            // Bottom-Left
+            direction = Direction.SW;
+        } else if (y < scrollspace) {
+            // Top
+            direction = Direction.N;
+        } else if (x >= gui.getWidth() - scrollspace) {
+            // Right
+            direction = Direction.E;
+        } else if (y >= gui.getHeight() - scrollspace) {
+            // Bottom
+            direction = Direction.S;
+        } else if (x < scrollspace) {
+            // Left
+            direction = Direction.W;
+        } else {
+            // Center
+            if (scrollThread != null) {
+                scrollThread.stopScrolling();
+                scrollThread = null;
+            }
+            return;
+        }
+
+        if (scrollThread != null) {
+            // continue scrolling in a (perhaps new) direction
+            scrollThread.setDirection(direction);
+        } else {
+            // start scrolling in a direction
+            scrollThread = new ScrollThread(map, gui);
+            scrollThread.setDirection(direction);
+            scrollThread.start();
+        }
+	}
 
     /**
      * Scrolls the view of the Map by moving its focus.

@@ -252,6 +252,12 @@ public class ClientOptions extends OptionMap {
      */
     public static final String MAP_SCROLL_ON_DRAG = "model.option.mapScrollOnDrag";
 
+	/**
+     * Option for activating autoscroll when dragging units on the mapboard.
+     */
+    public static final String AUTO_SCROLL = "model.option.autoScroll";
+
+	
     /**
      * Option for autoload emigrants on saling to america.
      */
