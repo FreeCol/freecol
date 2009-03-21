@@ -17,16 +17,14 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package net.sf.freecol.client.gui.panel;
 
-
 import java.awt.GridLayout;
-import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -36,15 +34,13 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
 
-import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Foreign Affairs Report.
  */
 public final class ReportIndianPanel extends ReportPanel {
 
-    public static final int EXTRA_ROWS = 10;
-    
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
@@ -54,7 +50,9 @@ public final class ReportIndianPanel extends ReportPanel {
         Player player = getCanvas().getClient().getMyPlayer();
         reportPanel.setLayout(new GridLayout(0, 1));
         for (Player opponent : getCanvas().getClient().getGame().getPlayers()) {
-            buildIndianAdvisorPanel(player, opponent);
+            if (opponent.isIndian() && !opponent.isDead() && player.hasContacted(opponent)) {
+                add(buildIndianAdvisorPanel(player, opponent));
+            }
         }
         reportPanel.doLayout();
     }
@@ -65,65 +63,26 @@ public final class ReportIndianPanel extends ReportPanel {
      * @param player a <code>Player</code> value
      * @param opponent a <code>Player</code> value
      */
-    private void buildIndianAdvisorPanel(Player player, Player opponent) {
-        if (opponent.isEuropean() || opponent.isREF()) {
-          return;
-        }
-        if (opponent.isDead()) {
-          return;
-        }
-        if (!player.hasContacted(opponent)) {
-          return;
-        }
-        
+    private JPanel buildIndianAdvisorPanel(Player player, Player opponent) {
+
         ImageLibrary library = getCanvas().getClient().getImageLibrary();
 
-        int numberOfSettlements = opponent.getSettlements().size();
-        int heights[] = new int[2 * (numberOfSettlements + EXTRA_ROWS)];
-        int widths[] = new int[] { 0, 10, 0 };
-        int labelColumn = 1;
-        int valueColumn = 3;
-        int row = 1;
+        JPanel result = new JPanel(new MigLayout("wrap 2", "[]20px[]", ""));
 
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = 3;
-        }
-        heights[EXTRA_ROWS - 1] = 16;
-        heights[EXTRA_ROWS + 1] = 6;
+        result.add(new JLabel(Messages.message("report.indian.nameOfTribe")));
+        result.add(new JLabel(opponent.getNationAsString()));
+        result.add(new JLabel(Messages.message("report.indian.chieftain")));
+        result.add(new JLabel(opponent.getName()));
+        result.add(new JLabel(Messages.message("report.indian.typeOfSettlements")));
+        result.add(new JLabel(((IndianNationType) opponent.getNationType()).getSettlementTypeAsString()));
+        result.add(new JLabel(Messages.message("report.indian.numberOfSettlements")));
+        result.add(new JLabel(String.valueOf(opponent.getSettlements().size())));
+        result.add(new JLabel(Messages.message("report.indian.tension")));
+        result.add(new JLabel(opponent.getTension(player).toString()));
 
-        JPanel result = new JPanel(new HIGLayout(widths, heights));
-
-        result.add(new JLabel(Messages.message("report.indian.nameOfTribe")),
-                   higConst.rc(row, labelColumn));
-        result.add(new JLabel(opponent.getNationAsString()),
-                   higConst.rc(row, valueColumn));
-        row += 2;
-        result.add(new JLabel(Messages.message("report.indian.chieftain")),
-                   higConst.rc(row, labelColumn));
-        result.add(new JLabel(opponent.getName()),
-                   higConst.rc(row, valueColumn));
-        row += 2;
-        result.add(new JLabel(Messages.message("report.indian.typeOfSettlements")),
-                   higConst.rc(row, labelColumn));
-        result.add(new JLabel(String.valueOf(((IndianNationType) opponent.getNationType())
-                                             .getSettlementTypeAsString())),
-                   higConst.rc(row, valueColumn));
-        row += 2;
-        result.add(new JLabel(Messages.message("report.indian.numberOfSettlements")),
-                   higConst.rc(row, labelColumn));
-        result.add(new JLabel(String.valueOf(numberOfSettlements)),
-                   higConst.rc(row, valueColumn));
-        row += 2;
-        result.add(new JLabel(Messages.message("report.indian.tension")),
-                   higConst.rc(row, labelColumn));
-        result.add(new JLabel(opponent.getTension(player).toString()),
-                   higConst.rc(row, valueColumn));
-        row += 2;
-        result.add(new JLabel(Messages.message("report.indian.location")),
-                   higConst.rc(row, labelColumn));
-        result.add(new JLabel(Messages.message("report.indian.skillTaught")),
-                   higConst.rc(row, valueColumn));
-        row += 2;
+        result.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
+        result.add(new JLabel(Messages.message("Settlement")), "newline 10");
+        result.add(new JLabel(Messages.message("report.indian.skillTaught")));
 
         for (IndianSettlement settlement : opponent.getIndianSettlements()) {
             String locationName = settlement.getLocationName() + 
@@ -139,11 +98,9 @@ public final class ReportIndianPanel extends ReportPanel {
                 skillLabel.setIcon(library.getScaledImageIcon(skillImage, 0.66f));
             }
             skillLabel.setText(skill);
-            result.add(new JLabel(locationName),
-                       higConst.rc(row, labelColumn));
-            result.add(skillLabel, higConst.rc(row, valueColumn));
-            row += 2;
+            result.add(new JLabel(locationName));
+            result.add(skillLabel);
         }
-        reportPanel.add(result);
+        return result;
     }
 }
