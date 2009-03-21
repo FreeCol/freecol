@@ -32,14 +32,12 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Region;
 
-import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Foreign Affairs Report.
  */
 public final class ReportExplorationPanel extends ReportPanel {
-
-    public static final int EXTRA_ROWS = 2;
 
     // only use this for regions that have already been discovered!
     private static final Comparator<Region> regionComparator = new Comparator<Region>() {
@@ -72,50 +70,21 @@ public final class ReportExplorationPanel extends ReportPanel {
         }
         Collections.sort(regions, regionComparator);
 
-        int heights[] = new int[2 * regions.size() + EXTRA_ROWS];
-        int widths[] = new int[] { 0, 10, 0, 10, 0, 10, 0, 10, 0 };
-        int regionColumn = 1;
-        int typeColumn = 3;
-        int turnColumn = 5;
-        int playerColumn = 7;
-        int valueColumn = 9;
-        
-        int row = 1;
-
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = 3;
-        }
-
-        JPanel result = new JPanel(new HIGLayout(widths, heights));
-        result.setOpaque(false);
+        reportPanel.setLayout(new MigLayout("wrap 5, fillx", "", ""));
 
         // headline
-        result.add(new JLabel(Messages.message("report.exploration.nameOfRegion")),
-                   higConst.rc(row, regionColumn));
-        result.add(new JLabel(Messages.message("report.exploration.typeOfRegion")),
-                   higConst.rc(row, typeColumn));
-        result.add(new JLabel(Messages.message("report.exploration.discoveredIn")),
-                   higConst.rc(row, turnColumn));
-        result.add(new JLabel(Messages.message("report.exploration.discoveredBy")),
-                   higConst.rc(row, playerColumn));
-        result.add(new JLabel(Messages.message("report.exploration.valueOfRegion")),
-                   higConst.rc(row, valueColumn));
-        row += 2;
+        reportPanel.add(new JLabel(Messages.message("report.exploration.nameOfRegion")));
+        reportPanel.add(new JLabel(Messages.message("report.exploration.typeOfRegion")));
+        reportPanel.add(new JLabel(Messages.message("report.exploration.discoveredIn")));
+        reportPanel.add(new JLabel(Messages.message("report.exploration.discoveredBy")));
+        reportPanel.add(new JLabel(Messages.message("report.exploration.valueOfRegion")));
 
         for (Region region : regions) {
-            result.add(new JLabel(region.getName()),
-                       higConst.rc(row, regionColumn));
-            result.add(new JLabel(region.getTypeName()),
-                       higConst.rc(row, typeColumn));
-            result.add(new JLabel(region.getDiscoveredIn().toString()),
-                       higConst.rc(row, turnColumn));
-            result.add(new JLabel(region.getDiscoveredBy().getNationAsString()),
-                       higConst.rc(row, playerColumn));
-            result.add(new JLabel(String.valueOf(region.getScoreValue())),
-                       higConst.rc(row, valueColumn));
-            row += 2;
-        }            
-
-        reportPanel.add(result);
+            reportPanel.add(new JLabel(region.getName()));
+            reportPanel.add(new JLabel(region.getTypeName()));
+            reportPanel.add(new JLabel(region.getDiscoveredIn().toString()));
+            reportPanel.add(new JLabel(region.getDiscoveredBy().getNationAsString()));
+            reportPanel.add(new JLabel(String.valueOf(region.getScoreValue())));
+        }
     }
 }
