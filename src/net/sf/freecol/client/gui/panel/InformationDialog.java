@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 
@@ -34,16 +35,11 @@ import javax.swing.JTextArea;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 public class InformationDialog extends FreeColDialog<Boolean> {
-
-    public static final int leftMargin = 10;
-    public static final int rightMargin = 10;
-    public static final int topMargin = 200;
-    public static final int bottomMargin = 10;
-    public static final int hGap = 10;
-    public static final int vGap = 10;
 
     private JButton okButton = new JButton(Messages.message("ok"));
 
@@ -73,29 +69,13 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      */
     public InformationDialog(String[] texts, ImageIcon[] images) {
 
-        int[] widths = {leftMargin, 510, rightMargin};
-        int[] heights = {topMargin, 252, vGap, 30, bottomMargin};
-        setLayout(new HIGLayout(widths, heights));
+        setLayout(new MigLayout("wrap 1, insets 200 10 10 10", "[510]", "[242]20[20]"));
 
-        int[] textWidths = {0, hGap, 0};
-        int[] textHeights = new int[2 * texts.length - 1];
-        int imageColumn = 1;
-        int textColumn = 3;
-
-        for (int index = 1; index < texts.length; index += 2) {
-            textHeights[index] = margin;
-        }
-
-        if (images == null) {
-            textWidths = new int[] {0};
-            textColumn = 1;
-        }
-
-        enterPressesWhenFocused(okButton);
-
-        HIGLayout layout = new HIGLayout(textWidths, textHeights);
-        JPanel textPanel = new JPanel(layout);
+        JPanel textPanel = new JPanel();
         textPanel.setOpaque(false);
+        if (images != null) {
+            textPanel.setLayout(new MigLayout("wrap 2", "", ""));
+        }
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -103,15 +83,19 @@ public class InformationDialog extends FreeColDialog<Boolean> {
             }
         });
 
-        int row = 1;
-        for (int i = 0; i < texts.length; i++) {
-            if (images != null && images[i] != null) {
-                textPanel.add(new JLabel(images[i]), higConst.rc(row, imageColumn));
+        if (images == null) {
+            for (String text : texts) {
+                textPanel.add(getDefaultTextArea(text, 30));
             }
-            JTextArea textArea = getDefaultTextArea(texts[i]);
-            textArea.setColumns(30);
-            textPanel.add(textArea, higConst.rc(row, textColumn));
-            row += 2;
+        } else {
+            for (int i = 0; i < texts.length; i++) {
+                if (images[i] == null) {
+                    textPanel.add(getDefaultTextArea(texts[i], 30), "skip");
+                } else {
+                    textPanel.add(new JLabel(images[i]));
+                    textPanel.add(getDefaultTextArea(texts[i], 30));
+                }
+            }
         }
 
         JScrollPane scrollPane = new JScrollPane(textPanel,
@@ -122,9 +106,8 @@ public class InformationDialog extends FreeColDialog<Boolean> {
         scrollPane.setBorder(null);
         setBorder(null);
 
-        add(scrollPane, higConst.rc(2, 2));
-        add(okButton, higConst.rc(4, 2));
-        setSize(getPreferredSize());
+        add(scrollPane);
+        add(okButton, "tag ok");
 
     }
 
