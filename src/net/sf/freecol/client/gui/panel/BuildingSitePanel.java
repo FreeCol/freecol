@@ -151,6 +151,10 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
         initialize();
     }
 
+    public void removePropertyChangeListeners() {
+        colony.removePropertyChangeListener(this);
+    }
+
 }
 
 

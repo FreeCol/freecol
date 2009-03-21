@@ -104,7 +104,10 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
 
     public void removePropertyChangeListeners() {
         building.removePropertyChangeListener(this);
-        building.getColony().removePropertyChangeListener(this);
+        GoodsType inputType = building.getGoodsInputType();
+        if (inputType != null) {
+            building.getColony().removePropertyChangeListener(inputType.getId(), this);
+        }
     }
 
     /**
