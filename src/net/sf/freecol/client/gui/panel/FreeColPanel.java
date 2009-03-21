@@ -95,7 +95,7 @@ public class FreeColPanel extends JPanel {
     protected static final Font bigHeaderFont = ((Font) UIManager.get("HeaderFont")).deriveFont(0, 48);
 
     // How many columns (em-widths) to use in the text area
-    protected static final int columns = 20;
+    protected static final int COLUMNS = 20;
 
     // The margin to use for HIGLayout
     protected static final int margin = 3;
@@ -224,6 +224,18 @@ public class FreeColPanel extends JPanel {
      *         dialogs.
      */
     public static JTextArea getDefaultTextArea(String text) {
+        return getDefaultTextArea(text, COLUMNS);
+    }
+    /**
+     * Returns a text area with standard settings suitable for use in FreeCol
+     * dialogs.
+     * 
+     * @param text The text to display in the text area.
+     * @param columns an <code>int</code> value
+     * @return a text area with standard settings suitable for use in FreeCol
+     *         dialogs.
+     */
+    public static JTextArea getDefaultTextArea(String text, int columns) {
         JTextArea textArea = new JTextArea(text);
         textArea.setColumns(columns);
         textArea.setOpaque(false);
