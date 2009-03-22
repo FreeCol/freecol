@@ -89,7 +89,7 @@ public final class ReportTurnPanel extends ReportPanel {
 
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new MigLayout("wrap 4, fillx", "", ""));
+        reportPanel.setLayout(new MigLayout("wrap 4, fillx", "[][500!][][]", ""));
 
         source = this;
         type = null;
@@ -145,6 +145,7 @@ public final class ReportTurnPanel extends ReportPanel {
             insertMessage(textPane.getStyledDocument(), message, getCanvas().getClient().getMyPlayer());
             reportPanel.add(textPane);
 
+            boolean ignore = false;
             final JComponent label = component;
             if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
@@ -158,6 +159,7 @@ public final class ReportTurnPanel extends ReportPanel {
                     }
                 });
                 reportPanel.add(ignoreButton);
+                ignore = true;
             }
             final BooleanOption filterOption = options.getBooleanOption(message);
             // Message type can be filtered
@@ -173,7 +175,11 @@ public final class ReportTurnPanel extends ReportPanel {
                         label.setEnabled(!flag);
                     }
                 });
-                reportPanel.add(filterButton);
+                if (ignore) {
+                    reportPanel.add(filterButton);
+                } else {
+                    reportPanel.add(filterButton, "skip");
+                }
             }
         }
     }
