@@ -761,6 +761,9 @@ public class UnitTest extends FreeColTestCase {
         
         Unit soldier = new Unit(game, colonyTile, dutch, spec().getUnitType("model.unit.veteranSoldier"),
                                 UnitState.ACTIVE);
+        
+        assertTrue("soldier location should be the colony tile",soldier.getLocation() == colonyTile);
+        assertTrue("soldier tile should be the colony tile",soldier.getTile() == colonyTile);
         Boolean found = false;
         for (Unit u : colonyTile.getUnitList()){
             if(u == soldier){
