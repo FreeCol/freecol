@@ -930,6 +930,15 @@ public class Player extends FreeColGameObject implements Nameable {
             Unit unit = unitIterator.next();
             if (unit.isCarrier()) {
                 /*
+                 * The carrier has colonist units on board
+                 */
+                for(Unit u : unit.getUnitList()){
+                    if(u.isColonist()){
+                        return false;
+                    }
+                }
+                
+                /*
                  * The carrier has units 
                  *or goods that can be sold
                  */
