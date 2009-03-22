@@ -1279,7 +1279,7 @@ public final class FreeColServer {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(new File(FreeCol.getDataDirectory(), HIGH_SCORE_FILE));
-            XMLStreamReader xsr = xif.createXMLStreamReader(fis);
+            XMLStreamReader xsr = xif.createXMLStreamReader(fis, "UTF-8");
             xsr.nextTag();
             while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                 if (xsr.getLocalName().equals("highScore")) {

@@ -71,7 +71,7 @@ public class XMLStream implements Closeable {
     private XMLStreamReader createXMLStreamReader(InputStream inputStream) throws IOException{
         try {
             XMLInputFactory xif = XMLInputFactory.newInstance();        
-            return xif.createXMLStreamReader(inputStream);
+            return xif.createXMLStreamReader(inputStream, "UTF-8");
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

@@ -226,7 +226,7 @@ public abstract class OptionMap extends OptionGroup {
         }
         XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
-            return xif.createXMLStreamReader(in);
+            return xif.createXMLStreamReader(in, "UTF-8");
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
             e.printStackTrace(new PrintWriter(sw));

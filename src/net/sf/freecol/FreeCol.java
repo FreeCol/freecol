@@ -25,9 +25,8 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -415,7 +414,7 @@ public final class FreeCol {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         XMLStreamReader in = null;
         try {
-            in = xif.createXMLStreamReader(new BufferedReader(new FileReader(getClientOptionsFile())));
+            in = xif.createXMLStreamReader(new FileInputStream(getClientOptionsFile()), "UTF-8");
             in.nextTag();
             /** 
              * The following code was contributed by armcode to fix
