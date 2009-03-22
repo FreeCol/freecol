@@ -35,7 +35,7 @@ import net.sf.freecol.common.model.Player.Stance;
 
 import org.w3c.dom.Element;
 
-import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Foreign Affairs Report.
@@ -49,17 +49,12 @@ public final class ReportForeignAffairPanel extends ReportPanel {
      * @param parent The parent of this panel.
      */
     public ReportForeignAffairPanel(Canvas parent) {
+
         super(parent, Messages.message("menuBar.report.foreign"));
+
         // Display Panel
         reportPanel.removeAll();
         reportPanel.setLayout(new GridLayout(0, 2));
-
-        int[] widths = new int[] { 0, 12, 0, 12, 0, 0 };
-        int[] heights = new int[] { 0, 12, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0 };
-        int coatColumn = 1;
-        int labelColumn = 3;
-        int valueColumn = 5;
-        int percentColumn = 6;
 
         FreeColClient client = getCanvas().getClient();
         ImageLibrary imageLibrary = getCanvas().getGUI().getImageLibrary();
@@ -67,58 +62,47 @@ public final class ReportForeignAffairPanel extends ReportPanel {
         int number = report.getChildNodes().getLength();
         for (int i = 0; i < number; i++) {
             Element enemyElement = (Element) report.getChildNodes().item(i);
-            JPanel enemyPanel = new JPanel(new HIGLayout(widths, heights));
+            JPanel enemyPanel = new JPanel(new MigLayout("gapy 0", "[][]20[align right]0[]", ""));
             enemyPanel.setOpaque(false);
-            int row = 1;
             Player enemy = (Player) client.getGame().getFreeColGameObject(enemyElement.getAttribute("player"));
+            JLabel coatLabel = new JLabel();
             final ImageIcon coatOfArms = imageLibrary.getCoatOfArmsImageIcon(enemy.getNation());
             if (coatOfArms != null) {
-                enemyPanel.add(new JLabel(coatOfArms),
-                               higConst.rcwh(row, coatColumn, 1, heights.length, "t"));
+                coatLabel.setIcon(coatOfArms);
             }
-            enemyPanel.add(new JLabel(enemy.getNationAsString()), higConst.rc(row, labelColumn));
-            row += 2;
-            enemyPanel.add(new JLabel(Messages.message("report.stance")), higConst.rc(row, labelColumn));
+            enemyPanel.add(coatLabel, "spany, aligny top");
+            enemyPanel.add(new JLabel(enemy.getNationAsString()), "wrap 12");
+
+            enemyPanel.add(new JLabel(Messages.message("report.stance")), "newline");
             Stance stance = Enum.valueOf(Stance.class, enemyElement.getAttribute("stance"));
-            enemyPanel.add(new JLabel(Player.getStanceAsString(stance)),
-                           higConst.rc(row, valueColumn, "r"));
-            row++;
-            enemyPanel.add(new JLabel(Messages.message("report.numberOfColonies")), higConst.rc(row, labelColumn));
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("numberOfColonies"), JLabel.TRAILING), higConst.rc(row,
-                    valueColumn));
-            row++;
-            enemyPanel.add(new JLabel(Messages.message("report.numberOfUnits")), higConst.rc(row, labelColumn));
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("numberOfUnits"), JLabel.TRAILING), higConst.rc(row,
-                    valueColumn));
-            row++;
-            enemyPanel.add(new JLabel(Messages.message("report.militaryStrength")), higConst.rc(row, labelColumn));
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("militaryStrength"), JLabel.TRAILING), higConst.rc(row,
-                    valueColumn));
-            row++;
-            enemyPanel.add(new JLabel(Messages.message("report.navalStrength")), higConst.rc(row, labelColumn));
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("navalStrength"), JLabel.TRAILING), higConst.rc(row,
-                    valueColumn));
-            row++;
-            enemyPanel.add(new JLabel(Messages.message("goldTitle")), higConst.rc(row, labelColumn));
-            enemyPanel.add(new JLabel(enemyElement.getAttribute("gold"), JLabel.TRAILING), 
-                           higConst.rc(row, valueColumn));
-            row += 2;
+            enemyPanel.add(new JLabel(Player.getStanceAsString(stance)));
+
+            enemyPanel.add(new JLabel(Messages.message("report.numberOfColonies")), "newline");
+            enemyPanel.add(new JLabel(enemyElement.getAttribute("numberOfColonies")));
+
+            enemyPanel.add(new JLabel(Messages.message("report.numberOfUnits")), "newline");
+            enemyPanel.add(new JLabel(enemyElement.getAttribute("numberOfUnits")));
+
+            enemyPanel.add(new JLabel(Messages.message("report.militaryStrength")), "newline");
+            enemyPanel.add(new JLabel(enemyElement.getAttribute("militaryStrength")));
+
+            enemyPanel.add(new JLabel(Messages.message("report.navalStrength")), "newline");
+            enemyPanel.add(new JLabel(enemyElement.getAttribute("navalStrength")));
+
+            enemyPanel.add(new JLabel(Messages.message("goldTitle")), "newline");
+            enemyPanel.add(new JLabel(enemyElement.getAttribute("gold")));
 
             if (enemyElement.hasAttribute("tax")) {
-                enemyPanel.add(new JLabel(Messages.message("menuBar.colopedia.father")), higConst.rc(row, labelColumn));
-                enemyPanel.add(new JLabel(enemyElement.getAttribute("foundingFathers"), JLabel.TRAILING), higConst.rc(
-                        row, valueColumn));
-                row++;
-                enemyPanel.add(new JLabel(Messages.message("tax")), higConst.rc(row, labelColumn));
-                enemyPanel.add(new JLabel(enemyElement.getAttribute("tax"), JLabel.TRAILING), higConst.rc(row,
-                        valueColumn));
-                enemyPanel.add(new JLabel("%"), higConst.rc(row, percentColumn));
-                row++;
-                enemyPanel.add(new JLabel(Messages.message("report.sonsOfLiberty")), higConst.rc(row, labelColumn));
-                enemyPanel.add(new JLabel(enemyElement.getAttribute("SoL"), JLabel.TRAILING), higConst.rc(row,
-                        valueColumn));
-                enemyPanel.add(new JLabel("%"), higConst.rc(row, percentColumn));
-                row++;
+                enemyPanel.add(new JLabel(Messages.message("menuBar.colopedia.father")), "newline 8");
+                enemyPanel.add(new JLabel(enemyElement.getAttribute("foundingFathers")));
+
+                enemyPanel.add(new JLabel(Messages.message("tax")), "newline");
+                enemyPanel.add(new JLabel(enemyElement.getAttribute("tax")));
+                enemyPanel.add(new JLabel("%"));
+
+                enemyPanel.add(new JLabel(Messages.message("report.sonsOfLiberty")), "newline");
+                enemyPanel.add(new JLabel(enemyElement.getAttribute("SoL")));
+                enemyPanel.add(new JLabel("%"));
 
             }
             reportPanel.add(enemyPanel);
