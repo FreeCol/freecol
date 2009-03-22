@@ -27,7 +27,7 @@ import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -39,16 +39,15 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Unit;
 
-import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
 public class BuildingProductionPanel extends FreeColPanel implements ActionListener {
 
     private final JButton okButton = new JButton(Messages.message("ok"));
-    private final Canvas parent;
 
     public BuildingProductionPanel(Canvas canvas, Unit unit) {
 
-        parent = canvas;
+        super(canvas);
 
         Colony colony = unit.getColony();
         Building building = unit.getWorkLocation();
@@ -60,38 +59,18 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
             modifiers.add(colony.getProductionModifier(goodsType));
         }
 
-        int numberOfModifiers = modifiers.size();
-        int extraRows = 4; // title, icon, result, buttons
-        int numberOfRows = 2 * (numberOfModifiers + extraRows) - 1;
-
-        int[] widths = {0, 20, 0, 0};
-        int[] heights = new int[numberOfRows];
-        int labelColumn = 1;
-        int valueColumn = 3;
-        int percentageColumn = 4;
-
-        for (int index = 1; index < numberOfRows; index += 2) {
-            heights[index] = margin;
-        }
-
         okButton.setActionCommand("ok");
         okButton.addActionListener(this);
-        //okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         enterPressesWhenFocused(okButton);
 
-        setLayout(new HIGLayout(widths, heights));
+        setLayout(new MigLayout("", "[]20[align right][]", ""));
 
-        int row = 1;
+        add(new JLabel(building.getName()), "span, align center");
 
-        add(new JLabel(building.getName()),
-            higConst.rc(row, labelColumn));
-        row += 2;
         // TODO: make this a building image
-        add(new UnitLabel(unit, parent, false, true),
-            higConst.rc(row, labelColumn));
-        add(new JLabel(parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType)),
-            higConst.rc(row, valueColumn));
-        row += 2;
+        add(new UnitLabel(unit, canvas, false, true), "newline");
+        add(new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType)));
+
         for (Modifier modifier : modifiers) {
             FreeColGameObjectType source = modifier.getSource();
             String sourceName;
@@ -100,7 +79,8 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
             } else {
                 sourceName = source.getName();
             }
-            add(new JLabel(sourceName), higConst.rc(row, labelColumn));
+            add(new JLabel(sourceName), "newline");
+            boolean percent = false;
             String bonus = getModifierFormat().format(modifier.getValue());
             switch(modifier.getType()) {
             case ADDITIVE:
@@ -112,15 +92,17 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
                 if (modifier.getValue() > 0) {
                     bonus = "+" + bonus;
                 }
-                add(new JLabel("%"), higConst.rc(row, percentageColumn));
+                percent = true;
                 break;
             case MULTIPLICATIVE:
                 bonus = "\u00D7" + bonus;
                 break;
             default:
-            }                
-            add(new JLabel(bonus), higConst.rc(row, valueColumn, "r"));
-            row += 2;
+            }
+            add(new JLabel(bonus));
+            if (percent) {
+                add(new JLabel("%"));
+            }
         }
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
@@ -129,15 +111,13 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
             colony.getProductionBonus();
         JLabel finalLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
         finalLabel.setFont(bigFont);
-        add(finalLabel, higConst.rc(row, labelColumn));
+        add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx");
+        add(finalLabel);
         JLabel finalResult = new JLabel(getModifierFormat().format(result));
         finalResult.setFont(bigFont);
-        add(finalResult, higConst.rc(row, valueColumn, "r"));
+        add(finalResult);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(okButton);
-        add(buttonPanel, higConst.rcwh(heights.length, 1, widths.length, 1));
+        add(okButton, "newline 20, span, tag ok");
         setSize(getPreferredSize());
 
     }
@@ -153,7 +133,7 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
-        parent.remove(this);
+        getCanvas().remove(this);
     }
 
 }
