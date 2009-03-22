@@ -19,7 +19,6 @@
 
 package net.sf.freecol.util.test;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Locale;
@@ -40,6 +39,7 @@ import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.server.model.ServerGame;
 
 /**
  * The base class for all FreeCol tests. Contains useful methods used by the
@@ -104,7 +104,7 @@ public class FreeColTestCase extends TestCase {
      * @return A new game with with players for each nation added.
      */
     public static Game getStandardGame() {
-        game = new Game(new MockModelController());
+        game = new ServerGame(new MockModelController());
         game.setMaximumPlayers(8);
 
         Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));

@@ -82,6 +82,7 @@ import net.sf.freecol.server.control.ServerModelController;
 import net.sf.freecol.server.control.UserConnectionHandler;
 import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.generator.MapGenerator;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerModelObject;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -138,7 +139,7 @@ public final class FreeColServer {
 
     private final InGameController inGameController;
 
-    private Game game;
+    private ServerGame game;
 
     private AIMain aiMain;
 
@@ -213,7 +214,7 @@ public final class FreeColServer {
         this.nationOptions = nationOptions;
 
         modelController = new ServerModelController(this);
-        game = new Game(modelController);
+        game = new ServerGame(modelController);
         game.setVacantNations(new ArrayList<Nation>(nationOptions.getEuropeanNations()));
         game.setMaximumPlayers(nationOptions.getEuropeanNations().size());
         mapGenerator = new MapGenerator();
@@ -709,7 +710,7 @@ public final class FreeColServer {
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
-                    game = new Game(null, getModelController(), xsr, serverObjects
+                    game = new ServerGame(null, getModelController(), xsr, serverObjects
                             .toArray(new FreeColGameObject[0]));
                     game.setCurrentPlayer(null);
                     gameState = GameState.IN_GAME;

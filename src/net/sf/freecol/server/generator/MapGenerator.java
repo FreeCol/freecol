@@ -68,6 +68,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.model.ServerRegion;
 
@@ -185,7 +186,7 @@ public class MapGenerator implements IMapGenerator {
                     }
                 } else if (xsr.getLocalName().equals(Game.getXMLElementTagName())) {
                     // Read the game model:
-                    game = new Game(null, null, xsr, serverObjects
+                    game = new ServerGame(null, null, xsr, serverObjects
                                     .toArray(new FreeColGameObject[serverObjects.size()]));
                     game.setCurrentPlayer(null);
                     game.checkIntegrity();

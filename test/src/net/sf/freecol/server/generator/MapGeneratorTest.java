@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.RangeOption;
+import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
 
@@ -45,7 +46,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     public void testWithNoIndians() {
 
-        Game g = new Game(new MockModelController());
+        Game g = new ServerGame(new MockModelController());
         Specification s = FreeCol.getSpecification();
 
         // A new game does not have a map yet
@@ -71,7 +72,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     public void testSinglePlayerOnSmallMap() {
 
-        Game g = new Game(new MockModelController());
+        Game g = new ServerGame(new MockModelController());
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -103,7 +104,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
     public void testMapGenerator() {
 
-        Game g = new Game(new MockModelController());
+        Game g = new ServerGame(new MockModelController());
 
         // A new game does not have a map yet
         assertEquals(null, g.getMap());
@@ -166,7 +167,7 @@ public class MapGeneratorTest extends FreeColTestCase {
      */
     public void testIndianCapital() {
 
-        Game g = new Game(new MockModelController());
+        Game g = new ServerGame(new MockModelController());
 
         IMapGenerator gen = new MapGenerator();
 
@@ -214,7 +215,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         /**
          * Make sure we can import all distributed maps.
          */
-        Game g = new Game(new MockModelController());
+        Game g = new ServerGame(new MockModelController());
         IMapGenerator gen = new MapGenerator();
         File mapDir = new File("data/maps/");
         for (File importFile : mapDir.listFiles()) {
@@ -233,7 +234,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         // Reset import file option value (set by previous tests)
         ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
 
-        Game game = new Game(new MockModelController());
+        Game game = new ServerGame(new MockModelController());
         IMapGenerator gen = new MapGenerator();
         try {
             gen.createMap(game);

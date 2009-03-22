@@ -56,26 +56,26 @@ public class Game extends FreeColGameObject {
     private Player unknownEnemy;
 
     /** Contains all the players in the game. */
-    private List<Player> players = new ArrayList<Player>();
+    protected List<Player> players = new ArrayList<Player>();
 
     private Map map;
 
-    private GameOptions gameOptions;
+    protected GameOptions gameOptions;
 
     /** The name of the player whose turn it is. */
-    private Player currentPlayer = null;
+    protected Player currentPlayer = null;
 
     /**
      * The owner of this view of the game, or <code>null</code> if this game
      * has all the information.
      */
-    private Player viewOwner;
+    protected Player viewOwner = null;
 
     /** The maximum number of (human) players allowed in this game. */
     private int maxPlayers = 4;
 
     /** Contains references to all objects created in this game. */
-    private HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
+    protected HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
 
     /**
      * The next available ID, that can be given to a new
@@ -84,13 +84,13 @@ public class Game extends FreeColGameObject {
     private int nextId = 1;
 
     /** Indicates whether or not this object may give IDs. */
-    private boolean canGiveID;
+    protected boolean canGiveID;
 
     private Turn turn = new Turn(1);
 
-    private final ModelController modelController;
+    protected ModelController modelController;
 
-    private FreeColGameObjectListener freeColGameObjectListener;
+    protected FreeColGameObjectListener freeColGameObjectListener;
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -100,105 +100,30 @@ public class Game extends FreeColGameObject {
      * implemented in future. As soon as that happens, we will also
      * have to make the combat model selectable.
      */
-    private CombatModel combatModel;
+    protected CombatModel combatModel;
 
     /**
      * The nations that can still be selected in this Game.
      */
-    private List<Nation> vacantNations = new ArrayList<Nation>();
-
-
-    /**
-     * Creates a new game model.
-     * 
-     * @param modelController A controller object the model can use to make
-     *            actions not allowed from the model (generate random numbers
-     *            etc).
-     * @see net.sf.freecol.server.FreeColServer#FreeColServer(boolean, boolean,
-     *      int, String)
-     */
-    public Game(ModelController modelController) {
-        super(null);
-
-        this.modelController = modelController;
-        this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
-        this.viewOwner = null;
-
-        gameOptions = new GameOptions();
-
-        currentPlayer = null;
-        canGiveID = true;
-        //market = new Market(this);
-    }
+    protected List<Nation> vacantNations = new ArrayList<Nation>();
 
     /**
-     * Initiate a new <code>Game</code> with information from a saved game.
-     * 
-     * @param freeColGameObjectListener A listener that should be monitoring
-     *            this <code>Game</code>.
-     * @param modelController A controller object the model can use to make
-     *            actions not allowed from the model (generate random numbers
-     *            etc).
-     * @param in The input stream containing the XML.
-     * @param fcgos A list of <code>FreeColGameObject</code>s to be added to
-     *            this <code>Game</code>.
-     * @throws XMLStreamException if an error occurred during parsing.
-     * @see net.sf.freecol.server.FreeColServer#loadGame(File)
+     * Minimal constructor, 
+     * Just necessary to call parent constructor
+     * @param game
      */
-    public Game(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController,
-                XMLStreamReader in, FreeColGameObject[] fcgos) throws XMLStreamException {
-        super(null, in);
-
-        setFreeColGameObjectListener(freeColGameObjectListener);
-        this.modelController = modelController;
-        if (modelController != null) {
-            // no model controller when using the map editor
-            this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
-        }
-        this.viewOwner = null;
-
-        canGiveID = true;
-
-        for (FreeColGameObject object : fcgos) {
-            object.setGame(this);
-            object.updateID();
-
-            if (object instanceof Player) {
-                players.add((Player) object);
-            }
-        }
-
-        readFromXML(in);
+    protected Game(Game game) {
+        super(game);
     }
-
-    /*
-     * Initiate a new <code>Game</code> with information from a saved game.
-     * 
-     * Currently not used, commented.
-     * 
-     * @param freeColGameObjectListener A listener that should be monitoring
-     * this <code>Game</code>. @param modelController A controller object the
-     * model can use to make actions not allowed from the model (generate random
-     * numbers etc). @param fcgos A list of <code>FreeColGameObject</code>s
-     * to be added to this <code>Game</code>. @param e An XML-element that
-     * will be used to initialize this object.
-     * 
-     * public Game(FreeColGameObjectListener freeColGameObjectListener,
-     * ModelController modelController, Element e, FreeColGameObject[] fcgos){
-     * super(null, e);
-     * 
-     * setFreeColGameObjectListener(freeColGameObjectListener);
-     * this.modelController = modelController; this.viewOwner = null;
-     * 
-     * canGiveID = true;
-     * 
-     * for (int i=0; i<fcgos.length; i++) { fcgos[i].setGame(this);
-     * fcgos[i].updateID();
-     * 
-     * if (fcgos[i] instanceof Player) { players.add((Player) fcgos[i]); } }
-     * 
-     * readFromXMLElement(e); }
+    
+    /**
+     * Minimal constructor, 
+     * Just necessary to call parent constructor
+     * @param game
      */
+    protected Game(Game game, XMLStreamReader in) throws XMLStreamException {
+        super(game, in);
+    }
 
     /*
      * Initiate a new <code>Game</code> object from a <code>Element</code>
