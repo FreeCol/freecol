@@ -341,6 +341,10 @@ public class Game extends FreeColGameObject {
         return turn;
     }
 
+    void setTurn(Turn newTurn) {
+        turn = newTurn;
+    }
+    
     /**
      * Get the <code>CombatModel</code> value.
      *

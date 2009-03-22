@@ -26,7 +26,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class PlayerTest extends FreeColTestCase {
-
+    
 
     public void testUnits() {
 
@@ -246,5 +246,53 @@ public class PlayerTest extends FreeColTestCase {
         assertEquals(errMsg, expectedDutchTension, dutch.getTension(french).getValue());
         errMsg = "French tension value should have remained the same";
         assertEquals(errMsg, expectedFrenchTension ,french.getTension(dutch).getValue());
+    }
+    
+    public void testCheckGameOverNoUnits() {
+        Game game = getStandardGame();
+        
+        Player dutch = game.getPlayer("model.nation.dutch");
+        
+        assertTrue("Should be game over due to no units",Player.checkForDeath(dutch));
+    }
+    
+    public void testCheckNoGameOverEnoughMoney() {
+        Game game = getStandardGame();
+        
+        Player dutch = game.getPlayer("model.nation.dutch");
+        
+        dutch.modifyGold(10000);
+        
+        assertFalse("Should not be game, enough money",Player.checkForDeath(dutch));
+    }
+    
+    public void testCheckNoGameOverHasColonistInNewWorld() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Player dutch = game.getPlayer("model.nation.dutch");
+        
+        UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
+        new Unit(game, map.getTile(4, 7), dutch, freeColonist, UnitState.ACTIVE);
+        
+        assertFalse("Should not be game over, has units",Player.checkForDeath(dutch));
+    }
+    
+    public void testCheckGameOver1600Threshold() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Player dutch = game.getPlayer("model.nation.dutch");
+        
+        UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
+        UnitType galleon = spec().getUnitType("model.unit.galleon");
+        new Unit(game, dutch.getEurope(), dutch, freeColonist, UnitState.IN_EUROPE);
+        new Unit(game, dutch.getEurope(), dutch, galleon, UnitState.IN_EUROPE);
+        assertFalse("Should not be game over, not 1600 yet",Player.checkForDeath(dutch));
+        
+        game.setTurn(new Turn(1600));
+        assertTrue("Should be game over, no new world presence after 1600",Player.checkForDeath(dutch));
     }
 }

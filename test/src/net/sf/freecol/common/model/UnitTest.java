@@ -764,7 +764,8 @@ public class UnitTest extends FreeColTestCase {
         
         assertTrue("soldier location should be the colony tile",soldier.getLocation() == colonyTile);
         assertTrue("soldier tile should be the colony tile",soldier.getTile() == colonyTile);
-        Boolean found = false;
+        //Boolean found = false;
+        boolean found = false;
         for (Unit u : colonyTile.getUnitList()){
             if(u == soldier){
                 found = true;
