@@ -47,7 +47,9 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel displays the Turn Report.
@@ -87,21 +89,7 @@ public final class ReportTurnPanel extends ReportPanel {
 
         // Display Panel
         reportPanel.removeAll();
-
-        int[] widths = new int[] { 0, margin, 500, margin, 0, margin, 0 };
-        int[] heights = new int[2 * (messages.length + headlines) - 1];
-        int imageColumn = 1;
-        int textColumn = 3;
-        int button1Column = 5;
-        int button2Column = 7;
-
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = margin;
-        }
-
-        HIGLayout layout = new HIGLayout(widths, heights);
-        layout.setColumnWeight(textColumn, 1);
-        reportPanel.setLayout(layout);
+        reportPanel.setLayout(new MigLayout("wrap 4, fillx", "", ""));
 
         source = this;
         type = null;
@@ -111,14 +99,12 @@ public final class ReportTurnPanel extends ReportPanel {
             // add headline if necessary
             if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE && message.getSource() != source) {
                 source = message.getSource();
-                reportPanel.add(getHeadline(source), higConst.rc(row, textColumn, "l"));
-                row += 2;
+                reportPanel.add(getHeadline(source), "newline 20, skip");
             } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE && message.getType() != type) {
                 type = message.getType();
                 JLabel headline = new JLabel(message.getTypeName());
                 headline.setFont(smallHeaderFont);
-                reportPanel.add(headline, higConst.rc(row, textColumn, "l"));
-                row += 2;
+                reportPanel.add(headline, "newline 20, skip, span");
             }
 
             JComponent component = new JLabel();
@@ -152,15 +138,14 @@ public final class ReportTurnPanel extends ReportPanel {
                 } else {
                     component = new JLabel(icon);
                 }
-
-                reportPanel.add(component, higConst.rc(row, imageColumn, ""));
             }
+            reportPanel.add(component, "newline");
 
             final JTextPane textPane = getDefaultTextPane();
             insertMessage(textPane.getStyledDocument(), message, getCanvas().getClient().getMyPlayer());
+            reportPanel.add(textPane);
 
             final JComponent label = component;
-            reportPanel.add(textPane, higConst.rc(row, textColumn));
             if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
                 ignoreButton.setToolTipText(Messages.message("model.message.ignore", message.getData()));
@@ -172,11 +157,11 @@ public final class ReportTurnPanel extends ReportPanel {
                         label.setEnabled(!flag);
                     }
                 });
-                reportPanel.add(ignoreButton, higConst.rc(row, button1Column, ""));
+                reportPanel.add(ignoreButton);
             }
             final BooleanOption filterOption = options.getBooleanOption(message);
             // Message type can be filtered
-            if(filterOption != null){
+            if (filterOption != null) {
                 JButton filterButton = new JButton("X");
                 filterButton.setToolTipText(Messages.message("model.message.filter", 
                     "%type%", message.getTypeName()));
@@ -188,9 +173,8 @@ public final class ReportTurnPanel extends ReportPanel {
                         label.setEnabled(!flag);
                     }
                 });
-                reportPanel.add(filterButton, higConst.rc(row, button2Column, ""));
+                reportPanel.add(filterButton);
             }
-            row += 2;
         }
     }
 
