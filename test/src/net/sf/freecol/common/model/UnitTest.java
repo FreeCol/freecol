@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Iterator;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -747,5 +749,38 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(spec().getEquipmentType("model.equipment.horses"), scout.getDefaultEquipmentType());
         assertEquals(1, scout.getDefaultEquipment().length);
 
+    }
+    
+    public void testUnitLocationAfterBuildingColony() {
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap();
+        game.setMap(map);
+
+        Tile colonyTile = map.getTile(6, 8);
+        
+        Unit soldier = new Unit(game, colonyTile, dutch, spec().getUnitType("model.unit.veteranSoldier"),
+                                UnitState.ACTIVE);
+        Boolean found = false;
+        for (Unit u : colonyTile.getUnitList()){
+            if(u == soldier){
+                found = true;
+            }
+        }
+        assertTrue("Unit not found in tile",found);
+        
+        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(6, 8));
+        soldier.buildColony(colony);
+        
+        assertFalse("soldier should be inside the colony",soldier.getLocation() == colonyTile);
+        // There is some inconsistence with the results below
+        // Unit.getTile() gives the location tile even though it isnt in the tile itself
+        // This may lead to some confusion
+        assertTrue("soldier should get the location tile as the colony tile",soldier.getTile() == colonyTile);
+        for (Unit u : colonyTile.getUnitList()){
+            if(u == soldier){
+                fail("Unit building colony still in tile");
+            }
+        }
     }
 }
