@@ -43,10 +43,12 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -273,6 +275,17 @@ public class DebugMenu extends JMenu {
             });
 
         this.addSeparator();
+
+        JMenu panelMenu = new JMenu("Display panels");
+        panelMenu.setOpaque(false);
+        final JMenuItem monarchPanel = new JMenuItem("Display Monarch panel");
+        monarchPanel.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    canvas.showFreeColDialog(new MonarchPanel(canvas, Monarch.MonarchAction.RAISE_TAX));
+                }
+            });
+        panelMenu.add(monarchPanel);
+        add(panelMenu);
 
         final JMenuItem europeStatus = new JMenuItem("Display Europe Status");
         europeStatus.setOpaque(false);

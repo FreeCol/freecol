@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
+import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
@@ -890,7 +891,8 @@ public final class InGameInputHandler extends InputHandler {
                     public void run() {
                         Canvas canvas = getFreeColClient().getCanvas();
                         if (!canvas.isShowingSubPanel()
-                            && (action == MonarchAction.ADD_UNITS || !canvas.showMonarchPanel(action))) {
+                            && (action == MonarchAction.ADD_UNITS ||
+                                !canvas.showFreeColDialog(new MonarchPanel(canvas, action)))) {
                             canvas.showEuropePanel();
                         }
                     }
@@ -1773,7 +1775,8 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            boolean choice = getFreeColClient().getCanvas().showMonarchPanel(_action, _replace);
+            Canvas canvas = getFreeColClient().getCanvas();
+            boolean choice = canvas.showFreeColDialog(new MonarchPanel(canvas, _action, _replace));
             return Boolean.valueOf(choice);
         }
 

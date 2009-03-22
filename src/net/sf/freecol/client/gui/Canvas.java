@@ -1628,28 +1628,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the monarch action panel.
-     * 
-     * @param action The monarch action.
-     * @param replace The replacement strings.
-     * @return true or false
-     * @see net.sf.freecol.common.model.Monarch
-     */
-    public boolean showMonarchPanel(MonarchAction action, String... replace) {
-        closeStatusPanel();
-
-        MonarchPanel monarchPanel = new MonarchPanel(this);
-        monarchPanel.initialize(action, replace);
-        addAsFrame(monarchPanel);
-        monarchPanel.requestFocus();
-
-        boolean response = monarchPanel.getResponseBoolean();
-        remove(monarchPanel);
-
-        return response;
-    }
-
-    /**
      * Shows the panel that allows the user to choose which unit will emigrate
      * from Europe. This method may only be called if the user has William
      * Brewster in congress.

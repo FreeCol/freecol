@@ -19,21 +19,19 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Nation;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel is used to show information about a tile.
@@ -46,74 +44,33 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
 
     private static final int CANCEL = 1;
 
-    private final Canvas parent;
-
-    private final JLabel header;
-
-    private final JLabel imageLabel;
-
-    private JTextArea textArea;
-
     private final JButton okButton;
-
-    private final JButton cancelButton;
-
 
     /**
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent panel.
      */
-    public MonarchPanel(Canvas parent) {
-        this.parent = parent;
+    public MonarchPanel(Canvas parent, MonarchAction action, String... replace) {
 
-        header = new JLabel("", SwingConstants.CENTER);
-        header.setFont(mediumHeaderFont);
-        header.setText(Messages.message("aMessageFromTheCrown"));
-        header.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        imageLabel = new JLabel();
+        super(parent);
 
         okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
-        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        cancelButton = new JButton();
+        JButton cancelButton = new JButton();
         cancelButton.setActionCommand(String.valueOf(CANCEL));
         cancelButton.addActionListener(this);
-        cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    }
+        setLayout(new MigLayout("wrap 2", "", ""));
 
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
-    /**
-     * Initializes the information that is being displayed on this panel. The
-     * information displayed will be based on the monarch action.
-     * 
-     * @param action The monarch action.
-     * @param replace The data to be used when displaying i18n-strings.
-     */
-    public void initialize(MonarchAction action, String... replace) {
-        removeAll();
+        JLabel header = new JLabel(Messages.message("aMessageFromTheCrown"));
+        header.setFont(mediumHeaderFont);
+        add(header, "span, align center, wrap 20");
 
         Nation nation = parent.getClient().getMyPlayer().getNation();
-        imageLabel.setIcon(parent.getGUI().getImageLibrary().getMonarchImageIcon(nation));
-
-        int[] widths = { -3, 3 * margin, -1 };
-        int[] heights = { 0, margin, 0, margin, 0 };
-        setLayout(new HIGLayout(widths, heights));
-
-        int row = 1;
-        int imageColumn = 1;
-        int textColumn = 3;
-        add(header, higConst.rcwh(row, imageColumn, widths.length, 1));
-        row += 2;
-
-        add(imageLabel, higConst.rc(row, imageColumn, "r"));
+        add(new JLabel(parent.getGUI().getImageLibrary().getMonarchImageIcon(nation)));
 
         String messageID;
         String okText = "ok";
@@ -153,21 +110,22 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
             messageID = "Unknown monarch action: " + action;
         }
 
-        textArea = getDefaultTextArea(Messages.message(messageID, replace));
-        add(textArea, higConst.rc(row, textColumn));
-        row += 2;
+        add(getDefaultTextArea(Messages.message(messageID, replace)));
 
         okButton.setText(Messages.message(okText));
-
         if (cancelText == null) {
-            add(okButton, higConst.rcwh(row, imageColumn, widths.length, 1, ""));
+            add(okButton, "newline 20, span, tag ok");
         } else {
+            add(okButton, "newline 20, span, tag ok, split 2");
             cancelButton.setText(Messages.message(cancelText));
-            add(okButton, higConst.rc(row, imageColumn, "r"));
-            add(cancelButton, higConst.rc(row, textColumn, "l"));
+            add(cancelButton, "tag cancel");
         }
 
         setSize(getPreferredSize());
+    }
+
+    public void requestFocus() {
+        okButton.requestFocus();
     }
 
     /**
