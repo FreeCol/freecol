@@ -36,7 +36,8 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * The panel that allows a user to recruit people in Europe.
@@ -100,15 +101,9 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
      */
     public void initialize() {
 
-        int[] widths = new int[] { 0 };
-        int[] heights = new int[] { 0, 3 * margin, 0, margin, 0, margin, 0, margin, 0 };
-        setLayout(new HIGLayout(widths, heights));
+        setLayout(new MigLayout("wrap 1", "", ""));
 
-        int row = 1;
-        int column = 1;
-
-        add(question, higConst.rc(row, 1));
-        row += 2;
+        add(question, "wrap 20");
 
         int recruitPrice = 0;
         Player player = freeColClient.getMyPlayer();
@@ -145,12 +140,11 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
                     person[index].setEnabled(true);
                 }
 
-                add(person[index], higConst.rc(row, column));
-                row += 2;
+                add(person[index], "growx");
             }
         }
 
-        add(cancel, higConst.rc(row, column, ""));
+        add(cancel, "newline 20, tag cancel");
 
         setSize(getPreferredSize());
 
