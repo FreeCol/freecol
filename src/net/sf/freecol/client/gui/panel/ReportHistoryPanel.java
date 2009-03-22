@@ -27,7 +27,8 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Turn;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the History Report.
@@ -51,27 +52,11 @@ public final class ReportHistoryPanel extends ReportPanel {
             return;
         }
 
-        int[] widths = new int[] { 0, 3 * margin, 0 };
-        int[] heights = new int[2 * history.size() - 1];
-        int turnColumn = 1;
-        int textColumn = 3;
+        reportPanel.setLayout(new MigLayout("wrap 2", "[]20[fill]", ""));
 
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = margin;
-        }
-
-        HIGLayout layout = new HIGLayout(widths, heights);
-        layout.setColumnWeight(textColumn, 1);
-        reportPanel.setLayout(layout);
-
-        int row = 1;
         for (HistoryEvent event : history) {
-            reportPanel.add(new JLabel(Turn.toString(event.getTurn())),
-                            higConst.rc(row, turnColumn, "l"));
-            reportPanel.add(getDefaultTextArea(event.toString()),
-                            higConst.rc(row, textColumn));
-            row += 2;
+            reportPanel.add(new JLabel(Turn.toString(event.getTurn())));
+            reportPanel.add(getDefaultTextArea(event.toString(), 40));
         }
     }
-
 }
