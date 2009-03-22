@@ -41,14 +41,10 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
-import cz.autel.dmi.HIGLayout;
-
 /**
  * This panel displays the Advanced Colony Report.
  */
 public final class ReportRequirementsPanel extends ReportPanel {
-
-
 
     /**
      * A list of all the player's colonies.
@@ -83,7 +79,6 @@ public final class ReportRequirementsPanel extends ReportPanel {
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
         // Display Panel
-        reportPanel.setLayout(new HIGLayout(new int[] {780}, new int[] {0}));
 
         //Create a text pane.
         JTextPane textPane = getDefaultTextPane();
@@ -176,7 +171,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
 
             // text area
-            reportPanel.add(textPane, higConst.rc(1, 1));
+            reportPanel.add(textPane);
 
         }
         textPane.setCaretPosition(0);
