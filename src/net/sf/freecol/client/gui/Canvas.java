@@ -131,6 +131,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -698,6 +699,13 @@ public final class Canvas extends JDesktopPane {
                 image = imageLibrary.getUnitImageIcon(unit.getType()).getImage();
             } catch (Exception e) {
                 logger.warning("could not find image for unit " + unit.getName());
+            }
+        } else if (display instanceof UnitType) {
+            UnitType unitType = (UnitType) display;
+            try {
+                image = imageLibrary.getUnitImageIcon(unitType).getImage();
+            } catch (Exception e) {
+                logger.warning("could not find image for unit " + unitType.getName());
             }
         } else if (display instanceof Settlement) {
             Settlement settlement = (Settlement) display;
@@ -1562,27 +1570,6 @@ public final class Canvas extends JDesktopPane {
         colonyPanel.initialize(colony);
         addAsFrame(colonyPanel);
         colonyPanel.requestFocus();
-    }
-
-    /**
-     * Displays the indian settlement panel of the given
-     * <code>IndianSettlement</code>.
-     * 
-     * @param settlement The indian settlement whose panel needs to be
-     *            displayed.
-     * @see IndianSettlement
-     */
-    public void showIndianSettlementPanel(IndianSettlement settlement) {
-        closeMenus();
-
-        IndianSettlementPanel indianSettlementPanel = new IndianSettlementPanel(freeColClient);
-        indianSettlementPanel.initialize(settlement);
-
-        addAsFrame(indianSettlementPanel);
-        indianSettlementPanel.requestFocus();
-        indianSettlementPanel.getResponseBoolean();
-        remove(indianSettlementPanel);
-
     }
 
     public TradeAction showIndianSettlementTradeDialog(boolean showBuy, boolean showSell, boolean showGift) {

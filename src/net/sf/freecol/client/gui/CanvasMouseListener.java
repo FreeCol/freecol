@@ -33,10 +33,8 @@ import net.sf.freecol.common.model.Unit;
  * Listens to mouse buttons being pressed at the level of the Canvas.
  */
 public final class CanvasMouseListener implements MouseListener {
+
     private static final Logger logger = Logger.getLogger(CanvasMouseListener.class.getName());
-
-
-
 
     private final Canvas canvas;
 

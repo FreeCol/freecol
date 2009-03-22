@@ -58,6 +58,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -396,7 +397,8 @@ public final class GUI {
                     } else if (s instanceof IndianSettlement) {
                         // show the Indian camp
                         setFocus(selectedTile);
-                        freeColClient.getCanvas().showIndianSettlementPanel((IndianSettlement)s);
+                        Canvas canvas =freeColClient.getCanvas();
+                        canvas.showFreeColDialog(new IndianSettlementPanel(canvas, (IndianSettlement) s));
                         return;
                     }
                 }

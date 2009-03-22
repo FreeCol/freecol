@@ -30,13 +30,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel is used to show information about an Indian settlement.
@@ -45,14 +47,7 @@ public final class IndianSettlementPanel extends FreeColDialog<Boolean> implemen
 
     private static final Logger logger = Logger.getLogger(IndianSettlementPanel.class.getName());
 
-    private final FreeColClient freeColClient;
-
     private static final int OK = 0;
-
-    private final JLabel settlementLabel;
-    private final JLabel missionaryLabel;
-    private final JLabel skillLabel;
-    private final JLabel wantedGoodsLabels[];
 
     private final JButton okButton;
 
@@ -60,92 +55,73 @@ public final class IndianSettlementPanel extends FreeColDialog<Boolean> implemen
     /**
      * The constructor that will add the items to this panel.
      */
-    public IndianSettlementPanel(FreeColClient freeColClient) {
+    public IndianSettlementPanel(Canvas canvas, IndianSettlement settlement) {
         
-        this.freeColClient = freeColClient;
-        
-        int[] w = { 10, 0, 30, 0, 10 };
-        int[] h = { 10, 0, 5, 0, 5, 0, 5, 0, 10, 0, 10 };
-        setLayout(new HIGLayout(w, h));
+        super(canvas);
 
+        setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
+        
         okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
 
-        settlementLabel = new JLabel();
-        missionaryLabel = new JLabel();
-        skillLabel = new JLabel();
-        wantedGoodsLabels = new JLabel[3];
-        for (int i=0; i<3; i++) {
-            wantedGoodsLabels[i] = new JLabel();
+        JLabel settlementLabel = new JLabel(getCanvas().getImageIcon(settlement, false));
+        String text = settlement.getLocationName();
+        Tension tension = settlement.getAlarm(getCanvas().getClient().getMyPlayer());
+        if (tension != null) {
+            text += " (" + tension.toString() + ")";
+        } else if (!getCanvas().getClient().getMyPlayer().hasContacted(settlement.getOwner())) {
+            text += " (" + Messages.message("notContacted") + ")";
         }
-        int labelColumn = 2;
-        int valueColumn = 4;
+        settlementLabel.setText(text);
+        add(settlementLabel);
 
-        add(settlementLabel, higConst.rc(2, labelColumn));
-        add(missionaryLabel, higConst.rc(2, valueColumn));
-        add(new JLabel(Messages.message("indianSettlement.learnableSkill")), higConst.rc(4, labelColumn));
-        add(skillLabel, higConst.rc(4, valueColumn));
-        add(new JLabel(Messages.message("indianSettlement.highlyWanted")), higConst.rc(6, labelColumn));
-        add(wantedGoodsLabels[0], higConst.rc(6, valueColumn));
-        add(new JLabel(Messages.message("indianSettlement.otherWanted")), higConst.rc(8, labelColumn));
-        JPanel otherGoodsPanel = new JPanel();
-        otherGoodsPanel.setOpaque(false);
-        otherGoodsPanel.add(wantedGoodsLabels[1]);
-        otherGoodsPanel.add(wantedGoodsLabels[2]);
-        add(otherGoodsPanel, higConst.rc(8, valueColumn));
-        add(okButton, higConst.rcwh(10, 2, 3, 1));
+        Unit missionary = settlement.getMissionary();
+        if (missionary != null) {
+            add(new JLabel(Messages.message("model.unit.nationUnit",
+                                            "%nation%", missionary.getOwner().getNationAsString(),
+                                            "%unit%", missionary.getName()),
+                           getCanvas().getImageIcon(missionary, true), JLabel.CENTER));
+        }
+
+        add(new JLabel(Messages.message("indianSettlement.learnableSkill")), "newline");
+        UnitType skill = settlement.getLearnableSkill();
+        if (skill == null) {
+            if (settlement.hasBeenVisited()) {
+                add(new JLabel(Messages.message("indianSettlement.skillNone")));
+            } else {
+                add(new JLabel(Messages.message("indianSettlement.skillUnknown")));
+            }
+        } else {
+            add(new JLabel(skill.getName(), getCanvas().getImageIcon(skill, true), JLabel.CENTER));
+        }
+
+        GoodsType[] wantedGoods = settlement.getWantedGoods();
+        add(new JLabel(Messages.message("indianSettlement.highlyWanted")), "newline");
+        if (wantedGoods.length > 0 && wantedGoods[0] != null) {
+            add(new JLabel(wantedGoods[0].getName(), getCanvas().getImageIcon(wantedGoods[0], false),
+                           JLabel.CENTER));
+        }
+
+        add(new JLabel(Messages.message("indianSettlement.otherWanted")), "newline");
+        if (wantedGoods.length > 1 && wantedGoods[1] != null) {
+            add(new JLabel(wantedGoods[1].getName(), getCanvas().getImageIcon(wantedGoods[1], false),
+                           JLabel.CENTER),
+                "split " + (wantedGoods.length - 1));
+            for (int index = 2; index < wantedGoods.length; index++) {
+                add(new JLabel(wantedGoods[index].getName(), 
+                               getCanvas().getImageIcon(wantedGoods[index], false),
+                               JLabel.CENTER));
+            }
+        }
+
+        add(okButton, "newline 20, span, tag ok");
+
+        setSize(getPreferredSize());
     }
 
     public void requestFocus() {
         okButton.requestFocus();
-    }
-
-    /**
-     * Initializes the information that is being displayed on this panel. The
-     * information displayed will be based on the given settlement.
-     * 
-     * @param settlement The IndianSettlement whose information should be
-     *            displayed.
-     */
-    public void initialize(IndianSettlement settlement) {
-        Image settlementImage = freeColClient.getImageLibrary().getSettlementImage(settlement);
-        settlementLabel.setIcon(new ImageIcon(settlementImage));
-        String text = settlement.getLocationName();
-        Tension tension = settlement.getAlarm(freeColClient.getMyPlayer());
-        if (tension != null) {
-            text += " (" + tension.toString() + ")";
-        } else if (!freeColClient.getMyPlayer().hasContacted(settlement.getOwner())) {
-            text += " (" + Messages.message("notContacted") + ")";
-        }
-        settlementLabel.setText(text);
-        Unit missionary = settlement.getMissionary();
-        if (missionary != null) {
-            ImageIcon missionaryImage = freeColClient.getImageLibrary().getUnitImageIcon(missionary);
-            missionaryLabel.setIcon(freeColClient.getImageLibrary().getScaledImageIcon(missionaryImage, 0.66f));
-            String missionaryName = missionary.getName() + " (" + missionary.getOwner().getNationAsString() + ")";
-            missionaryLabel.setText(missionaryName);
-        }
-        UnitType skill = settlement.getLearnableSkill();
-        String skillName;
-        if (skill != null) {
-            skillName = skill.getName();
-            ImageIcon skillImage = freeColClient.getImageLibrary().getUnitImageIcon(skill);
-            skillLabel.setIcon(freeColClient.getImageLibrary().getScaledImageIcon(skillImage, 0.66f));
-        } else {
-            skillName = "indianSettlement.skill" + (settlement.hasBeenVisited() ? "None" : "Unknown");
-        }
-        skillLabel.setText(Messages.message(skillName));
-
-        GoodsType[] wantedGoods = settlement.getWantedGoods();
-        for (int i=0; i<wantedGoods.length; i++) {
-            GoodsType g = wantedGoods[i];
-            if (g != null) {
-                wantedGoodsLabels[i].setText(g.getName());
-                wantedGoodsLabels[i].setIcon(freeColClient.getImageLibrary().getScaledGoodsImageIcon(g, 0.66f));
-            }
-        }
-        setSize(getPreferredSize());
     }
 
     /**
