@@ -44,7 +44,8 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.UnitType;
 
-import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * The panel that allows a user to train people in Europe.
@@ -55,40 +56,24 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TrainDialog.class.getName());
 
-    private static final int NUMBER_OF_COLUMNS = 2;
-
     private static final String TRAIN_DONE = "DONE";
 
-    private final Canvas parent;
-
-    private final FreeColClient freeColClient;
-
-    private final InGameController inGameController;
-    
     private final JButton done = new JButton(Messages.message("trainDialog.done"));
 
-    private final JPanel trainPanel = new JPanel(new GridLayout(0, NUMBER_OF_COLUMNS));
+    private final JLabel question;
 
     private final List<UnitType> trainableUnits = new ArrayList<UnitType>();
 
     private final Comparator<UnitType> unitPriceComparator;
 
-    private final int[] buttonWidths = new int[] { 0, 6, 0 };
-    private final int[] buttonHeights;
-    private final HIGLayout buttonLayout;
-
-
     /**
      * The constructor to use.
      */
     public TrainDialog(Canvas parent, EuropePanel.EuropeAction europeAction) {
-        super();
-        this.parent = parent;
-        this.freeColClient = parent.getClient();
-        this.inGameController = freeColClient.getInGameController();
-        setFocusCycleRoot(true);
 
-        final Europe europe = freeColClient.getMyPlayer().getEurope();
+        super(parent);
+
+        final Europe europe = parent.getClient().getMyPlayer().getEurope();
         unitPriceComparator = new Comparator<UnitType>() {
             public int compare(final UnitType type1, final UnitType type2) {
                 return (europe.getUnitPrice(type1) - 
@@ -96,35 +81,23 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             }
         };
 
-        JLabel question;
         switch(europeAction) {
         case TRAIN:
             trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesTrainedInEurope());
-            buttonHeights = new int[] { 22, 22 };
             question = new JLabel(Messages.message("trainDialog.clickOn"));
+            setLayout(new MigLayout("wrap 3", "[sg]", ""));
             break;
         case PURCHASE:
         default:
             trainableUnits.addAll(FreeCol.getSpecification().getUnitTypesPurchasedInEurope());
-            buttonHeights = new int[] { 30, 30 };
             question  = new JLabel(Messages.message("purchaseDialog.clickOn"));
+            setLayout(new MigLayout("wrap 2", "[sg]", ""));
         }
-
-        buttonLayout = new HIGLayout(buttonWidths, buttonHeights);
-        setLayout(new HIGLayout(new int[] { 0 }, new int[] { 0, 3 * margin, 0, 3 * margin, 0 }));
 
         done.setActionCommand(String.valueOf(TRAIN_DONE));
         done.addActionListener(this);
         enterPressesWhenFocused(done);
 
-        add(question, higConst.rc(1, 1, ""));
-        add(trainPanel, higConst.rc(3, 1));
-        add(done, higConst.rc(5, 1, ""));
-
-    }
-
-    public void requestFocus() {
-        done.requestFocus();
     }
 
     /**
@@ -133,12 +106,13 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
      */
     public void initialize() {
 
-        trainPanel.removeAll();
+        removeAll();
+        add(question, "span, wrap 20");
 
-        final Player player = freeColClient.getMyPlayer();
+        final Player player = getCanvas().getClient().getMyPlayer();
         final Europe europe = player.getEurope();
 
-        final ImageLibrary library = parent.getGUI().getImageLibrary();
+        final ImageLibrary library = getCanvas().getGUI().getImageLibrary();
 
         // price may have changed
         Collections.sort(trainableUnits, unitPriceComparator);
@@ -146,7 +120,8 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
         for (UnitType unitType : trainableUnits) {
             int price = europe.getUnitPrice(unitType);
             JButton newButton = new JButton();
-            newButton.setLayout(buttonLayout);
+            newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
+
             ImageIcon unitIcon = library.getUnitImageIcon(unitType, (price > player.getGold()));
             JLabel unitName = new JLabel(unitType.getName());
             JLabel unitPrice = new JLabel(Messages.message("goldAmount", "%amount%", 
@@ -156,18 +131,21 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
                 unitPrice.setEnabled(false);
                 newButton.setEnabled(false);
             }
-            newButton.add(new JLabel(library.getScaledImageIcon(unitIcon, 0.66f)),
-                          higConst.rcwh(1, 1, 1, 2, ""));
-            newButton.add(unitName, higConst.rc(1, 3));
-            newButton.add(unitPrice, higConst.rc(2, 3));
+            newButton.add(new JLabel(library.getScaledImageIcon(unitIcon, 0.66f)), "span 1 2");
+            newButton.add(unitName);
+            newButton.add(unitPrice);
             newButton.setActionCommand(unitType.getId());
             newButton.addActionListener(this);
             enterPressesWhenFocused(newButton);
-            trainPanel.add(newButton);
+            add(newButton, "grow");
         }
-        trainPanel.setSize(trainPanel.getPreferredSize());
+        add(done, "newline 20, span, tag ok");
         setSize(getPreferredSize());
         revalidate();
+    }
+
+    public void requestFocus() {
+        done.requestFocus();
     }
 
     /**
@@ -182,10 +160,10 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             setResponse(new Integer(-1));
         } else {
             UnitType unitType = FreeCol.getSpecification().getUnitType(command);
-            inGameController.trainUnitInEurope(unitType);
-            parent.getEuropePanel().refreshDocks();
-            parent.getEuropePanel().refreshInPort();
-            parent.getEuropePanel().revalidate();
+            getCanvas().getClient().getInGameController().trainUnitInEurope(unitType);
+            getCanvas().getEuropePanel().refreshDocks();
+            getCanvas().getEuropePanel().refreshInPort();
+            getCanvas().getEuropePanel().revalidate();
 
             initialize();
         }
