@@ -32,41 +32,33 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel is displayed when an imporantant event in the game has happened.
  */
 public final class EventPanel extends FreeColDialog<Boolean> implements ActionListener {
 
-
-
     private static final Logger logger = Logger.getLogger(EventPanel.class.getName());
 
-    public static final int FIRST_LANDING = 0;
-
-    public static final int MEETING_NATIVES = 1;
-
-    public static final int MEETING_EUROPEANS = 2;
-
-    public static final int MEETING_AZTEC = 3;
-
-    public static final int MEETING_INCA = 4;
-
-    public static final int DISCOVER_PACIFIC = 5;
+    public static enum EventType {
+        FIRST_LANDING,
+        MEETING_NATIVES,
+        MEETING_EUROPEANS,
+        MEETING_AZTEC,
+        MEETING_INCA,
+        DISCOVER_PACIFIC
+    };
 
     private static final int OK = 0;
-
-    private final FreeColClient freeColClient;
-
-    @SuppressWarnings("unused")
-    private final Canvas parent;
 
     private JLabel header;
 
     private JLabel imageLabel;
 
-    private JButton okButton;
+    private final JButton okButton = new JButton(Messages.message("ok"));;
 
 
     /**
@@ -75,63 +67,60 @@ public final class EventPanel extends FreeColDialog<Boolean> implements ActionLi
      * @param parent The parent of this panel.
      * @param freeColClient The main controller object for the client.
      */
-    public EventPanel(Canvas parent, FreeColClient freeColClient) {
-        this.parent = parent;
-        this.freeColClient = freeColClient;
+    public EventPanel(Canvas parent, EventType type) {
 
-        int[] w = { 0 };
-        int[] h = { 0, 10, 0, 10, 0 };
-        setLayout(new HIGLayout(w, h));
+        super(parent);
 
-        header = new JLabel("", JLabel.CENTER);
-        header.setFont(mediumHeaderFont);
-
-        imageLabel = new JLabel();
-
-        okButton = new JButton(Messages.message("ok"));
         okButton.setActionCommand(String.valueOf(OK));
         okButton.addActionListener(this);
         enterPressesWhenFocused(okButton);
 
-        add(header, higConst.rc(1, 1));
-        add(imageLabel, higConst.rc(3, 1, ""));
-        add(okButton, higConst.rc(5, 1));
+        setLayout(new MigLayout("", "", ""));
+
+        header = new JLabel();
+        header.setFont(mediumHeaderFont);
+
+        imageLabel = new JLabel();
+
+        switch(type) {
+        case FIRST_LANDING:
+            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.firstLanding")));
+            header.setText(Messages.message("event.firstLanding", "%name%",
+                                            parent.getClient().getMyPlayer().getNewLandName()));
+            break;
+        case MEETING_NATIVES:
+            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingNatives")));
+            header.setText(Messages.message("event.meetingNatives"));
+            break;
+        case MEETING_EUROPEANS:
+            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingEuropeans")));
+            header.setText(Messages.message("event.meetingEuropeans"));
+            break;
+        case MEETING_AZTEC:
+            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingAztec")));
+            header.setText(Messages.message("event.meetingAztec"));
+            break;
+        case MEETING_INCA:
+            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingInca")));
+            header.setText(Messages.message("event.meetingInca"));
+            break;
+        case DISCOVER_PACIFIC:
+            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.discoverPacific")));
+            header.setText(Messages.message("model.region.pacific.discover"));
+            break;
+        default:
+            setResponse(Boolean.FALSE);
+        }
+
+        add(header, "align center, wrap 20");
+        add(imageLabel);
+        add(okButton, "newline 20, tag ok");
+
+        setSize(getPreferredSize());
     }
 
     public void requestFocus() {
         okButton.requestFocus();
-    }
-
-    public void initialize(int eventID) {
-        if (eventID == FIRST_LANDING) {
-            Image image = ResourceManager.getImage("EventImage.firstLanding");
-            imageLabel.setIcon(new ImageIcon(image));
-            header.setText(Messages.message("event.firstLanding", "%name%",
-                    freeColClient.getMyPlayer().getNewLandName()));
-        } else if (eventID == MEETING_NATIVES) {
-            Image image = ResourceManager.getImage("EventImage.meetingNatives");
-            imageLabel.setIcon(new ImageIcon(image));
-            header.setText(Messages.message("event.meetingNatives"));
-        } else if (eventID == MEETING_EUROPEANS) {
-            Image image = ResourceManager.getImage("EventImage.meetingEuropeans");
-            imageLabel.setIcon(new ImageIcon(image));
-            header.setText(Messages.message("event.meetingEuropeans"));
-        } else if (eventID == MEETING_AZTEC) {
-            Image image = ResourceManager.getImage("EventImage.meetingAztec");
-            imageLabel.setIcon(new ImageIcon(image));
-            header.setText(Messages.message("event.meetingAztec"));
-        } else if (eventID == MEETING_INCA) {
-            Image image = ResourceManager.getImage("EventImage.meetingInca");
-            imageLabel.setIcon(new ImageIcon(image));
-            header.setText(Messages.message("event.meetingInca"));
-        } else if (eventID == DISCOVER_PACIFIC) {
-            Image image = ResourceManager.getImage("EventImage.discoverPacific");
-            imageLabel.setIcon(new ImageIcon(image));
-            header.setText(Messages.message("model.region.pacific.discover"));
-        } else {
-            setResponse(Boolean.FALSE);
-        }
-        setSize(getPreferredSize());
     }
 
     /**

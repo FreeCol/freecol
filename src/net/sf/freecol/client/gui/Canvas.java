@@ -603,11 +603,11 @@ public final class Canvas extends JDesktopPane {
 
         if (modelMessages.length == 1) {
             String id = modelMessages[0].getId();
-            if ("EventPanel.MEETING_NATIVES".equals(id)) {
-                showEventDialog(EventPanel.MEETING_NATIVES);
+            if (EventPanel.EventType.MEETING_NATIVES.toString().equals(id)) {
+                showFreeColDialog(new EventPanel(this, EventPanel.EventType.MEETING_NATIVES));
                 return;
-            } else if ("EventPanel.MEETING_AZTEC".equals(id)) {
-                showEventDialog(EventPanel.MEETING_AZTEC);
+            } else if (EventPanel.EventType.MEETING_AZTEC.toString().equals(id)) {
+                showFreeColDialog(new EventPanel(this, EventPanel.EventType.MEETING_AZTEC));
                 return;
             }
         }
@@ -1467,25 +1467,6 @@ public final class Canvas extends JDesktopPane {
         colopediaPanel.initialize(panelType, objectType);
         addAsFrame(colopediaPanel);
         colopediaPanel.requestFocus();
-    }
-
-    /**
-     * Shows the {@link EventPanel}.
-     * 
-     * @param eventID The type of <code>EventPanel</code> to be displayed.
-     * @return <code>true</code>.
-     */
-    public boolean showEventDialog(int eventID) {
-        EventPanel eventPanel = new EventPanel(this, freeColClient);
-        eventPanel.initialize(eventID);
-        addAsFrame(eventPanel);
-        eventPanel.requestFocus();
-
-        boolean response = eventPanel.getResponseBoolean();
-
-        remove(eventPanel);
-
-        return response;
     }
 
     /**

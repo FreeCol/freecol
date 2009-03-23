@@ -1908,7 +1908,7 @@ public final class InGameController implements NetworkConstants {
             Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
             setNewLandNameElement.setAttribute("newLandName", newLandName);
             client.sendAndWait(setNewLandNameElement);
-            canvas.showEventDialog(EventPanel.FIRST_LANDING);
+            canvas.showFreeColDialog(new EventPanel(canvas, EventPanel.EventType.FIRST_LANDING));
             unit.getOwner().getHistory()
                 .add(new HistoryEvent(unit.getGame().getTurn().getNumber(),
                                       HistoryEvent.Type.DISCOVER_NEW_WORLD,
@@ -1934,8 +1934,7 @@ public final class InGameController implements NetworkConstants {
             String name = null;
             if (region.isPacific()) {
                 name = Messages.message("model.region.pacific");
-                //canvas.showInformationMessage("model.region.pacific.discover");
-                canvas.showEventDialog(EventPanel.DISCOVER_PACIFIC);
+                canvas.showFreeColDialog(new EventPanel(canvas, EventPanel.EventType.DISCOVER_PACIFIC));
             } else if (unit.getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {
                 String defaultName = unit.getOwner().getDefaultRegionName(region.getType());
                 name = freeColClient.getCanvas().showInputDialog("nameRegion.text", defaultName,
