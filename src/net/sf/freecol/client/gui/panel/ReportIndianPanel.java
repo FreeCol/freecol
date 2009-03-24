@@ -51,7 +51,7 @@ public final class ReportIndianPanel extends ReportPanel {
         reportPanel.setLayout(new GridLayout(0, 1));
         for (Player opponent : getCanvas().getClient().getGame().getPlayers()) {
             if (opponent.isIndian() && !opponent.isDead() && player.hasContacted(opponent)) {
-                add(buildIndianAdvisorPanel(player, opponent));
+                reportPanel.add(buildIndianAdvisorPanel(player, opponent));
             }
         }
         reportPanel.doLayout();
