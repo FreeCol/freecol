@@ -99,19 +99,21 @@ public class BuildColonyMessage extends Message {
         }
         Colony colony = new Colony(game, serverPlayer, colonyName, unit.getTile());
         unit.buildColony(colony);
+        server.sendUpdatedTileToAll(unit.getTile(), serverPlayer);
 
+        // Not changing the protocol yet, but buildColonyConfirmed+colony
+        // is redundant, the client just needs the update.
         Element reply = Message.createNewRootElement("buildColonyConfirmed");
         reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
         Element updateElement = reply.getOwnerDocument().createElement("update");
+        updateElement.appendChild(unit.getTile().toXMLElement(player, reply.getOwnerDocument()));
         int range = colony.getLineOfSight();
         if (range > unit.getLineOfSight()) {
             for (Tile t : game.getMap().getSurroundingTiles(unit.getTile(), range)) {
                 updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
             }
         }
-        updateElement.appendChild(unit.getTile().toXMLElement(player, reply.getOwnerDocument()));
         reply.appendChild(updateElement);
-        server.sendUpdatedTileToAll(unit.getTile(), player);
         return reply;
     }
 

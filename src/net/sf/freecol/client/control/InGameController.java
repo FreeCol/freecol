@@ -473,28 +473,24 @@ public final class InGameController implements NetworkConstants {
         if (reply.getTagName().equals("buildColonyConfirmed")) {
             freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
             Element updateElement = getChildElement(reply, "update");
-            if (updateElement != null) {
-                freeColClient.getInGameInputHandler().update(updateElement);
-            }
-            Element colonyElement = (Element) reply.getFirstChild();
-            Colony colony = (Colony) game.getFreeColGameObject(colonyElement.getAttribute("ID"));
-            if (colony == null) {
-                colony = new Colony(game, colonyElement);
+            if (updateElement == null) {
+                logger.warning("buildColonyConfirmed message missing update");
             } else {
-                colony.readFromXMLElement(colonyElement);
-            }
+                unit.setLocation(null); // new location arriving in update
+                freeColClient.getInGameInputHandler().update(updateElement);
 
-            changeWorkType(unit, Goods.FOOD);
-            
-            ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
-            for(Unit unitInTile : units) {
-                if (unitInTile.canCarryTreasure()) {
-                    checkCashInTreasureTrain(unitInTile);
+                // There should be a colony here now.  Check units present
+                // for treasure cash-in.
+                ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
+                for(Unit unitInTile : units) {
+                    if (unitInTile.canCarryTreasure()) {
+                        checkCashInTreasureTrain(unitInTile);
+                    }
                 }
             }
             
             gui.setActiveUnit(null);
-            gui.setSelectedTile(colony.getTile().getPosition());
+            gui.setSelectedTile(tile.getPosition());
         } else {
             // Handle error message.
         }
