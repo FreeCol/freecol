@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
+import net.sf.freecol.client.gui.panel.VictoryPanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.Map;
@@ -285,6 +286,13 @@ public class DebugMenu extends JMenu {
                 }
             });
         panelMenu.add(monarchPanel);
+        final JMenuItem victoryPanel = new JMenuItem("Display Victory panel");
+        monarchPanel.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    canvas.showPanel(new VictoryPanel(canvas));
+                }
+            });
+        panelMenu.add(victoryPanel);
         add(panelMenu);
 
         final JMenuItem europeStatus = new JMenuItem("Display Europe Status");

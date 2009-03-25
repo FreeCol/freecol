@@ -32,7 +32,9 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel gets displayed to the player who have won the game.
@@ -42,8 +44,6 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
     private static final Logger logger = Logger.getLogger(VictoryPanel.class.getName());
 
     private static final int OK = 0, CONTINUE = 1;
-
-    private final Canvas parent;
 
     private Box buttonsBox = Box.createHorizontalBox();
             
@@ -57,47 +57,33 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
      * @param parent The parent of this panel.
      */
     public VictoryPanel(Canvas parent) {
-        this.parent = parent;
-        
-        int[] widths = { 0 };
-        int[] heights = { 0, margin, 0, margin, 0 };
 
-        setLayout(new HIGLayout(widths, heights));
+        super(parent);
+        
+        setLayout(new MigLayout("wrap 1", "", ""));
         setCancelComponent(ok);
 
-        JLabel victoryLabel = getDefaultHeader(Messages.message("victory.text"));
+        add(getDefaultHeader(Messages.message("victory.text")), "align center, wrap 20");
 
         Image tempImage = ResourceManager.getImage("VictoryImage");
-        JLabel imageLabel;
-
         if (tempImage != null) {
-            imageLabel = new JLabel(new ImageIcon(tempImage));
-        } else {
-            imageLabel = new JLabel("");
+            add(new JLabel(new ImageIcon(tempImage)), "align center");
         }
-
-        int row = 1;
-        int column = 1;
-        
-        add(victoryLabel, higConst.rc(row, column));
-        row += 2;
-        add(imageLabel, higConst.rc(row, column));
-        row += 2;
-        add(buttonsBox, higConst.rc(row, column));
 
         ok.setActionCommand(String.valueOf(OK));
         ok.addActionListener(this);
+        enterPressesWhenFocused(ok);
+
         continueButton.setActionCommand(String.valueOf(CONTINUE));
         continueButton.addActionListener(this);
-        enterPressesWhenFocused(ok);
         enterPressesWhenFocused(continueButton);
 
-        buttonsBox.removeAll();
         if (parent.getClient().isSingleplayer()) {
-            buttonsBox.add(continueButton);
-            buttonsBox.add(Box.createGlue());
+            add(ok, "newline 20, split 2");
+            add(continueButton);
+        } else {
+            add(ok, "newline 20");
         }
-        buttonsBox.add(ok);
         setSize(getPreferredSize());
     }
 
@@ -116,19 +102,19 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                if(parent.getClient().retire()){
-                    parent.showInformationMessage("highscores.new");
-                    parent.showPanel(new ReportHighScoresPanel(parent));
+                if(getCanvas().getClient().retire()){
+                    getCanvas().showInformationMessage("highscores.new");
+                    getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
                 }
-                parent.quit();
+                getCanvas().quit();
                 break;
             case CONTINUE:
-                if(parent.getClient().retire()){
-                    parent.showInformationMessage("highscores.new");
-                    parent.showPanel(new ReportHighScoresPanel(parent));
+                if(getCanvas().getClient().retire()){
+                    getCanvas().showInformationMessage("highscores.new");
+                    getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
                 }
-                parent.getClient().continuePlaying();
-                parent.remove(this);
+                getCanvas().getClient().continuePlaying();
+                getCanvas().remove(this);
                 break;
             default:
                 logger.warning("Invalid ActionCommand: invalid number.");
