@@ -37,7 +37,9 @@ import javax.swing.table.TableCellEditor;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
 * A table cell editor that can be used to edit colors.
@@ -81,11 +83,11 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
             JButton okButton = new JButton( Messages.message("ok") );
             JButton cancelButton = new JButton( Messages.message("cancel") );
 
-            setLayout(new HIGLayout(new int[] {220, 10, 220}, new int[] {350, 10, 0}));
+            setLayout(new MigLayout("", "", ""));
 
-            add(colorChooser, higConst.rcwh(1, 1, 3, 1));
-            add(okButton, higConst.rc(3, 1));
-            add(cancelButton, higConst.rc(3, 3));
+            add(colorChooser);
+            add(okButton, "newline 20, split 2, tag ok");
+            add(cancelButton);
 
             okButton.setActionCommand(OK);
             cancelButton.setActionCommand(CANCEL);
