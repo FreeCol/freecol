@@ -1426,9 +1426,13 @@ public final class InGameController implements NetworkConstants {
             tradeType = canvas.showIndianSettlementTradeDialog(canBuy,canSell,canGift);            
         }
         closeTransactionSession(unit,settlement);
-        // no action taken, restore movement points
-        if(!actionTaken){
+        // if no action taken, restore movement points
+        GUI gui = freeColClient.getGUI();
+        if (actionTaken) {
+            gui.setActiveUnit(null);
+        } else {
             unit.setMovesLeft(initialUnitMoves);
+            gui.setActiveUnit(unit);
         }
     }
 
