@@ -87,28 +87,11 @@ public class CloseTransactionMessage extends Message {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = player.getGame();
         Unit unit = server.getUnitSafely(unitId, serverPlayer);
-        if (unit.getTile() == null) {
-            throw new IllegalStateException("Unit is not on the map: " + unitId);
-        }
-        if (settlementId == null) {
-            throw new IllegalStateException("settlementId is null");
-        } else if (!(game.getFreeColGameObject(settlementId) instanceof Settlement)) {
-            throw new IllegalStateException("Not a Settlement: " + settlementId);
-        }
-        Settlement settlement = (Settlement) game.getFreeColGameObject(settlementId);
-        if (settlement.getTile() == null) {
-            throw new IllegalStateException("Settlement is not on the map: " + settlementId);
-        }
-        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Unit " + unitId + " is not adjacent to settlement " + settlementId);
-        }
-        if (settlement.getOwner().isIndian() && !player.hasContacted(settlement.getOwner())) {
-            throw new IllegalStateException("Player has not established contact with the " + settlement.getOwner().getNationAsString());
-        }
-
+        Settlement settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
         InGameController controller = (InGameController) server.getController();
+
         if (!controller.isTransactionSessionOpen(unit, settlement)) {
-            throw new IllegalStateException("Trying to close a non-exitant session.");
+            throw new IllegalStateException("Trying to close a non-existant session.");
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
         // restore unit movements if no action made

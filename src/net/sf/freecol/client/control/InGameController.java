@@ -1426,7 +1426,8 @@ public final class InGameController implements NetworkConstants {
             // Still has options for trade, show the main menu again
             tradeType = canvas.showIndianSettlementTradeDialog(canBuy,canSell,canGift);            
         }
-        closeTransactionSession(unit,settlement);
+        freeColClient.getClient().ask(new CloseTransactionMessage(unit, settlement).toXMLElement());
+
         // if no action taken, restore movement points
         GUI gui = freeColClient.getGUI();
         if (actionTaken) {
@@ -1438,8 +1439,7 @@ public final class InGameController implements NetworkConstants {
     }
 
     private java.util.Map<String,Boolean> getTransactionSession(Unit unit, Settlement settlement){
-        Element transactionElement = new GetTransactionMessage(unit, settlement).toXMLElement();
-        Element reply = freeColClient.getClient().ask(transactionElement);
+        Element reply = freeColClient.getClient().ask(new GetTransactionMessage(unit, settlement).toXMLElement());
 
         if (reply == null || !reply.getTagName().equals("getTransactionAnswer")) {
             logger.warning("Illegal reply to getTransaction.");
@@ -1455,10 +1455,6 @@ public final class InGameController implements NetworkConstants {
         return transactionSession;
     }
 
-    private void closeTransactionSession(Unit unit, Settlement settlement){
-        freeColClient.getClient().ask(new CloseTransactionMessage(unit, settlement).toXMLElement());
-    }
-    
     private ArrayList<Goods> getGoodsForSaleInIndianSettlement(Unit unit, Settlement settlement){
         // Get goods for sale from server
         Element reply = freeColClient.getClient().ask(new GoodsForSaleMessage(unit, settlement).toXMLElement());
