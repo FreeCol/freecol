@@ -80,6 +80,7 @@ import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
+import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -361,10 +362,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return trade(connection, element);
             }
         });
-        register("goodsForSale", new CurrentPlayerNetworkRequestHandler() {
+        register(GoodsForSaleMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return goodsForSaleRequest(connection, element);
+                return new GoodsForSaleMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("buyProposition", new CurrentPlayerNetworkRequestHandler() {
@@ -2705,38 +2706,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
         
         return null;
-    }
-    
-    /**
-     * Handles a "goodsForSale"-message
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element goodsForSaleRequest(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        IndianSettlement settlement = (IndianSettlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
-        
-        checkGeneralCondForTradeQuery(element, player, unit, settlement, null);
-
-        if (!(settlement instanceof IndianSettlement)) { 
-            throw new IllegalStateException("Settlement not an Indian Settlement");
-        }
-        
-        AIPlayer aiPlayer = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
-
-        // Send reply
-        Element reply = Message.createNewRootElement("goodsForSaleAnswer");
-        List<Goods> goodsForSale = (settlement).getSellGoods();
-        if (!goodsForSale.isEmpty()) {
-            for (Goods goods : goodsForSale) {
-                aiPlayer.registerSellGoods(goods);
-                reply.appendChild(goods.toXMLElement(null, reply.getOwnerDocument()));
-            }
-        }
-        return reply;
     }
     
     /**

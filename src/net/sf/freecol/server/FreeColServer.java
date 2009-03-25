@@ -60,8 +60,10 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HighScore;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -1121,7 +1123,8 @@ public final class FreeColServer {
      * @param serverPlayer The <code>ServerPlayer</code> to whom the unit must belong.
      *
      * @return The unit corresponding to the unitId argument.
-     * @throws IllegalStateException on failure to validate the unitId in any way.
+     * @throws IllegalStateException on failure to validate the unitId
+     *         in any way.
      *         In the worst case this may be indicative of a malign client.
      */
     public Unit getUnitSafely(String unitId, ServerPlayer serverPlayer) {
@@ -1139,6 +1142,74 @@ public final class FreeColServer {
             throw new IllegalStateException("Not the owner of unit: " + unitId);
         }
         return unit;
+    }
+
+    /**
+     * Get a settlement by ID, validating the ID as much as possible.
+     * Designed for message unpacking where the ID should not be trusted.
+     *
+     * @param settlementId The ID of the <code>Settlement</code> to be found.
+     * @param unit A <code>Unit</code> which must be adjacent
+     *             to the <code>Settlement</code>.
+     *
+     * @return The settlement corresponding to the settlementId argument.
+     * @throws IllegalStateException on failure to validate the settlementId
+     *         in any way.
+     *         In the worst case this may be indicative of a malign client.
+     */
+    public Settlement getAdjacentSettlementSafely(String settlementId, Unit unit) {
+        Game game = unit.getOwner().getGame();
+        Settlement settlement;
+
+        if (settlementId == null) {
+            throw new IllegalStateException("settlementId is null");
+        } else if (!(game.getFreeColGameObject(settlementId) instanceof Settlement)) {
+            throw new IllegalStateException("Not a Settlement: " + settlementId);
+        }
+        settlement = (Settlement) game.getFreeColGameObject(settlementId);
+        if (settlement.getTile() == null) {
+            throw new IllegalStateException("Settlement is not on the map: "
+                                            + settlementId);
+        }
+        if (unit.getTile() == null) {
+            throw new IllegalStateException("Unit is not on the map: "
+                                            + unit.getId());
+        }
+        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
+            throw new IllegalStateException("Unit " + unit.getId()
+                                            + " is not adjacent to settlement " + settlementId);
+        }
+        if (unit.getOwner() == settlement.getOwner()) {
+            throw new IllegalStateException("Unit " + unit.getId()
+                                            + " and settlement " + settlementId
+                                            + " are owned by the same player.");
+        }
+        return settlement;
+    }
+
+    /**
+     * Get an adjacent Indian settlement by ID, validating as much as possible,
+     * including checking whether the nation involved has been contacted.
+     * Designed for message unpacking where the ID should not be trusted.
+     *
+     * @param settlementId The ID of the <code>Settlement</code> to be found.
+     * @param unit A <code>Unit</code> which must be adjacent
+     *             to the <code>Settlement</code>.
+     *
+     * @return The settlement corresponding to the settlementId argument.
+     * @throws IllegalStateException on failure to validate the settlementId
+     *         in any way.
+     *         In the worst case this may be indicative of a malign client.
+     */
+    public IndianSettlement getAdjacentIndianSettlementSafely(String settlementId, Unit unit) {
+        Settlement settlement = getAdjacentSettlementSafely(settlementId, unit);
+        if (!(settlement instanceof IndianSettlement)) {
+            throw new IllegalStateException("Not an IndianSettlement: " + settlementId);
+        }
+        if (!unit.getOwner().hasContacted(settlement.getOwner())) {
+            throw new IllegalStateException("Player has not established contact with the " + settlement.getOwner().getNationAsString());
+        }
+        return (IndianSettlement) settlement;
     }
 
 

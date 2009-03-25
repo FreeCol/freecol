@@ -108,6 +108,7 @@ import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DiplomaticTradeMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
+import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.RenameMessage;
@@ -1460,16 +1461,10 @@ public final class InGameController implements NetworkConstants {
     
     private ArrayList<Goods> getGoodsForSaleInIndianSettlement(Unit unit, Settlement settlement){
         // Get goods for sale from server
-        Element goodsForSaleElement = Message.createNewRootElement("goodsForSale");
-        goodsForSaleElement.setAttribute("unit", unit.getId());
-        goodsForSaleElement.setAttribute("settlement", settlement.getId());
+        Element reply = freeColClient.getClient().ask(new GoodsForSaleMessage(unit, settlement).toXMLElement());
 
-        Client client = freeColClient.getClient();
-        Element reply = client.ask(goodsForSaleElement);
-
-        if (reply == null || !reply.getTagName().equals("goodsForSaleAnswer")) {
-            logger.warning("Illegal reply to goodsForSale.");
-            throw new IllegalStateException();
+        if (reply == null || !reply.getTagName().equals(GoodsForSaleMessage.getXMLElementTagName())) {
+            throw new IllegalStateException("Illegal reply to goodsForSale message.");
         }
 
         // Get goods for sell from server response
