@@ -81,10 +81,7 @@ public class Game extends FreeColGameObject {
      * The next available ID, that can be given to a new
      * <code>FreeColGameObject</code>.
      */
-    private int nextId = 1;
-
-    /** Indicates whether or not this object may give IDs. */
-    protected boolean canGiveID;
+    protected int nextId = 1;
 
     private Turn turn = new Turn(1);
 
@@ -166,7 +163,6 @@ public class Game extends FreeColGameObject {
 
         this.modelController = modelController;
         this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
-        canGiveID = false;
         readFromXML(in);
         this.viewOwner = getPlayerByName(viewOwnerUsername);
     }
@@ -286,22 +282,6 @@ public class Game extends FreeColGameObject {
      */
     public final void setCombatModel(final CombatModel newCombatModel) {
         this.combatModel = newCombatModel;
-    }
-
-    /**
-     * Get a unique ID to identify a <code>FreeColGameObject</code>.
-     * 
-     * @return A unique ID.
-     */
-    public String getNextID() {
-        if (canGiveID) {
-            String id = Integer.toString(nextId);
-            nextId++;
-
-            return id;
-        } else {
-            throw new Error("The client's \"Game\" was requested to give out an id.");
-        }
     }
 
     /**

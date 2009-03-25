@@ -64,7 +64,6 @@ public class ServerGame extends Game {
         gameOptions = new GameOptions();
 
         currentPlayer = null;
-        canGiveID = true;
         //market = new Market(this);
     }
 
@@ -93,8 +92,6 @@ public class ServerGame extends Game {
             this.combatModel = new SimpleCombatModel(modelController.getPseudoRandom());
         }
         this.viewOwner = null;
-
-        canGiveID = true;
 
         for (FreeColGameObject object : fcgos) {
             object.setGame(this);
@@ -136,5 +133,16 @@ public class ServerGame extends Game {
      * 
      * readFromXMLElement(e); }
      */
+
+    /**
+     * Get a unique ID to identify a <code>FreeColGameObject</code>.
+     * 
+     * @return A unique ID.
+     */
+    public String getNextID() {
+        String id = Integer.toString(nextId);
+        nextId++;
+        return id;
+    }
 
 }

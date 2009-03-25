@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.server.model.ServerGame;
 
 import org.w3c.dom.Element;
 
@@ -57,8 +58,8 @@ abstract public class FreeColGameObject extends FreeColObject {
     public FreeColGameObject(Game game) {
         this.game = game;
 
-        if (game != null) {
-            setId(getRealXMLElementTagName() + ":" + game.getNextID());
+        if (game != null && game instanceof ServerGame) {
+            setId(getRealXMLElementTagName() + ":" + ((ServerGame)game).getNextID());
         } else if (this instanceof Game) {
             setId("0");
         } else {
