@@ -87,7 +87,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
 
             add(colorChooser);
             add(okButton, "newline 20, split 2, tag ok");
-            add(cancelButton);
+            add(cancelButton, "tag cancel");
 
             okButton.setActionCommand(OK);
             cancelButton.setActionCommand(CANCEL);
