@@ -99,7 +99,7 @@ public class BuildColonyMessage extends Message {
         }
         Colony colony = new Colony(game, serverPlayer, colonyName, unit.getTile());
         unit.buildColony(colony);
-        server.sendUpdatedTileToAll(unit.getTile(), serverPlayer);
+        server.getInGameInputHandler().sendUpdatedTileToAll(unit.getTile(), serverPlayer);
 
         // Not changing the protocol yet, but buildColonyConfirmed+colony
         // is redundant, the client just needs the update.

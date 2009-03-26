@@ -1090,32 +1090,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Describe <code>sendUpdatedTileToAll</code> method here.
-     *
-     * @param newTile a <code>Tile</code> value
-     * @param player a <code>Player</code> value
-     */
-    public void sendUpdatedTileToAll(Tile newTile, Player player) {
-        // TODO: can Player be null?
-        for (Player enemy : getGame().getPlayers()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemy;
-            if (player != null && player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
-            try {
-                if (enemyPlayer.canSee(newTile)) {
-                    Element updateElement = Message.createNewRootElement("update");
-                    updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                    enemyPlayer.getConnection().sendAndWait(updateElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                        + enemyPlayer.getConnection());
-            }
-        }
-    }
-
-    /**
      * Get a unit by ID, validating the ID as much as possible.  Designed for
      * message unpacking where the ID should not be trusted.
      *
