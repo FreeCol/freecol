@@ -1431,7 +1431,7 @@ public final class InGameController implements NetworkConstants {
         // if no action taken, restore movement points
         GUI gui = freeColClient.getGUI();
         if (actionTaken) {
-            gui.setActiveUnit(null);
+            nextActiveUnit();
         } else {
             unit.setMovesLeft(initialUnitMoves);
             gui.setActiveUnit(unit);
