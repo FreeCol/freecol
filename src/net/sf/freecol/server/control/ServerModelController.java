@@ -339,7 +339,7 @@ public class ServerModelController implements ModelController {
 
         try {
             player.getConnection().send(updateElement);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warning("Could not send message to: " + player.getName() + " with connection "
                     + player.getConnection());
         }
