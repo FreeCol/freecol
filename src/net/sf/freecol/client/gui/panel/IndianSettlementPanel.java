@@ -34,6 +34,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -66,11 +67,18 @@ public final class IndianSettlementPanel extends FreeColDialog<Boolean> implemen
         okButton.addActionListener(this);
 
         JLabel settlementLabel = new JLabel(getCanvas().getImageIcon(settlement, false));
+        Player indian = settlement.getOwner();
         String text = settlement.getLocationName();
+        if (settlement.isCapital()){
+            text += ", "+Messages.message("indianCapital", "%nation%", indian.getNationAsString());
+        } else {
+            text += ", "+Messages.message("indianSettlement", "%nation%", indian.getNationAsString());
+        }
+
         Tension tension = settlement.getAlarm(getCanvas().getClient().getMyPlayer());
         if (tension != null) {
             text += " (" + tension.toString() + ")";
-        } else if (!getCanvas().getClient().getMyPlayer().hasContacted(settlement.getOwner())) {
+        } else if (!getCanvas().getClient().getMyPlayer().hasContacted(indian)) {
             text += " (" + Messages.message("notContacted") + ")";
         }
         settlementLabel.setText(text);
