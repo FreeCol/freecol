@@ -327,6 +327,13 @@ public class ClientOptions extends OptionMap {
     public static final String AUTO_END_TURN = "model.option.autoEndTurn";
 
     /**
+     * The type of labour report to display.
+     */
+    public static final String LABOUR_REPORT = "model.option.labourReport";
+    public static final int LABOUR_REPORT_CLASSIC = 0;
+    public static final int LABOUR_REPORT_COMPACT = 1;
+
+    /**
      * Comparators for sorting colonies.
      */
     private static Comparator<Colony> colonyAgeComparator = new Comparator<Colony>() {

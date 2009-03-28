@@ -1897,8 +1897,8 @@
       <!-- Option for activating autoscroll when dragging units on the mapboard. -->
       <booleanOption id="model.option.mapScrollOnDrag" defaultValue="true"/>
       <!-- Option for autoscrolling when hitting the boundaries of the mapboard -->
-	  <booleanOption id="model.option.autoScroll" defaultValue="true"/>
-	  <!-- Whether to display a compass rose or not. -->
+      <booleanOption id="model.option.autoScroll" defaultValue="true"/>
+      <!-- Whether to display a compass rose or not. -->
       <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
       <!-- Whether to display the map controls by default or not. -->
       <booleanOption id="model.option.displayMapControls" defaultValue="true"/>
@@ -2007,6 +2007,11 @@
       <booleanOption id="model.option.autoloadEmigrants" defaultValue="false"/>
       <!-- If enabled: Automatically ends the turn when no units can be made active. -->
       <booleanOption id="model.option.autoEndTurn" defaultValue="true"/>
+      <!-- Type of labour report. -->
+      <selectOption id="model.option.labourReport" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.labourReport.classic" value="0"/>
+        <selectValue label="clientOptions.labourReport.compact" value="1"/>
+      </selectOption>
     </optionGroup>
     <optionGroup id="mapGeneratorOptions.import" >
       <!-- Option for setting a file to be imported (map etc). -->

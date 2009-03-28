@@ -27,7 +27,9 @@ import java.util.logging.Logger;
 
 import javax.swing.KeyStroke;
 
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.panel.CompactLabourReport;
 import net.sf.freecol.client.gui.panel.ReportLabourPanel;
 
 
@@ -72,6 +74,11 @@ public class ReportLabourAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showPanel(new ReportLabourPanel(freeColClient.getCanvas()));
+        if (freeColClient.getClientOptions().getInteger(ClientOptions.LABOUR_REPORT) ==
+            ClientOptions.LABOUR_REPORT_CLASSIC) {
+            freeColClient.getCanvas().showPanel(new ReportLabourPanel(freeColClient.getCanvas()));
+        } else {
+            freeColClient.getCanvas().showPanel(new CompactLabourReport(freeColClient.getCanvas()));
+        }
     }
 }
