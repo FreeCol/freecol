@@ -1710,14 +1710,8 @@ public final class GUI {
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
         for (Direction direction : Direction.values()) {
-            Map.Position p = Map.getAdjacent(pos, direction);
-            if (map.isValid(p)) {
-                Tile borderingTile = map.getTile(p.x, p.y);
-                if (borderingTile == null) {
-                    // this really shouldn't happen
-                    logger.warning("Bordering Tile was null.");
-                    continue;
-                }
+            Tile borderingTile = map.getAdjacentTile(pos, direction);
+            if (borderingTile!=null) {
 
                 if (!drawUnexploredBorders && !borderingTile.isExplored() &&
                     (direction == Direction.SE || direction == Direction.S ||
@@ -1946,9 +1940,8 @@ public final class GUI {
                     long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
                     boolean connectedRoad = false;
                     for (Direction direction : Direction.values()) {
-                        Map.Position p = Map.getAdjacent(pos, direction);
-                        if (map.isValid(p)) {
-                            Tile borderingTile = map.getTile(p);
+                        Tile borderingTile = map.getAdjacentTile(pos, direction);
+                        if (borderingTile!=null) {
                             if (borderingTile.hasRoad()) {
                                 connectedRoad =  true;
                                 int nx = x + tileWidth/2;
@@ -2139,11 +2132,10 @@ public final class GUI {
             Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
             for (Direction direction : Direction.values()) {
-                Map.Position p = Map.getAdjacent(pos, direction);
-                if (map.isValid(p)) {
-                    Tile borderingTile = map.getTile(p);
+                Tile borderingTile = map.getAdjacentTile(pos, direction);
+                if (borderingTile!=null) {
 
-                    if (borderingTile == null || borderingTile.isExplored()){
+                    if (borderingTile.isExplored()){
                         continue;
                     }
 

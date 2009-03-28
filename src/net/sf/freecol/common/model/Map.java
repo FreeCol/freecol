@@ -1205,6 +1205,22 @@ public class Map extends FreeColGameObject {
                                direction.getOddDY() : direction.getEvenDY());
          return new Position(x, y);
      }
+     
+     /**
+      * Gets the position adjacent Tile to a given Tile, in a given
+      * direction.
+      *
+      * @param position The position
+      * @param direction The direction (N, NE, E, etc.)
+      * @return Adjacent tile
+      */
+      public Tile getAdjacentTile(Position position, Direction direction) {
+          int x = position.x + ((position.y & 1) != 0 ?
+                                direction.getOddDX() : direction.getEvenDX());
+          int y = position.y + ((position.y & 1) != 0 ?
+                                direction.getOddDY() : direction.getEvenDY());
+          return this.getTile(x, y);
+      }
 
     /**
      * Get an adjacent iterator.
