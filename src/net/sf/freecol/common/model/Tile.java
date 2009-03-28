@@ -277,10 +277,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             CircleIterator mapIterator = getMap().getCircleIterator(getPosition(), true, radius);
             while (mapIterator.hasNext()) {
                 nearSettlement = getMap().getTile(mapIterator.nextPosition()).getSettlement();
-                if (nearSettlement != null && nearSettlement instanceof Colony) {
-                    String name = ((Colony) nearSettlement).getName();
+                if (nearSettlement != null) {
                     return getName() + " ("
-                        + Messages.message("nearLocation","%location%", name) + ")";
+                        + Messages.message("nearLocation", "%location%",
+                                           nearSettlement.getName()) + ")";
                 }
             }
             if (region != null && region.getName() != null) {
