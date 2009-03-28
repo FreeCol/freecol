@@ -22,11 +22,14 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -50,7 +53,10 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.Utils;
+
 import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This is the panel that shows more details about the currently selected unit
@@ -256,94 +262,15 @@ public final class InfoPanel extends FreeColPanel {
      */
     public class TileInfoPanel extends JPanel {
         
-        private final JLabel tileLabel, tileNameLabel, bonusLabel,
-                riverRoadLabel, plowOwnerLabel, movementLabel;
-        
-        private final JPanel picturePanel, labelPanel, goodsPanel;
-        
         private Tile tile;
-        
+        private Font font = getFont().deriveFont(9f);
         
         public TileInfoPanel() {
             super(null);
             
-            picturePanel = new JPanel(new BorderLayout());
-            picturePanel.setOpaque(false);
-            picturePanel.setSize(130, 100);
-            picturePanel.setLocation(0, 0);
-            tileLabel = new JLabel();
-            tileLabel.setHorizontalAlignment(JLabel.CENTER);
-            tileLabel.setVerticalAlignment(JLabel.CENTER);
-            picturePanel.add(tileLabel, BorderLayout.CENTER);
-            add(picturePanel);
-            
-            int[] widths_goods = { 0, 0, 0 };
-            int[] heights_goods = { 0, 0 };
-            goodsPanel = new JPanel(new HIGLayout(widths_goods, heights_goods));
-            goodsPanel.setOpaque(false);
-            
-            int[] widths = { 0 };
-            int[] heights = new int[8];
-            labelPanel = new JPanel(new HIGLayout(widths, heights));
-            labelPanel.setOpaque(false);
-            
-            tileNameLabel = new JLabel();
-            bonusLabel = new JLabel();
-            riverRoadLabel = new JLabel();
-            plowOwnerLabel = new JLabel();
-            movementLabel = new JLabel();
-            
-            tileLabel.setFocusable(false);
-            tileNameLabel.setFocusable(false);
-            bonusLabel.setFocusable(false);
-            riverRoadLabel.setFocusable(false);
-            plowOwnerLabel.setFocusable(false);
-            movementLabel.setFocusable(false);
-            
-            bonusLabel.setFont(bonusLabel.getFont().deriveFont(9f));
-            riverRoadLabel.setFont(riverRoadLabel.getFont().deriveFont(9f));
-            plowOwnerLabel.setFont(plowOwnerLabel.getFont().deriveFont(9f));
-            movementLabel.setFont(movementLabel.getFont().deriveFont(9f));
-
-            labelPanel.setSize(100, 100);
-            labelPanel.setLocation(130, 10);// (100-labelPanel.getHeight())/2);
-            add(labelPanel);
-            
             setSize(226, 100);
             setOpaque(false);
-        }
-        
-        /**
-         * Returns the basic movement cost of the tile
-         * @return the basic movement cost of the tile
-         */
-        private int getMovementCost(Tile tile) {
-            return tile.getType().getBasicMoveCost();
-        }
-        
-        /**
-         * Adds the goods produced by the tile
-         */
-        private void addProducedGoods(Tile tile) {
-            int counter = 1;
-            int row = 1;
-            goodsPanel.removeAll();
-            List<AbstractGoods> production = tile.getType().getProduction();
-            for (AbstractGoods goods : production) {
-                JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goods.getType(), null)),
-                                               library.getScaledGoodsImageIcon(goods.getType(), 0.50f),
-                                               JLabel.RIGHT);
-                goodsLabel.setToolTipText(goods.getType().getName());
-                goodsLabel.setFont(goodsLabel.getFont().deriveFont(9f));
-                goodsPanel.add(goodsLabel, higConst.rc(row, counter));
-                if (counter == 3) {
-                    row++;
-                    counter = 1;
-                } else {
-                    counter++;
-                }
-            }
-            goodsPanel.validate();
+            setLayout(new MigLayout("fill, wrap 2, gap 0 0", "", "[][][][][nogrid]"));
         }
         
         /**
@@ -352,69 +279,62 @@ public final class InfoPanel extends FreeColPanel {
          * @param tile The displayed tile (or null if none)
          */
         public void update(Tile tile) {
+
             this.tile = tile;
             
-            labelPanel.removeAll();
-            if (tile != null) {
-                if (tile.isExplored()) {
-                    tileNameLabel.setText(tile.getName());
-                    labelPanel.add(tileNameLabel, higConst.rc(1, 1));
-                    StringBuilder text = new StringBuilder();
-                    int row = 2;
-                    for (TileImprovement tileImprovement : tile.getCompletedTileImprovements()) {
-                        text.append(tileImprovement.getType().getDescription());
-                        text.append(", ");
-                    }
-                    if (tile.getOwner() != null) {
-                        text.append(tile.getOwner().getNationAsString());
-                    } else {
-                        int length = text.length();
-                        if (length > 2) {
-                            text.delete(length - 2, length);
-                        }
-                    }
+            removeAll();
 
-                    if (text.length() > 0) {
-                        plowOwnerLabel.setText(text.toString());
-                        labelPanel.add(plowOwnerLabel, higConst.rc(row, 1));
-                        row++;
+            if (tile != null) {
+                int width = library.getTerrainImageWidth(tile.getType());
+                int height = library.getTerrainImageHeight(tile.getType());
+                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                freeColClient.getGUI().displayTerrain(image.createGraphics(), 
+                                                      freeColClient.getGame().getMap(),
+                                                      tile, 0, 0);
+                if (tile.isExplored()) {
+                    List<String> items = new ArrayList<String>();
+                    items.add(tile.getName());
+                    for (TileImprovement tileImprovement : tile.getCompletedTileImprovements()) {
+                        items.add(tileImprovement.getType().getDescription());
+                    }
+                    add(new JLabel(Utils.join(", ", items)), "span, align center");
+
+                    add(new JLabel(new ImageIcon(image)), "span 1 3");
+                    if (tile.getOwner() == null) {
+                        add(new JLabel());
+                    } else {
+                        JLabel ownerLabel = new JLabel(tile.getOwner().getNationAsString());
+                        ownerLabel.setFont(font);
+                        add(ownerLabel);
                     }
 
                     int defenceBonus = (int) tile.getType().getFeatureContainer()
                         .applyModifier(100, "model.modifier.defence") - 100;
-                    bonusLabel.setText(Messages.message("colopedia.terrain.defenseBonus") +
-                                       " " + defenceBonus + "%");
-                    labelPanel.add(bonusLabel, higConst.rc(row, 1));
-                    row++;
+                    JLabel defenceLabel = new JLabel(Messages.message("colopedia.terrain.defenseBonus") +
+                                                     " " + defenceBonus + "%");
+                    defenceLabel.setFont(font);
+                    add(defenceLabel);
+                    JLabel moveLabel = new JLabel(Messages.message("colopedia.terrain.movementCost") +
+                                                  " " + String.valueOf(tile.getType().getBasicMoveCost()/3));
+                    moveLabel.setFont(font);
+                    add(moveLabel);
 
-                    movementLabel.setText(Messages.message("colopedia.terrain.movementCost") +
-                                          " " + String.valueOf(getMovementCost(tile)/3));
-                    labelPanel.add(movementLabel, higConst.rc(row, 1));
-                    row++;
-
-                    labelPanel.add(goodsPanel, higConst.rc(row, 1));
-                    addProducedGoods(tile);
-                
-                    int width = library.getTerrainImageWidth(tile.getType());
-                    int height = library.getTerrainImageHeight(tile.getType());
-                    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                    freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(),
-                                                          tile, 0, 0);
-                    tileLabel.setIcon(new ImageIcon(image));
+                    List<AbstractGoods> production = tile.getType().getProduction();
+                    for (AbstractGoods goods : production) {
+                        JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goods.getType(), null)),
+                                                       library.getScaledGoodsImageIcon(goods.getType(), 0.50f),
+                                                       JLabel.RIGHT);
+                        goodsLabel.setToolTipText(goods.getType().getName());
+                        goodsLabel.setFont(font);
+                        add(goodsLabel);
+                    }
                 } else {
-                    tileNameLabel.setText("Unexplored");
-                    labelPanel.add(tileNameLabel, higConst.rc(1, 1));
-                    int width = library.getTerrainImageWidth(tile.getType());
-                    int height = library.getTerrainImageHeight(tile.getType());
-                    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                    freeColClient.getGUI().displayTerrain(image.createGraphics(), freeColClient.getGame().getMap(),
-                                                          tile, 0, 0);
-                    tileLabel.setIcon(new ImageIcon(image));
+                    add(new JLabel(Messages.message("unexplored")), "span, align center");
+                    add(new JLabel(new ImageIcon(image)), "spany");
                 }
-            } else {
-                tileLabel.setIcon(null);
+                revalidate();
+                repaint();
             }
-            labelPanel.validate();
         }
         
         /**
