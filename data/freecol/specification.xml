@@ -1808,7 +1808,7 @@
       <!-- Option for activating autoscroll when dragging units on the mapboard. -->
       <booleanOption id="model.option.mapScrollOnDrag" defaultValue="true"/>
       <!-- Option for autoscrolling when hitting the boundaries of the mapboard -->
-	  <booleanOption id="model.option.autoScroll" defaultValue="true"/>
+	  <booleanOption id="model.option.autoScroll" defaultValue="false"/>
 	  <!-- Whether to display a compass rose or not. -->
       <booleanOption id="model.option.displayCompassRose" defaultValue="false"/>
       <!-- Whether to display the map controls by default or not. -->
