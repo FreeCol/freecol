@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import cz.autel.dmi.HIGLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -38,11 +37,13 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel displays the Trade Report.
@@ -50,25 +51,9 @@ import java.util.List;
 public final class ReportTradePanel extends ReportPanel {
 
     /**
-     * How many additional rows are defined.
-     */
-    private static final int extraRows = 7; // labels and separators
-    private static final int extraBottomRows = 2;
-
-    /**
-     * How many additional columns are defined.
-     */
-    private static final int extraColumns = 1; // labels
-
-    /**
      * Storable goods types.
      */
     private List<GoodsType> storableGoods = new ArrayList<GoodsType>();
-
-    /**
-     * How wide the margins should be.
-     */
-    private static final int marginWidth = 12;
 
     private final JLabel salesLabel;
 
@@ -114,32 +99,20 @@ public final class ReportTradePanel extends ReportPanel {
         colonies = player.getColonies();
         Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
 
-        int columns = storableGoods.size() + extraColumns;
-        int[] widths = new int[columns];
+        String layoutConstraints = "insets 0, gap 0 0";
+        String columnConstraints = "[170!, fill][42!, fill]";
+        String rowConstraints = "[fill]";
 
-        //align the labels with the goodsHeader
-        widths[0] = 170;
-        for (int i = 1; i < columns; i++) {
-            widths[i] = 42;
-        }
-
-        int[] heights = new int[colonies.size() * 2 + extraRows + extraBottomRows];
-
-        int labelColumn = 1;
-
-        heights[extraRows - 1] = marginWidth; // separator
-        heights[heights.length - 2] = marginWidth;
-
-        reportPanel.setLayout(new HIGLayout(widths, heights));
-        goodsHeader.setLayout(new HIGLayout(widths, new int[1]));
+        reportPanel.setLayout(new MigLayout(layoutConstraints, columnConstraints, rowConstraints));
+        goodsHeader.setLayout(new MigLayout(layoutConstraints, columnConstraints, rowConstraints));
 
         JLabel emptyLabel = new JLabel();
         emptyLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
-        goodsHeader.add(emptyLabel, higConst.rc(1, labelColumn));
+        goodsHeader.add(emptyLabel, "cell 0 0");
 
-        reportPanel.add(salesLabel, higConst.rc(1, labelColumn));
-        reportPanel.add(beforeTaxesLabel, higConst.rc(2, labelColumn));
-        reportPanel.add(afterTaxesLabel, higConst.rc(3, labelColumn));
+        reportPanel.add(salesLabel, "cell 0 0");
+        reportPanel.add(beforeTaxesLabel, "cell 0 1");
+        reportPanel.add(afterTaxesLabel, "cell 0 2");
 
         JLabel cargoUnitsLabel = new JLabel(Messages.message("report.trade.cargoUnits"), JLabel.TRAILING);
         cargoUnitsLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
@@ -148,12 +121,12 @@ public final class ReportTradePanel extends ReportPanel {
         JLabel totalDeltaLabel = new JLabel(Messages.message("report.trade.totalDelta"), JLabel.TRAILING);
         totalDeltaLabel.setBorder(FreeColPanel.LEFTCELLBORDER);
 
-        reportPanel.add(cargoUnitsLabel, higConst.rc(4, labelColumn));
-        reportPanel.add(totalUnitsLabel, higConst.rc(5, labelColumn));
-        reportPanel.add(totalDeltaLabel, higConst.rc(6, labelColumn));
+        reportPanel.add(cargoUnitsLabel, "cell 0 3");
+        reportPanel.add(totalUnitsLabel, "cell 0 4");
+        reportPanel.add(totalDeltaLabel, "cell 0 5");
 
         JLabel currentLabel;
-        int column = extraColumns;
+        int column = 0;
         for (GoodsType goodsType : storableGoods) {
             column++;
             int sales = player.getSales(goodsType);
@@ -164,28 +137,28 @@ public final class ReportTradePanel extends ReportPanel {
             marketLabel.setVerticalTextPosition(JLabel.BOTTOM);
             marketLabel.setHorizontalTextPosition(JLabel.CENTER);
 
-            goodsHeader.add(marketLabel, higConst.rc(1, column));
+            goodsHeader.add(marketLabel);
 
             currentLabel = new JLabel(String.valueOf(sales), JLabel.TRAILING);
             currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (sales < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(1, column));
+            reportPanel.add(currentLabel, "cell " + column + " 0");
 
             currentLabel = new JLabel(String.valueOf(beforeTaxes), JLabel.TRAILING);
             currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (beforeTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(2, column));
+            reportPanel.add(currentLabel, "cell " + column + " 1");
 
             currentLabel = new JLabel(String.valueOf(afterTaxes), JLabel.TRAILING);
             currentLabel.setBorder(FreeColPanel.CELLBORDER);
             if (afterTaxes < 0) {
                 currentLabel.setForeground(Color.RED);
             }
-            reportPanel.add(currentLabel, higConst.rc(3, column));
+            reportPanel.add(currentLabel, "cell " + column + " 2");
 
             int cargoUnits = 0;
             for (Iterator<Unit> iterator = player.getUnitIterator(); iterator.hasNext();) {
@@ -204,11 +177,11 @@ public final class ReportTradePanel extends ReportPanel {
 
             JLabel cargoUnitsAmount = new JLabel(String.valueOf(cargoUnits), JLabel.TRAILING);
             cargoUnitsAmount.setBorder(FreeColPanel.CELLBORDER);
-            reportPanel.add(cargoUnitsAmount, higConst.rc(4, column));
+            reportPanel.add(cargoUnitsAmount, "cell " + column + " 3");
 
             JLabel totalUnitsAmount = new JLabel(String.valueOf(totalUnits), JLabel.TRAILING);
             totalUnitsAmount.setBorder(FreeColPanel.CELLBORDER);
-            reportPanel.add(totalUnitsAmount, higConst.rc(5, column));
+            reportPanel.add(totalUnitsAmount, "cell " + column + " 4");
 
             JLabel deltaUnitsAmount = new JLabel(String.valueOf(deltaUnits), JLabel.TRAILING);
             if (deltaUnits < 0) {
@@ -217,16 +190,16 @@ public final class ReportTradePanel extends ReportPanel {
                 deltaUnitsAmount.setText("+" + deltaUnits);
             }
             deltaUnitsAmount.setBorder(FreeColPanel.CELLBORDER);
-            reportPanel.add(deltaUnitsAmount, higConst.rc(6, column));
+            reportPanel.add(deltaUnitsAmount, "cell " + column + " 5, wrap 20");
         }
 
-        int row = extraRows + 1;
+        int row = 6;
 
         for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
             Colony colony = colonies.get(colonyIndex);
             JButton colonyButton = createColonyButton(colonyIndex);
-            reportPanel.add(colonyButton, higConst.rcwh(row, labelColumn, 1, 2));
-            column = extraColumns;
+            reportPanel.add(colonyButton, "cell 0 " + row + " 1 2");
+            column = 0;
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                 if (!goodsType.isStorable()) {
                     continue;
@@ -242,7 +215,7 @@ public final class ReportTradePanel extends ReportPanel {
                 if (colony.getExportData(goodsType).isExported()) {
                     goodsLabel.setText("*" + String.valueOf(amount));
                 }
-                reportPanel.add(goodsLabel, higConst.rc(row, column));
+                reportPanel.add(goodsLabel, "cell " + column + " " + row);
 
                 int production = colony.getProductionNetOf(goodsType);
 
@@ -264,14 +237,14 @@ public final class ReportTradePanel extends ReportPanel {
                 }
 
                 productionLabel.setBorder(FreeColPanel.CELLBORDER);
-                reportPanel.add(productionLabel, higConst.rc(row + 1, column));
+                reportPanel.add(productionLabel, "cell " + column + " " + (row + 1));
             }
             row += 2;
         }
 
         row++;
         reportPanel.add(new JLabel(Messages.message("report.trade.hasCustomHouse")),
-                higConst.rcwh(row, 1, widths.length, 1));
+                        "cell 0 " + row + ", span");
     }
 
     private JButton createColonyButton(int index) {
