@@ -24,7 +24,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -51,11 +50,9 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
 
-import cz.autel.dmi.HIGLayout;
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -263,7 +260,7 @@ public final class InfoPanel extends FreeColPanel {
     public class TileInfoPanel extends JPanel {
         
         private Tile tile;
-        private Font font = getFont().deriveFont(9f);
+        private Font font = new JLabel().getFont().deriveFont(9f);
         
         public TileInfoPanel() {
             super(null);
@@ -354,60 +351,11 @@ public final class InfoPanel extends FreeColPanel {
      */
     public class UnitInfoPanel extends JPanel {
         
-        private final JLabel unitLabel, unitNameLabel, unitTypeLabel, unitMovesLabel, unitToolsLabel, goldLabel;
-        
-        private final JPanel unitCargoPanel, labelPanel;
-        
         private Unit unit;
         
-        private final int[] widths = { 0, 0, 0, 0 };
-        
-        private final int[] heights = { 0, 0 };
-        
         public UnitInfoPanel() {
-            super(null);
-            
-            Image tools = library.getGoodsImage(Goods.TOOLS);
-            ImageIcon toolsIcon = new ImageIcon(tools.getScaledInstance(tools.getWidth(null) * 2 / 3, tools
-                    .getHeight(null) * 2 / 3, Image.SCALE_SMOOTH));
-            unitToolsLabel = new JLabel(toolsIcon);
-            
-            unitCargoPanel = new JPanel(new HIGLayout(widths, heights));
-            unitCargoPanel.setOpaque(false);
-            
-            JPanel picturePanel = new JPanel(new BorderLayout());
-            picturePanel.setOpaque(false);
-            picturePanel.setSize(110, 100);
-            picturePanel.setLocation(0, 0);
-            unitLabel = new JLabel();
-            unitLabel.setHorizontalAlignment(JLabel.CENTER);
-            unitLabel.setVerticalAlignment(JLabel.CENTER);
-            picturePanel.add(unitLabel, BorderLayout.CENTER);
-            add(picturePanel);
-            
-            int[] widths = { 0 };
-            int[] heights = { 0, 0, 0, 0 };
-            labelPanel = new JPanel(new HIGLayout(widths, heights));
-            labelPanel.setOpaque(false);
-            
-            unitNameLabel = new JLabel();
-            unitMovesLabel = new JLabel();
-            unitTypeLabel = new JLabel();
-            goldLabel = new JLabel();
-            
-            labelPanel.add(unitNameLabel, higConst.rc(1, 1));
-            labelPanel.add(unitTypeLabel, higConst.rc(2, 1));
-            labelPanel.add(unitMovesLabel, higConst.rc(3, 1));
-            labelPanel.add(unitCargoPanel, higConst.rc(4, 1));
-            
-            unitLabel.setFocusable(false);
-            unitNameLabel.setFocusable(false);
-            unitTypeLabel.setFocusable(false);
-            unitMovesLabel.setFocusable(false);
-            unitToolsLabel.setFocusable(false);
-            labelPanel.setSize(130, 100);
-            labelPanel.setLocation(100, 10);// (100-labelPanel.getHeight())/2);
-            add(labelPanel);
+
+            super(new MigLayout("wrap 6, fill, gap 0 0", "", ""));
             
             setSize(226, 100);
             setOpaque(false);
@@ -416,33 +364,54 @@ public final class InfoPanel extends FreeColPanel {
         /**
          * Updates this <code>InfoPanel</code>.
          *
-         * @param unit2 The displayed unit (or null if none)
+         * @param unit The displayed unit (or null if none)
          */
-        public void update(Unit unit2) {
-            this.unit = unit2;
+        public void update(Unit unit) {
+            this.unit = unit;
             
-            unitCargoPanel.removeAll();
+            removeAll();
             if (unit != null) {
-                setUnitNameType(unit);
-                unitLabel.setIcon(library.getUnitImageIcon(unit));
+                add(new JLabel(library.getUnitImageIcon(unit)), "spany, gapafter 5px");
+                String name = unit.getName();
+                // TODO: this is too brittle!
+                int index = name.indexOf(" (");
+                if (index < 0) {
+                    add(new JLabel(name), "span");
+                } else {
+                    add(new JLabel(name.substring(0, index)), "span");
+                    add(new JLabel(name.substring(index + 1)), "span");
+                }
+                add(new JLabel(Messages.message("moves") + " " + unit.getMovesAsString()), "span");
                 
                 // Handle the special cases. TODO: make this more generic
-                if (unit.getRole() == Role.PIONEER) {
-                    EquipmentType toolsType = FreeCol.getSpecification()
-                        .getEquipmentType("model.equipment.tools");
-                    int count = unit.getEquipmentCount(toolsType) * 20;
-                    unitToolsLabel.setText(String.valueOf(count));
-                    unitCargoPanel.add(unitToolsLabel, higConst.rc(1, 1));
-                } else if (unit.canCarryTreasure()) {
-                    goldLabel.setText(unit.getTreasureAmount() + " " + Messages.message("gold"));
-                    unitCargoPanel.add(goldLabel, higConst.rc(1, 1));
+                if (unit.canCarryTreasure()) {
+                    add(new JLabel(unit.getTreasureAmount() + " " + Messages.message("gold")), "span");
                 } else if (unit.isCarrier()) {
-                    addCarriedGoods(unit);
+                    for (Goods goods : unit.getGoodsList()) {
+                        JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+                        goodsLabel.setToolTipText(String.valueOf(goods.getAmount()) + " " + goods.getName());
+                        add(goodsLabel);
+                    }
+                    for (Unit carriedUnit : unit.getUnitList()) {
+                        ImageIcon unitIcon = library.getUnitImageIcon(carriedUnit);
+                        JLabel unitLabel = new JLabel(library.getScaledImageIcon(unitIcon, 0.5f));
+                        unitLabel.setToolTipText(carriedUnit.getName());
+                        add(unitLabel);
+                    }
+                } else {
+                    for (EquipmentType equipment : unit.getEquipment()) {
+                        for (AbstractGoods goods : equipment.getGoodsRequired()) {
+                            JLabel equipmentLabel = 
+                                new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+                            equipmentLabel.setToolTipText(String.valueOf(goods.getAmount())
+                                                          + " " + goods.getType().getName());
+                            add(equipmentLabel);
+                        }
+                    }
                 }
-            } else {
-                unitLabel.setIcon(null);
             }
-            labelPanel.validate();
+            revalidate();
+            repaint();
         }
         
         /**
@@ -456,53 +425,6 @@ public final class InfoPanel extends FreeColPanel {
             return unit;
         }
         
-        /**
-         * Fills the panel with the name, type and movements left for the currently selected unit.
-         */
-        private void setUnitNameType(Unit unit) {
-            String name = unit.getName();
-            int index = name.indexOf(" (");
-            if (index < 0) {
-                unitNameLabel.setText(name);
-                unitTypeLabel.setText(null);
-            } else {
-                unitNameLabel.setText(name.substring(0, index));
-                unitTypeLabel.setText(name.substring(index + 1));
-            }
-            unitMovesLabel.setText(Messages.message("moves") + " " + unit.getMovesAsString());
-        }
-        
-        /**
-         * Adds the currently carried goods to the panel
-         */
-        private void addCarriedGoods(Unit unit) {
-            int counter = 1;
-            int row = 1;
-            for (Goods goods : unit.getGoodsList()) {
-                JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
-                goodsLabel.setToolTipText(String.valueOf(goods.getAmount()) + " " + goods.getName());
-                unitCargoPanel.add(goodsLabel, higConst.rc(row, counter));
-                if (counter == 4) {
-                    row++;
-                    counter = 1;
-                } else {
-                    counter++;
-                }
-            }
-            for (Unit carriedUnit : unit.getUnitList()) {
-                ImageIcon unitIcon = library.getUnitImageIcon(carriedUnit);
-                JLabel unitLabel = new JLabel(library.getScaledImageIcon(unitIcon, 0.5f));
-                unitLabel.setToolTipText(carriedUnit.getName());
-                unitCargoPanel.add(unitLabel, higConst.rc(row, counter));
-                if (counter == 4) {
-                    row++;
-                    counter = 1;
-                } else {
-                    counter++;
-                }
-            }
-            unitCargoPanel.validate();
-        }
     }
     
     /**
