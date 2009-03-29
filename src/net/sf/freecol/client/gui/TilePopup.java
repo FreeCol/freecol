@@ -35,6 +35,7 @@ import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
@@ -187,13 +188,15 @@ public final class TilePopup extends JPopupMenu {
                 JMenuItem toMenuItem = new JMenuItem(currentUnit.toString());
                 toMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
-                            // TODO: is this really necessary?
-                            Player mp = (Player) freeColClient.getFreeColServer().getGame()
-                                .getFreeColGameObject(freeColClient.getMyPlayer().getId());
-                            currentUnit.setOwner(mp);
-                            for (Unit unit : currentUnit.getUnitList()) {
-                                unit.setOwner(mp);
+                            // Server:
+                            final Game serverGame = freeColClient.getFreeColServer().getGame();
+                            final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
+                            final Unit serverUnit = (Unit) serverGame.getFreeColGameObject(currentUnit.getId());
+                            serverUnit.setOwner(serverPlayer);
+                            for (Unit serverChildUnit : currentUnit.getUnitList()) {
+                                serverChildUnit.setOwner(serverPlayer);
                             }
+                            freeColClient.getConnectController().reconnect();
                         }
                     });
                 takeOwnership.add(toMenuItem);
@@ -218,10 +221,12 @@ public final class TilePopup extends JPopupMenu {
                 JMenuItem toMenuItem = new JMenuItem(tile.getSettlement().toString());
                 toMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
-                            // TODO: is this really necessary?
-                            Player mp = (Player) freeColClient.getFreeColServer().getGame()
-                                .getFreeColGameObject(freeColClient.getMyPlayer().getId());
-                            tile.getSettlement().setOwner(mp);
+                            // Server:
+                            final Game serverGame = freeColClient.getFreeColServer().getGame();
+                            final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
+                            final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
+                            serverTile.getSettlement().setOwner(serverPlayer);
+                            freeColClient.getConnectController().reconnect();
                         }
                     });
                 takeOwnership.add(toMenuItem);
