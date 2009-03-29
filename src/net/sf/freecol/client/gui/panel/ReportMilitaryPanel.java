@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -90,14 +91,12 @@ public final class ReportMilitaryPanel extends ReportPanel {
     /**
      * Records the number of units of each type.
      */
-    private Map<UnitType, Integer> soldiers = new HashMap<UnitType, Integer>();
-    private Map<UnitType, Integer> dragoons = new HashMap<UnitType, Integer>();
-    private Map<UnitType, Integer> scouts = new HashMap<UnitType, Integer>();
-    private Map<UnitType, Integer> others = new HashMap<UnitType, Integer>();
+    private TypeCountMap<UnitType> soldiers = new TypeCountMap<UnitType>();
+    private TypeCountMap<UnitType> dragoons = new TypeCountMap<UnitType>();
+    private TypeCountMap<UnitType> scouts = new TypeCountMap<UnitType>();
+    private TypeCountMap<UnitType> others = new TypeCountMap<UnitType>();
 
     private Map<String, ArrayList<Unit>> locations;
-
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -142,17 +141,17 @@ public final class ReportMilitaryPanel extends ReportPanel {
                 (unitType.hasAbility("model.ability.expertSoldier") ||
                  unitType.getOffence() > 0)) {
                 if (unitType.hasAbility("model.ability.canBeEquipped")) {
-                    scoutUnits.add(new AbstractUnit(unitType, Role.SCOUT, getCount(scouts, unitType)));
-                    dragoonUnits.add(new AbstractUnit(unitType, Role.DRAGOON, getCount(dragoons, unitType)));
-                    soldierUnits.add(new AbstractUnit(unitType, Role.SOLDIER, getCount(soldiers, unitType)));
+                    scoutUnits.add(new AbstractUnit(unitType, Role.SCOUT, scouts.getCount(unitType)));
+                    dragoonUnits.add(new AbstractUnit(unitType, Role.DRAGOON, dragoons.getCount(unitType)));
+                    soldierUnits.add(new AbstractUnit(unitType, Role.SOLDIER, soldiers.getCount(unitType)));
                 } else {
-                    units.add(new AbstractUnit(unitType, Role.DEFAULT, getCount(others, unitType)));
+                    units.add(new AbstractUnit(unitType, Role.DEFAULT, others.getCount(unitType)));
                 }
             }
         }
-        dragoonUnits.add(new AbstractUnit(defaultType, Role.DRAGOON, getCount(dragoons, defaultType)));
-        soldierUnits.add(new AbstractUnit(defaultType, Role.SOLDIER, getCount(soldiers, defaultType)));
-        scoutUnits.add(new  AbstractUnit(defaultType, Role.SCOUT, getCount(scouts, defaultType)));
+        dragoonUnits.add(new AbstractUnit(defaultType, Role.DRAGOON, dragoons.getCount(defaultType)));
+        soldierUnits.add(new AbstractUnit(defaultType, Role.SOLDIER, soldiers.getCount(defaultType)));
+        scoutUnits.add(new  AbstractUnit(defaultType, Role.SCOUT, scouts.getCount(defaultType)));
         units.addAll(dragoonUnits);
         units.addAll(soldierUnits);
         units.addAll(scoutUnits);
@@ -195,36 +194,6 @@ public final class ReportMilitaryPanel extends ReportPanel {
         return getMinimumSize();
     }
     
-    public int getCount(Map<UnitType, Integer> hash, UnitType unitType) {
-        Integer count = hash.get(unitType);
-        if (count != null) {
-            return count.intValue();
-        } else { 
-            return 0;
-        }
-    }
-
-    public int getCount(UnitType unitType, Role role) {
-        switch(role) {
-        case SOLDIER:
-            return getCount(soldiers, unitType);
-        case DRAGOON:
-            return getCount(dragoons, unitType);
-        case DEFAULT:
-        default:
-            return getCount(others, unitType);
-        }
-    }
-
-    private void incrementCount(Map<UnitType, Integer> hash, UnitType unitType) {
-        Integer count = hash.get(unitType);
-        if (count == null) {
-            hash.put(unitType, new Integer(1));
-        } else {
-            hash.put(unitType, new Integer(count.intValue() + 1));
-        }
-    }
-
     private void gatherData() {
         Player player = getCanvas().getClient().getMyPlayer();
         locations = new HashMap<String, ArrayList<Unit>>();
@@ -248,13 +217,13 @@ public final class ReportMilitaryPanel extends ReportPanel {
                 }
                 switch(unit.getRole()) {
                 case DRAGOON:
-                    incrementCount(dragoons, unitType);
+                    dragoons.incrementCount(unitType, 1);
                     break;
                 case SOLDIER:
-                    incrementCount(soldiers, unitType);
+                    soldiers.incrementCount(unitType, 1);
                     break;
                 default:
-                    incrementCount(others, unitType);
+                    others.incrementCount(unitType, 1);
                 }
             } else {
                 continue;

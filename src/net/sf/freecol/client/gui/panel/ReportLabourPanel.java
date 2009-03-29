@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
@@ -55,7 +56,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class ReportLabourPanel extends ReportPanel implements ActionListener {
     
-    private Map<UnitType, Integer> unitCount, unitAtSea, unitOnLand, unitInEurope;
+    private TypeCountMap<UnitType> unitCount, unitAtSea, unitOnLand, unitInEurope;
     private Map<UnitType, Map<Colony, Integer>> unitLocations;
     private List<Colony> colonies;
 
@@ -76,11 +77,11 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     public void gatherData() {
 
         // Count Units
-        unitCount = new HashMap<UnitType, Integer>();
-        unitAtSea = new HashMap<UnitType, Integer>();
-        unitOnLand = new HashMap<UnitType, Integer>();
-        unitInEurope = new HashMap<UnitType, Integer>();
-        unitLocations = new HashMap<UnitType, Map<Colony,Integer>>();
+        unitCount = new TypeCountMap<UnitType>();
+        unitAtSea = new TypeCountMap<UnitType>();
+        unitOnLand = new TypeCountMap<UnitType>();
+        unitInEurope = new TypeCountMap<UnitType>();
+        unitLocations = new HashMap<UnitType, Map<Colony, Integer>>();
         for (UnitType type : Specification.getSpecification().getUnitTypeList()) {
             unitLocations.put(type, new HashMap<Colony, Integer>());
         }
@@ -93,29 +94,20 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             UnitType type = unit.getType();
             Location location = unit.getLocation();
 
-            incrementUnitCount(unitCount, type);
+            unitCount.incrementCount(type, 1);
 
             if (location instanceof WorkLocation) {
                 incrementColonyCount(((WorkLocation) location).getColony(), type);
             } else if (location instanceof Europe) {
-                incrementUnitCount(unitInEurope, type);
+                unitInEurope.incrementCount(type, 1);
             } else if (location instanceof Tile && ((Tile) location).getSettlement() != null) {
                 incrementColonyCount((Colony) ((Tile) location).getSettlement(), type);
             } else if (location instanceof Unit) {
-                incrementUnitCount(unitAtSea, type);
+                unitAtSea.incrementCount(type, 1);
             } else {
-                incrementUnitCount(unitOnLand, type);
+                unitOnLand.incrementCount(type, 1);
             }
 
-        }
-    }
-
-    private void incrementUnitCount(Map<UnitType, Integer> map, UnitType type) {
-        Integer count = map.get(type);
-        if (count == null) {
-            map.put(type, new Integer(1));
-        } else {
-            map.put(type, new Integer(count.intValue() + 1));
         }
     }
 
@@ -149,13 +141,13 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 role = Role.MISSIONARY;
             }
             
-            if (unitCount.get(unitType) == null) {
+            int unitTypeCount = unitCount.getCount(unitType);
+            if (unitTypeCount == 0) {
                 reportPanel.add(createUnitTypeLabel(unitType, role, 0));
                 JLabel unitName = new JLabel(unitType.getName());
                 unitName.setForeground(Color.GRAY);
                 reportPanel.add(unitName);
             } else {
-                int unitTypeCount = unitCount.get(unitType).intValue();
                 reportPanel.add(createUnitTypeLabel(unitType, role, unitTypeCount));
                 JButton linkButton = getLinkButton(unitType.getName(), null, unitType.getId());
                 linkButton.addActionListener(this);
@@ -180,8 +172,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         final ImageLibrary library = getCanvas().getGUI().getImageLibrary();
         detailPanel.add(new JLabel(library.getUnitImageIcon(unitType, role)), "spany");
         detailPanel.add(new JLabel(unitType.getName()));
-        detailPanel.add(new JLabel(String.valueOf(unitCount.get(unitType))), "wrap 10");                        
-
+        detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;
         for (Colony colony : colonies) {
             if (unitLocations.get(unitType).get(colony) != null) {
@@ -198,25 +189,25 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                 detailPanel.add(countLabel);
             }
         }
-        if (unitInEurope.get(unitType) != null) {
+        if (unitInEurope.getCount(unitType) > 0) {
             JButton europeButton = getLinkButton(player.getEurope().getName(), null,
                                                  player.getEurope().getId());
             europeButton.addActionListener(report);
             detailPanel.add(europeButton);
-            JLabel countLabel = new JLabel(String.valueOf(unitInEurope.get(unitType)));
+            JLabel countLabel = new JLabel(String.valueOf(unitInEurope.getCount(unitType)));
             countLabel.setForeground(LINK_COLOR);
             detailPanel.add(countLabel);
         }
-        if (unitOnLand.get(unitType) != null) {
+        if (unitOnLand.getCount(unitType) > 0) {
             JLabel onLandLabel = new JLabel(Messages.message("report.onLand"));
             detailPanel.add(onLandLabel);
-            JLabel countLabel = new JLabel(String.valueOf(unitOnLand.get(unitType)));
+            JLabel countLabel = new JLabel(String.valueOf(unitOnLand.getCount(unitType)));
             detailPanel.add(countLabel); 
         }
-        if (unitAtSea.get(unitType) != null) {
+        if (unitAtSea.getCount(unitType) > 0) {
             JLabel atSeaLabel = new JLabel(Messages.message("report.atSea"));
             detailPanel.add(atSeaLabel);
-            JLabel countLabel = new JLabel(String.valueOf(unitAtSea.get(unitType)));
+            JLabel countLabel = new JLabel(String.valueOf(unitAtSea.getCount(unitType)));
             detailPanel.add(countLabel);
         }
         if (canTrain) {
