@@ -60,14 +60,13 @@ import net.sf.freecol.common.model.UnitTradeItem;
 
 import org.w3c.dom.Element;
 
-import cz.autel.dmi.HIGLayout;
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * The panel that allows negotiations between players.
  */
 public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> implements ActionListener {
-
-
 
     private static final String SEND = "send", ACCEPT = "accept", CANCEL = "cancel";
 
@@ -194,47 +193,36 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         int numberOfTradeItems = 4;
         int extraRows = 2; // headline and buttons
 
-        int[] widths = {200, 10, 300, 10, 200};
-        int[] heights = new int[2 * (numberOfTradeItems + extraRows) - 1];
-        for (int index = 1; index < heights.length; index += 2) {
-            heights[index] = 10;
-        }
-        setLayout(new HIGLayout(widths, heights));
+        setLayout(new MigLayout("wrap 3", "[200, fill][300, fill][200, fill]", ""));
 
         int demandColumn = 1;
         int summaryColumn = 3;
         int offerColumn = 5;
 
         int row = 1;
-        add(new JLabel(Messages.message("negotiationDialog.demand")),
-            higConst.rc(row, demandColumn));
-        add(new JLabel(Messages.message("negotiationDialog.offer")),
-            higConst.rc(row, offerColumn));
-        row += 2;
-        add(stance, higConst.rc(row, offerColumn));
-        row += 2;
-        add(goldDemand, higConst.rc(row, demandColumn));
-        add(goldOffer, higConst.rc(row, offerColumn));
-        add(summary, higConst.rcwh(row, summaryColumn, 1, 5));
-        row += 2;
+        add(new JLabel(Messages.message("negotiationDialog.demand")), "center");
+        add(new JLabel(Messages.message("negotiationDialog.offer")), "skip, center");
+
+        add(stance, "skip 2");
+        add(goldDemand);
+        add(summary, "spany");
+        add(goldOffer);
         if (unit.isCarrier()) {
             goodsDemand = new GoodsTradeItemPanel(this, otherPlayer, null);
-            add(goodsDemand, higConst.rc(row, demandColumn));
+            add(goodsDemand);
             goodsOffer = new GoodsTradeItemPanel(this, player, null);
-            add(goodsOffer, higConst.rc(row, offerColumn));
+            add(goodsOffer);
         } else {
-            add(colonyDemand, higConst.rc(row, demandColumn));
-            add(colonyOffer, higConst.rc(row, offerColumn));
+            add(colonyDemand);
+            add(colonyOffer);
         }
-        row += 2;
         /** TODO: UnitTrade
             add(unitDemand, higConst.rc(row, demandColumn));
             add(unitOffer, higConst.rc(row, offerColumn));
         */
-        row += 2;
-        add(sendButton, higConst.rc(row, demandColumn, ""));
-        add(acceptButton, higConst.rc(row, summaryColumn, ""));
-        add(cancelButton, higConst.rc(row, offerColumn, ""));
+        add(sendButton, "newline 20, span, split 3");
+        add(acceptButton, "tag ok");
+        add(cancelButton, "tag cancel");
             
         updateDialog();
     }
@@ -556,13 +544,13 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             colonyBox = new JComboBox();
             updateColonyBox();
 
-            setLayout(new HIGLayout(new int[] {0}, new int[] {0, 0, 0}));
+            setLayout(new MigLayout("wrap 1", "", ""));
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             this.textLabel = new JLabel(Messages.message("tradeItem.colony"));
-            add(this.textLabel, higConst.rc(1, 1));
-            add(colonyBox,  higConst.rc(2, 1));
-            add(addButton,  higConst.rc(3, 1));
+            add(this.textLabel);
+            add(colonyBox);
+            add(addButton);
             
         }
         
@@ -659,10 +647,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            setLayout(new HIGLayout(new int[] {0}, new int[] {0, 0, 0}));
-            add(label, higConst.rc(1, 1));
-            add(goodsBox, higConst.rc(2, 1));
-            add(addButton, higConst.rc(3, 1));
+            setLayout(new MigLayout("wrap 1", "", ""));
+            add(label);
+            add(goodsBox);
+            add(addButton);
             setSize(getPreferredSize());
         }
 
@@ -764,11 +752,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            setLayout(new HIGLayout(new int[] {0}, new int[] {0, 0, 0}));
-            add(new JLabel(Messages.message("tradeItem.stance")),
-                higConst.rc(1, 1));
-            add(stanceBox, higConst.rc(2, 1));
-            add(addButton, higConst.rc(3, 1));
+            setLayout(new MigLayout("wrap 1", "", ""));
+            add(new JLabel(Messages.message("tradeItem.stance")));
+            add(stanceBox);
+            add(addButton);
         }
 
         /**
@@ -823,11 +810,10 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            setLayout(new HIGLayout(new int[] {0}, new int[] {0, 0, 0}));
-            add(new JLabel(Messages.message("tradeItem.gold")),
-                higConst.rc(1, 1));
-            add(spinner, higConst.rc(2, 1));
-            add(addButton, higConst.rc(3, 1));
+            setLayout(new MigLayout("wrap 1", "", ""));
+            add(new JLabel(Messages.message("tradeItem.gold")));
+            add(spinner);
+            add(addButton);
         }
 
         /**
