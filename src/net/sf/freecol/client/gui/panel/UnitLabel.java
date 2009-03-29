@@ -253,9 +253,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
             pl.paintComponent(g);
             g.translate(0, -10);
         } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel || 
-            getParent() instanceof ColonyPanel.InPortPanel || 
-            getParent() instanceof EuropePanel.InPortPanel || 
-                   getParent().getParent() instanceof ReportUnitPanel) {
+                   getParent() instanceof ColonyPanel.InPortPanel || 
+                   getParent() instanceof EuropePanel.InPortPanel || 
+                   getParent().getParent() instanceof ReportPanel) {
             int x = (getWidth() - getIcon().getIconWidth()) / 2;
             int y = (getHeight() - getIcon().getIconHeight()) / 2;
             parent.getGUI().displayOccupationIndicator(g, unit, x, y);
