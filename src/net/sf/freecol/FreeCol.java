@@ -142,6 +142,9 @@ public final class FreeCol {
     private static boolean checkIntegrity = false;
 
     private static final Options options = new Options();
+    
+    private static String splashFilename = DEFAULT_SPLASH_FILE;
+    private static boolean displaySplash = false;
 
 
 
@@ -170,17 +173,7 @@ public final class FreeCol {
         handleArgs(args);
         
         // Display splash screen:
-        JWindow splash = null;
-        for (int i=0; i<args.length; i++) {
-            if (args[i].startsWith("--splash")) {
-                String splashFile = DEFAULT_SPLASH_FILE;
-                if (args[i].indexOf('=') > 0) {
-                    splashFile = args[i].substring(args[i].indexOf('=') + 1);
-                }
-                splash = displaySplash(splashFile);
-                break;
-            }
-        }
+        final JWindow splash = (displaySplash) ? displaySplash(splashFilename) : null;
 
         createAndSetDirectories();
         initLogging();
@@ -730,7 +723,7 @@ public final class FreeCol {
         options.addOption(OptionBuilder.withLongOpt("splash")
                           .withDescription(Messages.message("cli.splash"))
                           .withArgName(Messages.message("cli.arg.file"))
-                          .hasArg()
+                          .hasOptionalArg()
                           .create());
         options.addOption(OptionBuilder.withLongOpt("check-savegame")
                           .withDescription(Messages.message("cli.check-savegame"))
@@ -745,6 +738,13 @@ public final class FreeCol {
         try {
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);
+            if (line.hasOption("splash")) {
+                displaySplash = true;
+                final String str = line.getOptionValue("splash");
+                if (str != null) {
+                    splashFilename = str;
+                }
+            }
             if (line.hasOption("freecol-data")) {
                 dataFolder = line.getOptionValue("freecol-data");
                 if (!dataFolder.endsWith(FILE_SEP)) {
