@@ -356,7 +356,7 @@ public class Map extends FreeColGameObject {
      * the <code>end</code> will not be checked against validity (neither the
      * <code>options</code> nor allowed movement by the <code>unit</code>.
      * 
-     * @param unit
+     * @param currentUnit
      *            The <code>Unit</code> that should be used to determine
      *            whether or not a path is legal. The <code>options</code> are
      *            used instead if <code>unit == null</code>.
@@ -385,8 +385,8 @@ public class Map extends FreeColGameObject {
      * @exception IllegalArgumentException
      *                if <code>start == end</code>.
      */
-    private PathNode findPath(Unit unit, Tile start, final Tile end, PathType type,
-            Unit carrier) {
+    private PathNode findPath(final Unit unit, final Tile start, final Tile end,
+            final PathType type, final Unit carrier) {
         /*
          * Using A* with the Manhatten distance as the heuristics.
          * 
@@ -411,15 +411,12 @@ public class Map extends FreeColGameObject {
             throw new IllegalArgumentException("Argument 'unit' must not be 'null'.");
         }
 
-        final Unit theUnit = unit;
-        if (carrier != null) {
-            unit = carrier;
-        }
+        Unit currentUnit = (carrier == null) ? unit : carrier;
 
-        PathNode firstNode;
-        if (unit != null) {
+        final PathNode firstNode;
+        if (currentUnit != null) {
             firstNode = new PathNode(start, 0, getDistance(start.getPosition(),
-                    end.getPosition()), Direction.N, unit.getMovesLeft(), 0);
+                    end.getPosition()), Direction.N, currentUnit.getMovesLeft(), 0);
             firstNode.setOnCarrier(carrier != null);
         } else {
             firstNode = new PathNode(start, 0, getDistance(start.getPosition(),
@@ -450,7 +447,9 @@ public class Map extends FreeColGameObject {
 
         while (!openList.isEmpty()) {
             // Choosing the node with the lowest f:
-            PathNode currentNode = openListQueue.peek();
+            PathNode currentNode = openListQueue.poll();
+            openList.remove(currentNode.getTile().getId());
+            closedList.put(currentNode.getTile().getId(), currentNode);
 
             // Found our goal:
             if (currentNode.getTile() == end) {
@@ -463,7 +462,7 @@ public class Map extends FreeColGameObject {
             
             // Try every direction:
             for (Direction direction : Direction.values()) {
-                Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
+                final Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
 
                 if (newTile == null) {
                     continue;
@@ -472,6 +471,10 @@ public class Map extends FreeColGameObject {
                 // If the new tile is the tile we just visited, skip it. We can use == because PathNode.getTile() 
                 // and getNeighborOrNull both return references to the actual Tile in tiles[][].
                 if (currentNode.previous != null && currentNode.previous.getTile() == newTile) {
+                    continue;
+                }
+                
+                if (closedList.containsKey(newTile.getId())) {
                     continue;
                 }
 
@@ -485,33 +488,33 @@ public class Map extends FreeColGameObject {
                         && onCarrier
                         && newTile.isLand()                        
                         && (newTile.getSettlement() == null || newTile
-                                .getSettlement().getOwner() == unit.getOwner())) {
+                                .getSettlement().getOwner() == currentUnit.getOwner())) {
                     onCarrier = false;
-                    unit = theUnit;
-                    movesLeft = unit.getInitialMovesLeft();
+                    currentUnit = unit;
+                    movesLeft = currentUnit.getInitialMovesLeft();
                 } else {
                     if (currentNode.isOnCarrier()) {
-                        unit = carrier;
+                        currentUnit = carrier;
                     } else {
-                        unit = theUnit;
+                        currentUnit = unit;
                     }
                 }
                 
-                if (unit != null) {
-                    int extraCost = defaultCostDecider.getCost(unit,
+                if (currentUnit != null) {
+                    int extraCost = defaultCostDecider.getCost(currentUnit,
                             currentNode.getTile(), newTile, movesLeft, turns);
                     if (extraCost == CostDecider.ILLEGAL_MOVE && !newTile.equals(end)) {
                         continue;
                     }
                     if (extraCost == CostDecider.ILLEGAL_MOVE) {
                         if (newTile.equals(end)) {
-                            cost += unit.getInitialMovesLeft();
+                            cost += currentUnit.getInitialMovesLeft();
                             movesLeft = 0;
                         }
                     } else {
                         if (carrier != null) {
-                            if (unit.equals(carrier)) {
-                                extraCost *= theUnit.getInitialMovesLeft();    
+                            if (currentUnit.equals(carrier)) {
+                                extraCost *= unit.getInitialMovesLeft();    
                             } else {
                                 extraCost *= carrier.getInitialMovesLeft();
                             }
@@ -532,28 +535,16 @@ public class Map extends FreeColGameObject {
                     }
                 }
 
-                int f = cost
-                        + getDistance(newTile.getPosition(), end.getPosition());
+                final int f = cost + getDistance(newTile.getPosition(), end.getPosition());
 
                 // Finding the node on the open list:
                 PathNode successor = openList.get(newTile.getId());
-
                 if (successor != null) {
                     if (successor.getF() <= f) {
                         continue;
                     } else {
                         openList.remove(successor.getTile().getId());
                         openListQueue.remove(successor);
-                    }
-                } else {
-                    // Finding the node on the closed list.
-                    successor = closedList.get(newTile.getId());
-                    if (successor != null) {
-                        if (successor.getF() <= f) {
-                            continue;
-                        } else {
-                            closedList.remove(newTile.getId());
-                        }
                     }
                 }
 
@@ -566,12 +557,6 @@ public class Map extends FreeColGameObject {
                 openList.put(successor.getTile().getId(), successor);
                 openListQueue.offer(successor);
             }
-
-            closedList.put(currentNode.getTile().getId(), currentNode);
-
-            // Removing the current node from the open list:
-            openList.remove(currentNode.getTile().getId());
-            openListQueue.remove(currentNode);
         }
 
         return null;
