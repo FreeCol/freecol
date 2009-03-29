@@ -723,7 +723,7 @@ public class Map extends FreeColGameObject {
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
      * 
-     * @param unit
+     * @param currentUnit
      *            The <code>Unit</code> to find the path for.
      * @param startTile
      *            The <code>Tile</code> to start the search from.
@@ -743,8 +743,9 @@ public class Map extends FreeColGameObject {
      * @return The path to a goal determined by the given
      *         <code>GoalDecider</code>.
      */
-    public PathNode search(Unit unit, Tile startTile, GoalDecider gd,
-            CostDecider costDecider, int maxTurns, Unit carrier) {
+    public PathNode search(final Unit unit, final Tile startTile,
+            final GoalDecider gd, final CostDecider costDecider,
+            final int maxTurns, final Unit carrier) {
         /*
          * Using Dijkstra's algorithm with a closedList for marking the visited
          * nodes and using a PriorityQueue for getting the next edge with the
@@ -757,12 +758,10 @@ public class Map extends FreeColGameObject {
             throw new IllegalArgumentException("startTile must not be 'null'.");
         }
 
-        Unit theUnit = unit;
-        if (carrier != null) {
-            unit = carrier;
-        }
-        int ml = (unit != null) ? unit.getMovesLeft() : -1;
-        PathNode firstNode = new PathNode(startTile, 0, 0, Direction.N, ml, 0);
+        Unit currentUnit = (carrier == null)  ? unit : carrier;
+
+        final int ml = (currentUnit != null) ? currentUnit.getMovesLeft() : -1;
+        final PathNode firstNode = new PathNode(startTile, 0, 0, Direction.N, ml, 0);
         firstNode.setOnCarrier(carrier != null);
 
         final HashMap<String, PathNode> openList = new HashMap<String, PathNode>();
@@ -789,7 +788,7 @@ public class Map extends FreeColGameObject {
 
         while (!openList.isEmpty()) {
             // Choosing the node with the lowest cost:
-            PathNode currentNode = openListQueue.poll();
+            final PathNode currentNode = openListQueue.poll();
             openList.remove(currentNode.getTile().getId());
             closedList.put(currentNode.getTile().getId(), currentNode);
 
@@ -798,7 +797,7 @@ public class Map extends FreeColGameObject {
                 break;
             }            
 
-            if (gd.check(unit, currentNode) && !gd.hasSubGoals()) {
+            if (gd.check(currentUnit, currentNode) && !gd.hasSubGoals()) {
                 PathNode bestTarget = gd.getGoal();
                 if (bestTarget != null) {
                     while (bestTarget.previous != null) {
@@ -815,7 +814,7 @@ public class Map extends FreeColGameObject {
             // Try every direction:
             for (Direction direction : Direction.values()) {
 
-                Tile newTile = getNeighbourOrNull(direction, currentNode
+                final Tile newTile = getNeighbourOrNull(direction, currentNode
                         .getTile());
 
                 if (newTile == null) {
@@ -825,6 +824,10 @@ public class Map extends FreeColGameObject {
                 // If the new tile is the tile we just visited, skip it. We can use == because PathNode.getTile() 
                 // and getNeighborOrNull both return references to the actual Tile in tiles[][].
                 if (currentNode.previous != null && currentNode.previous.getTile() == newTile) {
+                    continue;
+                }
+                
+                if (closedList.containsKey(newTile.getId())) {
                     continue;
                 }
 
@@ -838,26 +841,26 @@ public class Map extends FreeColGameObject {
                         && onCarrier
                         && newTile.isLand()                        
                         && (newTile.getSettlement() == null || newTile
-                                .getSettlement().getOwner() == unit.getOwner())) {
+                                .getSettlement().getOwner() == currentUnit.getOwner())) {
                     onCarrier = false;
-                    unit = theUnit;
-                    movesLeft = unit.getInitialMovesLeft();
+                    currentUnit = unit;
+                    movesLeft = currentUnit.getInitialMovesLeft();
                 } else {
                     if (currentNode.isOnCarrier()) {
-                        unit = carrier;
+                        currentUnit = carrier;
                     } else {
-                        unit = theUnit;
+                        currentUnit = unit;
                     }
                 }
 
-                int extraCost = costDecider.getCost(unit,
+                int extraCost = costDecider.getCost(currentUnit,
                         currentNode.getTile(), newTile, movesLeft, turns);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     continue;
                 }
-                if (carrier != null && unit.equals(theUnit)) {
+                if (carrier != null && currentUnit.equals(unit)) {
                     cost += extraCost
-                            * (1 + (carrier.getInitialMovesLeft() / ((double) theUnit
+                            * (1 + (carrier.getInitialMovesLeft() / ((double) unit
                                     .getInitialMovesLeft())));
                 } else {
                     cost += extraCost;
@@ -867,31 +870,21 @@ public class Map extends FreeColGameObject {
                     turns++;
                 }
 
-                // Finding the node on the open list:
-                PathNode successor = closedList.get(newTile.getId());
+                PathNode successor = openList.get(newTile.getId());
                 if (successor != null) {
                     if (successor.getCost() <= cost) {
                         continue;
                     } else {
-                        logger.warning("This should not happen. :-(");
+                        openList.remove(successor.getTile().getId());
+                        openListQueue.remove(successor);
                     }
-                } else {
-                    successor = openList.get(newTile.getId());
-                    if (successor != null) {
-                        if (successor.getCost() <= cost) {
-                            continue;
-                        } else {
-                            openList.remove(successor.getTile().getId());
-                            openListQueue.remove(successor);
-                        }
-                    }
-                    successor = new PathNode(newTile, cost, cost, direction,
-                            movesLeft, turns);
-                    successor.previous = currentNode;
-                    successor.setOnCarrier(onCarrier);
-                    openList.put(successor.getTile().getId(), successor);
-                    openListQueue.offer(successor);
                 }
+                successor = new PathNode(newTile, cost, cost, direction,
+                        movesLeft, turns);
+                successor.previous = currentNode;
+                successor.setOnCarrier(onCarrier);
+                openList.put(successor.getTile().getId(), successor);
+                openListQueue.offer(successor);
             }
         }
 
