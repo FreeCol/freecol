@@ -40,15 +40,14 @@ import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
-import cz.autel.dmi.HIGLayout;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel is used to display the information received from the meta-server.
  */
 public final class ServerListPanel extends FreeColPanel implements ActionListener {
-
-
-
 
     private static final Logger logger = Logger.getLogger(ServerListPanel.class.getName());
 
@@ -116,21 +115,16 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
         tableScroll.getViewport().setOpaque(false);
         tableScroll.getColumnHeader().setOpaque(false);
 
-        HIGLayout layout = new HIGLayout(new int[] {200, 200}, new int[] {350, 12, 0});
-        layout.setRowWeight(1, 1);
-        layout.setColumnWeight(1, 1);
-        layout.setColumnWeight(2, 1);
-        setLayout(layout);
-
-        add(tableScroll, higConst.rcwh(1, 1, 2, 1));
-        add(connect, higConst.rc(3, 1, "l"));
-        add(cancel, higConst.rc(3, 2, "r"));
-
         connect.setActionCommand(String.valueOf(CONNECT));
-        cancel.setActionCommand(String.valueOf(CANCEL));
-
         connect.addActionListener(this);
+
+        cancel.setActionCommand(String.valueOf(CANCEL));
         cancel.addActionListener(this);
+
+        setLayout(new MigLayout("", "", ""));
+        add(tableScroll, "width 400:, height 350:");
+        add(connect, "newline 20, split 2");
+        add(cancel, "tag cancel");
 
         setSize(getPreferredSize());
     }
