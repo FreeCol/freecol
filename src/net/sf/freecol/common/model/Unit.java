@@ -289,7 +289,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public Unit(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);
         readFromXML(in);
-        getOwner().setUnit(this);
     }
 
     /**
@@ -302,7 +301,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public Unit(Game game, Element e) {
         super(game, e);
         readFromXMLElement(e);
-        getOwner().setUnit(this);
     }
 
     /**
@@ -3800,6 +3798,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             goodsContainer = new GoodsContainer(getGame(), this);
         }
 
+        getOwner().setUnit(this);
         getOwner().invalidateCanSeeTiles();
     }
 
