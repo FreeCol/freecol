@@ -2288,7 +2288,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         unit.putOutsideColony();
         sendUpdatedTileToAll(unit.getTile(), player);
-        return null;
+        Element updateElement = Message.createNewRootElement("update");
+        updateElement.appendChild(unit.getTile().toXMLElement(player, updateElement.getOwnerDocument()));
+        return updateElement;
     }
 
     /**

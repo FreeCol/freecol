@@ -2738,10 +2738,14 @@ public final class InGameController implements NetworkConstants {
 
         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
         putOutsideColonyElement.setAttribute("unit", unit.getId());
-        unit.putOutsideColony();
 
         Client client = freeColClient.getClient();
-        client.sendAndWait(putOutsideColonyElement);
+        Element reply = client.ask(putOutsideColonyElement);
+        if (reply != null && reply.getTagName().equals("update")) {
+            freeColClient.getInGameInputHandler().update(reply);
+        } else {
+            logger.warning("putOutsideColony message missing update");
+        }
 
         return true;
     }
