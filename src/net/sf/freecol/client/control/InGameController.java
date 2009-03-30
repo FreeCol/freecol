@@ -477,7 +477,6 @@ public final class InGameController implements NetworkConstants {
             if (updateElement == null) {
                 logger.warning("buildColonyConfirmed message missing update");
             } else {
-                unit.setLocation(null); // new location arriving in update
                 freeColClient.getInGameInputHandler().update(updateElement);
 
                 // There should be a colony here now.  Check units present
