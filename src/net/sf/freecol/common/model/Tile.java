@@ -1689,6 +1689,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         boolean settlementSent = false;
+        units.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
                 settlement = updateFreeColGameObject(in, Colony.class);
@@ -1697,9 +1698,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 settlement = updateFreeColGameObject(in, IndianSettlement.class);
                 settlementSent = true;
             } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-                units = new ArrayList<Unit>();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                        if (units.equals(Collections.emptyList())) {
+                            units = new ArrayList<Unit>();
+                        }
                         units.add(updateFreeColGameObject(in, Unit.class));
                     }
                 }
