@@ -1649,6 +1649,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.setAttribute("result", "die");
             unit.dispose();
         } else if (action.equals("speak")) {
+            unit.contactAdjacent(settlement.getTile());
             if (!settlement.hasBeenVisited()) {
                 // This can probably be randomized, I don't think the AI needs
                 // to do anything here.
@@ -1682,6 +1683,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 reply.setAttribute("result", "nothing");
             }
         } else if (action.equals("tribute")) {
+            unit.contactAdjacent(settlement.getTile());
             demandTribute(settlement, player, reply);
         }
         return reply;

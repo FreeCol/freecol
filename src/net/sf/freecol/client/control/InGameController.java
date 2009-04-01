@@ -3253,10 +3253,12 @@ public final class InGameController implements NetworkConstants {
             client.sendAndWait(scoutMessage);
             return;
         case INDIAN_SETTLEMENT_SPEAK:
+            unit.contactAdjacent(unit.getTile());
             scoutMessage.setAttribute("action", "speak");
             reply = client.ask(scoutMessage);
             break;
         case INDIAN_SETTLEMENT_TRIBUTE:
+            unit.contactAdjacent(unit.getTile());
             scoutMessage.setAttribute("action", "tribute");
             reply = client.ask(scoutMessage);
             break;
