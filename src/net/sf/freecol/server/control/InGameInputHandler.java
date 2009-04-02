@@ -1665,7 +1665,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                                 && (map.getTile(position).isLand() || map.getTile(position).isCoast())) {
                             Tile t = map.getTile(position);
                             player.setExplored(t);
-                            update.appendChild(t.toXMLElement(player, update.getOwnerDocument(), true, false));
+                            update.appendChild(t.toXMLElement(player, update.getOwnerDocument(), false, false));
                         }
                     }
                     reply.appendChild(update);
