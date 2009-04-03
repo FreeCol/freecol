@@ -1451,6 +1451,7 @@ public final class GUI {
         big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
 
         int playerColor = color.getRGB();
+        int borderColor = getStringBorderColor(color).getRGB();
         for (int biX=0; biX<bi.getWidth(); biX++) {
             for (int biY=0; biY<bi.getHeight(); biY++) {
                 int r = bi.getRGB(biX, biY);
@@ -1462,7 +1463,7 @@ public final class GUI {
                 for (int cX=-1; cX <=1; cX++) {
                     for (int cY=-1; cY <=1; cY++) {
                         if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
-                            bi.setRGB(biX, biY, getStringBorderColor(color).getRGB());
+                            bi.setRGB(biX, biY, borderColor);
                             continue;
                         }
                     }
