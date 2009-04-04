@@ -19,20 +19,34 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.GridLayout;
+import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
-import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.TypeCountMap;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
  * This panel displays the ContinentalCongress Report.
@@ -43,12 +57,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
     static final String none = Messages.message("report.continentalCongress.none");
 
-    private final ReportProductionPanel productionPanel;
-
-    private final JPanel summaryPanel;
-
-    private final JPanel fatherPanel;
-
+    private final static GoodsType goodsType = Goods.BELLS;
 
     /**
      * The constructor that will add the items to this panel.
@@ -58,60 +67,49 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
     public ReportContinentalCongressPanel(Canvas parent) {
         super(parent, title);
 
-        int[] widths = { 0 };
-        int[] heights = { 0, 12, 0, 12, 0 };
-        reportPanel.setLayout(new HIGLayout(widths, heights));
-
-        summaryPanel = new JPanel();
-        summaryPanel.setOpaque(false);
-        fatherPanel = new JPanel(new GridLayout(0, 4));
-        fatherPanel.setOpaque(false);
-        productionPanel = new ReportProductionPanel(Goods.BELLS, getCanvas(), this);
+        reportPanel.setLayout(new MigLayout("fill, wrap 3", "", ""));
 
         Player player = getCanvas().getClient().getMyPlayer();
+        ImageLibrary library = parent.getGUI().getImageLibrary();
 
-        // Display Panel
-        summaryPanel.removeAll();
-        fatherPanel.removeAll();
-        reportPanel.removeAll();
-
-        // summary
-        summaryPanel.add(new JLabel(Messages.message("report.continentalCongress.recruiting")), higConst.rc(1, 1));
+        JLabel recruiting = new JLabel(Messages.message("report.continentalCongress.recruiting"));
+        recruiting.setFont(smallHeaderFont);
+        reportPanel.add(recruiting, "align center, growy");
         if (player.getCurrentFather() == null) {
-            summaryPanel.add(new JLabel(none), higConst.rc(1, 3));
+            reportPanel.add(new JLabel(none), "wrap 20");
         } else {
             FoundingFather father = player.getCurrentFather();
-            JLabel currentFatherLabel = new JLabel(father.getName());
+            JLabel currentFatherLabel = new JLabel(father.getName(),
+                                                   new ImageIcon(library.getFoundingFatherImage(father)),
+                                                   JLabel.CENTER);
             currentFatherLabel.setToolTipText(father.getDescription());
-            summaryPanel.add(currentFatherLabel, higConst.rc(1, 3));
+            currentFatherLabel.setVerticalTextPosition(JLabel.TOP);
+            currentFatherLabel.setHorizontalTextPosition(JLabel.CENTER);
+            reportPanel.add(currentFatherLabel);
+            FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), goodsType);
+            int total = 0;
+            for (Colony colony : player.getColonies()) {
+                total += colony.getProductionNetOf(goodsType);
+            }
             int bells = player.getLiberty();
             int required = player.getTotalFoundingFatherCost();
-            int production = productionPanel.getTotalProduction();
-
-            FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), Goods.BELLS);
-            progressBar.update(0, required, bells, production);
-            summaryPanel.add(progressBar);
+            progressBar.update(0, required, bells, total);
+            reportPanel.add(progressBar, "wrap 20");
         }
 
         // founding fathers
-        if (player.getFatherCount() < 1) {
-            JLabel fatherLabel = new JLabel(none);
-            fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-            fatherPanel.add(fatherLabel);
-        } else {
+        if (player.getFatherCount() > 0) {
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
                 if (player.hasFather(father)) {
-                    JLabel fatherLabel = new JLabel(Messages.message(father.getName()));
+                    JLabel fatherLabel = new JLabel(father.getName(),
+                                                   new ImageIcon(library.getFoundingFatherImage(father)),
+                                                   JLabel.CENTER);
+                    fatherLabel.setVerticalTextPosition(JLabel.TOP);
+                    fatherLabel.setHorizontalTextPosition(JLabel.CENTER);
                     fatherLabel.setToolTipText(Messages.message(father.getDescription()));
-                    fatherLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-                    fatherPanel.add(fatherLabel);
+                    reportPanel.add(fatherLabel);
                 }
             }
         }
-        fatherPanel.setBorder(BorderFactory.createTitledBorder(player.getNationAsString() + " " + title));
-
-        reportPanel.add(summaryPanel, higConst.rc(1, 1));
-        reportPanel.add(fatherPanel, higConst.rc(3, 1));
-        reportPanel.add(productionPanel, higConst.rc(5, 1));
     }
 }
