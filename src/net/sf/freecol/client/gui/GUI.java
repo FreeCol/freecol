@@ -1408,7 +1408,9 @@ public final class GUI {
      */
     public BufferedImage createStringImage(JComponent c, String nameString, Color color, int maxWidth, int preferredFontSize) {
         return createStringImage(c, null, nameString, color, maxWidth, preferredFontSize);
-    }    
+    }
+    
+    private HashMap<String, BufferedImage> stringImageCache = new HashMap<String, BufferedImage>();
     
     /**
      * Creates an image with a string of a given color and with 
@@ -1427,29 +1429,38 @@ public final class GUI {
      * @param preferredFontSize The preferred font size.
      * @return The image that was created.
      */
-    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {        
+    private BufferedImage createStringImage(JComponent c, Graphics g, String nameString, Color color, int maxWidth, int preferredFontSize) {
         if (color == null) {
             logger.warning("createStringImage called with color null");
             color = Color.WHITE;
         }
+        BufferedImage bi = null;
+        // Lookup in the cache if the image has been generated already
+        bi = stringImageCache.get(nameString);
+        if (bi!=null) {
+            return bi;
+        }
+        
         Font nameFont = (c != null) ? c.getFont() : g.getFont();
         FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
-        BufferedImage bi = null;
 
+        // create an image of the appropriate size
         int fontSize = preferredFontSize;
         do {
-            nameFont = nameFont.deriveFont(Font.BOLD, fontSize);            
+            nameFont = nameFont.deriveFont(Font.BOLD, fontSize);
             nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
-            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
+            bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, 
+                                   nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
             fontSize -= 2;
         } while (bi.getWidth() > maxWidth);
 
+        // draw the string with selected color
         Graphics2D big = bi.createGraphics();
-
         big.setColor(color);
         big.setFont(nameFont);
         big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
 
+        // draw the border around letters
         int playerColor = color.getRGB();
         int borderColor = getStringBorderColor(color).getRGB();
         for (int biX=0; biX<bi.getWidth(); biX++) {
@@ -1470,7 +1481,7 @@ public final class GUI {
                 }
             }
         }
-
+        this.stringImageCache.put(nameString, bi);
         return bi;
     }
 
