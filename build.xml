@@ -35,6 +35,8 @@
         <pathelement location="${basedir}/jars/miglayout-3.7-swing.jar"/>
         <!-- MigLayout manager -->
         <pathelement location="${basedir}/jars/commons-cli-1.1.jar"/>
+        <!-- Cortado Video Applet -->
+        <pathelement location="${basedir}/jars/cortado-fc-1.0.jar"/>
     </path>
     <path id="junit.classpath">
         <pathelement location="${basedir}/test/lib/junit.jar" />
@@ -141,7 +143,7 @@
       <manifest file="${basedir}/src/MANIFEST.MF">
         <attribute name="Created-By" value="FreeCol Team"/>
         <attribute name="Main-Class" value="net.sf.freecol.FreeCol"/>
-        <attribute name="Class-Path" value="jars/higlayout.jar jars/jsr173_1.0_api.jar jars/wstx-lgpl-4.0pr1.jar jars/jogg-0.0.7.jar jars/jorbis-0.0.15.jar jars/tritonus_share.jar jars/vorbisspi1.0.3.jar jars/miglayout-3.7-swing.jar jars/commons-cli-1.1.jar"/>
+        <attribute name="Class-Path" value="jars/higlayout.jar jars/jsr173_1.0_api.jar jars/wstx-lgpl-4.0pr1.jar jars/jogg-0.0.7.jar jars/jorbis-0.0.15.jar jars/tritonus_share.jar jars/vorbisspi1.0.3.jar jars/miglayout-3.7-swing.jar jars/commons-cli-1.1.jar jars/cortado-fc-1.0.jar"/>
         <attribute name="Revision" value="${svn.Revision}"/>
       </manifest>
     </target>
