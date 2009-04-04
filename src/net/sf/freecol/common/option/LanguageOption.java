@@ -56,6 +56,7 @@ public class LanguageOption extends AbstractOption {
 
     private static final String[][] languageNamesHelper = {
         {"arz", "\u0645\u0635\u0631\u064A"},
+        {"hsb", "Serb\u0161\u0107ina"},
         {"nds", "Plattd\u00fc\u00fctsch"},
         {"pms", "Piemont\u00e9s"}
     };
