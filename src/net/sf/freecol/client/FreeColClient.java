@@ -69,8 +69,6 @@ import net.sf.freecol.common.option.ListOption;
 import net.sf.freecol.common.option.Option;
 import net.sf.freecol.common.option.PercentageOption;
 import net.sf.freecol.common.option.LanguageOption.Language;
-import net.sf.freecol.common.resources.ImageResource;
-import net.sf.freecol.common.resources.ResourceFactory;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;
@@ -257,7 +255,7 @@ public final class FreeColClient {
                     (PercentageOption) getClientOptions().getObject(ClientOptions.MUSIC_VOLUME),
                     false,
                     true);
-            playMusic("intro");
+            //playMusic("intro");
         } else {
             musicPlayer = null;
         }
@@ -297,9 +295,9 @@ public final class FreeColClient {
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
         
         SwingUtilities.invokeLater(new Runnable() {
-        	public void run() {
-        		canvas.showMainPanel();
-        	}
+            public void run() {
+                canvas.showOpeningVideoPanel();
+            }
         });
         gui.startCursorBlinking();
     }

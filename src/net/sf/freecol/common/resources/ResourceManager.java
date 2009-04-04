@@ -28,6 +28,7 @@ import java.util.ListIterator;
 import javax.swing.ImageIcon;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.video.Video;
 import net.sf.freecol.common.io.sza.SimpleZippedAnimation;
 
 
@@ -216,6 +217,16 @@ public class ResourceManager {
         updateIfDirty();
         final SZAResource r = getResource(resource, SZAResource.class);
         return (r != null) ? r.getSimpleZippedAnimation() : null;
+    }
+    
+    /**
+     * Gets the <code>Video</code> represented by the given resource.
+     * @return The <code>Video</code> in it's original size.
+     */
+    public static Video getVideo(final String resource) {
+        updateIfDirty();
+        final VideoResource r = getResource(resource, VideoResource.class);
+        return (r != null) ? r.getVideo() : null;
     }
     
     /**

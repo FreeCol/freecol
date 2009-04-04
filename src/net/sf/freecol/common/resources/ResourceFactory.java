@@ -74,6 +74,8 @@ public class ResourceFactory {
         if (r == null) {
             if (url.getPath().endsWith(".sza")) {
                 r = new SZAResource(url);
+            } else if (url.getPath().endsWith("video.ogg")) {
+                r = new VideoResource(url);
             } else {
                 r = new ImageResource(url);
             }
