@@ -2479,9 +2479,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 Unit unit = unitIterator.next();
                 numberOfUnits++;
                 if (unit.isNaval()) {
-                    navalStrength += unit.getGame().getCombatModel().getOffencePower(unit, unit);
+                    navalStrength += unit.getGame().getCombatModel().getOffencePower(unit, null);
                 } else {
-                    militaryStrength += unit.getGame().getCombatModel().getOffencePower(unit, unit);
+                    militaryStrength += unit.getGame().getCombatModel().getOffencePower(unit, null);
                 }
             }
             Stance stance = enemyPlayer.getStance(player);

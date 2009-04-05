@@ -250,6 +250,9 @@ public class SimpleCombatModel implements CombatModel {
     /**
      * Return the offensive power of the attacker versus the defender.
      * 
+     * Null can be passed as the defender when only the attacker unit stats
+     *  are required
+     * 
      * @param attacker an <code>Unit</code> value
      * @param defender an <code>Unit</code> value
      * @return a <code>float</code> value
@@ -262,6 +265,9 @@ public class SimpleCombatModel implements CombatModel {
     /**
      * Return a list of all offensive modifiers that apply to the attacker
      * versus the defender.
+     * 
+     * Null can be passed as the defender when only the attacker unit stats
+     *  are required
      * 
      * @param colony an <code>Colony</code> value
      * @param defender an <code>Unit</code> value
@@ -279,6 +285,9 @@ public class SimpleCombatModel implements CombatModel {
      * Return a list of all offensive modifiers that apply to the attacker
      * versus the defender.
      * 
+     * Null can be passed as the defender when only the attacker unit stats
+     *  are required
+     *  
      * @param attacker an <code>Unit</code> value
      * @param defender an <code>Unit</code> value
      * @return a <code>List</code> of Modifiers
