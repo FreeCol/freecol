@@ -23,356 +23,177 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.JSeparator;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
-import cz.autel.dmi.HIGConstraints;
-import cz.autel.dmi.HIGLayout;
+import net.sf.freecol.common.model.TypeCountMap;
+
+import net.miginfocom.swing.MigLayout;
+
 
 /**
- * This panel displays the Production Report.
+ * This panel displays the ContinentalCongress Report.
  */
-public final class ReportProductionPanel extends JPanel implements ActionListener {
+public final class ReportProductionPanel extends ReportPanel {
 
-    /** How many additional rows are defined. */
-    private final int extraRows = 2;
-
-    /** How much space to leave between labels. */
-    private final int columnSeparatorWidth = 12;
-
-    /** How wide the margins should be. */
-    private final int marginWidth = 12;
-
-    private Canvas parent;
-
-    private List<Colony> colonies;
-
-    private final GoodsType goodsType;
-
-    private final ReportPanel reportPanel;
-
-    private int totalProduction;
-
+    private static final int NUMBER_OF_GOODS = 4;
+    private final JComboBox[] boxes = new JComboBox[NUMBER_OF_GOODS];
+    private final JButton selectButton;
+    private final JLabel selectLabel;
+    private final List<GoodsType> goodsTypes;
 
     /**
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
      */
-    public ReportProductionPanel(GoodsType goodsType, Canvas parent, ReportPanel reportPanel) {
-        this.goodsType = goodsType;
-        this.parent = parent;
-        this.reportPanel = reportPanel;
+    public ReportProductionPanel(Canvas parent) {
+        super(parent, Messages.message("report.production.title"));
 
-        setOpaque(false);
-        Player player = parent.getClient().getMyPlayer();
-        
-        int columns = 3;
-        if (goodsType == Goods.BELLS) {
-            // percentage, sol, tory, percent50, percent100
-            columns += 5;
-        }
-
-        int buildingCount[] = new int[FreeCol.getSpecification().numberOfBuildingTypes()];
-        List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
-        for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
-            if ((buildingType.getProducedGoodsType() == goodsType ||
-                 !buildingType.getModifierSet(goodsType.getId()).isEmpty()) &&
-                !buildingType.getGoodsRequired().isEmpty()) {
-                buildingTypes.add(buildingType);
-                buildingCount[buildingType.getIndex()] = 0;
+        // TODO: can we extend this to cover farmed goods?
+        goodsTypes = new ArrayList<GoodsType>();
+        List<String> goodsNames = new ArrayList<String>();
+        goodsNames.add(Messages.message("nothing"));
+        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+            if (!goodsType.isFarmed()) {
+                goodsTypes.add(goodsType);
+                goodsNames.add(goodsType.getName());
             }
         }
 
-        // add a column for each building
-        columns += buildingTypes.size();
-
-        int colonyColumn = 1;
-        int productionColumn = 2;
-        int unitColumn = 3;
-        int buildingColumn = 4;
-        int percentageColumn = buildingColumn + buildingTypes.size();
-        int solColumn = percentageColumn + 1;
-        int toryColumn = solColumn + 1;
-        int percent50Column = toryColumn + 1;
-        int percent100Column = percent50Column + 1;
-
-        // Display Panel
-        removeAll();
-
-        colonies = player.getColonies();
-        int numberOfColonies = colonies.size();
-        int[] widths = new int[columns];
-        int[] heights = new int[numberOfColonies + extraRows];
-
-        /** TODO: replace this magic number by some value from the
-         * ImageLibrary. At the moment this is difficult, as the
-         * unit images in the library are not sorted according to
-         * type. For this purpose, however, one would need to
-         * consider only ships for the naval report and only units
-         * able to defend colonies for the military report. The
-         * value of 64 is large enough to accommodate the 2/3
-         * scale version of all unit graphics.
-         */
-        Arrays.fill(heights, 0, heights.length, 64);        
-
-        HIGConstraints higConst = new HIGConstraints();
-        setLayout(new HIGLayout(widths, heights));
-
-        JLabel newLabel;
-        // labels
-        newLabel = new JLabel(Messages.message("Colony"));
-        newLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
-        add(newLabel, higConst.rc(1, colonyColumn));
-
-        newLabel = new JLabel(Messages.message("report.production"));
-        newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
-        add(newLabel, higConst.rc(1, productionColumn));
-
-        newLabel = new JLabel(Messages.message("report.units"));
-        newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
-        add(newLabel, higConst.rc(1, unitColumn));
-
-        int column = buildingColumn;
-        for (BuildingType buildingType : buildingTypes) {
-            newLabel = new JLabel(buildingType.getName());
-            newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
-            add(newLabel, higConst.rc(1, column));
-            column++;
+        String[] model = goodsNames.toArray(new String[goodsTypes.size() + 1]);
+        for (int index = 0; index < NUMBER_OF_GOODS; index++) {
+            boxes[index] = new JComboBox(model);
         }
-        
-        if (goodsType == Goods.BELLS) {
-            newLabel = new JLabel(Messages.message("sonsOfLiberty") + "%");
-            newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
-            add(newLabel, higConst.rc(1, percentageColumn));
 
-            newLabel = new JLabel(Messages.message("sonsOfLiberty"));
-            newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
-            add(newLabel, higConst.rc(1, solColumn));
-
-            newLabel = new JLabel(Messages.message("tory"));
-            newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
-            add(newLabel, higConst.rc(1, toryColumn));
-
-            newLabel = new JLabel("50%");
-            newLabel.setToolTipText(Messages.message("report.50percent"));
-            newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
-            add(newLabel, higConst.rc(1, percent50Column));
-
-            newLabel = new JLabel("100%");
-            newLabel.setToolTipText(Messages.message("report.100percent"));
-            newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
-            add(newLabel, higConst.rc(1, percent100Column));
-        }
-            
-
-        int row = extraRows + 1;
-        totalProduction = 0;
-        int totalUnits = 0;
-
-        int percentageCount = 0;
-        int solCount = 0;
-        int toryCount = 0;
-
-        Collections.sort(colonies, parent.getClient().getClientOptions().getColonyComparator());
-
-        for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
-
-            Colony colony = colonies.get(colonyIndex);
-
-            // colonyButton
-            add(createColonyButton(colonyIndex), higConst.rc(row, colonyColumn));
-
-            // production
-            int newValue = colony.getProductionNetOf(goodsType);
-            totalProduction += newValue;
-            Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
-            GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
-            goodsLabel.setHorizontalAlignment(JLabel.LEADING);
-            goodsLabel.setBorder(FreeColPanel.CELLBORDER);
-            add(goodsLabel, higConst.rc(row, productionColumn));
-
-            // units
-            Building building = colony.getBuildingForProducing(goodsType);
-            JPanel unitPanel = new JPanel();
-            unitPanel.setBorder(FreeColPanel.CELLBORDER);
-            unitPanel.setOpaque(false);
-            if (building != null) {
-                Iterator<Unit> unitIterator = building.getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = unitIterator.next();
-                    UnitLabel label = new UnitLabel(unit, parent, true);
-                    unitPanel.add(label);
-                    totalUnits++;
+        selectLabel = new JLabel(Messages.message("report.production.selectGoods"));
+        selectButton = new JButton(Messages.message("report.production.update"));
+        selectButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    update();
                 }
+            });
+
+        reportPanel.setLayout(new MigLayout("gap 0 0", "[fill]", "[fill]"));
+        update();
+    }
+
+    private void update() {
+
+        List<GoodsType> selectedTypes = new ArrayList<GoodsType>();
+
+        reportPanel.removeAll();
+
+        reportPanel.add(selectLabel, "span, split " + (NUMBER_OF_GOODS + 2));
+
+        for (int index = 0; index < NUMBER_OF_GOODS; index++) {
+            reportPanel.add(boxes[index]);
+            int selectedIndex = boxes[index].getSelectedIndex();
+            if (selectedIndex > 0) {
+                selectedTypes.add(goodsTypes.get(selectedIndex - 1));
             }
-            add(unitPanel, higConst.rc(row, unitColumn));
+        }
 
-            
-            column = buildingColumn;
-            for (BuildingType buildingType : buildingTypes) {
-                Building b = colony.getBuilding(buildingType);
-                int level = 0;
-                if (b!=null)
-                    level = b.getLevel();
-                newLabel = new JLabel();
-                newLabel.setBorder(FreeColPanel.CELLBORDER);
-                if (level == buildingType.getLevel()) {
-                    newLabel.setText("X");
-                    buildingCount[buildingType.getIndex()]++;
-                }
-                add(newLabel, higConst.rc(row, column));
-                column++;
-            }
+        reportPanel.add(selectButton, "wrap 20");
 
-            // special
-            if (goodsType == Goods.BELLS) {
-                int percentage = colony.getSoL();
-                percentageCount += percentage;
-                int count = colony.getUnitCount();
-                int sol = percentage * count / 100;
-                solCount += sol;
-                int tories = count - sol;
-                toryCount += tories;
+        if (!selectedTypes.isEmpty()) {
+            Player player = getCanvas().getClient().getMyPlayer();
+            List<Colony> colonies = new ArrayList<Colony>(player.getColonies());
 
-                newLabel = new JLabel(String.valueOf(percentage), JLabel.TRAILING);
-                newLabel.setBorder(FreeColPanel.CELLBORDER);
-                add(newLabel, higConst.rc(row, percentageColumn));
-                newLabel = new JLabel(String.valueOf(sol), JLabel.TRAILING);
-                newLabel.setBorder(FreeColPanel.CELLBORDER);
-                add(newLabel, higConst.rc(row, solColumn));
-                newLabel = new JLabel(String.valueOf(tories), JLabel.TRAILING);
-                newLabel.setBorder(FreeColPanel.CELLBORDER);
-                add(newLabel, higConst.rc(row, toryColumn));
-
-                if (newValue > 0 && percentage < 50) {
-                    int required = (Colony.LIBERTY_PER_REBEL * count) / 2;
-                    int turns = required / newValue;
-                    if (required % newValue > 0) {
-                        turns++;
+            TypeCountMap<BuildingType> buildingCount = new TypeCountMap<BuildingType>();
+            List<List<BuildingType>> basicBuildingTypes = new ArrayList<List<BuildingType>>();
+            for (GoodsType goodsType : selectedTypes) {
+                List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
+                for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+                    if (goodsType.equals(buildingType.getProducedGoodsType())
+                        || !buildingType.getModifierSet(goodsType.getId()).isEmpty()) {
+                        BuildingType firstLevel = buildingType.getFirstLevel();
+                        if (!buildingTypes.contains(firstLevel)) {
+                            buildingTypes.add(firstLevel);
+                        }
                     }
-                    newLabel = new JLabel(String.valueOf(turns), JLabel.TRAILING);
-                    newLabel.setBorder(FreeColPanel.CELLBORDER);
-                    add(newLabel, higConst.rc(row, percent50Column));
-                } else {
-                    newLabel = new JLabel();
-                    newLabel.setBorder(FreeColPanel.CELLBORDER);
-                    add(newLabel, higConst.rc(row, percent50Column));
                 }
-                if (newValue > 0 && percentage < 100) {
-                    int required = Colony.LIBERTY_PER_REBEL * count;
-                    int turns = required / newValue;
-                    if (required % newValue > 0) {
-                        turns++;
+                basicBuildingTypes.add(buildingTypes);
+            }
+
+            JLabel newLabel;
+
+            // labels
+            newLabel = new JLabel(Messages.message("Colony"));
+            newLabel.setBorder(FreeColPanel.TOPLEFTCELLBORDER);
+            reportPanel.add(newLabel, "newline 20");
+
+            for (int index = 0; index < selectedTypes.size(); index++) {
+                newLabel = new JLabel(selectedTypes.get(index).getName());
+                newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
+                reportPanel.add(newLabel);
+
+                for (BuildingType buildingType : basicBuildingTypes.get(index)) {
+                    newLabel = new JLabel(buildingType.getName());
+                    newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
+                    reportPanel.add(newLabel);
+                }
+            }
+
+
+            Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+
+            int[] totalProduction = new int[selectedTypes.size()];
+
+            for (Colony colony : colonies) {
+
+                // colonyButton
+                JButton colonyButton = getLinkButton(colony.getName(), null, colony.getId());
+                colonyButton.setBorder(FreeColPanel.LEFTCELLBORDER);
+                reportPanel.add(colonyButton, "newline");
+
+                // production
+                for (int index = 0; index < selectedTypes.size(); index++) {
+                    GoodsType goodsType = selectedTypes.get(index);
+                    int newValue = colony.getProductionNetOf(goodsType);
+                    totalProduction[index] += newValue;
+                    Goods goods = new Goods(colony.getGame(), colony, goodsType, newValue);
+                    GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
+                    goodsLabel.setHorizontalAlignment(JLabel.LEADING);
+                    goodsLabel.setBorder(FreeColPanel.CELLBORDER);
+                    reportPanel.add(goodsLabel);
+
+                    for (BuildingType buildingType : basicBuildingTypes.get(index)) {
+                        Building building = colony.getBuilding(buildingType);
+                        if (building == null) {
+                            newLabel = new JLabel();
+                            newLabel.setBorder(FreeColPanel.CELLBORDER);
+                            reportPanel.add(newLabel);
+                        } else {
+                            buildingCount.incrementCount(building.getType(), 1);
+                            BuildingPanel buildingPanel = new BuildingPanel(building, getCanvas());
+                            buildingPanel.setBorder(FreeColPanel.CELLBORDER);
+                            reportPanel.add(buildingPanel);
+                        }
                     }
-                    newLabel = new JLabel(String.valueOf(turns), JLabel.TRAILING);
-                    newLabel.setBorder(FreeColPanel.CELLBORDER);
-                    add(newLabel, higConst.rc(row, percent100Column));
-                } else {
-                    newLabel = new JLabel();
-                    newLabel.setBorder(FreeColPanel.CELLBORDER);
-                    add(newLabel, higConst.rc(row, percent100Column));
                 }
             }
 
-
-            row++;
         }
-
-        row = 2;
-        // summary
-        JLabel allColonies = new JLabel(Messages.message("report.allColonies", "%number%",
-                                                         String.valueOf(numberOfColonies)));
-        allColonies.setForeground(Color.BLUE);
-        allColonies.setBorder(FreeColPanel.LEFTCELLBORDER);
-        add(allColonies, higConst.rc(row, colonyColumn));
-
-        Goods allGoods = new Goods(parent.getClient().getGame(), null, goodsType, totalProduction);
-        GoodsLabel allGoodsLabel = new GoodsLabel(allGoods, parent);
-        allGoodsLabel.setHorizontalAlignment(JLabel.LEADING);
-        allGoodsLabel.setBorder(FreeColPanel.CELLBORDER);
-        add(allGoodsLabel, higConst.rc(row, productionColumn));
-
-        newLabel = new JLabel(String.valueOf(totalUnits));
-        newLabel.setBorder(FreeColPanel.CELLBORDER);
-        add(newLabel, higConst.rc(row, unitColumn));
-
-        column = buildingColumn;
-        for (BuildingType buildingType : buildingTypes) {
-            int count = buildingCount[buildingType.getIndex()];
-            newLabel = new JLabel(String.valueOf(count), JLabel.TRAILING);
-            newLabel.setBorder(FreeColPanel.CELLBORDER);
-            add(newLabel, higConst.rc(row, column));
-            column++;
-        }
-        
-        if (goodsType == Goods.BELLS) {
-            int percentage = 0;
-            if (numberOfColonies > 0) {
-                percentage = percentageCount / numberOfColonies;
-            }
-            newLabel = new JLabel(String.valueOf(percentage), JLabel.TRAILING);
-            newLabel.setBorder(FreeColPanel.CELLBORDER);
-            add(newLabel, higConst.rc(row, percentageColumn));
-            newLabel = new JLabel(String.valueOf(solCount), JLabel.TRAILING);
-            newLabel.setBorder(FreeColPanel.CELLBORDER);
-            add(newLabel, higConst.rc(row, solColumn));
-            newLabel = new JLabel(String.valueOf(toryCount), JLabel.TRAILING);
-            newLabel.setBorder(FreeColPanel.CELLBORDER);
-            add(newLabel, higConst.rc(row, toryColumn));
-            newLabel = new JLabel();
-            newLabel.setBorder(FreeColPanel.CELLBORDER);
-            add(newLabel, higConst.rc(row, percent50Column));
-            newLabel = new JLabel();
-            newLabel.setBorder(FreeColPanel.CELLBORDER);
-            add(newLabel, higConst.rc(row, percent100Column));
-        }
+        revalidate();
+        repaint();
     }
-
-
-    private JButton createColonyButton(int index) {
-        JButton button = FreeColPanel.getLinkButton(colonies.get(index).getName(), null, String.valueOf(index));
-        button.setHorizontalAlignment(SwingConstants.LEADING);
-        button.setBorder(FreeColPanel.LEFTCELLBORDER);
-        button.addActionListener(this);
-        return button;
-    }
-
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        int action = Integer.valueOf(command).intValue();
-        if (action == ReportPanel.OK) {
-            reportPanel.actionPerformed(event);
-        } else {
-            parent.showColonyPanel(colonies.get(action));
-        }
-    }
-
-    public int getTotalProduction() {
-        return totalProduction;
-    }
-
 }
