@@ -57,7 +57,6 @@ import javax.swing.text.StyledDocument;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.model.Modifier;
-import cz.autel.dmi.HIGConstraints;
 
 /**
  * Superclass for all panels in FreeCol.
@@ -68,8 +67,6 @@ public class FreeColPanel extends JPanel {
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
 
     public static final Insets emptyMargin = new Insets(0,0,0,0);
-
-    protected static final HIGConstraints higConst = new HIGConstraints();
 
     private static final int cancelKeyCode = KeyEvent.VK_ESCAPE;
 
