@@ -240,7 +240,7 @@ public class IndianDemandMission extends Mission {
             warehouse.getGoodsCount(food) >= 100) {
             int amount = (warehouse.getGoodsCount(food) * dx) / 6;
             if (amount > 0) {
-                return new Goods(getGame(), target, food, amount);
+                return new Goods(getGame(), target, food, capAmount(amount, dx));
             }
         } else if (tension.compareTo(Tension.Level.DISPLEASED) <= 0) {
             Market market = target.getOwner().getMarket();
@@ -257,7 +257,7 @@ public class IndianDemandMission extends Mission {
                 }
             }
             if (goods != null) {
-                goods.setAmount(Math.max((goods.getAmount() * dx) / 6, 1));
+                goods.setAmount(capAmount(goods.getAmount(), dx));
                 return goods;
             }
         } else {
@@ -266,7 +266,7 @@ public class IndianDemandMission extends Mission {
                 if (preferred.isMilitaryGoods()) {
                     int amount = warehouse.getGoodsCount(preferred);
                     if (amount > 0) {
-                        return new Goods(getGame(), target, preferred, Math.max((amount * dx) / 6, 1));
+                        return new Goods(getGame(), target, preferred, capAmount(amount, dx));
                     }
                 }
             }
@@ -275,7 +275,7 @@ public class IndianDemandMission extends Mission {
                 if (preferred.isBuildingMaterial() && preferred.isStorable()) {
                     int amount = warehouse.getGoodsCount(preferred);
                     if (amount > 0) {
-                        return new Goods(getGame(), target, preferred, Math.max((amount * dx) / 6, 1));
+                        return new Goods(getGame(), target, preferred, capAmount(amount, dx));
                     }
                 }
             }
@@ -284,7 +284,7 @@ public class IndianDemandMission extends Mission {
                 if (preferred.isTradeGoods()) {
                     int amount = warehouse.getGoodsCount(preferred);
                     if (amount > 0) {
-                        return new Goods(getGame(), target, preferred, Math.max((amount * dx) / 6, 1));
+                        return new Goods(getGame(), target, preferred, capAmount(amount, dx));
                     }
                 }
             }
@@ -293,7 +293,7 @@ public class IndianDemandMission extends Mission {
                 if (preferred.isRefined() && preferred.isStorable()) {
                     int amount = warehouse.getGoodsCount(preferred);
                     if (amount > 0) {
-                        return new Goods(getGame(), target, preferred, Math.max((amount * dx) / 6, 1));
+                        return new Goods(getGame(), target, preferred, capAmount(amount, dx));
                     }
                 }
             }
@@ -311,9 +311,16 @@ public class IndianDemandMission extends Mission {
             }
         }
         if (goods != null) {
-            goods.setAmount(Math.max((goods.getAmount() * dx) / 6, 1));
+            goods.setAmount(capAmount(goods.getAmount(), dx));
         }
         return goods;
+    }
+
+    private int capAmount(int amount, int difficulty) {
+        int finalAmount = Math.max((amount * difficulty) / 6, 1);
+        // natives can only carry one load of goods
+        finalAmount = Math.min(finalAmount, 100);
+        return finalAmount;
     }
 
     /**
