@@ -32,6 +32,7 @@ public class AllTests {
         suite.addTestSuite(PioneeringMissionTest.class);
         suite.addTestSuite(ScoutingMissionTest.class);
         suite.addTestSuite(TransportMissionTest.class);
+        suite.addTestSuite(UnitSeekAndDestroyMissionTest.class);
         //$JUnit-END$
         return suite;
     }
