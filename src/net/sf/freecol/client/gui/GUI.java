@@ -1410,7 +1410,28 @@ public final class GUI {
         return createStringImage(c, null, nameString, color, maxWidth, preferredFontSize);
     }
     
-    private HashMap<String, BufferedImage> stringImageCache = new HashMap<String, BufferedImage>();
+    /**
+     * For performance reason, string images are rendered once and cached for reuse.
+     * The class StringImageKey provide an identifier for looking up images
+     */
+    private class StringImageKey {
+        public Color color;
+        public String name;
+        public StringImageKey(Color c, String s) {
+            this.color = c;
+            this.name = s;
+        }
+        public int hashCode() {
+            return name.hashCode();
+        }
+        public boolean equals(Object o) {
+            if (o==null || !(o instanceof StringImageKey))
+                return false;
+            StringImageKey other = (StringImageKey) o;
+            return (other.color.equals(this.color)) && (other.name.equals(this.name));
+        }
+    }
+    private HashMap<StringImageKey, BufferedImage> stringImageCache = new HashMap<StringImageKey, BufferedImage>();
     
     /**
      * Creates an image with a string of a given color and with 
@@ -1436,7 +1457,8 @@ public final class GUI {
         }
         BufferedImage bi = null;
         // Lookup in the cache if the image has been generated already
-        bi = stringImageCache.get(nameString);
+        StringImageKey key = new StringImageKey(color, nameString);
+        bi = stringImageCache.get(key);
         if (bi!=null) {
             return bi;
         }
@@ -1481,7 +1503,7 @@ public final class GUI {
                 }
             }
         }
-        this.stringImageCache.put(nameString, bi);
+        this.stringImageCache.put(key, bi);
         return bi;
     }
 
