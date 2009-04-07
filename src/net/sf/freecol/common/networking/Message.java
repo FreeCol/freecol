@@ -50,7 +50,7 @@ public class Message {
 
     protected static final Logger logger = Logger.getLogger(Message.class.getName());
 
-    private static final String FREECOL_PROTOCOL_VERSION = "0.1.4";
+    private static final String FREECOL_PROTOCOL_VERSION = "0.1.5";
 
     private static final String INVALID_MESSAGE = "invalid";
 
