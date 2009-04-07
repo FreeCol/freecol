@@ -590,7 +590,7 @@ public class ColonyPlan {
     }
 
     /**
-     * Returns the production of food accoring to this plan.
+     * Returns the production of food according to this plan.
      * 
      * @return The maximum possible food production
      *         according to this <code>ColonyPlan</code>.
@@ -598,18 +598,7 @@ public class ColonyPlan {
     public int getFoodProduction() {
         int amount = 0;
         for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
-            Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
-            while (wlpIterator.hasNext()) {
-                WorkLocationPlan wlp = wlpIterator.next();
-                amount += wlp.getProductionOf(foodType);
-            }
-
-            // Add values for the center tile:
-            if (foodType == colony.getTile().primaryGoods() ||
-                foodType == colony.getTile().secondaryGoods()) {
-                // TODO: find out about unit working here, if any (?)
-                amount += colony.getTile().getMaximumPotential(foodType, null);
-            }
+            amount += getProductionOf(foodType);
         }
 
         return amount;
