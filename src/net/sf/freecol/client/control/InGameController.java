@@ -103,6 +103,7 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
+import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
@@ -1483,36 +1484,29 @@ public final class InGameController implements NetworkConstants {
                 
         Client client = freeColClient.getClient();
         Goods goods = null;
-        do {
-            // Show dialog with goods for sale
+        for (;;) {
+            // Choose goods to buy
             goods = canvas.showChoiceDialog(Messages.message("buyProposition.text"),
                                             Messages.message("buyProposition.cancel"),
                                             goodsOffered);
+            if (goods == null) break; // Trade aborted by the player
             
-            if (goods == null) { // == Trade aborted by the player, cancel buy attempt
-                return false;
-            }
-            
-            // Get price for chosen good from server
-            Element buyPropositionElement = Message.createNewRootElement("buyProposition");
-            buyPropositionElement.setAttribute("unit", unit.getId());
-            buyPropositionElement.appendChild(goods.toXMLElement(null, buyPropositionElement.getOwnerDocument()));
-
-            Element proposalReply = client.ask(buyPropositionElement);
-            while (proposalReply != null) {
-                if (!proposalReply.getTagName().equals("buyPropositionAnswer")) {
-                    logger.warning("Illegal reply.");
-                    throw new IllegalStateException();
+            int gold = -1; // Initially ask for a price
+            for (;;) {
+                // Propose to purchase
+                Element reply = client.ask(new BuyPropositionMessage(unit, settlement, goods, gold).toXMLElement());
+                if (reply == null
+                    || !reply.getTagName().equals("buyProposition")) {
+                    throw new IllegalStateException("Illegal reply to \"buyProposition\" message.");
                 }
-
-                int gold = Integer.parseInt(proposalReply.getAttribute("gold"));
-                // proposal was refused
+                gold = Integer.parseInt(reply.getAttribute("gold"));
                 if (gold <= NO_TRADE) {
+                    // Proposal was refused
                     canvas.showInformationMessage("noTrade");
                     return true;
                 }
                 
-                //show dialog for chosen goods buy proposal
+                // Show dialog for buy proposal
                 String text = Messages.message("buy.text",
                         "%nation%", settlement.getOwner().getNationAsString(),
                         "%goods%", goods.getName(),
@@ -1522,36 +1516,22 @@ public final class InGameController implements NetworkConstants {
                 choices.add(new ChoiceItem<Integer>(Messages.message("buy.moreGold"), 2));
                 Integer ci = canvas.showChoiceDialog(text, Messages.message("buy.cancel"), choices);
                 
-                // player cancelled goods choice, return to goods to sale dialog
                 if (ci == null) {
+                    // Cancelled, break out to goods for sale loop
                     break;
                 }
-                // process player choice
-                switch(ci.intValue()){
-                    case 1:
-                        // Accepts price, makes purchase
-                        buyFromSettlement(unit, (IndianSettlement) settlement, goods, gold);
-                        return true;
-                    case 2:
-                        // Try to negociate new price
-                        int newPrice = gold * 9 / 10;
-                        
-                        // send new proposal to server
-                        buyPropositionElement = Message.createNewRootElement("buyProposition");
-                        buyPropositionElement.setAttribute("unit", unit.getId());
-                        buyPropositionElement.appendChild(goods.toXMLElement(null, buyPropositionElement.getOwnerDocument()));
-                        buyPropositionElement.setAttribute("gold", Integer.toString(newPrice));
-
-                        proposalReply = client.ask(buyPropositionElement);
-                        break;
-                     default:
-                         logger.warning("Unknown choice for buying goods from Indian Settlement.");
-                         throw new IllegalStateException();
+                switch (ci.intValue()) {
+                case 1: // Accept price, make purchase
+                    buyFromSettlement(unit, (IndianSettlement) settlement, goods, gold);
+                    return true;
+                case 2: // Try to negotiate a lower price
+                    gold = gold * 9 / 10;
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown choice for buying goods from Indian Settlement.");
                 }
             }
-        } while(goods != null);
-        // This should not happen
-        logger.warning("Unexpected situation");
+        }
         return false;
     }
     
