@@ -91,6 +91,16 @@ public class FreeColTestCase extends TestCase {
         return game;
     }
     
+    /**
+     * Specifically sets the game instance to run with
+     * Necessary for server tests that create their own game instances
+     * Allows for same interface for accessing the game instance for all types of tests
+     * @param newGame Game instance to work with
+     */
+    public static void setGame(Game newGame) {
+        game = newGame;
+    }
+    
     public static Specification spec(){
     	return FreeCol.getSpecification();
     }
@@ -245,7 +255,6 @@ public class FreeColTestCase extends TestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         Map map = game.getMap();
-        game.setMap(map);
 
         Tile tile = map.getTile(tileX, tileY);
         Colony colony = new Colony(game, dutch, "New Amsterdam", tile);
