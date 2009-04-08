@@ -35,21 +35,21 @@ import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
- * The message sent when negotiating a purchase at an IndianSettlement.
+ * The message sent when negotiating a sale at an IndianSettlement.
  */
-public class BuyPropositionMessage extends Message {
+public class SellPropositionMessage extends Message {
     /**
-     * The ID of the unit that is buying.
+     * The ID of the unit that is selling.
      */
     private String unitId;
 
     /**
-     * The ID of the settlement that is selling.
+     * The ID of the settlement that is buying.
      */
     private String settlementId;
 
     /**
-     * The goods to be bought.
+     * The goods to be sold.
      */
     private Goods goods;
 
@@ -59,14 +59,14 @@ public class BuyPropositionMessage extends Message {
     private int gold;
 
     /**
-     * Create a new <code>BuyPropositionMessage</code>.
+     * Create a new <code>SellPropositionMessage</code>.
      *
-     * @param unit The <code>Unit</code> that is buying.
-     * @param goods The <code>Goods</code> to buy.
+     * @param unit The <code>Unit</code> that is trading.
+     * @param goods The <code>Goods</code> to sell.
      * @param gold The price of the goods (negative if unknown).
      */
-    public BuyPropositionMessage(Unit unit, Settlement settlement,
-                                 Goods goods, int gold) {
+    public SellPropositionMessage(Unit unit, Settlement settlement,
+                                   Goods goods, int gold) {
         this.unitId = unit.getId();
         this.settlementId = settlement.getId();
         this.goods = goods;
@@ -74,13 +74,13 @@ public class BuyPropositionMessage extends Message {
     }
 
     /**
-     * Create a new <code>BuyPropositionMessage</code> from a
+     * Create a new <code>SellPropositionMessage</code> from a
      * supplied element.
      *
      * @param game The <code>Game</code> this message belongs to.
      * @param element The <code>Element</code> to use to create the message.
      */
-    public BuyPropositionMessage(Game game, Element element) {
+    public SellPropositionMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.settlementId = element.getAttribute("settlement");
         this.gold = Integer.parseInt(element.getAttribute("gold"));
@@ -97,13 +97,13 @@ public class BuyPropositionMessage extends Message {
     }
 
     /**
-     * Handle a "buyProposition"-message.
+     * Handle a "sellProposition"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return Null.
+     * @return This message with updated gold value.
      * @throws IllegalStateException if there is problem with the arguments.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
@@ -112,33 +112,32 @@ public class BuyPropositionMessage extends Message {
         Unit unit = server.getUnitSafely(unitId, serverPlayer);
         IndianSettlement settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
 
-        // Make sure we are trying to buy something that is there
+        // Make sure we are trying to sell something that is there
         Boolean ok = false;
-        for (Goods sell : settlement.getSellGoods()) {
+        for (Goods sell : unit.getGoodsList()) {
             if (sell.getId() == goods.getId()) ok = true;
         }
         if (!ok) {
-            throw new IllegalStateException("buyProposition for non-existant goods");
+            throw new IllegalStateException("sellProposition for non-existant goods");
         }
 
         InGameController controller = (InGameController) server.getController();
         if (!controller.isTransactionSessionOpen(unit, settlement)) {
-            throw new IllegalStateException("trying to trade without opening a transaction session");
+            throw new IllegalStateException("Trying to sell without opening a transaction session");
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if(!(Boolean) session.get("canBuy")
-           && !(Boolean) session.get("hasSpaceLeft")) {
-            throw new IllegalStateException("Trying to buy in a session where buying is not allowed.");
+        if (!(Boolean) session.get("canSell")) {
+            throw new IllegalStateException("Trying to sell in a session where selling is not allowed.");
         }
 
         // AI considers the proposition, return with a gold value
         AIPlayer ai = (AIPlayer) server.getAIMain().getAIObject(settlement.getOwner());
-        gold = ai.buyProposition(unit, goods, gold);
+        gold = ai.tradeProposition(unit, settlement, goods, gold);
         return this.toXMLElement();
     }
 
     /**
-     * Convert this BuyPropositionMessage to XML.
+     * Convert this SellPropositionMessage to XML.
      *
      * @return The XML representation of this message.
      */
@@ -154,9 +153,9 @@ public class BuyPropositionMessage extends Message {
     /**
      * The tag name of the root element representing this object.
      *
-     * @return "buyProposition".
+     * @return "sellProposition".
      */
     public static String getXMLElementTagName() {
-        return "buyProposition";
+        return "sellProposition";
     }
 }

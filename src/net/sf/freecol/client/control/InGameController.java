@@ -113,6 +113,7 @@ import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
@@ -1372,7 +1373,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (unit.getGoodsCount() == 0) {
-            canvas.errorMessage("noGoodsOnboard");
+            canvas.errorMessage("trade.noGoodsOnboard");
             return;
         }
         // Save moves to restore if no action taken
@@ -1438,28 +1439,28 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    private java.util.Map<String,Boolean> getTransactionSession(Unit unit, Settlement settlement){
+    private java.util.Map<String,Boolean> getTransactionSession(Unit unit, Settlement settlement) {
         Element reply = freeColClient.getClient().ask(new GetTransactionMessage(unit, settlement).toXMLElement());
 
-        if (reply == null || !reply.getTagName().equals("getTransactionAnswer")) {
+        if (reply == null
+            || !reply.getTagName().equals("getTransactionAnswer")) {
             logger.warning("Illegal reply to getTransaction.");
             throw new IllegalStateException();
         }
         
         java.util.Map<String,Boolean> transactionSession = new HashMap<String,Boolean>();
-        
         transactionSession.put("canBuy", new Boolean(reply.getAttribute("canBuy")));
         transactionSession.put("canSell", new Boolean(reply.getAttribute("canSell")));
         transactionSession.put("canGift", new Boolean(reply.getAttribute("canGift")));
-        
         return transactionSession;
     }
 
-    private ArrayList<Goods> getGoodsForSaleInIndianSettlement(Unit unit, Settlement settlement){
+    private ArrayList<Goods> getGoodsForSaleInIndianSettlement(Unit unit, Settlement settlement) {
         // Get goods for sale from server
         Element reply = freeColClient.getClient().ask(new GoodsForSaleMessage(unit, settlement).toXMLElement());
 
-        if (reply == null || !reply.getTagName().equals(GoodsForSaleMessage.getXMLElementTagName())) {
+        if (reply == null
+            || !reply.getTagName().equals(GoodsForSaleMessage.getXMLElementTagName())) {
             throw new IllegalStateException("Illegal reply to goodsForSale message.");
         }
 
@@ -1469,26 +1470,26 @@ public final class InGameController implements NetworkConstants {
         for (int i = 0; i < childNodes.getLength(); i++) {
             goodsOffered.add(new Goods(freeColClient.getGame(), (Element) childNodes.item(i)));
         }
-        
         return goodsOffered;
     }
     
-    private boolean attemptBuyFromIndianSettlement(Unit unit, Settlement settlement){
+    private boolean attemptBuyFromIndianSettlement(Unit unit,
+                                                   Settlement settlement) {
         Canvas canvas = freeColClient.getCanvas();
+        Client client = freeColClient.getClient();
+        Goods goods = null;
         
         // Get list of goods for sale
         List<ChoiceItem<Goods>> goodsOffered = new ArrayList<ChoiceItem<Goods>>();
-        for (Goods goods : getGoodsForSaleInIndianSettlement(unit, settlement)) {
-            goodsOffered.add(new ChoiceItem<Goods>(goods));
+        for (Goods sell : getGoodsForSaleInIndianSettlement(unit, settlement)) {
+            goodsOffered.add(new ChoiceItem<Goods>(sell));
         }
-                
-        Client client = freeColClient.getClient();
-        Goods goods = null;
+
         for (;;) {
             // Choose goods to buy
             goods = canvas.showChoiceDialog(Messages.message("buyProposition.text"),
-                                            Messages.message("buyProposition.cancel"),
-                                            goodsOffered);
+                Messages.message("buyProposition.nothing"),
+                goodsOffered);
             if (goods == null) break; // Trade aborted by the player
             
             int gold = -1; // Initially ask for a price
@@ -1499,10 +1500,10 @@ public final class InGameController implements NetworkConstants {
                     || !reply.getTagName().equals("buyProposition")) {
                     throw new IllegalStateException("Illegal reply to \"buyProposition\" message.");
                 }
-                gold = Integer.parseInt(reply.getAttribute("gold"));
+                gold = new BuyPropositionMessage(freeColClient.getGame(), reply).getGold();
                 if (gold <= NO_TRADE) {
                     // Proposal was refused
-                    canvas.showInformationMessage("noTrade");
+                    canvas.showInformationMessage("trade.noTrade");
                     return true;
                 }
                 
@@ -1514,13 +1515,12 @@ public final class InGameController implements NetworkConstants {
                 List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
                 choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), 1));
                 choices.add(new ChoiceItem<Integer>(Messages.message("buy.moreGold"), 2));
-                Integer ci = canvas.showChoiceDialog(text, Messages.message("buy.cancel"), choices);
-                
-                if (ci == null) {
-                    // Cancelled, break out to goods for sale loop
+                Integer offerReply = canvas.showChoiceDialog(text, Messages.message("buyProposition.cancel"), choices);
+                if (offerReply == null) {
+                    // Cancelled, break out to choice-of-goods loop
                     break;
                 }
-                switch (ci.intValue()) {
+                switch (offerReply.intValue()) {
                 case 1: // Accept price, make purchase
                     buyFromSettlement(unit, (IndianSettlement) settlement, goods, gold);
                     return true;
@@ -1535,90 +1535,69 @@ public final class InGameController implements NetworkConstants {
         return false;
     }
     
-    private boolean attemptSellToIndianSettlement(Unit unit, Settlement settlement){
+    private boolean attemptSellToIndianSettlement(Unit unit,
+                                                  Settlement settlement) {
         Canvas canvas = freeColClient.getCanvas();
-        
-        // show buy dialog
-        Goods choice = canvas.showSimpleChoiceDialog(Messages.message("tradeProposition.text"),
-                                                     Messages.message("tradeProposition.cancel"),
-                                                     unit.getGoodsList());
-        
-        if (choice == null) { // == Trade aborted by the player.
-            return false;
-        }
-        
         Client client = freeColClient.getClient();
+        Goods goods = null;
 
-        // Send initial proposal to server
-        Element tradePropositionElement = Message.createNewRootElement("tradeProposition");
-        tradePropositionElement.setAttribute("unit", unit.getId());
-        tradePropositionElement.setAttribute("settlement", settlement.getId());
-        tradePropositionElement.appendChild(choice.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
+        for (;;) {
+            // Choose goods to sell
+            goods = canvas.showSimpleChoiceDialog(Messages.message("sellProposition.text"),
+                Messages.message("sellProposition.nothing"),
+                unit.getGoodsList());
+            if (goods == null) break; // Trade aborted by the player
 
-        Element reply = client.ask(tradePropositionElement);
-        while (reply != null) {
-            if (!reply.getTagName().equals("tradePropositionAnswer")) {
-                logger.warning("Illegal reply.");
-                throw new IllegalStateException();
-            }
-            int gold = Integer.parseInt(reply.getAttribute("gold"));
-            
-            // Indian do not need the goods, refuse and end trade
-            if (gold == NO_NEED_FOR_THE_GOODS) {
-                canvas.showInformationMessage("noNeedForTheGoods", "%goods%", choice.getName());
-                return true;
-            }
-            
-            // Deal is totally not acceptable, refuse and end trade
-            if (gold <= NO_TRADE) {
-                canvas.showInformationMessage("noTrade");
-                return true;
-            } 
-            
-            // Show proposal for goods
-            String text = Messages.message("trade.text",
-                                           "%nation%", settlement.getOwner().getNationAsString(),
-                                           "%goods%", choice.getName(),
-                                           "%gold%", Integer.toString(gold));
-            List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-            choices.add(new ChoiceItem<Integer>(Messages.message("trade.takeOffer"), 1));
-            choices.add(new ChoiceItem<Integer>(Messages.message("trade.moreGold"), 2));
-            choices.add(new ChoiceItem<Integer>(Messages.message("trade.gift", "%goods%", 
-                                                                 choice.getName()), 0));
-            Integer offerReply = canvas.showChoiceDialog(text, Messages.message("trade.cancel"), choices);
-
-            if (offerReply == null) { // == Trade aborted by the player.
-                return false;
-            }
-            
-            switch(offerReply.intValue()){
-                case 0:
-                    // decide to make a gift of the goods
-                    deliverGiftToSettlement(unit, settlement, choice);
+            int gold = -1; // Initially ask for a price
+            for (;;) {
+                // Propose to sell
+                Element reply = client.ask(new SellPropositionMessage(unit, settlement, goods, gold).toXMLElement());
+                if (reply == null
+                    || !reply.getTagName().equals("sellProposition")) {
+                    throw new IllegalStateException("Illegal reply to \"sellProposition\" message.");
+                }
+                gold = new SellPropositionMessage(freeColClient.getGame(), reply).getGold();
+                if (gold == NO_NEED_FOR_THE_GOODS) {
+                    // Indians do not need the goods, refuse and end trade
+                    canvas.showInformationMessage("trade.noNeedForTheGoods",
+                                                  "%goods%", goods.getName());
                     return true;
-                case 1:
-                    // deal accepted
-                    sellToSettlement(unit, settlement, choice, gold);
+                } else if (gold <= NO_TRADE) {
+                    // Proposal was refused
+                    canvas.showInformationMessage("trade.noTrade");
                     return true;
-                case 2:
-                    // ask for more money
+                }
+
+                // Show dialog for sale proposal
+                String text = Messages.message("sell.text",
+                        "%nation%", settlement.getOwner().getNationAsString(),
+                        "%goods%", goods.getName(),
+                        "%gold%", Integer.toString(gold));
+                List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
+                choices.add(new ChoiceItem<Integer>(Messages.message("sell.takeOffer"), 1));
+                choices.add(new ChoiceItem<Integer>(Messages.message("sell.moreGold"), 2));
+                choices.add(new ChoiceItem<Integer>(Messages.message("sell.gift", "%goods%",
+                                                                     goods.getName()), 3));
+                Integer offerReply = canvas.showChoiceDialog(text, Messages.message("sellProposition.cancel"), choices);
+                if (offerReply == null) {
+                    // Cancelled, break out to choice-of-goods loop
+                    break;
+                }
+                switch (offerReply.intValue()) {
+                case 1: // Accepted price, make the sale
+                    sellToSettlement(unit, settlement, goods, gold);
+                    return true;
+                case 2: // Ask for more money
                     gold = (gold * 11) / 10;
                     break;
+                case 3: // Decide to make a gift of the goods
+                    deliverGiftToSettlement(unit, settlement, goods);
+                    return true;
                 default:
-                    logger.warning("Unknon player reply to indian proposal for goods sale");
-                    return false;            
+                    throw new IllegalStateException("Unknown choice for selling goods to Indian Settlement.");
+                }
             }
-            
-            // send counter proposal
-            tradePropositionElement = Message.createNewRootElement("tradeProposition");
-            tradePropositionElement.setAttribute("unit", unit.getId());
-            tradePropositionElement.setAttribute("settlement", settlement.getId());
-            tradePropositionElement.appendChild(choice.toXMLElement(null, tradePropositionElement.getOwnerDocument()));
-            tradePropositionElement.setAttribute("gold", Integer.toString(gold));
-
-            reply = client.ask(tradePropositionElement);
         }
-        logger.warning("Request for indian proposal for goods sale was null");
         return false;
     }
     
@@ -1767,7 +1746,7 @@ public final class InGameController implements NetworkConstants {
         // no goods were chosen as gift, show dialog to decide
         if (goods == null){
             goods = canvas.showSimpleChoiceDialog(Messages.message("gift.text"),
-                                                  Messages.message("tradeProposition.cancel"),
+                                                  Messages.message("cancel"),
                                                   unit.getGoodsList());
             
             if (goods == null) { // == Trade aborted by the player.
