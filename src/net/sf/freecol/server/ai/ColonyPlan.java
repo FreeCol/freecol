@@ -282,7 +282,7 @@ public class ColonyPlan {
     /**
      * Creates a plan for this colony. That is; determines what type of goods
      * each tile should produce and what type of goods that should be
-     * manufactored.
+     * manufactured.
      */
     public void create() {
         
@@ -290,10 +290,14 @@ public class ColonyPlan {
         // Colonies should be able to specialize, determine role by colony
         // resources, buildings and specialists
         
+        final GoodsType hammersType = FreeCol.getSpecification().getGoodsType("model.goods.hammers");
+        final GoodsType toolsType = FreeCol.getSpecification().getGoodsType("model.goods.tools");
+        final GoodsType lumberType = FreeCol.getSpecification().getGoodsType("model.goods.lumber");
+        final GoodsType oreType = FreeCol.getSpecification().getGoodsType("model.goods.ore");
+        
         workLocationPlans.clear();
-        Building carpenter = colony.getBuildingForProducing(Goods.HAMMERS);
         Building townHall = colony.getBuildingForProducing(Goods.BELLS);
-
+        
         // Choose the best production for each tile:
         for (ColonyTile ct : colony.getColonyTiles()) {
 
@@ -306,9 +310,27 @@ public class ColonyPlan {
             WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), ct, goodsType);
             workLocationPlans.add(wlp);
         }
+        
+        // We need to find what, if any, is still required for what we are building
+        GoodsType buildingReq = null;
+        GoodsType buildingRawMat = null;
+        Building buildingReqProducer = null;
+        BuildableType currBuild = colony.getCurrentlyBuilding();
+        if(currBuild != null){
+            if(colony.getGoodsCount(hammersType) < currBuild.getAmountRequiredOf(hammersType)){
+                buildingReq = hammersType;
+                buildingRawMat = lumberType;
+            }
+            else{
+                buildingReq = toolsType;
+                buildingRawMat = oreType;
+            }
+            buildingReqProducer = colony.getBuildingForProducing(buildingReq);
+        }
 
-        // Ensure that we produce lumber:
-        if (getProductionOf(Goods.LUMBER) <= 0) {
+        // Try to ensure that we produce the raw material necessary for
+        //what we are building
+        if(buildingRawMat != null && getProductionOf(buildingRawMat) <= 0) {
             WorkLocationPlan bestChoice = null;
             int highestPotential = 0;
 
@@ -317,8 +339,8 @@ public class ColonyPlan {
                 WorkLocationPlan wlp = wlpIterator.next();
                 // TODO: find out about unit working here, if any (?)
                 if (wlp.getWorkLocation() instanceof ColonyTile
-                    && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.LUMBER, null) > highestPotential) {
-                    highestPotential = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(Goods.LUMBER, null);
+                    && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(buildingRawMat, null) > highestPotential) {
+                    highestPotential = ((ColonyTile) wlp.getWorkLocation()).getWorkTile().potential(buildingRawMat, null);
                     bestChoice = wlp;
                 }
             }
@@ -337,7 +359,10 @@ public class ColonyPlan {
         int secondaryRawMaterialProduction = 0;
         List<GoodsType> goodsTypeList = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsTypeList) {
-            if (goodsType.getProducedMaterial() == null) {
+            // only consider goods that can be transformed
+            // do not consider hammers as a valid transformation
+            if (goodsType.getProducedMaterial() == null 
+                    || goodsType.getProducedMaterial() == hammersType) {
                 continue;
             }
             if (getProductionOf(goodsType) > primaryRawMaterialProduction) {
@@ -380,10 +405,14 @@ public class ColonyPlan {
             wlp.setGoodsType(Goods.FOOD);
         }
 
-        // Place a carpenter:
-        if (getProductionOf(Goods.LUMBER) > 0) {
+        // Produce the goods required for what is being built, if:
+        //     - anything is being built, and
+        //     - there is either production or stock of the raw material
+        if(buildingReq != null && 
+            (getProductionOf(buildingRawMat) > 0 
+              || colony.getGoodsCount(buildingRawMat) > 0)){
             WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(),
-                    colony.getBuildingForProducing(Goods.HAMMERS), Goods.HAMMERS);
+                    colony.getBuildingForProducing(buildingReq), buildingReq);
             workLocationPlans.add(wlp);
         }
 
@@ -443,55 +472,57 @@ public class ColonyPlan {
                 WorkLocationPlan wlp = wlpIterator2.next();
                 if (wlp.getWorkLocation() instanceof Building) {
                     Building b = (Building) wlp.getWorkLocation();
-                    if (b != carpenter && b != townHall) {
+                    if ( b != buildingReqProducer && b != townHall) {
                         wlpIterator2.remove();
                     }
                 }
             }
         }
 
-        // Remove the lumberjacks if we still lack food:
+        // Still lacking food
+        // Remove the producers of the raw and/or non-raw materials required for the build
+        // The decision of which to start depends on existence or not of stock of
+        //raw materials
+        GoodsType buildMatToGo = buildingReq;
+        if(colony.getGoodsCount(buildingRawMat) > 0){
+            buildMatToGo = buildingRawMat;
+        }
         if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
             while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
                 WorkLocationPlan wlp = wlpIterator2.next();
-                if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == Goods.LUMBER) {
+                if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == buildMatToGo) {
                     wlpIterator2.remove();
                 }
             }
-        }
-
-        // Remove the carpenter if we have no lumber or lack food:
-        // TODO: Erik - run short on lumber as long as there is a stockpile!
-        if (getProductionOf(Goods.LUMBER) < 1 || getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
-            Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
-                WorkLocationPlan wlp = wlpIterator2.next();
-                if (wlp.getWorkLocation() instanceof Building) {
-                    Building b = (Building) wlp.getWorkLocation();
-                    if (b == carpenter) {
+            // still lacking food, removing the rest
+            if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+                buildMatToGo = (buildMatToGo == buildingRawMat)? buildingReq : buildingRawMat;
+                
+                wlpIterator2 = workLocationPlans.iterator();
+                while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
+                    WorkLocationPlan wlp = wlpIterator2.next();
+                    if (wlp.getWorkLocation() instanceof ColonyTile && wlp.getGoodsType() == buildMatToGo) {
                         wlpIterator2.remove();
                     }
                 }
             }
-        }
-
-        // Remove all other colonists in buildings if we still are lacking food:
-        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
-            Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
-            while (wlpIterator2.hasNext() && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION) {
-                WorkLocationPlan wlp = wlpIterator2.next();
-                if (wlp.getWorkLocation() instanceof Building) {
-                    wlpIterator2.remove();
-                }
-            }
+        }        
+        
+        // Primary allocations done
+        // Beginning secondary allocations
+        
+        // Not enough food for more allocations, save work and stop here
+        if(getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2){
+            return;
         }
 
         int primaryWorkers = 1;
         int secondaryWorkers = 0;
-        int carpenters = 1;
+        int builders = 1;
         int gunsmiths = 0;
         boolean colonistAdded = true;
+        //XXX: This loop does not work, only goes through once, not as intended
         while (colonistAdded) {
             boolean blacksmithAdded = false;
 
@@ -542,15 +573,15 @@ public class ColonyPlan {
                 }
             }
 
-            // Add carpenters:
+            // Add builders
             if (getFoodProduction() >= workLocationPlans.size() * Colony.FOOD_CONSUMPTION + 2
-                    && 12 * carpenters + 6 <= getProductionOf(Goods.LUMBER) && carpenters <= MAX_LEVEL) {
-                if (carpenter != null) {
-                    WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), carpenter, Goods.HAMMERS);
-                    workLocationPlans.add(wlp);
-                    colonistAdded = true;
-                    carpenters++;
-                }
+                    && buildingReqProducer != null 
+                    && buildingReqProducer.getProduction() * builders <= getProductionOf(buildingRawMat) 
+                    && buildingReqProducer.getMaxUnits() < builders) {
+                WorkLocationPlan wlp = new WorkLocationPlan(getAIMain(), buildingReqProducer, buildingReq);
+                workLocationPlans.add(wlp);
+                colonistAdded = true;
+                builders++;
             }
 
             // TODO: Add worker to armory.

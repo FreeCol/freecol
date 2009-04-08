@@ -1218,20 +1218,6 @@ public class AIColony extends AIObject {
           colony.setExports(Goods.COATS, true);
           }*/
 
-        // temporarily move units from carpenter to blacksmith if the current building needs no lumber but more tools
-        // TODO: mine ore if needed
-        BuildableType nowbuilding = colony.getCurrentlyBuilding();
-        if (nowbuilding != null &&
-            getHammersRequired(nowbuilding) <= colony.getGoodsCount(Goods.HAMMERS) &&
-            getToolsRequired(nowbuilding) > colony.getGoodsCount(Goods.TOOLS)) {
-            Building carpenter = colony.getBuildingForProducing(Goods.HAMMERS);
-            Building blacksmith = colony.getBuildingForProducing(Goods.TOOLS);
-            for (Unit unit : carpenter.getUnitList()) {
-                if (carpenter.getUnitCount() > 0 && blacksmith.canAdd(carpenter.getFirstUnit())) {
-                    carpenter.getFirstUnit().setLocation(blacksmith);
-                }
-            }
-        }
         decideBuildable(connection);
         createTileImprovementPlans();
         createWishes();

@@ -19,26 +19,32 @@
 
 package net.sf.freecol.server.ai;
 
-import java.util.Iterator;
-
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
-import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class ColonyPlanTest extends FreeColTestCase {	
-	UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-		
+	final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+	final TileType forestType = spec().getTileType("model.tile.coniferForest");
+	final TileType mountainType = spec().getTileType("model.tile.mountains");
+	final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
+    final GoodsType oreType = spec().getGoodsType("model.goods.ore");
+    final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
+    final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
+    final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
+    
 	FreeColServer server = null;
 	
 	public void tearDown() throws Exception {
@@ -48,6 +54,20 @@ public class ColonyPlanTest extends FreeColTestCase {
             server = null;
 		}
 		super.tearDown();
+	}
+	
+	// creates the special map for the tests
+	// map will have: 
+    //    - a colony in (5,8) (built after)
+	//    - a forest in (4,8) for lumber
+	//    - a mountain in (6,8) for ore
+	private Map buildMap(boolean withBuildRawMat){
+	    MapBuilder builder = new MapBuilder(getGame());
+	    if(withBuildRawMat){
+	        builder.setTile(4, 8, forestType);
+	        builder.setTile(6, 8, mountainType);
+	    }
+	    return builder.build();
 	}
 	
 	public void testPlanFoodProductionBeforeWorkerAllocation() {
@@ -86,5 +106,179 @@ public class ColonyPlanTest extends FreeColTestCase {
         int amount = plan.getFoodProduction();
         
         assertEquals("Wrong initial food ammount",expAmount,amount);
+	}
+	
+	public void testReqLumberAndHammersForBuild(){
+	       // start a server
+        server = ServerTestHelper.startServer(false, true);
+        
+        Map map = buildMap(true);
+        
+        server.setMapGenerator(new MockMapGenerator(map));
+        
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+        
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        
+        Game game = server.getGame();
+        
+        FreeColTestCase.setGame(game);
+        
+        AIMain aiMain = server.getAIMain();
+            
+        Colony colony = getStandardColony();
+        colony.setCurrentlyBuilding(warehouse);
+        
+        ColonyPlan plan = new ColonyPlan(aiMain,colony);
+        
+        plan.create();
+        
+        int lumber = plan.getProductionOf(lumberType);
+        assertTrue("The colony should plan to produce lumber", lumber > 0);
+        
+        int hammers = plan.getProductionOf(hammersType);
+        assertTrue("The colony should plan to produce hammers", hammers > 0);
+	}
+	
+	public void testReqOreAndToolsWithEnoughHammersForBuild(){
+        // start a server
+        server = ServerTestHelper.startServer(false, true);
+        
+        Map map = buildMap(true);
+        
+        server.setMapGenerator(new MockMapGenerator(map));
+        
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+        
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        
+        Game game = server.getGame();
+        
+        FreeColTestCase.setGame(game);
+        
+        AIMain aiMain = server.getAIMain();
+            
+        Colony colony = getStandardColony();
+        
+        // colony has enough hammers, requires tools
+        colony.setCurrentlyBuilding(warehouse);
+        colony.addGoods(hammersType, warehouse.getAmountRequiredOf(hammersType));
+        
+        ColonyPlan plan = new ColonyPlan(aiMain,colony);
+        
+        plan.create();
+        
+        int ore = plan.getProductionOf(oreType);
+        assertTrue("The colony should plan to produce ore", ore > 0);
+     
+        int tools = plan.getProductionOf(toolsType);
+        assertTrue("The colony should plan to produce tools", tools > 0);
+        
+        int hammers = plan.getProductionOf(hammersType);
+        assertFalse("The colony should not produce hammers, has enough", hammers > 0);
+    }
+	
+	/*
+	 * This test verifies behavior when the colony isnt building anything
+	 */
+	public void testNoBuildNoHammers(){
+        // start a server
+        server = ServerTestHelper.startServer(false, true);
+        
+        Map map = buildMap(true);
+        
+        server.setMapGenerator(new MockMapGenerator(map));
+        
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+        
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        
+        Game game = server.getGame();
+        
+        FreeColTestCase.setGame(game);
+        
+        AIMain aiMain = server.getAIMain();
+            
+        Colony colony = getStandardColony();
+        
+        // colony isnt building anything
+        colony.setCurrentlyBuilding(null);
+        
+        ColonyPlan plan = new ColonyPlan(aiMain,colony);
+        
+        plan.create();
+        
+        int hammers = plan.getProductionOf(hammersType);
+        assertFalse("The colony should not produce hammers, building nothing", hammers > 0);
+    }
+	
+	/*
+	 * This test verifies behavior when the colony has no tiles that provide 
+	 *the raw materials for the build, but has them in stock
+	 */
+	public void testNoBuildRawMatTiles(){
+        final int fullStock = 100;
+	    // start a server
+        server = ServerTestHelper.startServer(false, true);
+        
+        Map map = buildMap(false);
+        
+        server.setMapGenerator(new MockMapGenerator(map));
+        
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+        
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        
+        Game game = server.getGame();
+        
+        FreeColTestCase.setGame(game);
+        
+        AIMain aiMain = server.getAIMain();
+            
+        Colony colony = getStandardColony();
+        // Add enough raw materials for build
+        colony.addGoods(lumberType, fullStock);
+        colony.addGoods(oreType, fullStock);
+        
+        colony.setCurrentlyBuilding(warehouse);
+
+        ColonyPlan plan = new ColonyPlan(aiMain,colony);        
+        plan.create();
+        
+        int lumber = plan.getProductionOf(lumberType);
+        int hammers = plan.getProductionOf(hammersType);
+        assertFalse("The colony no produce lumber, no forests available", lumber > 0);
+        assertTrue("The colony should produce hammers, has lumber in stock", hammers > 0);
+
+        // Simulate that enough hammers have been gathered, re-plan and re-check
+        colony.addGoods(hammersType, warehouse.getAmountRequiredOf(hammersType));
+        plan.create();
+        
+        hammers = plan.getProductionOf(hammersType);
+        int ore = plan.getProductionOf(oreType);
+        int tools = plan.getProductionOf(toolsType);
+        assertFalse("The colony should not produce hammers, has enough", hammers > 0);
+        assertFalse("The colony cannot produce ore, none available", ore > 0);
+        assertTrue("The colony should produce tools, has ore in stock", tools > 0);
 	}
 }
