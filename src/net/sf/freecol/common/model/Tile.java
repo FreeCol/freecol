@@ -1470,285 +1470,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
     }
 
-    private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
-        if (!units.isEmpty()) {
-            out.writeStartElement(UNITS_TAG_NAME);
-            for (Unit unit : units) {
-                unit.toXML(out, player, showAll, toSavedGame);
-            }
-            out.writeEndElement();
-        }
-    }
-
-
-    /**
-     * This method writes an XML-representation of this object to the given
-     * stream.
-     * 
-     * <br>
-     * <br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will be added
-     * to that representation if <code>showAll</code> is set to
-     * <code>false</code>.
-     * 
-     * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation should be
-     *            made for, or <code>null</code> if
-     *            <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> will be
-     *            added to the representation if <code>showAll</code> is set
-     *            to <i>false</i>.
-     * @param toSavedGame If <code>true</code> then information that is only
-     *            needed when saving a game is added.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
-     */
-    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-        throws XMLStreamException {
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
-
-        if (toSavedGame && !showAll) {
-            logger.warning("toSavedGame is true, but showAll is false");
-        }
-
-        PlayerExploredTile pet = null;
-        if (!(showAll)) {
-            // We're sending the Tile from the server to the client and showAll
-            // is false.
-            if (player != null) {
-                pet = playerExploredTiles.get(player);
-            } else {
-                logger.warning("player == null");
-            }
-        }
-
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute("x", Integer.toString(x));
-        out.writeAttribute("y", Integer.toString(y));
-
-        writeAttribute(out, "type", getType());
-        writeAttribute(out, "region", getRegion());
-
-        if (connected && !type.isConnected()) {
-            out.writeAttribute("connected", Boolean.toString(true));
-        }
-
-        if (owner != null) {
-            if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
-                out.writeAttribute("owner", owner.getId());
-            } else if (pet != null) {
-                writeAttribute(out, "owner", pet.getOwner());
-            }
-        }
-
-        if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owningSettlement != null)) {
-            out.writeAttribute("owningSettlement", owningSettlement.getId());
-        }
-
-        if (settlement != null) {
-            if (pet == null || getGame().isClientTrusted() || showAll || settlement.getOwner() == player) {
-                settlement.toXML(out, player, showAll, toSavedGame);
-            } else {
-                if (getColony() != null) {
-                    if (!player.canSee(getTile())) {
-                        if (pet.getColonyUnitCount() != 0) {
-                            out.writeStartElement(Colony.getXMLElementTagName());
-                            out.writeAttribute(ID_ATTRIBUTE, getColony().getId());
-                            out.writeAttribute("name", getColony().getName());
-                            out.writeAttribute("owner", getColony().getOwner().getId());
-                            out.writeAttribute("tile", getId());
-                            out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
-
-                            Building stockade = getColony().getStockade();
-                            if (stockade != null) {
-                                stockade.toXML(out);
-                            }
-
-                            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
-                            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
-                            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
-
-                            out.writeEndElement();
-                        } // Else: Colony not discovered.
-                    } else {
-                        settlement.toXML(out, player, showAll, toSavedGame);
-                    }
-                } else if (getSettlement() instanceof IndianSettlement) {
-                    final IndianSettlement is = (IndianSettlement) getSettlement();
-
-                    out.writeStartElement(IndianSettlement.getXMLElementTagName());
-                    out.writeAttribute(ID_ATTRIBUTE, getSettlement().getId());
-                    out.writeAttribute("tile", getId());
-                    out.writeAttribute("name", getSettlement().getName());
-                    out.writeAttribute("owner", getSettlement().getOwner().getId());
-                    out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
-                    writeAttribute(out, "learnableSkill", pet.getSkill());
-                    if (pet.getWantedGoods()[0] != null) {
-                        out.writeAttribute("wantedGoods0", pet.getWantedGoods()[0].getId());
-                        out.writeAttribute("wantedGoods1", pet.getWantedGoods()[1].getId());
-                        out.writeAttribute("wantedGoods2", pet.getWantedGoods()[2].getId());
-                    }
-                    out.writeAttribute("hasBeenVisited", Boolean.toString(pet.hasBeenVisited()));
-
-                    for (Entry<Player, Tension> entry : is.getAlarm().entrySet()) {
-                        out.writeStartElement("alarm");
-                        out.writeAttribute("player", entry.getKey().getId());
-                        out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
-                        out.writeEndElement();
-                    }
-
-                    if (pet.getMissionary() != null) {
-                        out.writeStartElement("missionary");
-                        pet.getMissionary().toXML(out, player, false, false);
-                        out.writeEndElement();
-                    }
-
-                    GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), is);
-                    emptyGoodsContainer.setFakeID(is.getGoodsContainer().getId());
-                    emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
-
-                    out.writeEndElement();
-                } else {
-                    logger.warning("Unknown type of settlement: " + getSettlement());
-                }
-            }
-        }
-
-        // Check if the player can see the tile:
-        // Do not show enemy units or any tileitems on a tile out-of-sight.
-        if (getGame().isClientTrusted() || showAll
-            || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
-            || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
-            unitsToXML(out, player, showAll, toSavedGame);
-            if (tileItemContainer != null) {
-                tileItemContainer.toXML(out, player, showAll, toSavedGame);
-            }
-        } else {
-            if (tileItemContainer != null) {
-                TileItemContainer newTileItemContainer = null;
-                if (pet != null) {
-                    newTileItemContainer = new TileItemContainer(getGame(), this, pet);
-                } else {
-                    newTileItemContainer = new TileItemContainer(getGame(), this);                
-                }
-                newTileItemContainer.setFakeID(tileItemContainer.getId());
-                newTileItemContainer.toXML(out, player, showAll, toSavedGame);
-            }
-        }
-
-        if (toSavedGame) {
-            for (Entry<Player, PlayerExploredTile> entry : playerExploredTiles.entrySet()) {
-                if (entry.getValue().isExplored()) {
-                    entry.getValue().toXML(out, entry.getKey(), showAll, toSavedGame);
-                }
-            }
-        }
-
-        out.writeEndElement();
-    }
-
-    /**
-     * Initialize this object from an XML-representation of this object.
-     * 
-     * @param in The input stream with the XML.
-     */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-
-        x = Integer.parseInt(in.getAttributeValue(null, "x"));
-        y = Integer.parseInt(in.getAttributeValue(null, "y"));
-        String typeString = in.getAttributeValue(null, "type");
-        if (typeString != null) {
-            type = FreeCol.getSpecification().getTileType(typeString);
-        }
-
-        // compatibility mode
-        boolean needsRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(), false);
-
-        connected = getAttribute(in, "connected", false);
-        owner = getFreeColGameObject(in, "owner", Player.class, null);
-        region = getFreeColGameObject(in, "region", Region.class, null);
-
-        final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
-        if (owningSettlementStr != null) {
-            owningSettlement = (Settlement) getGame().getFreeColGameObject(owningSettlementStr);
-            if (owningSettlement == null) {
-                if (owningSettlementStr.startsWith(IndianSettlement.getXMLElementTagName())) {
-                    owningSettlement = new IndianSettlement(getGame(), owningSettlementStr);
-                } else if (owningSettlementStr.startsWith(Colony.getXMLElementTagName())) {
-                    owningSettlement = new Colony(getGame(), owningSettlementStr);
-                } else {
-                    logger.warning("Unknown type of Settlement.");
-                }
-            }
-        } else {
-            owningSettlement = null;
-        }
-
-        boolean settlementSent = false;
-        units.clear();
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
-                settlement = updateFreeColGameObject(in, Colony.class);
-                settlementSent = true;
-            } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
-                settlement = updateFreeColGameObject(in, IndianSettlement.class);
-                settlementSent = true;
-            } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
-                        if (units.equals(Collections.emptyList())) {
-                            units = new ArrayList<Unit>();
-                        }
-                        units.add(updateFreeColGameObject(in, Unit.class));
-                    }
-                }
-            } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
-                tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
-                if (tileItemContainer != null) {
-                    tileItemContainer.readFromXML(in);
-                } else {
-                    tileItemContainer = new TileItemContainer(getGame(), this, in);
-                }
-            } else if (in.getLocalName().equals("playerExploredTile")) {
-                // Only from a savegame:
-                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
-                if (playerExploredTiles.get(player) == null) {
-                    PlayerExploredTile pet = new PlayerExploredTile(getGame(), in);
-                    playerExploredTiles.put(player, pet);
-                } else {
-                    playerExploredTiles.get(player).readFromXML(in);
-                }
-            } else {
-                logger.warning("Unknown tag: " + in.getLocalName() + " [" +
-                               in.getAttributeValue(null, "ID") + "] " +
-                               " loading tile with ID " +
-                               getId());
-                in.nextTag();
-            }
-        }
-        if (!settlementSent && settlement != null) {
-            settlement.dispose();
-        }
-
-        // compatibility mode
-        if (needsRumour) {
-            add(new LostCityRumour(getGame(), this));
-        }
-
-    }
-
-    /**
-     * Returns the tag name of the root element representing this object.
-     * 
-     * @return "tile".
-     */
-    public static String getXMLElementTagName() {
-        return "tile";
-    }
 
     /**
      * Gets the <code>PlayerExploredTile</code> for the given
@@ -2009,5 +1730,280 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public String toString() {
         return "Tile("+x+","+y+"):"+((type==null)?"unknown":type.getId());
+    }
+
+
+    /**
+     * This method writes an XML-representation of this object to the given
+     * stream.
+     * 
+     * <br>
+     * <br>
+     * 
+     * Only attributes visible to the given <code>Player</code> will be added
+     * to that representation if <code>showAll</code> is set to
+     * <code>false</code>.
+     * 
+     * @param out The target stream.
+     * @param player The <code>Player</code> this XML-representation should be
+     *            made for, or <code>null</code> if
+     *            <code>showAll == true</code>.
+     * @param showAll Only attributes visible to <code>player</code> will be
+     *            added to the representation if <code>showAll</code> is set
+     *            to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that is only
+     *            needed when saving a game is added.
+     * @throws XMLStreamException if there are any problems writing to the
+     *             stream.
+     */
+    protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
+        throws XMLStreamException {
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
+        if (toSavedGame && !showAll) {
+            logger.warning("toSavedGame is true, but showAll is false");
+        }
+
+        PlayerExploredTile pet = null;
+        if (!(showAll)) {
+            // We're sending the Tile from the server to the client and showAll
+            // is false.
+            if (player != null) {
+                pet = playerExploredTiles.get(player);
+            } else {
+                logger.warning("player == null");
+            }
+        }
+
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute("x", Integer.toString(x));
+        out.writeAttribute("y", Integer.toString(y));
+
+        writeAttribute(out, "type", getType());
+        writeAttribute(out, "region", getRegion());
+
+        if (connected && !type.isConnected()) {
+            out.writeAttribute("connected", Boolean.toString(true));
+        }
+
+        if (owner != null) {
+            if (getGame().isClientTrusted() || showAll || player.canSee(this)) {
+                out.writeAttribute("owner", owner.getId());
+            } else if (pet != null) {
+                writeAttribute(out, "owner", pet.getOwner());
+            }
+        }
+
+        if ((getGame().isClientTrusted() || showAll || player.canSee(this)) && (owningSettlement != null)) {
+            out.writeAttribute("owningSettlement", owningSettlement.getId());
+        }
+
+        if (settlement != null) {
+            if (pet == null || getGame().isClientTrusted() || showAll || settlement.getOwner() == player) {
+                settlement.toXML(out, player, showAll, toSavedGame);
+            } else {
+                if (getColony() != null) {
+                    if (!player.canSee(getTile())) {
+                        if (pet.getColonyUnitCount() != 0) {
+                            out.writeStartElement(Colony.getXMLElementTagName());
+                            out.writeAttribute(ID_ATTRIBUTE, getColony().getId());
+                            out.writeAttribute("name", getColony().getName());
+                            out.writeAttribute("owner", getColony().getOwner().getId());
+                            out.writeAttribute("tile", getId());
+                            out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
+
+                            Building stockade = getColony().getStockade();
+                            if (stockade != null) {
+                                stockade.toXML(out);
+                            }
+
+                            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
+                            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
+                            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+
+                            out.writeEndElement();
+                        } // Else: Colony not discovered.
+                    } else {
+                        settlement.toXML(out, player, showAll, toSavedGame);
+                    }
+                } else if (getSettlement() instanceof IndianSettlement) {
+                    final IndianSettlement is = (IndianSettlement) getSettlement();
+
+                    out.writeStartElement(IndianSettlement.getXMLElementTagName());
+                    out.writeAttribute(ID_ATTRIBUTE, getSettlement().getId());
+                    out.writeAttribute("tile", getId());
+                    out.writeAttribute("name", getSettlement().getName());
+                    out.writeAttribute("owner", getSettlement().getOwner().getId());
+                    out.writeAttribute("isCapital", Boolean.toString(is.isCapital()));
+                    writeAttribute(out, "learnableSkill", pet.getSkill());
+                    if (pet.getWantedGoods()[0] != null) {
+                        out.writeAttribute("wantedGoods0", pet.getWantedGoods()[0].getId());
+                        out.writeAttribute("wantedGoods1", pet.getWantedGoods()[1].getId());
+                        out.writeAttribute("wantedGoods2", pet.getWantedGoods()[2].getId());
+                    }
+                    out.writeAttribute("hasBeenVisited", Boolean.toString(pet.hasBeenVisited()));
+
+                    for (Entry<Player, Tension> entry : is.getAlarm().entrySet()) {
+                        out.writeStartElement("alarm");
+                        out.writeAttribute("player", entry.getKey().getId());
+                        out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
+                        out.writeEndElement();
+                    }
+
+                    if (pet.getMissionary() != null) {
+                        out.writeStartElement("missionary");
+                        pet.getMissionary().toXML(out, player, false, false);
+                        out.writeEndElement();
+                    }
+
+                    GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), is);
+                    emptyGoodsContainer.setFakeID(is.getGoodsContainer().getId());
+                    emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+
+                    out.writeEndElement();
+                } else {
+                    logger.warning("Unknown type of settlement: " + getSettlement());
+                }
+            }
+        }
+
+        // Check if the player can see the tile:
+        // Do not show enemy units or any tileitems on a tile out-of-sight.
+        if (getGame().isClientTrusted() || showAll
+            || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
+            || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
+            if (!units.isEmpty()) {
+                out.writeStartElement(UNITS_TAG_NAME);
+                for (Unit unit : units) {
+                    unit.toXML(out, player, showAll, toSavedGame);
+                }
+                out.writeEndElement();
+            }
+            if (tileItemContainer != null) {
+                tileItemContainer.toXML(out, player, showAll, toSavedGame);
+            }
+        } else {
+            if (tileItemContainer != null) {
+                TileItemContainer newTileItemContainer = null;
+                if (pet != null) {
+                    newTileItemContainer = new TileItemContainer(getGame(), this, pet);
+                } else {
+                    newTileItemContainer = new TileItemContainer(getGame(), this);                
+                }
+                newTileItemContainer.setFakeID(tileItemContainer.getId());
+                newTileItemContainer.toXML(out, player, showAll, toSavedGame);
+            }
+        }
+
+        if (toSavedGame) {
+            for (Entry<Player, PlayerExploredTile> entry : playerExploredTiles.entrySet()) {
+                if (entry.getValue().isExplored()) {
+                    entry.getValue().toXML(out, entry.getKey(), showAll, toSavedGame);
+                }
+            }
+        }
+
+        out.writeEndElement();
+    }
+
+    /**
+     * Initialize this object from an XML-representation of this object.
+     * 
+     * @param in The input stream with the XML.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+
+        x = Integer.parseInt(in.getAttributeValue(null, "x"));
+        y = Integer.parseInt(in.getAttributeValue(null, "y"));
+        String typeString = in.getAttributeValue(null, "type");
+        if (typeString != null) {
+            type = FreeCol.getSpecification().getTileType(typeString);
+        }
+
+        // compatibility mode
+        boolean needsRumour = getAttribute(in, LostCityRumour.getXMLElementTagName(), false);
+
+        connected = getAttribute(in, "connected", false);
+        owner = getFreeColGameObject(in, "owner", Player.class, null);
+        region = getFreeColGameObject(in, "region", Region.class, null);
+
+        final String owningSettlementStr = in.getAttributeValue(null, "owningSettlement");
+        if (owningSettlementStr != null) {
+            owningSettlement = (Settlement) getGame().getFreeColGameObject(owningSettlementStr);
+            if (owningSettlement == null) {
+                if (owningSettlementStr.startsWith(IndianSettlement.getXMLElementTagName())) {
+                    owningSettlement = new IndianSettlement(getGame(), owningSettlementStr);
+                } else if (owningSettlementStr.startsWith(Colony.getXMLElementTagName())) {
+                    owningSettlement = new Colony(getGame(), owningSettlementStr);
+                } else {
+                    logger.warning("Unknown type of Settlement.");
+                }
+            }
+        } else {
+            owningSettlement = null;
+        }
+
+        boolean settlementSent = false;
+        units.clear();
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
+                settlement = updateFreeColGameObject(in, Colony.class);
+                settlementSent = true;
+            } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
+                settlement = updateFreeColGameObject(in, IndianSettlement.class);
+                settlementSent = true;
+            } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
+                        if (units.equals(Collections.emptyList())) {
+                            units = new ArrayList<Unit>();
+                        }
+                        units.add(updateFreeColGameObject(in, Unit.class));
+                    }
+                }
+            } else if (in.getLocalName().equals(TileItemContainer.getXMLElementTagName())) {
+                tileItemContainer = (TileItemContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
+                if (tileItemContainer != null) {
+                    tileItemContainer.readFromXML(in);
+                } else {
+                    tileItemContainer = new TileItemContainer(getGame(), this, in);
+                }
+            } else if (in.getLocalName().equals("playerExploredTile")) {
+                // Only from a savegame:
+                Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
+                if (playerExploredTiles.get(player) == null) {
+                    PlayerExploredTile pet = new PlayerExploredTile(getGame(), in);
+                    playerExploredTiles.put(player, pet);
+                } else {
+                    playerExploredTiles.get(player).readFromXML(in);
+                }
+            } else {
+                logger.warning("Unknown tag: " + in.getLocalName() + " [" +
+                               in.getAttributeValue(null, "ID") + "] " +
+                               " loading tile with ID " +
+                               getId());
+                in.nextTag();
+            }
+        }
+        if (!settlementSent && settlement != null) {
+            settlement.dispose();
+        }
+
+        // compatibility mode
+        if (needsRumour) {
+            add(new LostCityRumour(getGame(), this));
+        }
+
+    }
+
+    /**
+     * Returns the tag name of the root element representing this object.
+     * 
+     * @return "tile".
+     */
+    public static String getXMLElementTagName() {
+        return "tile";
     }
 }
