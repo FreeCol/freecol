@@ -1526,4 +1526,10 @@ public class IndianSettlement extends Settlement {
         if (price < 1) price = 1;
         return amount * price;
     }
+    
+    public String toString() {
+        StringBuilder s = new StringBuilder(getLocationName());
+        s.append(" at (").append(tile.getX()).append(",").append(tile.getY()).append(")"); 
+        return s.toString();
+    }
 }
