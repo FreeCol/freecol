@@ -103,7 +103,7 @@ public class BuyPropositionMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return Null.
+     * @return This message with an updated gold value.
      * @throws IllegalStateException if there is problem with the arguments.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
@@ -126,8 +126,8 @@ public class BuyPropositionMessage extends Message {
             throw new IllegalStateException("trying to trade without opening a transaction session");
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if(!(Boolean) session.get("canBuy")
-           && !(Boolean) session.get("hasSpaceLeft")) {
+        if (!(Boolean) session.get("canBuy")
+            && !(Boolean) session.get("hasSpaceLeft")) {
             throw new IllegalStateException("Trying to buy in a session where buying is not allowed.");
         }
 

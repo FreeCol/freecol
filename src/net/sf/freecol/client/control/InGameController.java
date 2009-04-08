@@ -472,30 +472,31 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element reply = client.ask(new BuildColonyMessage(name, unit).toXMLElement());
-        if (reply.getTagName().equals("buildColonyConfirmed")) {
-            freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
-            Element updateElement = getChildElement(reply, "update");
-            if (updateElement == null) {
-                logger.warning("buildColonyConfirmed message missing update");
-            } else {
-                freeColClient.getInGameInputHandler().update(updateElement);
+        Element reply = client.askExpecting(new BuildColonyMessage(name, unit).toXMLElement(),
+            "buildColonyConfirmed");
+        if (reply == null) {
+            throw new IllegalArgumentException("Illegal reply to "
+                + BuildColonyMessage.getXMLElementTagName() + " message");
+        }
+        freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
+        Element updateElement = getChildElement(reply, "update");
+        if (updateElement == null) {
+            logger.warning("buildColonyConfirmed message missing update");
+        } else {
+            freeColClient.getInGameInputHandler().update(updateElement);
 
-                // There should be a colony here now.  Check units present
-                // for treasure cash-in.
-                ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
-                for(Unit unitInTile : units) {
-                    if (unitInTile.canCarryTreasure()) {
-                        checkCashInTreasureTrain(unitInTile);
-                    }
+            // There should be a colony here now.  Check units present
+            // for treasure cash-in.
+            ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
+            for(Unit unitInTile : units) {
+                if (unitInTile.canCarryTreasure()) {
+                    checkCashInTreasureTrain(unitInTile);
                 }
             }
-            
-            gui.setActiveUnit(null);
-            gui.setSelectedTile(tile.getPosition());
-        } else {
-            // Handle error message.
         }
+
+        gui.setActiveUnit(null);
+        gui.setSelectedTile(tile.getPosition());
     }
 
 
@@ -1240,14 +1241,6 @@ public final class InGameController implements NetworkConstants {
     private void negotiate(Unit unit, Direction direction) {
         Map map = freeColClient.getGame().getMap();
         Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
-
-        // TODO: should the client be getting full details on the settlement?
-        // AFAICT it does not need it, so comment out and look to remove
-        // Element reply = freeColClient.getClient().ask(new SpySettlementMessage(unit, direction).toXMLElement());
-        // if (reply != null) {
-        //    settlement.readFromXMLElement((Element) reply.getFirstChild());
-        //}
-
         if (settlement == null) return;
 
         DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
@@ -1440,12 +1433,11 @@ public final class InGameController implements NetworkConstants {
     }
 
     private java.util.Map<String,Boolean> getTransactionSession(Unit unit, Settlement settlement) {
-        Element reply = freeColClient.getClient().ask(new GetTransactionMessage(unit, settlement).toXMLElement());
-
-        if (reply == null
-            || !reply.getTagName().equals("getTransactionAnswer")) {
-            logger.warning("Illegal reply to getTransaction.");
-            throw new IllegalStateException();
+        Element reply = freeColClient.getClient().askExpecting(new GetTransactionMessage(unit, settlement).toXMLElement(),
+            "getTransactionAnswer");
+        if (reply == null) {
+            throw new IllegalStateException("Illegal reply to "
+                + GetTransactionMessage.getXMLElementTagName() + " message");
         }
         
         java.util.Map<String,Boolean> transactionSession = new HashMap<String,Boolean>();
@@ -1457,11 +1449,11 @@ public final class InGameController implements NetworkConstants {
 
     private ArrayList<Goods> getGoodsForSaleInIndianSettlement(Unit unit, Settlement settlement) {
         // Get goods for sale from server
-        Element reply = freeColClient.getClient().ask(new GoodsForSaleMessage(unit, settlement).toXMLElement());
-
-        if (reply == null
-            || !reply.getTagName().equals(GoodsForSaleMessage.getXMLElementTagName())) {
-            throw new IllegalStateException("Illegal reply to goodsForSale message.");
+        Element reply = freeColClient.getClient().askExpecting(new GoodsForSaleMessage(unit, settlement).toXMLElement(),
+            GoodsForSaleMessage.getXMLElementTagName());
+        if (reply == null) {
+            throw new IllegalStateException("Illegal reply to "
+                + GoodsForSaleMessage.getXMLElementTagName() + " message");
         }
 
         // Get goods for sell from server response
@@ -1495,11 +1487,13 @@ public final class InGameController implements NetworkConstants {
             int gold = -1; // Initially ask for a price
             for (;;) {
                 // Propose to purchase
-                Element reply = client.ask(new BuyPropositionMessage(unit, settlement, goods, gold).toXMLElement());
-                if (reply == null
-                    || !reply.getTagName().equals("buyProposition")) {
-                    throw new IllegalStateException("Illegal reply to \"buyProposition\" message.");
+                Element reply = client.askExpecting(new BuyPropositionMessage(unit, settlement, goods, gold).toXMLElement(),
+                    BuyPropositionMessage.getXMLElementTagName());
+                if (reply == null) {
+                    throw new IllegalStateException("Illegal reply to "
+                        + BuyPropositionMessage.getXMLElementTagName() + " message");
                 }
+
                 gold = new BuyPropositionMessage(freeColClient.getGame(), reply).getGold();
                 if (gold <= NO_TRADE) {
                     // Proposal was refused
@@ -1551,11 +1545,13 @@ public final class InGameController implements NetworkConstants {
             int gold = -1; // Initially ask for a price
             for (;;) {
                 // Propose to sell
-                Element reply = client.ask(new SellPropositionMessage(unit, settlement, goods, gold).toXMLElement());
-                if (reply == null
-                    || !reply.getTagName().equals("sellProposition")) {
-                    throw new IllegalStateException("Illegal reply to \"sellProposition\" message.");
+                Element reply = client.askExpecting(new SellPropositionMessage(unit, settlement, goods, gold).toXMLElement(),
+                    SellPropositionMessage.getXMLElementTagName());
+                if (reply == null) {
+                    throw new IllegalStateException("Illegal reply to "
+                        + SellPropositionMessage.getXMLElementTagName() + " message");
                 }
+
                 gold = new SellPropositionMessage(freeColClient.getGame(), reply).getGold();
                 if (gold == NO_NEED_FOR_THE_GOODS) {
                     // Indians do not need the goods, refuse and end trade
