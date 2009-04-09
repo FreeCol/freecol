@@ -2632,13 +2632,9 @@ public final class InGameController implements NetworkConstants {
                     }
                 }
             }
-            for (int count = 0; count < amount; count++) {
-                unit.equipWith(type);
-            }
+            unit.equipWith(type, amount);
         } else {
-            for (int count = 0; count > amount; count--) {
-                unit.removeEquipment(type);
-            }
+            unit.removeEquipment(type, amount);
         }
 
         freeColClient.getCanvas().updateGoldLabel();

@@ -1160,7 +1160,7 @@ public class IndianSettlement extends Settlement {
     			continue;
     		}
     		logger.info("Equiping brave with muskets");
-    		brave.equipWith(armsEqType);
+    		brave.equipWith(armsEqType, 1);
     		if(!brave.isArmed()){
     			logger.warning("Brave has NOT been armed");
     		}	
@@ -1175,7 +1175,7 @@ public class IndianSettlement extends Settlement {
     			continue;
     		}
     		logger.info("Equiping brave with horses");
-    		brave.equipWith(horsesEqType);
+    		brave.equipWith(horsesEqType, 1);
     		horsesAvail = getGoodsCount(horsesType);
     	}
     }

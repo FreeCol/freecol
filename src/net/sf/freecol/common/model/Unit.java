@@ -2158,8 +2158,33 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return true;
     }
 
+    /**
+     * Describe <code>equipWith</code> method here.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     */
     public void equipWith(EquipmentType equipmentType) {
-        equipWith(equipmentType, false);
+        equipWith(equipmentType, 1, false);
+    }
+
+    /**
+     * Describe <code>equipWith</code> method here.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @param amount an <code>int</code> value
+     */
+    public void equipWith(EquipmentType equipmentType, int amount) {
+        equipWith(equipmentType, amount, false);
+    }
+
+    /**
+     * Describe <code>equipWith</code> method here.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @param asResultOfCombat a <code>boolean</code> value
+     */
+    public void equipWith(EquipmentType equipmentType, boolean asResultOfCombat) {
+        equipWith(equipmentType, 1, asResultOfCombat);
     }
 
     /**
@@ -2168,12 +2193,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * at this location or is present as a result of combat.
      *
      * @param equipmentType an <code>EquipmentType</code> value
+     * @param amount an <code>int</code> value
      * @param asResultOfCombat a <code>boolean</code> value
      * @see #canBeEquippedWith
      */
-    public void equipWith(EquipmentType equipmentType, boolean asResultOfCombat) {
+    public void equipWith(EquipmentType equipmentType, int amount, boolean asResultOfCombat) {
         if (equipmentType == null) {
             throw new IllegalArgumentException("EquipmentType is 'null'.");
+        } else if (amount < 1) {
+            throw new IllegalArgumentException("Amount must be a positive integer.");
         }
         if (!canBeEquippedWith(equipmentType)) {
             logger.fine("Unable to equip unit " + getId() + " with " + equipmentType.getName());
@@ -2186,46 +2214,62 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             logger.fine("Unable to build equipment " + equipmentType.getName());
             return;
         }
-        Set<EquipmentType> equipmentTypes = equipment.keySet();
-        for (EquipmentType oldEquipment : equipmentTypes) {
-            if (!oldEquipment.isCompatibleWith(equipmentType)) {
-                dumpEquipment(oldEquipment, asResultOfCombat);
-                equipmentTypes.remove(oldEquipment);
-            }
-        }
         if (!asResultOfCombat) {
             setMovesLeft(0);
             if (getColony() != null) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                	if(getColony().getGoodsCount(goods.getType()) < goods.getAmount()){
-                            throw new IllegalStateException("Not enough goods to equip");
-                	}
-                    getColony().removeGoods(goods);
+                    int requiredAmount = amount * goods.getAmount();
+                    if(getColony().getGoodsCount(goods.getType()) < requiredAmount){
+                        throw new IllegalStateException("Not enough goods to equip");
+                    }
+                    getColony().removeGoods(goods.getType(), requiredAmount);
                 }
             } else if (isInEurope()) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                    getOwner().getMarket().buy(goods.getType(), goods.getAmount(), getOwner());
+                    int requiredAmount = amount * goods.getAmount();
+                    getOwner().getMarket().buy(goods.getType(), requiredAmount, getOwner());
                 }
             } else if(getIndianSettlement() != null) {
             	for (AbstractGoods goods : equipmentType.getGoodsRequired()) {            		
-                	if(getIndianSettlement().getGoodsCount(goods.getType()) < goods.getAmount()){
+                    int requiredAmount = amount * goods.getAmount();
+                    if(getIndianSettlement().getGoodsCount(goods.getType()) < requiredAmount){
                         throw new IllegalStateException("Not enough goods to equip");
-                	}
-            		getIndianSettlement().removeGoods(goods);
+                    }
+                    getIndianSettlement().removeGoods(goods.getType(), requiredAmount);
                 }
             }
         }
-        equipment.incrementCount(equipmentType, 1);
+        equipment.incrementCount(equipmentType, amount);
+        Set<EquipmentType> equipmentTypes = equipment.keySet();
+        for (EquipmentType oldEquipment : equipmentTypes) {
+            if (!oldEquipment.isCompatibleWith(equipmentType)) {
+                dumpEquipment(oldEquipment, equipment.getCount(oldEquipment), asResultOfCombat);
+                equipmentTypes.remove(oldEquipment);
+            }
+        }
         setRole();
     }
 
-    public void removeEquipment(EquipmentType equipmentType) {
-        removeEquipment(equipmentType, false);
+    /**
+     * Describe <code>removeEquipment</code> method here.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @param amount an <code>int</code> value
+     */
+    public void removeEquipment(EquipmentType equipmentType, int amount) {
+        removeEquipment(equipmentType, amount, false);
     }
 
-    public void removeEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
-        dumpEquipment(equipmentType, 1, asResultOfCombat);
-        equipment.incrementCount(equipmentType, -1);
+    /**
+     * Describe <code>removeEquipment</code> method here.
+     *
+     * @param equipmentType an <code>EquipmentType</code> value
+     * @param amount an <code>int</code> value
+     * @param asResultOfCombat a <code>boolean</code> value
+     */
+    public void removeEquipment(EquipmentType equipmentType, int amount, boolean asResultOfCombat) {
+        dumpEquipment(equipmentType, amount, asResultOfCombat);
+        equipment.incrementCount(equipmentType, -amount);
         if (asResultOfCombat) {
             // loss of horses reduces movement
             setMovesLeft(Math.min(movesLeft, getInitialMovesLeft()));
@@ -2237,15 +2281,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     public void removeAllEquipment(boolean asResultOfCombat) {
         for (EquipmentType equipmentType : equipment.keySet()) {
-            dumpEquipment(equipmentType, asResultOfCombat);
+            dumpEquipment(equipmentType, equipment.getCount(equipmentType), asResultOfCombat);
         }
         equipment.clear();
         setMovesLeft(0);
         setRole();
-    }
-
-    private void dumpEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
-        dumpEquipment(equipmentType, equipment.getCount(equipmentType), asResultOfCombat);
     }
 
     private void dumpEquipment(EquipmentType equipmentType, int amount, boolean asResultOfCombat) {

@@ -1281,7 +1281,7 @@ public class SimpleCombatModel implements CombatModel {
         String messageID = Messages.getKey(unit.getType().getId() + ".demoted",
                                            "model.unit.unitDemoted");
 
-        unit.removeEquipment(typeToLose, true);
+        unit.removeEquipment(typeToLose, 1, true);
         if (unit.getEquipment().isEmpty()) {
             messageID = "model.unit.unitDemotedToUnarmed";
         }
@@ -1331,7 +1331,7 @@ public class SimpleCombatModel implements CombatModel {
             && enemyUnit.canBeEquippedWith(newEquipType)) {
             IndianSettlement settlement = enemyUnit.getIndianSettlement();
 
-            enemyUnit.equipWith(newEquipType, true);
+            enemyUnit.equipWith(newEquipType, 1, true);
             unit.addModelMessage(unit,
                                  ModelMessage.MessageType.COMBAT_RESULT,
                                  "model.unit.equipmentCaptured",
