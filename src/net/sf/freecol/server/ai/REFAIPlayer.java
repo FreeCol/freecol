@@ -149,7 +149,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
                        && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") ||
                            getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
-            } else if (unit.getEquipment().contains(toolsType)
+            } else if (unit.getEquipment().containsKey(toolsType)
                        && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
             } else if (unit.isColonist()) {

@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 // TODO: implement entire Map interface
 public class TypeCountMap<T extends FreeColGameObjectType> {
@@ -41,9 +42,32 @@ public class TypeCountMap<T extends FreeColGameObjectType> {
         Integer oldValue = values.get(key);
         if (oldValue == null) {
             return values.put(key, new Integer(newCount));
+        } else if (oldValue == -newCount) {
+            values.remove(key);
+            return null;
         } else {
             return values.put(key, oldValue + newCount);
         }
+    }
+
+    public void clear() {
+        values.clear();
+    }
+
+    public Set<T> keySet() {
+        return values.keySet();
+    }
+
+    public boolean containsKey(T key) {
+        return values.containsKey(key);
+    }
+
+    public boolean isEmpty() {
+        return values.isEmpty();
+    }
+
+    public int size() {
+        return values.size();
     }
 
 }

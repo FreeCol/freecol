@@ -315,7 +315,7 @@ public class SimpleCombatModel implements CombatModel {
                                         Modifier.Type.PERCENTAGE));
             }
         } else {
-            for (EquipmentType equipment : attacker.getEquipment()) {
+            for (EquipmentType equipment : attacker.getEquipment().keySet()) {
                 result.addAll(equipment.getFeatureContainer().getModifierSet(Modifier.OFFENCE));
             }
             // 50% attack bonus
@@ -465,7 +465,7 @@ public class SimpleCombatModel implements CombatModel {
                 }
             }
 
-            for (EquipmentType equipment : defender.getEquipment()) {
+            for (EquipmentType equipment : defender.getEquipment().keySet()) {
                 result.addAll(equipment.getFeatureContainer().getModifierSet(Modifier.DEFENCE));
             }
             // 50% fortify bonus
@@ -1152,7 +1152,7 @@ public class SimpleCombatModel implements CombatModel {
         EquipmentType toLose = null;
         int combatLossPriority = 0;
 
-        for (EquipmentType equipmentType : victim.getEquipment()) {
+        for (EquipmentType equipmentType : victim.getEquipment().keySet()) {
             if (equipmentType.getCombatLossPriority() > combatLossPriority) {
                 toLose = equipmentType;
                 combatLossPriority = equipmentType.getCombatLossPriority();

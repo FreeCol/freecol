@@ -586,7 +586,7 @@ public class AIColony extends AIObject {
             AIUnit au = (AIUnit) getAIMain().getAIObject(u);
             if (au.getMission() != null && 
                 au.getMission() instanceof PioneeringMission &&
-                !u.getEquipment().contains(toolsType)) {
+                !u.getEquipment().containsKey(toolsType)) {
                 return au;
             }
         }

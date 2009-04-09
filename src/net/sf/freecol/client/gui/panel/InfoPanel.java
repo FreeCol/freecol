@@ -399,11 +399,12 @@ public final class InfoPanel extends FreeColPanel {
                         add(unitLabel);
                     }
                 } else {
-                    for (EquipmentType equipment : unit.getEquipment()) {
+                    for (EquipmentType equipment : unit.getEquipment().keySet()) {
                         for (AbstractGoods goods : equipment.getGoodsRequired()) {
                             JLabel equipmentLabel = 
                                 new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
-                            equipmentLabel.setToolTipText(String.valueOf(goods.getAmount())
+                            int amount = goods.getAmount() * unit.getEquipment().getCount(equipment);
+                            equipmentLabel.setToolTipText(String.valueOf(amount)
                                                           + " " + goods.getType().getName());
                             add(equipmentLabel);
                         }

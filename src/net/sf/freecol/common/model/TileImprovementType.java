@@ -123,19 +123,7 @@ public final class TileImprovementType extends FreeColGameObjectType
         if (!isWorkerTypeAllowed(unit.getType())) {
             return false;
         }
-        if (expendedAmount == 0) {
-            return true;
-        }
-        int count = 0;
-        for (EquipmentType equipmentType : unit.getEquipment()) {
-            if (equipmentType == expendedEquipmentType) {
-                count++;
-                if (count >= expendedAmount) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return (unit.getEquipment().getCount(expendedEquipmentType) >= expendedAmount);
     }
 
     /**

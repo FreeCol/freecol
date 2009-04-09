@@ -195,7 +195,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * The equipment this Unit carries.
      */
-    private List<EquipmentType> equipment = new ArrayList<EquipmentType>();
+    private TypeCountMap<EquipmentType> equipment = new TypeCountMap<EquipmentType>();
 
 
     /**
@@ -267,7 +267,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 equipment.clear();
                 break;
             } else {
-                equipment.add(equipmentType);
+                equipment.incrementCount(equipmentType, 1);
             }
         }
         setRole();
@@ -384,7 +384,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *
      * @return a <code>List<EquipmentType></code> value
      */
-    public final List<EquipmentType> getEquipment() {
+    public final TypeCountMap<EquipmentType> getEquipment() {
         return equipment;
     }
 
@@ -393,7 +393,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *
      * @param newEquipment The new Equipment value.
      */
-    public final void setEquipment(final List<EquipmentType> newEquipment) {
+    public final void setEquipment(final TypeCountMap<EquipmentType> newEquipment) {
         this.equipment = newEquipment;
     }
 
@@ -823,7 +823,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         result.addAll(getOwner().getFeatureContainer()
                       .getAbilitySet(id, unitType, getGame().getTurn()));
         // EquipmentType abilities always apply
-        for (EquipmentType equipmentType : equipment) {
+        for (EquipmentType equipmentType : equipment.keySet()) {
             result.addAll(equipmentType.getFeatureContainer().getAbilitySet(id));
         }
         return FeatureContainer.hasAbility(result);
@@ -844,7 +844,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         result.addAll(getOwner().getFeatureContainer()
                       .getModifierSet(id, unitType, getGame().getTurn()));
         // EquipmentType modifiers always apply
-        for (EquipmentType equipmentType : equipment) {
+        for (EquipmentType equipmentType : equipment.keySet()) {
             result.addAll(equipmentType.getFeatureContainer().getModifierSet(id));
         }
         return result;
@@ -2152,13 +2152,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 }
             }
         }
-        int count = 1;
-        for (EquipmentType oldType : equipment) {
-            if (oldType == equipmentType) {
-                count++;
-            }
-        }
-        if (count > equipmentType.getMaximumCount()) {
+        if (equipment.getCount(equipmentType) >= equipmentType.getMaximumCount()) {
             return false;
         }
         return true;
@@ -2192,12 +2186,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             logger.fine("Unable to build equipment " + equipmentType.getName());
             return;
         }
-        Iterator<EquipmentType> equipmentIterator = equipment.iterator();
-        while (equipmentIterator.hasNext()) {
-            EquipmentType oldEquipment = equipmentIterator.next();
+        Set<EquipmentType> equipmentTypes = equipment.keySet();
+        for (EquipmentType oldEquipment : equipmentTypes) {
             if (!oldEquipment.isCompatibleWith(equipmentType)) {
                 dumpEquipment(oldEquipment, asResultOfCombat);
-                equipmentIterator.remove();
+                equipmentTypes.remove(oldEquipment);
             }
         }
         if (!asResultOfCombat) {
@@ -2222,7 +2215,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 }
             }
         }
-        equipment.add(equipmentType);
+        equipment.incrementCount(equipmentType, 1);
         setRole();
     }
 
@@ -2231,8 +2224,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     public void removeEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
-        dumpEquipment(equipmentType, asResultOfCombat);
-        equipment.remove(equipmentType);
+        dumpEquipment(equipmentType, 1, asResultOfCombat);
+        equipment.incrementCount(equipmentType, -1);
         if (asResultOfCombat) {
             // loss of horses reduces movement
             setMovesLeft(Math.min(movesLeft, getInitialMovesLeft()));
@@ -2243,7 +2236,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     public void removeAllEquipment(boolean asResultOfCombat) {
-        for (EquipmentType equipmentType : equipment) {
+        for (EquipmentType equipmentType : equipment.keySet()) {
             dumpEquipment(equipmentType, asResultOfCombat);
         }
         equipment.clear();
@@ -2252,15 +2245,19 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     private void dumpEquipment(EquipmentType equipmentType, boolean asResultOfCombat) {
+        dumpEquipment(equipmentType, equipment.getCount(equipmentType), asResultOfCombat);
+    }
+
+    private void dumpEquipment(EquipmentType equipmentType, int amount, boolean asResultOfCombat) {
         if (!asResultOfCombat) {
             // the equipment is returned to storage in the form of goods
             if (getColony() != null) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                    getColony().addGoods(goods);
+                    getColony().addGoods(goods.getType(), amount * goods.getAmount());
                 }
             } else if (isInEurope()) {
                 for (AbstractGoods goods : equipmentType.getGoodsRequired()) {
-                    getOwner().getMarket().sell(goods.getType(), goods.getAmount(), getOwner());
+                    getOwner().getMarket().sell(goods.getType(), amount * goods.getAmount(), getOwner());
                 }
             }
         }
@@ -2274,7 +2271,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return an <code>int</code> value
      */
     public int getEquipmentCount(EquipmentType equipmentType) {
-        return Collections.frequency(equipment, equipmentType);
+        return equipment.getCount(equipmentType);
     }
 
     /**
@@ -2427,16 +2424,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     // TODO: make these go away, if possible, private if not
     public boolean isArmed() {
     	if(getOwner().isIndian()){
-    		return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets"));
+            return equipment.containsKey(FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets"));
     	}
-        return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
+        return equipment.containsKey(FreeCol.getSpecification().getEquipmentType("model.equipment.muskets"));
     }
 
     public boolean isMounted() {
     	if(getOwner().isIndian()){
-    		return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses"));
+            return equipment.containsKey(FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses"));
     	}
-        return equipment.contains(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
+        return equipment.containsKey(FreeCol.getSpecification().getEquipmentType("model.equipment.horses"));
     }
 
     /**
@@ -2673,7 +2670,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     private void setRole() {
         role = Role.DEFAULT;
-        for (EquipmentType type : equipment) {
+        for (EquipmentType type : equipment.keySet()) {
             switch (type.getRole()) {
             case SOLDIER:
                 if (role == Role.SCOUT) {
@@ -3167,13 +3164,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param amount The number of tools to remove.
      */
     private void expendEquipment(EquipmentType type, int amount) {
-        for (int count = 0; count < amount; count++) {
-            equipment.remove(type);
-        }
+        equipment.incrementCount(type, -amount);
         setRole();
         // TODO: make this more generic
         EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
-        if (!equipment.contains(tools)) {
+        if (!equipment.containsKey(tools)) {
             addModelMessage(this, ModelMessage.MessageType.WARNING, this,
                             Messages.getKey(getId() + ".noMoreTools", 
                                             "model.unit.noMoreTools"),
@@ -3648,12 +3643,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         if (!equipment.isEmpty()) {
             out.writeStartElement(EQUIPMENT_TAG);
-            out.writeAttribute(ARRAY_SIZE, Integer.toString(equipment.size()));
             int index = 0;
-            for (EquipmentType type : equipment) {
-                out.writeAttribute("x" + Integer.toString(index), type.getId());
-                index++;
+            for (EquipmentType type : equipment.keySet()) {
+                for (int index2 = 0; index2 < equipment.getCount(type); index2++) {
+                    out.writeAttribute("x" + Integer.toString(index), type.getId());
+                    index++;
+                }
             }
+            out.writeAttribute(ARRAY_SIZE, Integer.toString(index));
             out.writeEndElement();
         }
 
@@ -3785,7 +3782,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
                 for (int index = 0; index < length; index++) {
                     String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                    equipment.add(FreeCol.getSpecification().getEquipmentType(equipmentId));
+                    equipment.incrementCount(FreeCol.getSpecification().getEquipmentType(equipmentId), 1);
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {

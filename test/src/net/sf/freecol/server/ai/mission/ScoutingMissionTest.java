@@ -83,9 +83,7 @@ public class ScoutingMissionTest extends FreeColTestCase {
 
             Tile unitTile = map.getTile(2, 2);
             Unit scout = new Unit(game, unitTile, player2, scoutType, UnitState.ACTIVE);
-            List<EquipmentType> equipment = new ArrayList<EquipmentType>();
-            equipment.add(horsesEqType);
-            scout.setEquipment(equipment);
+            scout.equipWith(horsesEqType);
             
             // Setup mission
             // this will call AIPlayer.giveNormalMissions() and set the scout mission

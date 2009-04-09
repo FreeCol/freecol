@@ -369,12 +369,7 @@ public final class DragListener extends MouseAdapter {
         ImageLibrary imageLibrary = unitLabel.getCanvas().getGUI().getImageLibrary();
         boolean separatorNeeded = false;
         for (EquipmentType equipmentType : Specification.getSpecification().getEquipmentTypeList()) {
-            int count = 0;
-            for (EquipmentType oldEquipment : tempUnit.getEquipment()) {
-                if (equipmentType == oldEquipment) {
-                    count++;
-                }
-            }
+            int count = tempUnit.getEquipment().getCount(equipmentType);
             if (count > 0) {
                 // "remove current equipment" action
                 JMenuItem newItem = new JMenuItem(Messages.message(equipmentType.getId() + ".remove"));

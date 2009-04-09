@@ -142,7 +142,7 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(dutch, dragoon.getOwner());
         assertEquals(tile1, dragoon.getTile());
         assertEquals(1, dragoon.getEquipment().size());
-        assertEquals(muskets, dragoon.getEquipment().get(0));
+        assertEquals(1, dragoon.getEquipment().getCount(muskets));
         assertEquals(3, dragoon.getInitialMovesLeft());
         assertEquals(3, dragoon.getMovesLeft());
 
@@ -194,9 +194,9 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(dutch, dragoon.getOwner());
         assertEquals(tile1, dragoon.getTile());
         assertEquals(1, dragoon.getEquipment().size());
-        assertEquals(muskets, dragoon.getEquipment().get(0));
+        assertEquals(1, dragoon.getEquipment().getCount(muskets));
         assertEquals(1, brave.getEquipment().size());
-        assertEquals(indianHorses, brave.getEquipment().get(0));
+        assertEquals(1, brave.getEquipment().getCount(indianHorses));
         assertEquals(50, settlement1.getGoodsCount(Goods.HORSES));
         assertEquals(0, settlement2.getGoodsCount(Goods.HORSES));
 
@@ -206,8 +206,8 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(tile1, dragoon.getTile());
         assertTrue(dragoon.getEquipment().isEmpty());
         assertEquals(2, brave.getEquipment().size());
-        assertEquals(indianHorses, brave.getEquipment().get(0));
-        assertEquals(indianMuskets, brave.getEquipment().get(1));
+        assertEquals(1, brave.getEquipment().getCount(indianHorses));
+        assertEquals(1, brave.getEquipment().getCount(indianMuskets));
         assertEquals(50, settlement1.getGoodsCount(Goods.MUSKETS));
         assertEquals(0, settlement2.getGoodsCount(Goods.MUSKETS));
 
