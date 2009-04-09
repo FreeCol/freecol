@@ -1256,6 +1256,7 @@ public class IndianSettlement extends Settlement {
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
+        boolean full = getGame().isClientTrusted() || showAll || player == getOwner();
         // Start element:
         out.writeStartElement(getXMLElementTagName());
 
@@ -1270,35 +1271,38 @@ public class IndianSettlement extends Settlement {
         out.writeAttribute("lastTribute", Integer.toString(lastTribute));
         out.writeAttribute("isCapital", Boolean.toString(isCapital));
 
-        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
+        if (full) {
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
+        }
+        if (full || hasBeenVisited(player)) {
             writeAttribute(out, "learnableSkill", learnableSkill);
-
             for (int i = 0; i < wantedGoods.length; i++) {
                 String tag = "wantedGoods" + Integer.toString(i);
                 out.writeAttribute(tag, wantedGoods[i].getId());
             }
         }
-
         // attributes end here
         
-        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
+        if (full) {
             Iterator<Player> playerIterator = visitedBy.iterator();
             while (playerIterator.hasNext()) {
                 out.writeStartElement(IS_VISITED_TAG_NAME);
                 out.writeAttribute("player", playerIterator.next().getId());
                 out.writeEndElement();
             }
+            for (Entry<Player, Tension> entry : alarm.entrySet()) {
+                out.writeStartElement(ALARM_TAG_NAME);
+                out.writeAttribute("player", entry.getKey().getId());
+                out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
+                out.writeEndElement();
+            }
         } else if (hasBeenVisited(player)) {
             out.writeStartElement(IS_VISITED_TAG_NAME);
             out.writeAttribute("player", player.getId());
             out.writeEndElement();
-        }
-
-        for (Entry<Player, Tension> entry : alarm.entrySet()) {
             out.writeStartElement(ALARM_TAG_NAME);
-            out.writeAttribute("player", entry.getKey().getId());
-            out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
+            out.writeAttribute("player", player.getId());
+            out.writeAttribute("value", String.valueOf(getAlarm(player).getValue()));
             out.writeEndElement();
         }
 
@@ -1308,7 +1312,7 @@ public class IndianSettlement extends Settlement {
             out.writeEndElement();
         }
 
-        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
+        if (full) {
             if (!units.isEmpty()) {
                 out.writeStartElement(UNITS_TAG_NAME);
                 for (Unit unit : units) {
