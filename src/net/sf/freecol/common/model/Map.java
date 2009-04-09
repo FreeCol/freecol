@@ -574,7 +574,7 @@ public class Map extends FreeColGameObject {
      * @param unit
      *            The <code>Unit</code> to find the path for.
      * @param gd
-     *            The object responsible for determining wether a given
+     *            The object responsible for determining whether a given
      *            <code>PathNode</code> is a goal or not.
      * @param maxTurns
      *            The maximum number of turns the given <code>Unit</code> is
@@ -600,7 +600,7 @@ public class Map extends FreeColGameObject {
      * @param startTile
      *            The <code>Tile</code> to start the search from.
      * @param gd
-     *            The object responsible for determining wether a given
+     *            The object responsible for determining whether a given
      *            <code>PathNode</code> is a goal or not.
      * @param maxTurns
      *            The maximum number of turns the given <code>Unit</code> is
@@ -655,7 +655,7 @@ public class Map extends FreeColGameObject {
      * @param startTile
      *            The <code>Tile</code> to start the search from.
      * @param gd
-     *            The object responsible for determining wether a given
+     *            The object responsible for determining whether a given
      *            <code>PathNode</code> is a goal or not.
      * @param costDecider
      *            The object responsible for determining the cost.
@@ -684,7 +684,7 @@ public class Map extends FreeColGameObject {
      * @param startTile
      *            The <code>Tile</code> to start the search from.
      * @param gd
-     *            The object responsible for determining wether a given
+     *            The object responsible for determining whether a given
      *            <code>PathNode</code> is a goal or not.
      * @param costDecider
      *            The object responsible for determining the cost.
@@ -713,7 +713,7 @@ public class Map extends FreeColGameObject {
      * @param startTile
      *            The <code>Tile</code> to start the search from.
      * @param gd
-     *            The object responsible for determining wether a given
+     *            The object responsible for determining whether a given
      *            <code>PathNode</code> is a goal or not.
      * @param costDecider
      *            The object responsible for determining the cost.
@@ -917,7 +917,7 @@ public class Map extends FreeColGameObject {
      * 
      * @param unit
      *            The <code>Unit</code> that should be used to determine
-     *            wether or not a path is legal.
+     *            whether or not a path is legal.
      * @param start
      *            The starting <code>Tile</code>.
      * @return The path to the target or <code>null</code> if no target can be
@@ -951,6 +951,60 @@ public class Map extends FreeColGameObject {
             }
         };
         return search(unit, start, gd, defaultCostDecider, Integer.MAX_VALUE);
+    }
+    
+    /**
+     * Finds the best path to <code>Europe</code> independently of any unit.
+     * This method is meant to be executed by the server/AI code, with complete knowledge of the map
+     * 
+     * @param start
+     *            The starting <code>Tile</code>.
+     * @return The path to the target or <code>null</code> if no target can be
+     *         found.
+     * @see Europe
+     */
+    public PathNode findPathToEurope(Tile start) {
+        final GoalDecider gd = new GoalDecider() {
+            private PathNode goal = null;
+
+            public PathNode getGoal() {
+                return goal;
+            }
+
+            public boolean hasSubGoals() {
+                return false;
+            }
+
+            public boolean check(Unit u, PathNode pathNode) {
+                Map map = getGame().getMap();
+                Tile t = pathNode.getTile();
+                if (t.canMoveToEurope()) {
+                    goal = pathNode;
+                    return true;
+                }
+                if (map.isAdjacentToMapEdge(t)) {
+                    goal = pathNode;
+                    return true;
+                }
+                return false;
+            }
+        };
+        final CostDecider cd = new CostDecider() {
+            public int getCost(Unit unit, Tile oldTile, Tile newTile, int movesLeft, int turns) {
+                if (newTile.isLand()) {
+                    return ILLEGAL_MOVE;
+                } else {
+                    return 1;
+                }
+            }
+            public int getMovesLeft() {
+                return 0;
+            }
+            public boolean isNewTurn() {
+                return false;
+            }
+        };
+        return search(start, gd, cd, Integer.MAX_VALUE);
     }
 
     /**
@@ -1694,7 +1748,7 @@ public class Map extends FreeColGameObject {
         /**
          * Obtains the next position.
          * 
-         * @return The next position. This position is guaratied to be
+         * @return The next position. This position is guaranteed to be
          *         {@link Map#isValid(net.sf.freecol.common.model.Map.Position) valid}.
          */
         @Override

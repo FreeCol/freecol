@@ -439,48 +439,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 value = 0;
             } else {
                 // TODO: Remove when wagon train code has been written. START
-                final GoalDecider gd = new GoalDecider() {
-                    private PathNode goal = null;
-
-                    public PathNode getGoal() {
-                        return goal;
-                    }
-
-                    public boolean hasSubGoals() {
-                        return false;
-                    }
-
-                    public boolean check(Unit u, PathNode pathNode) {
-                        Map map = getGame().getMap();
-                        Tile t = pathNode.getTile();
-                        if (t.canMoveToEurope()) {
-                            goal = pathNode;
-                            return true;
-                        }
-                        if (map.isAdjacentToMapEdge(t)) {
-                            goal = pathNode;
-                            return true;
-                        }
-                        return false;
-                    }
-                };
-                final CostDecider cd = new CostDecider() {
-                    public int getCost(Unit unit, Tile oldTile, Tile newTile, int movesLeft, int turns) {
-                        if (newTile.isLand()) {
-                            return ILLEGAL_MOVE;
-                        } else {
-                            return 1;
-                        }
-                    }
-                    public int getMovesLeft() {
-                        return 0;
-                    }
-                    public boolean isNewTurn() {
-                        return false;
-                    }
-                };
-                final PathNode n = getMap().search(this, gd, cd, Integer.MAX_VALUE);
+                final PathNode n = getMap().findPathToEurope(this);
                 if (n == null) {
+                    // no path to Europe, therefore it is a poor location
                     value = 0;
                 }
                 // END-TODO
