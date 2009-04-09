@@ -483,6 +483,8 @@ public class GoodsContainer extends FreeColGameObject {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
+        storedGoods.clear();
+        oldStoredGoods.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(STORED_GOODS_TAG)) {
