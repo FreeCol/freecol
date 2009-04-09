@@ -2224,13 +2224,15 @@ public final class Canvas extends JDesktopPane {
                 abort.run();
             }
         });
-        addMouseListener(new MouseAdapter() {
+        MouseAdapter ma = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 removeMouseListener(this);
                 abort.run();
             }
-        });
+        };
+        this.addMouseListener(ma);
+        vp.addMouseListener(ma);
     }
 
     /**

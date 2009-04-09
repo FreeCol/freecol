@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.video;
 
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 import javax.swing.border.Border;
@@ -83,6 +84,10 @@ public class VideoComponent extends JPanel {
      */
     public void stop() {
         applet.stop();
+    }
+    
+    public void addMouseListener(MouseListener l) {
+        applet.addMouseListener(l);
     }
     
     private Border createBorder() {
