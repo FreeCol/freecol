@@ -294,13 +294,11 @@ public final class FreeColClient {
 
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
 
-        /*        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 canvas.showOpeningVideoPanel();
             }
         });
-        */
         gui.startCursorBlinking();
     }
 
