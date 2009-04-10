@@ -27,7 +27,6 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -65,8 +64,6 @@ public final class ReportIndianPanel extends ReportPanel {
      */
     private JPanel buildIndianAdvisorPanel(Player player, Player opponent) {
 
-        ImageLibrary library = getCanvas().getClient().getImageLibrary();
-
         JPanel result = new JPanel(new MigLayout("wrap 2", "[]20px[]", ""));
 
         result.add(new JLabel(Messages.message("report.indian.nameOfTribe")));
@@ -94,8 +91,8 @@ public final class ReportIndianPanel extends ReportPanel {
             String skill = Messages.message("indianSettlement.skillUnknown");
             if (skillType != null) {
                 skill = skillType.getName();
-                ImageIcon skillImage = library.getUnitImageIcon(skillType);
-                skillLabel.setIcon(library.getScaledImageIcon(skillImage, 0.66f));
+                ImageIcon skillImage = getLibrary().getUnitImageIcon(skillType);
+                skillLabel.setIcon(getLibrary().getScaledImageIcon(skillImage, 0.66f));
             }
             skillLabel.setText(skill);
             result.add(new JLabel(locationName));

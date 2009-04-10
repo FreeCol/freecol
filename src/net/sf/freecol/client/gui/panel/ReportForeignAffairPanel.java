@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
@@ -57,7 +56,6 @@ public final class ReportForeignAffairPanel extends ReportPanel {
         reportPanel.setLayout(new GridLayout(0, 2));
 
         FreeColClient client = getCanvas().getClient();
-        ImageLibrary imageLibrary = getCanvas().getGUI().getImageLibrary();
         Element report = client.getInGameController().getForeignAffairsReport();
         int number = report.getChildNodes().getLength();
         for (int i = 0; i < number; i++) {
@@ -66,7 +64,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
             enemyPanel.setOpaque(false);
             Player enemy = (Player) client.getGame().getFreeColGameObject(enemyElement.getAttribute("player"));
             JLabel coatLabel = new JLabel();
-            final ImageIcon coatOfArms = imageLibrary.getCoatOfArmsImageIcon(enemy.getNation());
+            final ImageIcon coatOfArms = getLibrary().getCoatOfArmsImageIcon(enemy.getNation());
             if (coatOfArms != null) {
                 coatLabel.setIcon(coatOfArms);
             }

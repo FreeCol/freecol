@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamException;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.Turn;
@@ -54,7 +53,6 @@ public final class ReportHighScoresPanel extends ReportPanel {
         reportPanel.removeAll();
 
         FreeColClient client = getCanvas().getClient();
-        ImageLibrary imageLibrary = getCanvas().getGUI().getImageLibrary();
         Element report = client.getInGameController().getHighScores();
         int number = report.getChildNodes().getLength();
         

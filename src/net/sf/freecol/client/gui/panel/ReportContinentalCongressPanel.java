@@ -34,7 +34,6 @@ import javax.swing.JSeparator;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -70,7 +69,6 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("fill, wrap 3", "", ""));
 
         Player player = getCanvas().getClient().getMyPlayer();
-        ImageLibrary library = parent.getGUI().getImageLibrary();
 
         JLabel recruiting = new JLabel(Messages.message("report.continentalCongress.recruiting"));
         recruiting.setFont(smallHeaderFont);
@@ -80,7 +78,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         } else {
             FoundingFather father = player.getCurrentFather();
             JLabel currentFatherLabel = new JLabel(father.getName(),
-                                                   new ImageIcon(library.getFoundingFatherImage(father)),
+                                                   new ImageIcon(getLibrary().getFoundingFatherImage(father)),
                                                    JLabel.CENTER);
             currentFatherLabel.setToolTipText(father.getDescription());
             currentFatherLabel.setVerticalTextPosition(JLabel.TOP);
@@ -102,7 +100,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
                 if (player.hasFather(father)) {
                     JLabel fatherLabel = new JLabel(father.getName(),
-                                                   new ImageIcon(library.getFoundingFatherImage(father)),
+                                                   new ImageIcon(getLibrary().getFoundingFatherImage(father)),
                                                    JLabel.CENTER);
                     fatherLabel.setVerticalTextPosition(JLabel.TOP);
                     fatherLabel.setHorizontalTextPosition(JLabel.CENTER);

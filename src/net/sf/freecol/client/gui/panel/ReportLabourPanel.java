@@ -35,7 +35,6 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
@@ -130,7 +129,6 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             }
         }
 
-        final ImageLibrary library = getCanvas().getGUI().getImageLibrary();
         reportPanel.setLayout(new MigLayout("wrap 6", "[]30[]30[]", ""));
         
         for (UnitType unitType : colonists) {
@@ -169,8 +167,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         }
             
         // summary
-        //final ImageLibrary library = getCanvas().getGUI().getImageLibrary();
-        detailPanel.add(new JLabel(library.getUnitImageIcon(unitType, role)), "spany");
+        detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, role)), "spany");
         detailPanel.add(new JLabel(unitType.getName()));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;

@@ -57,7 +57,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected static final String OK = "OK";
 
-    protected static ImageLibrary library;
+    private static ImageLibrary library;
 
     protected JPanel reportPanel;
 
