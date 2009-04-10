@@ -40,6 +40,10 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
@@ -51,17 +55,17 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
 
-    protected static final int OK = -1;
+    protected static final String OK = "OK";
+
+    protected static ImageLibrary library;
 
     protected JPanel reportPanel;
 
     protected JLabel header;
 
-    protected JButton ok;
-
     protected JScrollPane scrollPane;
 
-    private static ImageLibrary library;
+    private JButton ok;
 
     private static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
         public int compare(Unit unit1, Unit unit2) {
@@ -180,11 +184,17 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        int action = Integer.valueOf(command).intValue();
-        if (action == OK) {
+        if (OK.equals(command)) {
             getCanvas().remove(this);
         } else {
-            logger.warning("Invalid ActionCommand: " + action);
+            FreeColGameObject object = getCanvas().getClient().getGame().getFreeColGameObject(command);
+            if (object instanceof Colony) {
+                getCanvas().showColonyPanel((Colony) object);
+            } else if (object instanceof Europe) {
+                getCanvas().showEuropePanel();
+            } else if (object instanceof Tile) {
+                getCanvas().getGUI().setFocus(((Tile) object).getPosition());
+            }
         }
     }
 }

@@ -325,28 +325,4 @@ public final class ReportTurnPanel extends ReportPanel {
         document.insertString(document.getLength(), " ", document.getStyle("button"));
     }
 
-
-    /**
-     * This function analyzes an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (command.equals(String.valueOf(OK))) {
-            super.actionPerformed(event);
-        } else {
-            FreeColGameObject object = getCanvas().getClient().getGame().getFreeColGameObject(command);
-            if (object instanceof Europe) {
-                getCanvas().showEuropePanel();
-            } else if (object instanceof Tile) {
-                getCanvas().getGUI().setFocus(((Tile) object).getPosition());
-            } else if (object instanceof Colony) {
-                getCanvas().showColonyPanel((Colony) object);
-            }
-        }
-    }
-
 }

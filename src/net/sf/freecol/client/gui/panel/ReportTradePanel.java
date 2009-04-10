@@ -36,7 +36,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -197,7 +196,7 @@ public final class ReportTradePanel extends ReportPanel {
 
         for (int colonyIndex = 0; colonyIndex < colonies.size(); colonyIndex++) {
             Colony colony = colonies.get(colonyIndex);
-            JButton colonyButton = createColonyButton(colonyIndex);
+            JButton colonyButton = createColonyButton(colony, colonyIndex);
             reportPanel.add(colonyButton, "cell 0 " + row + " 1 2");
             column = 0;
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
@@ -247,10 +246,10 @@ public final class ReportTradePanel extends ReportPanel {
                         "cell 0 " + row + ", span");
     }
 
-    private JButton createColonyButton(int index) {
+    private JButton createColonyButton(Colony colony, int index) {
 
         JButton button = new JButton();
-        String name = colonies.get(index).getName();
+        String name = colony.getName();
         if (colonies.get(index).hasAbility("model.ability.export")) {
             name += "*";
         }
@@ -265,25 +264,9 @@ public final class ReportTradePanel extends ReportPanel {
             button.setBorder(FreeColPanel.LEFTCELLBORDER);
         }
 
-        button.setActionCommand(String.valueOf(index));
+        button.setActionCommand(colony.getId());
         button.addActionListener(this);
         return button;
-    }
-
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     *
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        int action = Integer.valueOf(command).intValue();
-        if (action == OK) {
-            super.actionPerformed(event);
-        } else {
-            getCanvas().showColonyPanel(colonies.get(action));
-        }
     }
 
     @Override

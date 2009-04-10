@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.Collections;
@@ -31,7 +30,6 @@ import javax.swing.JLabel;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 
@@ -78,21 +76,6 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         return button;
     }
 
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (command.equals(Integer.toString(ReportPanel.OK))) {
-            getCanvas().remove(this);
-        } else {
-            FreeColGameObject object = getCanvas().getClient().getGame().getFreeColGameObject(command);
-            getCanvas().showColonyPanel((Colony) object);
-        }
-    }
 
 }
 

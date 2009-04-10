@@ -169,7 +169,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
         }
             
         // summary
-        final ImageLibrary library = getCanvas().getGUI().getImageLibrary();
+        //final ImageLibrary library = getCanvas().getGUI().getImageLibrary();
         detailPanel.add(new JLabel(library.getUnitImageIcon(unitType, role)), "spany");
         detailPanel.add(new JLabel(unitType.getName()));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
@@ -181,7 +181,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
                     canTrain = true;
                     colonyName += "*";
                 }
-                JButton colonyButton = getLinkButton(colonyName, null, colony.getName());
+                JButton colonyButton = getLinkButton(colonyName, null, colony.getId());
                 colonyButton.addActionListener(report);
                 detailPanel.add(colonyButton);
                 JLabel countLabel = new JLabel(unitLocations.get(unitType).get(colony).toString());
@@ -226,7 +226,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        if (Integer.toString(OK).equals(command)) {
+        if (OK.equals(command)) {
             super.actionPerformed(event);
         } else {
             UnitType unitType = FreeCol.getSpecification().getUnitType(command);

@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
@@ -52,21 +51,4 @@ public final class ReportLabourDetailPanel extends ReportPanel implements Action
         reportPanel.add(detailPanel);
     }
 
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (command.equals("-1")) {
-            super.actionPerformed(event);
-        } else if (command.equals(player.getEurope().getId())) {
-            getCanvas().showEuropePanel();
-        } else {
-            getCanvas().showColonyPanel(player.getColony(command));
-        }
-    }
 }

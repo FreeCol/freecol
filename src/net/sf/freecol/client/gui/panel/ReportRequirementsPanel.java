@@ -19,8 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -293,23 +291,5 @@ public final class ReportRequirementsPanel extends ReportPanel {
         return button;
     }
 
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (command.equals(String.valueOf(OK))) {
-            super.actionPerformed(event);
-        } else {
-            Colony colony = (Colony) getCanvas().getClient().getGame().getFreeColGameObject(command);
-            if (colony instanceof Colony) {
-                getCanvas().showColonyPanel(colony);
-            }
-        }
-    }
 
 }

@@ -20,18 +20,12 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
-import javax.swing.border.Border;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
@@ -141,25 +135,4 @@ public final class ReportColonyPanel extends ReportPanel {
         }
 
     }
-
-
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    @Override
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if ("-1".equals(command)) {
-            super.actionPerformed(event);
-        } else {
-            Colony colony = (Colony) getCanvas().getClient().getGame().getFreeColGameObject(command);
-            if (colony != null) {
-                getCanvas().showColonyPanel(colony);
-            }
-        }
-    }
-
 }
