@@ -1257,30 +1257,43 @@ public class IndianSettlement extends Settlement {
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         boolean full = getGame().isClientTrusted() || showAll || player == getOwner();
-        // Start element:
-        out.writeStartElement(getXMLElementTagName());
+        PlayerExploredTile pet = (player == null) ? null
+            : getTile().getPlayerExploredTile(player);
 
         if (toSavedGame && !showAll) {
             logger.warning("toSavedGame is true, but showAll is false");
         }
 
+        // Start element:
+        out.writeStartElement(getXMLElementTagName());
+
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("tile", tile.getId());
         out.writeAttribute("name", getName());
         out.writeAttribute("owner", owner.getId());
-        out.writeAttribute("lastTribute", Integer.toString(lastTribute));
         out.writeAttribute("isCapital", Boolean.toString(isCapital));
 
         if (full) {
+            out.writeAttribute("lastTribute", Integer.toString(lastTribute));
             out.writeAttribute("convertProgress", Integer.toString(convertProgress));
-        }
-        if (full || hasBeenVisited(player)) {
             writeAttribute(out, "learnableSkill", learnableSkill);
             for (int i = 0; i < wantedGoods.length; i++) {
                 String tag = "wantedGoods" + Integer.toString(i);
                 out.writeAttribute(tag, wantedGoods[i].getId());
             }
+        } else if (pet != null) {
+            writeAttribute(out, "learnableSkill", pet.getSkill());
+            GoodsType[] wanted = pet.getWantedGoods();
+            int i, j = 0;
+            for (i = 0; i < wanted.length; i++) {
+                if (wanted[i] != null) {
+                    String tag = "wantedGoods" + Integer.toString(j);
+                    out.writeAttribute(tag, wanted[i].getId());
+                    j++;
+                }
+            }
         }
+
         // attributes end here
         
         if (full) {
@@ -1296,23 +1309,11 @@ public class IndianSettlement extends Settlement {
                 out.writeAttribute("value", String.valueOf(entry.getValue().getValue()));
                 out.writeEndElement();
             }
-        } else if (hasBeenVisited(player)) {
-            out.writeStartElement(IS_VISITED_TAG_NAME);
-            out.writeAttribute("player", player.getId());
-            out.writeEndElement();
-            out.writeStartElement(ALARM_TAG_NAME);
-            out.writeAttribute("player", player.getId());
-            out.writeAttribute("value", String.valueOf(getAlarm(player).getValue()));
-            out.writeEndElement();
-        }
-
-        if (missionary != null) {
-            out.writeStartElement(MISSIONARY_TAG_NAME);
-            missionary.toXML(out, player, showAll, toSavedGame);
-            out.writeEndElement();
-        }
-
-        if (full) {
+            if (missionary != null) {
+                out.writeStartElement(MISSIONARY_TAG_NAME);
+                missionary.toXML(out, player, showAll, toSavedGame);
+                out.writeEndElement();
+            }
             if (!units.isEmpty()) {
                 out.writeStartElement(UNITS_TAG_NAME);
                 for (Unit unit : units) {
@@ -1326,7 +1327,24 @@ public class IndianSettlement extends Settlement {
                 out.writeAttribute(ID_ATTRIBUTE, unit.getId());
                 out.writeEndElement();
             }
-        } else {
+        } else if (pet != null) {
+            out.writeStartElement(IS_VISITED_TAG_NAME);
+            out.writeAttribute("player", player.getId());
+            out.writeEndElement();
+            if (getAlarm(player) != null) {
+                out.writeStartElement(ALARM_TAG_NAME);
+                out.writeAttribute("player", player.getId());
+                out.writeAttribute("value", String.valueOf(getAlarm(player).getValue()));
+                out.writeEndElement();
+            }
+            if (pet.getMissionary() != null) {
+                out.writeStartElement(MISSIONARY_TAG_NAME);
+                pet.getMissionary().toXML(out, player, showAll, toSavedGame);
+                out.writeEndElement();
+            }
+        }
+
+        if (!full) {
             GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), this);
             emptyGoodsContainer.setFakeID(goodsContainer.getId());
             emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
