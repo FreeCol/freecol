@@ -44,7 +44,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -68,11 +67,6 @@ public final class InfoPanel extends FreeColPanel {
     
     private static final int PANEL_HEIGHT = 128;
     
-    private final FreeColClient freeColClient;
-    
-    @SuppressWarnings("unused")
-    private final Game game;
-    
     private final EndTurnPanel endTurnPanel = new EndTurnPanel();
     
     private final UnitInfoPanel unitInfoPanel;
@@ -89,8 +83,6 @@ public final class InfoPanel extends FreeColPanel {
      */
     public InfoPanel(final FreeColClient freeColClient) {
         super(freeColClient.getCanvas());
-        this.freeColClient = freeColClient;
-        this.game = freeColClient.getGame();
         
         unitInfoPanel = new UnitInfoPanel();
         setLayout(null);
@@ -119,7 +111,7 @@ public final class InfoPanel extends FreeColPanel {
 
         addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
-                    GUI gui = freeColClient.getGUI();
+                    GUI gui = getClient().getGUI();
                     Unit activeUnit = gui.getActiveUnit();
                     if (activeUnit != null && activeUnit.getTile() != null) {
                         gui.setFocus(activeUnit.getTile().getPosition());
@@ -206,8 +198,8 @@ public final class InfoPanel extends FreeColPanel {
      * @param graphics The Graphics context in which to draw this component.
      */
     public void paintComponent(Graphics graphics) {
-        int viewMode = freeColClient.getGUI().getViewMode().getView();
-        if (!freeColClient.isMapEditor()) {
+        int viewMode = getClient().getGUI().getViewMode().getView();
+        if (!getClient().isMapEditor()) {
             if (mapEditorPanel.isVisible()) {
                 mapEditorPanel.setVisible(false);
             }
@@ -218,8 +210,8 @@ public final class InfoPanel extends FreeColPanel {
                         unitInfoPanel.setVisible(true);
                         endTurnPanel.setVisible(false);
                     }
-                } else if (freeColClient.getMyPlayer() != null
-                        && !freeColClient.getMyPlayer().hasNextActiveUnit()) {
+                } else if (getClient().getMyPlayer() != null
+                        && !getClient().getMyPlayer().hasNextActiveUnit()) {
                     if (!endTurnPanel.isVisible()) {
                         endTurnPanel.setVisible(true);
                         unitInfoPanel.setVisible(false);
@@ -282,8 +274,8 @@ public final class InfoPanel extends FreeColPanel {
                 int width = getLibrary().getTerrainImageWidth(tile.getType());
                 int height = getLibrary().getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                freeColClient.getGUI().displayTerrain(image.createGraphics(), 
-                                                      freeColClient.getGame().getMap(),
+                getClient().getGUI().displayTerrain(image.createGraphics(), 
+                                                      getClient().getGame().getMap(),
                                                       tile, 0, 0);
                 if (tile.isExplored()) {
                     List<String> items = new ArrayList<String>();
@@ -451,12 +443,12 @@ public final class InfoPanel extends FreeColPanel {
             /*
              * endTurnButton.addActionListener(new ActionListener() { public
              * void actionPerformed(ActionEvent e) {
-             * freeColClient.getInGameController().endTurn(); } });
+             * getClient().getInGameController().endTurn(); } });
              */
             
             endTurnButton.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
-                    freeColClient.getInGameController().endTurn();
+                    getClient().getInGameController().endTurn();
                 }
             });
         }

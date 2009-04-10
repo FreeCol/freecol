@@ -29,7 +29,6 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -55,19 +54,12 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
 
     private final JComboBox comboBox;
 
-    private final FreeColClient freeColClient;
-
-    private final InGameController inGameController;
-
-
     /**
      * The constructor to use.
      */
     public SelectAmountDialog(Canvas parent, GoodsType goodsType, int available, boolean needToPay) {
         super(parent);
 
-        this.freeColClient = parent.getClient();
-        this.inGameController = freeColClient.getInGameController();
         setFocusCycleRoot(true);
 
         question = getDefaultTextArea(Messages.message("goodsTransfer.text"));

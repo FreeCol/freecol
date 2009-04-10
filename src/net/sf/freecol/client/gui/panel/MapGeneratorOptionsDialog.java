@@ -38,7 +38,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
@@ -56,8 +55,6 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
 
     private static final int OK = 0, CANCEL = 1, RESET = 2;
 
-    private final FreeColClient freeColClient;
-
     private JButton ok, cancel;
 
     private JPanel buttons = new JPanel(new FlowLayout());
@@ -71,13 +68,10 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
-     * @param freeColClient The main controller object for the client.
      */
-    public MapGeneratorOptionsDialog(Canvas parent, FreeColClient freeColClient) {
+    public MapGeneratorOptionsDialog(Canvas parent) {
         super(parent);
         setLayout(new BorderLayout());
-
-        this.freeColClient = freeColClient;
 
         ok = new JButton(Messages.message("ok"));
         ok.setActionCommand(String.valueOf(OK));
@@ -207,9 +201,9 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
                 ui.unregister();
                 ui.updateOption();
                 getCanvas().remove(this);
-                if (!freeColClient.isMapEditor()) {
-                    freeColClient.getPreGameController().sendMapGeneratorOptions();
-                    freeColClient.getCanvas().getStartGamePanel().updateMapGeneratorOptions();
+                if (!getClient().isMapEditor()) {
+                    getClient().getPreGameController().sendMapGeneratorOptions();
+                    getClient().getCanvas().getStartGamePanel().updateMapGeneratorOptions();
                 }
                 setResponse(new Boolean(true));
                 break;

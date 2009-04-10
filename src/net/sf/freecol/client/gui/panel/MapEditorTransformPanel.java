@@ -37,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -69,8 +68,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
 
-    private final FreeColClient freeColClient;
-
     private final JPanel listPanel;
 
     private ButtonGroup group;
@@ -84,8 +81,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      */
     public MapEditorTransformPanel(Canvas parent) {
         super(parent, new BorderLayout());
-
-        this.freeColClient = parent.getClient();
 
         listPanel = new JPanel(new GridLayout(2, 0));
 
@@ -143,7 +138,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         group.add(button);
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                freeColClient.getMapEditorController().setMapTransform(mt);
+                getClient().getMapEditorController().setMapTransform(mt);
             }
         });
         button.setBorder(null);

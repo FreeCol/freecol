@@ -54,6 +54,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -193,6 +194,10 @@ public class FreeColPanel extends JPanel {
      */
     public ImageLibrary getLibrary() {
         return canvas.getGUI().getImageLibrary();
+    }
+
+    public FreeColClient getClient() {
+        return canvas.getClient();
     }
 
     /**

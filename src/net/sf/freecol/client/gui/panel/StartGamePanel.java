@@ -157,7 +157,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     public StartGamePanel(final Canvas parent) {
         super(parent);
 
-        FreeColClient freeColClient = parent.getClient();
         JButton cancel = new JButton(Messages.message("cancel"));
 
         JScrollPane chatScroll, tableScroll;
@@ -173,7 +172,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatArea = new JTextArea();
         chatScroll = new JScrollPane(chatArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        tableModel = new PlayersTableModel(freeColClient, freeColClient.getPreGameController());
+        tableModel = new PlayersTableModel(getClient().getPreGameController());
         table = new JTable(tableModel);
 
         TableColumn nameColumn = table.getColumnModel().getColumn(NAME_COLUMN),
@@ -432,9 +431,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
  */
 class PlayersTableModel extends AbstractTableModel {
 
-    @SuppressWarnings("unused")
-    private FreeColClient freeColClient;
-
     private List<Player> players;
 
     private Player thisPlayer;
@@ -458,8 +454,7 @@ class PlayersTableModel extends AbstractTableModel {
      * @param pgc The PreGameController to use when updates need to be notified
      *            across the network.
      */
-    public PlayersTableModel(FreeColClient freeColClient, PreGameController pgc) {
-        this.freeColClient = freeColClient;
+    public PlayersTableModel(PreGameController pgc) {
         players = new ArrayList<Player>();
         thisPlayer = null;
         preGameController = pgc;

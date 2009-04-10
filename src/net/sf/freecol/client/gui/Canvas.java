@@ -252,7 +252,7 @@ public final class Canvas extends JDesktopPane {
         mainPanel = new MainPanel(this, freeColClient);
         startGamePanel = new StartGamePanel(this);
         serverListPanel = new ServerListPanel(this, freeColClient, freeColClient.getConnectController());
-        europePanel = new EuropePanel(this, freeColClient, freeColClient.getInGameController());
+        europePanel = new EuropePanel(this);
         statusPanel = new StatusPanel(this);
         chatPanel = new ChatPanel(this, freeColClient);
         clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
@@ -921,7 +921,7 @@ public final class Canvas extends JDesktopPane {
      *         <code>false</code> otherwise.
      */
     public boolean showMapGeneratorOptionsDialog(boolean editable, MapGeneratorOptions mgo) {
-        MapGeneratorOptionsDialog mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this, freeColClient);
+        MapGeneratorOptionsDialog mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this);
         mapGeneratorOptionsDialog.initialize(editable, mgo);
 
         addAsFrame(mapGeneratorOptionsDialog);
