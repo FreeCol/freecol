@@ -33,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -54,8 +55,8 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * @return An information dialog that shows the given text 
      *       and an "OK" button.
      */
-    public InformationDialog(String text, ImageIcon image) {
-        this(new String[] { text }, new ImageIcon[] { image });
+    public InformationDialog(Canvas canvas, String text, ImageIcon image) {
+        this(canvas, new String[] { text }, new ImageIcon[] { image });
     }
 
     /**
@@ -67,8 +68,8 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * @return An information dialog that shows the given text 
      *       and an "OK" button.
      */
-    public InformationDialog(String[] texts, ImageIcon[] images) {
-
+    public InformationDialog(Canvas parent, String[] texts, ImageIcon[] images) {
+        super(parent);
         setLayout(new MigLayout("wrap 1, insets 200 10 10 10", "[510]", "[242]20[20]"));
 
         JPanel textPanel = new JPanel();

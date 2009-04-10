@@ -55,7 +55,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Ability;
@@ -111,8 +110,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
     private final Canvas parent;
 
-    private final ImageLibrary library;
-
     private JLabel header;
 
     private JPanel listPanel;
@@ -129,9 +126,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent The parent of this panel.
      */
     public ColopediaPanel(Canvas parent) {
-        super(new FlowLayout(FlowLayout.CENTER, 1000, 10));
+        super(parent, new FlowLayout(FlowLayout.CENTER, 1000, 10));
         this.parent = parent;
-        this.library = parent.getGUI().getImageLibrary();
 
         none = Messages.message("none");
 
@@ -489,7 +485,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent - the parent node
      */
     private void buildTerrainItem(TileType tileType, DefaultMutableTreeNode parent) {
-        ImageIcon icon = new ImageIcon(library.getScaledTerrainImage(tileType, 0.25f));
+        ImageIcon icon = new ImageIcon(getLibrary().getScaledTerrainImage(tileType, 0.25f));
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(tileType, 
                                                                                        tileType.getName(), icon));
         parent.add(item);
@@ -502,7 +498,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent - the parent node
      */
     private void buildResourceItem(ResourceType resType, DefaultMutableTreeNode parent) {
-        ImageIcon icon = library.getScaledBonusImageIcon(resType, 0.75f);
+        ImageIcon icon = getLibrary().getScaledBonusImageIcon(resType, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(resType,
                                                                                        resType.getName(),
                                                                                        icon));
@@ -517,7 +513,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent
      */
     private void buildUnitItem(UnitType unitType, float scale, DefaultMutableTreeNode parent) {
-        ImageIcon icon = library.getScaledImageIcon(library.getUnitImageIcon(unitType), 0.5f);
+        ImageIcon icon = getLibrary().getScaledImageIcon(getLibrary().getUnitImageIcon(unitType), 0.5f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(unitType,
                                                                                        unitType.getName(), icon));
         parent.add(item);
@@ -530,7 +526,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      * @param parent The parent tree node
      */
     private void buildGoodsItem(GoodsType goodsType, DefaultMutableTreeNode parent) {
-        ImageIcon icon = library.getScaledGoodsImageIcon(goodsType, 0.75f);
+        ImageIcon icon = getLibrary().getScaledGoodsImageIcon(goodsType, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType,
                                                                                        goodsType.getName(), icon));
         parent.add(item);
@@ -544,7 +540,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildFatherItem(FoundingFather foundingFather, DefaultMutableTreeNode parent) {
         String name = foundingFather.getName();
-        ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
+        ImageIcon icon = getLibrary().getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather,
                                                                                        name, icon));
         parent.add(item);
@@ -558,7 +554,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildNationItem(Nation nation, DefaultMutableTreeNode parent) {
         String name = nation.getName();
-        ImageIcon icon = library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f);
+        ImageIcon icon = getLibrary().getScaledImageIcon(getLibrary().getCoatOfArmsImageIcon(nation), 0.5f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(nation,
                                                                                        name, icon));
         parent.add(item);
@@ -572,8 +568,8 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
      */
     private void buildNationTypeItem(NationType nationType, DefaultMutableTreeNode parent) {
         String name = nationType.getName();
-        //ImageIcon icon = library.getCoatOfArmsImageIcon(nation);
-        ImageIcon icon = library.getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
+        //ImageIcon icon = getLibrary().getCoatOfArmsImageIcon(nation);
+        ImageIcon icon = getLibrary().getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(nationType,
                                                                                        name, icon));
         parent.add(item);
@@ -590,23 +586,23 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     }
 
     private JButton getResourceButton(final ResourceType resourceType) {
-        return getButton(resourceType, null, library.getBonusImageIcon(resourceType));
+        return getButton(resourceType, null, getLibrary().getBonusImageIcon(resourceType));
     }
 
     private JButton getGoodsButton(final GoodsType goodsType) {
-        return getButton(goodsType, null, library.getGoodsImageIcon(goodsType));
+        return getButton(goodsType, null, getLibrary().getGoodsImageIcon(goodsType));
     }
 
     private JButton getGoodsButton(final GoodsType goodsType, String text) {
-        return getButton(goodsType, text, library.getGoodsImageIcon(goodsType));
+        return getButton(goodsType, text, getLibrary().getGoodsImageIcon(goodsType));
     }
 
     private JButton getGoodsButton(final GoodsType goodsType, int amount) {
-        return getButton(goodsType, Integer.toString(amount), library.getGoodsImageIcon(goodsType));
+        return getButton(goodsType, Integer.toString(amount), getLibrary().getGoodsImageIcon(goodsType));
     }
 
     private JButton getUnitButton(final UnitType unitType, Role role) {
-        ImageIcon unitIcon = library.scaleIcon(library.getUnitImageIcon(unitType, role), 0.66f);
+        ImageIcon unitIcon = getLibrary().scaleIcon(getLibrary().getUnitImageIcon(unitType, role), 0.66f);
         JButton unitButton = getButton(unitType, null, unitIcon);
         unitButton.setHorizontalAlignment(SwingConstants.LEFT);
         return unitButton;
@@ -646,7 +642,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.add(nameLabel, "span, align center");
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.terrainImage")));
-        Image terrainImage = library.getScaledTerrainImage(tileType, 1f);
+        Image terrainImage = getLibrary().getScaledTerrainImage(tileType, 1f);
         detailPanel.add(new JLabel(new ImageIcon(terrainImage)));
 
         List<ResourceType> resourceList = tileType.getResourceTypeList();
@@ -1130,7 +1126,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
-        Image image = library.getFoundingFatherImage(father);
+        Image image = getLibrary().getFoundingFatherImage(father);
 
         JLabel imageLabel;
         if (image != null) {
@@ -1169,7 +1165,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
-        JLabel artLabel = new JLabel(library.getMonarchImageIcon(nation));
+        JLabel artLabel = new JLabel(getLibrary().getMonarchImageIcon(nation));
         detailPanel.add(artLabel, "spany, gap 40, top");
 
         detailPanel.add(new JLabel(Messages.message("colopedia.nation.ruler")));
@@ -1295,7 +1291,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
         detailPanel.add(new JLabel(Messages.message("colopedia.nationType.typeOfSettlements")));
         detailPanel.add(new JLabel(nationType.getSettlementTypeAsString(),
-                                   new ImageIcon(library.getSettlementImage(nationType.getTypeOfSettlement())),
+                                   new ImageIcon(getLibrary().getSettlementImage(nationType.getTypeOfSettlement())),
                                    SwingConstants.CENTER));
 
         List<String> regionNames = new ArrayList<String>();

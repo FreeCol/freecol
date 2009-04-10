@@ -69,7 +69,7 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
 
         // TODO: make this a building image
         add(new UnitLabel(unit, canvas, false, true), "newline");
-        add(new JLabel(canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType)));
+        add(new JLabel(getLibrary().getGoodsImageIcon(goodsType)));
 
         for (Modifier modifier : modifiers) {
             FreeColGameObjectType source = modifier.getSource();

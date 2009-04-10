@@ -40,7 +40,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map.Direction;
@@ -72,8 +71,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     private final FreeColClient freeColClient;
 
-    private final ImageLibrary library;
-
     private final JPanel listPanel;
 
     private ButtonGroup group;
@@ -89,7 +86,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         super(parent, new BorderLayout());
 
         this.freeColClient = parent.getClient();
-        this.library = parent.getGUI().getImageLibrary();
 
         listPanel = new JPanel(new GridLayout(2, 0));
 
@@ -110,16 +106,16 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private void buildList() {
         List<TileType> tileList = FreeCol.getSpecification().getTileTypeList();
         for (TileType type : tileList) {
-            buildButton(library.getScaledTerrainImage(type, 1f),
+            buildButton(getLibrary().getScaledTerrainImage(type, 1f),
                         type.getName(), new TileTypeTransform(type));
         }
-        buildButton(library.getRiverImage(10), Messages.message("minorRiver"),
+        buildButton(getLibrary().getRiverImage(10), Messages.message("minorRiver"),
                     new RiverTransform(TileImprovement.SMALL_RIVER));
-        buildButton(library.getRiverImage(20), Messages.message("majorRiver"),
+        buildButton(getLibrary().getRiverImage(20), Messages.message("majorRiver"),
                     new RiverTransform(TileImprovement.LARGE_RIVER));
-        buildButton(library.getBonusImage(FreeCol.getSpecification().getResourceTypeList().get(0)),
+        buildButton(getLibrary().getBonusImage(FreeCol.getSpecification().getResourceTypeList().get(0)),
                     Messages.message("editor.resource"), new ResourceTransform());
-        buildButton(library.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
+        buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR),
                     Messages.message("model.message.LOST_CITY_RUMOUR"), new LostCityRumourTransform());
     }
 
@@ -132,7 +128,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      */
     private void buildButton(Image image, String text, final MapTransform mt) {
 
-        Image scaledImage = library.scaleImage(image, 0.5f);
+        Image scaledImage = getLibrary().scaleImage(image, 0.5f);
 
         JPanel descriptionPanel = new JPanel(new BorderLayout());
         descriptionPanel.add(new JLabel(new ImageIcon(image)), BorderLayout.CENTER);

@@ -342,7 +342,7 @@ public final class OptionGroupUI extends JPanel implements OptionUpdater {
          */        
         private class OptionGroupPanel extends FreeColPanel {
             public OptionGroupPanel() {
-                super(new BorderLayout());
+                super(FreeCol.getFreeColClient().getCanvas(), new BorderLayout());
                 
                 JButton button = new JButton(Messages.message("ok"));
                 button.addActionListener(new ActionListener() {

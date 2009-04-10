@@ -34,7 +34,6 @@ import javax.swing.SwingConstants;
 
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
@@ -52,8 +51,6 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
 
     private static final int CANCEL = 1;
 
-    private final Canvas parent;
-
     private final JLabel header;
 
     private final JButton okButton;
@@ -70,7 +67,7 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
      * @param parent The parent panel.
      */
     public DumpCargoDialog(Canvas parent) {
-        this.parent = parent;
+        super(parent);
 
         header = new JLabel("", SwingConstants.CENTER);
         header.setFont(mediumHeaderFont);
@@ -107,12 +104,11 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
         setLayout(new MigLayout("wrap 1", "", ""));
 
         int row = 1;
-        ImageLibrary library = parent.getGUI().getImageLibrary();
         for (Goods goods : goodsList) {
             // TODO: find out why check box is not displayed when icon
             // is present
             JCheckBox checkBox = new JCheckBox(goods.toString(),
-                                               //library.getGoodsImageIcon(goods.getType()),
+                                               //getLibrary().getGoodsImageIcon(goods.getType()),
                                                true);
             checkBoxes.add(checkBox);
             add(checkBox);
@@ -135,7 +131,7 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                InGameController inGameController = parent.getClient().getInGameController();
+                InGameController inGameController = getCanvas().getClient().getInGameController();
                 for (int index = 0; index < checkBoxes.size(); index++) {
                     if (checkBoxes.get(index).isSelected()) {
                         inGameController.unloadCargo(goodsList.get(index));

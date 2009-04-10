@@ -637,7 +637,7 @@ public final class Canvas extends JDesktopPane {
                 }
             }
         } else {
-            InformationDialog informationDialog = new InformationDialog(messageText, messageIcon);
+            InformationDialog informationDialog = new InformationDialog(this, messageText, messageIcon);
             addAsFrame(informationDialog);
             informationDialog.requestFocus();
 
@@ -1326,7 +1326,7 @@ public final class Canvas extends JDesktopPane {
                 logger.warning("could not find message with id: " + txt + " or " + okTxt + ".");
             }
 
-            InformationDialog informationDialog = new InformationDialog(txt, null);
+            InformationDialog informationDialog = new InformationDialog(this, txt, null);
 
             do {
                 remove(inputDialog);
@@ -2133,7 +2133,7 @@ public final class Canvas extends JDesktopPane {
         if (displayObject != null) {
             icon = getImageIcon(displayObject, false);
         }
-        InformationDialog infoDialog = new InformationDialog(text, icon);
+        InformationDialog infoDialog = new InformationDialog(this, text, icon);
         addAsFrame(infoDialog);
         infoDialog.requestFocus();
 

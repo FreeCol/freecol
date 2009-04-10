@@ -37,7 +37,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 import net.sf.freecol.common.model.Europe;
@@ -112,8 +111,6 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
         final Player player = getCanvas().getClient().getMyPlayer();
         final Europe europe = player.getEurope();
 
-        final ImageLibrary library = getCanvas().getGUI().getImageLibrary();
-
         // price may have changed
         Collections.sort(trainableUnits, unitPriceComparator);
 
@@ -122,7 +119,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             JButton newButton = new JButton();
             newButton.setLayout(new MigLayout("wrap 2", "[60]", "[30][30]"));
 
-            ImageIcon unitIcon = library.getUnitImageIcon(unitType, (price > player.getGold()));
+            ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType, (price > player.getGold()));
             JLabel unitName = new JLabel(unitType.getName());
             JLabel unitPrice = new JLabel(Messages.message("goldAmount", "%amount%", 
                                                            String.valueOf(price)));
@@ -131,7 +128,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
                 unitPrice.setEnabled(false);
                 newButton.setEnabled(false);
             }
-            newButton.add(new JLabel(library.getScaledImageIcon(unitIcon, 0.66f)), "span 1 2");
+            newButton.add(new JLabel(getLibrary().getScaledImageIcon(unitIcon, 0.66f)), "span 1 2");
             newButton.add(unitName);
             newButton.add(unitPrice);
             newButton.setActionCommand(unitType.getId());

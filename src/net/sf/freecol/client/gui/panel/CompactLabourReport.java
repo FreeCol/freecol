@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -341,15 +340,14 @@ public final class CompactLabourReport extends ReportPanel {
             LabourData.UnitData unit = unitData;
             GoodsType goods = unit.getExpertProduction();
 
-            ImageLibrary imageLibrary = getCanvas().getGUI().getImageLibrary();
-            JLabel production = new JLabel(imageLibrary.getGoodsImageIcon(goods));
+            JLabel production = new JLabel(getLibrary().getGoodsImageIcon(goods));
             production.setBorder(TOPCELLBORDER);
 
             headerRow.add(production, "cell " + PRODUCTION_SYMBOL_COLUMN + " " + row + " "
                           + (!goods.isStoredAs() ? 4 : 3) + " 1");
 
             if (showNetProduction && goods.isStoredAs()) {
-                JLabel netProduction = new JLabel(imageLibrary.getGoodsImageIcon(goods.getStoredAs()));
+                JLabel netProduction = new JLabel(getLibrary().getGoodsImageIcon(goods.getStoredAs()));
                 netProduction.setBorder(TOPCELLBORDER);
                 headerRow.add(netProduction, "cell " + NETPRODUCTION_SUMMARY_COLUMN + " 1");
             }
@@ -571,8 +569,7 @@ public final class CompactLabourReport extends ReportPanel {
             icon.setBorder(CELLBORDER);
             GoodsType goods = data.getUnitData().getExpertProduction();
             if (goods != null) {
-                ImageLibrary imageLibrary = getCanvas().getGUI().getImageLibrary();
-                icon.setIcon(imageLibrary.getGoodsImageIcon(goods));
+                icon.setIcon(getLibrary().getGoodsImageIcon(goods));
             }
             reportPanel.add(icon, "cell " + PRODUCTION_SYMBOL_COLUMN + " " + row
                             + " " + 1 + " " + rows);

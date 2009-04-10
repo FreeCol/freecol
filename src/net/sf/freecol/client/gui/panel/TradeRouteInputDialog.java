@@ -303,7 +303,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
 
         public CargoLabel(GoodsType type) {
-            super(getCanvas().getGUI().getImageLibrary().getGoodsImageIcon(type));
+            super(getLibrary().getGoodsImageIcon(type));
             setTransferHandler(cargoHandler);
             addMouseListener(dragListener);
             this.goodsType = type;

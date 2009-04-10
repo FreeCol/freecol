@@ -53,8 +53,6 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
 
     private static final int CLOSE = 0;
         
-    private final Canvas parent;
- 
     private JButton exitButton;
     
     /**
@@ -63,7 +61,7 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
     * @param parent The parent of this panel.
     */
     public AboutPanel(Canvas parent) {
-        this.parent = parent;
+        super(parent);
         
         setLayout(new BorderLayout());
 
@@ -135,7 +133,7 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case CLOSE:
-                    parent.remove(this);
+                    getCanvas().remove(this);
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

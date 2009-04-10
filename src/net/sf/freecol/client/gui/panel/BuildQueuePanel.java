@@ -49,7 +49,6 @@ import javax.swing.TransferHandler;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -482,7 +481,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
 
             JPanel itemPanel = new JPanel(new MigLayout("", "", ""));
             JLabel imageLabel = new JLabel();
-            ImageLibrary library = getCanvas().getGUI().getImageLibrary();
             Image buildableImage = ResourceManager.getImage(item.getId() + ".image");
             if (buildableImage != null) {
                 buildableImage = buildableImage.getScaledInstance(-1, 48, Image.SCALE_SMOOTH);
@@ -496,7 +494,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
             if (size > 0) {
                 AbstractGoods goods = goodsRequired.get(0);
                 JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()), 
-                                               library.getScaledGoodsImageIcon(goods.getType(), 0.66f),
+                                               getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f),
                                                SwingConstants.CENTER);
                 if (size == 1) {
                     itemPanel.add(goodsLabel);
@@ -505,7 +503,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
                     for (int i = 1; i < size; i++) {
                         goods = goodsRequired.get(i);
                         goodsLabel = new JLabel(Integer.toString(goods.getAmount()),
-                                                library.getScaledGoodsImageIcon(goods.getType(), 0.66f),
+                                                getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f),
                                                 SwingConstants.CENTER);
                         itemPanel.add(goodsLabel);
                     }

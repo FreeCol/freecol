@@ -53,8 +53,6 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
     private static final int CONNECT = 0, CANCEL = 1;
 
-    private final Canvas parent;
-
     @SuppressWarnings("unused")
     private final FreeColClient freeColClient;
 
@@ -78,7 +76,7 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      *            connections.
      */
     public ServerListPanel(Canvas parent, FreeColClient freeColClient, ConnectController connectController) {
-        this.parent = parent;
+        super(parent);
         this.freeColClient = freeColClient;
         this.connectController = connectController;
 
@@ -196,8 +194,8 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
                 connectController.joinMultiplayerGame(username, si.getAddress(), si.getPort());
                 break;
             case CANCEL:
-                parent.remove(this);
-                parent.showPanel(new NewPanel(parent));
+                getCanvas().remove(this);
+                getCanvas().showPanel(new NewPanel(getCanvas()));
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

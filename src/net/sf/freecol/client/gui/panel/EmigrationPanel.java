@@ -28,7 +28,6 @@ import javax.swing.JButton;
 import javax.swing.JTextArea;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.UnitType;
@@ -81,17 +80,15 @@ public final class EmigrationPanel extends FreeColDialog<Integer> implements Act
             question.insert(Messages.message("lostCityRumour.FountainOfYouth") + "\n\n", 0);
         }
 
-        ImageLibrary library = getCanvas().getGUI().getImageLibrary();
-
         setLayout(new MigLayout("wrap 1", "", ""));
 
         add(question, "wrap 20");
 
         for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
             UnitType unitType = europe.getRecruitable(index);
-            ImageIcon unitIcon = library.getUnitImageIcon(unitType);
+            ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType);
             person[index].setText(unitType.getName());
-            person[index].setIcon(library.getScaledImageIcon(unitIcon, 0.66f));
+            person[index].setIcon(getLibrary().getScaledImageIcon(unitIcon, 0.66f));
 
             add(person[index]);
         }

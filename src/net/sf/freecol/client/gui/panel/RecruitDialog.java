@@ -30,7 +30,6 @@ import javax.swing.JTextArea;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
@@ -121,7 +120,6 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
                     turns++;
                 }
             }
-            ImageLibrary library = getCanvas().getGUI().getImageLibrary();
             recruitPrice = player.getRecruitPrice();
 
             question.setText(Messages.message("recruitDialog.clickOn",
@@ -130,9 +128,9 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
 
             for (int index = 0; index < NUMBER_OF_PERSONS; index++) {
                 UnitType unitType = player.getEurope().getRecruitable(index);
-                ImageIcon unitIcon = library.getUnitImageIcon(unitType);
+                ImageIcon unitIcon = getLibrary().getUnitImageIcon(unitType);
                 person[index].setText(unitType.getName());
-                person[index].setIcon(library.getScaledImageIcon(unitIcon, 0.66f));
+                person[index].setIcon(getLibrary().getScaledImageIcon(unitIcon, 0.66f));
 
                 if (recruitPrice > player.getGold()) {
                     person[index].setEnabled(false);

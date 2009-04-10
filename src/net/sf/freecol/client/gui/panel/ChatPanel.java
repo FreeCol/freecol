@@ -43,7 +43,6 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
 
     public static final int    CHAT = 1;
 
-    private final Canvas            parent;
     private final FreeColClient     freeColClient;
     private final JTextField        field;
 
@@ -59,7 +58,7 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
     *       client.
     */
     public ChatPanel(Canvas parent, FreeColClient freeColClient) {
-        this.parent = parent;
+        super(parent);
         this.freeColClient = freeColClient;
 
         JLabel label = new JLabel("Message: ");
@@ -98,8 +97,8 @@ public final class ChatPanel extends FreeColPanel implements ActionListener {
                 case CHAT:
                     String message = getChatText();
                     freeColClient.getInGameController().sendChat(message);
-                    parent.displayChatMessage(message);
-                    parent.remove(this);
+                    getCanvas().displayChatMessage(message);
+                    getCanvas().remove(this);
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

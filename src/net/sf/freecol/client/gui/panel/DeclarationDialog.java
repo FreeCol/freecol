@@ -53,9 +53,6 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
 
     private final FreeColClient freeColClient;
 
-    @SuppressWarnings("unused")
-    private final Canvas parent;
-
     private final SignaturePanel signaturePanel;
 
     final DeclarationDialog theDialog = this;
@@ -68,7 +65,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
      * @param freeColClient The main controller object for the client.
      */
     public DeclarationDialog(final Canvas parent, final FreeColClient freeColClient) {
-        this.parent = parent;
+        super(parent);
         this.freeColClient = freeColClient;
         this.signaturePanel = new SignaturePanel();
 

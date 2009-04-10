@@ -53,8 +53,6 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
 
     private static final int OK = 0, CANCEL = 1;
 
-    private final Canvas parent;
-
     @SuppressWarnings("unused")
     private final FreeColClient freeColClient;
 
@@ -82,9 +80,9 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
      * @param freeColClient The main controller object for the client.
      */
     public LoadingSavegameDialog(Canvas parent, FreeColClient freeColClient) {
+        super(parent);
         setLayout(new BorderLayout());
 
-        this.parent = parent;
         this.freeColClient = freeColClient;
 
         ok = new JButton(Messages.message("ok"));
@@ -194,11 +192,11 @@ public final class LoadingSavegameDialog extends FreeColDialog<Boolean> implemen
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                parent.remove(this);
+                getCanvas().remove(this);
                 setResponse(Boolean.TRUE);
                 break;
             case CANCEL:
-                parent.remove(this);
+                getCanvas().remove(this);
                 setResponse(Boolean.FALSE);
                 break;
             default:

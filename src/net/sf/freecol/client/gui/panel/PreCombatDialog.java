@@ -52,6 +52,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         new Modifier("modifiers.baseDefence", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
 
     public PreCombatDialog(Unit attacker, Unit defender, Settlement settlement, Canvas parent) {
+        super(parent);
 
         CombatModel combatModel = attacker.getGame().getCombatModel();
         Set<Modifier> offence = sortModifiers(combatModel.getOffensiveModifiers(attacker, defender));

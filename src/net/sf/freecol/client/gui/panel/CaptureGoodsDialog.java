@@ -53,7 +53,6 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> impleme
 
 
     @SuppressWarnings("unused") 
-    private final Canvas parent;
     private JButton allButton;
     private JButton noneButton;
     private JButton acceptButton;
@@ -63,7 +62,7 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> impleme
     private int maxCargo;
 
     public CaptureGoodsDialog(Canvas parent) {
-        this.parent = parent;
+        super(parent);
 
         setBorder(null);
         setOpaque(false);

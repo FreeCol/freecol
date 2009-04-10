@@ -53,8 +53,6 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
 
     private static final int OK = 0, CANCEL = 1;
 
-    private final Canvas parent;
-
     private final JButton ok = new JButton(Messages.message("ok"));
 
     private final JButton cancel = new JButton(Messages.message("cancel"));
@@ -68,7 +66,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
      * @param parent The parent of this panel.
      */
     public WarehouseDialog(Canvas parent, Colony colony) {
-        this.parent = parent;
+        super(parent);
 
         warehouseDialog = new JPanel(new GridLayout(0, 4, margin, margin));
         warehouseDialog.setOpaque(false);
@@ -128,7 +126,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
                 }
                 break;
             case CANCEL:
-                parent.remove(this);
+                getCanvas().remove(this);
                 setResponse(new Boolean(false));
                 break;
             default:
@@ -170,7 +168,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
             // goods label
             Goods goods = new Goods(colony.getGame(), colony, goodsType, 
                                     colony.getGoodsContainer().getGoodsCount(goodsType));
-            GoodsLabel goodsLabel = new GoodsLabel(goods, parent);
+            GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
             goodsLabel.setHorizontalAlignment(JLabel.LEADING);
             add(goodsLabel, "span 1 2");
 
@@ -219,7 +217,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
             exportData.setHighLevel(highLevelValue);
             exportData.setExportLevel(exportLevelValue);
             if (changed) {
-                parent.getClient().getInGameController().setGoodsLevels(colony, goodsType);
+                getCanvas().getClient().getInGameController().setGoodsLevels(colony, goodsType);
             }
         }
 

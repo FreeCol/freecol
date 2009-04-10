@@ -53,8 +53,7 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                                 MAP_EDITOR = 2,
                                 OPTIONS = 3,
                                 QUIT = 4;
-    
-    private final Canvas parent;
+
     private final FreeColClient freeColClient;
     private JButton newButton;
     
@@ -65,9 +64,8 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
     * @param freeColClient The main controller object for the client
     */
     public MainPanel(Canvas parent, FreeColClient freeColClient) {
-        setLayout(new BorderLayout());
+        super(parent, new BorderLayout());
 
-        this.parent = parent;
         this.freeColClient = freeColClient;
 
         JButton openButton = new JButton( Messages.message("menuBar.game.open") );
@@ -149,8 +147,8 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case NEW:
-                    parent.remove(this);                
-                    parent.showPanel(new NewPanel(parent));
+                    getCanvas().remove(this);                
+                    getCanvas().showPanel(new NewPanel(getCanvas()));
                     break;
                 case OPEN:
                     freeColClient.getConnectController().loadGame();
@@ -159,10 +157,10 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                     freeColClient.getMapEditorController().startMapEditor();
                     break;
                 case OPTIONS:
-                    parent.showClientOptionsDialog();
+                    getCanvas().showClientOptionsDialog();
                     break;
                 case QUIT:
-                    parent.quit();
+                    getCanvas().quit();
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

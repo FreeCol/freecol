@@ -50,8 +50,6 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
 
     private static final int OK = 0, CANCEL = 1, SAVE = 2, LOAD = 3, RESET = 4;
 
-    private final Canvas parent;
-
     private final FreeColClient freeColClient;
 
     private JButton ok, load, save, cancel;
@@ -70,9 +68,9 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
      * @param freeColClient The main controller object for the client.
      */
     public GameOptionsDialog(Canvas parent, FreeColClient freeColClient, boolean editable) {
+        super(parent);
         setLayout(new BorderLayout());
 
-        this.parent = parent;
         this.freeColClient = freeColClient;
 
         ok = new JButton(Messages.message("ok"));
@@ -173,13 +171,13 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
                 ui.unregister();
                 ui.updateOption();
                 freeColClient.getPreGameController().sendGameOptions();
-                parent.remove(this);
+                getCanvas().remove(this);
                 setResponse(Boolean.TRUE);
                 break;
             case CANCEL:
                 ui.rollback();
                 ui.unregister();
-                parent.remove(this);
+                getCanvas().remove(this);
                 setResponse(Boolean.FALSE);
                 break;
             case SAVE:

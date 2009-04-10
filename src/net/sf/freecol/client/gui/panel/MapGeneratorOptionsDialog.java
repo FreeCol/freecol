@@ -56,8 +56,6 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
 
     private static final int OK = 0, CANCEL = 1, RESET = 2;
 
-    private final Canvas parent;
-
     private final FreeColClient freeColClient;
 
     private JButton ok, cancel;
@@ -76,9 +74,9 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
      * @param freeColClient The main controller object for the client.
      */
     public MapGeneratorOptionsDialog(Canvas parent, FreeColClient freeColClient) {
+        super(parent);
         setLayout(new BorderLayout());
 
-        this.parent = parent;
         this.freeColClient = freeColClient;
 
         ok = new JButton(Messages.message("ok"));
@@ -208,7 +206,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
             case OK:
                 ui.unregister();
                 ui.updateOption();
-                parent.remove(this);
+                getCanvas().remove(this);
                 if (!freeColClient.isMapEditor()) {
                     freeColClient.getPreGameController().sendMapGeneratorOptions();
                     freeColClient.getCanvas().getStartGamePanel().updateMapGeneratorOptions();
@@ -218,7 +216,7 @@ public final class MapGeneratorOptionsDialog extends FreeColDialog<Boolean> impl
             case CANCEL:
                 ui.rollback();
                 ui.unregister();
-                parent.remove(this);
+                getCanvas().remove(this);
                 setResponse(new Boolean(false));
                 break;
             case RESET:

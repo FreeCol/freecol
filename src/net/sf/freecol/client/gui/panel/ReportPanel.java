@@ -57,8 +57,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected static final String OK = "OK";
 
-    private static ImageLibrary library;
-
     protected JPanel reportPanel;
 
     protected JLabel header;
@@ -87,8 +85,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      */
     public ReportPanel(Canvas parent, String title) {
         super(parent, new FlowLayout(FlowLayout.CENTER, 1000, 10));
-
-        ReportPanel.library = getCanvas().getGUI().getImageLibrary();
 
         setLayout(new BorderLayout());
 
@@ -142,14 +138,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      */
     public void requestFocus() {
         ok.requestFocus();
-    }
-
-    /**
-     * Returns the ImageLibrary.
-     * @return the ImageLibrary.
-     */
-    public ImageLibrary getLibrary() {
-        return library;
     }
 
     /**

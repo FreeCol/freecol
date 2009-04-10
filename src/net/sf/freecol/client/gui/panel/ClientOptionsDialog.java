@@ -53,7 +53,6 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
                                 CANCEL = 1,
                                 RESET = 2;
 
-    private final Canvas        parent;
     private final FreeColClient freeColClient;
 
     private JButton ok;
@@ -69,9 +68,9 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
     *       client.
     */
     public ClientOptionsDialog(Canvas parent, FreeColClient freeColClient) {
+        super(parent);
         setLayout(new BorderLayout());
 
-        this.parent = parent;
         this.freeColClient = freeColClient;
 
         ok = new JButton(Messages.message("ok"));
@@ -147,7 +146,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
                 case OK:
                     ui.unregister();
                     ui.updateOption();
-                    parent.remove(this);
+                    getCanvas().remove(this);
                     freeColClient.saveClientOptions();
                     freeColClient.getActionManager().update();
                     if (freeColClient.getCanvas().getJMenuBar() != null) {
@@ -164,7 +163,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
                 case CANCEL:
                     ui.rollback();
                     ui.unregister();
-                    parent.remove(this);
+                    getCanvas().remove(this);
                     setResponse(Boolean.FALSE);
                     break;
                 case RESET:

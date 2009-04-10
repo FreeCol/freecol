@@ -60,7 +60,6 @@ public final class TilePanel extends FreeColDialog<Boolean> implements ActionLis
 
     private static final int OK = 0;
     private static final int COLOPEDIA = 1;
-    private final Canvas canvas;
     private final JButton okButton = new JButton(Messages.message("ok"));
 
     private TileType tileType;
@@ -72,8 +71,8 @@ public final class TilePanel extends FreeColDialog<Boolean> implements ActionLis
      * @param tile a <code>Tile</code> value
      */
     public TilePanel(Canvas parent, Tile tile) {
+        super(parent);
 
-        canvas = parent;
         tileType = tile.getType();
 
         setLayout(new MigLayout("wrap 1, insets 20 30 10 30", "[center]", ""));
@@ -103,10 +102,10 @@ public final class TilePanel extends FreeColDialog<Boolean> implements ActionLis
         String name = tile.getLabel() + " (" + tile.getX() + ", " + tile.getY() + ")";
         add(new JLabel(name));
 
-        int width = canvas.getClient().getImageLibrary().getTerrainImageWidth(tileType);
-        int height = canvas.getClient().getImageLibrary().getTerrainImageHeight(tileType);
+        int width = getLibrary().getTerrainImageWidth(tileType);
+        int height = getLibrary().getTerrainImageHeight(tileType);
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        canvas.getGUI().displayColonyTile((Graphics2D) image.getGraphics(), tile.getMap(),
+        getCanvas().getGUI().displayColonyTile((Graphics2D) image.getGraphics(), tile.getMap(),
                                           tile, 0, 0, null);
         add(new JLabel(new ImageIcon(image)));
 
@@ -125,13 +124,13 @@ public final class TilePanel extends FreeColDialog<Boolean> implements ActionLis
             if (!production.isEmpty()) {
                 GoodsType goodsType = production.get(0).getType();
                 add(new JLabel(String.valueOf(tile.potential(goodsType, null)),
-                               canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType),
+                               getLibrary().getGoodsImageIcon(goodsType),
                                JLabel.CENTER),
                     "split " + production.size());
                 for (int index = 1; index < production.size(); index++) {
                     goodsType = production.get(index).getType();
                     add(new JLabel(String.valueOf(tile.potential(goodsType, null)),
-                                   canvas.getGUI().getImageLibrary().getGoodsImageIcon(goodsType),
+                                   getLibrary().getGoodsImageIcon(goodsType),
                                    JLabel.CENTER));
                 }
 
@@ -164,7 +163,7 @@ public final class TilePanel extends FreeColDialog<Boolean> implements ActionLis
                 break;
             case COLOPEDIA:
                 setResponse(new Boolean(true));
-                canvas.showColopediaPanel(ColopediaPanel.PanelType.TERRAIN, tileType);
+                getCanvas().showColopediaPanel(ColopediaPanel.PanelType.TERRAIN, tileType);
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

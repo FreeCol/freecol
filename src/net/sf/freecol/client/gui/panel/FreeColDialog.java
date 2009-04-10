@@ -50,6 +50,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
@@ -74,9 +75,11 @@ public class FreeColDialog<T> extends FreeColPanel {
     /**
     * Default constructor.
     */
+    /*
     public FreeColDialog() {
         super();
     }
+    */
 
     /**
      * Constructor.
@@ -205,7 +208,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JButton firstButton;
         firstButton = new JButton(choices.get(0).toString());
 
-        final FreeColDialog<ChoiceItem<T>> choiceDialog = new FreeColDialog<ChoiceItem<T>>() {
+        final FreeColDialog<ChoiceItem<T>> choiceDialog =
+            new FreeColDialog<ChoiceItem<T>>(FreeCol.getFreeColClient().getCanvas()) {
             public void requestFocus() {
                 firstButton.requestFocus();
             }
@@ -298,7 +302,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JButton  okButton = new JButton(okText);
 
         // create the dialog
-        final FreeColDialog<Boolean> confirmDialog = new FreeColDialog<Boolean>() {
+        final FreeColDialog<Boolean> confirmDialog =
+            new FreeColDialog<Boolean>(FreeCol.getFreeColClient().getCanvas()) {
             public void requestFocus() {
                 okButton.requestFocus();
             }
@@ -351,7 +356,8 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         final JTextField input = new JTextField(defaultValue);
         
-        final FreeColDialog<String> inputDialog = new FreeColDialog<String>()  {
+        final FreeColDialog<String> inputDialog =
+            new FreeColDialog<String>(FreeCol.getFreeColClient().getCanvas())  {
             public void requestFocus() {
                 input.requestFocus();
             }
@@ -412,7 +418,8 @@ public class FreeColDialog<T> extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog<File> createLoadDialog(File directory, FileFilter[] fileFilters) {
-        final FreeColDialog<File> loadDialog = new FreeColDialog<File>();
+        final FreeColDialog<File> loadDialog =
+            new FreeColDialog<File>(FreeCol.getFreeColClient().getCanvas());
         final JFileChooser fileChooser = new JFileChooser(directory);
 
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
@@ -456,7 +463,8 @@ public class FreeColDialog<T> extends FreeColPanel {
     * @return The <code>FreeColDialog</code>.
     */
     public static FreeColDialog<File> createSaveDialog(File directory, final String standardName, FileFilter[] fileFilters, String defaultName) {
-        final FreeColDialog<File> saveDialog = new FreeColDialog<File>();
+        final FreeColDialog<File> saveDialog =
+            new FreeColDialog<File>(FreeCol.getFreeColClient().getCanvas());
         final JFileChooser fileChooser = new JFileChooser(directory);
         final File defaultFile = new File(defaultName);
 

@@ -78,8 +78,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
     public static enum EuropeAction { EXIT, RECRUIT, PURCHASE, TRAIN, UNLOAD, SAIL }
 
-    private final Canvas parent;
-
     private final FreeColClient freeColClient;
 
     private InGameController inGameController;
@@ -119,7 +117,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
      * @param inGameController The controller object to be used when ingame.
      */
     public EuropePanel(Canvas parent, FreeColClient freeColClient, InGameController inGameController) {
-        this.parent = parent;
+        super(parent);
         this.freeColClient = freeColClient;
         this.inGameController = inGameController;
 
@@ -334,7 +332,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         int width = getWidth();
         int height = getHeight();
 
-        Image bgImage = ResourceManager.getImage("EuropeBackgroundImage", parent.getSize());
+        Image bgImage = ResourceManager.getImage("EuropeBackgroundImage", getCanvas().getSize());
         if (bgImage != null) {
             g.drawImage(bgImage, 0, 0, this);
         } else {
@@ -366,7 +364,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
             if (((unit.getState() == UnitState.ACTIVE) ||
                  (unit.getState() == UnitState.SENTRY)) && (!unit.isNaval())) {
-                UnitLabel unitLabel = new UnitLabel(unit, parent);
+                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                 unitLabel.setTransferHandler(defaultTransferHandler);
                 unitLabel.addMouseListener(pressListener);
 
@@ -388,7 +386,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         List<Unit> units = europe.getUnitList();
         for (Unit unit : units) {
             if ((unit.getState() == UnitState.ACTIVE) && (unit.isNaval())) {
-                UnitLabel unitLabel = new UnitLabel(unit, parent);
+                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                 unitLabel.setTransferHandler(defaultTransferHandler);
                 unitLabel.addMouseListener(pressListener);
                 inPortPanel.add(unitLabel);
@@ -434,7 +432,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
 
         UnitLabel lastCarrier = null;
         for (Unit unit : europe.getUnitList()) {
-            UnitLabel unitLabel = new UnitLabel(unit, parent);
+            UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
             unitLabel.setTransferHandler(defaultTransferHandler);
             unitLabel.addMouseListener(pressListener);
 
@@ -470,7 +468,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsTypes) {
             if (goodsType.isStorable()) {
-                MarketLabel marketLabel = new MarketLabel(goodsType, player.getMarket(), parent);
+                MarketLabel marketLabel = new MarketLabel(goodsType, player.getMarket(), getCanvas());
                 marketLabel.setTransferHandler(defaultTransferHandler);
                 marketLabel.addMouseListener(pressListener);
                 marketPanel.add(marketLabel);
@@ -592,12 +590,12 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             // Get Command
             EuropeAction europeAction = Enum.valueOf(EuropeAction.class, command);
             // Close any open Europe Dialog, and show new one if required
-            parent.showEuropeDialog(europeAction);
+            getCanvas().showEuropeDialog(europeAction);
             // Refresh if necessary
             switch (europeAction) {
             case EXIT:
                 freeColClient.getMyPlayer().getMarket().removeTransactionListener(log);
-                parent.remove(this);
+                getCanvas().remove(this);
                 freeColClient.getInGameController().nextModelMessage();
                 break;
             case RECRUIT:
@@ -653,8 +651,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     }
 
     public final class EuropeCargoPanel extends CargoPanel {
-        public EuropeCargoPanel(Canvas parent) {
-            super(parent, true);
+        public EuropeCargoPanel(Canvas canvas) {
+            super(canvas, true);
         }
         
         @Override
@@ -710,7 +708,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     if (!autoload
                             && docksPanel.getUnitCount() > 0
                             && unit.getSpaceLeft() > 0) {
-                        boolean leaveColonists = parent.showConfirmDialog(
+                        boolean leaveColonists = getCanvas().showConfirmDialog(
                                 "europe.leaveColonists",
                                 "yes",
                                 "no",
@@ -725,7 +723,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     inGameController.moveToAmerica(unit);
                     docksPanel.removeAll();
                     for (Unit u : europe.getUnitList()) {
-                        UnitLabel unitLabel = new UnitLabel(u, parent);
+                        UnitLabel unitLabel = new UnitLabel(u, getCanvas());
                         unitLabel.setTransferHandler(defaultTransferHandler);
                         unitLabel.addMouseListener(pressListener);
 
@@ -919,13 +917,13 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
         public Component add(Component comp, boolean editState) {
             if (editState) {
                 if (comp instanceof GoodsLabel) {
-                    // comp.getParent().remove(comp);
+                    // comp.getCanvas().remove(comp);
                     Goods goods = ((GoodsLabel) comp).getGoods();
                     Player player = freeColClient.getMyPlayer();
                     if (player.canTrade(goods)) {
                         inGameController.sellGoods(goods);
                     } else {
-                        switch (parent.showBoycottedGoodsDialog(goods, europe)) {
+                        switch (getCanvas().showBoycottedGoodsDialog(goods, europe)) {
                         case PAY_ARREARS:
                             inGameController.payArrears(goods);
                             break;

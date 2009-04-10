@@ -52,8 +52,6 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
 
     private static final int CLOSE = 0;
         
-    private final Canvas parent;
- 
     private JButton exitButton;
     
     class StatisticsModel extends AbstractTableModel {
@@ -157,7 +155,7 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
     *       client.
     */
     public StatisticsPanel(Canvas parent, FreeColClient freeColClient) {
-        this.parent = parent;
+        super(parent);
         
         setLayout(new BorderLayout());
         
@@ -232,7 +230,7 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         try {
             switch (Integer.valueOf(command).intValue()) {
                 case CLOSE:
-                    parent.remove(this);
+                    getCanvas().remove(this);
                     break;
                 default:
                     logger.warning("Invalid Actioncommand: invalid number.");

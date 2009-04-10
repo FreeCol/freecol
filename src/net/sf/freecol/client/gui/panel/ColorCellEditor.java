@@ -78,6 +78,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
         * @param l The ActionListener for the OK and cancel buttons.
         */
         public ColorChooserPanel(ActionListener l) {
+            super(canvas);
             lastRow = -1;
 
             JButton okButton = new JButton( Messages.message("ok") );

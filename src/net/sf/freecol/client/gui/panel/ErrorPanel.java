@@ -35,16 +35,11 @@ import net.sf.freecol.client.gui.i18n.Messages;
  */
 public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionListener {
 
-
-
     private static final Logger logger = Logger.getLogger(ErrorPanel.class.getName());
 
     private static final int OK = 0;
 
     private static final int lineWidth = 320;
-
-    @SuppressWarnings("unused")
-    private final Canvas parent;
 
     private LinkedList<JLabel> errorLabels; // A LinkedList of JLabel objects.
 
@@ -57,7 +52,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionLi
      * @param parent The parent of this panel.
      */
     public ErrorPanel(Canvas parent) {
-        this.parent = parent;
+        super(parent);
 
         setLayout(null);
 

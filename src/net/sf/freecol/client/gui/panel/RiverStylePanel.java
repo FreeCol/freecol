@@ -30,7 +30,6 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 
 
@@ -58,15 +57,13 @@ public final class RiverStylePanel extends FreeColDialog<Integer> implements Act
         super(parent);
         setLayout(new BorderLayout());
         
-        ImageLibrary library = parent.getGUI().getImageLibrary();
-
         JPanel stylesPanel = new JPanel(new GridLayout(9, 9));
-        JButton deleteButton = new JButton(library.getScaledImageIcon(library.getMiscImageIcon(ImageLibrary.DELETE), 0.5f));
+        JButton deleteButton = new JButton(getLibrary().getScaledImageIcon(getLibrary().getMiscImageIcon(getLibrary().DELETE), 0.5f));
         deleteButton.setActionCommand(String.valueOf(DELETE));
         deleteButton.addActionListener(this);
         stylesPanel.add(deleteButton);
-        for (int index = 1; index < ImageLibrary.RIVER_STYLES; index++) {
-            JButton riverButton = new JButton(library.getScaledImageIcon(library.getRiverImage(index), 0.5f));
+        for (int index = 1; index < getLibrary().RIVER_STYLES; index++) {
+            JButton riverButton = new JButton(getLibrary().getScaledImageIcon(getLibrary().getRiverImage(index), 0.5f));
             riverButton.setActionCommand(String.valueOf(index));
             riverButton.addActionListener(this);
             stylesPanel.add(riverButton);

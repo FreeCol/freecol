@@ -55,6 +55,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.model.Modifier;
 
@@ -120,9 +121,11 @@ public class FreeColPanel extends JPanel {
     /**
      * Default constructor.
      */
+    /*
     public FreeColPanel() {
         this(null, new FlowLayout());
     }
+    */
 
     /**
      * Constructor.
@@ -134,9 +137,11 @@ public class FreeColPanel extends JPanel {
     /**
      * Constructor.
      */
+    /*
     public FreeColPanel(LayoutManager layout) {
         this(null, layout);
     }
+    */
 
     /**
      * Default constructor.
@@ -179,6 +184,15 @@ public class FreeColPanel extends JPanel {
      */
     public final Canvas getCanvas() {
         return canvas;
+    }
+
+    /**
+     * Returns the ImageLibrary.
+     *
+     * @return the ImageLibrary.
+     */
+    public ImageLibrary getLibrary() {
+        return canvas.getGUI().getImageLibrary();
     }
 
     /**

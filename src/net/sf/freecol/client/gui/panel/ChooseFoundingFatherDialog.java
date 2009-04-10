@@ -69,7 +69,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
      *        picked in each of those categories.
      */
     public ChooseFoundingFatherDialog(Canvas parent, List<FoundingFather> possibleFoundingFathers) {
-
+        super(parent);
         possibleFathers = possibleFoundingFathers;
         chooseFoundingFatherDialog = this;
 

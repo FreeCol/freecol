@@ -39,7 +39,6 @@ import javax.swing.JPanel;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.ViewMode;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
@@ -74,8 +73,6 @@ public final class InfoPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private final Game game;
     
-    private final ImageLibrary library;
-    
     private final EndTurnPanel endTurnPanel = new EndTurnPanel();
     
     private final UnitInfoPanel unitInfoPanel;
@@ -91,9 +88,9 @@ public final class InfoPanel extends FreeColPanel {
      * @param freeColClient The main controller object for the client.
      */
     public InfoPanel(final FreeColClient freeColClient) {
+        super(freeColClient.getCanvas());
         this.freeColClient = freeColClient;
         this.game = freeColClient.getGame();
-        this.library = freeColClient.getImageLibrary();
         
         unitInfoPanel = new UnitInfoPanel();
         setLayout(null);
@@ -282,8 +279,8 @@ public final class InfoPanel extends FreeColPanel {
             removeAll();
 
             if (tile != null) {
-                int width = library.getTerrainImageWidth(tile.getType());
-                int height = library.getTerrainImageHeight(tile.getType());
+                int width = getLibrary().getTerrainImageWidth(tile.getType());
+                int height = getLibrary().getTerrainImageHeight(tile.getType());
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 freeColClient.getGUI().displayTerrain(image.createGraphics(), 
                                                       freeColClient.getGame().getMap(),
@@ -319,7 +316,7 @@ public final class InfoPanel extends FreeColPanel {
                     List<AbstractGoods> production = tile.getType().getProduction();
                     for (AbstractGoods goods : production) {
                         JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goods.getType(), null)),
-                                                       library.getScaledGoodsImageIcon(goods.getType(), 0.50f),
+                                                       getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.50f),
                                                        JLabel.RIGHT);
                         goodsLabel.setToolTipText(goods.getType().getName());
                         goodsLabel.setFont(font);
@@ -371,7 +368,7 @@ public final class InfoPanel extends FreeColPanel {
             
             removeAll();
             if (unit != null) {
-                add(new JLabel(library.getUnitImageIcon(unit)), "spany, gapafter 5px");
+                add(new JLabel(getLibrary().getUnitImageIcon(unit)), "spany, gapafter 5px");
                 String name = unit.getName();
                 // TODO: this is too brittle!
                 int index = name.indexOf(" (");
@@ -388,13 +385,13 @@ public final class InfoPanel extends FreeColPanel {
                     add(new JLabel(unit.getTreasureAmount() + " " + Messages.message("gold")), "span");
                 } else if (unit.isCarrier()) {
                     for (Goods goods : unit.getGoodsList()) {
-                        JLabel goodsLabel = new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+                        JLabel goodsLabel = new JLabel(getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f));
                         goodsLabel.setToolTipText(String.valueOf(goods.getAmount()) + " " + goods.getName());
                         add(goodsLabel);
                     }
                     for (Unit carriedUnit : unit.getUnitList()) {
-                        ImageIcon unitIcon = library.getUnitImageIcon(carriedUnit);
-                        JLabel unitLabel = new JLabel(library.getScaledImageIcon(unitIcon, 0.5f));
+                        ImageIcon unitIcon = getLibrary().getUnitImageIcon(carriedUnit);
+                        JLabel unitLabel = new JLabel(getLibrary().getScaledImageIcon(unitIcon, 0.5f));
                         unitLabel.setToolTipText(carriedUnit.getName());
                         add(unitLabel);
                     }
@@ -402,7 +399,7 @@ public final class InfoPanel extends FreeColPanel {
                     for (EquipmentType equipment : unit.getEquipment().keySet()) {
                         for (AbstractGoods goods : equipment.getGoodsRequired()) {
                             JLabel equipmentLabel = 
-                                new JLabel(library.getScaledGoodsImageIcon(goods.getType(), 0.66f));
+                                new JLabel(getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f));
                             int amount = goods.getAmount() * unit.getEquipment().getCount(equipment);
                             equipmentLabel.setToolTipText(String.valueOf(amount)
                                                           + " " + goods.getType().getName());

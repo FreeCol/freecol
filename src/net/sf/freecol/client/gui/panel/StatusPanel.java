@@ -50,7 +50,7 @@ public final class StatusPanel extends FreeColPanel {
     * @param parent The parent of this panel.
     */
     public StatusPanel(Canvas parent) {
-        super(new FlowLayout());
+        super(parent, new FlowLayout());
 
         setFocusCycleRoot(false);
         setFocusable(false);

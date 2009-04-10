@@ -50,11 +50,9 @@ import net.miginfocom.swing.MigLayout;
 public class ColonyTileProductionPanel extends FreeColPanel implements ActionListener {
 
     private final JButton okButton = new JButton(Messages.message("ok"));
-    private final Canvas parent;
 
     public ColonyTileProductionPanel(Canvas canvas, ColonyTile colonyTile, GoodsType goodsType) {
-
-        parent = canvas;
+        super(canvas);
 
         Colony colony = colonyTile.getColony();
         UnitType unitType = null;
@@ -83,7 +81,7 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
         canvas.getGUI().displayColonyTile((Graphics2D) image.getGraphics(), colonyTile.getWorkTile().getMap(),
                                           colonyTile.getWorkTile(), 0, 0, colony);
         add(new JLabel(new ImageIcon(image)));
-        add(new UnitLabel(colonyTile.getUnit(), parent, false, false), "wrap");
+        add(new UnitLabel(colonyTile.getUnit(), getCanvas(), false, false), "wrap");
 
         for (Modifier modifier : modifiers) {
             FreeColGameObjectType source = modifier.getSource();
@@ -158,7 +156,7 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
-        parent.remove(this);
+        getCanvas().remove(this);
     }
 
 

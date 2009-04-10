@@ -74,8 +74,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private final JCheckBox     publicServer;
 
-    private final Canvas        parent;
-
     private final ConnectController connectController;
     private JButton ok = new JButton( Messages.message("ok") );
 
@@ -86,7 +84,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     * @param parent The parent of this panel.
     */
     public NewPanel(Canvas parent) {
-        this.parent = parent;
+        super(parent);
         this.connectController = parent.getClient().getConnectController();
 
         JButton         cancel = new JButton( Messages.message("cancel") );
@@ -226,7 +224,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             switch (Integer.valueOf(command).intValue()) {
                 case OK:
                     if (single.isSelected()) {
-                        NationOptions nationOptions = parent.showFreeColDialog(new NationOptionsDialog(parent));
+                        NationOptions nationOptions = getCanvas().showFreeColDialog(new NationOptionsDialog(getCanvas()));
                         connectController.startSingleplayerGame(name.getText(), nationOptions);
                     } else if (join.isSelected()) {
                         int port;
@@ -249,19 +247,19 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
                             port2Label.setForeground(Color.red);
                             break;
                         }
-                        NationOptions nationOptions = parent.showFreeColDialog(new NationOptionsDialog(parent));
+                        NationOptions nationOptions = getCanvas().showFreeColDialog(new NationOptionsDialog(getCanvas()));
                         connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(), port,
                                                                nationOptions);
                     } else if (meta.isSelected()) {
                         ArrayList<ServerInfo> serverList = connectController.getServerList();
                         if (serverList != null) {
-                            parent.showServerListPanel(name.getText(), serverList);
+                            getCanvas().showServerListPanel(name.getText(), serverList);
                         }
                     }
                     break;
                 case CANCEL:
-                    parent.remove(this);
-                    parent.showMainPanel();
+                    getCanvas().remove(this);
+                    getCanvas().showMainPanel();
                     break;
                 case SINGLE:
                 case JOIN:
