@@ -38,7 +38,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.networking.StatisticsMessage;
@@ -151,17 +150,13 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
     * The constructor that will add the items to this panel.
     * 
     * @param parent The parent of this panel.
-    * @param freeColClient The main controller object for the
-    *       client.
     */
-    public StatisticsPanel(Canvas parent, FreeColClient freeColClient) {
-        super(parent);
-        
-        setLayout(new BorderLayout());
+    public StatisticsPanel(Canvas parent) {
+        super(parent, new BorderLayout());
         
         // Retrieve the client and server data
-        StatisticsMessage serverStatistics = freeColClient.getInGameController().getServerStatistics();
-        StatisticsMessage clientStatistics = new StatisticsMessage(freeColClient.getGame(), null);
+        StatisticsMessage serverStatistics = getClient().getInGameController().getServerStatistics();
+        StatisticsMessage clientStatistics = new StatisticsMessage(getGame(), null);
 
         // Title
         JPanel header = new JPanel();
@@ -169,8 +164,15 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         header.add(new JLabel("Statistics"),JPanel.CENTER_ALIGNMENT);
         
         // Actual stats panel
-        JPanel statsPanel = new JPanel(new GridLayout(1,2)); 
-        this.add(statsPanel,BorderLayout.CENTER);
+        JPanel statsPanel = new JPanel(new GridLayout(1,2));
+        JScrollPane scrollPane = new JScrollPane(statsPanel,
+                                                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        // correct way to make scroll pane opaque
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(null);
+
+        this.add(scrollPane,BorderLayout.CENTER);
         statsPanel.add(displayStatsMessage("Client", clientStatistics));
         statsPanel.add(displayStatsMessage("Server", serverStatistics));
 
