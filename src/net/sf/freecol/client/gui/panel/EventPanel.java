@@ -37,7 +37,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel is displayed when an imporantant event in the game has happened.
  */
-public final class EventPanel extends FreeColDialog<Boolean> implements ActionListener {
+public final class EventPanel extends FreeColDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(EventPanel.class.getName());
 
@@ -50,14 +50,9 @@ public final class EventPanel extends FreeColDialog<Boolean> implements ActionLi
         DISCOVER_PACIFIC
     };
 
-    private static final int OK = 0;
-
     private JLabel header;
 
     private JLabel imageLabel;
-
-    private final JButton okButton = new JButton(Messages.message("ok"));;
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -68,10 +63,6 @@ public final class EventPanel extends FreeColDialog<Boolean> implements ActionLi
     public EventPanel(Canvas parent, EventType type) {
 
         super(parent);
-
-        okButton.setActionCommand(String.valueOf(OK));
-        okButton.addActionListener(this);
-        enterPressesWhenFocused(okButton);
 
         setLayout(new MigLayout("", "", ""));
 
@@ -116,28 +107,4 @@ public final class EventPanel extends FreeColDialog<Boolean> implements ActionLi
         setSize(getPreferredSize());
     }
 
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                setResponse(Boolean.TRUE);
-                break;
-            default:
-                logger.warning("Invalid Actioncommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
-        }
-    }
 }

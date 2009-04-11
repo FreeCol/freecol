@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
@@ -41,7 +40,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * {@link FreeColClient#isMapEditor() map editor mode}.
  * 
  */
-public final class RiverStylePanel extends FreeColDialog<Integer> implements ActionListener {
+public final class RiverStylePanel extends FreeColDialog<Integer> {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(RiverStylePanel.class.getName());

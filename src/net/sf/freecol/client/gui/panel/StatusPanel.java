@@ -32,18 +32,11 @@ import net.sf.freecol.client.gui.Canvas;
 * A <code>Panel</code> for showing status information on screen.
 */
 public final class StatusPanel extends FreeColPanel {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(StatusPanel.class.getName());
 
-
-
-    @SuppressWarnings("unused")
-    private final Canvas        parent;
     private final JLabel        statusLabel;
-
-
-    
-    
 
     /**
     * Creates a new <code>StatusPanel</code>.
@@ -55,17 +48,11 @@ public final class StatusPanel extends FreeColPanel {
         setFocusCycleRoot(false);
         setFocusable(false);
         
-        this.parent = parent;
-
         statusLabel = new JLabel();
         add(statusLabel);
 
         setSize(260, 60);
     }
-    
-    
-    
-    
     
     /**
     * Sets a new status message to be displayed by this

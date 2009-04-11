@@ -22,15 +22,12 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
@@ -47,9 +44,7 @@ import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
 
-public class ColonyTileProductionPanel extends FreeColPanel implements ActionListener {
-
-    private final JButton okButton = new JButton(Messages.message("ok"));
+public class ColonyTileProductionPanel extends FreeColPanel {
 
     public ColonyTileProductionPanel(Canvas canvas, ColonyTile colonyTile, GoodsType goodsType) {
         super(canvas);
@@ -67,10 +62,6 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
         }
 
         setLayout(new MigLayout("wrap 3, insets 30 30 10 30", "[]30:push[right][]", ""));
-
-        okButton.setActionCommand("ok");
-        okButton.addActionListener(this);
-        enterPressesWhenFocused(okButton);
 
         add(new JLabel(colonyTile.getLabel()), "span, align center, wrap 30");
 
@@ -144,22 +135,6 @@ public class ColonyTileProductionPanel extends FreeColPanel implements ActionLis
         setSize(getPreferredSize());
 
     }
-
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
-
-    /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        getCanvas().remove(this);
-    }
-
-
 }
 
 

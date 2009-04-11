@@ -20,15 +20,12 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
@@ -50,8 +47,6 @@ import net.miginfocom.swing.MigLayout;
 public final class FindColonyDialog extends FreeColDialog implements ListSelectionListener {
 
     private static final Logger logger = Logger.getLogger(FindColonyDialog.class.getName());
-
-    private JButton okButton = new JButton(Messages.message("ok"));
 
     private List<Colony> knownColonies = new ArrayList<Colony>();
 
@@ -84,23 +79,9 @@ public final class FindColonyDialog extends FreeColDialog implements ListSelecti
         colonyList.addListSelectionListener(this);
         add(listScroller, "growx, growy");
 
-        okButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    remove();
-                }
-            });
-        enterPressesWhenFocused(okButton);
-        add(okButton);
+        add(okButton, "tag ok");
 
         setSize(getPreferredSize());
-    }
-
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
-    public void remove() {
-        getCanvas().remove(this);
     }
 
     /**

@@ -54,13 +54,11 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel is used to show information about a tile.
  */
-public final class TilePanel extends FreeColDialog<Boolean> implements ActionListener {
+public final class TilePanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(TilePanel.class.getName());
 
-    private static final int OK = 0;
-    private static final int COLOPEDIA = 1;
-    private final JButton okButton = new JButton(Messages.message("ok"));
+    private static final String COLOPEDIA = "COLOPEDIA";
 
     private TileType tileType;
 
@@ -82,22 +80,11 @@ public final class TilePanel extends FreeColDialog<Boolean> implements ActionLis
         colopediaButton.addActionListener(this);
         enterPressesWhenFocused(colopediaButton);
 
-        okButton.setActionCommand(String.valueOf(OK));
-        okButton.addActionListener(this);
-        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        enterPressesWhenFocused(okButton);
-
         // Use ESCAPE for closing the panel:
         InputMap inputMap = new ComponentInputMap(okButton);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
         SwingUtilities.replaceUIInputMap(okButton, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);        
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(colopediaButton);
-        buttonPanel.add(okButton);
-        add(buttonPanel);
-
 
         String name = tile.getLabel() + " (" + tile.getX() + ", " + tile.getY() + ")";
         add(new JLabel(name));
@@ -145,10 +132,6 @@ public final class TilePanel extends FreeColDialog<Boolean> implements ActionLis
     }
 
 
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
     /**
      * This function analyses an event and calls the right methods to take
      * care of the user's requests.
@@ -156,20 +139,10 @@ public final class TilePanel extends FreeColDialog<Boolean> implements ActionLis
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                setResponse(new Boolean(true));
-                break;
-            case COLOPEDIA:
-                setResponse(new Boolean(true));
-                getCanvas().showColopediaPanel(ColopediaPanel.PanelType.TERRAIN, tileType);
-                break;
-            default:
-                logger.warning("Invalid Actioncommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+        if (OK.equals(command)) {
+            getCanvas().remove(this);
+        } else {
+            getCanvas().showColopediaPanel(ColopediaPanel.PanelType.TERRAIN, tileType);
         }
     }
 }

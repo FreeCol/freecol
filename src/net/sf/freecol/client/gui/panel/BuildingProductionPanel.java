@@ -19,13 +19,10 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.Font;
 
 import java.util.Set;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 
@@ -41,9 +38,7 @@ import net.sf.freecol.common.model.Unit;
 
 import net.miginfocom.swing.MigLayout;
 
-public class BuildingProductionPanel extends FreeColPanel implements ActionListener {
-
-    private final JButton okButton = new JButton(Messages.message("ok"));
+public class BuildingProductionPanel extends FreeColPanel {
 
     public BuildingProductionPanel(Canvas canvas, Unit unit) {
 
@@ -58,10 +53,6 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
         if (colony.getProductionBonus() != 0) {
             modifiers.add(colony.getProductionModifier(goodsType));
         }
-
-        okButton.setActionCommand("ok");
-        okButton.addActionListener(this);
-        enterPressesWhenFocused(okButton);
 
         setLayout(new MigLayout("", "[]20[align right][]", ""));
 
@@ -121,19 +112,4 @@ public class BuildingProductionPanel extends FreeColPanel implements ActionListe
         setSize(getPreferredSize());
 
     }
-
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
-
-    /**
-     * This function analyses an event and calls the right methods to take
-     * care of the user's requests.
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        getCanvas().remove(this);
-    }
-
 }

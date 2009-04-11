@@ -44,7 +44,7 @@ import net.sf.freecol.client.gui.option.OptionMapUI;
 /**
 * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
 */
-public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements ActionListener {
+public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
 
     private static final Logger logger = Logger.getLogger(ClientOptionsDialog.class.getName());
 
@@ -53,7 +53,6 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
                                 CANCEL = 1,
                                 RESET = 2;
 
-    private JButton ok;
     private JPanel buttons = new JPanel(new FlowLayout());
     private JLabel header;
     private OptionMapUI ui;
@@ -67,11 +66,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
         super(parent);
         setLayout(new BorderLayout());
 
-        ok = new JButton(Messages.message("ok"));
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        ok.setMnemonic('O');
-        buttons.add(ok);
+        buttons.add(okButton);
 
         JButton reset = new JButton(Messages.message("reset"));
         reset.setActionCommand(String.valueOf(RESET));
@@ -85,7 +80,6 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
         cancel.setMnemonic('C');
         buttons.add(cancel);
 
-        FreeColPanel.enterPressesWhenFocused(ok);
         setCancelComponent(cancel);
 
         setSize(780, 540);
@@ -122,17 +116,11 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
         add(buttons, BorderLayout.SOUTH);
     }
 
-
-    public void requestFocus() {
-        ok.requestFocus();
-    }
-
-
     /**
-    * This function analyses an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
+     * This function analyses an event and calls the right methods to take
+     * care of the user's requests.
+     * @param event The incoming ActionEvent.
+     */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {

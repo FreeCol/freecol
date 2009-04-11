@@ -25,6 +25,8 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.text.DecimalFormat;
@@ -58,6 +60,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Modifier;
@@ -66,10 +69,12 @@ import net.sf.freecol.common.model.Player;
 /**
  * Superclass for all panels in FreeCol.
  */
-public class FreeColPanel extends JPanel {
+public class FreeColPanel extends JPanel implements ActionListener {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(FreeColPanel.class.getName());
+
+    protected static final String OK = "OK";
 
     public static final Insets emptyMargin = new Insets(0,0,0,0);
 
@@ -77,7 +82,6 @@ public class FreeColPanel extends JPanel {
 
     // The decimal format to use for Modifiers
     private static final DecimalFormat modifierFormat = new DecimalFormat("0.00");
-
 
     /**
      * The canvas all panels belong to.
@@ -121,6 +125,8 @@ public class FreeColPanel extends JPanel {
 
     protected boolean editable = true;
 
+    protected JButton okButton = new JButton(Messages.message("ok"));
+
 
     /**
      * Constructor.
@@ -154,13 +160,15 @@ public class FreeColPanel extends JPanel {
         setBorder(BorderFactory.createCompoundBorder(imageBorder,
                 BorderFactory.createEmptyBorder(margin, margin,margin,margin)));
 
-        // setBorder( new CompoundBorder(new BevelBorder(BevelBorder.RAISED),
-        // new EmptyBorder(5,5,5,5)) );
-
         // See the message of Ulf Onnen for more information about the presence
         // of this fake mouse listener.
         addMouseListener(new MouseAdapter() {
         });
+
+        okButton.setActionCommand(String.valueOf(OK));
+        okButton.addActionListener(this);
+        enterPressesWhenFocused(okButton);
+        setCancelComponent(okButton);
     }
 
     /**
@@ -222,6 +230,10 @@ public class FreeColPanel extends JPanel {
      */
     public boolean isEditable() {
         return editable;
+    }
+
+    public void requestFocus() {
+        okButton.requestFocus();
     }
 
     public static JTextPane getDefaultTextPane() {
@@ -352,4 +364,16 @@ public class FreeColPanel extends JPanel {
         return sortedResult;
     }
 
+    /**
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (OK.equals(command)) {
+            getCanvas().remove(this);
+        }
+    }
 }

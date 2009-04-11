@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -38,7 +37,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * The panel that allows a user to choose which unit will emigrate from Europe.
  */
-public final class EmigrationPanel extends FreeColDialog<Integer> implements ActionListener {
+public final class EmigrationPanel extends FreeColDialog<Integer> {
 
     private static final Logger logger = Logger.getLogger(EmigrationPanel.class.getName());
 

@@ -25,7 +25,6 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
@@ -69,7 +68,7 @@ import net.miginfocom.swing.MigLayout;
  * This is a panel for the Europe display. It shows the ships in Europe and
  * allows the user to send them back.
  */
-public final class EuropePanel extends FreeColPanel implements ActionListener {
+public final class EuropePanel extends FreeColPanel {
 
     private static Logger logger = Logger.getLogger(EuropePanel.class.getName());
 

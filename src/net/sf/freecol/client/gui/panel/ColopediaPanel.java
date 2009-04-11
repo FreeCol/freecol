@@ -26,7 +26,6 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -89,7 +88,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel displays the Colopedia.
  */
-public final class ColopediaPanel extends FreeColPanel implements ActionListener, TreeSelectionListener {
+public final class ColopediaPanel extends FreeColPanel implements TreeSelectionListener {
 
     private static final Logger logger = Logger.getLogger(ColopediaPanel.class.getName());
 
@@ -100,7 +99,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
     private static final DecimalFormat modifierFormat = 
         new DecimalFormat("0.##");
 
-    private static final String OK = "OK";
     private static final String ROOT = "ROOT";
 
     private final String none;
@@ -116,8 +114,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
 
     private JPanel detailPanel;
 
-    private JButton ok;
-    
     private JTree tree;
 
     /**
@@ -150,12 +146,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         detailPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
         add(detailPanel, BorderLayout.CENTER);
 
-        ok = new JButton(Messages.message("ok"));
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        enterPressesWhenFocused(ok);
-        setCancelComponent(ok);
-        add(ok, BorderLayout.SOUTH);
+        add(okButton, BorderLayout.SOUTH);
 
         setSize(getPreferredSize());
 
@@ -265,15 +256,6 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
         }
     }
  
-
-    /**
-     * 
-     */
-    @Override
-    public void requestFocus() {
-        ok.requestFocus();
-    }
-    
     /**
      * Builds the JTree which represents the navigation menu and then returns it
      * 

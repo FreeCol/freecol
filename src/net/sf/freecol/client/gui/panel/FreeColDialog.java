@@ -66,26 +66,26 @@ public class FreeColDialog<T> extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(FreeColDialog.class.getName());
 
+    private static final String CANCEL = "CANCEL";
+
     // Stores the response from the user:
     private T response = null;
 
     // Whether or not the user have made the choice.
     private boolean responseGiven = false;
 
-    /**
-    * Default constructor.
-    */
-    /*
-    public FreeColDialog() {
-        super();
-    }
-    */
+    protected JButton cancelButton = new JButton(Messages.message("cancel"));
 
     /**
      * Constructor.
      */
     public FreeColDialog(Canvas parent) {
         super(parent);
+
+        cancelButton.setActionCommand(String.valueOf(CANCEL));
+        cancelButton.addActionListener(this);
+        enterPressesWhenFocused(cancelButton);
+        setCancelComponent(cancelButton);
     }
 
     /**
@@ -156,28 +156,6 @@ public class FreeColDialog<T> extends FreeColPanel {
         responseGiven = false;
 
         return tempResponse;
-    }
-
-
-    /**
-    * Convenience method for {@link #getResponse}.
-    * @return The response as a <code>boolean</code>.
-    * @exception ClassCastException if the response-object
-    *       is not of type <code>Boolean</code>.
-    */
-    public boolean getResponseBoolean() {
-        return ((Boolean) getResponse()).booleanValue();
-    }
-
-
-    /**
-    * Convenience method for {@link #getResponse}.
-    * @return The response as a <code>int</code>.
-    * @exception ClassCastException if the response-object
-    *       is not of type <code>Integer</code>.
-    */
-    public int getResponseInt() {
-        return ((Integer) getResponse()).intValue();
     }
 
     /**
@@ -573,5 +551,6 @@ public class FreeColDialog<T> extends FreeColPanel {
      * Used for Polymorphism in Recruit, Purchase, Train Dialogs
      */
     public void initialize() {}
+
 
 }

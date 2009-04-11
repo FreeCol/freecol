@@ -54,15 +54,11 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected static final Logger logger = Logger.getLogger(ReportPanel.class.getName());
 
-    protected static final String OK = "OK";
-
     protected JPanel reportPanel;
 
     protected JLabel header;
 
     protected JScrollPane scrollPane;
-
-    private JButton ok;
 
     private static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
         public int compare(Unit unit1, Unit unit2) {
@@ -99,12 +95,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
         add(scrollPane, BorderLayout.CENTER);
 
-        ok = new JButton(Messages.message("ok"));
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        enterPressesWhenFocused(ok);
-        setCancelComponent(ok);
-        add(ok, BorderLayout.SOUTH);
+        add(okButton, BorderLayout.SOUTH);
 
         setSize(850, 600);
     }
@@ -130,13 +121,6 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
     public void initialize() {
         reportPanel.removeAll();
         reportPanel.doLayout();
-    }
-
-    /**
-     * 
-     */
-    public void requestFocus() {
-        ok.requestFocus();
     }
 
     /**

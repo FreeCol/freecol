@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -41,17 +40,13 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel is used to show information about a tile.
  */
-public final class DumpCargoDialog extends FreeColDialog<Boolean> implements ActionListener {
+public final class DumpCargoDialog extends FreeColDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(DumpCargoDialog.class.getName());
 
-    private static final int OK = 0;
-
-    private static final int CANCEL = 1;
+    private static final String CANCEL = "CANCEL";
 
     private final JLabel header;
-
-    private final JButton okButton;
 
     private final JButton cancelButton;
 
@@ -72,20 +67,11 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
         header.setText(Messages.message("dumpGoods"));
         header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        okButton = new JButton(Messages.message("ok"));
-        okButton.setActionCommand(String.valueOf(OK));
-        okButton.addActionListener(this);
-        okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         cancelButton = new JButton("cancel");
         cancelButton.setActionCommand(String.valueOf(CANCEL));
         cancelButton.addActionListener(this);
         cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    }
-
-    public void requestFocus() {
-        okButton.requestFocus();
     }
 
     /**
@@ -126,24 +112,15 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                for (int index = 0; index < checkBoxes.size(); index++) {
-                    if (checkBoxes.get(index).isSelected()) {
-                        getController().unloadCargo(goodsList.get(index));
-                    }
+        if (OK.equals(command)) {
+            for (int index = 0; index < checkBoxes.size(); index++) {
+                if (checkBoxes.get(index).isSelected()) {
+                    getController().unloadCargo(goodsList.get(index));
                 }
-                setResponse(Boolean.TRUE);
-                break;
-            case CANCEL:
-                setResponse(Boolean.FALSE);
-                break;
-            default:
-                logger.warning("Invalid Actioncommand: invalid number.");
             }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+            setResponse(Boolean.TRUE);
+        } else {
+            setResponse(Boolean.FALSE);
         }
     }
 

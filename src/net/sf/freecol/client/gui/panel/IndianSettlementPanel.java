@@ -40,14 +40,9 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel is used to show information about an Indian settlement.
  */
-public final class IndianSettlementPanel extends FreeColDialog<Boolean> implements ActionListener {
+public final class IndianSettlementPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(IndianSettlementPanel.class.getName());
-
-    private static final int OK = 0;
-
-    private final JButton okButton;
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -58,10 +53,6 @@ public final class IndianSettlementPanel extends FreeColDialog<Boolean> implemen
 
         setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
         
-        okButton = new JButton(Messages.message("ok"));
-        okButton.setActionCommand(String.valueOf(OK));
-        okButton.addActionListener(this);
-
         JLabel settlementLabel = new JLabel(canvas.getImageIcon(settlement, false));
         Player indian = settlement.getOwner();
         String text = settlement.getName();
@@ -140,28 +131,4 @@ public final class IndianSettlementPanel extends FreeColDialog<Boolean> implemen
         setSize(getPreferredSize());
     }
 
-    public void requestFocus() {
-        okButton.requestFocus();
-    }
-
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                setResponse(Boolean.TRUE);
-                break;
-            default:
-                logger.warning("Invalid Actioncommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
-        }
-    }
 }

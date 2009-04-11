@@ -23,15 +23,12 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -47,14 +44,10 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * This is the About panel 
  */
-public final class AboutPanel extends FreeColPanel implements ActionListener {
+public final class AboutPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(AboutPanel.class.getName());
 
-    private static final int CLOSE = 0;
-        
-    private JButton exitButton;
-    
     /**
     * The constructor that will add the items to this panel.
     * 
@@ -109,40 +102,11 @@ public final class AboutPanel extends FreeColPanel implements ActionListener {
         // copyright
         infoPanel.add(new JLabel(Messages.message("aboutPanel.copyright"),JLabel.CENTER),BorderLayout.CENTER);
         
-        // Close button
-        exitButton = new JButton(Messages.message("close"));
-        exitButton.addActionListener(this);
-        enterPressesWhenFocused(exitButton);
-        setCancelComponent(exitButton);
-        exitButton.setActionCommand(String.valueOf(CLOSE));        
-        this.add(exitButton,BorderLayout.SOUTH);
-        exitButton.setFocusable(true);
+        this.add(okButton, BorderLayout.SOUTH);
 
         setSize(getPreferredSize());
     }
 
-     
-
-    /**
-    * This function analyzes an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-                case CLOSE:
-                    getCanvas().remove(this);
-                    break;
-                default:
-                    logger.warning("Invalid Actioncommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
-        }
-    }
-    
     /**
      * This inner class is meant to handle mouse click events from hypertext-style links
      * Swing has no explicit support for links, but they can be simulated with

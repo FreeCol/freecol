@@ -49,10 +49,6 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
 
     private static final Logger logger = Logger.getLogger(StatisticsPanel.class.getName());
 
-    private static final int CLOSE = 0;
-        
-    private JButton exitButton;
-    
     class StatisticsModel extends AbstractTableModel {
 
         private static final int NAME_COLUMN = 0, VALUE_COLUMN = 1;
@@ -176,14 +172,7 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         statsPanel.add(displayStatsMessage("Client", clientStatistics));
         statsPanel.add(displayStatsMessage("Server", serverStatistics));
 
-        // Close button
-        exitButton = new JButton(Messages.message("close"));
-        exitButton.addActionListener(this);
-        enterPressesWhenFocused(exitButton);
-        setCancelComponent(exitButton);
-        exitButton.setActionCommand(String.valueOf(CLOSE));        
-        this.add(exitButton,BorderLayout.SOUTH);
-        exitButton.setFocusable(true);
+        add(okButton, BorderLayout.SOUTH);
 
         setSize(getPreferredSize());
     }
@@ -222,24 +211,4 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         return panel;
     }
     
-    /**
-    * This function analyzes an event and calls the right methods to take
-    * care of the user's requests.
-    * @param event The incoming ActionEvent.
-    */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-                case CLOSE:
-                    getCanvas().remove(this);
-                    break;
-                default:
-                    logger.warning("Invalid Actioncommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
-        }
-    }
-
 }

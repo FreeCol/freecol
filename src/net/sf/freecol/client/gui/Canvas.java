@@ -621,7 +621,7 @@ public final class Canvas extends JDesktopPane {
             addAsFrame(confirmDialog);
             confirmDialog.requestFocus();
 
-            if (!confirmDialog.getResponseBoolean()) {
+            if (!confirmDialog.getResponse()) {
                 remove(confirmDialog);
                 if (source instanceof Europe) {
                     showEuropePanel();
@@ -747,7 +747,7 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
 
-        boolean response = confirmDialog.getResponseBoolean();
+        boolean response = confirmDialog.getResponse();
 
         remove(confirmDialog);
 
@@ -792,7 +792,7 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
 
-        boolean response = confirmDialog.getResponseBoolean();
+        boolean response = confirmDialog.getResponse();
 
         remove(confirmDialog);
 
@@ -873,7 +873,7 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(loadingSavegameDialog);
         loadingSavegameDialog.requestFocus();
 
-        boolean r = loadingSavegameDialog.getResponseBoolean();
+        boolean r = loadingSavegameDialog.getResponse();
         remove(loadingSavegameDialog);
 
         return r;
@@ -891,7 +891,7 @@ public final class Canvas extends JDesktopPane {
         clientOptionsDialogShowing = true;
         addAsFrame(clientOptionsDialog);
         clientOptionsDialog.requestFocus();
-        boolean r = clientOptionsDialog.getResponseBoolean();
+        boolean r = clientOptionsDialog.getResponse();
         remove(clientOptionsDialog);
         clientOptionsDialogShowing = false;
         freeColClient.getActionManager().update();
@@ -926,7 +926,7 @@ public final class Canvas extends JDesktopPane {
 
         addAsFrame(mapGeneratorOptionsDialog);
         mapGeneratorOptionsDialog.requestFocus();
-        boolean r = mapGeneratorOptionsDialog.getResponseBoolean();
+        boolean r = mapGeneratorOptionsDialog.getResponse();
         remove(mapGeneratorOptionsDialog);
 
         return r;
@@ -1279,7 +1279,7 @@ public final class Canvas extends JDesktopPane {
                 .message("no"));
         addAsFrame(confirmDialog);
         confirmDialog.requestFocus();
-        boolean result = confirmDialog.getResponseBoolean();
+        boolean result = confirmDialog.getResponse();
         remove(confirmDialog);
         return result;
     }
@@ -1504,7 +1504,7 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(localDialog);
         localDialog.requestFocus();
 
-        int response = localDialog.getResponseInt();
+        int response = localDialog.getResponse();
 
         remove(localDialog);
         if (europeOpenDialog == localDialog) {
@@ -1551,22 +1551,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the tile panel of the given <code>Tile</code>.
-     * 
-     * @param tile The tile whose panel needs to be displayed.
-     * @see Tile
-     */
-    public void showTilePanel(Tile tile) {
-        TilePanel tilePanel = new TilePanel(this, tile);
-
-        addAsFrame(tilePanel);
-        tilePanel.requestFocus();
-        tilePanel.getResponseBoolean();
-        remove(tilePanel);
-
-    }
-
-    /**
      * Displays the <code>DumpCargoDialog</code>.
      * 
      * @param unit The Unit that should dump all cargo
@@ -1578,7 +1562,7 @@ public final class Canvas extends JDesktopPane {
 
         addAsFrame(dumpCargoDialog);
         dumpCargoDialog.requestFocus();
-        dumpCargoDialog.getResponseBoolean();
+        dumpCargoDialog.getResponse();
         remove(dumpCargoDialog);
 
     }
@@ -1609,7 +1593,7 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(emigrationPanel);
         emigrationPanel.requestFocus();
 
-        int response = emigrationPanel.getResponseInt();
+        int response = emigrationPanel.getResponse();
 
         remove(emigrationPanel);
 
@@ -1624,7 +1608,7 @@ public final class Canvas extends JDesktopPane {
         RiverStylePanel riverStylePanel = new RiverStylePanel(this);
         addAsFrame(riverStylePanel);
         riverStylePanel.requestFocus();
-        int response = riverStylePanel.getResponseInt();
+        int response = riverStylePanel.getResponse();
         remove(riverStylePanel);
         return response;
     }
@@ -2032,7 +2016,7 @@ public final class Canvas extends JDesktopPane {
                 if (tp.hasItem()) {
                     showPopup(tp, x, y);
                 } else if (t.isExplored()) {
-                    showTilePanel(t);
+                    showPanel(new TilePanel(this, t));
                 }
             }
         }

@@ -64,7 +64,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
 
     private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
 
-    private static final String OK = "ok";
     private static final String BUY = "buy";
 
     private final BuildQueueTransferHandler buildQueueHandler = new BuildQueueTransferHandler();
@@ -120,10 +119,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         JLabel headLine = new JLabel(Messages.message("colonyPanel.buildQueue"));
         headLine.setFont(bigHeaderFont);
 
-        JButton ok = new JButton(Messages.message(OK));
-        ok.setActionCommand(OK);
-        ok.addActionListener(this);
-
         JButton buyBuilding = new JButton(Messages.message("colonyPanel.buyBuilding"));
         buyBuilding.setActionCommand(BUY);
         buyBuilding.addActionListener(this);
@@ -136,7 +131,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         add(new JScrollPane(buildQueueList), "grow");
         add(new JScrollPane(buildingList), "grow, wrap 20");
         add(buyBuilding, "span, split 2");
-        add(ok, "tag ok");
+        add(okButton, "tag ok");
     }
 
 

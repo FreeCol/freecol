@@ -34,6 +34,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
+import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
@@ -326,7 +327,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(settlement.getLocationName());
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showFreeColDialog(new IndianSettlementPanel(canvas, settlement));
+                    canvas.showPanel(new IndianSettlementPanel(canvas, settlement));
                 }
             });
         add(menuItem);
@@ -341,7 +342,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(tile.getName());
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showTilePanel(tile);
+                    canvas.showPanel(new TilePanel(canvas, tile));
                 }
             });
 

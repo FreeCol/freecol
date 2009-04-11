@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.logging.Logger;
@@ -28,7 +27,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * This is the panel that pops up when an error needs to be reported.
@@ -37,14 +35,9 @@ public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionLi
 
     private static final Logger logger = Logger.getLogger(ErrorPanel.class.getName());
 
-    private static final int OK = 0;
-
     private static final int lineWidth = 320;
 
     private LinkedList<JLabel> errorLabels; // A LinkedList of JLabel objects.
-
-    private JButton errorButton;
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -56,18 +49,9 @@ public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionLi
 
         setLayout(null);
 
-        errorButton = new JButton(Messages.message("ok"));
-        errorButton.setSize(80, 20);
-        errorButton.setActionCommand(String.valueOf(OK));
-        errorButton.addActionListener(this);
-
         errorLabels = null;
 
-        add(errorButton);
-    }
-
-    public void requestFocus() {
-        errorButton.requestFocus();
+        add(okButton);
     }
 
     /**
@@ -132,31 +116,10 @@ public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionLi
             errorLabels.add(label);
         }
 
-        errorButton.setLocation(130, 25 + (lines.size() - 1) * 20);
-        add(errorButton);
+        okButton.setLocation(130, 25 + (lines.size() - 1) * 20);
+        add(okButton);
 
         setSize(340, 50 + (lines.size() - 1) * 20);
     }
 
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                // parent.closeErrorPanel();
-                setResponse(Boolean.TRUE);
-                break;
-            default:
-                logger.warning("Invalid Actioncommand: invalid number.");
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
-        }
-    }
 }

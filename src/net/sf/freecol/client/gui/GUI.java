@@ -398,7 +398,7 @@ public final class GUI {
                         // show the Indian camp
                         setFocus(selectedTile);
                         Canvas canvas =freeColClient.getCanvas();
-                        canvas.showFreeColDialog(new IndianSettlementPanel(canvas, (IndianSettlement) s));
+                        canvas.showPanel(new IndianSettlementPanel(canvas, (IndianSettlement) s));
                         return;
                     }
                 }

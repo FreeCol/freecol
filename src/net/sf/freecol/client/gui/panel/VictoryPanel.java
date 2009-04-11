@@ -21,10 +21,8 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
-import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -39,15 +37,11 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel gets displayed to the player who have won the game.
  */
-public final class VictoryPanel extends FreeColPanel implements ActionListener {
+public final class VictoryPanel extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(VictoryPanel.class.getName());
 
-    private static final int OK = 0, CONTINUE = 1;
-
-    private Box buttonsBox = Box.createHorizontalBox();
-            
-    private JButton ok = new JButton(Messages.message("victory.yes"));
+    private static final String CONTINUE = "CONTINUE";
 
     private JButton continueButton = new JButton(Messages.message("victory.continue"));
 
@@ -60,8 +54,9 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
 
         super(parent);
         
+        okButton.setText(Messages.message("victory.yes"));
+
         setLayout(new MigLayout("wrap 1", "", ""));
-        setCancelComponent(ok);
 
         add(getDefaultHeader(Messages.message("victory.text")), "align center, wrap 20");
 
@@ -70,25 +65,17 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
             add(new JLabel(new ImageIcon(tempImage)), "align center");
         }
 
-        ok.setActionCommand(String.valueOf(OK));
-        ok.addActionListener(this);
-        enterPressesWhenFocused(ok);
-
-        continueButton.setActionCommand(String.valueOf(CONTINUE));
+        continueButton.setActionCommand(CONTINUE);
         continueButton.addActionListener(this);
         enterPressesWhenFocused(continueButton);
 
         if (parent.getClient().isSingleplayer()) {
-            add(ok, "newline 20, split 2");
+            add(okButton, "newline 20, split 2, tag ok");
             add(continueButton);
         } else {
-            add(ok, "newline 20");
+            add(okButton, "newline 20, tag ok");
         }
         setSize(getPreferredSize());
-    }
-
-    public void requestFocus() {
-        ok.requestFocus();
     }
 
     /**
@@ -99,28 +86,19 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
      */
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
-        try {
-            switch (Integer.valueOf(command).intValue()) {
-            case OK:
-                if(getClient().retire()){
-                    getCanvas().showInformationMessage("highscores.new");
-                    getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
-                }
-                getCanvas().quit();
-                break;
-            case CONTINUE:
-                if(getClient().retire()){
-                    getCanvas().showInformationMessage("highscores.new");
-                    getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
-                }
-                getClient().continuePlaying();
-                getCanvas().remove(this);
-                break;
-            default:
-                logger.warning("Invalid ActionCommand: invalid number.");
+        if (OK.equals(command)) {
+            if(getClient().retire()){
+                getCanvas().showInformationMessage("highscores.new");
+                getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
             }
-        } catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+            getCanvas().quit();
+        } else {
+            if(getClient().retire()){
+                getCanvas().showInformationMessage("highscores.new");
+                getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
+            }
+            getClient().continuePlaying();
+            getCanvas().remove(this);
         }
     }
 }
