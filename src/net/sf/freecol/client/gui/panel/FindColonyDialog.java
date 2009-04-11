@@ -64,7 +64,7 @@ public final class FindColonyDialog extends FreeColDialog implements ListSelecti
     public FindColonyDialog(Canvas parent) {
         super(parent);
 
-        for (Player player : getCanvas().getClient().getGame().getEuropeanPlayers()) {
+        for (Player player : getGame().getEuropeanPlayers()) {
             knownColonies.addAll(player.getColonies());
         }
 

@@ -140,7 +140,7 @@ public final class DragListener extends MouseAdapter {
 
 
     public JPopupMenu getUnitMenu(final UnitLabel unitLabel) {
-        ImageLibrary imageLibrary = unitLabel.getCanvas().getGUI().getImageLibrary();
+        ImageLibrary imageLibrary = parentPanel.getLibrary();
         final Unit tempUnit = unitLabel.getUnit();
         JPopupMenu menu = new JPopupMenu("Unit");
         ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit);
@@ -209,7 +209,7 @@ public final class DragListener extends MouseAdapter {
     private boolean addWorkItems(final UnitLabel unitLabel, final JPopupMenu menu) {
 
         final Unit tempUnit = unitLabel.getUnit();
-        ImageLibrary imageLibrary = unitLabel.getCanvas().getGUI().getImageLibrary();
+        ImageLibrary imageLibrary = parentPanel.getLibrary();
         Colony colony = tempUnit.getLocation().getColony();
         boolean separatorNeeded = false;
 
@@ -289,7 +289,7 @@ public final class DragListener extends MouseAdapter {
     
     private boolean addEducationItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         Unit tempUnit = unitLabel.getUnit();
-        ImageLibrary imageLibrary = unitLabel.getCanvas().getGUI().getImageLibrary();
+        ImageLibrary imageLibrary = parentPanel.getLibrary();
         boolean separatorNeeded = false;
         for (Unit teacher : tempUnit.getColony().getTeachers()) {
             if (tempUnit.canBeStudent(teacher) &&
@@ -366,7 +366,7 @@ public final class DragListener extends MouseAdapter {
 
     private boolean addEquipmentItems(final UnitLabel unitLabel, final JPopupMenu menu) {
         final Unit tempUnit = unitLabel.getUnit();
-        ImageLibrary imageLibrary = unitLabel.getCanvas().getGUI().getImageLibrary();
+        ImageLibrary imageLibrary = parentPanel.getLibrary();
         boolean separatorNeeded = false;
         for (EquipmentType equipmentType : Specification.getSpecification().getEquipmentTypeList()) {
             int count = tempUnit.getEquipment().getCount(equipmentType);
@@ -470,7 +470,7 @@ public final class DragListener extends MouseAdapter {
 
         final Goods goods = goodsLabel.getGoods();
         final InGameController inGameController = goodsLabel.getCanvas().getClient().getInGameController();
-        ImageLibrary imageLibrary = goodsLabel.getCanvas().getGUI().getImageLibrary();
+        ImageLibrary imageLibrary = parentPanel.getLibrary();
         JPopupMenu menu = new JPopupMenu("Cargo");
         JMenuItem name = new JMenuItem(goods.getName() + " (" +
                                        Messages.message("menuBar.colopedia") + ")", 

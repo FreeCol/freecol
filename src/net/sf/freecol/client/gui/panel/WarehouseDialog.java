@@ -217,7 +217,7 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
             exportData.setHighLevel(highLevelValue);
             exportData.setExportLevel(exportLevelValue);
             if (changed) {
-                getCanvas().getClient().getInGameController().setGoodsLevels(colony, goodsType);
+                getController().setGoodsLevels(colony, goodsType);
             }
         }
 

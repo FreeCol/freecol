@@ -110,7 +110,7 @@ public final class ReportProductionPanel extends ReportPanel {
         reportPanel.add(selectButton, "wrap 20");
 
         if (!selectedTypes.isEmpty()) {
-            Player player = getCanvas().getClient().getMyPlayer();
+            Player player = getMyPlayer();
             List<Colony> colonies = new ArrayList<Colony>(player.getColonies());
 
             TypeCountMap<BuildingType> buildingCount = new TypeCountMap<BuildingType>();
@@ -149,7 +149,7 @@ public final class ReportProductionPanel extends ReportPanel {
             }
 
 
-            Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+            Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
             int[] totalProduction = new int[selectedTypes.size()];
 

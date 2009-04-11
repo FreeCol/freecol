@@ -51,14 +51,12 @@ import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -96,8 +94,6 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     private final MouseListener pressListener;
 
     private Europe europe;
-
-    private Game game;
 
     private UnitLabel selectedUnit;
 
@@ -401,9 +397,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
      */
     public void initialize(Europe europe, Game game) {
         this.europe = europe;
-        this.game = game;
 
-        getClient().getMyPlayer().getMarket().addTransactionListener(log);
+        getMyPlayer().getMarket().addTransactionListener(log);
         
         //
         // Remove the old components from the panels.
@@ -455,18 +450,17 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             cargoPanel.setCarrier(lastCarrier.getUnit());
         }
 
-        Player player = getClient().getMyPlayer();
         List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsTypes) {
             if (goodsType.isStorable()) {
-                MarketLabel marketLabel = new MarketLabel(goodsType, player.getMarket(), getCanvas());
+                MarketLabel marketLabel = new MarketLabel(goodsType, getMyPlayer().getMarket(), getCanvas());
                 marketLabel.setTransferHandler(defaultTransferHandler);
                 marketLabel.addMouseListener(pressListener);
                 marketPanel.add(marketLabel);
             }
         }
 
-        String newLandName = player.getNewLandName();
+        String newLandName = getMyPlayer().getNewLandName();
         ((TitledBorder) toAmericaPanel.getBorder()).setTitle(Messages.message("sailingTo", 
                 "%location%", newLandName));
     }
@@ -542,15 +536,14 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
     private void unload() {
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
-            Player player = getClient().getMyPlayer();
             Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();
-                if (player.canTrade(goods)) {
-                    getClient().getInGameController().sellGoods(goods);
+                if (getMyPlayer().canTrade(goods)) {
+                    getController().sellGoods(goods);
                     updateCargoPanel();
                 } else {
-                    getClient().getInGameController().payArrears(goods);
+                    getController().payArrears(goods);
                 }
                 getCargoPanel().revalidate();
                 refresh();
@@ -558,7 +551,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit newUnit = unitIterator.next();
-                getClient().getInGameController().leaveShip(newUnit);
+                getController().leaveShip(newUnit);
                 updateCargoPanel();
                 getCargoPanel().revalidate();
                 // update docks panel
@@ -585,9 +578,9 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             // Refresh if necessary
             switch (europeAction) {
             case EXIT:
-                getClient().getMyPlayer().getMarket().removeTransactionListener(log);
+                getMyPlayer().getMarket().removeTransactionListener(log);
                 getCanvas().remove(this);
-                getClient().getInGameController().nextModelMessage();
+                getController().nextModelMessage();
                 break;
             case RECRUIT:
             case PURCHASE:
@@ -602,7 +595,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
             case SAIL:
                 Unit unit = getSelectedUnit();
                 if (unit != null && unit.isNaval()) {
-                    getClient().getInGameController().moveToAmerica(unit);
+                    getController().moveToAmerica(unit);
                     UnitLabel unitLabel = getSelectedUnitLabel();
                     inPortPanel.remove(unitLabel);
                     toAmericaPanel.add(unitLabel, false);
@@ -624,8 +617,8 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
      * @param goodsType The type of goods for paying arrears
      */
     public void payArrears(GoodsType goodsType) {
-        if (getClient().getMyPlayer().getArrears(goodsType) > 0) {
-            getClient().getInGameController().payArrears(goodsType);
+        if (getMyPlayer().getArrears(goodsType) > 0) {
+            getController().payArrears(goodsType);
             getMarketPanel().revalidate();
             refresh();
         }
@@ -711,7 +704,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     }
                     comp.getParent().remove(comp);
 
-                    getClient().getInGameController().moveToAmerica(unit);
+                    getController().moveToAmerica(unit);
                     docksPanel.removeAll();
                     for (Unit u : europe.getUnitList()) {
                         UnitLabel unitLabel = new UnitLabel(u, getCanvas());
@@ -775,7 +768,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 if (comp instanceof UnitLabel) {
                     comp.getParent().remove(comp);
                     Unit unit = ((UnitLabel) comp).getUnit();
-                    getClient().getInGameController().moveToEurope(unit);
+                    getController().moveToEurope(unit);
                 } else {
                     logger.warning("An invalid component got dropped on this ToEuropePanel.");
                     return null;
@@ -848,7 +841,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     comp.getParent().remove(comp);
                     /* Unnecessary, leaveShip() is called in CargoPanel.remove()
                     Unit unit = ((UnitLabel) comp).getUnit();
-                    getClient().getInGameController().leaveShip(unit);
+                    getController().leaveShip(unit);
                     */
                 } else {
                     logger.warning("An invalid component got dropped on this DocksPanel.");
@@ -910,16 +903,15 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                 if (comp instanceof GoodsLabel) {
                     // comp.getCanvas().remove(comp);
                     Goods goods = ((GoodsLabel) comp).getGoods();
-                    Player player = getClient().getMyPlayer();
-                    if (player.canTrade(goods)) {
-                        getClient().getInGameController().sellGoods(goods);
+                    if (getMyPlayer().canTrade(goods)) {
+                        getController().sellGoods(goods);
                     } else {
                         switch (getCanvas().showBoycottedGoodsDialog(goods, europe)) {
                         case PAY_ARREARS:
-                            getClient().getInGameController().payArrears(goods);
+                            getController().payArrears(goods);
                             break;
                         case DUMP_CARGO:
-                            getClient().getInGameController().unloadCargo(goods);
+                            getController().unloadCargo(goods);
                             break;
                         case CANCEL:
                         default:
@@ -927,7 +919,7 @@ public final class EuropePanel extends FreeColPanel implements ActionListener {
                     }
                     europePanel.getCargoPanel().revalidate();
                     revalidate();
-                    getClient().getInGameController().nextModelMessage();
+                    getController().nextModelMessage();
                     europePanel.refresh();
 
                     // TODO: Make this look prettier :-)

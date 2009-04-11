@@ -249,14 +249,14 @@ public final class Canvas extends JDesktopPane {
         setOpaque(false);
         setLayout(null);
 
-        mainPanel = new MainPanel(this, freeColClient);
+        mainPanel = new MainPanel(this);
         startGamePanel = new StartGamePanel(this);
-        serverListPanel = new ServerListPanel(this, freeColClient, freeColClient.getConnectController());
+        serverListPanel = new ServerListPanel(this, freeColClient.getConnectController());
         europePanel = new EuropePanel(this);
         statusPanel = new StatusPanel(this);
-        chatPanel = new ChatPanel(this, freeColClient);
-        clientOptionsDialog = new ClientOptionsDialog(this, freeColClient);
-        loadingSavegameDialog = new LoadingSavegameDialog(this, freeColClient);
+        chatPanel = new ChatPanel(this);
+        clientOptionsDialog = new ClientOptionsDialog(this);
+        loadingSavegameDialog = new LoadingSavegameDialog(this);
 
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -1522,7 +1522,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showColonyPanel(Colony colony) {
         freeColClient.getGUI().stopBlinking();
-        ColonyPanel colonyPanel = new ColonyPanel(this, freeColClient);
+        ColonyPanel colonyPanel = new ColonyPanel(this);
         colonyPanel.initialize(colony);
         addAsFrame(colonyPanel);
         colonyPanel.requestFocus();

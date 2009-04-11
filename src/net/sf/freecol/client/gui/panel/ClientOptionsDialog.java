@@ -35,7 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -46,14 +45,13 @@ import net.sf.freecol.client.gui.option.OptionMapUI;
 * Dialog for changing the {@link net.sf.freecol.client.ClientOptions}.
 */
 public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements ActionListener {
+
     private static final Logger logger = Logger.getLogger(ClientOptionsDialog.class.getName());
 
 
     private static final int    OK = 0,
                                 CANCEL = 1,
                                 RESET = 2;
-
-    private final FreeColClient freeColClient;
 
     private JButton ok;
     private JPanel buttons = new JPanel(new FlowLayout());
@@ -64,14 +62,10 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
-    * @param freeColClient The main controller object for the
-    *       client.
     */
-    public ClientOptionsDialog(Canvas parent, FreeColClient freeColClient) {
+    public ClientOptionsDialog(Canvas parent) {
         super(parent);
         setLayout(new BorderLayout());
-
-        this.freeColClient = freeColClient;
 
         ok = new JButton(Messages.message("ok"));
         ok.setActionCommand(String.valueOf(OK));
@@ -111,7 +105,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
         removeAll();
 
         // Header:
-        header = new JLabel(freeColClient.getClientOptions().getName(), JLabel.CENTER);
+        header = new JLabel(getClient().getClientOptions().getName(), JLabel.CENTER);
         header.setFont(((Font) UIManager.get("HeaderFont")).deriveFont(0, 48));
         header.setBorder(new EmptyBorder(20, 0, 0, 0));
         add(header, BorderLayout.NORTH);
@@ -119,7 +113,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(freeColClient.getClientOptions());
+        ui = new OptionMapUI(getClient().getClientOptions());
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);
@@ -147,15 +141,15 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean> implements
                     ui.unregister();
                     ui.updateOption();
                     getCanvas().remove(this);
-                    freeColClient.saveClientOptions();
-                    freeColClient.getActionManager().update();
-                    if (freeColClient.getCanvas().getJMenuBar() != null) {
-                        freeColClient.getCanvas().resetFreeColMenuBar();
+                    getClient().saveClientOptions();
+                    getClient().getActionManager().update();
+                    if (getCanvas().getJMenuBar() != null) {
+                        getCanvas().resetFreeColMenuBar();
                     }
                     setResponse(Boolean.TRUE);
                     
                     // Immediately redraw the minimap if that was updated.
-                    MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.id);
+                    MapControlsAction mca = (MapControlsAction) getClient().getActionManager().getFreeColAction(MapControlsAction.id);
                     if(mca.getMapControls() != null) {
                         mca.getMapControls().update();                        
                     }

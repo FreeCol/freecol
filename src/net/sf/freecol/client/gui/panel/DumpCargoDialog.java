@@ -29,10 +29,8 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
@@ -131,10 +129,9 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> implements Act
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                InGameController inGameController = getCanvas().getClient().getInGameController();
                 for (int index = 0; index < checkBoxes.size(); index++) {
                     if (checkBoxes.get(index).isSelected()) {
-                        inGameController.unloadCargo(goodsList.get(index));
+                        getController().unloadCargo(goodsList.get(index));
                     }
                 }
                 setResponse(Boolean.TRUE);

@@ -21,7 +21,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,11 +30,8 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -72,7 +68,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
 
         super(parent);
 
-        final Europe europe = parent.getClient().getMyPlayer().getEurope();
+        final Europe europe = getMyPlayer().getEurope();
         unitPriceComparator = new Comparator<UnitType>() {
             public int compare(final UnitType type1, final UnitType type2) {
                 return (europe.getUnitPrice(type1) - 
@@ -108,7 +104,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
         removeAll();
         add(question, "span, wrap 20");
 
-        final Player player = getCanvas().getClient().getMyPlayer();
+        final Player player = getMyPlayer();
         final Europe europe = player.getEurope();
 
         // price may have changed
@@ -157,7 +153,7 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
             setResponse(new Integer(-1));
         } else {
             UnitType unitType = FreeCol.getSpecification().getUnitType(command);
-            getCanvas().getClient().getInGameController().trainUnitInEurope(unitType);
+            getController().trainUnitInEurope(unitType);
             getCanvas().getEuropePanel().refreshDocks();
             getCanvas().getEuropePanel().refreshInPort();
             getCanvas().getEuropePanel().revalidate();

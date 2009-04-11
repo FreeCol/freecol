@@ -37,7 +37,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
@@ -175,7 +174,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         if (OK.equals(command)) {
             getCanvas().remove(this);
         } else {
-            FreeColGameObject object = getCanvas().getClient().getGame().getFreeColGameObject(command);
+            FreeColGameObject object = getGame().getFreeColGameObject(command);
             if (object instanceof Colony) {
                 getCanvas().showColonyPanel((Colony) object);
             } else if (object instanceof Europe) {

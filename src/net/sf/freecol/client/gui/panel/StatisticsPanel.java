@@ -155,7 +155,7 @@ public final class StatisticsPanel extends FreeColPanel implements ActionListene
         super(parent, new BorderLayout());
         
         // Retrieve the client and server data
-        StatisticsMessage serverStatistics = getClient().getInGameController().getServerStatistics();
+        StatisticsMessage serverStatistics = getController().getServerStatistics();
         StatisticsMessage clientStatistics = new StatisticsMessage(getGame(), null);
 
         // Title

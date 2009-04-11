@@ -237,13 +237,12 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      */
     public void initialize(boolean singlePlayerGame, NationOptions nationOptions) {
         this.singlePlayerGame = singlePlayerGame;
-        FreeColClient freeColClient = getCanvas().getClient();
+        FreeColClient freeColClient = getClient();
         game = freeColClient.getGame();
-        thisPlayer = freeColClient.getMyPlayer();
 
         Nation[] nations = nationOptions.getEuropeanNations().toArray(new Nation[0]);
 
-        tableModel.setData(game.getPlayers(), thisPlayer, nationOptions.getNationalAdvantages());
+        tableModel.setData(game.getPlayers(), getMyPlayer(), nationOptions.getNationalAdvantages());
 
         JLabel playerLabel = new JLabel(Messages.message("player"));
         JButton nationButton = new JButton(Messages.message("nation"));
@@ -310,7 +309,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * Updates the map generator options displayed on this panel.
      */
     public void updateMapGeneratorOptions() {
-        getCanvas().getClient().getPreGameController().getMapGeneratorOptions()
+        getClient().getPreGameController().getMapGeneratorOptions()
             .getObject(MapGeneratorOptions.MAP_SIZE);
     }
 
@@ -343,7 +342,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         table.setEnabled(enabled);
 
         if (enabled) {
-            start.setEnabled(getCanvas().getClient().isAdmin());
+            start.setEnabled(getClient().isAdmin());
         }
 
         gameOptions.setEnabled(enabled);
@@ -368,29 +367,29 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                     thisPlayer.setReady(true);
                 }
 
-                getCanvas().getClient().getPreGameController().requestLaunch();
+                getClient().getPreGameController().requestLaunch();
                 break;
             case CANCEL:
-                getCanvas().getClient().getConnectController().quitGame(true);
+                getClient().getConnectController().quitGame(true);
                 getCanvas().remove(this);
                 getCanvas().showPanel(new NewPanel(getCanvas()));
                 break;
             case READY:
-                getCanvas().getClient().getPreGameController().setReady(readyBox.isSelected());
+                getClient().getPreGameController().setReady(readyBox.isSelected());
                 refreshPlayersTable();
                 break;
             case CHAT:
                 if (chat.getText().trim().length() > 0) {
-                    getCanvas().getClient().getPreGameController().chat(chat.getText());
-                    displayChat(getCanvas().getClient().getMyPlayer().getName(), chat.getText(), false);
+                    getClient().getPreGameController().chat(chat.getText());
+                    displayChat(getMyPlayer().getName(), chat.getText(), false);
                     chat.setText("");
                 }
                 break;
             case GAME_OPTIONS:
-                getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getCanvas().getClient(), getCanvas().getClient().isAdmin()));
+                getCanvas().showFreeColDialog(new GameOptionsDialog(getCanvas(), getClient().isAdmin()));
                 break;
             case MAP_GENERATOR_OPTIONS:
-                getCanvas().showMapGeneratorOptionsDialog(getCanvas().getClient().isAdmin());
+                getCanvas().showMapGeneratorOptionsDialog(getClient().isAdmin());
                 break;
             default:
                 logger.warning("Invalid Actioncommand: invalid number.");

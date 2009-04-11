@@ -36,7 +36,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -54,19 +53,15 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                                 OPTIONS = 3,
                                 QUIT = 4;
 
-    private final FreeColClient freeColClient;
     private JButton newButton;
     
 
     /**
     * The constructor that will add the items to this panel.
     * @param parent The parent of this panel.
-    * @param freeColClient The main controller object for the client
     */
-    public MainPanel(Canvas parent, FreeColClient freeColClient) {
+    public MainPanel(Canvas parent) {
         super(parent, new BorderLayout());
-
-        this.freeColClient = freeColClient;
 
         JButton openButton = new JButton( Messages.message("menuBar.game.open") );
         JButton mapEditorButton = new JButton( Messages.message("mainPanel.editor") );
@@ -151,10 +146,10 @@ public final class MainPanel extends FreeColPanel implements ActionListener {
                     getCanvas().showPanel(new NewPanel(getCanvas()));
                     break;
                 case OPEN:
-                    freeColClient.getConnectController().loadGame();
+                    getClient().getConnectController().loadGame();
                     break;
                 case MAP_EDITOR:
-                    freeColClient.getMapEditorController().startMapEditor();
+                    getClient().getMapEditorController().startMapEditor();
                     break;
                 case OPTIONS:
                     getCanvas().showClientOptionsDialog();

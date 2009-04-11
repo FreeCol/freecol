@@ -194,7 +194,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
 
         TradeRoute tradeRoute = newRoute.clone();
 
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getMyPlayer();
 
         // combo box for selecting destination
         destinationSelector.addItem(Messages.message("report.allColonies", "%number%", ""));
@@ -275,7 +275,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                 }
                 originalRoute.setStops(stops);
                 // TODO: update trade routes only if they have been modified
-                getCanvas().getClient().getInGameController().updateTradeRoute(originalRoute);
+                getController().updateTradeRoute(originalRoute);
                 setResponse(new Boolean(true));
                 break;
             case CANCEL:
@@ -453,7 +453,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
      * 
      * public void saveSettings() { if (export.isSelected() !=
      * colony.getExports(goodsType)) {
-     * getCanvas().getClient().getInGameController().setExports(colony,
+     * getController().setExports(colony,
      * goodsType, export.isSelected()); colony.setExports(goodsType,
      * export.isSelected()); } colony.getLowLevel()[goodsType] =
      * ((SpinnerNumberModel) lowLevel.getModel()).getNumber().intValue();

@@ -27,8 +27,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -55,19 +53,12 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
 
     private final JTextArea question;
 
-    private final FreeColClient freeColClient;
-
-    private final InGameController inGameController;
-
-
     /**
      * The constructor to use.
      */
     public RecruitDialog(Canvas parent) {
         super(parent);
 
-        this.freeColClient = parent.getClient();
-        this.inGameController = freeColClient.getInGameController();
         setFocusCycleRoot(true);
 
         question = getDefaultTextArea(Messages.message("recruitDialog.clickOn"));
@@ -105,8 +96,8 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
         add(question, "wrap 20");
 
         int recruitPrice = 0;
-        Player player = freeColClient.getMyPlayer();
-        if ((freeColClient.getGame() != null) && (player != null)) {
+        Player player = getMyPlayer();
+        if ((getGame() != null) && (player != null)) {
 
             int production = 0;
             for (Colony colony : player.getColonies()) {
@@ -161,7 +152,7 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
             if (action == RECRUIT_CANCEL) {
                 setResponse(new Integer(-1));
             } else if (action >= 0 && action < NUMBER_OF_PERSONS) {
-                inGameController.recruitUnitInEurope(action);
+                getController().recruitUnitInEurope(action);
                 setResponse(new Integer(0));
             } else {
                 logger.warning("Invalid action command");

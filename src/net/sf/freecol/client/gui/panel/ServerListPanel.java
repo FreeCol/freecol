@@ -35,7 +35,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -53,9 +52,6 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
 
     private static final int CONNECT = 0, CANCEL = 1;
 
-    @SuppressWarnings("unused")
-    private final FreeColClient freeColClient;
-
     private final ConnectController connectController;
 
     private final JTable table;
@@ -71,13 +67,11 @@ public final class ServerListPanel extends FreeColPanel implements ActionListene
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
-     * @param freeColClient The main controller object for the client
      * @param connectController The controller responsible for creating new
      *            connections.
      */
-    public ServerListPanel(Canvas parent, FreeColClient freeColClient, ConnectController connectController) {
+    public ServerListPanel(Canvas parent, ConnectController connectController) {
         super(parent);
-        this.freeColClient = freeColClient;
         this.connectController = connectController;
 
         JButton cancel = new JButton("Cancel");

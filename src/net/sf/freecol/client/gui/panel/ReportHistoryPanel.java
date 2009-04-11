@@ -44,7 +44,7 @@ public final class ReportHistoryPanel extends ReportPanel {
 
         super(parent, Messages.message("menuBar.report.history"));
 
-        List<HistoryEvent> history = getCanvas().getClient().getMyPlayer().getHistory();
+        List<HistoryEvent> history = getMyPlayer().getHistory();
 
         // Display Panel
         reportPanel.removeAll();

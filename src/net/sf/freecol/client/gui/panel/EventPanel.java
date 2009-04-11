@@ -19,7 +19,6 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
@@ -28,7 +27,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -65,7 +63,7 @@ public final class EventPanel extends FreeColDialog<Boolean> implements ActionLi
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
-     * @param freeColClient The main controller object for the client.
+     * @param type The type of this panel.
      */
     public EventPanel(Canvas parent, EventType type) {
 
@@ -85,8 +83,7 @@ public final class EventPanel extends FreeColDialog<Boolean> implements ActionLi
         switch(type) {
         case FIRST_LANDING:
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.firstLanding")));
-            header.setText(Messages.message("event.firstLanding", "%name%",
-                                            parent.getClient().getMyPlayer().getNewLandName()));
+            header.setText(Messages.message("event.firstLanding", "%name%", getMyPlayer().getNewLandName()));
             break;
         case MEETING_NATIVES:
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingNatives")));

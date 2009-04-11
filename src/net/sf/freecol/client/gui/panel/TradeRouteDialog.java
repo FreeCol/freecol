@@ -93,7 +93,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         // button for adding new TradeRoute
         newRouteButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Player player = parent.getClient().getMyPlayer();
+                    Player player = getMyPlayer();
                     TradeRoute newRoute = parent.getClient().getModelController().getNewTradeRoute(player);
                     newRoute.setName(Messages.message("traderouteDialog.newRoute"));
                     if (parent.showFreeColDialog(new TradeRouteInputDialog(parent, newRoute))) {
@@ -117,7 +117,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
                 }
             });
 
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getMyPlayer();
 
         for (TradeRoute route : player.getTradeRoutes()) {
             listModel.addElement(route);
@@ -177,7 +177,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
             for (int index = 0; index < listModel.getSize(); index++) {
                 routes.add((TradeRoute) listModel.getElementAt(index));
             }
-            getCanvas().getClient().getInGameController().setTradeRoutes(routes);
+            getController().setTradeRoutes(routes);
             setResponse((TradeRoute) tradeRoutes.getSelectedValue());
             break;
         case CANCEL:

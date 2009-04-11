@@ -34,7 +34,6 @@ import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.BooleanOptionUI;
@@ -50,8 +49,6 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
 
     private static final int OK = 0, CANCEL = 1, SAVE = 2, LOAD = 3, RESET = 4;
 
-    private final FreeColClient freeColClient;
-
     private JButton ok, load, save, cancel;
 
     private JPanel buttons = new JPanel(new FlowLayout());
@@ -65,13 +62,10 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
-     * @param freeColClient The main controller object for the client.
      */
-    public GameOptionsDialog(Canvas parent, FreeColClient freeColClient, boolean editable) {
+    public GameOptionsDialog(Canvas parent, boolean editable) {
         super(parent);
         setLayout(new BorderLayout());
-
-        this.freeColClient = freeColClient;
 
         ok = new JButton(Messages.message("ok"));
         ok.setActionCommand(String.valueOf(OK));
@@ -107,13 +101,13 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         setCancelComponent(cancel);
 
         // Header:
-        header = getDefaultHeader(freeColClient.getGame().getGameOptions().getName());
+        header = getDefaultHeader(getGame().getGameOptions().getName());
         add(header, BorderLayout.NORTH);
 
         // Options:
         JPanel uiPanel = new JPanel(new BorderLayout());
         uiPanel.setOpaque(false);
-        ui = new OptionMapUI(freeColClient.getGame().getGameOptions(), editable);
+        ui = new OptionMapUI(getGame().getGameOptions(), editable);
         uiPanel.add(ui, BorderLayout.CENTER);
         uiPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(uiPanel, BorderLayout.CENTER);
@@ -129,7 +123,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
         
         // Disable victory option "All humans defeated"
         //when playing single player
-        if (editable && freeColClient.isSingleplayer()){
+        if (editable && getClient().isSingleplayer()){
             BooleanOptionUI comp = (BooleanOptionUI) ui.getOptionUI(GameOptions.VICTORY_DEFEAT_HUMANS);
 
             comp.setValue(false);
@@ -170,7 +164,7 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
             case OK:
                 ui.unregister();
                 ui.updateOption();
-                freeColClient.getPreGameController().sendGameOptions();
+                getClient().getPreGameController().sendGameOptions();
                 getCanvas().remove(this);
                 setResponse(Boolean.TRUE);
                 break;
@@ -184,21 +178,21 @@ public final class GameOptionsDialog extends FreeColDialog<Boolean> implements A
                 FileFilter[] filters = new FileFilter[] { FreeColDialog.getFGOFileFilter(),
                                                           FreeColDialog.getFSGFileFilter(), 
                                                           FreeColDialog.getGameOptionsFileFilter() };
-                File saveFile = freeColClient.getCanvas()
-                    .showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters, "");
+                File saveFile = getCanvas().showSaveDialog(FreeCol.getSaveDirectory(), ".fgo", filters, "");
                 if (saveFile != null) {
                     ui.updateOption();
-                    freeColClient.getGame().getGameOptions().save(saveFile);
+                    getGame().getGameOptions().save(saveFile);
                 }
                 break;
             case LOAD:
-                File loadFile = freeColClient.getCanvas()
-                    .showLoadDialog(FreeCol.getSaveDirectory(),
-                                    new FileFilter[] { FreeColDialog.getFGOFileFilter(),
-                                                       FreeColDialog.getFSGFileFilter(),
-                                                       FreeColDialog.getGameOptionsFileFilter() });
+                File loadFile = getCanvas().showLoadDialog(FreeCol.getSaveDirectory(),
+                                                           new FileFilter[] {
+                                                               FreeColDialog.getFGOFileFilter(),
+                                                               FreeColDialog.getFSGFileFilter(),
+                                                               FreeColDialog.getGameOptionsFileFilter()
+                                                           });
                 if (loadFile != null) {
-                    freeColClient.getGame().getGameOptions().load(loadFile);
+                    getGame().getGameOptions().load(loadFile);
                 }
                 break;
             case RESET:

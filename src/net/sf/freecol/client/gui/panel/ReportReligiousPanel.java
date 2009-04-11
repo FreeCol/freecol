@@ -49,14 +49,14 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         super(parent, Messages.message("menuBar.report.religion"));
 
         reportPanel.setLayout(new MigLayout("wrap 5, gap 20 20", "", ""));
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getMyPlayer();
 
         reportPanel.add(new JLabel(Messages.message("crosses")));
         FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), Goods.CROSSES);
         reportPanel.add(progressBar, "wrap");
 
         List<Colony> colonies = player.getColonies();
-        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
         int production = 0;
         for (Colony colony : colonies) {

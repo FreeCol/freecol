@@ -294,7 +294,7 @@ public final class InGameController implements NetworkConstants {
         freeColClient.getMyPlayer().declareIndependence();
         freeColClient.getActionManager().update();
 
-        canvas.showFreeColDialog(new DeclarationDialog(canvas, freeColClient));
+        canvas.showFreeColDialog(new DeclarationDialog(canvas));
         nextModelMessage();
     }
 

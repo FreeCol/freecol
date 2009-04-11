@@ -78,7 +78,7 @@ public final class ReportCargoPanel extends ReportPanel {
 
         gatherData();
 
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getMyPlayer();
 
         reportPanel.setLayout(new MigLayout("fillx, wrap 12", "", ""));
 
@@ -125,9 +125,9 @@ public final class ReportCargoPanel extends ReportPanel {
 
     private void gatherData() {
         locations = new HashMap<String, ArrayList<Unit>>();
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getMyPlayer();
         List<Colony> colonies = player.getColonies();
-        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
         colonyNames = new ArrayList<String>();
         for (Colony colony : colonies) {
             colonyNames.add(colony.getName());

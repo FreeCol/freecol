@@ -210,8 +210,8 @@ public final class InfoPanel extends FreeColPanel {
                         unitInfoPanel.setVisible(true);
                         endTurnPanel.setVisible(false);
                     }
-                } else if (getClient().getMyPlayer() != null
-                        && !getClient().getMyPlayer().hasNextActiveUnit()) {
+                } else if (getMyPlayer() != null
+                        && !getMyPlayer().hasNextActiveUnit()) {
                     if (!endTurnPanel.isVisible()) {
                         endTurnPanel.setVisible(true);
                         unitInfoPanel.setVisible(false);
@@ -448,7 +448,7 @@ public final class InfoPanel extends FreeColPanel {
             
             endTurnButton.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
-                    getClient().getInGameController().endTurn();
+                    getController().endTurn();
                 }
             });
         }

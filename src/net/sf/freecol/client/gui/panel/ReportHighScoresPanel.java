@@ -19,14 +19,11 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionListener;
 import java.text.DateFormat;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.xml.stream.XMLStreamException;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.HighScore;
@@ -52,8 +49,7 @@ public final class ReportHighScoresPanel extends ReportPanel {
         // Display Panel
         reportPanel.removeAll();
 
-        FreeColClient client = getCanvas().getClient();
-        Element report = client.getInGameController().getHighScores();
+        Element report = getController().getHighScores();
         int number = report.getChildNodes().getLength();
         
         reportPanel.setLayout(new MigLayout("wrap 3, gapx 30", "[][][align right]", ""));

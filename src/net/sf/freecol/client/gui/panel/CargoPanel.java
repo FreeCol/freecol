@@ -31,7 +31,6 @@ import javax.swing.BorderFactory;
 import javax.swing.border.TitledBorder;
 import javax.swing.JPanel;
 
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
@@ -228,13 +227,12 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
         }
         
         if (editState) {
-            InGameController inGameController = getCanvas().getClient().getInGameController();
             if (comp instanceof UnitLabel) {
                 Container oldParent = comp.getParent();
                 Unit unit = ((UnitLabel) comp).getUnit();
                 if (carrier.canAdd(unit)) {
                     ((UnitLabel) comp).setSmall(false);
-                    if (inGameController.boardShip(unit, carrier)) {
+                    if (getController().boardShip(unit, carrier)) {
                         if (oldParent != null) {
                             oldParent.remove(comp);
                             oldParent.repaint();
@@ -256,7 +254,7 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                 Goods goodsToAdd = new Goods(goods.getGame(), goods.getLocation(),
                                              goods.getType(), loadableAmount);
                 goods.setAmount(goods.getAmount() - loadableAmount);
-                inGameController.loadCargo(goodsToAdd, carrier);
+                getController().loadCargo(goodsToAdd, carrier);
                 initialize();
                 Container oldParent = comp.getParent();
                 if (oldParent instanceof ColonyPanel.WarehousePanel) {
@@ -271,13 +269,13 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                 MarketLabel label = (MarketLabel) comp;
                 Player player = carrier.getOwner();
                 if (player.canTrade(label.getType())) {
-                    inGameController.buyGoods(label.getType(), label.getAmount(), carrier);
-                    inGameController.nextModelMessage();
+                    getController().buyGoods(label.getType(), label.getAmount(), carrier);
+                    getController().nextModelMessage();
                     initialize();
                     updateTitle();
                     return comp;
                 } else {
-                    inGameController.payArrears(label.getType());
+                    getController().payArrears(label.getType());
                     return null;
                 }
             } else {
@@ -293,15 +291,14 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
 
     @Override
     public void remove(Component comp) {
-        InGameController inGameController = getCanvas().getClient().getInGameController();
         if (comp instanceof UnitLabel) {
             Unit unit = ((UnitLabel) comp).getUnit();
-            inGameController.leaveShip(unit);
+            getController().leaveShip(unit);
             updateTitle();
             super.remove(comp);
         } else if (comp instanceof GoodsLabel) {
             Goods g = ((GoodsLabel) comp).getGoods();
-            inGameController.unloadCargo(g);
+            getController().unloadCargo(g);
             updateTitle();
             super.remove(comp);
         }

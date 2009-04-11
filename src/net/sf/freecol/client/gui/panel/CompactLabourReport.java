@@ -70,8 +70,6 @@ public final class CompactLabourReport extends ReportPanel {
 
     private LabourData.UnitData unitData;
 
-    private Player player;
-
     private boolean showProduction;
     private boolean showNetProduction;
     private boolean showProductionSymbols;
@@ -100,7 +98,6 @@ public final class CompactLabourReport extends ReportPanel {
     private CompactLabourReport(Canvas parent, LabourData.UnitData data) {
         super(parent, data == null ? Messages.message("report.labour") : Messages.message("report.labour.details"));
         this.unitData = data;
-        player = parent.getClient().getMyPlayer();
 
         headerRow.setBorder(new EmptyBorder(20, 20, 0, 20));
         scrollPane.setColumnHeaderView(headerRow);
@@ -192,7 +189,7 @@ public final class CompactLabourReport extends ReportPanel {
         int minHeight = allColonistsButton.getPreferredSize().height;
         //HIGLayout higLayout = (HIGLayout) reportPanel.getLayout();
         
-        for (UnitType unitType : LabourData.getLabourTypes(player)) {
+        for (UnitType unitType : LabourData.getLabourTypes(getMyPlayer())) {
             LabourData.UnitData unitData = labourData.getUnitData(unitType);
 
             JButton unitButton = createUnitNameButton(unitData.getUnitName(), unitData);
@@ -269,9 +266,9 @@ public final class CompactLabourReport extends ReportPanel {
 
         row = addLocationData(unitTotal, null, row);
 
-        List<Colony> colonies = player.getColonies();
+        List<Colony> colonies = getMyPlayer().getColonies();
 
-        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
         for (Colony colony : colonies) {
             LabourData.LocationData colonyData = unitData.getDetails().get(colony);
@@ -283,7 +280,7 @@ public final class CompactLabourReport extends ReportPanel {
         }
         LabourData.LocationData europe = unitData.getUnitsInEurope();
         if (europe.getRowCount() > 0) {
-            JButton button = createButton(player.getEurope().getName(), new ActionListener() {
+            JButton button = createButton(getMyPlayer().getEurope().getName(), new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     getCanvas().showEuropePanel();
                 }

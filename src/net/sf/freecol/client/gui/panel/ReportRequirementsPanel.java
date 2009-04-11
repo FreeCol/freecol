@@ -72,9 +72,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
      */
     public ReportRequirementsPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.requirements"));
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getMyPlayer();
         colonies = player.getColonies();
-        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
         // Display Panel
 

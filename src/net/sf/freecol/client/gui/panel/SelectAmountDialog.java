@@ -26,10 +26,8 @@ import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
@@ -65,8 +63,8 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
         question = getDefaultTextArea(Messages.message("goodsTransfer.text"));
 
         if (needToPay) {
-            int gold = parent.getClient().getMyPlayer().getGold();
-            int price = parent.getClient().getMyPlayer().getMarket().costToBuy(goodsType);
+            int gold = getMyPlayer().getGold();
+            int price = getMyPlayer().getMarket().costToBuy(goodsType);
             available = Math.min(available, gold/price);
         }
 

@@ -102,18 +102,18 @@ public final class VictoryPanel extends FreeColPanel implements ActionListener {
         try {
             switch (Integer.valueOf(command).intValue()) {
             case OK:
-                if(getCanvas().getClient().retire()){
+                if(getClient().retire()){
                     getCanvas().showInformationMessage("highscores.new");
                     getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
                 }
                 getCanvas().quit();
                 break;
             case CONTINUE:
-                if(getCanvas().getClient().retire()){
+                if(getClient().retire()){
                     getCanvas().showInformationMessage("highscores.new");
                     getCanvas().showPanel(new ReportHighScoresPanel(getCanvas()));
                 }
-                getCanvas().getClient().continuePlaying();
+                getClient().continuePlaying();
                 getCanvas().remove(this);
                 break;
             default:

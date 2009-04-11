@@ -19,17 +19,13 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
@@ -75,10 +71,10 @@ public final class IndianSettlementPanel extends FreeColDialog<Boolean> implemen
             text += ", "+Messages.message("indianSettlement", "%nation%", indian.getNationAsString());
         }
 
-        Tension tension = settlement.getAlarm(getCanvas().getClient().getMyPlayer());
+        Tension tension = settlement.getAlarm(getMyPlayer());
         if (tension != null) {
             text += " (" + tension.toString() + ")";
-        } else if (!getCanvas().getClient().getMyPlayer().hasContacted(indian)) {
+        } else if (!getMyPlayer().hasContacted(indian)) {
             text += " (" + Messages.message("notContacted") + ")";
         }
         settlementLabel.setText(text);

@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Player;
 
 
 /**
@@ -33,15 +32,12 @@ import net.sf.freecol.common.model.Player;
  */
 public final class ReportLabourDetailPanel extends ReportPanel implements ActionListener {
     
-    private Player player;
-
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
     public ReportLabourDetailPanel(Canvas parent) {
         super(parent, Messages.message("report.labour.details"));
-        player = parent.getClient().getMyPlayer();
     }
 
     /**

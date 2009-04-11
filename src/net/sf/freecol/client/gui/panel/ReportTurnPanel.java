@@ -64,12 +64,12 @@ public final class ReportTurnPanel extends ReportPanel {
     public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
         super(parent, Messages.message("menuBar.report.turn"));
 
-        Comparator<ModelMessage> comparator = getCanvas().getClient().getClientOptions().getModelMessageComparator();
+        Comparator<ModelMessage> comparator = getClient().getClientOptions().getModelMessageComparator();
         if (comparator != null) {
             Arrays.sort(messages, comparator);
         }
 
-        ClientOptions options = getCanvas().getClient().getClientOptions();
+        ClientOptions options = getClient().getClientOptions();
         int groupBy = options.getInteger(ClientOptions.MESSAGES_GROUP_BY);
 
         Object source = this;
@@ -142,7 +142,7 @@ public final class ReportTurnPanel extends ReportPanel {
             reportPanel.add(component, "newline");
 
             final JTextPane textPane = getDefaultTextPane();
-            insertMessage(textPane.getStyledDocument(), message, getCanvas().getClient().getMyPlayer());
+            insertMessage(textPane.getStyledDocument(), message, getMyPlayer());
             reportPanel.add(textPane);
 
             boolean ignore = false;
@@ -153,7 +153,7 @@ public final class ReportTurnPanel extends ReportPanel {
                 ignoreButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         boolean flag = label.isEnabled();
-                        getCanvas().getClient().getInGameController().ignoreMessage(message, flag);
+                        getController().ignoreMessage(message, flag);
                         textPane.setEnabled(!flag);
                         label.setEnabled(!flag);
                     }
@@ -202,7 +202,7 @@ public final class ReportTurnPanel extends ReportPanel {
         } else if (source instanceof Market) {
             JButton button = new JButton(Messages.message("model.message.marketPrices"));
             button.addActionListener(this);
-            button.setActionCommand(getCanvas().getClient().getMyPlayer().getEurope().getId());
+            button.setActionCommand(getMyPlayer().getEurope().getId());
             headline = button;
         } else if (source instanceof Colony) {
             final Colony colony = (Colony) source;

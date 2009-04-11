@@ -68,7 +68,7 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
         reportPanel.setLayout(new MigLayout("fill, wrap 3", "", ""));
 
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getMyPlayer();
 
         JLabel recruiting = new JLabel(Messages.message("report.continentalCongress.recruiting"));
         recruiting.setFont(smallHeaderFont);

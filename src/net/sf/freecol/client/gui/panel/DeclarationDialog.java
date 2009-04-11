@@ -37,7 +37,6 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.FAFile;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -51,8 +50,6 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(DeclarationDialog.class.getName());
 
-    private final FreeColClient freeColClient;
-
     private final SignaturePanel signaturePanel;
 
     final DeclarationDialog theDialog = this;
@@ -62,11 +59,9 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
-     * @param freeColClient The main controller object for the client.
      */
-    public DeclarationDialog(final Canvas parent, final FreeColClient freeColClient) {
+    public DeclarationDialog(final Canvas parent) {
         super(parent);
-        this.freeColClient = freeColClient;
         this.signaturePanel = new SignaturePanel();
 
         setLayout(null);
@@ -112,7 +107,7 @@ public final class DeclarationDialog extends FreeColDialog<Boolean> {
         final int SIGNATURE_Y = 450;
         resetResponse();
 
-        signaturePanel.initialize(freeColClient.getMyPlayer().getName());
+        signaturePanel.initialize(getMyPlayer().getName());
         signaturePanel.setLocation((getWidth() - signaturePanel.getWidth()) / 2,
                 (getHeight() + SIGNATURE_Y - signaturePanel.getHeight()) / 2 - 15);
 

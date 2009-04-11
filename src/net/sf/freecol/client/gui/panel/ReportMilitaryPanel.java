@@ -108,7 +108,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
 
         gatherData();
 
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getMyPlayer();
 
         reportPanel.setLayout(new MigLayout("fillx, wrap 12", "", ""));
 
@@ -116,7 +116,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
-        List<AbstractUnit> refUnits = getCanvas().getClient().getInGameController().getREFUnits();
+        List<AbstractUnit> refUnits = getController().getREFUnits();
         if (refUnits != null) {
             for (AbstractUnit unit : refUnits) {
                 if (!unit.getUnitType().hasAbility("model.ability.navalUnit")) {
@@ -195,10 +195,10 @@ public final class ReportMilitaryPanel extends ReportPanel {
     }
     
     private void gatherData() {
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getMyPlayer();
         locations = new HashMap<String, ArrayList<Unit>>();
         List<Colony> colonies = new ArrayList<Colony>(player.getColonies());
-        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
         colonyNames = new ArrayList<String>();
         for (Colony colony : colonies) {
             colonyNames.add(colony.getName());

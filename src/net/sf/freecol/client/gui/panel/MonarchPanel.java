@@ -69,8 +69,8 @@ public final class MonarchPanel extends FreeColDialog<Boolean> implements Action
         header.setFont(mediumHeaderFont);
         add(header, "span, align center, wrap 20");
 
-        Nation nation = parent.getClient().getMyPlayer().getNation();
-        add(new JLabel(parent.getGUI().getImageLibrary().getMonarchImageIcon(nation)));
+        Nation nation = getMyPlayer().getNation();
+        add(new JLabel(getLibrary().getMonarchImageIcon(nation)));
 
         String messageID;
         String okText = "ok";

@@ -27,7 +27,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -46,7 +45,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
@@ -54,29 +52,20 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
-import javax.swing.border.TitledBorder;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.AbstractGoods;
-import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
@@ -90,7 +79,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -116,10 +104,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     public static final int SCROLL_SPEED = 40;
 
     private static final int EXIT = 0, UNLOAD = 2, WAREHOUSE = 4, FILL = 5;
-
-    private final FreeColClient freeColClient;
-
-    private InGameController inGameController;
 
     private final JLabel rebelLabel, bonusLabel, royalistLabel;
 
@@ -164,12 +148,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * The constructor for the panel.
      * 
      * @param parent The parent of this panel
-     * @param freeColClient The main controller object for the client.
      */
-    public ColonyPanel(Canvas parent, FreeColClient freeColClient) {
+    public ColonyPanel(Canvas parent) {
         super(parent);
-        this.freeColClient = freeColClient;
-        this.inGameController = freeColClient.getInGameController();
 
         setFocusCycleRoot(true);
 
@@ -519,7 +500,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     }
     
     private void sortColonies(List<Colony> colonies) {
-        Collections.sort(colonies, freeColClient.getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
     }
 
     public void updateProductionPanel() {
@@ -623,8 +604,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 unload();
                 break;
             case WAREHOUSE:
-                Canvas canvas = freeColClient.getCanvas();
-                if (canvas.showFreeColDialog(new WarehouseDialog(canvas, colony))) {
+                if (getCanvas().showFreeColDialog(new WarehouseDialog(getCanvas(), colony))) {
                     warehousePanel.update();
                 }
                 break;
@@ -648,12 +628,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();
-                inGameController.unloadCargo(goods);
+                getController().unloadCargo(goods);
             }
             Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit newUnit = unitIterator.next();
-                inGameController.leaveShip(newUnit);
+                getController().leaveShip(newUnit);
             }
         }
         unloadButton.setEnabled(false);
@@ -671,7 +651,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 Goods goods = goodsIterator.next();
                 if (goods.getAmount() < 100 && colony.getGoodsCount(goods.getType()) > 0) {
                     int amount = Math.min(100 - goods.getAmount(), colony.getGoodsCount(goods.getType()));
-                    inGameController.loadCargo(new Goods(goods.getGame(), colony, goods.getType(), amount), unit);
+                    getController().loadCargo(new Goods(goods.getGame(), colony, goods.getType(), amount), unit);
                 }
             }
         }
@@ -682,11 +662,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      */
     public void closeColonyPanel() {
         if (getColony().getUnitCount() > 0 ||
-            freeColClient.getCanvas().showConfirmDialog("abandonColony.text",
-                                                        "abandonColony.yes",
-                                                        "abandonColony.no")) {
+            getCanvas().showConfirmDialog("abandonColony.text",
+                                          "abandonColony.yes",
+                                          "abandonColony.no")) {
             if (getColony().getUnitCount() <= 0) {
-                freeColClient.getInGameController().abandonColony(getColony());
+                getController().abandonColony(getColony());
             }
 
             getCanvas().remove(this);
@@ -703,16 +683,16 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             buildingsPanel.removePropertyChangeListeners();
             tilePanel.removePropertyChangeListeners();
 
-            if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                freeColClient.getInGameController().nextModelMessage();
+            if (getGame().getCurrentPlayer() == getMyPlayer()) {
+                getController().nextModelMessage();
                 Unit activeUnit = getCanvas().getGUI().getActiveUnit();
                 if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0
                         || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.isOnCarrier()))) {
                     getCanvas().getGUI().setActiveUnit(null);
-                    freeColClient.getInGameController().nextActiveUnit();
+                    getController().nextActiveUnit();
                 }
             }
-            freeColClient.getGUI().restartBlinking();
+            getClient().getGUI().restartBlinking();
         }
     }
 
@@ -782,16 +762,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     }
 
     /**
-     * Returns a pointer to the <code>FreeColClient</code> which uses this
-     * panel.
-     * 
-     * @return The <code>FreeColClient</code>.
-     */
-    public final FreeColClient getClient() {
-        return freeColClient;
-    }
-
-    /**
      * Returns a pointer to the <code>Colony</code>-pointer in use.
      * 
      * @return The <code>Colony</code>.
@@ -813,7 +783,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         if (this.colony != null){
             this.colony.addPropertyChangeListener(this);
     	}
-        editable = (colony.getOwner() == freeColClient.getMyPlayer());
+        editable = (colony.getOwner() == getMyPlayer());
     }
 
     /**
@@ -954,7 +924,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
                         if (getBuilding().canAdd(unit)) {
                             oldParent.remove(comp);
-                            inGameController.work(unit, getBuilding());
+                            getController().work(unit, getBuilding());
                         } else {
                             return null;
                         }
@@ -1042,7 +1012,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     Unit unit = unitLabel.getUnit();
 
                     if (!unit.isOnCarrier()) {
-                        inGameController.putOutsideColony(unit);
+                        getController().putOutsideColony(unit);
                     }
 
                     if (unit.getColony() == null) {
@@ -1380,26 +1350,26 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             if (ci == null) {
                                 return null;
                             } else if (ci.intValue() == 1) {
-                                if (price > freeColClient.getMyPlayer().getGold()) {
+                                if (price > getMyPlayer().getGold()) {
                                     getCanvas().errorMessage("notEnoughGold");
                                     return null;
                                 }
 
-                                inGameController.buyLand(colonyTile.getWorkTile());
+                                getController().buyLand(colonyTile.getWorkTile());
                             } else if (ci.intValue() == 2) {
-                                inGameController.stealLand(colonyTile.getWorkTile(), colony);
+                                getController().stealLand(colonyTile.getWorkTile(), colony);
                             }
                         }
 
                         if (colonyTile.canAdd(unit)) { 
                             oldParent.remove(comp);
 
-                            inGameController.work(unit, colonyTile);
+                            getController().work(unit, colonyTile);
 
                             // check whether worktype is suitable
                             GoodsType workType = colonyTile.getWorkType(unit);
                             if (workType != unit.getWorkType()) {
-                                inGameController.changeWorkType(unit, workType);
+                                getController().changeWorkType(unit, workType);
                             }
 
                             //updateDescriptionLabel((UnitLabel) comp, true);

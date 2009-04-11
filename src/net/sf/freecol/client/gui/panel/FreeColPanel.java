@@ -55,11 +55,13 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Player;
 
 /**
  * Superclass for all panels in FreeCol.
@@ -195,6 +197,24 @@ public class FreeColPanel extends JPanel {
      */
     public Game getGame() {
         return canvas.getClient().getGame();
+    }
+
+    /**
+     * Describe <code>getController</code> method here.
+     *
+     * @return an <code>InGameController</code> value
+     */
+    public InGameController getController() {
+        return canvas.getClient().getInGameController();
+    }
+
+    /**
+     * Describe <code>getMyPlayer</code> method here.
+     *
+     * @return a <code>Player</code> value
+     */
+    public Player getMyPlayer() {
+        return canvas.getClient().getMyPlayer();
     }
 
     /**

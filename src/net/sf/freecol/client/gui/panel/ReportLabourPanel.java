@@ -59,16 +59,13 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
     private Map<UnitType, Map<Colony, Integer>> unitLocations;
     private List<Colony> colonies;
 
-    private Player player;
-
     /**
      * The constructor that will add the items to this panel.
      * @param parent The parent of this panel.
      */
     public ReportLabourPanel(Canvas parent) {
         super(parent, Messages.message("report.labour"));
-        player = parent.getClient().getMyPlayer();
-        colonies = player.getColonies();
+        colonies = getMyPlayer().getColonies();
         gatherData();
         displayData();
     }
@@ -85,9 +82,9 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             unitLocations.put(type, new HashMap<Colony, Integer>());
         }
 
-        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
-        Iterator<Unit> units = player.getUnitIterator();
+        Iterator<Unit> units = getMyPlayer().getUnitIterator();
         while (units.hasNext()) {
             Unit unit = units.next();
             UnitType type = unit.getType();
@@ -187,8 +184,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             }
         }
         if (unitInEurope.getCount(unitType) > 0) {
-            JButton europeButton = getLinkButton(player.getEurope().getName(), null,
-                                                 player.getEurope().getId());
+            JButton europeButton = getLinkButton(getMyPlayer().getEurope().getName(), null,
+                                                 getMyPlayer().getEurope().getId());
             europeButton.addActionListener(report);
             detailPanel.add(europeButton);
             JLabel countLabel = new JLabel(String.valueOf(unitInEurope.getCount(unitType)));

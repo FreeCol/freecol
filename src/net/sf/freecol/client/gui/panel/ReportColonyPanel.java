@@ -57,11 +57,11 @@ public final class ReportColonyPanel extends ReportPanel {
     public ReportColonyPanel(Canvas parent) {
 
         super(parent, Messages.message("menuBar.report.colony"));
-        Player player = getCanvas().getClient().getMyPlayer();
+        Player player = getMyPlayer();
         colonies = player.getColonies();
 
         // Display Panel
-        Collections.sort(colonies, getCanvas().getClient().getClientOptions().getColonyComparator());
+        Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
         reportPanel.setLayout(new MigLayout("wrap 12, fillx", "", ""));
 

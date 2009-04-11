@@ -804,7 +804,7 @@ public final class ColopediaPanel extends FreeColPanel implements ActionListener
             }
         }
 
-        Player player = parent.getClient().getMyPlayer();
+        Player player = getMyPlayer();
         // player can be null when using the map editor
         Europe europe = (player == null) ? null : player.getEurope();
 
