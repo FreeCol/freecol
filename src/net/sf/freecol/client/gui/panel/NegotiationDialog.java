@@ -41,7 +41,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
-import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
@@ -71,8 +70,6 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     private static final String SEND = "send", ACCEPT = "accept", CANCEL = "cancel";
 
     private static Logger logger = Logger.getLogger(NegotiationDialog.class.getName());
-
-    private FreeColClient freeColClient;
 
     private DiplomaticTrade agreement;
 
@@ -117,8 +114,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
 
         this.unit = unit;
         this.settlement = settlement;
-        this.freeColClient = parent.getClient();
-        this.player = freeColClient.getMyPlayer();
+        this.player = getClient().getMyPlayer();
         this.sender = unit.getOwner();
         this.recipient = settlement.getOwner();
         this.canAccept = agreement != null; // a new offer can't be accepted
@@ -136,7 +132,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         if (player.getStance(otherPlayer) == Stance.WAR) {
             if (!hasPeaceOffer()) {
                 Stance stance = Stance.PEACE;
-                this.agreement.add(new StanceTradeItem(freeColClient.getGame(), player, otherPlayer, stance));
+                this.agreement.add(new StanceTradeItem(getGame(), player, otherPlayer, stance));
             }
         }
 
@@ -162,7 +158,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      *
      */
     public void initialize() {
-    	
+        
         sendButton = new JButton(Messages.message("negotiationDialog.send"));
         sendButton.addActionListener(this);
         sendButton.setActionCommand(SEND);
@@ -276,42 +272,42 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
     }
     
     private void updateOfferItems(){
-    	// Update stance options
-    	stance.updateStanceBox();
-    	
-    	// Update the gold amount that can be demanded
-    	goldOffer.setAvailableGold(player.getGold());
-    	
-    	if(unit.isCarrier()){
-        	Iterator<Goods> goodsInAgreement = agreement.getGoodsGivenBy(player).iterator();
-        	List<Goods> goodsAvail = new ArrayList<Goods>();
-        	goodsAvail.addAll(unit.getGoodsContainer().getGoods());
-        	
-        	//remove the ones already on the table
-        	while(goodsInAgreement.hasNext()){
-        		Goods goods = goodsInAgreement.next();
-        		for(int i=0;i<goodsAvail.size();i++){
-        			Goods goodAvail = goodsAvail.get(i);
-        			if(goodAvail.getType() == goods.getType() &&
-        			    goodAvail.getAmount() == goods.getAmount()){
-        					// this good is already on the agreement, remove it
-        					goodsAvail.remove(i);
-        					break;
-        			}
-        		}
-        	}
-        	
-    		// Update the list of goods available to add to agreement
-    		goodsOffer.updateGoodsBox(goodsAvail);
-    	} else{
-        	// Update the list of colonies available to add to agreement
-        	colonyOffer.updateColonyBox();
-    	}
+        // Update stance options
+        stance.updateStanceBox();
+        
+        // Update the gold amount that can be demanded
+        goldOffer.setAvailableGold(player.getGold());
+        
+        if(unit.isCarrier()){
+            Iterator<Goods> goodsInAgreement = agreement.getGoodsGivenBy(player).iterator();
+            List<Goods> goodsAvail = new ArrayList<Goods>();
+            goodsAvail.addAll(unit.getGoodsContainer().getGoods());
+                
+            //remove the ones already on the table
+            while(goodsInAgreement.hasNext()){
+                Goods goods = goodsInAgreement.next();
+                for(int i=0;i<goodsAvail.size();i++){
+                    Goods goodAvail = goodsAvail.get(i);
+                    if(goodAvail.getType() == goods.getType() &&
+                       goodAvail.getAmount() == goods.getAmount()){
+                        // this good is already on the agreement, remove it
+                        goodsAvail.remove(i);
+                        break;
+                    }
+                }
+            }
+                
+            // Update the list of goods available to add to agreement
+            goodsOffer.updateGoodsBox(goodsAvail);
+        } else{
+            // Update the list of colonies available to add to agreement
+            colonyOffer.updateColonyBox();
+        }
     }
     
     private void updateDemandItems(){
-    	// Update the gold amount that can be demanded
-    	int foreignGold = 0;
+        // Update the gold amount that can be demanded
+        int foreignGold = 0;
         Element report = getCanvas().getClient().getInGameController().getForeignAffairsReport();
         int number = report.getChildNodes().getLength();
         for (int i = 0; i < number; i++) {
@@ -325,37 +321,37 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         goldDemand.setAvailableGold(foreignGold);
         
         if(unit.isCarrier()){
-        	Iterator<Goods> goodsInAgreement = agreement.getGoodsGivenBy(otherPlayer).iterator();
-        	List<Goods> goodsAvail = new ArrayList<Goods>();
-        	goodsAvail.addAll(settlement.getGoodsContainer().getGoods());
-        	
-        	//remove the ones already on the table
-        	while(goodsInAgreement.hasNext()){
-        		Goods goods = goodsInAgreement.next();
-        		for(int i=0;i<goodsAvail.size();i++){
-        			Goods goodAvail = goodsAvail.get(i);
-        			if(goodAvail.getType() == goods.getType() &&
-        			    goodAvail.getAmount() == goods.getAmount()){
-        					// this good is already on the agreement, remove it
-        					goodsAvail.remove(i);
-        					break;
-        			}
-        		}
-        	}
-        	
-        	// Update the list of goods available to add to agreement
-        	goodsDemand.updateGoodsBox(goodsAvail);
+            Iterator<Goods> goodsInAgreement = agreement.getGoodsGivenBy(otherPlayer).iterator();
+            List<Goods> goodsAvail = new ArrayList<Goods>();
+            goodsAvail.addAll(settlement.getGoodsContainer().getGoods());
+                
+            //remove the ones already on the table
+            while(goodsInAgreement.hasNext()){
+                Goods goods = goodsInAgreement.next();
+                for(int i=0;i<goodsAvail.size();i++){
+                    Goods goodAvail = goodsAvail.get(i);
+                    if(goodAvail.getType() == goods.getType() &&
+                       goodAvail.getAmount() == goods.getAmount()){
+                        // this good is already on the agreement, remove it
+                        goodsAvail.remove(i);
+                        break;
+                    }
+                }
+            }
+                
+            // Update the list of goods available to add to agreement
+            goodsDemand.updateGoodsBox(goodsAvail);
         }
         else{
-        	// Update the list of colonies available to add to agreement
-        	colonyDemand.updateColonyBox();
+            // Update the list of colonies available to add to agreement
+            colonyDemand.updateColonyBox();
         }
     }
     
     public void updateDialog(){
-    	updateOfferItems();
-    	updateDemandItems();
-    	updateSummary();
+        updateOfferItems();
+        updateDemandItems();
+        updateSummary();
     }
 
     private void insertText(String text) throws Exception {
@@ -388,7 +384,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                     description = Messages.message("tradeItem.gold.long", "%amount%", gold);
                 } else if (item instanceof ColonyTradeItem) {
                     description = Messages.message("tradeItem.colony.long", 
-                            "%colony%", ((ColonyTradeItem) item).getColony().getName());
+                                                   "%colony%", ((ColonyTradeItem) item).getColony().getName());
                 } else if (item instanceof GoodsTradeItem) {
                     description = String.valueOf(((GoodsTradeItem) item).getGoods().getAmount()) + " " +
                         ((GoodsTradeItem) item).getGoods().getName();
@@ -441,7 +437,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         } else {
             destination = otherPlayer;
         }
-        agreement.add(new ColonyTradeItem(freeColClient.getGame(), source, destination, colony));
+        agreement.add(new ColonyTradeItem(getGame(), source, destination, colony));
     }
 
     /**
@@ -457,7 +453,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         } else {
             destination = otherPlayer;
         }
-        agreement.add(new GoldTradeItem(freeColClient.getGame(), source, destination, amount));
+        agreement.add(new GoldTradeItem(getGame(), source, destination, amount));
     }
 
     /**
@@ -473,7 +469,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         } else {
             destination = otherPlayer;
         }
-        agreement.add(new GoodsTradeItem(freeColClient.getGame(), source, destination, goods, settlement));
+        agreement.add(new GoodsTradeItem(getGame(), source, destination, goods, settlement));
     }
 
 
@@ -484,7 +480,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
      * @param stance a <code>Stance</code> value
      */
     public void setStance(Stance stance) {
-        agreement.add(new StanceTradeItem(freeColClient.getGame(), otherPlayer, player, stance));
+        agreement.add(new StanceTradeItem(getGame(), otherPlayer, player, stance));
     }
 
 
@@ -557,7 +553,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         private void updateColonyBox() {
 
             if (!player.isEuropean()) {
-        		return;
+                return;
             }
 
             // Remove all action listeners, so the update has no effect (except
@@ -567,40 +563,39 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 colonyBox.removeActionListener(al);
             }
             colonyBox.removeAllItems();
-        	
+                
             Iterator<Colony> coloniesInAgreement = agreement.getColoniesGivenBy(player).iterator();
-        	List<Colony> coloniesAvail = new ArrayList<Colony>();
-        	coloniesAvail.addAll(player.getColonies());
-        	
-        	//remove the ones already on the table
-        	while(coloniesInAgreement.hasNext()){
-        		Colony colony = coloniesInAgreement.next();
-        		for(int i=0;i<coloniesAvail.size();i++){
-        			Colony colonyAvail = coloniesAvail.get(i);
-        			if(colonyAvail == colony){
-        					// this good is already on the agreement, remove it
-        					coloniesAvail.remove(i);
-        					break;
-        			}
-        		}
-        	}
+            List<Colony> coloniesAvail = new ArrayList<Colony>();
+            coloniesAvail.addAll(player.getColonies());
+                
+            //remove the ones already on the table
+            while(coloniesInAgreement.hasNext()){
+                Colony colony = coloniesInAgreement.next();
+                for(int i=0;i<coloniesAvail.size();i++){
+                    Colony colonyAvail = coloniesAvail.get(i);
+                    if(colonyAvail == colony){
+                        // this good is already on the agreement, remove it
+                        coloniesAvail.remove(i);
+                        break;
+                    }
+                }
+            }
             
-        	if(coloniesAvail.isEmpty()){
-        		addButton.setEnabled(false);
-        		colonyBox.setEnabled(false);
-        	}
-        	else{
-        		Collections.sort(coloniesAvail, freeColClient.getClientOptions().getColonyComparator());
-        		Iterator<Colony> colonyIterator = coloniesAvail.iterator();
-        		while (colonyIterator.hasNext()) {
-        			colonyBox.addItem(colonyIterator.next());
-        		}
-        		for(ActionListener al : listeners) {
-        			colonyBox.addActionListener(al);
-        		}
-        		addButton.setEnabled(true);
-        		colonyBox.setEnabled(true);
-        	}
+            if (coloniesAvail.isEmpty()){
+                addButton.setEnabled(false);
+                colonyBox.setEnabled(false);
+            } else {
+                Collections.sort(coloniesAvail, getClient().getClientOptions().getColonyComparator());
+                Iterator<Colony> colonyIterator = coloniesAvail.iterator();
+                while (colonyIterator.hasNext()) {
+                    colonyBox.addItem(colonyIterator.next());
+                }
+                for(ActionListener al : listeners) {
+                    colonyBox.addActionListener(al);
+                }
+                addButton.setEnabled(true);
+                colonyBox.setEnabled(true);
+            }
         }
 
         /**
@@ -665,22 +660,22 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             goodsBox.removeAllItems();
             
             if(allGoods != null && !allGoods.isEmpty()){
-            	Iterator<Goods> goodsIterator = allGoods.iterator();
-            	while (goodsIterator.hasNext()) {
-            		Goods goods = goodsIterator.next();
-            		if(goods.getType().isStorable()){
-            			goodsBox.addItem(goods);
-            		}
-            	}
-            	for(ActionListener al : listeners) {
+                Iterator<Goods> goodsIterator = allGoods.iterator();
+                while (goodsIterator.hasNext()) {
+                    Goods goods = goodsIterator.next();
+                    if(goods.getType().isStorable()){
+                        goodsBox.addItem(goods);
+                    }
+                }
+                for(ActionListener al : listeners) {
                     goodsBox.addActionListener(al);
                 }
-            	
-            	this.label.setEnabled(true);
+                
+                this.label.setEnabled(true);
                 addButton.setEnabled(true);
                 goodsBox.setEnabled(true);
             } else{
-            	this.label.setEnabled(false);
+                this.label.setEnabled(false);
                 addButton.setEnabled(false);
                 goodsBox.setEnabled(false);
             }            
@@ -775,8 +770,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         }
         
         public void updateStanceBox(){
-        	stanceBox.removeAllItems();
-        	Stance stance = source.getStance(target);
+            stanceBox.removeAllItems();
+            Stance stance = source.getStance(target);
             if (stance != Stance.WAR) stanceBox.addItem(new StanceItem(Stance.WAR));
             if (stance == Stance.WAR) stanceBox.addItem(new StanceItem(Stance.CEASE_FIRE));
             if (stance != Stance.PEACE && stance != Stance.UNCONTACTED) stanceBox.addItem(new StanceItem(Stance.PEACE));
@@ -833,8 +828,8 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
         }
         
         public void setAvailableGold(int gold) {
-        	SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
-        	model.setMaximum(new Integer(gold));
+            SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+            model.setMaximum(new Integer(gold));
         }
     }
 
