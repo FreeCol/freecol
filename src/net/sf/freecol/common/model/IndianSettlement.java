@@ -1328,9 +1328,11 @@ public class IndianSettlement extends Settlement {
                 out.writeEndElement();
             }
         } else if (pet != null) {
-            out.writeStartElement(IS_VISITED_TAG_NAME);
-            out.writeAttribute("player", player.getId());
-            out.writeEndElement();
+            if (hasBeenVisited(player)) {
+                out.writeStartElement(IS_VISITED_TAG_NAME);
+                out.writeAttribute("player", player.getId());
+                out.writeEndElement();
+            }
             if (getAlarm(player) != null) {
                 out.writeStartElement(ALARM_TAG_NAME);
                 out.writeAttribute("player", player.getId());
