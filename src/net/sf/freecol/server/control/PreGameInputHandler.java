@@ -34,6 +34,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.NationOptions.Advantages;
+import net.sf.freecol.server.NationOptions.NationState;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -167,7 +168,8 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
             Nation nation = FreeCol.getSpecification().getNation(element.getAttribute("value"));
-            if (getFreeColServer().getNationOptions().getEuropeanNations().contains(nation)) {
+            if (getFreeColServer().getNationOptions().getEuropeanNations().get(nation) ==
+                NationState.AVAILABLE) {
                 player.setNation(nation);
                 Element updateNation = Message.createNewRootElement("updateNation");
                 updateNation.setAttribute("player", player.getId());

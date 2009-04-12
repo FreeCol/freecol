@@ -20,7 +20,9 @@
 package net.sf.freecol.server;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.FreeColObject;
@@ -40,6 +42,12 @@ public class NationOptions extends FreeColObject{
     public static enum Advantages { NONE, FIXED, SELECTABLE };
 
     /**
+     * Nations may be available to all players, to AI players only, or
+     * to no players.
+     */
+    public static enum NationState { AVAILABLE, AI_ONLY, NOT_AVAILABLE };
+
+    /**
      * Describe selectColors here.
      */
     private boolean selectColors;
@@ -52,19 +60,19 @@ public class NationOptions extends FreeColObject{
     /**
      * Describe nativeNations here.
      */
-    private List<Nation> nativeNations = new ArrayList<Nation>();
+    private Map<Nation, NationState> nativeNations = new HashMap<Nation, NationState>();
 
     /**
      * Describe europeanNations here.
      */
-    private List<Nation> europeanNations = new ArrayList<Nation>();
+    private Map<Nation, NationState> europeanNations = new HashMap<Nation, NationState>();
 
     /**
      * Get the <code>EuropeanNations</code> value.
      *
-     * @return a <code>List<Nation></code> value
+     * @return a <code>Map<Nation, NationState></code> value
      */
-    public final List<Nation> getEuropeanNations() {
+    public final Map<Nation, NationState> getEuropeanNations() {
         return europeanNations;
     }
 
@@ -73,16 +81,16 @@ public class NationOptions extends FreeColObject{
      *
      * @param newEuropeanNations The new EuropeanNations value.
      */
-    public final void setEuropeanNations(final List<Nation> newEuropeanNations) {
+    public final void setEuropeanNations(final Map<Nation, NationState> newEuropeanNations) {
         this.europeanNations = newEuropeanNations;
     }
 
     /**
      * Get the <code>NativeNations</code> value.
      *
-     * @return a <code>List<Nation></code> value
+     * @return a <code>Map<Nation, NationState></code> value
      */
-    public final List<Nation> getNativeNations() {
+    public final Map<Nation, NationState> getNativeNations() {
         return nativeNations;
     }
 
@@ -91,7 +99,7 @@ public class NationOptions extends FreeColObject{
      *
      * @param newNativeNations The new NativeNations value.
      */
-    public final void setNativeNations(final List<Nation> newNativeNations) {
+    public final void setNativeNations(final Map<Nation, NationState> newNativeNations) {
         this.nativeNations = newNativeNations;
     }
 
@@ -140,8 +148,16 @@ public class NationOptions extends FreeColObject{
         NationOptions result = new NationOptions();
         result.setSelectColors(true);
         result.setNationalAdvantages(Advantages.SELECTABLE);
-        result.setEuropeanNations(new ArrayList<Nation>(Specification.getSpecification().getEuropeanNations()));
-        result.setNativeNations(new ArrayList<Nation>(Specification.getSpecification().getIndianNations()));
+        Map<Nation, NationState> defaultEuropeanNations = new HashMap<Nation, NationState>();
+        for (Nation nation : Specification.getSpecification().getEuropeanNations()) {
+            defaultEuropeanNations.put(nation, NationState.AVAILABLE);
+        }
+        result.setEuropeanNations(defaultEuropeanNations);
+        Map<Nation, NationState> defaultNativeNations = new HashMap<Nation, NationState>();
+        for (Nation nation : Specification.getSpecification().getIndianNations()) {
+            defaultNativeNations.put(nation, NationState.AI_ONLY);
+        }
+        result.setNativeNations(defaultNativeNations);
         return result;
     }
 
@@ -163,19 +179,30 @@ public class NationOptions extends FreeColObject{
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("europeanNations")) {
                 europeanNations.clear();
-                String[] nationIds = readFromArrayElement("europeanNations", in, new String[0]);
-                for (String id : nationIds) {
-                    europeanNations.add(Specification.getSpecification().getNation(id));
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (in.getLocalName().equals("europeanNation")) {
+                        String nationId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                        Nation nation = Specification.getSpecification().getNation(nationId);
+                        NationState state = Enum.valueOf(NationState.class,
+                                                         in.getAttributeValue(null, "state"));
+                        europeanNations.put(nation, state);
+                    }
+                    in.nextTag();
                 }
             } else if (in.getLocalName().equals("nativeNations")) {
                 nativeNations.clear();
-                String[] nationIds = readFromArrayElement("nativeNations", in, new String[0]);
-                for (String id : nationIds) {
-                    nativeNations.add(Specification.getSpecification().getNation(id));
+                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                    if (in.getLocalName().equals("nativeNation")) {
+                        String nationId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                        Nation nation = Specification.getSpecification().getNation(nationId);
+                        NationState state = Enum.valueOf(NationState.class,
+                                                         in.getAttributeValue(null, "state"));
+                        nativeNations.put(nation, state);
+                    }
+                    in.nextTag();
                 }
             }
         }
-
         in.nextTag(); // close this element
     }
     
@@ -193,16 +220,24 @@ public class NationOptions extends FreeColObject{
         //out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("selectColors", Boolean.toString(selectColors));
         out.writeAttribute("nationalAdvantages", nationalAdvantages.toString());
-        String[] nationIds = new String[europeanNations.size()];
-        for (int index = 0; index < nationIds.length; index++) {
-            nationIds[index] = europeanNations.get(index).getId();
+        // europeans
+        out.writeStartElement("europeanNations");
+        for (Map.Entry<Nation, NationState> entry : europeanNations.entrySet()) {
+            out.writeStartElement("europeanNation");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey().getId());
+            out.writeAttribute("state", entry.getValue().toString());
+            out.writeEndElement();
         }
-        toArrayElement("europeanNations", nationIds, out);
-        nationIds = new String[nativeNations.size()];
-        for (int index = 0; index < nationIds.length; index++) {
-            nationIds[index] = nativeNations.get(index).getId();
+        out.writeEndElement();
+        // natives
+        out.writeStartElement("nativeNations");
+        for (Map.Entry<Nation, NationState> entry : nativeNations.entrySet()) {
+            out.writeStartElement("nativeNation");
+            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey().getId());
+            out.writeAttribute("state", entry.getValue().toString());
+            out.writeEndElement();
         }
-        toArrayElement("nativeNations", nationIds, out);
+        out.writeEndElement();
 
         out.writeEndElement();
     }
@@ -216,16 +251,14 @@ public class NationOptions extends FreeColObject{
         StringBuilder result = new StringBuilder(); 
         result.append("selectColors: " + selectColors + "\n");
         result.append("nationalAdvantages: " + nationalAdvantages.toString() + "\n");
-        result.append("europeanNations: ");
-        for (Nation nation : europeanNations) {
-            result.append(nation.getId() + " ");
+        result.append("europeanNations:\n");
+        for (Map.Entry<Nation, NationState> entry : europeanNations.entrySet()) {
+            result.append("   " + entry.getKey().getId() + " " + entry.getValue().toString() + "\n");
         }
-        result.append("\n");
-        result.append("nativeNations: ");
-        for (Nation nation : nativeNations) {
-            result.append(nation.getId() + " ");
+        result.append("nativeNations:\n");
+        for (Map.Entry<Nation, NationState> entry : nativeNations.entrySet()) {
+            result.append("   " + entry.getKey().getId() + " " + entry.getValue().toString() + "\n");
         }
-        result.append("\n");
         return result.toString();
     }
 }

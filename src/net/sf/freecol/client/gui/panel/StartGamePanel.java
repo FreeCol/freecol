@@ -239,10 +239,11 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         this.singlePlayerGame = singlePlayerGame;
         FreeColClient freeColClient = getClient();
         game = freeColClient.getGame();
+        thisPlayer = getMyPlayer();
 
-        Nation[] nations = nationOptions.getEuropeanNations().toArray(new Nation[0]);
+        Nation[] nations = nationOptions.getEuropeanNations().keySet().toArray(new Nation[0]);
 
-        tableModel.setData(game.getPlayers(), getMyPlayer(), nationOptions.getNationalAdvantages());
+        tableModel.setData(game.getPlayers(), thisPlayer, nationOptions.getNationalAdvantages());
 
         JLabel playerLabel = new JLabel(Messages.message("player"));
         JButton nationButton = new JButton(Messages.message("nation"));

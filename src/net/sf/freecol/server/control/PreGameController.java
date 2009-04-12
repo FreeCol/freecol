@@ -22,6 +22,7 @@ package net.sf.freecol.server.control;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +41,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.NationOptions.NationState;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -99,14 +101,21 @@ public final class PreGameController extends Controller {
         freeColServer.setAIMain(aiMain);
         game.setFreeColGameObjectListener(aiMain);
 
-        List<Nation> nations = new ArrayList<Nation>(freeColServer.getNationOptions().getEuropeanNations());
-        nations.addAll(freeColServer.getNationOptions().getNativeNations());
-
         // Add AI players
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
-        for (Nation nation : nations) {
-            if (game.getPlayer(nation.getId()) == null) {
-                freeColServer.addAIPlayer(nation);
+
+        for (Entry<Nation, NationState> entry : 
+                 freeColServer.getNationOptions().getEuropeanNations().entrySet()) {
+            if (entry.getValue() != NationState.NOT_AVAILABLE &&
+                game.getPlayer(entry.getKey().getId()) == null) {
+                freeColServer.addAIPlayer(entry.getKey());
+            }
+        }
+        for (Entry<Nation, NationState> entry : 
+                 freeColServer.getNationOptions().getNativeNations().entrySet()) {
+            if (entry.getValue() != NationState.NOT_AVAILABLE &&
+                game.getPlayer(entry.getKey().getId()) == null) {
+                freeColServer.addAIPlayer(entry.getKey());
             }
         }
         

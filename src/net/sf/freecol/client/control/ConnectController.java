@@ -57,6 +57,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.NationOptions;
+import net.sf.freecol.server.NationOptions.Advantages;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;

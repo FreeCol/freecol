@@ -293,7 +293,6 @@ public final class FreeColClient {
         changeWindowedMode(windowed);
 
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
-
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 canvas.showOpeningVideoPanel();

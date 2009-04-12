@@ -29,10 +29,14 @@ import java.util.logging.Logger;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -43,6 +47,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.server.NationOptions;
+import net.sf.freecol.server.NationOptions.Advantages;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -53,29 +58,23 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(NewPanel.class.getName());
 
-    private static final int    OK = 0,
-                                CANCEL = 1,
-                                SINGLE = 2,
-                                JOIN = 3,
-                                START = 4,
-                                META_SERVER = 5;
+    private static enum NewPanelAction {
+        OK,
+        CANCEL,
+        SINGLE,
+        JOIN,
+        START,
+        META_SERVER
+    };
 
-    private final JTextField    server,
-                                port1,
-                                port2,
-                                name;
-    private final JRadioButton  single,
-                                join,
-                                start,
-                                meta;
-    private final JLabel        ipLabel,
-        port1Label,
-        port2Label;
-
-    private final JCheckBox     publicServer;
+    private final JTextField server, port1, port2, name;
+    private final JRadioButton single, join, start, meta;
+    private final JLabel ipLabel, port1Label, port2Label, advantageLabel;
+    private final JCheckBox publicServer;
+    private final JCheckBox selectColors;
+    private final JComboBox nationalAdvantages;
 
     private final ConnectController connectController;
-    private JButton ok = new JButton( Messages.message("ok") );
 
 
     /**
@@ -85,7 +84,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     */
     public NewPanel(Canvas parent) {
         super(parent);
-        this.connectController = parent.getClient().getConnectController();
+        this.connectController = getClient().getConnectController();
 
         JButton         cancel = new JButton( Messages.message("cancel") );
         ButtonGroup     group = new ButtonGroup();
@@ -96,6 +95,7 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         ipLabel = new JLabel( Messages.message("host") );
         port1Label = new JLabel( Messages.message("port") );
         port2Label = new JLabel( Messages.message("startServerOnPort") );
+        advantageLabel = new JLabel(Messages.message("playerOptions.nationalAdvantages"));
 
         publicServer = new JCheckBox( Messages.message("publicServer") );
         name = new JTextField( System.getProperty("user.name", Messages.message("defaultPlayerName")) );
@@ -109,46 +109,60 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         start = new JRadioButton(Messages.message("startMultiplayerGame"), false);
         meta = new JRadioButton( Messages.message("getServerList") + " (" + FreeCol.META_SERVER_ADDRESS + ")", false);
 
+        // TODO: enable this option
+        selectColors = new JCheckBox(Messages.message("playerOptions.selectColors"));
+        selectColors.setSelected(true);
+        selectColors.setEnabled(false);
+
+        Advantages[] choices = new Advantages[] {
+            Advantages.SELECTABLE,
+            Advantages.FIXED,
+            Advantages.NONE
+        };
+        nationalAdvantages = new JComboBox(choices);
+        nationalAdvantages.setRenderer(new AdvantageRenderer());
+
         group.add(single);
         group.add(join);
         group.add(start);
         group.add(meta);
 
-        setLayout(new MigLayout("wrap 4", "[15]", ""));
+        setLayout(new MigLayout("", "[15]", ""));
 
-        add(nameLabel, "skip, span, split 2");
+        add(single, "span 3");
+        add(new JSeparator(JSeparator.VERTICAL), "spany 7, grow");
+        add(nameLabel, "span, split 2");
         add(name, "growx");
 
-        add(single, "span");
+        add(meta, "newline, span 3");
+        add(advantageLabel);
+        add(nationalAdvantages);
 
+        add(join, "newline, span 3");
+        add(selectColors);
 
-        add(meta, "span");
+        add(ipLabel, "newline, skip, split 2");
+        add(server, "width 80:");
+        add(port1Label, "split 2");
+        add(port1, "width 60:");
 
-        add(join, "span");
+        add(start, "newline, span 3");
 
-        add(ipLabel, "skip, split 2");
-        add(server);
-        add(port1Label, "span, split 2");
-        add(port1);
-
-        add(start, "span");
-
-        add(port2Label, "skip");
+        add(port2Label, "newline, skip");
         add(port2, "width 60:");
 
-        add(publicServer, "span");
+        add(publicServer, "newline, skip");
 
-        add(ok, "span, split 2, tag ok");
+        add(okButton, "newline, span, split 2, tag ok");
         add(cancel, "tag cancel");
 
-        ok.setActionCommand(String.valueOf(OK));
-        cancel.setActionCommand(String.valueOf(CANCEL));
-        single.setActionCommand(String.valueOf(SINGLE));
-        join.setActionCommand(String.valueOf(JOIN));
-        start.setActionCommand(String.valueOf(START));
-        meta.setActionCommand(String.valueOf(META_SERVER));
+        okButton.setActionCommand(String.valueOf(NewPanelAction.OK));
+        cancel.setActionCommand(String.valueOf(NewPanelAction.CANCEL));
+        single.setActionCommand(String.valueOf(NewPanelAction.SINGLE));
+        join.setActionCommand(String.valueOf(NewPanelAction.JOIN));
+        start.setActionCommand(String.valueOf(NewPanelAction.START));
+        meta.setActionCommand(String.valueOf(NewPanelAction.META_SERVER));
 
-        ok.addActionListener(this);
         cancel.addActionListener(this);
         single.addActionListener(this);
         join.addActionListener(this);
@@ -160,12 +174,6 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
 
         setSize(getPreferredSize());
     }
-
-
-    public void requestFocus() {
-        ok.requestFocus();
-    }
-
 
     /**
     * Sets whether or not this component is enabled. It also does this for
@@ -186,15 +194,19 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         if (single.isSelected()) {
             setJoinGameOptions(false);
             setServerOptions(false);
+            setAdvantageOptions(true);
         } else if (join.isSelected()) {
             setJoinGameOptions(true);
             setServerOptions(false);
+            setAdvantageOptions(false);
         } else if (start.isSelected()) {
             setJoinGameOptions(false);
             setServerOptions(true);
+            setAdvantageOptions(true);
         } else if (meta.isSelected()) {
             setJoinGameOptions(false);
             setServerOptions(false);
+            setAdvantageOptions(false);
         }
     }
 
@@ -210,7 +222,12 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
         port2.setEnabled(enabled);
         publicServer.setEnabled(enabled);
     }
-        
+
+    private void setAdvantageOptions(boolean enabled) {
+        advantageLabel.setEnabled(enabled);
+        nationalAdvantages.setEnabled(enabled);
+        //selectColors.setEnabled(enabled);
+    }
 
 
     /**
@@ -221,58 +238,68 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         try {
-            switch (Integer.valueOf(command).intValue()) {
-                case OK:
-                    if (single.isSelected()) {
-                        NationOptions nationOptions = getCanvas().showFreeColDialog(new NationOptionsDialog(getCanvas()));
-                        connectController.startSingleplayerGame(name.getText(), nationOptions);
-                    } else if (join.isSelected()) {
-                        int port;
-
-                        try {
-                            port = Integer.valueOf(port1.getText()).intValue();
-                        } catch (NumberFormatException e) {
-                            port1Label.setForeground(Color.red);
-                            break;
-                        }
-
+            switch (Enum.valueOf(NewPanelAction.class, command)) {
+            case OK:
+                if (single.isSelected()) {
+                    NationOptions nationOptions = NationOptions.getDefaults();
+                    nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
+                    nationOptions.setSelectColors(selectColors.isSelected());
+                    connectController.startSingleplayerGame(name.getText(), nationOptions);
+                } else if (join.isSelected()) {
+                    try {
+                        int port = Integer.valueOf(port1.getText()).intValue();
                         // tell Canvas to launch client
                         connectController.joinMultiplayerGame(name.getText(), server.getText(), port);
-                    } else if (start.isSelected()) {
-                        int port;
-
-                        try {
-                            port = Integer.valueOf(port2.getText()).intValue();
-                        } catch (NumberFormatException e) {
-                            port2Label.setForeground(Color.red);
-                            break;
-                        }
-                        NationOptions nationOptions = getCanvas().showFreeColDialog(new NationOptionsDialog(getCanvas()));
-                        connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(), port,
-                                                               nationOptions);
-                    } else if (meta.isSelected()) {
-                        ArrayList<ServerInfo> serverList = connectController.getServerList();
-                        if (serverList != null) {
-                            getCanvas().showServerListPanel(name.getText(), serverList);
-                        }
+                    } catch (NumberFormatException e) {
+                        port1Label.setForeground(Color.red);
                     }
-                    break;
-                case CANCEL:
-                    getCanvas().remove(this);
-                    getCanvas().showMainPanel();
-                    break;
-                case SINGLE:
-                case JOIN:
-                case START:
-                case META_SERVER:
-                    setEnabledComponents();
-                    break;
-                default:
-                    logger.warning("Invalid Actioncommand: invalid number.");
+                } else if (start.isSelected()) {
+                    try {
+                        int port = Integer.valueOf(port2.getText()).intValue();
+                        NationOptions nationOptions = NationOptions.getDefaults();
+                        nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
+                        nationOptions.setSelectColors(selectColors.isSelected());
+                        connectController.startMultiplayerGame(publicServer.isSelected(), name.getText(),
+                                                               port, nationOptions);
+                    } catch (NumberFormatException e) {
+                        port2Label.setForeground(Color.red);
+                    }
+                } else if (meta.isSelected()) {
+                    ArrayList<ServerInfo> serverList = connectController.getServerList();
+                    if (serverList != null) {
+                        getCanvas().showServerListPanel(name.getText(), serverList);
+                    }
+                }
+                break;
+            case CANCEL:
+                getCanvas().remove(this);
+                getCanvas().showMainPanel();
+                break;
+            case SINGLE:
+            case JOIN:
+            case START:
+            case META_SERVER:
+                setEnabledComponents();
+                break;
+            default:
+                logger.warning("Invalid Action command: " + command);
             }
+        } catch (Exception e) {
+            logger.warning(e.toString());
+            e.printStackTrace();
         }
-        catch (NumberFormatException e) {
-            logger.warning("Invalid Actioncommand: not a number.");
+    }
+
+
+    class AdvantageRenderer extends JLabel implements ListCellRenderer {
+
+        public Component getListCellRendererComponent(JList list,
+                                                      Object value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            setText(Messages.message("playerOptions." + value.toString()));
+            return this;
         }
     }
 }

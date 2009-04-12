@@ -37,6 +37,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -73,6 +74,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.util.XMLStream;
+import net.sf.freecol.server.NationOptions.NationState;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.control.Controller;
@@ -217,8 +219,14 @@ public final class FreeColServer {
 
         modelController = new ServerModelController(this);
         game = new ServerGame(modelController);
-        game.setVacantNations(new ArrayList<Nation>(nationOptions.getEuropeanNations()));
-        game.setMaximumPlayers(nationOptions.getEuropeanNations().size());
+        List<Nation> vacantNations = new ArrayList<Nation>();
+        for (Map.Entry<Nation, NationState> entry : nationOptions.getEuropeanNations().entrySet()) {
+            if (entry.getValue() == NationState.AVAILABLE) {
+                vacantNations.add(entry.getKey());
+            }
+        }
+        game.setVacantNations(vacantNations);
+        game.setMaximumPlayers(vacantNations.size());
         mapGenerator = new MapGenerator();
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
