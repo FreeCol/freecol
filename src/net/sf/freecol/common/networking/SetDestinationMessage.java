@@ -70,11 +70,11 @@ public class SetDestinationMessage extends Message {
     /**
      * Handle a "setDestination"-message.
      *
-     * @param server The <code>FreeColServer</code> which is handling the message.
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param server The <code>FreeColServer</code> handling the message.
+     * @param connection The <code>Connection</code> the message is from.
      *
-     * @return Null.
-     * @throws IllegalStateException if there is a problem with the message arguments.
+     * @return An update containing the unit with the new destination.
+     * @throws IllegalStateException if there is a problem with the arguments.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
@@ -90,7 +90,10 @@ public class SetDestinationMessage extends Message {
             destination = (Location) game.getFreeColGameObject(destinationId);
         }
         unit.setDestination(destination);
-        return null;
+
+        Element reply = Message.createNewRootElement("update");
+        reply.appendChild(unit.toXMLElement(serverPlayer, reply.getOwnerDocument()));
+        return reply;
     }
 
     /**

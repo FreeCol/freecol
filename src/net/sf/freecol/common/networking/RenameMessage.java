@@ -75,7 +75,7 @@ public class RenameMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> the message was received on.
      *
-     * @return Null.
+     * @return An update containing the renamed unit.
      * @throws IllegalStateException if there is problem with the message arguments.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
@@ -89,7 +89,10 @@ public class RenameMessage extends Message {
             throw new IllegalStateException("Not the owner of the nameable.");
         }
         object.setName(newName);
-        return null;
+
+        Element reply = Message.createNewRootElement("update");
+        reply.appendChild(((FreeColGameObject) object).toXMLElement(player, reply.getOwnerDocument()));
+        return reply;
     }
 
     /**

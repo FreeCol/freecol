@@ -73,12 +73,12 @@ public class BuildColonyMessage extends Message {
     /**
      * Handle a "buildColony"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling the request.
+     * @param server The <code>FreeColServer</code> handling the request.
      * @param player The <code>Player</code> building the colony.
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param connection The <code>Connection</code> the message is from.
      *
-     * @return Null if the build is not permitted, otherwise an element
-     *         defining the new colony and updating its surrounding tiles.
+     * @return An update message defining the new colony and updating it
+     *         surrounding tiles, or null on failure.
      * @throws IllegalStateException if there is a problem with the message
      *         arguments..
      */
@@ -101,19 +101,14 @@ public class BuildColonyMessage extends Message {
         unit.buildColony(colony);
         server.getInGameInputHandler().sendUpdatedTileToAll(unit.getTile(), serverPlayer);
 
-        // Not changing the protocol yet, but buildColonyConfirmed+colony
-        // is redundant, the client just needs the update.
-        Element reply = Message.createNewRootElement("buildColonyConfirmed");
-        reply.appendChild(colony.toXMLElement(player, reply.getOwnerDocument()));
-        Element updateElement = reply.getOwnerDocument().createElement("update");
-        updateElement.appendChild(unit.getTile().toXMLElement(player, reply.getOwnerDocument()));
+        Element reply = Message.createNewRootElement("update");
+        reply.appendChild(unit.getTile().toXMLElement(player, reply.getOwnerDocument()));
         int range = colony.getLineOfSight();
         if (range > unit.getLineOfSight()) {
             for (Tile t : game.getMap().getSurroundingTiles(unit.getTile(), range)) {
-                updateElement.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
+                reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
             }
         }
-        reply.appendChild(updateElement);
         return reply;
     }
 

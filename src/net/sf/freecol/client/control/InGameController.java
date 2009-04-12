@@ -278,6 +278,7 @@ public final class InGameController implements NetworkConstants {
         if (reply == null) {
             throw new NullPointerException("Failed to receive reply to \"declareIndependence\" message");
         }
+        //TODO clean up client work more
         NodeList childNodes = reply.getChildNodes();
         Element playerElement = (Element) childNodes.item(0);
         Player refPlayer = (Player) game.getFreeColGameObject(playerElement.getAttribute("ID"));
@@ -292,8 +293,8 @@ public final class InGameController implements NetworkConstants {
         }
         game.addPlayer(refPlayer);
         freeColClient.getMyPlayer().declareIndependence();
+        //END TODO
         freeColClient.getActionManager().update();
-
         canvas.showFreeColDialog(new DeclarationDialog(canvas));
         nextModelMessage();
     }
@@ -306,7 +307,7 @@ public final class InGameController implements NetworkConstants {
     public void sendChat(String message) {
         ChatMessage chatMessage = new ChatMessage(freeColClient.getMyPlayer(),
                                                   message,
-                                                  Boolean.FALSE);
+                                                  false);
         freeColClient.getClient().sendAndWait(chatMessage.toXMLElement());
     }
 
@@ -403,8 +404,14 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        freeColClient.getClient().sendAndWait(new RenameMessage((FreeColGameObject) object, name).toXMLElement());
-        object.setName(name);
+        Client client = freeColClient.getClient();
+        Element reply = client.askExpecting(new RenameMessage((FreeColGameObject) object, name).toXMLElement(), "update");
+        if (reply == null) {
+            throw new IllegalArgumentException("Illegal reply to "
+                                               + RenameMessage.getXMLElementTagName()
+                                               + " message");
+        }
+        freeColClient.getInGameInputHandler().update(reply);
     }
 
     /**
@@ -472,26 +479,20 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element reply = client.askExpecting(new BuildColonyMessage(name, unit).toXMLElement(),
-            "buildColonyConfirmed");
+        Element reply = client.askExpecting(new BuildColonyMessage(name, unit).toXMLElement(), "update");
         if (reply == null) {
             throw new IllegalArgumentException("Illegal reply to "
                 + BuildColonyMessage.getXMLElementTagName() + " message");
         }
         freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
-        Element updateElement = getChildElement(reply, "update");
-        if (updateElement == null) {
-            logger.warning("buildColonyConfirmed message missing update");
-        } else {
-            freeColClient.getInGameInputHandler().update(updateElement);
+        freeColClient.getInGameInputHandler().update(reply);
 
-            // There should be a colony here now.  Check units present
-            // for treasure cash-in.
-            ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
-            for(Unit unitInTile : units) {
-                if (unitInTile.canCarryTreasure()) {
-                    checkCashInTreasureTrain(unitInTile);
-                }
+        // There should be a colony here now.  Check units present
+        // for treasure cash-in.
+        ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
+        for(Unit unitInTile : units) {
+            if (unitInTile.canCarryTreasure()) {
+                checkCashInTreasureTrain(unitInTile);
             }
         }
 
@@ -712,8 +713,14 @@ public final class InGameController implements NetworkConstants {
      * @see Unit#setDestination(Location)
      */
     public void setDestination(Unit unit, Location destination) {
-        freeColClient.getClient().sendAndWait(new SetDestinationMessage(unit, destination).toXMLElement());
-        unit.setDestination(destination);
+        Client client = freeColClient.getClient();
+        Element reply = client.askExpecting(new SetDestinationMessage(unit, destination).toXMLElement(), "update");
+        if (reply == null) {
+            throw new IllegalArgumentException("Illegal reply to "
+                                               + SetDestinationMessage.getXMLElementTagName()
+                                               + " message.");
+        }
+        freeColClient.getInGameInputHandler().update(reply);
     }
 
     /**
@@ -1262,13 +1269,15 @@ public final class InGameController implements NetworkConstants {
         Game game = freeColClient.getGame();
         Colony colony = game.getMap().getNeighbourOrNull(direction,
                                                          unit.getTile()).getColony();
+        if (colony == null) return;
+
         Element reply = freeColClient.getClient().ask(new SpySettlementMessage(unit, direction).toXMLElement());
         if (reply != null) {
             unit.setMovesLeft(0);
             NodeList childNodes = reply.getChildNodes();
             colony.readFromXMLElement((Element) childNodes.item(0));
             Tile tile = colony.getTile();
-            for(int i=1; i < childNodes.getLength(); i++) {
+            for(int i = 1; i < childNodes.getLength(); i++) {
                 Element unitElement = (Element) childNodes.item(i);
                 Unit foreignUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
                 if (foreignUnit == null) {
@@ -1310,12 +1319,8 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element buyLandElement = new BuyLandMessage(tile).toXMLElement();
-
+        freeColClient.getClient().sendAndWait(new BuyLandMessage(tile).toXMLElement());
         freeColClient.getMyPlayer().buyLand(tile);
-
-        freeColClient.getClient().sendAndWait(buyLandElement);
-
         freeColClient.getCanvas().updateGoldLabel();
     }
 
@@ -1331,11 +1336,8 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element stealLandElement = new StealLandMessage(tile, colony).toXMLElement();
-        freeColClient.getClient().sendAndWait(stealLandElement);
-
+        freeColClient.getClient().sendAndWait(new StealLandMessage(tile, colony).toXMLElement());
         tile.takeOwnership(freeColClient.getMyPlayer(), colony);
-
     }
 
     /**
@@ -1373,7 +1375,7 @@ public final class InGameController implements NetworkConstants {
         int initialUnitMoves = unit.getMovesLeft();
         boolean actionTaken = false; 
         
-        java.util.Map<String, Boolean> transactionSession = getTransactionSession(unit,settlement);
+        java.util.Map<String, Boolean> transactionSession = getTransactionSession(unit, settlement);
         unit.setMovesLeft(0);
         
         boolean canBuy  = transactionSession.get("canBuy") && unit.getSpaceLeft() != 0;
@@ -1382,43 +1384,43 @@ public final class InGameController implements NetworkConstants {
         
         // Show main dialog
         TradeAction tradeType = canvas.showIndianSettlementTradeDialog(canBuy,canSell,canGift);
-        while(tradeType != null){
+        while (tradeType != null) {
             boolean tradeFinished = false;
-            switch(tradeType){
-                case BUY:
-                    tradeFinished = attemptBuyFromIndianSettlement(unit, settlement);
-                    if(tradeFinished){
-                        actionTaken = true;
-                        canBuy = false;
-                    }
-                    break;
-                case SELL:
-                    tradeFinished = attemptSellToIndianSettlement(unit,settlement);
-                    if(tradeFinished){
-                        actionTaken = true;
-                        canSell = false;
-                        // we may not have been able to buy only because of space constraints
-                        // after selling, space is available, so a recheck is required
-                        canBuy  = transactionSession.get("canBuy") && unit.getSpaceLeft() != 0;
-                    }
-                    break;
-                case GIFT:
-                    tradeFinished = deliverGiftToSettlement(unit, settlement, null);
-                    if(tradeFinished){
-                        actionTaken = true;
-                        canGift = false;
-                    }
-                    break;
-                default:
-                    logger.warning("Unkown trade type");
-                    break;
+            switch(tradeType) {
+            case BUY:
+                tradeFinished = attemptBuyFromIndianSettlement(unit, settlement);
+                if (tradeFinished) {
+                    actionTaken = true;
+                    canBuy = false;
+                }
+                break;
+            case SELL:
+                tradeFinished = attemptSellToIndianSettlement(unit, settlement);
+                if (tradeFinished) {
+                    actionTaken = true;
+                    canSell = false;
+                    // we may not have been able to buy only because of space constraints
+                    // after selling, space is available, so a recheck is required
+                    canBuy  = transactionSession.get("canBuy") && unit.getSpaceLeft() != 0;
+                }
+                break;
+            case GIFT:
+                tradeFinished = deliverGiftToSettlement(unit, settlement, null);
+                if (tradeFinished) {
+                    actionTaken = true;
+                    canGift = false;
+                }
+                break;
+            default:
+                logger.warning("Unknown trade type");
+                break;
             }
             // no more options available
-            if(!canBuy && !canSell && !canGift){
+            if (!canBuy && !canSell && !canGift) {
                 break;
             }
             // Still has options for trade, show the main menu again
-            tradeType = canvas.showIndianSettlementTradeDialog(canBuy,canSell,canGift);            
+            tradeType = canvas.showIndianSettlementTradeDialog(canBuy, canSell, canGift);
         }
         freeColClient.getClient().ask(new CloseTransactionMessage(unit, settlement).toXMLElement());
 
