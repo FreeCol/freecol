@@ -1551,23 +1551,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>DumpCargoDialog</code>.
-     * 
-     * @param unit The Unit that should dump all cargo
-     * @see Unit
-     */
-    public void showDumpCargoDialog(Unit unit) {
-        DumpCargoDialog dumpCargoDialog = new DumpCargoDialog(this);
-        dumpCargoDialog.initialize(unit);
-
-        addAsFrame(dumpCargoDialog);
-        dumpCargoDialog.requestFocus();
-        dumpCargoDialog.getResponse();
-        remove(dumpCargoDialog);
-
-    }
-
-    /**
      * Shows the panel that allows the user to choose which unit will emigrate
      * from Europe. This method may only be called if the user has William
      * Brewster in congress.
@@ -1597,19 +1580,6 @@ public final class Canvas extends JDesktopPane {
 
         remove(emigrationPanel);
 
-        return response;
-    }
-
-    /**
-     * Shows a panel that allows the user to adjust the river style of
-     * the current tile.
-     */
-    public int showRiverStylePanel() {
-        RiverStylePanel riverStylePanel = new RiverStylePanel(this);
-        addAsFrame(riverStylePanel);
-        riverStylePanel.requestFocus();
-        int response = riverStylePanel.getResponse();
-        remove(riverStylePanel);
         return response;
     }
 

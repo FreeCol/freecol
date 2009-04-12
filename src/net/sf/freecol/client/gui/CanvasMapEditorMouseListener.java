@@ -24,6 +24,7 @@ import java.awt.event.MouseListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -122,7 +123,7 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
                 Tile tile = getMap().getTile(p);
                 if (tile != null && tile.hasRiver()) {
                     TileImprovement river = tile.getRiver();
-                    int style = canvas.showRiverStylePanel();
+                    int style = canvas.showFreeColDialog(new RiverStylePanel(canvas));
                     if (style == -1) {
                         // user canceled
                     } else if (style == 0) {

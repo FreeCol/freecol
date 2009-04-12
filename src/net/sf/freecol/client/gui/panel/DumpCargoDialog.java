@@ -40,7 +40,7 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This panel is used to show information about a tile.
  */
-public final class DumpCargoDialog extends FreeColDialog<Boolean> {
+public final class DumpCargoDialog extends FreeColPanel {
 
     private static final Logger logger = Logger.getLogger(DumpCargoDialog.class.getName());
 
@@ -58,36 +58,23 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> {
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent panel.
+     * @param unit an <code>Unit</code> value
      */
-    public DumpCargoDialog(Canvas parent) {
+    public DumpCargoDialog(Canvas parent, Unit unit) {
         super(parent);
 
-        header = new JLabel("", SwingConstants.CENTER);
+        header = new JLabel(Messages.message("dumpGoods"));
         header.setFont(mediumHeaderFont);
-        header.setText(Messages.message("dumpGoods"));
-        header.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         cancelButton = new JButton("cancel");
         cancelButton.setActionCommand(String.valueOf(CANCEL));
         cancelButton.addActionListener(this);
-        cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-    }
-
-    /**
-     * Describe <code>initialize</code> method here.
-     *
-     * @param unit an <code>Unit</code> value
-     */
-    public void initialize(Unit unit) {
-        removeAll();
 
         goodsList = unit.getGoodsList();
         checkBoxes = new ArrayList<JCheckBox>(goodsList.size());
 
         setLayout(new MigLayout("wrap 1", "", ""));
 
-        int row = 1;
         for (Goods goods : goodsList) {
             // TODO: find out why check box is not displayed when icon
             // is present
@@ -118,10 +105,8 @@ public final class DumpCargoDialog extends FreeColDialog<Boolean> {
                     getController().unloadCargo(goodsList.get(index));
                 }
             }
-            setResponse(Boolean.TRUE);
-        } else {
-            setResponse(Boolean.FALSE);
         }
+        getCanvas().remove(this);
     }
 
 }
