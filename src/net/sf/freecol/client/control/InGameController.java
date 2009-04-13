@@ -274,9 +274,12 @@ public final class InGameController implements NetworkConstants {
                                             Messages.message("ok"), Messages.message("cancel"));
         player.setIndependentNationName(nationName);
 
-        Element reply = freeColClient.getClient().ask(new DeclareIndependenceMessage(nationName).toXMLElement());
+        DeclareIndependenceMessage message = new DeclareIndependenceMessage(nationName);
+        Element reply = freeColClient.getClient().ask(message.toXMLElement());
         if (reply == null) {
-            throw new NullPointerException("Failed to receive reply to \"declareIndependence\" message");
+            throw new IllegalStateException("Illegal reply to "
+                                            + message.getXMLElementTagName()
+                                            + " message.");
         }
         //TODO clean up client work more
         NodeList childNodes = reply.getChildNodes();
@@ -404,12 +407,13 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
+        RenameMessage message = new RenameMessage((FreeColGameObject) object, name);
         Client client = freeColClient.getClient();
-        Element reply = client.askExpecting(new RenameMessage((FreeColGameObject) object, name).toXMLElement(), "update");
+        Element reply = client.askExpecting(message.toXMLElement(), "update");
         if (reply == null) {
-            throw new IllegalArgumentException("Illegal reply to "
-                                               + RenameMessage.getXMLElementTagName()
-                                               + " message");
+            throw new IllegalStateException("Illegal reply to "
+                                            + message.getXMLElementTagName()
+                                            + " message");
         }
         freeColClient.getInGameInputHandler().update(reply);
     }
@@ -479,10 +483,12 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Element reply = client.askExpecting(new BuildColonyMessage(name, unit).toXMLElement(), "update");
+        BuildColonyMessage message = new BuildColonyMessage(name, unit);
+        Element reply = client.askExpecting(message.toXMLElement(), "update");
         if (reply == null) {
-            throw new IllegalArgumentException("Illegal reply to "
-                + BuildColonyMessage.getXMLElementTagName() + " message");
+            throw new IllegalStateException("Illegal reply to "
+                                            + message.getXMLElementTagName()
+                                            + " message");
         }
         freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
         freeColClient.getInGameInputHandler().update(reply);
@@ -714,11 +720,12 @@ public final class InGameController implements NetworkConstants {
      */
     public void setDestination(Unit unit, Location destination) {
         Client client = freeColClient.getClient();
-        Element reply = client.askExpecting(new SetDestinationMessage(unit, destination).toXMLElement(), "update");
+        SetDestinationMessage message = new SetDestinationMessage(unit, destination);
+        Element reply = client.askExpecting(message.toXMLElement(), "update");
         if (reply == null) {
-            throw new IllegalArgumentException("Illegal reply to "
-                                               + SetDestinationMessage.getXMLElementTagName()
-                                               + " message.");
+            throw new IllegalStateException("Illegal reply to "
+                                            + message.getXMLElementTagName()
+                                            + " message.");
         }
         freeColClient.getInGameInputHandler().update(reply);
     }
@@ -1255,7 +1262,8 @@ public final class InGameController implements NetworkConstants {
             unit.setMovesLeft(0);
             // Do not wait for response, if the trade is valid and accepted or countered
             // it will be handled by InGameInputHandler.diplomaticTrade()
-            freeColClient.getClient().send(new DiplomaticTradeMessage(unit, direction, agreement).toXMLElement());
+            DiplomaticTradeMessage message = new DiplomaticTradeMessage(unit, direction, agreement);
+            freeColClient.getClient().send(message.toXMLElement());
         }
     }
 
@@ -1271,24 +1279,29 @@ public final class InGameController implements NetworkConstants {
                                                          unit.getTile()).getColony();
         if (colony == null) return;
 
-        Element reply = freeColClient.getClient().ask(new SpySettlementMessage(unit, direction).toXMLElement());
-        if (reply != null) {
-            unit.setMovesLeft(0);
-            NodeList childNodes = reply.getChildNodes();
-            colony.readFromXMLElement((Element) childNodes.item(0));
-            Tile tile = colony.getTile();
-            for(int i = 1; i < childNodes.getLength(); i++) {
-                Element unitElement = (Element) childNodes.item(i);
-                Unit foreignUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-                if (foreignUnit == null) {
-                    foreignUnit = new Unit(game, unitElement);
-                } else {
-                    foreignUnit.readFromXMLElement(unitElement);
-                }
-                tile.add(foreignUnit);
-            }
-            freeColClient.getCanvas().showColonyPanel(colony);
+        SpySettlementMessage message = new SpySettlementMessage(unit, direction);
+        Client client = freeColClient.getClient();
+        Element reply = client.ask(message.toXMLElement());
+        if (reply == null) {
+            throw new IllegalStateException("Illegal reply to "
+                                            + message.getXMLElementTagName()
+                                            + " message.");
         }
+        unit.setMovesLeft(0);
+        NodeList childNodes = reply.getChildNodes();
+        colony.readFromXMLElement((Element) childNodes.item(0));
+        Tile tile = colony.getTile();
+        for(int i = 1; i < childNodes.getLength(); i++) {
+            Element unitElement = (Element) childNodes.item(i);
+            Unit foreignUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
+            if (foreignUnit == null) {
+                foreignUnit = new Unit(game, unitElement);
+            } else {
+                foreignUnit.readFromXMLElement(unitElement);
+            }
+            tile.add(foreignUnit);
+        }
+        freeColClient.getCanvas().showColonyPanel(colony);
     }
 
     /**
@@ -1319,7 +1332,10 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        freeColClient.getClient().sendAndWait(new BuyLandMessage(tile).toXMLElement());
+        BuyLandMessage message = new BuyLandMessage(tile);
+        Client client = freeColClient.getClient();
+        client.sendAndWait(message.toXMLElement());
+
         freeColClient.getMyPlayer().buyLand(tile);
         freeColClient.getCanvas().updateGoldLabel();
     }
@@ -1336,7 +1352,10 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        freeColClient.getClient().sendAndWait(new StealLandMessage(tile, colony).toXMLElement());
+        StealLandMessage message = new StealLandMessage(tile, colony);
+        Client client = freeColClient.getClient();
+        client.sendAndWait(message.toXMLElement());
+
         tile.takeOwnership(freeColClient.getMyPlayer(), colony);
     }
 
@@ -1422,7 +1441,8 @@ public final class InGameController implements NetworkConstants {
             // Still has options for trade, show the main menu again
             tradeType = canvas.showIndianSettlementTradeDialog(canBuy, canSell, canGift);
         }
-        freeColClient.getClient().ask(new CloseTransactionMessage(unit, settlement).toXMLElement());
+        CloseTransactionMessage message = new CloseTransactionMessage(unit, settlement);
+        freeColClient.getClient().ask(message.toXMLElement());
 
         // if no action taken, restore movement points
         GUI gui = freeColClient.getGUI();
@@ -1435,11 +1455,13 @@ public final class InGameController implements NetworkConstants {
     }
 
     private java.util.Map<String,Boolean> getTransactionSession(Unit unit, Settlement settlement) {
-        Element reply = freeColClient.getClient().askExpecting(new GetTransactionMessage(unit, settlement).toXMLElement(),
-            "getTransactionAnswer");
+        GetTransactionMessage message = new GetTransactionMessage(unit, settlement);
+        Client client = freeColClient.getClient();
+        Element reply = client.askExpecting(message.toXMLElement(), "getTransactionAnswer");
         if (reply == null) {
             throw new IllegalStateException("Illegal reply to "
-                + GetTransactionMessage.getXMLElementTagName() + " message");
+                                            + message.getXMLElementTagName()
+                                            + " message.");
         }
         
         java.util.Map<String,Boolean> transactionSession = new HashMap<String,Boolean>();
@@ -1451,11 +1473,14 @@ public final class InGameController implements NetworkConstants {
 
     private ArrayList<Goods> getGoodsForSaleInIndianSettlement(Unit unit, Settlement settlement) {
         // Get goods for sale from server
-        Element reply = freeColClient.getClient().askExpecting(new GoodsForSaleMessage(unit, settlement).toXMLElement(),
-            GoodsForSaleMessage.getXMLElementTagName());
+        GoodsForSaleMessage message = new GoodsForSaleMessage(unit, settlement);
+        Client client = freeColClient.getClient();
+        Element reply = client.askExpecting(message.toXMLElement(),
+                                            message.getXMLElementTagName());
         if (reply == null) {
             throw new IllegalStateException("Illegal reply to "
-                + GoodsForSaleMessage.getXMLElementTagName() + " message");
+                                            + message.getXMLElementTagName()
+                                            + " message.");
         }
 
         // Get goods for sell from server response
