@@ -26,7 +26,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -2168,25 +2167,30 @@ public final class Canvas extends JDesktopPane {
                 vp.stop();
                 Canvas.this.remove(vp);
                 showMainPanel();
-                freeColClient.playMusic("intro");  
+                freeColClient.playMusic("intro");
             }
         };
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                removeKeyListener(this);
+        class AbortListener extends MouseAdapter implements KeyListener 
+        {
+            private Runnable abort;
+            public AbortListener(Runnable aborter) {
+                abort = aborter;
+            }
+            private void abort() {
+                Canvas.this.removeMouseListener(this);
+                Canvas.this.removeKeyListener(this);
+                vp.removeMouseListener(this);
                 abort.run();
             }
-        });
-        MouseAdapter ma = new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                removeMouseListener(this);
-                abort.run();
-            }
-        };
-        this.addMouseListener(ma);
-        vp.addMouseListener(ma);
+            public void mouseClicked(MouseEvent e) { abort(); }
+            public void keyPressed(KeyEvent e) { abort(); }
+            public void keyReleased(KeyEvent e) { abort(); }
+            public void keyTyped(KeyEvent e) { abort(); }
+        }
+        AbortListener listener = new AbortListener(abort);
+        this.addKeyListener(listener);
+        this.addMouseListener(listener);
+        vp.addMouseListener(listener);
     }
 
     /**
