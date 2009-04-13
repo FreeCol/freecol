@@ -19,25 +19,13 @@
 
 package net.sf.freecol.client.gui.video;
 
-import java.net.URL;
-
 /**
- * Represents a video.
+ * A listener for video playback events.
  */
-public class Video {
-
-    private URL url;
+public interface VideoListener {
     
     /**
-     * Create a <code>Video</code>.
-     * @param url The <code>URL</code> to create the
-     *      video from. 
+     * Called when a playback has stopped.
      */
-    public Video(URL url) {
-        this.url = url;
-    }
-    
-    URL getURL() {
-        return url;
-    }
+    public void stopped();
 }

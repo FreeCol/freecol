@@ -85,6 +85,7 @@ import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TrainDialog;
+import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.client.gui.video.Video;
 import net.sf.freecol.client.gui.video.VideoComponent;
 import net.sf.freecol.common.ServerInfo;
@@ -2162,35 +2163,43 @@ public final class Canvas extends JDesktopPane {
         final VideoComponent vp = new VideoComponent(video);
         addCentered(vp, MAIN_LAYER);
         vp.play();
-        final Runnable abort = new Runnable() {
-            public void run() {
+        
+        final class AbortListener implements KeyListener, MouseListener, VideoListener {
+            public void stopped() {
+                execute();
+            }
+            
+            public void keyPressed(KeyEvent e) {
+                execute();
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                execute();
+            }
+            
+            private void execute() {
+                removeKeyListener(this);
+                removeMouseListener(this);
+                vp.removeMouseListener(this);
+                vp.removeVideoListener(this);
                 vp.stop();
                 Canvas.this.remove(vp);
                 showMainPanel();
                 freeColClient.playMusic("intro");
             }
+
+            public void keyReleased(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {}
+            public void mouseEntered(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {}
+            public void mousePressed(MouseEvent e) {}
+            public void mouseReleased(MouseEvent e) {}
         };
-        class AbortListener extends MouseAdapter implements KeyListener 
-        {
-            private Runnable abort;
-            public AbortListener(Runnable aborter) {
-                abort = aborter;
-            }
-            private void abort() {
-                Canvas.this.removeMouseListener(this);
-                Canvas.this.removeKeyListener(this);
-                vp.removeMouseListener(this);
-                abort.run();
-            }
-            public void mouseClicked(MouseEvent e) { abort(); }
-            public void keyPressed(KeyEvent e) { abort(); }
-            public void keyReleased(KeyEvent e) { abort(); }
-            public void keyTyped(KeyEvent e) { abort(); }
-        }
-        AbortListener listener = new AbortListener(abort);
-        this.addKeyListener(listener);
-        this.addMouseListener(listener);
-        vp.addMouseListener(listener);
+        final AbortListener l = new AbortListener();
+        addMouseListener(l);
+        addKeyListener(l);
+        vp.addMouseListener(l);
+        vp.addVideoListener(l);
     }
 
     /**

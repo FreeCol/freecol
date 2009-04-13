@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2009  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -21,15 +21,19 @@ package net.sf.freecol.client.gui.video;
 
 import java.awt.Image;
 import java.awt.Insets;
+import java.util.LinkedList;
+import java.util.List;
 import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.common.resources.ResourceManager;
 
 import com.fluendo.player.Cortado;
+import com.fluendo.player.StopListener;
 
 /**
  * A component for playing video.
@@ -37,6 +41,7 @@ import com.fluendo.player.Cortado;
 public class VideoComponent extends JPanel {
 
     private final Cortado applet;
+    private List<VideoListener> videoListeners = new LinkedList<VideoListener>();
 
     /**
      * Creates a component for displaying the given video.
@@ -64,12 +69,53 @@ public class VideoComponent extends JPanel {
         applet.setParam ("showStatus", "hide");
         applet.init();
 
+        applet.setStopListener(new StopListener() {
+            public void stopped() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (VideoListener sl : videoListeners) {
+                            sl.stopped();
+                        }
+                    }
+                });
+            }
+        });
+        
         setLayout(null);
         add(applet);
 
         // FIXME: -2 avoids transparent part of border.
         setSize(applet.getWidth() + insets.left + insets.right - 2,
                 applet.getHeight() + insets.top + insets.bottom - 2);
+    }
+    
+    /**
+     * Adds a listener for video playback events.
+     * @param videoListener A listener for video playback events.
+     */
+    public void addVideoListener(VideoListener videoListener) {
+        videoListeners.add(videoListener);
+    }
+    
+    /**
+     * Removes the given listener.
+     * @param videoListener The listener to be removed from this
+     *      <code>VideoComponent</code>.
+     */
+    public void removeVideoListener(VideoListener videoListener) {
+        videoListeners.remove(videoListener);
+    }
+    
+    @Override
+    public void addMouseListener(MouseListener l) {
+        super.addMouseListener(l);
+        applet.addMouseListener(l);
+    }
+    
+    @Override
+    public void removeMouseListener(MouseListener l) {
+        super.removeMouseListener(l);
+        applet.removeMouseListener(l);
     }
     
     /**
@@ -84,10 +130,6 @@ public class VideoComponent extends JPanel {
      */
     public void stop() {
         applet.stop();
-    }
-    
-    public void addMouseListener(MouseListener l) {
-        applet.addMouseListener(l);
     }
     
     private Border createBorder() {

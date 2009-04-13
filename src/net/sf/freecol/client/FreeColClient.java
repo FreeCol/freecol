@@ -175,10 +175,11 @@ public final class FreeColClient {
      * @param imageLibrary The object holding the images.
      * @param musicLibrary The object holding the music.
      * @param sfxLibrary The object holding the sound effects.
+     * @param showOpeningVideo Display the opening video.
      */
     public FreeColClient(boolean windowed, final Dimension innerWindowSize, 
                          ImageLibrary imageLibrary, MusicLibrary musicLibrary,
-                         SfxLibrary sfxLibrary) {
+                         SfxLibrary sfxLibrary, final boolean showOpeningVideo) {
         headless = "true".equals(System.getProperty("java.awt.headless", "false"));
         this.windowed = windowed;
         this.imageLibrary = imageLibrary;
@@ -219,7 +220,7 @@ public final class FreeColClient {
         if (!headless) {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        startGUI(innerWindowSize);
+                        startGUI(innerWindowSize, showOpeningVideo);
                     }
                 });
         }
@@ -248,7 +249,7 @@ public final class FreeColClient {
     /**
      * Starts the GUI by creating and displaying the GUI-objects.
      */
-    private void startGUI(Dimension innerWindowSize) {
+    private void startGUI(Dimension innerWindowSize, final boolean showOpeningVideo) {
         final AudioMixerOption amo = (AudioMixerOption) getClientOptions().getObject(ClientOptions.AUDIO_MIXER);
         if (musicLibrary != null) {
             musicPlayer = new SoundPlayer(amo,
@@ -293,11 +294,13 @@ public final class FreeColClient {
         changeWindowedMode(windowed);
 
         frame.setIconImage(ResourceManager.getImage("FrameIcon.image"));
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                canvas.showOpeningVideoPanel();
-            }
-        });
+        if (showOpeningVideo) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    canvas.showOpeningVideoPanel();
+                }
+            });
+        }
         gui.startCursorBlinking();
     }
 

@@ -49,7 +49,7 @@ public class FreeColMenuTest implements ActionListener, ItemListener {
 
         try {
             ImageLibrary lib = new ImageLibrary("/home/johnathanj/work/freecol/freecol/data/");
-            FreeColClient client = new FreeColClient(true, new Dimension(-1, -1), lib, null, null); 
+            FreeColClient client = new FreeColClient(true, new Dimension(-1, -1), lib, null, null, false); 
             
             //Create the menu bar.
             menuBar = new InGameMenuBar(client);

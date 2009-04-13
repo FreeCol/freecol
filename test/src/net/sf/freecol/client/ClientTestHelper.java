@@ -38,7 +38,7 @@ public class ClientTestHelper {
         try {
             FreeCol.initializeResourceFolders();
             ImageLibrary imageLibrary = new ImageLibrary();
-            FreeColClient client = new FreeColClient(false, null, imageLibrary, null, null);
+            FreeColClient client = new FreeColClient(false, null, imageLibrary, null, null, false);
             ConnectController connectController = client.getConnectController();
             client.setFreeColServer(freeColServer);
             client.setSingleplayer(true);

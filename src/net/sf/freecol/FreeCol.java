@@ -324,9 +324,10 @@ public final class FreeCol {
                 }
             }
 
-            freeColClient = new FreeColClient(windowed, preloadSize, lib, musicLibrary, sfxLibrary);
+            final boolean loadSavegame = (savegameFile != null);
+            freeColClient = new FreeColClient(windowed, preloadSize, lib, musicLibrary, sfxLibrary, !loadSavegame);
 
-            if (savegameFile != null) {
+            if (loadSavegame) {
                 final FreeColClient theFreeColClient = freeColClient;
                 final File theSavegameFile = savegameFile;
                 SwingUtilities.invokeLater(new Runnable() {
