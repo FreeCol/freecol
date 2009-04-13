@@ -220,7 +220,7 @@ public final class FreeColServer {
         modelController = new ServerModelController(this);
         game = new ServerGame(modelController);
         List<Nation> vacantNations = new ArrayList<Nation>();
-        for (Map.Entry<Nation, NationState> entry : nationOptions.getEuropeanNations().entrySet()) {
+        for (Map.Entry<Nation, NationState> entry : nationOptions.getNations().entrySet()) {
             if (entry.getValue() == NationState.AVAILABLE) {
                 vacantNations.add(entry.getKey());
             }

@@ -105,14 +105,7 @@ public final class PreGameController extends Controller {
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
 
         for (Entry<Nation, NationState> entry : 
-                 freeColServer.getNationOptions().getEuropeanNations().entrySet()) {
-            if (entry.getValue() != NationState.NOT_AVAILABLE &&
-                game.getPlayer(entry.getKey().getId()) == null) {
-                freeColServer.addAIPlayer(entry.getKey());
-            }
-        }
-        for (Entry<Nation, NationState> entry : 
-                 freeColServer.getNationOptions().getNativeNations().entrySet()) {
+                 freeColServer.getNationOptions().getNations().entrySet()) {
             if (entry.getValue() != NationState.NOT_AVAILABLE &&
                 game.getPlayer(entry.getKey().getId()) == null) {
                 freeColServer.addAIPlayer(entry.getKey());

@@ -168,7 +168,7 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
             Nation nation = FreeCol.getSpecification().getNation(element.getAttribute("value"));
-            if (getFreeColServer().getNationOptions().getEuropeanNations().get(nation) ==
+            if (getFreeColServer().getNationOptions().getNations().get(nation) ==
                 NationState.AVAILABLE) {
                 player.setNation(nation);
                 Element updateNation = Message.createNewRootElement("updateNation");

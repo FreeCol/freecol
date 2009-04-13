@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Nation;
@@ -45,7 +46,13 @@ public class NationOptions extends FreeColObject{
      * Nations may be available to all players, to AI players only, or
      * to no players.
      */
-    public static enum NationState { AVAILABLE, AI_ONLY, NOT_AVAILABLE };
+    public static enum NationState {
+        AVAILABLE, AI_ONLY, NOT_AVAILABLE;
+
+        public String getName() {
+            return Messages.message("nationState." + toString());
+        }            
+    };
 
     /**
      * Describe selectColors here.
@@ -58,49 +65,26 @@ public class NationOptions extends FreeColObject{
     private Advantages nationalAdvantages;
 
     /**
-     * Describe nativeNations here.
+     * All nations in the game.
      */
-    private Map<Nation, NationState> nativeNations = new HashMap<Nation, NationState>();
+    private Map<Nation, NationState> nations = new HashMap<Nation, NationState>();
 
     /**
-     * Describe europeanNations here.
-     */
-    private Map<Nation, NationState> europeanNations = new HashMap<Nation, NationState>();
-
-    /**
-     * Get the <code>EuropeanNations</code> value.
+     * Get the <code>Nations</code> value.
      *
      * @return a <code>Map<Nation, NationState></code> value
      */
-    public final Map<Nation, NationState> getEuropeanNations() {
-        return europeanNations;
+    public final Map<Nation, NationState> getNations() {
+        return nations;
     }
 
     /**
-     * Set the <code>EuropeanNations</code> value.
+     * Set the <code>Nations</code> value.
      *
-     * @param newEuropeanNations The new EuropeanNations value.
+     * @param newNations The new Nations value.
      */
-    public final void setEuropeanNations(final Map<Nation, NationState> newEuropeanNations) {
-        this.europeanNations = newEuropeanNations;
-    }
-
-    /**
-     * Get the <code>NativeNations</code> value.
-     *
-     * @return a <code>Map<Nation, NationState></code> value
-     */
-    public final Map<Nation, NationState> getNativeNations() {
-        return nativeNations;
-    }
-
-    /**
-     * Set the <code>NativeNations</code> value.
-     *
-     * @param newNativeNations The new NativeNations value.
-     */
-    public final void setNativeNations(final Map<Nation, NationState> newNativeNations) {
-        this.nativeNations = newNativeNations;
+    public final void setNations(final Map<Nation, NationState> newNations) {
+        this.nations = newNations;
     }
 
     /**
@@ -148,16 +132,17 @@ public class NationOptions extends FreeColObject{
         NationOptions result = new NationOptions();
         result.setSelectColors(true);
         result.setNationalAdvantages(Advantages.SELECTABLE);
-        Map<Nation, NationState> defaultEuropeanNations = new HashMap<Nation, NationState>();
-        for (Nation nation : Specification.getSpecification().getEuropeanNations()) {
-            defaultEuropeanNations.put(nation, NationState.AVAILABLE);
+        Map<Nation, NationState> defaultNations = new HashMap<Nation, NationState>();
+        for (Nation nation : Specification.getSpecification().getNations()) {
+            if (nation.getType().isREF()) {
+                continue;
+            } else if (nation.getType().isEuropean()) {
+                defaultNations.put(nation, NationState.AVAILABLE);
+            } else {
+                defaultNations.put(nation, NationState.AI_ONLY);
+            }
         }
-        result.setEuropeanNations(defaultEuropeanNations);
-        Map<Nation, NationState> defaultNativeNations = new HashMap<Nation, NationState>();
-        for (Nation nation : Specification.getSpecification().getIndianNations()) {
-            defaultNativeNations.put(nation, NationState.AI_ONLY);
-        }
-        result.setNativeNations(defaultNativeNations);
+        result.setNations(defaultNations);
         return result;
     }
 
@@ -177,27 +162,15 @@ public class NationOptions extends FreeColObject{
         nationalAdvantages = Enum.valueOf(Advantages.class, advantages);
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals("europeanNations")) {
-                europeanNations.clear();
+            if (in.getLocalName().equals("Nations")) {
+                nations.clear();
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals("europeanNation")) {
+                    if (in.getLocalName().equals("Nation")) {
                         String nationId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
                         Nation nation = Specification.getSpecification().getNation(nationId);
                         NationState state = Enum.valueOf(NationState.class,
                                                          in.getAttributeValue(null, "state"));
-                        europeanNations.put(nation, state);
-                    }
-                    in.nextTag();
-                }
-            } else if (in.getLocalName().equals("nativeNations")) {
-                nativeNations.clear();
-                while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                    if (in.getLocalName().equals("nativeNation")) {
-                        String nationId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
-                        Nation nation = Specification.getSpecification().getNation(nationId);
-                        NationState state = Enum.valueOf(NationState.class,
-                                                         in.getAttributeValue(null, "state"));
-                        nativeNations.put(nation, state);
+                        nations.put(nation, state);
                     }
                     in.nextTag();
                 }
@@ -220,19 +193,9 @@ public class NationOptions extends FreeColObject{
         //out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("selectColors", Boolean.toString(selectColors));
         out.writeAttribute("nationalAdvantages", nationalAdvantages.toString());
-        // europeans
-        out.writeStartElement("europeanNations");
-        for (Map.Entry<Nation, NationState> entry : europeanNations.entrySet()) {
-            out.writeStartElement("europeanNation");
-            out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey().getId());
-            out.writeAttribute("state", entry.getValue().toString());
-            out.writeEndElement();
-        }
-        out.writeEndElement();
-        // natives
-        out.writeStartElement("nativeNations");
-        for (Map.Entry<Nation, NationState> entry : nativeNations.entrySet()) {
-            out.writeStartElement("nativeNation");
+        out.writeStartElement("Nations");
+        for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
+            out.writeStartElement("Nation");
             out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey().getId());
             out.writeAttribute("state", entry.getValue().toString());
             out.writeEndElement();
@@ -251,12 +214,8 @@ public class NationOptions extends FreeColObject{
         StringBuilder result = new StringBuilder(); 
         result.append("selectColors: " + selectColors + "\n");
         result.append("nationalAdvantages: " + nationalAdvantages.toString() + "\n");
-        result.append("europeanNations:\n");
-        for (Map.Entry<Nation, NationState> entry : europeanNations.entrySet()) {
-            result.append("   " + entry.getKey().getId() + " " + entry.getValue().toString() + "\n");
-        }
-        result.append("nativeNations:\n");
-        for (Map.Entry<Nation, NationState> entry : nativeNations.entrySet()) {
+        result.append("Nations:\n");
+        for (Map.Entry<Nation, NationState> entry : nations.entrySet()) {
             result.append("   " + entry.getKey().getId() + " " + entry.getValue().toString() + "\n");
         }
         return result.toString();
