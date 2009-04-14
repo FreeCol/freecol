@@ -1074,7 +1074,7 @@ public final class ImageLibrary extends ImageProvider {
      * @return The graphics that will represent the given settlement.
      */
     public Image getSettlementImage(SettlementType settlementType) {
-        return ResourceManager.getImage(settlementType.toString() + ".image");
+        return ResourceManager.getImage(settlementType.toString() + ".image", scalingFactor);
     }
 
     /**
