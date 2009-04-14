@@ -23,6 +23,7 @@ import java.awt.Dimension;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -35,7 +36,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Player;
 
 import net.miginfocom.swing.MigLayout;
@@ -44,39 +45,45 @@ import net.miginfocom.swing.MigLayout;
 /**
  * Finds a colony on the map.
  */
-public final class FindColonyDialog extends FreeColDialog implements ListSelectionListener {
+public final class FindSettlementDialog extends FreeColDialog implements ListSelectionListener {
 
-    private static final Logger logger = Logger.getLogger(FindColonyDialog.class.getName());
+    private static final Logger logger = Logger.getLogger(FindSettlementDialog.class.getName());
 
-    private List<Colony> knownColonies = new ArrayList<Colony>();
+    private List<Settlement> knownSettlements = new ArrayList<Settlement>();
 
-    private JList colonyList;
+    private JList settlementList;
+
+
+    private static Comparator<Settlement> settlementComparator = new Comparator<Settlement>() {
+        public int compare(Settlement s1, Settlement s2) {
+            return s1.getName().compareTo(s2.getName());
+        }
+    };
 
 
     /**
      * The constructor to use.
      */
-    public FindColonyDialog(Canvas parent) {
+    public FindSettlementDialog(Canvas parent) {
         super(parent);
 
-        for (Player player : getGame().getEuropeanPlayers()) {
-            knownColonies.addAll(player.getColonies());
+        for (Player player : getGame().getPlayers()) {
+            knownSettlements.addAll(player.getSettlements());
         }
 
-        int comparator = ClientOptions.COLONY_COMPARATOR_NAME;
-        Collections.sort(knownColonies, ClientOptions.getColonyComparator(comparator));
+        Collections.sort(knownSettlements, settlementComparator);
 
         MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
         setLayout(layout);
 
-        JLabel header = new JLabel(Messages.message("menuBar.view.findColony"));
+        JLabel header = new JLabel(Messages.message("menuBar.view.findSettlement"));
         header.setFont(smallHeaderFont);
         add(header);
 
-        colonyList = new JList(knownColonies.toArray(new Colony[knownColonies.size()]));
-        JScrollPane listScroller = new JScrollPane(colonyList);
+        settlementList = new JList(knownSettlements.toArray(new Settlement[knownSettlements.size()]));
+        JScrollPane listScroller = new JScrollPane(settlementList);
         listScroller.setPreferredSize(new Dimension(250, 250));
-        colonyList.addListSelectionListener(this);
+        settlementList.addListSelectionListener(this);
         add(listScroller, "growx, growy");
 
         add(okButton, "tag ok");
@@ -91,8 +98,8 @@ public final class FindColonyDialog extends FreeColDialog implements ListSelecti
      * @param event The incoming ActionEvent.
      */
     public void valueChanged(ListSelectionEvent e) {
-        Colony colony = (Colony) colonyList.getSelectedValue();
-        getCanvas().getGUI().setFocus(colony.getTile().getPosition());
+        Settlement settlement = (Settlement) settlementList.getSelectedValue();
+        getCanvas().getGUI().setFocus(settlement.getTile().getPosition());
     }
 
 } 

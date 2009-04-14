@@ -27,26 +27,26 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.panel.FindColonyDialog;
+import net.sf.freecol.client.gui.panel.FindSettlementDialog;
 
 /**
  * An action for choosing the next unit as the active unit.
  */
-public class FindColonyAction extends MapboardAction {
+public class FindSettlementAction extends MapboardAction {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(FindColonyAction.class.getName());
+    private static final Logger logger = Logger.getLogger(FindSettlementAction.class.getName());
 
-    public static final String id = "findColonyAction";
+    public static final String id = "findSettlementAction";
 
 
     /**
-     * Creates a new <code>FindColonyAction</code>.
+     * Creates a new <code>FindSettlementAction</code>.
      * 
      * @param freeColClient The main controller object for the client.
      */
-    FindColonyAction(FreeColClient freeColClient) {
-        super(freeColClient, "menuBar.view.findColony", null,
+    FindSettlementAction(FreeColClient freeColClient) {
+        super(freeColClient, "menuBar.view.findSettlement", null,
               KeyStroke.getKeyStroke('F', Toolkit.getDefaultToolkit()
                 .getMenuShortcutKeyMask()));
     }
@@ -54,7 +54,7 @@ public class FindColonyAction extends MapboardAction {
     /**
      * Returns the id of this <code>Option</code>.
      * 
-     * @return "findColonyAction"
+     * @return "findSettlementAction"
      */
     public String getId() {
         return id;
@@ -76,6 +76,6 @@ public class FindColonyAction extends MapboardAction {
      */
     public void actionPerformed(ActionEvent e) {
         Canvas canvas = getFreeColClient().getCanvas();
-        canvas.showPanel(new FindColonyDialog(canvas), false);
+        canvas.showPanel(new FindSettlementDialog(canvas), false);
     }
 }
