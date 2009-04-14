@@ -134,14 +134,10 @@ public class NationOptions extends FreeColObject{
         result.setNationalAdvantages(Advantages.SELECTABLE);
         Map<Nation, NationState> defaultNations = new HashMap<Nation, NationState>();
         for (Nation nation : Specification.getSpecification().getNations()) {
-            if (nation.isSelectable()) {
-                if (nation.getType().isREF()) {
-                    continue;
-                } else if (nation.getType().isEuropean()) {
-                    defaultNations.put(nation, NationState.AVAILABLE);
-                } else {
-                    defaultNations.put(nation, NationState.AI_ONLY);
-                }
+            if (nation.getType().isREF()) {
+                continue;
+            } else if (nation.getType().isEuropean() && nation.isSelectable()) {
+                defaultNations.put(nation, NationState.AVAILABLE);
             } else {
                 defaultNations.put(nation, NationState.AI_ONLY);
             }
