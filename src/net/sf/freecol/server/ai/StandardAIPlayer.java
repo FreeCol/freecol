@@ -705,7 +705,8 @@ public class StandardAIPlayer extends AIPlayer {
                 Unit unit = null;
                 if (unitToTrain != null) {
                     getPlayer().modifyGold(price);
-                    unit = this.trainAIUnitInEurope(unitToTrain).getUnit();
+                    AIUnit aiUnit = this.trainAIUnitInEurope(unitToTrain);
+                    if (aiUnit != null) unit = aiUnit.getUnit();
                 }
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
