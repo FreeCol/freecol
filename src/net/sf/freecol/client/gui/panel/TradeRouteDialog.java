@@ -20,16 +20,24 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -37,6 +45,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.Unit;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -119,9 +128,33 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
 
         Player player = getMyPlayer();
 
-        for (TradeRoute route : player.getTradeRoutes()) {
+        List<TradeRoute> theRoutes = new ArrayList<TradeRoute>(player.getTradeRoutes());
+        player.resetTradeRouteCounts();
+        Collections.sort(theRoutes, tradeRouteComparator);
+        for (TradeRoute route : theRoutes) {
             listModel.addElement(route);
         }
+
+        tradeRoutes.setCellRenderer(new DefaultListCellRenderer() {
+                public Component getListCellRendererComponent(JList list,
+                                                              Object value,
+                                                              int index,
+                                                              boolean selected,
+                                                              boolean focus) {
+                    Component ret = super.getListCellRendererComponent(list,
+                        value, index, selected, focus);
+                    TradeRoute tradeRoute = (TradeRoute) value;
+                    String name = tradeRoute.getName();
+                    int n = tradeRoute.getCount();
+
+                    if (n > 0) {
+                        setText(name + "  (" + String.valueOf(n) + ")");
+                    } else {
+                        setText(name);
+                    }
+                    return ret;
+                }
+            });
 
         if (selectedRoute != null) {
             tradeRoutes.setSelectedValue(selectedRoute, true);
@@ -146,6 +179,12 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
 
     }
     
+     private static final Comparator<TradeRoute> tradeRouteComparator = new Comparator<TradeRoute>() {
+         public int compare(TradeRoute r1, TradeRoute r2) {
+             return r1.getName().compareTo(r2.getName());
+         }
+     };
+
     public void requestFocus() {
         ok.requestFocus();
     }

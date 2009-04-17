@@ -48,6 +48,12 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     private String name;
 
     /**
+     * The number of carriers using this route.
+     * (Only used in TradeRouteDialog for the present)
+     */
+    private int count;
+
+    /**
      * Whether the trade route has been modified. This is of interest only to
      * the client and can be ignored for XML serialization.
      */
@@ -82,6 +88,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         super(game);
         this.name = name;
         this.owner = player;
+        this.count = 0;
     }
 
     /**
@@ -155,6 +162,24 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
      */
     public final void setName(final String newName) {
         this.name = newName;
+    }
+
+    /**
+     * Get the <code>Count</code> value.
+     *
+     * @return The count of trade route users.
+     */
+    public int getCount() {
+        return count;
+    }
+
+    /**
+     * Set the <code>Count</code> value.
+     *
+     * @param newCount The new Count value.
+     */
+    public void setCount(int newCount) {
+        count = newCount;
     }
 
     /**
@@ -246,7 +271,6 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
             addStop(new Stop(otherStop));
         }
     }
-
 
     public class Stop {
 

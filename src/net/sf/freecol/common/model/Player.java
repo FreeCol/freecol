@@ -2300,6 +2300,23 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Reset the <code>TradeRoute</code> counts associated with the
+     * player's trade routes.
+     */
+    public final void resetTradeRouteCounts() {
+        Iterator<Unit> unitIterator = getUnitIterator();
+
+        for (TradeRoute tradeRoute : tradeRoutes) tradeRoute.setCount(0);
+        while (unitIterator.hasNext()) {
+            TradeRoute tradeRoute = unitIterator.next().getTradeRoute();
+
+            if (tradeRoute != null) {
+                tradeRoute.setCount(1 + tradeRoute.getCount());
+            }
+        }
+    }
+
+    /**
      * Checks to see whether or not a colonist can emigrate, and does so if
      * possible.
      *
