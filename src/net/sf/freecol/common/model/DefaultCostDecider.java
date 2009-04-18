@@ -57,8 +57,10 @@ public class DefaultCostDecider implements CostDecider {
             return ILLEGAL_MOVE;
         } 
         
-        if (newTile.isLand() && unit.isNaval() && (newTile.getSettlement() == null
-                || newTile.getSettlement().getOwner() != unit.getOwner())) {
+        if (newTile.isLand() && unit.isNaval()
+            && (newTile.getSettlement() == null
+                || (newTile.getSettlement().getOwner() != unit.getOwner()
+                    && !unit.canTradeWith(newTile.getSettlement())))) {
             // Not allowed to move a naval unit on land:
             return ILLEGAL_MOVE;
         } 
