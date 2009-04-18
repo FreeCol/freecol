@@ -35,6 +35,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMapEditorMouseListener;
 import net.sf.freecol.client.gui.CanvasMapEditorMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.MapEditorMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -97,6 +98,12 @@ public final class MapEditorController {
             canvas.closeMainPanel();
             canvas.closeMenus();            
             gui.setInGame(true);
+            
+            // We may need to reset the zoom value to the default value
+            ImageLibrary im = freeColClient.getImageLibrary();
+            if(gui.getImageLibrary() != im){
+            	gui.setImageLibrary(im);
+            }
             
             freeColClient.getCanvas().setJMenuBar(new MapEditorMenuBar(freeColClient));
             JInternalFrame f = freeColClient.getCanvas().addAsToolBox(new MapEditorTransformPanel(canvas));
