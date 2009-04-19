@@ -49,6 +49,7 @@ import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -56,8 +57,6 @@ import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.NationOptions;
-import net.sf.freecol.server.NationOptions.Advantages;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import org.w3c.dom.Element;
@@ -167,12 +166,11 @@ public final class ConnectController {
         }
 
         freeColClient.setSingleplayer(true);
-        nationOptions = login(username, "127.0.0.1", port);
 
-        if (nationOptions != null) {
+        if (login(username, "127.0.0.1", port)) {
             freeColClient.getPreGameController().setReady(true);
             freeColClient.getCanvas().showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(),
-                                                         true, nationOptions);
+                                                         true);
                                                          
         }
     }
@@ -207,10 +205,8 @@ public final class ConnectController {
         }
 
         freeColClient.setSingleplayer(false);
-        NationOptions nationOptions = login(username, host, port);
-        if (nationOptions != null && !freeColClient.getGUI().isInGame()) {
-            canvas.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false,
-                                      nationOptions);
+        if (login(username, host, port) && !freeColClient.getGUI().isInGame()) {
+            canvas.showStartGamePanel(freeColClient.getGame(), freeColClient.getMyPlayer(), false);
         }
     }
 
@@ -221,9 +217,9 @@ public final class ConnectController {
      * @param username The name to use when logging in. This should be a unique identifier.
      * @param host The name of the machine running the <code>FreeColServer</code>.
      * @param port The port to use when connecting to the host.
-     * @return NationOptions 
-    */
-    public NationOptions login(String username, String host, int port) {
+     * @return a <code>boolean</code> value
+     */
+    public boolean login(String username, String host, int port) {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         NationOptions nationOptions = new NationOptions();
@@ -238,10 +234,10 @@ public final class ConnectController {
             client = new Client(host, port, freeColClient.getPreGameInputHandler());
         } catch (ConnectException e) {
             canvas.errorMessage("server.couldNotConnect");
-            return null;
+            return false;
         } catch (IOException e) {
             canvas.errorMessage("server.couldNotConnect");
-            return null;
+            return false;
         }
 
         freeColClient.setClient(client);
@@ -262,7 +258,6 @@ public final class ConnectController {
                 boolean isCurrentPlayer = Boolean.valueOf(in.getAttributeValue(null, "isCurrentPlayer")).booleanValue();
 
                 in.nextTag();
-                nationOptions.readFromXMLImpl(in);
                 Game game = new Game(freeColClient.getModelController(), in, username);
                 
                 // this completes the client's view of the spec with options obtained from the server difficulty
@@ -297,11 +292,11 @@ public final class ConnectController {
                 canvas.errorMessage(in.getAttributeValue(null, "messageID"), in.getAttributeValue(null, "message"));
 
                 c.endTransmission(in);
-                return null;
+                return false;
             } else {
                 logger.warning("Unkown message received: " + in.getLocalName());
                 c.endTransmission(in);
-                return null;
+                return false;
             }            
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -317,7 +312,7 @@ public final class ConnectController {
 
         freeColClient.setLoggedIn(true);
 
-        return nationOptions;
+        return true;
     }
 
 

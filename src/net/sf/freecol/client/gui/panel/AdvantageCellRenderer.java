@@ -34,7 +34,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.server.NationOptions.Advantages;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 
 /**
 * A table cell renderer that should be used to display the chosen nation in a table.

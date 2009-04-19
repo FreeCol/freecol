@@ -31,9 +31,11 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
@@ -97,6 +99,8 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
                 reply = updateNationType(element);
             } else if (type.equals("updateColor")) {
                 reply = updateColor(element);
+            } else if (type.equals("setAvailable")) {
+                reply = setAvailable(element);
             } else if (type.equals("startGame")) {
                 reply = startGame(element);
             } else if (type.equals("logout")) {
@@ -297,6 +301,22 @@ public final class PreGameInputHandler extends InputHandler implements StreamedM
 
         player.setColor(new Color(Integer.decode(color)));
 
+        getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
+
+        return null;
+    }
+
+
+    /**
+    * Handles a "setAvailable"-message.
+    *
+    * @param element The element (root element in a DOM-parsed XML tree) that
+    *                holds all the information.
+    */
+    private Element setAvailable(Element element) {
+        Nation nation = Specification.getSpecification().getNation(element.getAttribute("nation"));
+        NationState state = Enum.valueOf(NationState.class, element.getAttribute("state"));
+        getFreeColClient().getGame().getNationOptions().setNationState(nation, state);
         getFreeColClient().getCanvas().getStartGamePanel().refreshPlayersTable();
 
         return null;

@@ -21,11 +21,11 @@ package net.sf.freecol.client;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.NationOptions;
-import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 public class ClientTestHelper {
@@ -43,8 +43,8 @@ public class ClientTestHelper {
             client.setFreeColServer(freeColServer);
             client.setSingleplayer(true);
             client.setHeadless(true);
-            NationOptions nationOptions = connectController.login(username, "127.0.0.1", port);
-            assertNotNull(nationOptions);
+            boolean connected = connectController.login(username, "127.0.0.1", port);
+            assertTrue(connected);
             client.getPreGameController().setReady(true);
             //client.getClientOptions().putOption(new RangeOption(ClientOptions.ANIMATION_SPEED, 0));
             //assertEquals(0, client.getClientOptions().getInt(ClientOptions.ANIMATION_SPEED));

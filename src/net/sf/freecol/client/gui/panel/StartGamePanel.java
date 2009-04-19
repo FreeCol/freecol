@@ -24,33 +24,21 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableCellRenderer;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -58,14 +46,15 @@ import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.Advantages;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.server.NationOptions;
-import net.sf.freecol.server.NationOptions.Advantages;
-import net.sf.freecol.server.NationOptions.NationState;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import net.miginfocom.swing.MigLayout;
@@ -81,10 +70,19 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     private static final int START = 0, CANCEL = 1,
         READY = 3, CHAT = 4, GAME_OPTIONS = 5, MAP_GENERATOR_OPTIONS = 6;
 
-    private static EuropeanNationType[] europeans = 
+    private static final EuropeanNationType[] europeans = 
         FreeCol.getSpecification().getEuropeanNationTypes().toArray(new EuropeanNationType[0]);
-    private static final JComboBox standardNationsComboBox = new JComboBox(europeans);
 
+    private static final NationState[] allStates = new NationState[] {
+        NationState.AVAILABLE,
+        NationState.AI_ONLY,
+        NationState.NOT_AVAILABLE
+    };
+
+    private static final NationState[] aiStates = new NationState[] {
+        NationState.AI_ONLY,
+        NationState.NOT_AVAILABLE
+    };
 
     private Game game;
 
@@ -106,16 +104,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     private JPanel table = new JPanel();
 
-    private NationOptions nationOptions;
-
-
-    // sort nations by status
-    public final Comparator<Nation> nationComparator = new Comparator<Nation>() {
-        public int compare(Nation nation1, Nation nation2) {
-            Map<Nation, NationState> nations = nationOptions.getNations();
-            return nations.get(nation1).compareTo(nations.get(nation2));
-        }
-    };
+    private final ListCellRenderer stateBoxRenderer = new NationStateRenderer();
 
     /**
      * The constructor that will add the items to this panel.
@@ -131,14 +120,12 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      *
      * @param singlePlayerGame <code>true</code> if the user wants to start a
      *            single player game, <code>false</code> otherwise.
-     * @param nationOptions a <code>NationOptions</code> value
      */
-    public void initialize(boolean singlePlayerGame, NationOptions nationOptions) {
+    public void initialize(boolean singlePlayerGame) {
         this.singlePlayerGame = singlePlayerGame;
         FreeColClient freeColClient = getClient();
         game = freeColClient.getGame();
         thisPlayer = getMyPlayer();
-        this.nationOptions = nationOptions;
 
         JButton cancel = new JButton(Messages.message("cancel"));
 
@@ -197,25 +184,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         setSize(getPreferredSize());
 
-        JLabel playerLabel = new JLabel(Messages.message("player"));
-        JButton nationButton = new JButton(Messages.message("nation"));
-        JButton advantageButton = new JButton(Messages.message("advantage"));
-        JLabel colorLabel = new JLabel(Messages.message("color"));
-
-        /*
-        nationButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showColopediaPanel(PanelType.NATIONS);
-                }
-            });
-
-        advantageButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showColopediaPanel(PanelType.NATION_TYPES);
-                }
-            });
-        */
-        
         if (singlePlayerGame) {
             // If we set the ready flag to false then the player will
             // be able to change the settings as he likes.
@@ -354,15 +322,62 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         final PreGameController controller = getClient().getPreGameController();
 
         table.removeAll();
-        List<Nation> sortedNations = new ArrayList<Nation>(nationOptions.getNations().keySet());
-        Collections.sort(sortedNations, nationComparator);
-        for (final Nation nation : sortedNations) {
+        JLabel playerLabel = new JLabel(Messages.message("player"));
+        JButton nationButton = new JButton(Messages.message("nation"));
+        JButton advantageButton = new JButton(Messages.message("advantage"));
+        JLabel colorLabel = new JLabel(Messages.message("color"));
+
+        nationButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    getCanvas().showColopediaPanel(PanelType.NATIONS);
+                }
+            });
+
+        advantageButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    getCanvas().showColopediaPanel(PanelType.NATION_TYPES);
+                }
+            });
+        
+        table.add(nationButton);
+        table.add(new JLabel(Messages.message("availability")));
+        table.add(advantageButton);
+        table.add(colorLabel);
+        table.add(playerLabel);
+        table.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx");
+
+        NationOptions nationOptions = getGame().getNationOptions();
+        for (final Nation nation : Specification.getSpecification().getNations()) {
             NationState state = nationOptions.getNations().get(nation);
+            if (state == null) {
+                continue;
+            }
             table.add(new JLabel(nation.getName()), "newline");
-            table.add(new JLabel(state.getName()));
+            if (nation != getMyPlayer().getNation() 
+                && (singlePlayerGame || getClient().isAdmin())) {
+                final JComboBox stateBox = new JComboBox(nation.isSelectable() ? allStates : aiStates);
+                stateBox.setSelectedItem(state);
+                stateBox.setRenderer(stateBoxRenderer);
+                stateBox.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            controller.setAvailable(nation, (NationState) stateBox.getSelectedItem());
+                        }
+                    });
+                table.add(stateBox);
+            } else {
+                table.add(new JLabel(state.getName()));
+            }
             if (nation == getMyPlayer().getNation()
                 && nationOptions.getNationalAdvantages() == NationOptions.Advantages.SELECTABLE) {
-                table.add(standardNationsComboBox);
+                final JComboBox nationBox = new JComboBox(europeans);
+                nationBox.setSelectedItem(nation.getType());
+                nationBox.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            controller.setNationType((NationType) nationBox.getSelectedItem());
+                            refreshPlayersTable();
+                        }
+                    });
+                table.add(nationBox);
             } else {
                 table.add(new JLabel(nation.getType().getName()));
             }
@@ -460,6 +475,14 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             }
         }
 
+    }
+
+    class NationStateRenderer extends JLabel implements ListCellRenderer {
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
+            setText(((NationState) value).getName());
+            return this;
+        }
     }
 
 

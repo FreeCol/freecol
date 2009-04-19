@@ -19,13 +19,11 @@
 
 package net.sf.freecol.common.model;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -35,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.NationOptions.NationState;
 
 /**
  * The main component of the game model.
@@ -71,9 +70,6 @@ public class Game extends FreeColGameObject {
      */
     protected Player viewOwner = null;
 
-    /** The maximum number of (human) players allowed in this game. */
-    private int maxPlayers = 4;
-
     /** Contains references to all objects created in this game. */
     protected HashMap<String, FreeColGameObject> freeColGameObjects = new HashMap<String, FreeColGameObject>(10000);
 
@@ -84,6 +80,11 @@ public class Game extends FreeColGameObject {
     protected int nextId = 1;
 
     private Turn turn = new Turn(1);
+
+    /**
+     * Describe nationOptions here.
+     */
+    private NationOptions nationOptions = NationOptions.getDefaults();
 
     protected ModelController modelController;
 
@@ -98,11 +99,6 @@ public class Game extends FreeColGameObject {
      * have to make the combat model selectable.
      */
     protected CombatModel combatModel;
-
-    /**
-     * The nations that can still be selected in this Game.
-     */
-    protected List<Nation> vacantNations = new ArrayList<Nation>();
 
     /**
      * Minimal constructor, 
@@ -202,16 +198,13 @@ public class Game extends FreeColGameObject {
      * @return a <code>List<Nation></code> value
      */
     public final List<Nation> getVacantNations() {
-        return vacantNations;
-    }
-
-    /**
-     * Set the <code>VacantNations</code> value.
-     *
-     * @param newNations the new list of vacant nations
-     */
-    public final void setVacantNations(final List<Nation> newNations) {
-        this.vacantNations = newNations;
+        List<Nation> result = new ArrayList<Nation>();
+        for (Entry<Nation, NationState> entry : nationOptions.getNations().entrySet()) {
+            if (entry.getValue() == NationState.AVAILABLE) {
+                result.add(entry.getKey());
+            }
+        }
+        return result;
     }
 
     /**
@@ -293,16 +286,8 @@ public class Game extends FreeColGameObject {
     public void addPlayer(Player player) {
         if (player.isAI() || canAddNewPlayer()) {
             players.add(player);
-            vacantNations.remove(FreeCol.getSpecification().getNation(player.getNationID()));
-            player.addPropertyChangeListener("nationID", new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent e) {
-                    final Nation oldNation = FreeCol.getSpecification().getNation((String) e.getOldValue());
-                    final Nation newNation = FreeCol.getSpecification().getNation((String) e.getNewValue());
-                    vacantNations.remove(newNation);
-                    vacantNations.add(oldNation);
-                }
-            });
-
+            Nation nation = FreeCol.getSpecification().getNation(player.getNationID());
+            nationOptions.getNations().put(nation, NationState.NOT_AVAILABLE);
             if (currentPlayer == null) {
                 currentPlayer = player;
             }
@@ -321,7 +306,8 @@ public class Game extends FreeColGameObject {
         boolean updateCurrentPlayer = (currentPlayer == player);
 
         players.remove(players.indexOf(player));
-        vacantNations.add(FreeCol.getSpecification().getNation(player.getNationID()));
+        Nation nation = FreeCol.getSpecification().getNation(player.getNationID());
+        nationOptions.getNations().put(nation, NationState.AVAILABLE);
         player.dispose();
 
         if (updateCurrentPlayer) {
@@ -435,16 +421,35 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get the <code>NationOptions</code> value.
+     *
+     * @return a <code>NationOptions</code> value
+     */
+    public final NationOptions getNationOptions() {
+        return nationOptions;
+    }
+
+    /**
+     * Set the <code>NationOptions</code> value.
+     *
+     * @param newNationOptions The new NationOptions value.
+     */
+    public final void setNationOptions(final NationOptions newNationOptions) {
+        this.nationOptions = newNationOptions;
+    }
+
+    /**
      * Returns a vacant nation.
      * 
      * @return A vacant nation.
      */
     public Nation getVacantNation() {
-        if (vacantNations.isEmpty()) {
-            return null;
-        } else {
-            return vacantNations.get(0);
+        for (Entry<Nation, NationState> entry : nationOptions.getNations().entrySet()) {
+            if (entry.getValue() == NationState.AVAILABLE) {
+                return entry.getKey();
+            }
         }
+        return null;
     }
 
     /**
@@ -653,42 +658,13 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the maximum number of (human) players that can be added to
-     * this game.
-     * 
-     * @return the maximum number of (human) players that can be added to this
-     *         game
-     */
-    public int getMaximumPlayers() {
-        return maxPlayers;
-    }
-
-    /**
-     * Sets the maximum number of (human) players that can be added to
-     * this game.
-     *
-     * @param newMax an <code>int</code> value
-     */
-    public void setMaximumPlayers(int newMax) {
-        maxPlayers = newMax;
-    }
-
-    /**
      * Checks if a new <code>Player</code> can be added.
      * 
      * @return <i>true</i> if a new player can be added and <i>false</i>
      *         otherwise.
      */
     public boolean canAddNewPlayer() {
-
-        int realPlayers = 0;
-
-        for (Player player : players) {
-            if (!player.isAI())
-                realPlayers++;
-        }
-
-        return realPlayers < getMaximumPlayers();
+        return (getVacantNation() != null);
     }
 
     /**
@@ -853,6 +829,7 @@ public class Game extends FreeColGameObject {
         }
 
         gameOptions.toXML(out);
+        nationOptions.toXML(out);
 
         // serialize players
         Iterator<Player> playerIterator = getPlayerIterator();
@@ -887,7 +864,7 @@ public class Game extends FreeColGameObject {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
 
-        getTurn().setNumber(Integer.parseInt(in.getAttributeValue(null, "turn")));
+        getTurn().setNumber(getAttribute(in, "turn", 1));
 
         final String nextIDStr = in.getAttributeValue(null, "nextID");
         if (nextIDStr != null) {
@@ -907,13 +884,14 @@ public class Game extends FreeColGameObject {
 
         gameOptions = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(GameOptions.getXMLElementTagName()) || in.getLocalName().equals("game-options")) {
-                // Gets the game options:
-                if (gameOptions != null) {
-                    gameOptions.readFromXML(in);
-                } else {
-                    gameOptions = new GameOptions(in);
+            if (in.getLocalName().equals(GameOptions.getXMLElementTagName())
+                || in.getLocalName().equals("game-options")) {
+                gameOptions = new GameOptions(in);
+            } else if (in.getLocalName().equals(NationOptions.getXMLElementTagName())) {
+                if (nationOptions == null) {
+                    nationOptions = new NationOptions();
                 }
+                nationOptions.readFromXML(in);
             } else if (in.getLocalName().equals(Player.getXMLElementTagName())) {
                 Player player = (Player) getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (player != null) {

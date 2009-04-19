@@ -62,7 +62,6 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
-import net.sf.freecol.client.gui.panel.DumpCargoDialog;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
@@ -79,7 +78,6 @@ import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
 import net.sf.freecol.client.gui.panel.RecruitDialog;
 import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
-import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
@@ -110,7 +108,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.server.NationOptions;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 /**
@@ -406,12 +403,11 @@ public final class Canvas extends JDesktopPane {
      *            game, 'false' otherwise.
      * @see StartGamePanel
      */
-    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode,
-                                   NationOptions nationOptions) {
+    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
         closeMenus();
 
         if (game != null && player != null) {
-            startGamePanel.initialize(singlePlayerMode, nationOptions);
+            startGamePanel.initialize(singlePlayerMode);
             addAsFrame(startGamePanel);
             startGamePanel.requestFocus();
         } else {

@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.server;
+package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,6 +124,26 @@ public class NationOptions extends FreeColObject{
     }
 
     /**
+     * Get the <code>NationState</code> value of a particular Nation.
+     *
+     * @param nation a <code>Nation</code> value
+     * @return a <code>NationState</code> value
+     */
+    public final NationState getNationState(Nation nation) {
+        return nations.get(nation);
+    }
+
+    /**
+     * Set the <code>NationState</code> value of a particular Nation.
+     *
+     * @param nation a <code>Nation</code> value
+     * @param state a <code>NationState</code> value
+     */
+    public final void setNationState(final Nation nation, final NationState state) {
+        this.nations.put(nation, state);
+    }
+
+    /**
      * Describe <code>getDefaults</code> method here.
      *
      * @return a <code>NationOptions</code> value
@@ -176,7 +196,6 @@ public class NationOptions extends FreeColObject{
                 }
             }
         }
-        in.nextTag(); // close this element
     }
     
     /**

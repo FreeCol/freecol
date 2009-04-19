@@ -37,11 +37,11 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.NationOptions.NationState;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.IMapGenerator;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -104,8 +104,7 @@ public final class PreGameController extends Controller {
         // Add AI players
         game.setUnknownEnemy(new Player(game, Player.UNKNOWN_ENEMY, false, null));
 
-        for (Entry<Nation, NationState> entry : 
-                 freeColServer.getNationOptions().getNations().entrySet()) {
+        for (Entry<Nation, NationState> entry : game.getNationOptions().getNations().entrySet()) {
             if (entry.getValue() != NationState.NOT_AVAILABLE &&
                 game.getPlayer(entry.getKey().getId()) == null) {
                 freeColServer.addAIPlayer(entry.getKey());

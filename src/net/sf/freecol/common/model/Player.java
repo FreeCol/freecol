@@ -43,6 +43,7 @@ import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.RandomChoice;
@@ -2125,9 +2126,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param newNation The new nation for this player.
      */
     public void setNation(Nation newNation) {
-        final String oldNationID = nationID;
+        Nation oldNation = getNation();
         nationID = newNation.getId();
-        firePropertyChange("nationID", oldNationID, nationID);
+        getGame().getNationOptions().getNations().put(oldNation, NationState.AVAILABLE);
+        getGame().getNationOptions().getNations().put(newNation, NationState.NOT_AVAILABLE);
     }
 
     /**

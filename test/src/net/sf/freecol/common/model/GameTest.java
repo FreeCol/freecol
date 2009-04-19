@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.server.model.ServerGame;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockModelController;
@@ -44,7 +45,7 @@ public class GameTest extends FreeColTestCase {
 
     public void testAddPlayer() {
         Game game = new ServerGame(new MockModelController());
-        game.setMaximumPlayers(8);
+        game.setNationOptions(NationOptions.getDefaults());
 
         Vector<Player> players = new Vector<Player>();
 

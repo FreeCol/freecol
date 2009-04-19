@@ -46,8 +46,8 @@ import net.sf.freecol.client.control.ConnectController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.ServerInfo;
-import net.sf.freecol.server.NationOptions;
-import net.sf.freecol.server.NationOptions.Advantages;
+import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.Advantages;
 
 import net.miginfocom.swing.MigLayout;
 

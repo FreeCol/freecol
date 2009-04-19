@@ -26,15 +26,16 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions.Advantages;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.NationOptions.Advantages;
-import net.sf.freecol.server.NationOptions.NationState;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Element;
@@ -87,6 +88,11 @@ public final class PreGameInputHandler extends InputHandler {
         register("setColor", new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return color(connection, element);
+            }
+        });
+        register("setAvailable", new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return available(connection, element);
             }
         });
         register("requestLaunch", new NetworkRequestHandler() {
@@ -168,7 +174,7 @@ public final class PreGameInputHandler extends InputHandler {
         ServerPlayer player = getFreeColServer().getPlayer(connection);
         if (player != null) {
             Nation nation = FreeCol.getSpecification().getNation(element.getAttribute("value"));
-            if (getFreeColServer().getNationOptions().getNations().get(nation) ==
+            if (getFreeColServer().getGame().getNationOptions().getNations().get(nation) ==
                 NationState.AVAILABLE) {
                 player.setNation(nation);
                 Element updateNation = Message.createNewRootElement("updateNation");
@@ -195,7 +201,7 @@ public final class PreGameInputHandler extends InputHandler {
         if (player != null) {
             NationType nationType = FreeCol.getSpecification().getNationType(element.getAttribute("value"));
             NationType fixedNationType = FreeCol.getSpecification().getNation(player.getNationID()).getType();
-            Advantages advantages = getFreeColServer().getNationOptions().getNationalAdvantages();
+            Advantages advantages = getFreeColServer().getGame().getNationOptions().getNationalAdvantages();
             if (advantages == Advantages.SELECTABLE
                 || (advantages == Advantages.FIXED && nationType.equals(fixedNationType))) {
                 player.setNationType(nationType);
@@ -229,6 +235,25 @@ public final class PreGameInputHandler extends InputHandler {
             getFreeColServer().getServer().sendToAll(updateColor, player.getConnection());
         } else {
             logger.warning("Color from unknown connection.");
+        }
+        return null;
+    }
+
+    /**
+     * Handles a "setAvailable"-message from a client.
+     * 
+     * @param connection The connection the message came from.
+     * @param element The element containing the request.
+     */
+    private Element available(Connection connection, Element element) {
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        if (player != null) {
+            Nation nation = Specification.getSpecification().getNation(element.getAttribute("nation"));
+            NationState state = Enum.valueOf(NationState.class, element.getAttribute("state"));
+            getFreeColServer().getGame().getNationOptions().setNationState(nation, state);
+            getFreeColServer().getServer().sendToAll(element, player.getConnection());
+        } else {
+            logger.warning("Available from unknown connection.");
         }
         return null;
     }

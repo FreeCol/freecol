@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -36,7 +37,6 @@ import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.NationOptions;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.Server;
 
@@ -210,12 +210,6 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
                 out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
                 out.writeAttribute("startGame", "true");
                 out.writeAttribute("isCurrentPlayer", Boolean.toString(isCurrentPlayer));
-                if (freeColServer.getNationOptions() == null) {
-                    // we don't really need this
-                    NationOptions.getDefaults().toXML(out);
-                } else {
-                    freeColServer.getNationOptions().toXML(out);
-                }
                 freeColServer.getGame().toXML(out, player);
                 freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
                 out.writeEndElement();
@@ -277,7 +271,6 @@ public final class UserConnectionHandler implements MessageHandler, StreamedMess
             out.writeStartElement("loginConfirmed");
             out.writeAttribute("admin", (admin ? "true" : "false"));
             out.writeAttribute("singleplayer", Boolean.toString(freeColServer.isSingleplayer()));
-            freeColServer.getNationOptions().toXML(out);
             freeColServer.getGame().toXML(out, newPlayer);
             freeColServer.getMapGenerator().getMapGeneratorOptions().toXML(out);
             out.writeEndElement();

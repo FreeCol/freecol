@@ -33,9 +33,11 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -158,6 +160,14 @@ public final class PreGameController {
         colorElement.setAttribute("value", "#" + Integer.toHexString(color.getRGB()).substring(2));
 
         freeColClient.getClient().sendAndWait(colorElement);
+    }
+
+    public void setAvailable(Nation nation, NationState state) {
+        freeColClient.getGame().getNationOptions().getNations().put(nation, state);
+        Element availableElement = Message.createNewRootElement("setAvailable");
+        availableElement.setAttribute("nation", nation.getId());
+        availableElement.setAttribute("state", state.toString());
+        freeColClient.getClient().sendAndWait(availableElement);
     }
 
 

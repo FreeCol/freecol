@@ -63,6 +63,8 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions;
+import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -74,7 +76,6 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.util.XMLStream;
-import net.sf.freecol.server.NationOptions.NationState;
 import net.sf.freecol.server.ai.AIInGameInputHandler;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.control.Controller;
@@ -168,11 +169,6 @@ public final class FreeColServer {
     private boolean integrity = false;
 
     /**
-     * Describe nationOptions here.
-     */
-    private NationOptions nationOptions;
-
-    /**
      * The high scores on this server.
      */
     private List<HighScore> highScores = null;
@@ -215,18 +211,10 @@ public final class FreeColServer {
         this.singleplayer = singleplayer;
         this.port = port;
         this.name = name;
-        this.nationOptions = nationOptions;
 
         modelController = new ServerModelController(this);
         game = new ServerGame(modelController);
-        List<Nation> vacantNations = new ArrayList<Nation>();
-        for (Map.Entry<Nation, NationState> entry : nationOptions.getNations().entrySet()) {
-            if (entry.getValue() == NationState.AVAILABLE) {
-                vacantNations.add(entry.getKey());
-            }
-        }
-        game.setVacantNations(vacantNations);
-        game.setMaximumPlayers(vacantNations.size());
+        game.setNationOptions(nationOptions);
         mapGenerator = new MapGenerator();
         userConnectionHandler = new UserConnectionHandler(this);
         preGameController = new PreGameController(this);
@@ -422,24 +410,6 @@ public final class FreeColServer {
     }
 
     /**
-     * Get the <code>NationOptions</code> value.
-     *
-     * @return a <code>NationOptions</code> value
-     */
-    public NationOptions getNationOptions() {
-        return nationOptions;
-    }
-
-    /**
-     * Set the <code>NationOptions</code> value.
-     *
-     * @param newNationOptions The new NationOptions value.
-     */
-    public void setNationOptions(final NationOptions newNationOptions) {
-        this.nationOptions = newNationOptions;
-    }
-
-    /**
      * Sends information about this server to the meta-server. The information
      * is only sent if <code>public == true</code>.
      * 
@@ -538,14 +508,14 @@ public final class FreeColServer {
      */
     public int getSlotsAvailable() {
         List<Player> players = game.getPlayers();
-        int n = game.getMaximumPlayers();
+        int n = 0;
         for (int i = 0; i < players.size(); i++) {
             ServerPlayer p = (ServerPlayer) players.get(i);
             if (!p.isEuropean() || p.isREF()) {
                 continue;
             }
-            if (p.isDead() || p.isConnected() && !p.isAI()) {
-                n--;
+            if (!(p.isDead() || p.isConnected() && !p.isAI())) {
+                n++;
             }
         }
         return n;

@@ -33,6 +33,7 @@ import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -115,7 +116,7 @@ public class FreeColTestCase extends TestCase {
      */
     public static Game getStandardGame() {
         game = new ServerGame(new MockModelController());
-        game.setMaximumPlayers(8);
+        game.setNationOptions(NationOptions.getDefaults());
 
         Specification.getSpecification().applyDifficultyLevel(game.getGameOptions().getInteger(GameOptions.DIFFICULTY));
         for (Nation n : FreeCol.getSpecification().getNations()) {
