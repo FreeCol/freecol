@@ -1100,8 +1100,9 @@ public final class GUI {
 
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
-                displayBaseTile(g, map, map.getTile(tileX, tileY), xx, yy, true);
-                paintBorders(g, map.getTile(tileX, tileY), xx, yy);
+                Tile tile = map.getTile(tileX, tileY);
+                displayBaseTile(g, map, tile, xx, yy, true);
+                paintBorders(g, tile, xx, yy);
                 xx += tileWidth;
             }
 
