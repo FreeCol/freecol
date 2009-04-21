@@ -2709,6 +2709,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Determine role based on equipment.
      */
     private void setRole() {
+        Role oldRole = role;
         role = Role.DEFAULT;
         for (EquipmentType type : equipment.keySet()) {
             switch (type.getRole()) {
@@ -2733,6 +2734,16 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (getState() == UnitState.IMPROVING && role != Role.PIONEER) {
             setStateUnchecked(UnitState.ACTIVE);
             setMovesLeft(0);
+        }
+        
+        //Check for role change for reseting the experience
+        // Soldier and Dragoon are compatible, no loss of experience
+        boolean keepExperience = (role == oldRole) || 
+                                 (role == Role.SOLDIER && oldRole == Role.DRAGOON) ||
+                                 (role == Role.DRAGOON && oldRole == Role.SOLDIER);
+        
+        if(!keepExperience){
+            experience = 0;
         }
     }
 

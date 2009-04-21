@@ -24,7 +24,7 @@ package net.sf.freecol.common.model;
  */
 public interface WorkLocation extends Location {
 
-
+    public void newTurn();
 
     /**
      * Returns the production of the given type of goods.

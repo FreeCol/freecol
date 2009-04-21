@@ -19,7 +19,8 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
@@ -54,7 +55,13 @@ public class UnitTest extends FreeColTestCase {
     TileImprovementType clear = spec().getTileImprovementType("model.improvement.ClearForest");
 
     EquipmentType toolsType = spec().getEquipmentType("model.equipment.tools");
+    EquipmentType horsesType = spec().getEquipmentType("model.equipment.horses");
+    EquipmentType musketsType = spec().getEquipmentType("model.equipment.muskets");
 
+    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    
+    GoodsType foodType = spec().getGoodsType("model.goods.food");
+    GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
     /**
      * Test Plowing with a hardy pioneer
      * 
@@ -797,5 +804,62 @@ public class UnitTest extends FreeColTestCase {
         ColonyTile workTile = soldier.getWorkTile();
         assertTrue("Soldier should be in a work tile in the colony",workTile != null);
         assertFalse("Soldier should not be working in central tile",workTile == colony.getColonyTile(colonyTile));
+    }
+    
+    public void testUnitGetsExperienceThroughWork() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Colony colony = getStandardColony();
+        
+        Unit colonist = colony.getRandomUnit();
+        
+        assertEquals("Colonist should not have any experience",0,colonist.getExperience());
+        
+        // colonist either in building or colony work tile
+        WorkLocation loc = colonist.getWorkLocation();
+        if(loc == null){
+            loc = colonist.getWorkTile();
+        }
+        // produces goods
+        loc.newTurn();
+        
+        assertTrue("Colonist should have gained some experience",colonist.getExperience() > 0);
+    }
+    
+    public void testUnitLosesExperienceWithWorkChange() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+                
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Unit colonist = new Unit(game, map.getTile(6, 8), dutch, colonistType, UnitState.ACTIVE);
+        
+        colonist.setWorkType(foodType);
+        colonist.modifyExperience(10);
+        assertTrue("Colonist should some initial experience",colonist.getExperience() > 0);
+        
+        colonist.setWorkType(cottonType);
+        assertTrue("Colonist should have lost all experience",colonist.getExperience() == 0);
+    }
+    
+    public void testUnitLosesExperienceWithRoleChange() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+                
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Unit colonist = new Unit(game, map.getTile(6, 8), dutch, colonistType, UnitState.ACTIVE);
+        
+        colonist.modifyExperience(10);
+        assertTrue("Colonist should some initial experience",colonist.getExperience() > 0);
+
+        colonist.equipWith(musketsType,true);
+        assertTrue("Colonist should have lost all experience, different role",colonist.getExperience() == 0);
+        
+        colonist.modifyExperience(10);
+        colonist.equipWith(horsesType,true);
+        assertTrue("Colonist should not have lost experience, compatible role",colonist.getExperience() > 0);
     }
 }
