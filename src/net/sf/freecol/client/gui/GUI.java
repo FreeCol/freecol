@@ -83,7 +83,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 
 /**
 * This class is responsible for drawing the map/background on the <code>Canvas</code>.
-* In addition, the graphical state of the map (focus, active unit..) is also a responsibillity
+* In addition, the graphical state of the map (focus, active unit..) is also a responsibility
 * of this class.
 */
 public final class GUI {
@@ -2422,13 +2422,37 @@ public final class GUI {
             return bestIndex;
         }
     }
+    
+    /**
+     * For performance reason, indicator images are rendered once and cached for reuse.
+     * The class IndicatorImageKey provide an identifier for looking up images
+     */
+    private class IndicatorImageKey {
+        public Color bgColor;
+        public Color fgColor;
+        public String name;
+        public IndicatorImageKey(Color bg, Color fg, String s) {
+            this.bgColor = bg;
+            this.fgColor = fg;
+            this.name = s;
+        }
+        public int hashCode() {
+            return name.hashCode();
+        }
+        public boolean equals(Object o) {
+            if (o==null || !(o instanceof IndicatorImageKey))
+                return false;
+            IndicatorImageKey other = (IndicatorImageKey) o;
+            return (other.bgColor.equals(this.bgColor)) && 
+                   (other.fgColor.equals(this.fgColor)) && 
+                   (other.name.equals(this.name));
+        }
+    }
+    private HashMap<IndicatorImageKey, BufferedImage> indicatorImageCache = new HashMap<IndicatorImageKey, BufferedImage>();
 
     private Image getOccupationIndicatorImage(Unit unit) {
-        Image chip = lib.getColorChip(unit.getOwner().getColor());
-        BufferedImage img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        Graphics g = img.getGraphics();
-        g.drawImage(chip, 0, 0, null);
-        g.setColor(getForegroundColor(unit.getOwner().getColor()));
+        Color backgroundColor = unit.getOwner().getColor();
+        Color foregroundColor = getForegroundColor(unit.getOwner().getColor());
         String occupationString;
         if (unit.getOwner() != freeColClient.getMyPlayer()
                 && unit.isNaval()) {
@@ -2436,10 +2460,21 @@ public final class GUI {
         } else {
             occupationString = unit.getOccupationIndicator();
             if (unit.getState() == UnitState.FORTIFIED)
-                g.setColor(Color.GRAY);
+                foregroundColor = Color.GRAY;
         }
+        // Lookup in the cache if the image has been generated already
+        IndicatorImageKey key = new IndicatorImageKey(backgroundColor, foregroundColor, occupationString);
+        BufferedImage img = indicatorImageCache.get(key);
+        if (img!=null)
+            return img;
+        // Draw it and put it in the cache
+        Image chip = lib.getColorChip(backgroundColor);
+        img = new BufferedImage(chip.getWidth(null), chip.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        Graphics g = img.getGraphics();
+        g.drawImage(chip, 0, 0, null);
+        g.setColor(foregroundColor);
         g.drawString(occupationString, TEXT_OFFSET_X, TEXT_OFFSET_Y);
-        
+        indicatorImageCache.put(key, img);
         return img;
     }
 
@@ -2613,7 +2648,7 @@ public final class GUI {
      */
     private JLabel getUnitLabel(Unit unit) {
         final Image unitImg = lib.getUnitImageIcon(unit).getImage();
-        final Image chipImg = getOccupationIndicatorImage(unit);
+        //final Image chipImg = getOccupationIndicatorImage(unit);
         
         final int width = tileWidth/2 + unitImg.getWidth(null)/2;
         final int height = unitImg.getHeight(null);
