@@ -773,7 +773,7 @@ public class UnitTest extends FreeColTestCase {
         }
         assertTrue("Unit not found in tile",found);
         
-        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(6, 8));
+        Colony colony = new Colony(game, dutch, "New Amsterdam", colonyTile);
         soldier.buildColony(colony);
         
         assertFalse("soldier should be inside the colony",soldier.getLocation() == colonyTile);
@@ -786,5 +786,16 @@ public class UnitTest extends FreeColTestCase {
                 fail("Unit building colony still in tile");
             }
         }
+                
+        found = false;
+        for(WorkLocation loc : colony.getWorkLocations()){
+            if(loc.getUnitList().contains(soldier)){
+                found = true;
+            }
+        }
+        assertTrue("Soldier should be in a work location in the colony",found);
+        ColonyTile workTile = soldier.getWorkTile();
+        assertTrue("Soldier should be in a work tile in the colony",workTile != null);
+        assertFalse("Soldier should not be working in central tile",workTile == colony.getColonyTile(colonyTile));
     }
 }
