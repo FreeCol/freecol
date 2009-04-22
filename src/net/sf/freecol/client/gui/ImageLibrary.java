@@ -181,7 +181,7 @@ public final class ImageLibrary extends ImageProvider {
     private void init(boolean doLookup) throws FreeColException {
         GraphicsConfiguration gc = null;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        if (!ge.isHeadless()) {
+        if (!GraphicsEnvironment.isHeadless()) {
             gc = ge.getDefaultScreenDevice() .getDefaultConfiguration();
         }
 
@@ -1096,25 +1096,26 @@ public final class ImageLibrary extends ImageProvider {
                 if (colony.getStockade() != null) {
                     stockadeLevel = colony.getStockade().getLevel();
                 }
+                int unitCount = colony.getUnitCount();
                 switch(stockadeLevel) {
                 case 0:
-                    if (colony.getUnitCount() <= 3) {
+                    if (unitCount <= 3) {
                         return getSettlementImage(SettlementType.SMALL);
-                    } else if (colony.getUnitCount() <= 7) {
+                    } else if (unitCount <= 7) {
                         return getSettlementImage(SettlementType.MEDIUM);
                     } else {
                         return getSettlementImage(SettlementType.LARGE);
                     }
                 case 1:
-                    if (colony.getUnitCount() > 7) {
+                    if (unitCount > 7) {
                         return getSettlementImage(SettlementType.LARGE_STOCKADE);
-                    } else if (colony.getUnitCount() > 3) {
+                    } else if (unitCount > 3) {
                         return getSettlementImage(SettlementType.MEDIUM_STOCKADE);
                     } else {
                         return getSettlementImage(SettlementType.SMALL_STOCKADE);
                     }
                 case 2:
-                    if (colony.getUnitCount() > 7) {
+                    if (unitCount > 7) {
                         return getSettlementImage(SettlementType.LARGE_FORT);
                     } else {
                         return getSettlementImage(SettlementType.MEDIUM_FORT);
