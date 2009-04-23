@@ -420,7 +420,8 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
                 }
             }
         }
-        
+
+        stops.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (getStopXMLElementTagName().equals(in.getLocalName())) {
                 stops.add(new Stop(in));

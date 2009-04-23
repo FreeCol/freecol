@@ -3525,6 +3525,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         tension = new HashMap<Player, Tension>();
         stance = new HashMap<String, Stance>();
+        tradeRoutes.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
                 Player player = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "player"));
@@ -3553,8 +3554,8 @@ public class Player extends FreeColGameObject implements Nameable {
                 event.readFromXMLImpl(in);
                 getHistory().add(event);
             } else if (in.getLocalName().equals(TradeRoute.getXMLElementTagName())) {
-                TradeRoute route = new TradeRoute(getGame(), in);
-                getTradeRoutes().add(route);
+                TradeRoute route = updateFreeColGameObject(in, TradeRoute.class);
+                tradeRoutes.add(route);
             } else if (in.getLocalName().equals(Market.getXMLElementTagName())) {
                 market = updateFreeColGameObject(in, Market.class);
             } else {
