@@ -1524,7 +1524,16 @@ public final class Canvas extends JDesktopPane {
         colonyPanel.requestFocus();
     }
 
-    public TradeAction showIndianSettlementTradeDialog(boolean showBuy, boolean showSell, boolean showGift) {
+    /**
+     * Displays the panel for trading with an <code>IndianSettlement</code>.
+     * 
+     * @param settlement The native settlement to trade with.
+     * @param showBuy Show a "buy" option.
+     * @param showSell Show a "sell" option.
+     * @param showGift Show a "gift" option.
+     */
+    public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
+                                                       boolean showBuy, boolean showSell, boolean showGift) {
         ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<ChoiceItem<TradeAction>>();
         if (showBuy){
             choices.add(new ChoiceItem<TradeAction>(Messages.message("tradeProposition.toBuy"),
@@ -1539,7 +1548,10 @@ public final class Canvas extends JDesktopPane {
                                                     TradeAction.GIFT));
         }
         
-        TradeAction choice = showChoiceDialog(Messages.message("tradeProposition.welcome"), 
+        String prompt = Messages.message("tradeProposition.welcome",
+                                         "%nation%", settlement.getOwner().getNationAsString(),
+                                         "%settlement%", settlement.getName()); 
+        TradeAction choice = showChoiceDialog(prompt,
                                               Messages.message("tradeProposition.cancel"), 
                                               choices);
         

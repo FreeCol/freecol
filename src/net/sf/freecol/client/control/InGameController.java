@@ -1402,7 +1402,7 @@ public final class InGameController implements NetworkConstants {
         boolean canGift = transactionSession.get("canGift");
         
         // Show main dialog
-        TradeAction tradeType = canvas.showIndianSettlementTradeDialog(canBuy,canSell,canGift);
+        TradeAction tradeType = canvas.showIndianSettlementTradeDialog(settlement, canBuy, canSell, canGift);
         while (tradeType != null) {
             boolean tradeFinished = false;
             switch(tradeType) {
@@ -1439,7 +1439,7 @@ public final class InGameController implements NetworkConstants {
                 break;
             }
             // Still has options for trade, show the main menu again
-            tradeType = canvas.showIndianSettlementTradeDialog(canBuy, canSell, canGift);
+            tradeType = canvas.showIndianSettlementTradeDialog(settlement, canBuy, canSell, canGift);
         }
         CloseTransactionMessage message = new CloseTransactionMessage(unit, settlement);
         freeColClient.getClient().ask(message.toXMLElement());
