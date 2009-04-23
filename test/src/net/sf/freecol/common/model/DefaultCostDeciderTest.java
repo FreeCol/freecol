@@ -18,6 +18,7 @@
  */
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -27,6 +28,8 @@ import net.sf.freecol.util.test.FreeColTestCase;
 public class DefaultCostDeciderTest extends FreeColTestCase {
     private UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
     private UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    private GoodsType tradeGoodsType = spec().getGoodsType("model.goods.tradeGoods");
+    
     private Game game;
 
     @Override
@@ -163,5 +166,47 @@ public class DefaultCostDeciderTest extends FreeColTestCase {
         DefaultCostDecider decider = new DefaultCostDecider();
         int cost = decider.getCost(unit, unitTile, enemyUnitTile, 4,4);
         assertTrue("Move should be invalid",cost == DefaultCostDecider.ILLEGAL_MOVE);
+    }
+    
+    /**
+     * Checks possible move of a naval unit to a tile with a settlement
+     */
+    public void testNavalUnitMoveToTileWithSettlement() {
+        // For this test we need a different map
+        Map map = getCoastTestMap(plainsType);
+        game.setMap(map);
+        
+        Tile unitTile = map.getTile(10, 9);
+        assertFalse("Unit tile should be ocean",unitTile.isLand());
+
+        Unit unit = new Unit(game, unitTile, game.getCurrentPlayer(), galleonType, UnitState.ACTIVE);
+        
+        Tile settlementTile = map.getTile(9, 9);
+        assertTrue("Tile should be land",settlementTile.isLand());
+        
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        Settlement settlement = builder.settlementTile(settlementTile).build();
+
+        // unit is trying go to settlement
+        unit.setDestination(settlementTile);
+        
+        // Execute
+        DefaultCostDecider decider = new DefaultCostDecider();
+        int cost = decider.getCost(unit, unitTile, settlementTile, 4,4);
+        assertTrue("Move should be invalid, nothing to trade",cost == DefaultCostDecider.ILLEGAL_MOVE);
+        
+        // Add goods to trade
+        Goods goods = new Goods(game, null, tradeGoodsType, 50);
+        unit.add(goods);
+        
+        cost = decider.getCost(unit, unitTile, settlementTile, 4,4);
+        assertFalse("Move should be valid, has goods to trade",cost == DefaultCostDecider.ILLEGAL_MOVE);
+        
+        // Set players at war
+        Player indianPlayer = settlement.getOwner();
+        indianPlayer.changeRelationWithPlayer(unit.getOwner(), Stance.WAR);
+        
+        cost = decider.getCost(unit, unitTile, settlementTile, 4,4);
+        assertTrue("Move should be invalid, players at war",cost == DefaultCostDecider.ILLEGAL_MOVE);
     }
 }
