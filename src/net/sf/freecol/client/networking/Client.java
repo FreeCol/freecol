@@ -130,39 +130,6 @@ public final class Client {
         return null;
     }
 
-    /**
-     * Sends the specified message to the server and returns the reply,
-     * if it has the specified tag.
-     *
-     * @param element The element (root element in a DOM-parsed XML tree)
-     *        that holds all the information
-     * @param tag The expected tag
-     * @return The answer from the server or <code>null</code> if either
-     *         an error occured, the server did not send a reply, or the
-     *         reply had the wrong tag.
-     * @see #sendAndWait
-     * @see #send
-     */
-    public Element askExpecting(Element element, String tag) {
-        try {
-            Element reply = c.ask(element);
-            if (reply == null) {
-                logger.log(Level.WARNING, "Client.ask received null reply to "
-                           + element);
-            } else if (!reply.getTagName().equals(tag)) {
-                logger.log(Level.WARNING, "Client.ask received reply"
-                           + " with tag " + reply.getTagName()
-                           + " which should have been " + tag
-                           + " to message " + element);
-            } else {
-                return reply;
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Client.ask could not send " + element, e);
-        }
-        return null;
-    }
-
 
     /**
     * Gets the <code>Connection</code> this <code>Client</code> uses when
