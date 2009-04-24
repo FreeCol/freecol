@@ -75,18 +75,19 @@ public class RenameMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> the message was received on.
      *
-     * @return An update containing the renamed unit.
-     * @throws IllegalStateException if there is problem with the message arguments.
+     * @return An update containing the renamed unit,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Nameable object = (Nameable) player.getGame().getFreeColGameObject(id);
+
         if (object == null) {
-            throw new IllegalStateException("Tried to rename an object with id "
-                                            + id + " which could not be found");
+            return Message.clientError("Tried to rename an object with id " + id
+                                       + " which could not be found.");
         }
         if (!(object instanceof Ownable) || ((Ownable) object).getOwner() != serverPlayer) {
-            throw new IllegalStateException("Not the owner of the nameable.");
+            return Message.clientError("Not the owner of nameable: " + id);
         }
         object.setName(newName);
 

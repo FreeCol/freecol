@@ -110,12 +110,20 @@ public class StealLandMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> the message was received on.
      *
-     * @return Null.
-     * @throws IllegalStateException if there is a problem with the message arguments.
+     * @return Null, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
+        if (tile == null) {
+            return Message.clientError("Tile must not be null.");
+        }
         if (tile.getOwner() != null && tile.getOwner().isEuropean()) {
-            throw new IllegalStateException("Can not steal land from European players!");
+            return Message.clientError("Can not steal land from European players!");
+        }
+        if (colony == null) {
+            return Message.clientError("Colony must not be null.");
+        }
+        if (colony.getOwner() != player) {
+            return Message.clientError("Player does not own colony.");
         }
         tile.takeOwnership(player, colony);
         return null;

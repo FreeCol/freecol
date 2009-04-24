@@ -77,25 +77,30 @@ public class BuildColonyMessage extends Message {
      * @param player The <code>Player</code> building the colony.
      * @param connection The <code>Connection</code> the message is from.
      *
-     * @return An update message defining the new colony and updating it
-     *         surrounding tiles, or null on failure.
-     * @throws IllegalStateException if there is a problem with the message
-     *         arguments..
+     * @return An update <code>Element</code> defining the new colony
+     *         and updating its surrounding tiles,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Unit unit = server.getUnitSafely(builderId, serverPlayer);
+        Unit unit;
 
+        try {
+            unit = server.getUnitSafely(builderId, serverPlayer);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
         if (colonyName == null || colonyName.length() == 0) {
-            throw new IllegalStateException("ColonyName must not be empty.");
+            return Message.createError("server.buildColony.badName",
+                                       "Empty colony name");
         } else if (player.getColony(colonyName) != null) {
-            throw new IllegalStateException("Duplicate colony name.");
+            return Message.createError("server.buildColony.badName",
+                                       "Non-unique colony name " + colonyName);
         } else if (!unit.canBuildColony()) {
-            logger.warning("BuildColony request for " + colonyName
-                           + " with unit " + builderId
-                           + " is not permitted!");
-            return null;
+            return Message.createError("server.buildColony.badUnit",
+                                       "Unit " + builderId
+                                       + " can not build colony " + colonyName);
         }
         Colony colony = new Colony(game, serverPlayer, colonyName, unit.getTile());
         unit.buildColony(colony);

@@ -257,51 +257,56 @@ public class DiplomaticTradeMessage extends Message {
      * @param server The <code>FreeColServer</code> that is handling the message.
      * @param connection The <code>Connection</code> the message was received on.
      *
-     * @return Null on error, or an element describing the trade with either
-     *         "accept" or "reject" status.
-     * @throws IllegalStateException if there is problem with the message arguments.
+     * @return An <code>Element</code> describing the trade with either
+     *         "accept" or "reject" status, null on trade failure,
+     *         or an error <code>Element</code> on outright error.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = serverPlayer.getGame();
-        Unit unit = server.getUnitSafely(unitId, serverPlayer);
+        Unit unit;
+
+        try {
+            unit = server.getUnitSafely(unitId, serverPlayer);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
         if (unit.getTile() == null) {
-            throw new IllegalArgumentException("Unit is not on the map: " + unitId);
+            return Message.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
-            throw new IllegalArgumentException("Could not find tile"
-                                               + " in direction: " + direction
-                                               + " from unit: " + unitId);
+            return Message.clientError("Could not find tile"
+                                       + " in direction: " + direction
+                                       + " from unit: " + unitId);
         }
         Settlement settlement = newTile.getSettlement();
         if (settlement == null || !(settlement instanceof Colony)) {
-            throw new IllegalArgumentException("There is no colony at: "
-                                               + newTile.getId());
+            return Message.clientError("There is no colony at: "
+                                       + newTile.getId());
         }
         if (agreement == null) {
-            throw new IllegalArgumentException("DiplomaticTrade with null agreement");
+            return Message.clientError("DiplomaticTrade with null agreement.");
         }
         if (agreement.getSender() != serverPlayer) {
-            throw new IllegalArgumentException("DiplomaticTrade received from player who is not the sender: "
-                                               + serverPlayer.getId());
+            return Message.clientError("DiplomaticTrade received from player who is not the sender: " + serverPlayer.getId());
         }
         if (status != TradeStatus.PROPOSE_TRADE || agreement.isAccept()) {
-            throw new IllegalArgumentException("DiplomaticTrade must start with a proposed trade!");
+            return Message.clientError("DiplomaticTrade must start with a proposed trade!");
         }
         ServerPlayer enemyPlayer = (ServerPlayer) agreement.getRecipient();
         if (enemyPlayer == null) {
-            throw new IllegalArgumentException("DiplomaticTrade recipient is null");
+            return Message.clientError("DiplomaticTrade recipient is null");
         }
         if (enemyPlayer == serverPlayer) {
-            throw new IllegalArgumentException("DiplomaticTrade recipient matches sender: "
-                                               + serverPlayer.getId());
+            return Message.clientError("DiplomaticTrade recipient matches sender: "
+                                       + serverPlayer.getId());
         }
         Player settlementPlayer = settlement.getOwner();
         if (settlementPlayer != (Player) enemyPlayer) {
-            throw new IllegalArgumentException("DiplomaticTrade recipient: " + enemyPlayer.getId()
-                                               + " does not match Settlement owner: " + settlementPlayer);
+            return Message.clientError("DiplomaticTrade recipient: " + enemyPlayer.getId()
+                                       + " does not match Settlement owner: " + settlementPlayer);
         }
 
         if (!serverPlayer.hasContacted(settlementPlayer)) {
@@ -320,24 +325,21 @@ public class DiplomaticTradeMessage extends Message {
             try {
                 reply = recipient.getConnection().ask(request.toXMLElement());
             } catch (IOException e) {
-                logger.warning("Diplomatic trade failed due to loss of connection to: "
-                               + recipient.getId());
-                reply = null;
+                return Message.createError("server.communicate", e.getMessage());
             }
-            if (reply == null) break;
             DiplomaticTradeMessage response = new DiplomaticTradeMessage(game, reply);
             switch (response.status) {
             case PROPOSE_TRADE:
                 if (request.isValidCounterProposal(response)) {
-                    // Recipient replied with a valid counter-proposal, swap and loop
+                    // Recipient replied with a valid counter-proposal,
+                    // swap and loop
                     request = response;
                     ServerPlayer tmp = sender;
                     sender = recipient;
                     recipient = tmp;
                     continue;
-                } else {
-                    logger.warning("Confused diplomatic counterproposal.");
                 }
+                logger.warning("Confused diplomatic counterproposal.");
                 break;
             case ACCEPT_TRADE:
                 if (request.isValidAcceptance(response)) {
@@ -348,15 +350,12 @@ public class DiplomaticTradeMessage extends Message {
                         request.setAccept();
                         sender.getConnection().send(request.toXMLElement());
                     } catch (IOException e) {
-                        logger.warning("Diplomatic trade failed due to loss of connection to: "
-                                       + sender.getId());
-                        break;
+                        return Message.createError("server.communicate", e.getMessage());
                     }
                     request.getAgreement().makeTrade();
                     return null;
-                } else {
-                    logger.warning("Confused diplomatic acceptance.");
                 }
+                logger.warning("Confused diplomatic acceptance.");
                 break;
             case REJECT_TRADE:
                 break;

@@ -78,27 +78,32 @@ public class SpySettlementMessage extends Message {
      * @param server The <code>FreeColServer</code> that is handling the message.
      * @param connection The <code>Connection</code> the message was received on.
      *
-     * @return An <code>Element</code> containing the settlement being spied upon,
-     *         and any units at that position.
-     * @throws IllegalStateException if there is problem with the message arguments,
-     *         including not finding a settlement where the spy is looking.
+     * @return An <code>Element</code> containing a representation of the
+     *         settlement being spied upon and any units at that position,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Unit unit = server.getUnitSafely(unitId, serverPlayer);
+        Unit unit;
+
+        try {
+            unit = server.getUnitSafely(unitId, serverPlayer);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
         if (unit.getTile() == null) {
-            throw new IllegalArgumentException("Unit is not on the map: " + unitId);
+            return Message.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
         Tile newTile = serverPlayer.getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
-            throw new IllegalArgumentException("Could not find tile"
-                                               + " in direction: " + direction
-                                               + " from unit: " + unitId);
+            return Message.clientError("Could not find tile"
+                                       + " in direction: " + direction
+                                       + " from unit: " + unitId);
         }
         Settlement settlement = newTile.getSettlement();
         if (settlement == null) {
-            throw new IllegalArgumentException("There is no settlement at: " + newTile.getId());
+            return Message.clientError("There is no settlement at: " + newTile.getId());
         }
 
         Element reply = Message.createNewRootElement("foreignColony");

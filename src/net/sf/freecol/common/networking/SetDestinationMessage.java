@@ -73,8 +73,8 @@ public class SetDestinationMessage extends Message {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> the message is from.
      *
-     * @return An update containing the unit with the new destination.
-     * @throws IllegalStateException if there is a problem with the arguments.
+     * @return An update containing the unit with the new destination,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
@@ -85,7 +85,7 @@ public class SetDestinationMessage extends Message {
         if (destinationId == null || destinationId.length() == 0) {
             destination = null;
         } else if (!(game.getFreeColGameObject(destinationId) instanceof Location)) {
-            throw new IllegalStateException("Not a location ID: " + destinationId);
+            return Message.clientError("Not a location ID: " + destinationId);
         } else {
             destination = (Location) game.getFreeColGameObject(destinationId);
         }

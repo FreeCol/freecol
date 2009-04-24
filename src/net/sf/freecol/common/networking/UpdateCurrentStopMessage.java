@@ -63,11 +63,16 @@ public class UpdateCurrentStopMessage extends Message {
      * @param server The <code>FreeColServer</code> handling the message.
      * @param connection The <code>Connection</code> the message was received on.
      *
-     * @return Null.
+     * @return Null, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
-        Unit unit = server.getUnitSafely(unitId, server.getPlayer(connection));
+        Unit unit;
 
+        try {
+            unit = server.getUnitSafely(unitId, server.getPlayer(connection));
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
         unit.nextStop();
         return null;
     }

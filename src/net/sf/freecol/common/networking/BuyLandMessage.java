@@ -62,18 +62,18 @@ public class BuyLandMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> the message was received on.
      *
-     * @return Null.
-     * @throws IllegalStateException if there is a problem with the message arguments.
+     * @return Null or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         if (tile == null) {
-            throw new IllegalStateException("Tile must not be 'null'.");
+            return Message.clientError("Tile must not be null.");
         } else if (tile.getOwner() == null) {
             tile.setOwner(player);
         } else if (tile.getOwner().isEuropean()) {
-            throw new IllegalStateException("Can not buy land from European players!");
+            return Message.createError("server.buyLand.europeans", null);
+        } else {
+            player.buyLand(tile);
         }
-        player.buyLand(tile);
         return null;
     }
 

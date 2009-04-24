@@ -64,17 +64,17 @@ public class DeclareIndependenceMessage extends Message {
     /**
      * Handle a "declareIndependence"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param connection The <code>Connection</code> the message is from.
      *
      * @return An <code>Element</code> containing the client view of the
-     *         REF raised to punish rebel insolence.
-     * @throws IllegalStateException if there is a problem with the message arguments.
+     *         REF raised to punish rebel insolence,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         if (nationName == null || nationName.length() == 0) {
-            throw new IllegalStateException("NationName must not be empty.");
+            return Message.createError("server.declareIndependence.badName", null);
         }
         ServerPlayer serverplayer = server.getPlayer(connection);
         ServerPlayer refPlayer = server.getInGameController().createREFPlayer(serverplayer);

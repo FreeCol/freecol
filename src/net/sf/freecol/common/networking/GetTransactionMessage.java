@@ -79,21 +79,27 @@ public class GetTransactionMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return A reply encapsulating the possibilities for this transaction.
-     * @throws IllegalStateException if there is problem with the message
-     *         arguments.
+     * @return A reply encapsulating the possibilities for this transaction,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
+        InGameController controller = (InGameController) server.getController();
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = player.getGame();
-        Unit unit = server.getUnitSafely(unitId, serverPlayer);
-        Settlement settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
-        InGameController controller = (InGameController) server.getController();
+        Unit unit;
+        Settlement settlement;
+
+        try {
+            unit = server.getUnitSafely(unitId, serverPlayer);
+            settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
 
         // if starting a transaction session, the unit needs movement points
         if (!controller.isTransactionSessionOpen(unit, settlement)
             && unit.getMovesLeft() <= 0) {
-            throw new IllegalStateException("No moves left!");
+            return Message.clientError("Unit " + unitId + "has no moves left.");
         }
         // Sets unit moves to zero to avoid cheating
         // If no action was done, the moves will be restored when closing

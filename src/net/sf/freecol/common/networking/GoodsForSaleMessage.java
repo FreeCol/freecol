@@ -95,15 +95,21 @@ public class GoodsForSaleMessage extends Message {
      * @param connection The <code>Connection</code> the message was received on.
      *
      * @return This <code>GoodsForSaleMessage</code> with the goods for
-     *         sale attached as children.
-     * @throws IllegalStateException if there is problem with the message
-     *         arguments.
+     *         sale attached as children,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
-        Unit unit = server.getUnitSafely(unitId, serverPlayer);
-        IndianSettlement settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+        Unit unit;
+        IndianSettlement settlement;
+
+        try {
+            unit = server.getUnitSafely(unitId, serverPlayer);
+            settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
         sellGoods = settlement.getSellGoods();
         if (!sellGoods.isEmpty()) {
             AIPlayer aiPlayer = (AIPlayer) server.getAIMain().getAIObject(settlement.getOwner());

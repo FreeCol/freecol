@@ -103,31 +103,35 @@ public class SellPropositionMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return This message with updated gold value.
-     * @throws IllegalStateException if there is problem with the arguments.
+     * @return This message with updated gold value,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
-        Unit unit = server.getUnitSafely(unitId, serverPlayer);
-        IndianSettlement settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+        Unit unit;
+        IndianSettlement settlement;
+
+        try {
+            unit = server.getUnitSafely(unitId, serverPlayer);
+            settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
 
         // Make sure we are trying to sell something that is there
-        Boolean ok = false;
-        for (Goods sell : unit.getGoodsList()) {
-            if (sell.getId() == goods.getId()) ok = true;
-        }
-        if (!ok) {
-            throw new IllegalStateException("sellProposition for non-existant goods");
+        if (goods.getLocation() != unit) {
+            return Message.createError("server.trade.noGoods", "Goods " + goods.getId()
+                                       + " are not with unit " + unitId);
         }
 
         InGameController controller = (InGameController) server.getController();
         if (!controller.isTransactionSessionOpen(unit, settlement)) {
-            throw new IllegalStateException("Trying to sell without opening a transaction session");
+            return Message.clientError("Trying to sell without opening a transaction session");
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canSell")) {
-            throw new IllegalStateException("Trying to sell in a session where selling is not allowed.");
+            return Message.clientError("Trying to sell in a session where selling is not allowed.");
         }
 
         // AI considers the proposition, return with a gold value

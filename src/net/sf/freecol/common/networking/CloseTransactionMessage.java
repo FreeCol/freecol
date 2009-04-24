@@ -79,24 +79,28 @@ public class CloseTransactionMessage extends Message {
      * @param player The <code>Player</code> the message applies to.
      * @param connection The <code>Connection</code> message was received on.
      *
-     * @return A reply encapsulating the possibilities for this transaction.
-     * @throws IllegalStateException if there is problem with the message
-     *         arguments.
+     * @return Null, or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = player.getGame();
-        Unit unit = server.getUnitSafely(unitId, serverPlayer);
-        Settlement settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
         InGameController controller = (InGameController) server.getController();
+        Unit unit;
+        Settlement settlement;
 
+        try {
+            unit = server.getUnitSafely(unitId, serverPlayer);
+            settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
         if (!controller.isTransactionSessionOpen(unit, settlement)) {
-            throw new IllegalStateException("Trying to close a non-existant session.");
+            return Message.clientError("Trying to close a non-existent session.");
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
         // restore unit movements if no action made
         boolean isActionTaken = ((Boolean)(session.get("actionTaken"))).booleanValue();
-        if (!isActionTaken){
+        if (!isActionTaken) {
             Integer unitMoves = (Integer) session.get("unitMoves");
             unit.setMovesLeft(unitMoves);
         }
