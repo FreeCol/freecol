@@ -244,6 +244,19 @@ public class Message {
     }
 
     /**
+     * Creates an error message in response to bad client data.
+     *
+     * @param message The error in plain text.
+     * @return The root <code>Element</code> of the error message.
+     */
+    public static Element clientError(String message) {
+        Element errorElement = createNewRootElement("error");
+        errorElement.setAttribute("messageID", "server.reject");
+        errorElement.setAttribute("message", message);
+        return errorElement;
+    }
+
+    /**
      * Gets the <code>Document</code> holding the message data.
      * 
      * @return The <code>Document</code> holding the message data.
