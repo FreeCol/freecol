@@ -42,6 +42,8 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.PlayerExploredTile;
+import net.sf.freecol.common.model.Tile;
 
 import org.w3c.dom.Element;
 
@@ -1951,14 +1953,17 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
+        boolean full = getGame().isClientTrusted() || showAll || player == getOwner();
+        PlayerExploredTile pet;
+
         // Start element:
         out.writeStartElement(getXMLElementTagName());
         // Add attributes:
         out.writeAttribute("ID", getId());
         out.writeAttribute("name", getName());
-        out.writeAttribute("owner", owner.getId());
         out.writeAttribute("tile", tile.getId());
-        if (getGame().isClientTrusted() || showAll || player == getOwner()) {
+        if (full) {
+            out.writeAttribute("owner", owner.getId());
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
             out.writeAttribute("oldSonsOfLiberty", Integer.toString(oldSonsOfLiberty));
             out.writeAttribute("tories", Integer.toString(tories));
@@ -1970,9 +1975,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             for (ExportData data : exportData.values()) {
                 data.toXML(out);
             }
-            /** 
-             * Don't write other features, they will be added from buildings in readFromXMLImpl
-             */
+            // Don't write other features, they will be added from
+            // buildings in readFromXMLImpl().
             for (Modifier modifier : featureContainer.getModifierSet("model.goods.bells",
                                                                      null, getGame().getTurn())) {
                 if (Modifier.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
@@ -1984,13 +1988,27 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 ((FreeColGameObject) workLocation).toXML(out, player, showAll, toSavedGame);
             }
             toListElement("buildQueue", buildQueue, out);
-        } else {
+            goodsContainer.toXML(out, player, showAll, toSavedGame);
+        } else if (player.canSee(getTile())) {
+            out.writeAttribute("owner", owner.getId());
             out.writeAttribute("unitCount", Integer.toString(getUnitCount()));
             if (getStockade() != null) {
                 getStockade().toXML(out, player, showAll, toSavedGame);
             }
+            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
+            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
+            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
+        } else if ((pet = getTile().getPlayerExploredTile(player)) != null) {
+            out.writeAttribute("owner", pet.getOwner().getId());
+            out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
+            // TODO: should be pet version of stockade
+            if (getStockade() != null) {
+                getStockade().toXML(out, player, showAll, toSavedGame);
+            }
+            GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
+            emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
+            emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
         }
-        goodsContainer.toXML(out, player, showAll, toSavedGame);
         // End element:
         out.writeEndElement();
     }

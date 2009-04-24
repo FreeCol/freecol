@@ -1760,37 +1760,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
 
         if (settlement != null) {
-            if (pet == null || getGame().isClientTrusted() || showAll
-                || settlement.getOwner() == player
-                || settlement instanceof IndianSettlement) {
-                settlement.toXML(out, player, showAll, toSavedGame);
-            } else if (getColony() != null) {
-                if (!player.canSee(getTile())) {
-                    if (pet.getColonyUnitCount() != 0) {
-                        out.writeStartElement(Colony.getXMLElementTagName());
-                        out.writeAttribute(ID_ATTRIBUTE, getColony().getId());
-                        out.writeAttribute("name", getColony().getName());
-                        out.writeAttribute("owner", getColony().getOwner().getId());
-                        out.writeAttribute("tile", getId());
-                        out.writeAttribute("unitCount", Integer.toString(pet.getColonyUnitCount()));
-
-                        Building stockade = getColony().getStockade();
-                        if (stockade != null) {
-                            stockade.toXML(out);
-                        }
-
-                        GoodsContainer emptyGoodsContainer = new GoodsContainer(getGame(), getColony());
-                        emptyGoodsContainer.setFakeID(getColony().getGoodsContainer().getId());
-                        emptyGoodsContainer.toXML(out, player, showAll, toSavedGame);
-
-                        out.writeEndElement();
-                    } // Else: Colony not discovered.
-                } else {
-                    settlement.toXML(out, player, showAll, toSavedGame);
-                }
-            } else {
-                logger.warning("Unknown type of settlement: " + getSettlement());
-            }
+            settlement.toXML(out, player, showAll, toSavedGame);
         }
 
         // Check if the player can see the tile:
