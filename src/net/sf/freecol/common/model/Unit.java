@@ -1580,8 +1580,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *                this unit.
      */
     public void boardShip(Unit carrier) {
-        if (isCarrier()) {
-            throw new IllegalStateException("A carrier cannot board another carrier!");
+        if (isNaval()) {
+            throw new IllegalStateException("A ship cannot board another carrier!");
         }
 
         if (getTile() == carrier.getTile() && isInEurope() == carrier.isInEurope()) {

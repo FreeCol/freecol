@@ -59,9 +59,13 @@ public class UnitTest extends FreeColTestCase {
     EquipmentType musketsType = spec().getEquipmentType("model.equipment.muskets");
 
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    UnitType caravelType = spec().getUnitType("model.unit.caravel");
+    UnitType wagonType = spec().getUnitType("model.unit.wagonTrain");
     
     GoodsType foodType = spec().getGoodsType("model.goods.food");
     GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+
     /**
      * Test Plowing with a hardy pioneer
      * 
@@ -426,6 +430,7 @@ public class UnitTest extends FreeColTestCase {
         assertFalse(caravel.canAdd(galleon));
 
         // tests according to other possible rules
+        wagonTrain.getType().setSpace(1);
         wagonTrain.getType().setSpaceTaken(2);
         caravel.getType().setSpaceTaken(1);
 
@@ -862,4 +867,36 @@ public class UnitTest extends FreeColTestCase {
         colonist.equipWith(horsesType,true);
         assertTrue("Colonist should not have lost experience, compatible role",colonist.getExperience() > 0);
     }
+
+    public void boardShipTest() {
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        Tile tile = map.getTile(6, 8);
+        game.setMap(map);
+
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Unit colonist = new Unit(game, tile, dutch, colonistType, UnitState.ACTIVE);
+        Unit galleon = new Unit(game, tile, dutch, galleonType, UnitState.ACTIVE);
+        Unit caravel = new Unit(game, tile, dutch, caravelType, UnitState.ACTIVE);
+        Unit wagon = new Unit(game, tile, dutch, wagonType, UnitState.ACTIVE);
+
+        caravel.getType().setSpaceTaken(2);
+        wagon.getType().setSpaceTaken(2);
+
+        // can't put ship on carrier
+        caravel.boardShip(galleon);
+        assertEquals(tile, caravel.getLocation());
+        assertEquals(UnitState.ACTIVE, caravel.getState());
+
+        // can put wagon on carrier
+        wagon.boardShip(galleon);
+        assertEquals(galleon, wagon.getLocation());
+        assertEquals(UnitState.SENTRY, wagon.getState());
+
+        colonist.boardShip(galleon);
+        assertEquals(galleon, colonist.getLocation());
+        assertEquals(UnitState.SENTRY, colonist.getState());
+
+    }
+
 }

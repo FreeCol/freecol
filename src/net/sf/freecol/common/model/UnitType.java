@@ -276,7 +276,7 @@ public final class UnitType extends BuildableType {
      * @return an <code>int</code> value
      */
     public int getSpaceTaken() {
-        return spaceTaken;
+        return Math.max(spaceTaken, space + 1);
     }
 
     /**

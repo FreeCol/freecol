@@ -1527,8 +1527,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (oldTile == null || oldTile.getSettlement() != null) {
             tellEnemyPlayers = false;
         }
-        if (unit.isCarrier()) {
-            logger.warning("Tried to load a carrier onto another carrier.");
+        if (unit.isNaval()) {
+            logger.warning("Tried to load a ship onto another carrier.");
             return null;
         }
         unit.boardShip(carrier);

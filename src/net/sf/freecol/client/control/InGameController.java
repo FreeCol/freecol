@@ -2394,8 +2394,8 @@ public final class InGameController implements NetworkConstants {
 
         Client client = freeColClient.getClient();
 
-        if (unit.isCarrier()) {
-            logger.warning("Trying to load a carrier onto another carrier.");
+        if (unit.isNaval()) {
+            logger.warning("Trying to load a ship onto another carrier.");
             return false;
         }
 
