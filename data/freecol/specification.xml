@@ -498,7 +498,9 @@
       <modifier id="model.goods.ore" type="additive" value="1"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" overlay="model.improvement.Plow.image"
+    <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" 
+                          over-trees="true"
+                          overlay="model.improvement.Plow.image"
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
       <tile id="model.tile.arctic" value="false"/>
