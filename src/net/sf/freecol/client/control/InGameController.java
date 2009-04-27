@@ -966,7 +966,25 @@ public final class InGameController implements NetworkConstants {
                 loadTradeGoodsFromColony(unit);
             }
               
-            updateCurrentStop(unit);
+            // Set destination to next stop's location
+            UpdateCurrentStopMessage message = new UpdateCurrentStopMessage(unit);
+            Element reply = askExpecting(freeColClient.getClient(),
+                                         message.toXMLElement(), "update");
+            if (reply != null) {
+                freeColClient.getInGameInputHandler().update(reply);
+
+                Stop nextStop = unit.getCurrentStop();
+                // Advanced to next stop, but the unit can already be there
+                // waiting to load
+                if (nextStop != null && nextStop.getLocation() != unit.getColony()) {
+                    if (unit.isInEurope()) {
+                        moveToAmerica(unit);
+                    } else {
+                        moveToDestination(unit);
+                    }
+                }
+            }
+
             // It may happen that the unit may need to wait
             // (Not enough goods in warehouse to load yet)
             if (oldStop.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()){
@@ -1165,21 +1183,6 @@ public final class InGameController implements NetworkConstants {
         }
     }
     
-    private void updateCurrentStop(Unit unit) {
-        // Set destination to next stop's location
-        freeColClient.getClient().sendAndWait(new UpdateCurrentStopMessage(unit).toXMLElement());
-        
-        Stop stop = unit.nextStop();
-        // go to next stop, unit can already be there waiting to load
-        if (stop != null && stop.getLocation() != unit.getColony()) {
-            if (unit.isInEurope()) {
-                moveToAmerica(unit);
-            } else {
-                moveToDestination(unit);
-            }
-        }
-    }
-
     /**
      * Moves the specified unit in a specified direction. This may result in an
      * attack, move... action.

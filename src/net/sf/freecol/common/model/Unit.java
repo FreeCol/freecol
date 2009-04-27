@@ -433,45 +433,35 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             // currentStop can be out of range if trade route is modified
             currentStop = 0;
         }
-        return stops.get(currentStop);
+        return (currentStop >= stops.size()) ? null : stops.get(currentStop);
     }
 
     /**
-     * Set current stop to next stop and return it
-     * 
-     * @return the next stop.
+     * Set current stop to the next valid stop if any.
+     * TODO: This should be a server-only method, which is called from the
+     *   UpdateCurrentStopMessage handler.
      */
-    public Stop nextStop() {
+    public void nextStop() {
         ArrayList<Stop> stops = getTradeRoute().getStops();
-        if (stops.size() == 0) {
-            currentStop = -1;
-            setDestination(null);
-            return null;
+        if (currentStop < 0 || currentStop >= stops.size()) {
+            currentStop = 0;
         }
-        
         int oldStop = currentStop;
-        Stop stop;
         do {
-            currentStop++;
-            if (currentStop >= stops.size()) {
-                currentStop = 0;
-            }
-            stop = stops.get(currentStop);
-        } while (!shouldGoToStop(stop) && currentStop != oldStop);
-        
-        setDestination(stop.getLocation());
+            if (++currentStop >= stops.size()) currentStop = 0;
+        } while (currentStop != oldStop && !shouldGoToStop(stops.get(currentStop)));
         // if there is no valid stop, keep in current stop waiting to load
-        return stop;
+        setDestination((stops.size() == 0) ? null
+                       : stops.get(currentStop).getLocation());
     }
     
     /**
-     * Returns true if the Unit should proceed to the next stop of its
-     * TradeRoute.
+     * Returns true if the Unit should proceed to the given stop.
      *
      * @param stop a <code>Stop</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean shouldGoToStop(Stop stop) {
+    private boolean shouldGoToStop(Stop stop) {
         ArrayList<GoodsType> goodsTypes = stop.getCargo();
         for(Goods goods : getGoodsList()) {
             boolean unload = true;

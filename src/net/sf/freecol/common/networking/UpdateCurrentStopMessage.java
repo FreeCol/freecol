@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.common.model.Game;
@@ -61,20 +62,27 @@ public class UpdateCurrentStopMessage extends Message {
      * Handle a "updateCurrentStop"-message.
      *
      * @param server The <code>FreeColServer</code> handling the message.
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param connection The <code>Connection</code> the message is from.
      *
-     * @return Null, or an error <code>Element</code> on failure.
+     * @return An update containing the unit after updating its current stop,
+     *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
+        ServerPlayer serverPlayer = server.getPlayer(connection);
         Unit unit;
 
         try {
-            unit = server.getUnitSafely(unitId, server.getPlayer(connection));
+            unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
+
         unit.nextStop();
-        return null;
+
+        Element reply = Message.createNewRootElement("update");
+        Document doc = reply.getOwnerDocument();
+        reply.appendChild(unit.toXMLElement(serverPlayer, doc));
+        return reply;
     }
 
     /**
