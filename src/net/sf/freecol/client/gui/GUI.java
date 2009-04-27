@@ -204,6 +204,7 @@ public final class GUI {
         messages = new Vector<GUIMessage>(MESSAGE_COUNT);
         viewMode = new ViewMode(this);
         logger.info("Starting in Move Units View Mode");
+        displayBorders = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS);
         displayGrid = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID);
         displayTileText = freeColClient.getClientOptions().getDisplayTileText();
         blinkingMarqueeEnabled = true;
