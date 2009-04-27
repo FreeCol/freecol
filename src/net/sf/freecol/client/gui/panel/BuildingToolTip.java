@@ -107,7 +107,7 @@ public class BuildingToolTip extends JToolTip {
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(350, 200);
+        return new Dimension(400, 200);
     }
 }
 
