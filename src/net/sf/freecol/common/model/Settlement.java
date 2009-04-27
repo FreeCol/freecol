@@ -273,11 +273,22 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         
         oldOwner.invalidateCanSeeTiles();
         
-        owner.setExplored(getTile());
-        Iterator<Position> positionIterator = getGame().getMap().getCircleIterator(getTile().getPosition(), true, getLineOfSight());
+        getTile().setOwner(owner);
+        Map map = getGame().getMap();
+        Position position = getTile().getPosition();
+        Iterator<Position> positionIterator = map.getCircleIterator(position, true, getRadius());
         while (positionIterator.hasNext()) {
-            Map.Position p = positionIterator.next();
-            owner.setExplored(getGame().getMap().getTile(p));
+            Tile tile = map.getTile(positionIterator.next());
+            if (tile.getOwner() == oldOwner) {
+                tile.setOwner(owner);
+            }
+        }
+
+        owner.setExplored(getTile());
+        positionIterator = map.getCircleIterator(position, true, getLineOfSight());
+        while (positionIterator.hasNext()) {
+            Tile tile = map.getTile(positionIterator.next());
+            owner.setExplored(tile);
         }
         
         if (getGame().getFreeColGameObjectListener() != null) {

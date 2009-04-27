@@ -2410,6 +2410,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         owner.setUnit(this);
         owner.modifyScore(getType().getScoreValue());
 
+        for (Unit unit : getUnitList()) {
+            unit.setOwner(owner);
+        }
         this.owner = owner;
 
         oldOwner.invalidateCanSeeTiles();

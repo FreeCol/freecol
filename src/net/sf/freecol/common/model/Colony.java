@@ -339,7 +339,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public void setOwner(Player owner) {
         // TODO: Erik - this only works if called on the server!
         super.setOwner(owner);
-        tile.setOwner(owner);
         for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
             if (unit.getLocation() instanceof ColonyTile) {
