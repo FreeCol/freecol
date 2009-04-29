@@ -38,8 +38,6 @@ public final class DefaultHandler extends Handler {
 
 
 
-    private static final String fileName = new String("FreeCol.log");
-
     private FileWriter fileWriter;
 
     private final boolean consoleLogging;
@@ -52,9 +50,9 @@ public final class DefaultHandler extends Handler {
      * @throws FreeColException In case the log file could not be
      *             created/written to.
      */
-    public DefaultHandler(boolean consoleLogging, File directory) throws FreeColException {
+    public DefaultHandler(boolean consoleLogging, String fileName) throws FreeColException {
         this.consoleLogging = consoleLogging;
-        File file = new File(directory, fileName);
+        File file = new File(fileName);
 
         if (file.exists()) {
             if (file.isDirectory()) {
@@ -67,7 +65,7 @@ public final class DefaultHandler extends Handler {
         try {
             file.createNewFile();
         } catch (IOException e) {
-            throw new FreeColException("Log file \"" + fileName + "\" could not be created.");
+            throw new FreeColException("Log file \"" + fileName + "\" could not be created: " + e.getMessage());
         }
 
         if (!file.canWrite()) {

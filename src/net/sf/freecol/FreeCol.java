@@ -113,7 +113,8 @@ public final class FreeCol {
                             consoleLogging = false;
     private static Dimension windowSize = new Dimension(-1, -1);
     private static String   dataFolder = "data" + FILE_SEP;
-    
+    private static String logFile = null;
+
     private static FreeColClient freeColClient;
 
     private static boolean standAloneServer = false;
@@ -381,8 +382,12 @@ public final class FreeCol {
         for (int i = 0; i < handlers.length; i++) {
             baseLogger.removeHandler(handlers[i]);
         }
+        if (logFile == null) {
+            logFile = mainUserDirectory.getName() + File.pathSeparator
+                + "FreeCol.log";
+        }
         try {
-            baseLogger.addHandler(new DefaultHandler(consoleLogging, mainUserDirectory));
+            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
             if (inDebugMode) {
                 logLevel = Level.FINEST;
             } 
@@ -672,6 +677,11 @@ public final class FreeCol {
         options.addOption(OptionBuilder.withLongOpt("log-console")
                           .withDescription(Messages.message("cli.log-console"))
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("log-file")
+                          .withDescription(Messages.message("cli.log-file"))
+                          .withArgName(Messages.message("cli.arg.name"))
+                          .hasArg()
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("log-level")
                           .withDescription(Messages.message("cli.log-level"))
                           .withArgName(Messages.message("cli.arg.loglevel"))
@@ -763,13 +773,14 @@ public final class FreeCol {
             }
             if (line.hasOption("log-console")) {
                 consoleLogging = true;
-                initLogging();
+            }
+            if (line.hasOption("log-file")) {
+                logFile = line.getOptionValue("log-file");
             }
             if (line.hasOption("log-level")) {
                 String logLevelString = line.getOptionValue("log-level").toUpperCase();
                 try {
                     logLevel = Level.parse(logLevelString);
-                    initLogging();
                 } catch (IllegalArgumentException e) {
                     printUsage();
                     System.exit(1);
@@ -905,4 +916,3 @@ public final class FreeCol {
     }
 
 }
-
