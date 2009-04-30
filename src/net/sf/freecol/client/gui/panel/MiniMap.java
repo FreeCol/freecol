@@ -440,14 +440,27 @@ public final class MiniMap extends JPanel implements MouseInputListener {
         miniRectY += y;
 
         g.setColor(Color.WHITE);
-        g.drawRect(miniRectX - miniRectWidth / 2, miniRectY - miniRectHeight / 2, miniRectWidth, miniRectHeight);
-        if (scaleMap) {
-            g.drawRect(miniRectX - miniRectWidth / 2 + 1, miniRectY - miniRectHeight / 2 + 1, miniRectWidth - 2, miniRectHeight - 2);
+        /* Use Math max and min to prevent the rect from being larger than the minimap. */
+        int miniRectMaxX = Math.max(miniRectX - miniRectWidth / 2, x);
+        int miniRectMaxY = Math.max(miniRectY - miniRectHeight / 2, y);
+        int miniRectMinWidth = Math.min(miniRectWidth, width - 1);
+        int miniRectMinHeight = Math.min(miniRectHeight, height - 1);
+        /* Prevent the rect from overlapping the bigger adjust rect */
+        if(miniRectMaxX + miniRectMinWidth > x + width - 1) {
+        	miniRectMaxX = x + width - miniRectMinWidth - 1;
         }
-
+        if(miniRectMaxY + miniRectMinHeight > y + height - 1) {
+        	miniRectMaxY = y + height - miniRectMinHeight - 1;
+        }
+        /* Draw the white rect. */
+        g.drawRect(miniRectMaxX, miniRectMaxY, miniRectMinWidth, miniRectMinHeight);
+        if(scaleMap) {
+        	g.drawRect(miniRectX - miniRectWidth / 2 + 1, miniRectY - miniRectHeight / 2 + 1, miniRectWidth - 2, miniRectHeight - 2);
+        }
+		/* Draw an additional white rect, if the whole map is shown on the minimap */
         if (adjustX > 0 && adjustY > 0) {
             g.setColor(Color.WHITE);
-            g.drawRect(x, y, width, height);
+            g.drawRect(x, y, width - 1, height - 1);
         }
     }
 
