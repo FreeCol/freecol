@@ -544,6 +544,15 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Set the current score of the player.
+     *
+     * @param newScore The new score.
+     */
+    public void setScore(int newScore) {
+        score = newScore;
+    }
+
+    /**
      * Modifies the score of the player by the given value.
      *
      * @param value an <code>int</code> value
@@ -1951,6 +1960,15 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getGold() {
         return gold;
+    }
+
+    /**
+     * Set the amount of gold that this player has.
+     *
+     * @param newGold The new player gold value.
+     */
+    public void setGold(int newGold) {
+        gold = newGold;
     }
 
     /**
