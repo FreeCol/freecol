@@ -1317,33 +1317,27 @@ public final class InGameController implements NetworkConstants {
      */
     private void spy(Unit unit, Direction direction) {
         Game game = freeColClient.getGame();
-        Colony colony = game.getMap().getNeighbourOrNull(direction,
-                                                         unit.getTile()).getColony();
-        if (colony == null) return;
+        Tile tile = game.getMap().getNeighbourOrNull(direction,
+                                                     unit.getTile());
+        if (tile.getColony() == null) return;
 
-        SpySettlementMessage message = new SpySettlementMessage(unit, direction);
         Client client = freeColClient.getClient();
-        Element reply = client.ask(message.toXMLElement());
-        if (reply == null) {
-            throw new IllegalStateException("Illegal reply to "
-                                            + message.getXMLElementTagName()
-                                            + " message.");
+        SpySettlementMessage message = new SpySettlementMessage(unit,
+                                                                direction);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "update");
+        if (reply != null) {
+            // Sleight of hand here.  The update contains two versions
+            // of the colony tile.  The first child node is a detailed
+            // view, which is read explicitly, displayed, removed, then
+            // superceded as the update is processed normally.
+            Element tileElement = (Element) reply.getFirstChild();
+            tile.readFromXMLElement(tileElement);
+            freeColClient.getCanvas().showColonyPanel(tile.getColony());
+            reply.removeChild(tileElement);
+            freeColClient.getInGameInputHandler().update(reply);
         }
-        unit.setMovesLeft(0);
-        NodeList childNodes = reply.getChildNodes();
-        colony.readFromXMLElement((Element) childNodes.item(0));
-        Tile tile = colony.getTile();
-        for(int i = 1; i < childNodes.getLength(); i++) {
-            Element unitElement = (Element) childNodes.item(i);
-            Unit foreignUnit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-            if (foreignUnit == null) {
-                foreignUnit = new Unit(game, unitElement);
-            } else {
-                foreignUnit.readFromXMLElement(unitElement);
-            }
-            tile.add(foreignUnit);
-        }
-        freeColClient.getCanvas().showColonyPanel(colony);
+        nextActiveUnit();
     }
 
     /**

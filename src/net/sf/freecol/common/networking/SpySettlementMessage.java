@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.common.model.Colony;
@@ -49,6 +50,11 @@ public class SpySettlementMessage extends Message {
     private String directionString;
 
     /**
+     * An Element describing the settlement spied upon.
+     */
+    Element tileElement;
+
+    /**
      * Create a new <code>SpySettlementMessage</code> with the
      * supplied unit and direction.
      *
@@ -58,6 +64,7 @@ public class SpySettlementMessage extends Message {
     public SpySettlementMessage(Unit unit, Direction direction) {
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
+        this.tileElement = null;
     }
 
     /**
@@ -70,7 +77,14 @@ public class SpySettlementMessage extends Message {
     public SpySettlementMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.directionString = element.getAttribute("direction");
+        this.tileElement = (element.getChildNodes().getLength() != 1) ? null
+            : (Element) element.getChildNodes().item(0);
     }
+
+    public Element getTileElement() {
+        return tileElement;
+    }
+
 
     /**
      * Handle a "spySettlement"-message.
@@ -95,26 +109,30 @@ public class SpySettlementMessage extends Message {
             return Message.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile newTile = serverPlayer.getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-        if (newTile == null) {
+        Tile tile = serverPlayer.getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
+        if (tile == null) {
             return Message.clientError("Could not find tile"
                                        + " in direction: " + direction
                                        + " from unit: " + unitId);
         }
-        Settlement settlement = newTile.getSettlement();
+        Settlement settlement = tile.getSettlement();
         if (settlement == null) {
-            return Message.clientError("There is no settlement at: " + newTile.getId());
+            return Message.clientError("There is no settlement at: " + tile.getId());
         }
 
-        Element reply = Message.createNewRootElement("foreignColony");
-        if (settlement instanceof Colony) {
-            reply.appendChild(((Colony) settlement).toXMLElement(serverPlayer, reply.getOwnerDocument(), true, false));
-        } else if (settlement instanceof IndianSettlement) {
-            reply.appendChild(((IndianSettlement) settlement).toXMLElement(serverPlayer, reply.getOwnerDocument(), true, false));
-        }
-        for(Unit foreignUnit : newTile.getUnitList()) {
-            reply.appendChild(foreignUnit.toXMLElement(serverPlayer, reply.getOwnerDocument(), true, false));
-        }
+        unit.setMovesLeft(0);
+
+        // Two versions of the tile, one detailed, one not.
+        // The client is trusted (gritch gritch) to pop the first off,
+        // show it, then process the update as normal.
+        // Given we are *correctly* revealing information the client
+        // would not normally have, there is not much to be done about
+        // the trust issue.
+        Element reply = createNewRootElement("update");
+        Document doc = reply.getOwnerDocument();
+        reply.appendChild(tile.toXMLElement(serverPlayer, doc, true, false));
+        reply.appendChild(tile.toXMLElement(serverPlayer, doc));
+        reply.appendChild(unit.toXMLElement(serverPlayer, doc));
         return reply;
     }
 
