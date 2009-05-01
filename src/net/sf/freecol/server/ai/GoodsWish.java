@@ -36,8 +36,6 @@ import org.w3c.dom.Element;
 
 /**
 * Represents the need for goods within a <code>Colony</code>.
-* <br><br>
-* TODO: Deal in amounts of goods.
 */
 public class GoodsWish extends Wish {
     @SuppressWarnings("unused")
@@ -45,9 +43,37 @@ public class GoodsWish extends Wish {
 
     
     private GoodsType goodsType;
+    private int amountRequested;
 
     /**
     * Creates a new <code>GoodsWish</code>.
+    *
+    * @param aiMain The main AI-object.
+    * @param destination The <code>Location</code> in which the
+    *       {@link Wish#getTransportable transportable} assigned to
+    *       this <code>GoodsWish</code> will have to reach.
+    * @param value The value identifying the importance of
+    *       this <code>Wish</code>.
+    * @param amountRequested The amount requested.    
+    * @param goodsType The type of goods needed for releasing this wish
+    *       completly.
+    */
+    public GoodsWish(AIMain aiMain, Location destination, int value, int amountRequested, GoodsType goodsType) {
+        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
+
+        if (destination == null) {
+            throw new NullPointerException("destination == null");
+        }       
+
+        this.destination = destination;
+        this.value = value;
+        this.goodsType = goodsType;
+        this.amountRequested = amountRequested;
+    }
+
+    /**
+    * Creates a new <code>GoodsWish</code>, using a standard request amount of 100.
+    * Possible TODO: Deprecate this in favor of the constructor without std amount?    
     *
     * @param aiMain The main AI-object.
     * @param destination The <code>Location</code> in which the
@@ -59,17 +85,8 @@ public class GoodsWish extends Wish {
     *       completly.
     */
     public GoodsWish(AIMain aiMain, Location destination, int value, GoodsType goodsType) {
-        super(aiMain, getXMLElementTagName() + ":" + aiMain.getNextID());
-
-        if (destination == null) {
-            throw new NullPointerException("destination == null");
-        }       
-
-        this.destination = destination;
-        this.value = value;
-        this.goodsType = goodsType;
+        this(aiMain,destination,value,100,goodsType);
     }
-
 
     /**
     * Creates a new <code>GoodsWish</code> from the given XML-representation.
@@ -114,6 +131,10 @@ public class GoodsWish extends Wish {
          return goodsType;
      }
      
+     public int getGoodsAmount() {
+        return amountRequested;
+     }
+     
      /**
       * Writes this object to an XML stream.
       *
@@ -121,20 +142,20 @@ public class GoodsWish extends Wish {
       * @throws XMLStreamException if there are any problems writing
       *      to the stream.
       */
-     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-         out.writeStartElement(getXMLElementTagName());
+    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        out.writeStartElement(getXMLElementTagName());
          
-         out.writeAttribute("ID", getId());
+        out.writeAttribute("ID", getId());
          
-         out.writeAttribute("destination", destination.getId());
-         if (transportable != null) {
-             out.writeAttribute("transportable", transportable.getId());
-         }
-         out.writeAttribute("value", Integer.toString(value));
-         
-         out.writeAttribute("goodsType", goodsType.getId());
-         
-         out.writeEndElement();
+        out.writeAttribute("destination", destination.getId());
+        if (transportable != null) {
+            out.writeAttribute("transportable", transportable.getId());
+        }
+        out.writeAttribute("value", Integer.toString(value));
+        out.writeAttribute("goodsType", goodsType.getId());
+        out.writeAttribute("amountRequested", Integer.toString(amountRequested));
+
+        out.writeEndElement();
      }
 
      /**
@@ -159,6 +180,15 @@ public class GoodsWish extends Wish {
          value = Integer.parseInt(in.getAttributeValue(null, "value"));
          
          goodsType = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
+
+         final String amountStr = in.getAttributeValue(null, "amountRequested");
+         if (amountStr != null) {
+            amountRequested = Integer.parseInt(amountStr);
+         } else {
+            //backwards compatibility in case amount has not been saved
+            //can be removed if savegame versions <3 are no longer supported.
+            amountRequested = 100;    
+         }
          
          in.nextTag();
      }
