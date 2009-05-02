@@ -126,7 +126,7 @@ public final class FreeCol {
     private static String serverName = null;
     private static final int DEFAULT_PORT = 3541;
 
-    private static File mainUserDirectory;
+    private static File mainUserDirectory = null;
 
     private static File saveDirectory;
     
@@ -383,7 +383,7 @@ public final class FreeCol {
             baseLogger.removeHandler(handlers[i]);
         }
         if (logFile == null) {
-            logFile = mainUserDirectory.getName() + File.separator
+            logFile = mainUserDirectory.getPath() + File.separator
                 + "FreeCol.log";
         }
         try {
