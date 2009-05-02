@@ -383,7 +383,7 @@ public final class FreeCol {
             baseLogger.removeHandler(handlers[i]);
         }
         if (logFile == null) {
-            logFile = mainUserDirectory.getName() + File.pathSeparator
+            logFile = mainUserDirectory.getName() + File.separator
                 + "FreeCol.log";
         }
         try {
