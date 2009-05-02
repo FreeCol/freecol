@@ -20,6 +20,8 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.HashSet;
 import java.util.List;
@@ -43,34 +45,25 @@ import org.w3c.dom.Element;
  */
 public class TileItemContainer extends FreeColGameObject {
 
-    /**
-     * TODO: can this be cleaned up? Do we really need to distinguish
-     * between TileImprovements and other TileItems? Do we really need
-     * the "quick pointers"? In other words, would performance be too
-     * bad otherwise?
-     *
-     * Can we assume that there will only be a single TileItem of any
-     * type in the container? If so, we could use a HashMap, or
-     * EnumMap for storage.
-     */
-
     private static final Logger logger = Logger.getLogger(TileItemContainer.class.getName());
 
-    /** The list of TileItems stored in this <code>TileItemContainer</code>. */
-    private List<TileImprovement> improvements = new ArrayList<TileImprovement>();
-    private Resource resource = null;
-
-    /** Quick Pointers */
-    private TileImprovement road = null;
-    private TileImprovement river = null;
-
-    /** The owner of this <code>TileItemContainer</code>. */
+    /**
+     * The owner of this <code>TileItemContainer</code>.
+     */
     private Tile tile;
 
     /**
-     * Describe lostCityRumour here.
+     * All tile items sorted by zIndex.
      */
-    private LostCityRumour lostCityRumour = null;
+    private List<TileItem> tileItems = new ArrayList<TileItem>();
+
+    // sort tile items ascending by zIndex
+    private final Comparator<TileItem> tileItemComparator = new Comparator<TileItem>() {
+        public int compare(TileItem tileItem1, TileItem tileItem2) {
+            return tileItem1.getZIndex() - tileItem2.getZIndex();
+        }
+    };
+
 
     // ------------------------------------------------------------ constructor
 
@@ -100,12 +93,15 @@ public class TileItemContainer extends FreeColGameObject {
         }
 
         this.tile = tile;
-        
-        improvements = pet.getImprovements();
-        resource = pet.getResource();
-        road = pet.getRoad();
-        river = pet.getRiver();
-        lostCityRumour = pet.getLostCityRumour();
+
+        tileItems.addAll(pet.getImprovements());
+        if (pet.getResource() != null) {
+            tileItems.add(pet.getResource());
+        }
+        if (pet.getLostCityRumour() != null) {
+            tileItems.add(pet.getLostCityRumour());
+        }
+        Collections.sort(tileItems, tileItemComparator);
     }
 
     /**
@@ -172,28 +168,49 @@ public class TileItemContainer extends FreeColGameObject {
         return tile;
     }
 
-    public boolean hasRoad() {
-        return (road != null && road.isComplete());
+    /**
+     * Get the <code>TileItems</code> value.
+     *
+     * @return a <code>List<TileItem></code> value
+     */
+    public final List<TileItem> getTileItems() {
+        return tileItems;
     }
 
-    public boolean hasRiver() {
-        return (river != null);
+    /**
+     * Set the <code>TileItems</code> value.
+     *
+     * @param newTileItems The new TileItems value.
+     */
+    public final void setTileItems(final List<TileItem> newTileItems) {
+        this.tileItems = newTileItems;
     }
 
-    public boolean hasResource() {
-        return (resource != null);
+    public Resource getResource() {
+        for (TileItem item : tileItems) {
+            if (item instanceof Resource) {
+                return (Resource) item;
+            }
+        }
+        return null;
     }
 
     public TileImprovement getRoad() {
-        return road;
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement && ((TileImprovement) item).isRoad()) {
+                return (TileImprovement) item;
+            }
+        }
+        return null;
     }
 
     public TileImprovement getRiver() {
-        return river;
-    }
-
-    public boolean hasLostCityRumour() {
-        return lostCityRumour != null;
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement && ((TileImprovement) item).isRiver()) {
+                return (TileImprovement) item;
+            }
+        }
+        return null;
     }
 
     /**
@@ -202,38 +219,19 @@ public class TileItemContainer extends FreeColGameObject {
      * @return a <code>LostCityRumour</code> value
      */
     public final LostCityRumour getLostCityRumour() {
-        return lostCityRumour;
-    }
-
-    /**
-     * Set the <code>LostCityRumour</code> value.
-     *
-     * @param newLostCityRumour The new LostCityRumour value.
-     */
-    public final void setLostCityRumour(final LostCityRumour newLostCityRumour) {
-        this.lostCityRumour = newLostCityRumour;
-    }
-
-    public Resource getResource() {
-        return resource;
-    }
-
-    public void clearResource() {
-        if (hasResource()) {
-            resource.dispose();
-            resource = null;
+        for (TileItem item : tileItems) {
+            if (item instanceof LostCityRumour) {
+                return (LostCityRumour) item;
+            }
         }
+        return null;
     }
 
     public void clear() {
-        clearResource();
-        for (TileImprovement t : improvements) {
-            t.dispose();
+        for (TileItem item : tileItems) {
+            item.dispose();
         }
-        improvements.clear();
-        road = null;
-        river = null;
-        lostCityRumour = null;
+        tileItems.clear();
     }
 
     /**
@@ -243,33 +241,17 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public void removeIncompatibleImprovements() {
         TileType tileType = tile.getType();
-        Iterator<TileImprovement> improvementIterator = getImprovementIterator();
-        while (improvementIterator.hasNext()) {
-            TileImprovement improvement = improvementIterator.next();
-            if (!improvement.getType().isTileTypeAllowed(tileType)) {
-                improvementIterator.remove();
-                if (improvement == road) {
-                    road = null;
-                } else if (improvement == river) {
-                    river = null;
-                }
-                improvement.dispose();
+        Iterator<TileItem> iterator = tileItems.iterator();
+        while (iterator.hasNext()) {
+            TileItem item = iterator.next();
+            if ((item instanceof TileImprovement
+                 && !((TileImprovement) item).getType().isTileTypeAllowed(tileType))
+                || (item instanceof Resource
+                    && !tileType.canHaveResourceType(((Resource) item).getType()))) {
+                iterator.remove();
+                item.dispose();
             }
         }
-        if (resource != null
-            && !tileType.canHaveResourceType(resource.getType())) {
-            clearResource();
-        }
-    }
-
-    /**
-     * Gets an <code>Iterator</code> of every <code>TileImprovement</code> in this
-     * <code>TileItemContainer</code>.
-     *
-     * @return The <code>Iterator</code>.
-     */
-    public Iterator<TileImprovement> getImprovementIterator() {
-        return getImprovements().iterator();
     }
 
     /**
@@ -277,9 +259,36 @@ public class TileItemContainer extends FreeColGameObject {
      * in this <code>TileItemContainer</code>.
      *
      * @return The <code>List</code>.
-     * @see #getImprovementIterator
      */
     public List<TileImprovement> getImprovements() {
+        return getImprovements(false);
+    }
+        
+    /**
+     * Returns a <code>List</code> of the completed
+     * <code>TileImprovement</code>s in this
+     * <code>TileItemContainer</code>.
+     *
+     * @return The <code>List</code>.
+     */
+    public List<TileImprovement> getCompletedImprovements() {
+        return getImprovements(true);
+    }
+
+    /**
+     * Returns a <code>List</code> of the <code>TileImprovement</code>s
+     * in this <code>TileItemContainer</code>.
+     *
+     * @return The <code>List</code>.
+     */
+    private List<TileImprovement> getImprovements(boolean completedOnly) {
+        List<TileImprovement> improvements = new ArrayList<TileImprovement>();
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement
+                && (!completedOnly || ((TileImprovement) item).isComplete())) {
+                improvements.add((TileImprovement) item);
+            }
+        }
         return improvements;
     }
 
@@ -288,10 +297,13 @@ public class TileItemContainer extends FreeColGameObject {
      * @param g a <code>GoodsType</code> value
      * @return The total bonus
      */
+    // TODO: this is probably unnecessary
     public int getImprovementBonusPotential(GoodsType g) {
         int bonus = 0;
-        for (TileImprovement ti : improvements) {
-            bonus += ti.getBonus(g);
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement) {
+                bonus += ((TileImprovement) item).getBonus(g);
+            }
         }
         return bonus;
     }
@@ -303,9 +315,12 @@ public class TileItemContainer extends FreeColGameObject {
      * @param potential an <code>int</code> value
      * @return The total bonus
      */
+    // TODO: this is probably unnecessary
     public int getResourceBonusPotential(GoodsType g, UnitType unitType, int potential) {
-        if (hasResource()) {
-            potential = resource.getBonus(g, unitType, potential);
+        for (TileItem item : tileItems) {
+            if (item instanceof Resource) {
+                return ((Resource) item).getBonus(g, unitType, potential);
+            }
         }
         return potential;
     }
@@ -332,13 +347,14 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public Set<Modifier> getProductionBonus(GoodsType goodsType, UnitType unitType) {
         Set<Modifier> result = new HashSet<Modifier>();
-        if (resource != null) {
-            result.addAll(resource.getType().getProductionModifier(goodsType, unitType));
-        }
-        for (TileImprovement improvement : improvements) {
-            Modifier modifier = improvement.getProductionModifier(goodsType);
-            if (modifier != null) {
-                result.add(modifier);
+        for (TileItem item : tileItems) {
+            if (item instanceof Resource) {
+                result.addAll(((Resource) item).getType().getProductionModifier(goodsType, unitType));
+            } else if (item instanceof TileImprovement) {
+                Modifier modifier = ((TileImprovement) item).getProductionModifier(goodsType);
+                if (modifier != null) {
+                    result.add(modifier);
+                }
             }
         }
         return result;
@@ -353,11 +369,12 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The movement cost
      */
     public int getMoveCost(int basicMoveCost, Tile fromTile) {
-        // Go through the TileImprovements to find reductions to Movement Cost
         int moveCost = basicMoveCost;
-        for (TileImprovement ti : improvements) {
-            moveCost = ti.getMovementCost(moveCost, fromTile);
-        }       
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement) {
+                moveCost = ((TileImprovement) item).getMovementCost(moveCost, fromTile);
+            }
+        }
         return moveCost;
     }
 
@@ -370,9 +387,10 @@ public class TileItemContainer extends FreeColGameObject {
      */
     public String getLabel(String separator) {
         String label = new String();
-        for (TileImprovement ti : improvements) {
-            if (ti.isComplete()) {
-                label += separator + Messages.message(ti.getName());
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement
+                && ((TileImprovement) item).isComplete()) {
+                label += separator + Messages.message(item.getName());
             }
         }
         return label;
@@ -390,53 +408,31 @@ public class TileItemContainer extends FreeColGameObject {
      * @param t The TileItem to add to this container.
      * @return The added TileItem or the existing TileItem or <code>null</code> on error
      */
-    public TileItem addTileItem(TileItem t) {
-        if (t == null) {
+    public TileItem addTileItem(TileItem item) {
+        if (item == null) {
             return null;
-        }
-        if (t instanceof Resource) {
-            // Disposes existing resource and replaces with new one
-            if (resource != null) {
-                resource.dispose();
-            }
-            resource = (Resource) t;
-            return t;
-        } else if (t instanceof LostCityRumour) {
-            // Disposes existing lostCityRumour and replaces with new one
-            if (lostCityRumour != null) {
-                lostCityRumour.dispose();
-            }
-            lostCityRumour = (LostCityRumour) t;
-            return t;
-        } else if (t instanceof TileImprovement) {
-            TileImprovement improvement = (TileImprovement) t;
-            // Check all improvements to find any to replace
-            String typeId = improvement.getType().getId();
-            if (typeId != null) {
-                Iterator<TileImprovement> ti = improvements.iterator();
-                while (ti.hasNext()) {
-                    TileImprovement imp = ti.next();
-                    if (imp.getType().getId().equals(typeId)) {
-                        if (imp.getMagnitude() < improvement.getMagnitude()) {
-                            removeTileItem(imp);
-                            break;
-                        } else {
-                            // Found it, but not replacing.
-                            return imp;
-                        }
+        } else {
+            for (int index = 0; index < tileItems.size(); index++) {
+                TileItem oldItem = tileItems.get(index);
+                if (item instanceof TileImprovement
+                    && oldItem instanceof TileImprovement
+                    && ((TileImprovement) oldItem).getType().getId()
+                    .equals(((TileImprovement) item).getType().getId())) {
+                    if (((TileImprovement) oldItem).getMagnitude() < ((TileImprovement) item).getMagnitude()) {
+                        tileItems.set(index, item);
+                        oldItem.dispose();
+                        return item;
+                    } else {
+                        // Found it, but not replacing.
+                        return oldItem;
                     }
+                } else if (oldItem.getZIndex() > item.getZIndex()) {
+                    tileItems.add(index, item);
+                    return item;
                 }
             }
-            if (improvement.isRoad()) {
-                road = improvement;
-            } else if (improvement.isRiver()) {
-                river = improvement;
-            }
-            improvements.add(improvement);
-            return improvement;
-        } else {
-            logger.warning("TileItem " + t.getClass().getSimpleName() + " has not be implemented yet.");
-            return null;
+            tileItems.add(item);
+            return item;
         }
     }
 
@@ -446,55 +442,39 @@ public class TileItemContainer extends FreeColGameObject {
      * @param t The TileItem to remove from this container.
      * @return The TileItem that has been removed from this container (if any).
      */
-    public TileItem removeTileItem(TileItem t) {
-        if (t == null) {
-            return null;
-        }
-        if (t instanceof Resource && resource == t) {
-            resource = null;
-            return t;
-        } else if (t instanceof LostCityRumour && lostCityRumour == t) {
-            lostCityRumour = null;
-            return t;
-        } else if (t instanceof TileImprovement) {
-            if (river == t) {
-                river = null;
-            } else if (road == t) {
-                road = null;
-            }
-            return (improvements.remove(t)) ? t : null;
-        } else {
-            logger.warning("TileItem " + t.getClass().getSimpleName() + " has not be implemented yet.");
-            return null;
-        }
+    public TileItem removeTileItem(TileItem item) {
+        return (tileItems.remove(item) ? item : null);
     }
     
     public void copyFrom(TileItemContainer tic) {
         copyFrom(tic, true, false);
     }
-    public void copyFrom(TileItemContainer tic, boolean importBonuses) {
-        copyFrom(tic, importBonuses, false);
+    public void copyFrom(TileItemContainer tic, boolean importResources) {
+        copyFrom(tic, importResources, false);
     }
-    public void copyFrom(TileItemContainer tic, boolean importBonuses, boolean copyOnlyNatural) {
-        clear();
-        if (tic.hasResource() && importBonuses) {
-            Resource ticR = tic.getResource();
-            Resource r = new Resource(getGame(), tile, ticR.getType());
-            r.setQuantity(ticR.getQuantity());
-            addTileItem(r);
-        }
-        if (tic.hasLostCityRumour()) {
-            LostCityRumour ticR = tic.getLostCityRumour();
-            LostCityRumour r = new LostCityRumour(getGame(), tile, ticR.getType(), ticR.getName());
-            addTileItem(r);
-        }
-        for (TileImprovement ti : tic.getImprovements()) {
-            if (!copyOnlyNatural || ti.getType().isNatural()) {
-                TileImprovement newTI = new TileImprovement(getGame(), tile, ti.getType());
-                newTI.setMagnitude(ti.getMagnitude());
-                newTI.setStyle(ti.getStyle());
-                newTI.setTurnsToComplete(ti.getTurnsToComplete());
-                addTileItem(newTI);
+    public void copyFrom(TileItemContainer tic, boolean importResources, boolean copyOnlyNatural) {
+        tileItems.clear();
+        for (TileItem item : tileItems) {
+            if (item instanceof Resource) {
+                if (importResources) {
+                    Resource ticR = (Resource) item;
+                    Resource r = new Resource(getGame(), tile, ticR.getType());
+                    r.setQuantity(ticR.getQuantity());
+                    tileItems.add(r);
+                }
+            } else if (item instanceof LostCityRumour) {
+                LostCityRumour ticR = (LostCityRumour) item;
+                LostCityRumour r = new LostCityRumour(getGame(), tile, ticR.getType(), ticR.getName());
+                addTileItem(r);
+            } else if (item instanceof TileImprovement) {
+                if (!copyOnlyNatural || ((TileImprovement) item).getType().isNatural()) {
+                    TileImprovement ti = (TileImprovement) item;
+                    TileImprovement newTI = new TileImprovement(getGame(), tile, ti.getType());
+                    newTI.setMagnitude(ti.getMagnitude());
+                    newTI.setStyle(ti.getStyle());
+                    newTI.setTurnsToComplete(ti.getTurnsToComplete());
+                    addTileItem(newTI);
+                }
             }
         }
     }
@@ -513,14 +493,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The result.
      */
     public boolean contains(TileItem t) {
-        if (t instanceof Resource) {
-            return ((Resource) t) == resource;
-        } else if (t instanceof LostCityRumour) {
-            return ((LostCityRumour) t) == lostCityRumour;
-        } else if (t instanceof TileImprovement) {
-            return (improvements.indexOf(t) >= 0);
-        }
-        return false;
+        return tileItems.contains(t);
     }
 
     /**
@@ -530,9 +503,9 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The result.
      */
     public TileImprovement findTileImprovementType(TileImprovementType type) {
-        for (TileImprovement ti : improvements) {
-            if (ti.getType() == type) {
-                return ti;
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement && ((TileImprovement) item).getType() == type) {
+                return (TileImprovement) item;
             }
         }
         return null;
@@ -576,11 +549,9 @@ public class TileItemContainer extends FreeColGameObject {
         if (magnitude == TileImprovement.NO_RIVER) {
             return null;
         }
-        if (!hasRiver()) {
-            river = new TileImprovement(getGame(), tile, FreeCol.getSpecification()
-                                        .getTileImprovementType("model.improvement.River"));
-            addTileItem(river);
-        }
+        TileImprovement river = new TileImprovement(getGame(), tile, FreeCol.getSpecification()
+                                                    .getTileImprovementType("model.improvement.River"));
+        river = (TileImprovement) addTileItem(river);
         river.setMagnitude(magnitude);
         river.setStyle(style);
         return river;
@@ -591,21 +562,15 @@ public class TileItemContainer extends FreeColGameObject {
      * Change neighbours' River Style with {@link #adjustNeighbourRiverStyle}.
      */
     public TileImprovement removeRiver() {
-        return (TileImprovement) removeTileItem(river);
-    }
-
-    public int getRiverStyle() {
-        if (river == null) {
-            return 0;
+        Iterator<TileItem> iterator = tileItems.iterator();
+        while (iterator.hasNext()) {
+            TileItem item = iterator.next();
+            if (item instanceof TileImprovement && ((TileImprovement) item).isRiver()) {
+                iterator.remove();
+                return (TileImprovement) item;
+            }
         }
-        return river.getStyle();
-    }
-
-    /**
-     * Disposes all <code>TileItem</code>s in this <code>TileItemContainer</code>.
-     */
-    public void disposeAllTileItems() {
-        clear();
+        return null;
     }
 
     // ------------------------------------------------------------ API methods
@@ -640,17 +605,8 @@ public class TileItemContainer extends FreeColGameObject {
         out.writeAttribute("ID", getId());
         out.writeAttribute("tile", tile.getId());
 
-        if (hasResource()) {
-            resource.toXML(out, player, showAll, toSavedGame);
-        }
-        if (hasLostCityRumour()) {
-            lostCityRumour.toXML(out, player, showAll, toSavedGame);
-        }
-
-        Iterator<TileImprovement> ti = getImprovementIterator();
-        while (ti.hasNext()) {
-            TileImprovement t = ti.next();
-            t.toXML(out, player, showAll, toSavedGame);
+        for (TileItem item : tileItems) {
+            item.toXML(out, player, showAll, toSavedGame);
         }
 
         out.writeEndElement();
@@ -668,41 +624,26 @@ public class TileItemContainer extends FreeColGameObject {
             tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
         }
 
-        improvements.clear();
+        tileItems.clear();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
-            if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
-                resource = (Resource) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (resource == null) {
-                    resource = new Resource(getGame(), in);
-                } else {
-                    resource.readFromXML(in);
+            TileItem item = (TileItem) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
+            if (item == null) {
+                if (in.getLocalName().equals(Resource.getXMLElementTagName())) {
+                    item = new Resource(getGame(), in);
+                } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
+                    item = new LostCityRumour(getGame(), in);
+                } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
+                    item = new TileImprovement(getGame(), in);
                 }
-            } else if (in.getLocalName().equals(LostCityRumour.getXMLElementTagName())) {
-                lostCityRumour = (LostCityRumour) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (lostCityRumour == null) {
-                    lostCityRumour = new LostCityRumour(getGame(), in);
-                } else {
-                    lostCityRumour.readFromXML(in);
-                }
-            } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
-                TileImprovement ti = (TileImprovement) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
-                if (ti == null) {
-                    ti = new TileImprovement(getGame(), in);
-                    improvements.add(ti);
-                } else {
-                    ti.readFromXML(in);
-                    if (!improvements.contains(ti)) {
-                        improvements.add(ti);
-                    }
-                }
-                if (ti.isRoad()) {
-                    road = ti;
-                } else if (ti.isRiver()) {
-                    river = ti;
-                }
+            } else {
+                item.readFromXML(in);
             }
+            tileItems.add(item);
         }
+        // TODO: remove this some time; at this point, sorting is only
+        // required for old savegames
+        Collections.sort(tileItems, tileItemComparator);
     }
 
 
@@ -722,11 +663,8 @@ public class TileItemContainer extends FreeColGameObject {
     public String toString() {
         StringBuffer sb = new StringBuffer(60);
         sb.append("TileItemContainer with: ");
-        if (hasResource()) {
-            sb.append(resource.toString() + ", ");
-        }
-        for (TileImprovement i : improvements) {
-            sb.append(i.toString() + ", ");
+        for (TileItem item : tileItems) {
+            sb.append(item.toString() + ", ");
         }
         return sb.toString();
     }

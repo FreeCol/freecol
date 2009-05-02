@@ -115,7 +115,7 @@ public final class FreeColServer {
     /**
      * The save game format used for saving games.
      */
-    public static final int SAVEGAME_VERSION = 3;
+    public static final int SAVEGAME_VERSION = 4;
 
     /**
      * The oldest save game format that can still be loaded.

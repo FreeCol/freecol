@@ -689,7 +689,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return <code>true</code> if this Tile has a River.
      */
     public boolean hasRiver() {
-        return tileItemContainer != null && getTileItemContainer().hasRiver();
+        return tileItemContainer != null && getTileItemContainer().getRiver() != null;
     }
 
     /**
@@ -698,7 +698,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return <code>true</code> if this Tile has a resource on it.
      */
     public boolean hasResource() {
-        return tileItemContainer != null && getTileItemContainer().hasResource();
+        return tileItemContainer != null && getTileItemContainer().getResource() != null;
     }
 
     /**
@@ -707,7 +707,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return <code>true</code> if this Tile has a lostCityRumour on it.
      */
     public boolean hasLostCityRumour() {
-        return tileItemContainer != null && getTileItemContainer().hasLostCityRumour();
+        return tileItemContainer != null && getTileItemContainer().getLostCityRumour() != null;
     }
 
     /**
@@ -716,7 +716,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return <code>true</code> if this Tile has a road.
      */
     public boolean hasRoad() {
-        return tileItemContainer != null && getTileItemContainer().hasRoad();
+        return tileItemContainer != null && getTileItemContainer().getRoad() != null;
     }
 
     /**
@@ -828,7 +828,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (tileItemContainer == null) {
             return 0;
         } else {
-            return tileItemContainer.getRiverStyle();
+            TileImprovement river = tileItemContainer.getRiver();
+            if (river == null) {
+                return 0;
+            } else {
+                return river.getStyle();
+            }
         }
     }
 
@@ -1293,7 +1298,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The result.
      */
     public boolean canGetRoad() {
-        return isLand() && (tileItemContainer == null || !tileItemContainer.hasRoad());
+        return isLand() && (tileItemContainer == null || tileItemContainer.getRoad() == null);
     }
 
     /**
@@ -1424,7 +1429,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                 "model.tile.resourceExhausted", 
                                 "%resource%", resource.getName(),
                                 "%colony%", ((Colony) settlement).getName());
-                tileItemContainer.clearResource();
+                tileItemContainer.removeTileItem(resource);
                 updatePlayerExploredTiles();
             }
         }

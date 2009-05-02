@@ -42,6 +42,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileItemContainer;
@@ -217,13 +218,14 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     tile.setTileItemContainer(tic);
                 }
                 int oldMagnitude = TileImprovement.NO_RIVER;
-                if (tic.hasRiver()) {
-                    oldMagnitude = tic.getRiver().getMagnitude();
+                TileImprovement river = tic.getRiver();
+                if (river != null) {
+                    oldMagnitude = river.getMagnitude();
                 }
 
                 if (magnitude != oldMagnitude) {
-                    tic.addRiver(magnitude, tic.getRiverStyle());
-                    RiverSection mysection = new RiverSection(tic.getRiverStyle());
+                    tic.addRiver(magnitude, river.getStyle());
+                    RiverSection mysection = new RiverSection(river.getStyle());
                     // for each neighboring tile
                     for (Direction direction : River.directions) {
                         Tile t = tile.getMap().getNeighbourOrNull(direction, tile);
@@ -262,8 +264,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private class ResourceTransform extends MapTransform {
         public void transform(Tile t) {
             // Check if there is a resource already
-            if (t.hasResource()) {
-                t.getTileItemContainer().clearResource();
+            Resource resource = t.getTileItemContainer().getResource();
+            if (resource != null) {
+                t.getTileItemContainer().removeTileItem(resource);
             } else {
                 List<ResourceType> resList = t.getType().getResourceTypeList();
                 switch(resList.size()) {

@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.16 -->
+<!-- specification version 0.17 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -472,10 +472,14 @@
       - putting all-land-tiles="true" all-forest-tiles="false" will result in all non-forested land tiles.
       tile child options: id
       change child options: from, to
+
+      zIndex: tile improvements will be layered according to their z-index
+              tile overlays (e.g. hills) have a zIndex of 100, forests of 200,
+              resources of 400, lost city rumours of 500
     -->
   <tileimprovement-types>
     <tileimprovement-type id="model.improvement.River" natural="true" add-work-turns="0" magnitude="1"
-                          movement-cost="1">
+                          movement-cost="1" zIndex="150">
       <tiles all-land-tiles="true"/>
       <tile id="model.tile.arctic" value="false"/>
       <tile id="model.tile.hills" value="false"/>
@@ -489,17 +493,16 @@
       <modifier id="model.goods.ore" type="additive" value="1"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.Road" add-work-turns="0" over-trees="true"
+    <tileimprovement-type id="model.improvement.Road" add-work-turns="0"
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1"
-                          movement-cost="1">
+                          movement-cost="1" zIndex="350">
       <tiles all-land-tiles="true"/>
       <modifier id="model.goods.furs" type="additive" value="2"/>
       <modifier id="model.goods.lumber" type="additive" value="2"/>
       <modifier id="model.goods.ore" type="additive" value="1"/>
       <modifier id="model.goods.silver" type="additive" value="1"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" 
-                          over-trees="true"
+    <tileimprovement-type id="model.improvement.Plow" add-work-turns="2" zIndex="250"
                           overlay="model.improvement.Plow.image"
                           expended-equipment-type="model.equipment.tools" expended-amount="1" magnitude="1">
       <tiles all-land-tiles="true" all-forest-tiles="false"/>
@@ -524,13 +527,13 @@
       <change from="model.tile.scrubForest"     to="model.tile.desert"/>
       <change from="model.tile.borealForest"    to="model.tile.tundra"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.fishBonusLand" natural="true">
+    <tileimprovement-type id="model.improvement.fishBonusLand" natural="true" zIndex="250">
       <tile id="model.tile.ocean" value="true"/>
       <tile id="model.tile.lake" value="true"/>
       <tile id="model.tile.greatRiver" value="true"/>
       <modifier id="model.goods.fish" type="additive" value="2"/>
     </tileimprovement-type>
-    <tileimprovement-type id="model.improvement.fishBonusRiver" natural="true">
+    <tileimprovement-type id="model.improvement.fishBonusRiver" natural="true" zIndex="250">
       <tile id="model.tile.ocean" value="true"/>
       <tile id="model.tile.lake" value="true"/>
       <tile id="model.tile.greatRiver" value="true"/>

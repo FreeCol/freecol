@@ -25,10 +25,12 @@ import javax.xml.stream.XMLStreamReader;
 import org.w3c.dom.Element;
 
 /**
-* Represents a <code>TileItem</code> item on a <code>Tile</code>.
-*/
+ * Represents a <code>TileItem</code> item on a <code>Tile</code>.
+ */
 public abstract class TileItem extends FreeColGameObject implements Locatable, Named {
 
+    public static final int RESOURCE_ZINDEX = 400;
+    public static final int RUMOUR_ZINDEX = 500;
 
     protected Tile tile;
     
@@ -100,7 +102,7 @@ public abstract class TileItem extends FreeColGameObject implements Locatable, N
      * @return The location of this <code>TileItem</code>.
      */
     public Location getLocation() {
-        return (tile);
+        return tile;
     }
 
     /**
@@ -121,6 +123,13 @@ public abstract class TileItem extends FreeColGameObject implements Locatable, N
     public int getSpaceTaken() {
         return 0;
     }
+
+    /**
+     * Get the <code>ZIndex</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public abstract int getZIndex();
 
     /**
      * Disposes this TileItem.

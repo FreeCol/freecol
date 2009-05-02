@@ -141,6 +141,15 @@ public class LostCityRumour extends TileItem {
     }
 
     /**
+     * Get the <code>ZIndex</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getZIndex() {
+        return RUMOUR_ZINDEX;
+    }
+
+    /**
      * This method writes an XML-representation of this object to the given
      * stream.
      *

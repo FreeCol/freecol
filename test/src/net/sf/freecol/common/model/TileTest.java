@@ -358,11 +358,11 @@ public class TileTest extends FreeColTestCase {
                                 Unit.UnitState.ACTIVE);
         soldier.buildColony(colony);
 
-        assertTrue(colony.getTile().getTileItemContainer().hasRoad());
+        assertTrue(colony.getTile().hasRoad());
 
         colony.dispose();
 
-        assertFalse(colony.getTile().getTileItemContainer().hasRoad());
+        assertFalse(colony.getTile().hasRoad());
 
     }
 

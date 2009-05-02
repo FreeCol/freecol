@@ -43,7 +43,6 @@ public final class TileImprovementType extends FreeColGameObjectType
     private int addWorkTurns;
 
     private String artOverlay;
-    private boolean artOverTrees;
 
     private List<TileType> allowedTileTypes;
     private TileImprovementType requiredImprovementType;
@@ -58,6 +57,13 @@ public final class TileImprovementType extends FreeColGameObjectType
 
     private int movementCost;
     private float movementCostFactor;
+
+    /**
+     * The layer a TileItem belongs to. Items with higher index
+     * will be displayed above items with a lower index. E.g. the
+     * LostCityRumour will be displayed above the Plow improvement.
+     */
+    private int zIndex;
 
     // ------------------------------------------------------------ constructors
 
@@ -87,8 +93,22 @@ public final class TileImprovementType extends FreeColGameObjectType
         return artOverlay;
     }
 
-    public boolean isArtOverTrees() {
-        return artOverTrees;
+    /**
+     * Get the <code>ZIndex</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getZIndex() {
+        return zIndex;
+    }
+
+    /**
+     * Set the <code>ZIndex</code> value.
+     *
+     * @param newZIndex The new ZIndex value.
+     */
+    public void setZIndex(final int newZIndex) {
+        this.zIndex = newZIndex;
     }
 
     public TileImprovementType getRequiredImprovementType() {
@@ -265,7 +285,7 @@ public final class TileImprovementType extends FreeColGameObjectType
                                                         TileImprovementType.class, null);
 
         artOverlay = getAttribute(in, "overlay", null);
-        artOverTrees = getAttribute(in, "over-trees", false);
+        zIndex = getAttribute(in, "z-index", 0);
 
         expendedEquipmentType = specification.getType(in, "expended-equipment-type", EquipmentType.class, null);
         expendedAmount = getAttribute(in, "expended-amount", 0);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.16 -->
+<!-- XSD for specification version 0.17 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="freecol-specification">
     <xs:complexType>
@@ -193,7 +193,6 @@
       <xs:attribute name="id" use="required" type="xs:ID"/>
       <xs:attribute name="natural" type="xs:boolean"/>
       <xs:attribute name="add-work-turns" type="xs:nonNegativeInteger"/>
-      <xs:attribute name="over-trees" type="xs:boolean"/>
       <xs:attribute name="overlay" type="xs:string"/>
       <xs:attribute name="occupation-string" type="xs:string"/>
       <xs:attribute name="expended-equipment-type" type="xs:IDREF"/>
@@ -202,6 +201,7 @@
       <xs:attribute name="deliver-amount" type="xs:nonNegativeInteger"/>
       <xs:attribute name="magnitude" type="xs:nonNegativeInteger"/>
       <xs:attribute name="movement-cost" type="xs:nonNegativeInteger"/>
+      <xs:attribute name="zIndex" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="tiles">

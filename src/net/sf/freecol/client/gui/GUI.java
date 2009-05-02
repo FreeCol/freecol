@@ -64,13 +64,16 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileItem;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -158,6 +161,10 @@ public final class GUI {
     MAX_OTHER_UNITS = 10,
     MESSAGE_COUNT = 3,
     MESSAGE_AGE = 30000; // The amount of time before a message gets deleted (in milliseconds).
+
+    public static final int OVERLAY_INDEX = 100;
+    public static final int FOREST_INDEX = 200;
+
 
     private boolean displayBorders = false;
     private boolean displayGrid = false;
@@ -1681,7 +1688,7 @@ public final class GUI {
      */
     public void displayTerrain(Graphics2D g, Map map, Tile tile, int x, int y) {
         displayBaseTile(g, map, tile, x, y, true);
-        displayAdditionsAndImprovements(g, map, tile, x, y);
+        displayTileItems(g, map, tile, x, y);
         //displayUnexploredBorders(g, map, tile, x, y);
     }
 
@@ -1854,7 +1861,7 @@ public final class GUI {
             if (drawUnexploredBorders) {
                 displayUnexploredBorders(g, map, tile, x, y);
             }
-            displayAdditionsAndImprovements(g, map, tile, x, y);
+            displayTileItems(g, map, tile, x, y);
             displaySettlement(g, map, tile, x, y, withNumber);
             displayFogOfWar(g, map, tile, x, y);
             displayOptionalValues(g, map, tile, x, y);
@@ -1873,136 +1880,105 @@ public final class GUI {
      * @param y The y-coordinate of the location where to draw the Tile
      * (in pixels).
      */
-    private void displayAdditionsAndImprovements(Graphics2D g, Map map, Tile tile, int x, int y) {  
-        Map.Position pos = new Map.Position(tile.getX(), tile.getY());
+    private void displayTileItems(Graphics2D g, Map map, Tile tile, int x, int y) {  
 
         if (!tile.isExplored()) {
             g.drawImage(lib.getTerrainImage(null, tile.getX(), tile.getY()), x, y, null);
         } else {
-            // Until the mountain/hill bordering tiles are done... -sjm
-            // When that happens, use normal bordering method - ryan
-/*            if (tile.isLand()) {
-                for (int i = 0; i < 8; i++) {
-                    Map.Position p = map.getAdjacent(pos, i);
-                    if (map.isValid(p)) {
-                        Tile borderingTile = map.getTile(p);
-                        if (borderingTile.getAddition() == Tile.ADD_HILLS) {
-                            g.drawImage(lib.getTerrainImage(ImageLibrary.HILLS, i, tile.getX(), tile.getY()), x, y - 32, null);
-                        } else if (borderingTile.getAddition() == Tile.ADD_MOUNTAINS) {
-                            g.drawImage(lib.getTerrainImage(ImageLibrary.MOUNTAINS, i, tile.getX(), tile.getY()), x, y - 32, null);
-                        }
-                    }
-                }
-            } */
-
-            // Tile Overlays first (eg. hills and mountains)
-            if (tile.getType().getArtOverlay() != null) {
-                g.drawImage(lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY()), x, y - (int) (32 * lib.getScalingFactor()), null);
+            // layer additions and improvements according to zIndex
+            List<TileItem> tileItems = new ArrayList<TileItem>();
+            if (tile.getTileItemContainer() != null) {
+                tileItems = tile.getTileItemContainer().getTileItems();
             }
-            
-            TileItemContainer tic = tile.getTileItemContainer();
-            if (tic == null) {
-                if(tile.isForested()) {
-                    g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
+            int startIndex = 0;
+            for (int index = startIndex; index < tileItems.size(); index++) {
+                if (tileItems.get(index).getZIndex() < OVERLAY_INDEX) {
+                    drawItem(g, tile, tileItems.get(index), x, y);
+                    startIndex = index + 1;
+                } else {
+                    startIndex = index;
+                    break;
                 }
-            } else {
-                List<TileImprovement> tiList = tile.getCompletedTileImprovements();
-                List<TileImprovement> tiList2 = new ArrayList<TileImprovement>();
-                // Go through improvements and add those that are drawn over trees to another list for later
-                // Skip roads and rivers
-                for (TileImprovement ti : tiList) {
-                    if (ti == tic.getRiver() || ti == tic.getRoad())
-                        continue;
-                    if (!ti.getType().isArtOverTrees()) {
-                        tiList2.add(ti);
-                    } else if (ti.getType().getArtOverlay() != null) {
-                        // Has its own Overlay Image in Misc, use it
-                        g.drawImage(ResourceManager.getImage(ti.getType().getArtOverlay()), x, y, null);
-                    }
+            }
+            // Tile Overlays (eg. hills and mountains)
+            if (tile.getType().getArtOverlay() != null) {
+                g.drawImage(lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY()), x,
+                            y - (int) (32 * lib.getScalingFactor()), null);
+            }
+            for (int index = startIndex; index < tileItems.size(); index++) {
+                if (tileItems.get(index).getZIndex() < FOREST_INDEX) {
+                    drawItem(g, tile, tileItems.get(index), x, y);
+                    startIndex = index + 1;
+                } else {
+                    startIndex = index;
+                    break;
                 }
+            }
+            // Forest
+            if (tile.isForested()) {
+                g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
+            }
 
-                // Draw River if any
-                if (tic.hasRiver() && tic.getRiver().getMagnitude() < TileImprovement.FJORD_RIVER) {
-                    g.drawImage(lib.getRiverImage(tic.getRiverStyle()), x, y, null);
-                }
-                if (tile.isForested()) {
-                    g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
-                }
+            // draw all remaining items
+            for (int index = startIndex; index < tileItems.size(); index++) {
+                drawItem(g, tile, tileItems.get(index), x, y);
+            }
+        }
+    }
 
-                for (TileImprovement ti : tiList2) {
-                    if (ti == tic.getRiver() || ti == tic.getRoad())
-                        continue;
-                    if (ti.getType().getArtOverlay() != null) {
-                        // Has its own Overlay Image in Misc, use it
-                        g.drawImage(ResourceManager.getImage(ti.getType().getArtOverlay()), x, y, null);
-                    }
-                }
+    private void drawItem(Graphics2D g, Tile tile, TileItem item, int x, int y) {
 
-                if (tile.hasResource()) {
-                    Image bonusImage = lib.getBonusImage(tic.getResource().getType());
-                    if (bonusImage != null) {
-                        g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2,
-                                    y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
-                    }
-                }
+        if (item instanceof Resource) {
+            Image bonusImage = lib.getBonusImage(((Resource) item).getType());
+            if (bonusImage != null) {
+                g.drawImage(bonusImage, x + tileWidth/2 - bonusImage.getWidth(null)/2,
+                            y + tileHeight/2 - bonusImage.getHeight(null)/2, null);
+            }
+        } else if (item instanceof LostCityRumour) {
+            g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
+                        x + (int) (RUMOUR_OFFSET_X * lib.getScalingFactor()),
+                        y + (int) (RUMOUR_OFFSET_Y * lib.getScalingFactor()), null);
+        } else if (item instanceof TileImprovement) {
+            TileImprovement improvement = (TileImprovement) item;
+            if (!improvement.isComplete()) {
+                return;
+            } else if (improvement.getType().getArtOverlay() != null) {
+                // Has its own Overlay Image in Misc, use it
+                g.drawImage(ResourceManager.getImage(improvement.getType().getArtOverlay()), x, y, null);
+            } else if (improvement.isRiver() && improvement.getMagnitude() < TileImprovement.FJORD_RIVER) {
+                g.drawImage(lib.getRiverImage(improvement.getStyle()), x, y, null);
+            } else if (improvement.isRoad()) {
+                long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
+                boolean connectedRoad = false;
+                for (Direction direction : Direction.values()) {
+                    Tile borderingTile = tile.getMap().getAdjacentTile(tile.getPosition(), direction);
+                    if (borderingTile!=null) {
+                        if (borderingTile.hasRoad()) {
+                            connectedRoad =  true;
+                            int nx = x + tileWidth/2;
+                            int ny = y + tileHeight/2;
 
-
-                /* Until the forest bordering tiles are done... -sjm
-                // When that happens, use normal bordering method. - ryan
-                if (tile.isLand()) {
-                for (int i = 0; i < 8; i++) {
-                Map.Position p = Map.getAdjacent(pos, i);
-                if (map.isValid(p)) {
-                Tile borderingTile = map.getTile(p);
-                if (tile.getType() == borderingTile.getType() ||
-                !borderingTile.isLand() ||
-                !tile.isLand() ||
-                !(borderingTile.getType().getIndex() < tile.getType().getIndex()) ||
-                !borderingTile.isExplored()) {
-                // Equal tiles, sea tiles and unexplored tiles have no effect
-                continue;
-                }
-                if (borderingTile.isForested()) {
-                g.drawImage(lib.getTerrainImage(ImageLibrary.FOREST, i, tile.getX(), tile.getY()),
-                x, y - 32, null);
-                } else 
-                }
-                }
-                }
-                */
-
-                // Paint the roads:
-                if (tile.hasRoad()) {
-                    long seed = Long.parseLong(Integer.toString(tile.getX()) + Integer.toString(tile.getY()));
-                    boolean connectedRoad = false;
-                    for (Direction direction : Direction.values()) {
-                        Tile borderingTile = map.getAdjacentTile(pos, direction);
-                        if (borderingTile!=null) {
-                            if (borderingTile.hasRoad()) {
-                                connectedRoad =  true;
-                                int nx = x + tileWidth/2;
-                                int ny = y + tileHeight/2;
-
-                                switch (direction) {
-                                case N : nx = x + tileWidth/2; ny = y; break;
-                                case NE: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
-                                case E : nx = x + tileWidth; ny = y + tileHeight/2; break;
-                                case SE: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
-                                case S : nx = x + tileWidth/2; ny = y + tileHeight; break;
-                                case SW: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
-                                case W : nx = x; ny = y + tileHeight/2; break;
-                                case NW: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
-                                }
-
-                                drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2, nx, ny);
+                            switch (direction) {
+                            case N : nx = x + tileWidth/2; ny = y; break;
+                            case NE: nx = x + (tileWidth*3)/4; ny = y + tileHeight/4; break;
+                            case E : nx = x + tileWidth; ny = y + tileHeight/2; break;
+                            case SE: nx = x + (tileWidth*3)/4; ny = y + (tileHeight*3)/4; break;
+                            case S : nx = x + tileWidth/2; ny = y + tileHeight; break;
+                            case SW: nx = x + tileWidth/4; ny = y + (tileHeight*3)/4; break;
+                            case W : nx = x; ny = y + tileHeight/2; break;
+                            case NW: nx = x + tileWidth/4; ny = y + tileHeight/4; break;
                             }
+
+                            drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2, nx, ny);
                         }
                     }
+                }
 
-                    if (!connectedRoad) {
-                        drawRoad(g, seed, x + tileWidth/2 - 10, y + tileHeight/2, x + tileWidth/2 + 10, y + tileHeight/2);
-                        drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2 - 10, x + tileWidth/2, y + tileHeight/2 + 10);
-                    }
+                if (!connectedRoad) {
+                    drawRoad(g, seed, x + tileWidth/2 - 10, y + tileHeight/2,
+                             x + tileWidth/2 + 10, y + tileHeight/2);
+                    drawRoad(g, seed, x + tileWidth/2, y + tileHeight/2 - 10,
+                             x + tileWidth/2, y + tileHeight/2 + 10);
                 }
             }
         }
@@ -2114,10 +2090,6 @@ public final class GUI {
                 } else {
                     logger.warning("Requested to draw unknown settlement type.");
                 }
-            } else if (tile.hasLostCityRumour()) {
-                g.drawImage(lib.getMiscImage(ImageLibrary.LOST_CITY_RUMOUR),
-                            x + (int) (RUMOUR_OFFSET_X * lib.getScalingFactor()),
-                            y + (int) (RUMOUR_OFFSET_Y * lib.getScalingFactor()), null);
             }
         }
     }

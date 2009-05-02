@@ -121,6 +121,15 @@ public class Resource extends TileItem {
     }
 
     /**
+     * Get the <code>ZIndex</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getZIndex() {
+        return RESOURCE_ZINDEX;
+    }
+
+    /**
      * Returns the best GoodsType
      */
     public GoodsType getBestGoodsType() {

@@ -205,6 +205,15 @@ public class TileImprovement extends TileItem {
         turnsToComplete = turns;
     }
 
+    /**
+     * Get the <code>ZIndex</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getZIndex() {
+        return type.getZIndex();
+    }
+
     public boolean isComplete() {
         return turnsToComplete <= 0;
     }
