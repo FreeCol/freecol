@@ -67,6 +67,7 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
         setLayout(new BorderLayout());
 
         buttons.add(okButton);
+        okButton.setActionCommand(String.valueOf(OK));
 
         JButton reset = new JButton(Messages.message("reset"));
         reset.setActionCommand(String.valueOf(RESET));
