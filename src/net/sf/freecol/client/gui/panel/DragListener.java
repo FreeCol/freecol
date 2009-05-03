@@ -483,8 +483,9 @@ public final class DragListener extends MouseAdapter {
             });
         menu.add(name);
                 
-        JMenuItem unload = new JMenuItem(Messages.message("unload"));
-        unload.addActionListener(new ActionListener() {
+        if (!(goods.getLocation() instanceof Colony)) {
+            JMenuItem unload = new JMenuItem(Messages.message("unload"));
+            unload.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     inGameController.unloadCargo(goods);
                     if (parentPanel instanceof CargoPanel) {
@@ -494,14 +495,14 @@ public final class DragListener extends MouseAdapter {
                         if (cargoPanel.getParentPanel() instanceof ColonyPanel) {
                             ((ColonyPanel) cargoPanel.getParentPanel()).updateWarehouse();
                         }
-                        */
+                         */
                     }
                     parentPanel.revalidate();
                 }
             });
-        menu.add(unload);
-        JMenuItem dump = new JMenuItem(Messages.message("dumpCargo"));
-        dump.addActionListener(new ActionListener() {
+            menu.add(unload);
+            JMenuItem dump = new JMenuItem(Messages.message("dumpCargo"));
+            dump.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     inGameController.unloadCargo(goods, true);
                     if (parentPanel instanceof CargoPanel) {
@@ -510,7 +511,8 @@ public final class DragListener extends MouseAdapter {
                     parentPanel.revalidate();
                 }
             });
-        menu.add(dump);
+            menu.add(dump);
+        }
                 
         return menu;
     }
