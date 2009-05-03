@@ -2064,7 +2064,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (amount > 0) {
             unit.equipWith(type, amount);
         } else {
-            unit.removeEquipment(type, amount);
+            unit.removeEquipment(type, -amount);
         }
 
         if (unit.getLocation() instanceof Tile) {

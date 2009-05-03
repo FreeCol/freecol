@@ -2686,7 +2686,7 @@ public final class InGameController implements NetworkConstants {
             }
             unit.equipWith(type, amount);
         } else {
-            unit.removeEquipment(type, amount);
+            unit.removeEquipment(type, -amount);
         }
 
         freeColClient.getCanvas().updateGoldLabel();
