@@ -181,7 +181,6 @@ public final class FreeCol {
 
         Locale.setDefault(getLocale());
         
-        
         if (javaCheck && !checkJavaVersion()) {
             removeSplash(splash);
             System.err.println("Java version " + MIN_JDK_VERSION +
@@ -657,6 +656,21 @@ public final class FreeCol {
         // create the command line parser
         CommandLineParser parser = new PosixParser();
 
+        /**
+         * Ugly hack: try to determine language first, so that usage,
+         * etc. will be localized.
+         */
+        for (int index = 0; index < args.length; index++) {
+            if ("--default-locale".equals(args[index])
+                && index + 1 < args.length
+                && !args[index + 1].startsWith("--")) {
+                Locale locale = LanguageOption.getLocale(args[index + 1]);
+                Locale.setDefault(locale);
+                Messages.setMessageBundle(locale);
+                break;
+            }
+        }
+
         // create the Options
         options.addOption(OptionBuilder.withLongOpt("freecol-data")
                           .withDescription(Messages.message("cli.freecol-data"))
@@ -752,6 +766,17 @@ public final class FreeCol {
         try {
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);
+            if (line.hasOption("default-locale")) {
+                // slightly ugly: strip encoding from LC_MESSAGES
+                String languageID = line.getOptionValue("default-locale");
+                int index = languageID.indexOf('.');
+                if (index > 0) {
+                    languageID = languageID.substring(0, index);
+                }
+                Locale newLocale = LanguageOption.getLocale(languageID);
+                Locale.setDefault(newLocale);
+                Messages.setMessageBundle(newLocale);
+            }
             if (line.hasOption("splash")) {
                 displaySplash = true;
                 final String str = line.getOptionValue("splash");
@@ -801,15 +826,6 @@ public final class FreeCol {
                         System.exit(1);
                     }
                 }
-            }
-            if (line.hasOption("default-locale")) {
-                // slightly ugly: strip encoding from LC_MESSAGES
-                String languageID = line.getOptionValue("default-locale");
-                int index = languageID.indexOf('.');
-                if (index > 0) {
-                    languageID = languageID.substring(0, index);
-                }
-                Locale.setDefault(LanguageOption.getLocale(languageID));
             }
             if (line.hasOption("no-sound")) {
                 sound = false;
