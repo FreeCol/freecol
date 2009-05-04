@@ -53,8 +53,13 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 
@@ -165,27 +170,40 @@ public final class DefaultTransferHandler extends TransferHandler {
 
             // Make sure we don't drop onto other Labels.
             if (comp instanceof UnitLabel) {
-
-                /*
-                  If the unit/cargo is dropped on a carrier in port (EuropePanel.InPortPanel),
-                  then the ship is selected and the unit is added to its cargo.
-
-                  If not, assume that the user wished to drop the unit/cargo on the panel below.
+                UnitLabel unitLabel = (UnitLabel) comp;
+                /**
+                 * If the unit/cargo is dropped on a carrier in port
+                 * (EuropePanel.InPortPanel), then the ship is
+                 * selected and the unit is added to its cargo. If the
+                 * unit is not a carrier, but can be equipped, and the
+                 * goods can be converted to equipment, equip the unit.
+                 *
+                 * If not, assume that the user wished to drop the
+                 * unit/cargo on the panel below.
                 */
-                if (((UnitLabel) comp).getUnit().isCarrier() && ((UnitLabel) comp).getParent() instanceof EuropePanel.InPortPanel) {
-                    if (data instanceof UnitLabel && ((UnitLabel) data).getUnit().isOnCarrier()
-                            || data instanceof GoodsLabel && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
+                if (unitLabel.getUnit().isCarrier()
+                    && unitLabel.getParent() instanceof EuropePanel.InPortPanel) {
+                    if (data instanceof UnitLabel
+                        && ((UnitLabel) data).getUnit().isOnCarrier()
+                        || data instanceof GoodsLabel
+                        && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
                         oldSelectedUnit = ((EuropePanel) parentPanel).getSelectedUnitLabel();
                     }
-                    ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
+                    ((EuropePanel) parentPanel).setSelectedUnitLabel(unitLabel);
                     comp = ((EuropePanel) parentPanel).getCargoPanel();
-                } else if (((UnitLabel) comp).getUnit().isCarrier() && ((UnitLabel) comp).getParent() instanceof ColonyPanel.InPortPanel) {
-                    if (data instanceof UnitLabel && ((UnitLabel) data).getUnit().isOnCarrier()
-                            || data instanceof GoodsLabel && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
+                } else if (unitLabel.getUnit().isCarrier()
+                           && unitLabel.getParent() instanceof ColonyPanel.InPortPanel) {
+                    if (data instanceof UnitLabel
+                        && ((UnitLabel) data).getUnit().isOnCarrier()
+                        || data instanceof GoodsLabel
+                        && ((GoodsLabel) data).getGoods().getLocation() instanceof Unit) {
                         oldSelectedUnit = ((ColonyPanel) parentPanel).getSelectedUnitLabel();
                     }
-                    ((ColonyPanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
+                    ((ColonyPanel) parentPanel).setSelectedUnitLabel(unitLabel);
                     comp = ((ColonyPanel) parentPanel).getCargoPanel();
+                } else if (unitLabel.getUnit().hasAbility("model.ability.canBeEquipped")
+                           && (data instanceof GoodsLabel || data instanceof MarketLabel)) {
+                    // don't do anything before partial amount has been checked
                 } else {
                     try {
                         comp = (JComponent)comp.getParent();
@@ -193,7 +211,9 @@ public final class DefaultTransferHandler extends TransferHandler {
                         return false;
                     }
 
-                    // This is because we use an extra panel for layout in this particular case; may find a better solution later.
+                    // This is because we use an extra panel for
+                    // layout in this particular case; may find a
+                    // better solution later.
                     try {
                         if ((JComponent)comp.getParent() instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
                             comp = (JComponent)comp.getParent();
@@ -323,6 +343,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     label.getGoods().setAmount(100);
                 }
 
+                /*
                 if (!(comp instanceof ColonyPanel.WarehousePanel || 
                       comp instanceof CargoPanel ||
                       comp instanceof EuropePanel.MarketPanel) || 
@@ -330,9 +351,31 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                     return false;
                 }
+                */
 
-
-                if (comp instanceof JLabel) {
+                if (comp instanceof UnitLabel) {
+                    UnitLabel unitLabel = ((UnitLabel) comp);
+                    Unit unit = unitLabel.getUnit();
+                    if (unit.hasAbility("model.ability.canBeEquipped")) {
+                        Goods goods = label.getGoods();
+                        for (EquipmentType equipment : Specification.getSpecification()
+                                 .getEquipmentTypeList()) {
+                            if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {
+                                AbstractGoods requiredGoods = equipment.getGoodsRequired().get(0);
+                                if (requiredGoods.getType().equals(goods.getType())
+                                    && requiredGoods.getAmount() <= goods.getAmount()) {
+                                    int amount = Math.min(goods.getAmount() / requiredGoods.getAmount(),
+                                                          equipment.getMaximumCount());
+                                    unitLabel.getCanvas().getClient().getInGameController()
+                                        .equipUnit(unit, equipment, amount);
+                                    unitLabel.updateIcon();
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                } else if (comp instanceof JLabel) {
                     logger.warning("Oops, I thought we didn't have to write this part.");
                     return true;
                 } else if (comp instanceof JPanel) {
@@ -378,7 +421,29 @@ public final class DefaultTransferHandler extends TransferHandler {
                 }
 
 
-                if (comp instanceof JLabel) {
+                if (comp instanceof UnitLabel) {
+                    UnitLabel unitLabel = (UnitLabel) comp;
+                    Unit unit = unitLabel.getUnit();
+                    if (unit.hasAbility("model.ability.canBeEquipped")) {
+                        GoodsType goodsType = label.getType();
+                        for (EquipmentType equipment : Specification.getSpecification()
+                                 .getEquipmentTypeList()) {
+                            if (unit.canBeEquippedWith(equipment) && equipment.getGoodsRequired().size() == 1) {
+                                AbstractGoods requiredGoods = equipment.getGoodsRequired().get(0);
+                                if (requiredGoods.getType().equals(label.getType())
+                                    && requiredGoods.getAmount() <= label.getAmount()) {
+                                    int amount = Math.min(label.getAmount() / requiredGoods.getAmount(),
+                                                          equipment.getMaximumCount());
+                                    unitLabel.getCanvas().getClient().getInGameController()
+                                        .equipUnit(unit, equipment, amount);
+                                    unitLabel.updateIcon();
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                } else if (comp instanceof JLabel) {
                     logger.warning("Oops, I thought we didn't have to write this part.");
                     return true;
                 } else if (comp instanceof JPanel) {
