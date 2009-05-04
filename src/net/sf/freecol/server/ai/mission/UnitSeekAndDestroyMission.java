@@ -31,15 +31,15 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -121,7 +121,8 @@ public class UnitSeekAndDestroyMission extends Mission {
     *
     * @param connection The <code>Connection</code> to the server.
     */
-    public void doMission(Connection connection) {
+    @Override
+	public void doMission(Connection connection) {
         Unit unit = getUnit();
 
         if (!isValid()) {
@@ -210,16 +211,16 @@ public class UnitSeekAndDestroyMission extends Mission {
     * Check to see if this is a valid hostility with a valid target.
     * @return <code>true</code> if this mission is valid.
     */
-    public boolean isValid() {
+    @Override
+	public boolean isValid() {
         Player owner = getUnit().getOwner();
         Player targetPlayer;
-
-        if (((FreeColGameObject) target).isDisposed()) {
-            return false;
-        }
         if (target == null) {
             return false;
         }     
+        if (((FreeColGameObject) target).isDisposed()) {
+            return false;
+        }
         if (target.getTile() == null) {
             return false;
         }
@@ -246,7 +247,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      *
      * @return The destination for this <code>Transportable</code>.
      */    
-    public Tile getTransportDestination() {
+    @Override
+	public Tile getTransportDestination() {
         if (target == null) {
             return null;
         }
@@ -282,7 +284,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      *
      * @return The priority.
      */
-    public int getTransportPriority() {
+    @Override
+	public int getTransportPriority() {
         if (getTransportDestination() != null) {
             return NORMAL_TRANSPORT_PRIORITY;
         } else {
@@ -322,7 +325,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+    @Override
+	protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         
         out.writeAttribute("unit", getUnit().getId());
@@ -336,7 +340,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * from XML data.
      * @param in The input stream with the XML.
      */
-    protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
+    @Override
+	protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setAIUnit((AIUnit) getAIMain().getAIObject(in.getAttributeValue(null, "unit")));        
         setTarget((Location) getGame().getFreeColGameObject(in.getAttributeValue(null, "target")));
         in.nextTag();
@@ -358,7 +363,8 @@ public class UnitSeekAndDestroyMission extends Mission {
      * 
      * @return The <code>String</code>.
      */
-    public String getDebuggingInfo() {
+    @Override
+	public String getDebuggingInfo() {
         if (target == null) {
             return "No target";
         } else {
