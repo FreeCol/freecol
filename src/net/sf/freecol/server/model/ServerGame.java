@@ -145,4 +145,22 @@ public class ServerGame extends Game {
         return id;
     }
 
+
+    /**
+     * Prepares this <code>Game</code> for a new turn.
+     * 
+     * Invokes <code>newTurn()</code> for every registered
+     * <code>FreeColGameObject</code>.
+     * 
+     * @see #setFreeColGameObject
+     */
+    public void newTurn() {
+        getTurn().increase();
+        logger.info("Turn is now " + getTurn().toString());
+
+        for (Player player : players) {
+            logger.info("Calling newTurn for player " + player.getName());
+            player.newTurn();
+        }
+    }
 }

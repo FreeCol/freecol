@@ -100,7 +100,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(false, plain.hasImprovement(plow));
 
         // Advance 1 turn
-        game.newTurn();
+        dutch.newTurn();
 
         // Pioneer finished work but can only move on next turn
         assertEquals(0, hardyPioneer.getMovesLeft());
@@ -110,7 +110,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(true, plain.hasImprovement(plow));
 
         // Advance last turn
-        game.newTurn();
+        dutch.newTurn();
 
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
@@ -156,7 +156,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("" + soldier.getLocation(), colony.getColonyTile(map.getTile(5, 8)), soldier.getLocation());
 
         // One turn to check production
-        game.newTurn();
+        dutch.newTurn();
 
         assertEquals(false, plain58.hasImprovement(plow));
         assertEquals(8, colony.getGoodsCount(Goods.FOOD));
@@ -169,7 +169,7 @@ public class UnitTest extends FreeColTestCase {
         plain58.add(plowImprovement);
         hardyPioneer.work(plowImprovement);
  
-        game.newTurn();
+        dutch.newTurn();
 
         assertEquals(true, plain58.hasImprovement(plow));
         // Production for next turn is updated
@@ -179,7 +179,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(2, colony.getFoodConsumption());
 
         // Advance last turn
-        game.newTurn();
+        dutch.newTurn();
 
         assertEquals(16 + 9, colony.getGoodsCount(Goods.FOOD));
         assertEquals(2, colony.getFoodConsumption());
@@ -226,7 +226,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
 
         // Advance 1 turn
-        game.newTurn();
+        dutch.newTurn();
 
         assertEquals(3, hardyPioneer.getMovesLeft());
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());

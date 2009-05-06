@@ -78,7 +78,7 @@ public class MarketTest extends FreeColTestCase {
                 
         // After 100 turns the prices should have recovered.
         for (int i = 0; i < 100; i++){
-            g.newTurn();
+            dm.newTurn();
         }
                 
         assertTrue(dm.getSalePrice(silver, 1) >= price);
@@ -224,8 +224,9 @@ public class MarketTest extends FreeColTestCase {
 
         // After 100 turns the prices should have recovered.
         for (int i = 0; i < 100; i++){
-            g.newTurn();
-
+            englishMarket.newTurn();
+            frenchMarket.newTurn();
+            
             // The french market should also recover 
             assertTrue(englishMarket.getSalePrice(silver, 1) <= frenchMarket.getSalePrice(silver, 1));
         }

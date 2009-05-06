@@ -885,7 +885,7 @@ public final class FreeColServer {
      * @return The <code>Game</code> which is the main class of the game-model
      *         being used in this game.
      */
-    public Game getGame() {
+    public ServerGame getGame() {
         return game;
     }
 

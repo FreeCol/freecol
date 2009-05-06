@@ -20,8 +20,8 @@
 package net.sf.freecol.server.control;
 
 import net.sf.freecol.common.PseudoRandom;
-import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.model.ServerGame;
 
 /**
  * This base class provides thread-safe access to a
@@ -53,7 +53,7 @@ public class FreeColServerHolder {
      *
      * @return a <code>Game</code> value
      */
-    protected Game getGame() {
+    protected ServerGame getGame() {
         return freeColServer.getGame();
     }
 

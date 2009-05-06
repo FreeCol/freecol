@@ -731,23 +731,6 @@ public class Game extends FreeColGameObject {
     	return false;
     }
 
-    /**
-     * Prepares this <code>Game</code> for a new turn.
-     * 
-     * Invokes <code>newTurn()</code> for every registered
-     * <code>FreeColGamObject</code>.
-     * 
-     * @see #setFreeColGameObject
-     */
-    public void newTurn() {
-        turn.increase();
-        logger.info("Turn is now " + turn.toString());
-
-        for (Player player : players) {
-            logger.info("Calling newTurn for player " + player.getName());
-            player.newTurn();
-        }
-    }
 
     /**
      * Gets the <code>GameOptions</code> that is associated with this
