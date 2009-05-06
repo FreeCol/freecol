@@ -72,6 +72,11 @@ public abstract class FreeColObject {
     protected static final String ARRAY_SIZE = "xLength";
 
     /**
+     * XML attribute tag to denote partial updates.
+     */
+    protected static final String PARTIAL_ATTRIBUTE = "PARTIAL";
+
+    /**
      * Unique identifier of an object
      */
     private String id;
@@ -150,11 +155,54 @@ public abstract class FreeColObject {
      * @return An XML-representation of this object.
      */
     public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
+        return toXMLElement(player, document, showAll, toSavedGame, null);
+    }
+
+    /**
+     * This method writes a partial XML-representation of this object to
+     * an element using only the mandatory and specified fields.
+     *
+     * @param document The <code>Document</code>.
+     * @param fields The fields to write.
+     * @return An XML-representation of this object.
+     */
+    public Element toXMLElementPartial(Document document, String... fields) {
+        return toXMLElement(null, document, true, false, fields);
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * <br><br>
+     *
+     * Only attributes visible to the given <code>Player</code> will
+     * be added to that representation if <code>showAll</code> is
+     * set to <code>false</code>.
+     *
+     * @param player The <code>Player</code> this XML-representation
+     *      should be made for, or <code>null</code> if
+     *      <code>showAll == true</code>.
+     * @param document The <code>Document</code>.
+     * @param showAll Only attributes visible to <code>player</code>
+     *      will be added to the representation if <code>showAll</code>
+     *      is set to <i>false</i>.
+     * @param toSavedGame If <code>true</code> then information that
+     *      is only needed when saving a game is added.
+     * @param fields An array of field names, which if non-null
+     *               indicates this should be a partial write.
+     * @return An XML-representation of this object.
+     */
+    public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame, String[] fields) {
         try {
             StringWriter sw = new StringWriter();
             XMLOutputFactory xif = XMLOutputFactory.newInstance();
             XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
-            toXML(xsw, player, showAll, toSavedGame);
+            if (fields == null) {
+                toXML(xsw, player, showAll, toSavedGame);
+            } else {
+                toXMLPartialImpl(xsw, fields);
+            }
             xsw.close();
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -273,13 +321,20 @@ public abstract class FreeColObject {
     }
 
     /**
-     * Initializes this object from an XML-representation of this object.
+     * Initializes this object from an XML-representation of this object,
+     * unless the PARTIAL_ATTRIBUTE tag is present which indicates
+     * a partial update of an existing object.
+     *
      * @param in The input stream with the XML.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
      */
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
+        if (in.getAttributeValue(null, PARTIAL_ATTRIBUTE) == null) {
+            readFromXMLImpl(in);
+        } else {
+            readFromXMLPartialImpl(in);
+        }
     }
 
     /**
@@ -626,6 +681,20 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Updates this object from an XML-representation of this object.
+     * Ideally this would be abstract, but as not all FreeColObject-subtypes
+     * need partial updates we provide a non-operating stub here which is
+     * to be overridden where needed.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLPartialImpl(XMLStreamReader in) throws XMLStreamException {
+        throw new UnsupportedOperationException("Partial update of unsupported type");
+    }
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *
@@ -634,6 +703,23 @@ public abstract class FreeColObject {
      *      to the stream.
      */
     abstract protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException;
+
+    /**
+     * This method writes a partial XML-representation of this object to
+     * the given stream using only the mandatory and specified fields.
+     * Ideally this would be abstract, but as not all FreeColObject-subtypes
+     * need partial updates we provide a non-operating stub here which is
+     * to be overridden where needed.
+     *
+     * @param out The target stream.
+     * @param fields The fields to write.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
+        throws XMLStreamException {
+        throw new UnsupportedOperationException("Partial update of unsupported type.");
+    }
 
     // TODO: make these abstract
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {}
