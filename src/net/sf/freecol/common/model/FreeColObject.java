@@ -77,7 +77,7 @@ public abstract class FreeColObject {
     private String id;
 
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    
+
     /**
      * Get the <code>Id</code> value.
      *
@@ -99,44 +99,56 @@ public abstract class FreeColObject {
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
+     * @param document The <code>Document</code>.
+     * @return An XML-representation of this object.
+     */
+    public Element toXMLElement(Document document) {
+        // since the player is null, showAll must be true
+        return toXMLElement(null, document, true, false);
+    }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
-     * @param player The <code>Player</code> this XML-representation 
+     *
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
      * @param document The <code>Document</code>.
      * @return An XML-representation of this object.
-     */    
+     */
     public Element toXMLElement(Player player, Document document) {
         return toXMLElement(player, document, true, false);
     }
-    
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
-     * @param player The <code>Player</code> this XML-representation 
+     *
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
      * @param document The <code>Document</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
      *      is only needed when saving a game is added.
      * @return An XML-representation of this object.
-     */    
+     */
     public Element toXMLElement(Player player, Document document, boolean showAll, boolean toSavedGame) {
         try {
             StringWriter sw = new StringWriter();
@@ -144,7 +156,7 @@ public abstract class FreeColObject {
             XMLStreamWriter xsw = xif.createXMLStreamWriter(sw);
             toXML(xsw, player, showAll, toSavedGame);
             xsw.close();
-            
+
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             Document tempDocument = null;
             try {
@@ -167,47 +179,35 @@ public abstract class FreeColObject {
                 ie.printStackTrace(new PrintWriter(swe));
                 logger.warning(swe.toString());
                 throw new IllegalStateException("IOException");
-            }                                    
+            }
         } catch (XMLStreamException e) {
             logger.warning(e.toString());
             throw new IllegalStateException("XMLStreamException");
         }
-    }    
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     * 
-     * @param document The <code>Document</code>.
-     * @return An XML-representation of this object.
-     */    
-    public Element toXMLElement(Document document) {
-    	// since the player is null, showAll must be true
-        return toXMLElement(null, document, true, false);
     }
 
-
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * <br><br>
-     * 
-     * Only attributes visible to the given <code>Player</code> will 
+     *
+     * Only attributes visible to the given <code>Player</code> will
      * be added to that representation if <code>showAll</code> is
      * set to <code>false</code>.
-     *  
+     *
      * @param out The target stream.
-     * @param player The <code>Player</code> this XML-representation 
+     * @param player The <code>Player</code> this XML-representation
      *      should be made for, or <code>null</code> if
      *      <code>showAll == true</code>.
-     * @param showAll Only attributes visible to <code>player</code> 
+     * @param showAll Only attributes visible to <code>player</code>
      *      will be added to the representation if <code>showAll</code>
      *      is set to <i>false</i>.
      * @param toSavedGame If <code>true</code> then information that
      *      is only needed when saving a game is added.
      * @throws XMLStreamException if there are any problems writing
      *      to the stream.
-     */    
+     */
     public void toXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame) throws XMLStreamException {
         toXMLImpl(out);
     }
@@ -226,12 +226,12 @@ public abstract class FreeColObject {
      */
     public void toXML(XMLStreamWriter out, Player player) throws XMLStreamException {
         toXML(out, player, false, false);
-    }   
-    
+    }
+
     /**
      * This method writes an XML-representation of this object to
      * the given stream.
-     * 
+     *
      * All attributes will be made visible.
      *
      * @param out The target stream.
@@ -241,7 +241,7 @@ public abstract class FreeColObject {
      */
     public void toXML(XMLStreamWriter out) throws XMLStreamException {
         toXML(out, null, true, false);
-    }        
+    }
 
     /**
      * Initialize this object from an XML-representation of this object.
@@ -249,7 +249,7 @@ public abstract class FreeColObject {
      *      this object.
      */
     public void readFromXMLElement(Element element) {
-        XMLInputFactory xif = XMLInputFactory.newInstance();        
+        XMLInputFactory xif = XMLInputFactory.newInstance();
         try {
             try {
                 TransformerFactory factory = TransformerFactory.newInstance();
@@ -281,10 +281,10 @@ public abstract class FreeColObject {
     public void readFromXML(XMLStreamReader in) throws XMLStreamException {
         readFromXMLImpl(in);
     }
-    
+
     /**
      * Reads an XML-representation of an array.
-     * 
+     *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param in The input stream with the XML.
@@ -292,26 +292,26 @@ public abstract class FreeColObject {
      * @return The array.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     */               
+     */
     protected int[] readFromArrayElement(String tagName, XMLStreamReader in, int[] arrayType)
         throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }
-        
+
         int[] array = new int[Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE))];
-        
+
         for (int x=0; x<array.length; x++) {
             array[x] = Integer.parseInt(in.getAttributeValue(null, "x" + Integer.toString(x)));
         }
-        
+
         in.nextTag();
         return array;
     }
 
     /**
      * Reads an XML-representation of an array.
-     * 
+     *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param in The input stream with the XML.
@@ -321,17 +321,17 @@ public abstract class FreeColObject {
      * @return The array.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     */               
+     */
     @SuppressWarnings("unchecked")
-    protected <T> T[] readFromArrayElement(String tagName, XMLStreamReader in, Class<T> type)
+        protected <T> T[] readFromArrayElement(String tagName, XMLStreamReader in, Class<T> type)
         throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }
-        
+
         final int size = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
         T[] array = (T[]) Array.newInstance(type, size);
-        
+
         for (int x=0; x<array.length; x++) {
             try {
                 final String value = in.getAttributeValue(null, "x" + Integer.toString(x));
@@ -353,14 +353,14 @@ public abstract class FreeColObject {
                 throw new RuntimeException(e);
             }
         }
-        
+
         in.nextTag();
         return array;
     }
-    
+
     /**
      * Creates an XML-representation of an array.
-     * 
+     *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param array The array to represent.
@@ -371,18 +371,18 @@ public abstract class FreeColObject {
     protected <T> void toArrayElement(String tagName, T[] array, XMLStreamWriter out)
         throws XMLStreamException {
         out.writeStartElement(tagName);
-        
+
         out.writeAttribute(ARRAY_SIZE, Integer.toString(array.length));
         for (int x=0; x < array.length; x++) {
             out.writeAttribute("x" + Integer.toString(x), array[x].toString());
         }
-        
+
         out.writeEndElement();
     }
-    
+
     /**
      * Creates an XML-representation of an array.
-     * 
+     *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param array The array to represent.
@@ -393,18 +393,18 @@ public abstract class FreeColObject {
     protected void toArrayElement(String tagName, int[] array, XMLStreamWriter out)
         throws XMLStreamException {
         out.writeStartElement(tagName);
-        
+
         out.writeAttribute(ARRAY_SIZE, Integer.toString(array.length));
         for (int x=0; x < array.length; x++) {
             out.writeAttribute("x" + Integer.toString(x), Integer.toString(array[x]));
         }
-        
+
         out.writeEndElement();
     }
-    
+
     /**
      * Creates an XML-representation of a list.
-     * 
+     *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param array The array to represent.
@@ -415,18 +415,18 @@ public abstract class FreeColObject {
     protected <T> void toListElement(String tagName, List<T> array, XMLStreamWriter out)
         throws XMLStreamException {
         out.writeStartElement(tagName);
-        
+
         out.writeAttribute(ARRAY_SIZE, Integer.toString(array.size()));
         for (int x=0; x < array.size(); x++) {
             out.writeAttribute("x" + Integer.toString(x), array.get(x).toString());
         }
-        
+
         out.writeEndElement();
     }
-    
+
     /**
      * Reads an XML-representation of a list.
-     * 
+     *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param in The input stream with the XML.
@@ -436,9 +436,9 @@ public abstract class FreeColObject {
      * @return The list.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     */               
+     */
     protected <T> List<T> readFromListElement(String tagName, XMLStreamReader in, Class<T> type)
-            throws XMLStreamException {
+        throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }
@@ -465,14 +465,14 @@ public abstract class FreeColObject {
                 throw new RuntimeException(e);
             }
         }
-        
+
         in.nextTag();
         return list;
     }
 
     /**
      * Reads an XML-representation of an array.
-     * 
+     *
      * @param tagName The tagname for the <code>Element</code>
      *       representing the array.
      * @param in The input stream with the XML.
@@ -480,17 +480,17 @@ public abstract class FreeColObject {
      * @return The array.
      * @throws XMLStreamException if a problem was encountered
      *      during parsing.
-     */               
+     */
     protected String[] readFromArrayElement(String tagName, XMLStreamReader in, String[] arrayType)
         throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
             in.nextTag();
         }
-        String[] array = new String[Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE))];        
+        String[] array = new String[Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE))];
         for (int x=0; x<array.length; x++) {
             array[x] = in.getAttributeValue(null, "x" + Integer.toString(x));
         }
-        
+
         in.nextTag();
         return array;
     }
@@ -506,7 +506,7 @@ public abstract class FreeColObject {
         final String attributeString = in.getAttributeValue(null, attributeName);
         return attributeString != null;
     }
-    
+
     /**
      * Return an attribute value or the default value.
      *
@@ -523,7 +523,7 @@ public abstract class FreeColObject {
             return defaultValue;
         }
     }
-    
+
     /**
      * Return an attribute value or the default value.
      *
@@ -591,26 +591,13 @@ public abstract class FreeColObject {
     }
 
     public void writeFreeColGameObject(FreeColGameObject object, XMLStreamWriter out, Player player,
-                                   boolean showAll, boolean toSavedGame)
+                                       boolean showAll, boolean toSavedGame)
         throws XMLStreamException {
         if (object != null) {
             object.toXMLImpl(out, player, showAll, toSavedGame);
         }
     }
 
-    /**
-     * Gets the tag name used to serialize this object, generally the
-     * class name starting with a lower case letter. This method
-     * should be overridden by all subclasses that need to be
-     * serialized.
-     *
-     * @return <code>null</code>.
-     */
-    public static String getXMLElementTagName() {
-        return null;
-    }
-
-    
     /**
      * Initialize this object from an XML-representation of this object.
      *
@@ -624,8 +611,8 @@ public abstract class FreeColObject {
         if (getId() == null) {
             setId(in.getAttributeValue(null, ID_ATTRIBUTE));
         }
-	readAttributes(in);
-	readChildren(in);
+        readAttributes(in);
+        readChildren(in);
     }
 
     protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
@@ -654,7 +641,7 @@ public abstract class FreeColObject {
 
 
     //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------
-    
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }
@@ -710,5 +697,17 @@ public abstract class FreeColObject {
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(propertyName, listener);
     }
-}
 
+
+    /**
+     * Gets the tag name used to serialize this object, generally the
+     * class name starting with a lower case letter. This method
+     * should be overridden by all subclasses that need to be
+     * serialized.
+     *
+     * @return <code>null</code>.
+     */
+    public static String getXMLElementTagName() {
+        return null;
+    }
+}
