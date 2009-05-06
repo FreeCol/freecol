@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -98,9 +101,12 @@ public class StanceTradeItem extends TradeItem {
     /**
      * Concludes the trade.
      *
+     * @return An item to be updated, or null if none required.
      */
-    public void makeTrade() {
+    public List<FreeColGameObject> makeTrade() {
         getSource().changeRelationWithPlayer(getDestination(), stance);
+        // changeRelationWithPlayer updates asynchronously
+        return Collections.emptyList();
     }
 
 

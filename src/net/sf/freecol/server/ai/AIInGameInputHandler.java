@@ -41,7 +41,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DiplomaticTradeMessage;
+import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MessageHandler;
 import net.sf.freecol.common.networking.StreamedMessageHandler;
@@ -145,7 +145,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("lostCityRumour")) {
                 } else if (type.equals("updateMarket")) {
                 } else if (type.equals("marketElement")) {
-                } else if (type.equals("diplomaticTrade")) {
+                } else if (type.equals("diplomacy")) {
                     reply = diplomaticTrade((DummyConnection) connection, element);
                 } else {
                     logger.warning("Message is of unsupported type \"" + type + "\".");
@@ -316,7 +316,7 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
      */
     private Element diplomaticTrade(DummyConnection connection, Element element) {
         // TODO: make an informed decision
-        DiplomaticTradeMessage message = new DiplomaticTradeMessage(freeColServer.getGame(), element);
+        DiplomacyMessage message = new DiplomacyMessage(freeColServer.getGame(), element);
         boolean accept = getAIPlayer().acceptDiplomaticTrade(message.getAgreement());
 
         if (accept) {

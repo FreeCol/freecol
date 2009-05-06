@@ -20,6 +20,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -136,10 +138,16 @@ public class GoodsTradeItem extends TradeItem {
     /**
      * Concludes the trade.
      *
+     * @return An item to be updated, or null if none required.
      */
-    public void makeTrade() {
-        goods.getLocation().remove(goods);
+    public List<FreeColGameObject> makeTrade() {
+        Location where = goods.getLocation();
+        where.remove(goods);
         settlement.add(goods);
+        List<FreeColGameObject> result = new ArrayList<FreeColGameObject>();
+        result.add(where.getGoodsContainer());
+        result.add(settlement);
+        return result;
     }
 
     /**

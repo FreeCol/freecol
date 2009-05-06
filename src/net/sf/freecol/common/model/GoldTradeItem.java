@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -97,10 +100,15 @@ public class GoldTradeItem extends TradeItem {
     /**
      * Concludes the trade.
      *
+     * @return An item to be updated, or null if none required.
      */
-    public void makeTrade() {
+    public List<FreeColGameObject> makeTrade() {
         getSource().modifyGold(-gold);
         getDestination().modifyGold(gold);
+        List<FreeColGameObject> result = new ArrayList<FreeColGameObject>();
+        result.add(getSource());
+        result.add(getDestination());
+        return result;
     }
 
 

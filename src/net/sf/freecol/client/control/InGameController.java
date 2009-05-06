@@ -108,7 +108,7 @@ import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
-import net.sf.freecol.common.networking.DiplomaticTradeMessage;
+import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.Message;
@@ -1287,26 +1287,63 @@ public final class InGameController implements NetworkConstants {
      * Initiates a negotiation with a foreign power. The player
      * creates a DiplomaticTrade with the NegotiationDialog. The
      * DiplomaticTrade is sent to the other player. If the other
-     * player accepts the offer, the trade is concluded. If not, this
+     * player accepts the offer, the trade is concluded.  If not, this
      * method returns, since the next offer must come from the other
      * player.
      *
      * @param unit an <code>Unit</code> value
-     * @param direction an <code>int</code> value
+     * @param direction an <code>Direction</code> value
      */
     private void negotiate(Unit unit, Direction direction) {
-        Map map = freeColClient.getGame().getMap();
-        Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
-        if (settlement == null) return;
+        Player player = freeColClient.getMyPlayer();
+        Client client = freeColClient.getClient();
+        Canvas canvas = freeColClient.getCanvas();
+        Game game = freeColClient.getGame();
+        Settlement settlement = game.getMap().getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+        DiplomaticTrade oldAgreement = null;
+        DiplomaticTrade newAgreement = null;
+        DiplomacyMessage message;
+        Element reply;
 
-        DiplomaticTrade agreement = freeColClient.getCanvas().showNegotiationDialog(unit, settlement, null);
-        if (agreement != null) {
-            unit.setMovesLeft(0);
-            // Do not wait for response, if the trade is valid and accepted or countered
-            // it will be handled by InGameInputHandler.diplomaticTrade()
-            DiplomaticTradeMessage message = new DiplomaticTradeMessage(unit, direction, agreement);
-            freeColClient.getClient().send(message.toXMLElement());
+        if (settlement == null) return;
+        for (;;) {
+            newAgreement = canvas.showNegotiationDialog(unit, settlement,
+                                                        oldAgreement);
+            if (newAgreement == null) {
+                if (oldAgreement != null) {
+                    // Inform of rejection of the old agreement
+                    message = new DiplomacyMessage(unit, direction,
+                                                   oldAgreement);
+                    message.setReject();
+                    client.sendAndWait(message.toXMLElement());
+                }
+                break;
+            }
+
+            // Send this acceptance or proposal to the other player
+            message = new DiplomacyMessage(unit, direction, newAgreement);
+            if (newAgreement.isAccept()) message.setAccept();
+            reply = askExpecting(client, message.toXMLElement(),
+                                 message.getXMLElementTagName());
+            if (reply == null) break; // fail
+
+            // What did they say?
+            message = new DiplomacyMessage(game, reply);
+            if (message.isReject()) {
+                String nation = message.getOtherNationName(player);
+                canvas.showInformationMessage("negotiationDialog.offerRejected",
+                                              "%nation%", nation);
+                break;
+            } else if (message.isAccept()) {
+                String nation = message.getOtherNationName(player);
+                canvas.showInformationMessage("negotiationDialog.offerAccepted",
+                                              "%nation%", nation);
+                break;
+            } else { // Loop with this proposal
+                oldAgreement = message.getAgreement();
+            }
         }
+        nextActiveUnit();
     }
 
     /**

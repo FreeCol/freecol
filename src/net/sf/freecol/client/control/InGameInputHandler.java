@@ -65,7 +65,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DiplomaticTradeMessage;
+import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.util.Utils;
@@ -150,8 +150,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = giveIndependence(element);
             } else if (type.equals("newConvert")) {
                 reply = newConvert(element);
-            } else if (type.equals("diplomaticTrade")) {
-                reply = diplomaticTrade(element);
+            } else if (type.equals("diplomacy")) {
+                reply = diplomacy(element);
             } else if (type.equals("marketElement")) {
                 reply = marketElement(element);
             } else if (type.equals("addPlayer")) {
@@ -675,41 +675,42 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "diplomaticTrade"-request.
-     * 
+     * Handles a "diplomacy"-request.  If the message informs of an
+     * acceptance or rejection then display the result and return
+     * null.  If the message is a proposal, then ask the user about
+     * it and return the response with appropriate response set.
+     *
      * @param element The element (root element in a DOM-parsed XML tree)
-     *        containing a "diplomaticTrade"-message.
-     * @return If the message informs of an acceptance or rejection then return null.
-     *         If the message is a proposal, then on accept return the original message
-     *         with "accept" set, on reject return null, otherwise return the
-     *         original message containing a counter proposal.
+     *        containing a "diplomacy"-message.
+     * @return A diplomacy response, or null if none required.
      */
-    private Element diplomaticTrade(Element element) {
-        DiplomaticTradeMessage message = new DiplomaticTradeMessage(getGame(), element);
+    private Element diplomacy(Element element) {
+        Player player = getFreeColClient().getMyPlayer();
+        DiplomacyMessage message = new DiplomacyMessage(getGame(), element);
+        DiplomaticTrade agreement;
+
         if (message.isReject()) {
-            String nation = message.getOtherNationName();
+            String nation = message.getOtherNationName(player);
             new ShowInformationMessageSwingTask("negotiationDialog.offerRejected",
                                                 "%nation%", nation).show();
-        } else if (message.isAccept()) {
-            String nation = message.getOtherNationName();
+            return null;
+        }
+        if (message.isAccept()) {
+            String nation = message.getOtherNationName(player);
             new ShowInformationMessageSwingTask("negotiationDialog.offerAccepted",
                                                 "%nation%", nation).show();
-            message.getAgreement().makeTrade();
-        } else {
-            DiplomaticTrade agreement = message.getAgreement();
-            agreement = new ShowNegotiationDialogSwingTask(message.getUnit(),
-                                                           message.getSettlement(),
-                                                           agreement).select();
-            if (agreement != null) {
-                message.setAgreement(agreement);
-                if (agreement.isAccept()) {
-                    message.setAccept();
-                    agreement.makeTrade();
-                }
-                return message.toXMLElement();
-            }
+            return null;
         }
-        return null;
+        agreement = new ShowNegotiationDialogSwingTask(message.getUnit(),
+                                                       message.getSettlement(),
+                                                       message.getAgreement()).select();
+        if (agreement == null) {
+            message.setReject();
+        } else {
+            message.setAgreement(agreement);
+            if (agreement.isAccept()) message.setAccept();
+        }
+        return message.toXMLElement();
     }
 
     /**

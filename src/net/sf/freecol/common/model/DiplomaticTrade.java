@@ -267,12 +267,17 @@ public class DiplomaticTrade extends FreeColObject {
     /**
      * Calls the <code>makeTrade</code> method of all TradeItems.
      *
+     * @return A list of all objects traded.
      */
-    public void makeTrade() {
+    public List<FreeColGameObject> makeTrade() {
+        ArrayList<FreeColGameObject> all = new ArrayList<FreeColGameObject>();
+
         for (TradeItem item : items) {
-            item.makeTrade();
+            all.addAll(item.makeTrade());
         }
+        return all;
     }
+
 
     /**
      * Returns all TradeItems.

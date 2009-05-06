@@ -20,7 +20,7 @@
 
 package net.sf.freecol.common.model;
 
-
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -147,8 +147,9 @@ public abstract class TradeItem extends FreeColObject {
     /**
      * Concludes the trade.
      *
+     * @return An item to be updated, or null if none required.
      */
-    public abstract void makeTrade();
+    public abstract List<FreeColGameObject> makeTrade();
 
     /**
      * Initialize this object from an XML-representation of this object.
