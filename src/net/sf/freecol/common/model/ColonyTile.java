@@ -260,36 +260,55 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     /**
-    * Checks if the specified <code>Locatable</code> may be added to this <code>WorkLocation</code>.
-    *
-    * @param locatable the <code>Locatable</code>.
-    * @return <code>true</code> if the <code>Unit</code> may be added and <code>false</code> otherwise.
-    */
+     * Checks if the specified <code>Locatable</code> may be added to
+     * this <code>WorkLocation</code>.
+     *
+     * @param locatable the <code>Locatable</code>.
+     * @return <code>true</code> if the <code>Unit</code> may be added
+     *         and <code>false</code> otherwise.
+     */
     public boolean canAdd(Locatable locatable) {
         if (workTile.getSettlement() != null) {
             return false;
-        } else if (locatable instanceof Unit) {
-            Unit unit = (Unit) locatable;
-            Settlement settlement = getWorkTile().getOwningSettlement();
-            if (settlement != null) {
-                if (settlement instanceof Colony && settlement != getColony()) {
-                    return false;
-                } else if (settlement instanceof IndianSettlement &&
-                           unit.getOwner().getLandPrice(getWorkTile()) > 0) {
+        }
+        if (!(locatable instanceof Unit)) {
+            return false;
+        }
+
+        Unit unit = (Unit) locatable;
+        Colony colony = getColony();
+        Tile tile = getWorkTile();
+        Settlement settlement = tile.getOwningSettlement();
+
+        if (settlement != null) {
+            if (settlement instanceof Colony) {
+                // Disallow if owned by other Europeans, or by the
+                // player but already in use.
+                Colony otherColony = (Colony) settlement;
+                if (otherColony != colony) {
+                    if (otherColony.getOwner() != getOwner()
+                        || !otherColony.getColonyTile(tile).canAdd(locatable)) {
+                        return false;
+                    }
+                }
+            } else if (settlement instanceof IndianSettlement) {
+                // Disallow if owned and valued by natives.
+                if (unit.getOwner().getLandPrice(tile) > 0) {
                     return false;
                 }
             }
-            if (!(workTile.isLand() || getColony().hasAbility("model.ability.produceInWater"))) {
-                return false;
-            }
+        }
 
-            if (!unit.getType().hasSkill()) {
-                return false;
-            }
-            return (getUnit() == null || unit == getUnit());
-        } else {
+        if (!(tile.isLand()
+              || colony.hasAbility("model.ability.produceInWater"))) {
             return false;
         }
+
+        if (!unit.getType().hasSkill()) {
+            return false;
+        }
+
+        return getUnit() == null || unit == getUnit();
     }
 
 

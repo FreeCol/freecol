@@ -1337,8 +1337,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel) comp).getUnit();
                         int price = unit.getOwner().getLandPrice(colonyTile.getWorkTile());
+                        Player player = colonyTile.getWorkTile().getOwner();
                         if (price > 0) {
-                            Player player = colonyTile.getWorkTile().getOwner();
                             List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
                             choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
                                                                                  Integer.toString(price)), 1));
@@ -1381,7 +1381,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             // could not add the unit on the tile
                             Settlement s = colonyTile.getWorkTile().getOwningSettlement();
                             if (s != null && s != getColony()) {
-                                if (s.getOwner().isEuropean()) {
+                                if (s.getOwner() == player) {
+                                    // Its one of ours
+                                    getCanvas().errorMessage("tileTakenSelf");
+                                } else if (s.getOwner().isEuropean()) {
                                     // occupied by a foreign european colony
                                     getCanvas().errorMessage("tileTakenEuro");
                                 } else if (s instanceof IndianSettlement && price > 0) { 
