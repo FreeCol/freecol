@@ -2462,7 +2462,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (enemyPlayer.getConnection() == null || enemyPlayer.isIndian() || enemyPlayer.isREF()) {
+            if (enemyPlayer.getConnection() == null || enemyPlayer.isIndian()) {
                 continue;
             }
             Element enemyElement = reply.getOwnerDocument().createElement("opponent");
