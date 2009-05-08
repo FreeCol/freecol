@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
@@ -193,24 +194,23 @@ public class BuildColonyMission extends Mission {
                 Direction r = moveTowards(connection, target);
                 moveButDontAttack(connection, r);
             }
-            if (getUnit().canBuildColony() && target == getUnit().getTile() && getUnit().getMovesLeft() > 0) {
-                Element buildColonyElement = Message.createNewRootElement("buildColony");
-                buildColonyElement.setAttribute("name", unit.getOwner().getDefaultSettlementName(false));
-                buildColonyElement.setAttribute("unit", unit.getId());
+            if (getUnit().canBuildColony() && target == getUnit().getTile()
+                && getUnit().getMovesLeft() > 0) {
+                String name = unit.getOwner().getDefaultSettlementName(false);
+                Element reply = null;
 
                 try {
-                    Element reply = connection.ask(buildColonyElement);
-                    if (reply!=null && reply.getTagName().equals("buildColonyConfirmed")) {
-                        colonyBuilt = true;
-                        Settlement settlement = unit.getTile().getSettlement();
-                        AIColony aiColony = (AIColony) getAIMain().getAIObject(settlement);
-                        getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), aiColony));
-                    }
-                    else {
-                        logger.warning("Could not build an AI colony on tile "+getUnit().getTile().getPosition().toString());
-                    }
+                    reply = connection.ask(new BuildColonyMessage(name, unit).toXMLElement());
                 } catch (IOException e) {
-                    logger.warning("Could not send \"buildColonyElement\"-message!");
+                    logger.warning("Could not send BuildColony message.");
+                }
+                if (reply != null) {
+                    colonyBuilt = true;
+                    Settlement settlement = unit.getTile().getSettlement();
+                    AIColony aiColony = (AIColony) getAIMain().getAIObject(settlement);
+                    getAIUnit().setMission(new WorkInsideColonyMission(getAIMain(), getAIUnit(), aiColony));
+                } else {
+                    logger.warning("Could not build an AI colony on tile "+getUnit().getTile().getPosition().toString());
                 }
             }
         }
