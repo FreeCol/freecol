@@ -25,6 +25,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -162,6 +163,9 @@ public final class InGameController extends Controller {
         
         if (getGame().isNextPlayerInNewTurn()) {
             getGame().newTurn();
+            if (!getGame().getSpanishSuccession()) {
+                checkSpanishSuccession();
+            }
             if (debugOnlyAITurns > 0) {
                 debugOnlyAITurns--;
             }
@@ -271,6 +275,68 @@ public final class InGameController extends Controller {
         freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
         
         return newPlayer;
+    }
+
+    private void checkSpanishSuccession() {
+        boolean rebelMajority = false;
+        Player weakestAIPlayer = null;
+        Player strongestAIPlayer = null;
+        java.util.Map<Player, Element> documentMap = new HashMap<Player, Element>();
+        for (Player player : getGame().getPlayers()) {
+            documentMap.put(player, Message.createNewRootElement("spanishSuccession"));
+            if (player.isEuropean()) {
+                if (player.isAI()) {
+                    if (weakestAIPlayer == null
+                        || weakestAIPlayer.getScore() > player.getScore()) {
+                        weakestAIPlayer = player;
+                    }
+                    if (strongestAIPlayer == null
+                        || strongestAIPlayer.getScore() < player.getScore()) {
+                        strongestAIPlayer = player;
+                    }
+                } else if (player.getSoL() > 50) {
+                    rebelMajority = true;
+                }
+            }
+        }
+
+        if (rebelMajority
+            && weakestAIPlayer != null
+            && strongestAIPlayer != null
+            && weakestAIPlayer != strongestAIPlayer) {
+            documentMap.remove(weakestAIPlayer);
+            for (Element element : documentMap.values()) {
+                element.setAttribute("loser", weakestAIPlayer.getId());
+                element.setAttribute("winner", strongestAIPlayer.getId());
+            }
+            for (Colony colony : weakestAIPlayer.getColonies()) {
+                colony.setOwner(strongestAIPlayer);
+                for (Entry<Player, Element> entry : documentMap.entrySet()) {
+                    if (entry.getKey().canSee(colony.getTile())) {
+                        entry.getValue().appendChild(colony.toXMLElement(entry.getKey(),
+                                                                         entry.getValue().getOwnerDocument()));
+                    }
+                }
+            }
+            for (Unit unit : weakestAIPlayer.getUnits()) {
+                unit.setOwner(strongestAIPlayer);
+                for (Entry<Player, Element> entry : documentMap.entrySet()) {
+                    if (entry.getKey().canSee(unit.getTile())) {
+                        entry.getValue().appendChild(unit.toXMLElement(entry.getKey(),
+                                                                       entry.getValue().getOwnerDocument()));
+                    }
+                }
+            }
+            for (Entry<Player, Element> entry : documentMap.entrySet()) {
+                try {
+                    ((ServerPlayer) entry.getKey()).getConnection().send(entry.getValue());
+                } catch (IOException e) {
+                    logger.warning("Could not send message to: " + entry.getKey().getName());
+                }
+            }
+            weakestAIPlayer.setDead(true);
+            getGame().setSpanishSuccession(true);
+        }
     }
     
     private boolean isHumanPlayersLeft() {

@@ -1577,10 +1577,13 @@ public class Player extends FreeColGameObject implements Nameable {
      * made unvisible. <br>
      * <br>
      * Use {@link #invalidateCanSeeTiles} whenever possible.
+     * @return <code>true</code> if successful <code>false</code> otherwise
      */
-    public void resetCanSeeTiles() {
+    public boolean resetCanSeeTiles() {
         Map map = getGame().getMap();
-        if (map != null) {
+        if (map == null) {
+            return false;
+        } else {
             canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
             if (!getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)) {
                 Iterator<Position> positionIterator = getGame().getMap().getWholeMapIterator();
@@ -1672,6 +1675,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
             }
+            return true;
         }
     }
 
@@ -1688,11 +1692,8 @@ public class Player extends FreeColGameObject implements Nameable {
         if (tile == null) {
             return false;
         }
-        if (canSeeTiles == null) {
-            resetCanSeeTiles();
-            if (canSeeTiles == null) {
-                return false;
-            }
+        if (canSeeTiles == null && !resetCanSeeTiles()) {
+            return false;
         }
         return canSeeTiles[tile.getX()][tile.getY()];
     }

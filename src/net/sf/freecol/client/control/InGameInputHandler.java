@@ -156,6 +156,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = marketElement(element);
             } else if (type.equals("addPlayer")) {
                 reply = addPlayer(element);
+            } else if (type.equals("spanishSuccession")) {
+                reply = spanishSuccession(element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -1207,6 +1209,31 @@ public final class InGameInputHandler extends InputHandler {
         player.addModelMessage(m);
         return null;
     }
+
+    /**
+     * Handles a "spanishSuccession" message
+     * 
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *            holds all the information.
+     */
+    private Element spanishSuccession(Element element) {
+        final Player player = getFreeColClient().getMyPlayer();
+        final Player loser = (Player) getGame().getFreeColGameObject(element.getAttribute("loser"));
+        final Player winner = (Player) getGame().getFreeColGameObject(element.getAttribute("winner"));
+        player.addModelMessage(new ModelMessage(winner, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                null, "model.diplomacy.spanishSuccession",
+                                                "%loserNation%", loser.getNationAsString(),
+                                                "%nation%", winner.getNationAsString()));
+        loser.setDead(true);
+        update(element);
+        return null;
+    }
+
+    /**
+     *
+     *    Handler methods end here.
+     *
+     */
 
 
     /**

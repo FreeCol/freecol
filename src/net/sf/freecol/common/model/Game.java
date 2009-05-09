@@ -86,6 +86,11 @@ public class Game extends FreeColGameObject {
      */
     private NationOptions nationOptions = NationOptions.getDefaults();
 
+    /**
+     * Whether the War of Spanish Succession has already taken place.
+     */
+    private boolean spanishSuccession = false;
+
     protected ModelController modelController;
 
     protected FreeColGameObjectListener freeColGameObjectListener;
@@ -683,6 +688,24 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get the <code>SpanishSuccession</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public final boolean getSpanishSuccession() {
+        return spanishSuccession;
+    }
+
+    /**
+     * Set the <code>SpanishSuccession</code> value.
+     *
+     * @param newSpanishSuccession The new SpanishSuccession value.
+     */
+    public final void setSpanishSuccession(final boolean newSpanishSuccession) {
+        this.spanishSuccession = newSpanishSuccession;
+    }
+
+    /**
      * Checks the integrity of this <code>Game</code
      * by checking if there are any
      * {@link FreeColGameObject#isUninitialized() uninitialized objects}.
@@ -702,7 +725,7 @@ public class Game extends FreeColGameObject {
             FreeColGameObject fgo = iterator.next();
             if (fgo.isUninitialized()) {
             	brokenObjects.add(fgo.getId());
-                logger.warning("Uinitialized object: " + fgo.getId() + " (" + fgo.getClass() + ")");
+                logger.warning("Uninitialized object: " + fgo.getId() + " (" + fgo.getClass() + ")");
                 ok = false;
             }
         }
@@ -804,6 +827,7 @@ public class Game extends FreeColGameObject {
 
         out.writeAttribute("ID", getId());
         out.writeAttribute("turn", Integer.toString(getTurn().getNumber()));
+        out.writeAttribute("spanishSuccession", Boolean.toString(spanishSuccession));
 
         writeAttribute(out, "currentPlayer", currentPlayer);
 
@@ -848,6 +872,7 @@ public class Game extends FreeColGameObject {
         setId(in.getAttributeValue(null, "ID"));
 
         getTurn().setNumber(getAttribute(in, "turn", 1));
+        setSpanishSuccession(getAttribute(in, "spanishSuccession", false));
 
         final String nextIDStr = in.getAttributeValue(null, "nextID");
         if (nextIDStr != null) {
