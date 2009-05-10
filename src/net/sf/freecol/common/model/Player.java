@@ -346,7 +346,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 europe = new Europe(game, this);
                 if (!nationType.isREF()) {
                     // colonial nation
-                    monarch = new Monarch(game, this, "");
+                    monarch = new Monarch(game, this, newNation.getRulerName());
                     playerType = PlayerType.COLONIAL;
                 } else {
                     // Royal expeditionary force
@@ -2167,7 +2167,10 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The nation of this player as a String.
      */
     public String getNationAsString() {
-        return Messages.message(nationID + ".name");
+        return (playerType == PlayerType.REBEL
+                || playerType == PlayerType.INDEPENDENT)
+            ? independentNationName
+            : Messages.message(nationID + ".name");
     }
 
     /**

@@ -64,17 +64,15 @@ public final class ReportHighScoresPanel extends ReportPanel {
                 reportPanel.add(scoreValue);
                 
                 String messageID = null;
-                String nation = null;
                 if (highScore.getIndependenceTurn() > 0) {
                     messageID = "report.highScores.president";
-                    nation = highScore.getNationName();
                 } else {
                     messageID = "report.highScores.governor";
-                    nation = highScore.getNewLandName();
                 }
+                String country = highScore.getNewLandName();
                 JLabel headline = new JLabel(Messages.message(messageID,
                                                               "%name%", highScore.getPlayerName(),
-                                                              "%nation%", nation));
+                                                              "%nation%", country));
                 headline.setFont(smallHeaderFont);
                 reportPanel.add(headline, "span, wrap 10");
 
@@ -91,7 +89,11 @@ public final class ReportHighScoresPanel extends ReportPanel {
                 reportPanel.add(new JLabel(independence));
 
                 reportPanel.add(new JLabel(Messages.message("report.highScores.nation")), "skip");
-                reportPanel.add(new JLabel(String.valueOf(highScore.getOldNationName())));
+                if (highScore.getIndependenceTurn() > 0) {
+                    reportPanel.add(new JLabel(String.valueOf(highScore.getNationName())));
+                } else {
+                    reportPanel.add(new JLabel(String.valueOf(highScore.getOldNationName())));
+                }
 
                 reportPanel.add(new JLabel(Messages.message("report.highScores.nationType")), "skip");
                 reportPanel.add(new JLabel(Messages.message(highScore.getNationTypeID() + ".name")));

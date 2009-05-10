@@ -50,8 +50,10 @@ import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
+import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
+import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
@@ -311,19 +313,15 @@ public final class InGameController implements NetworkConstants {
                                           Integer.toString(player.getSoL()));
             return;
         }
-        if (!canvas.showConfirmDialog("declareIndependence.areYouSure.text",
-                                      "declareIndependence.areYouSure.yes",
-                                      "declareIndependence.areYouSure.no")) {
-            return;
-        }
-        String nationName = Messages.message("declareIndependence.defaultNation",
-                                             "%nation%", player.getNewLandName());
-        nationName = canvas.showInputDialog("declareIndependence.enterNation", nationName, 
-                                            Messages.message("ok"), Messages.message("cancel"));
-        if (nationName == null) return;
-        player.setIndependentNationName(nationName);
 
-        DeclareIndependenceMessage message = new DeclareIndependenceMessage(nationName);
+        List<String> names = canvas.showFreeColDialog(new ConfirmDeclarationDialog(canvas));
+        if (names == null) return;
+        String nationName = names.get(0);
+        String countryName = names.get(1);
+        player.setIndependentNationName(nationName);
+        player.setNewLandName(countryName);
+
+        DeclareIndependenceMessage message = new DeclareIndependenceMessage(nationName, countryName);
         Element reply = freeColClient.getClient().ask(message.toXMLElement());
         if (reply == null) {
             throw new IllegalStateException("Illegal reply to "

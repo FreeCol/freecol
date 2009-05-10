@@ -34,11 +34,16 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The message sent when a player declares independence.
  */
 public class DeclareIndependenceMessage extends Message {
+
     /**
      * The new name for the rebelling nation
      */
     private String nationName;
 
+    /**
+     * The new name for the rebelling country
+     */
+    private String countryName;
 
     /**
      * Create a new <code>DeclareIndependenceMessage</code> with the
@@ -46,8 +51,9 @@ public class DeclareIndependenceMessage extends Message {
      *
      * @param nationName The new name for the rebelling nation.
      */
-    public DeclareIndependenceMessage(String nationName) {
+    public DeclareIndependenceMessage(String nationName, String countryName) {
         this.nationName = nationName;
+        this.countryName = countryName;
     }
 
     /**
@@ -58,7 +64,8 @@ public class DeclareIndependenceMessage extends Message {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DeclareIndependenceMessage(Game game, Element element) {
-        this.nationName = (String) element.getAttribute("nationName");
+        this.nationName = element.getAttribute("nationName");
+        this.countryName = element.getAttribute("countryName");
     }
 
     /**
@@ -80,6 +87,7 @@ public class DeclareIndependenceMessage extends Message {
         ServerPlayer refPlayer = server.getInGameController().createREFPlayer(serverplayer);
         List<Unit> refUnits = server.getInGameController().createREFUnits(serverplayer, refPlayer);
         player.setIndependentNationName(nationName);
+        player.setNewLandName(countryName);
         player.declareIndependence();
 
         Element reply = Message.createNewRootElement("update");
@@ -98,6 +106,7 @@ public class DeclareIndependenceMessage extends Message {
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
         result.setAttribute("nationName", nationName);
+        result.setAttribute("countryName", countryName);
         return result;
     }
 

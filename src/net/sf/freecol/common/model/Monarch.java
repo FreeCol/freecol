@@ -181,6 +181,10 @@ public final class Monarch extends FreeColGameObject {
     }
 
 
+    public String getName() {
+        return name;
+    }
+
     /**
      * Returns a monarch action. Not all actions are always
      * applicable, and their probability depends on the player's
@@ -612,7 +616,7 @@ public final class Monarch extends FreeColGameObject {
         if (player == null) {
             player = new Player(getGame(), in.getAttributeValue(null, "player"));
         }
-        name = in.getAttributeValue(null, "name");
+        name = getAttribute(in, "name", player.getNation().getRulerName());
         supportSea = Boolean.valueOf(in.getAttributeValue(null, "supportSea")).booleanValue();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
