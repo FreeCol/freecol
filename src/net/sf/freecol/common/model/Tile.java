@@ -816,7 +816,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * is one.
      */
     public void removeLostCityRumour() {
-        tileItemContainer.removeTileItem(tileItemContainer.getLostCityRumour());
+        if (tileItemContainer != null) {
+            tileItemContainer.removeAll(LostCityRumour.class);
+        }
     }
 
     /**

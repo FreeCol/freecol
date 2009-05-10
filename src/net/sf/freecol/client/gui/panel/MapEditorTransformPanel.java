@@ -219,7 +219,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 }
                 int oldMagnitude = TileImprovement.NO_RIVER;
                 TileImprovement river = tic.getRiver();
-                if (river != null) {
+                if (river == null) {
+                    river = new TileImprovement(tile.getGame(), tile, riverType);
+                } else {
                     oldMagnitude = river.getMagnitude();
                 }
 
@@ -264,7 +266,10 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private class ResourceTransform extends MapTransform {
         public void transform(Tile t) {
             // Check if there is a resource already
-            Resource resource = t.getTileItemContainer().getResource();
+            Resource resource = null;
+            if (t.getTileItemContainer() != null) {
+                resource = t.getTileItemContainer().getResource();
+            }
             if (resource != null) {
                 t.getTileItemContainer().removeTileItem(resource);
             } else {

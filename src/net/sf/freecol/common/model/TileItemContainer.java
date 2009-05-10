@@ -445,6 +445,15 @@ public class TileItemContainer extends FreeColGameObject {
     public TileItem removeTileItem(TileItem item) {
         return (tileItems.remove(item) ? item : null);
     }
+
+    public void removeAll(Class c) {
+        Iterator<TileItem> iterator = tileItems.iterator();
+        while (iterator.hasNext()) {
+            if (c.isInstance(iterator.next())) {
+                iterator.remove();
+            }
+        }
+    }
     
     public void copyFrom(TileItemContainer tic) {
         copyFrom(tic, true, false);
