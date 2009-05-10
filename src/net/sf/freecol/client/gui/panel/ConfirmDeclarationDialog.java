@@ -23,26 +23,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Building;
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.ColonyTile;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
 
