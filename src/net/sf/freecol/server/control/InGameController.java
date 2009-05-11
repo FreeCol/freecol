@@ -285,7 +285,7 @@ public final class InGameController extends Controller {
         for (Player player : getGame().getPlayers()) {
             documentMap.put(player, Message.createNewRootElement("spanishSuccession"));
             if (player.isEuropean()) {
-                if (player.isAI()) {
+                if (player.isAI() && !player.isREF()) {
                     if (weakestAIPlayer == null
                         || weakestAIPlayer.getScore() > player.getScore()) {
                         weakestAIPlayer = player;
