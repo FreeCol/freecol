@@ -131,7 +131,7 @@ public class SpySettlementMessage extends Message {
         Element reply = createNewRootElement("update");
         Document doc = reply.getOwnerDocument();
         reply.appendChild(tile.toXMLElement(serverPlayer, doc, true, false));
-        reply.appendChild(tile.toXMLElement(serverPlayer, doc));
+        reply.appendChild(tile.toXMLElement(serverPlayer, doc, false, false));
         reply.appendChild(unit.toXMLElement(serverPlayer, doc));
         return reply;
     }
