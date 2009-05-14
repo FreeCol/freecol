@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Settlement.SettlementType;
 
 import org.w3c.dom.Element;
 
@@ -369,19 +370,25 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         used by the AI when deciding where to build a new colony.
      */
     public int getColonyValue() {
-        if (!getType().canSettle()) {
-            return 0;
-        } else if (getSettlement() != null) {
-            return 0;
-        } else {
-            int value = potential(primaryGoods(), null) * 3;
-            
+        // TODO: tune magic numbers
+        if (getType().canSettle() && getSettlement() == null) {
+            int value = potential(primaryGoods(), null) * 30;
+            float advantages = 1f;
+
+            if (hasResource()) {
+                // because production can not be improved much
+                advantages *= 0.75f;
+            }
+
             boolean nearbyTileIsOcean = false;
 
-            java.util.Map<GoodsType, Boolean> buildingMaterialMap = new HashMap<GoodsType, Boolean>();
+            TypeCountMap<GoodsType> buildingMaterialMap = new TypeCountMap<GoodsType>();
+            TypeCountMap<GoodsType> foodMap = new TypeCountMap<GoodsType>();
             for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
                 if (type.isRawBuildingMaterial()) {
-                    buildingMaterialMap.put(type, false);
+                    buildingMaterialMap.incrementCount(type, 0);
+                } else if (type.isFoodType()) {
+                    foodMap.incrementCount(type, 0);
                 }
             }
 
@@ -390,64 +397,82 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     // can't build next to colony
                     return 0;
                 } else if (tile.getSettlement() != null) {
-                    // can build next to an indian settlement
-                    value -= 10;
-                } else {
-                    if (!tile.isConnected()) {
-                        nearbyTileIsOcean = true;
+                    // can build next to an indian settlement, but shouldn't
+                    SettlementType type = ((IndianNationType) tile.getSettlement().getOwner().getNationType())
+                        .getTypeOfSettlement();
+                    if (type == SettlementType.INCA_CITY || type == SettlementType.AZTEC_CITY) {
+                        // really shouldn't build next to cities
+                        advantages *= 0.25f;
+                    } else {
+                        advantages *= 0.5f;
                     }
+                } else {
                     for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
                         int potential = tile.potential(type, null);
-                        value += potential;
-                        if (type.isRawBuildingMaterial() && potential > 4) {
-                            buildingMaterialMap.put(type, true);
+                        value += potential * type.getInitialSellPrice();
+                        // a few tiles with high production are better
+                        // than many tiles with low production
+                        int highProductionValue = 0;
+                        if (potential > 8) {
+                            advantages *= 1.2f;
+                            highProductionValue = 2;
+                        } else if (potential > 4) {
+                            advantages *= 1.1f;
+                            highProductionValue = 1;
+                        }
+                        if (type.isRawBuildingMaterial()) {
+                            buildingMaterialMap.incrementCount(type, highProductionValue);
+                        } else if (type.isFoodType()) {
+                            foodMap.incrementCount(type, highProductionValue);
                         }
                     }
-                    if (tile.hasResource()) {
-                        value += 20;
-                    }
 
+                    if (tile.isConnected()) {
+                        nearbyTileIsOcean = true;
+                    }
                     if (tile.getOwner() != null &&
                         tile.getOwner() != getGame().getCurrentPlayer()) {
                         // tile is already owned by someone (and not by us!)
                         if (tile.getOwner().isEuropean()) {
-                            value -= 20;
+                            advantages *= 0.8f;
                         } else {
-                            value -= 5;
+                            advantages *= 0.9f;
                         }
                     }
                 }
             }
 
-            if (hasResource()) {
-                value -= 10;
-            }
-
-            if (isForested()) {
-                value -= 5;
-            }
-
-            for (Boolean buildingMaterial : buildingMaterialMap.values()) {
-                if (!buildingMaterial) {
-                    value -= 40;
+            for (Integer buildingMaterial : buildingMaterialMap.values()) {
+                if (buildingMaterial == 0) {
+                    advantages *= 0.75;
                 }
             }
-
+            int foodProduction = 0;
+            for (Integer food : foodMap.values()) {
+                foodProduction += food;
+            }
+            if (foodProduction < 2) {
+                advantages *= 0.5f;
+            } else if (foodProduction < 4) {
+                advantages *= 0.75f;
+            }
+            /*
             if (!nearbyTileIsOcean) {
-                // TODO: Uncomment when wagon train code has been written:
-                // value -= 20;
-                value = 0;
-            } else {
-                // TODO: Remove when wagon train code has been written. START
-                final PathNode n = getMap().findPathToEurope(this);
-                if (n == null) {
-                    // no path to Europe, therefore it is a poor location
-                    value = 0;
-                }
-                // END-TODO
+                advantages *= 0.75f;
+            }
+            */
+            final PathNode n = getMap().findPathToEurope(this);
+            if (n == null) {
+                // no path to Europe, therefore it is a poor location
+                // TODO: at the moment, this means we are land-locked
+                advantages *= 0.5f;
+            } else if (n.getTotalTurns() > 3) {
+                advantages *= 0.75f;
             }
 
-            return Math.max(0, value);
+            return Math.max(0, (int) (value * advantages));
+        } else {
+            return 0;
         }
     }
 

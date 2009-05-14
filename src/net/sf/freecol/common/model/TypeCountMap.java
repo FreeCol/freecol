@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +57,10 @@ public class TypeCountMap<T extends FreeColGameObjectType> {
 
     public Set<T> keySet() {
         return values.keySet();
+    }
+
+    public Collection<Integer> values() {
+        return values.values();
     }
 
     public boolean containsKey(T key) {

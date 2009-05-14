@@ -2528,54 +2528,6 @@ public class Player extends FreeColGameObject implements Nameable {
         this.history = newHistory;
     }
 
-    private static int getNearbyColonyBonus(Player owner, Tile tile) {
-        Game game = tile.getGame();
-        Map map = game.getMap();
-        Iterator<Position> it = map.getCircleIterator(tile.getPosition(), false, 3);
-        while (it.hasNext()) {
-            Tile ct = map.getTile(it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 45;
-            }
-        }
-        it = map.getCircleIterator(tile.getPosition(), false, 4);
-        while (it.hasNext()) {
-            Tile ct = map.getTile(it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 25;
-            }
-        }
-        it = map.getCircleIterator(tile.getPosition(), false, 5);
-        while (it.hasNext()) {
-            Tile ct = map.getTile(it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 20;
-            }
-        }
-        it = map.getCircleIterator(tile.getPosition(), false, 6);
-        while (it.hasNext()) {
-            Tile ct = map.getTile(it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 30;
-            }
-        }
-        it = map.getCircleIterator(tile.getPosition(), false, 7);
-        while (it.hasNext()) {
-            Tile ct = map.getTile(it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 15;
-            }
-        }
-        it = map.getCircleIterator(tile.getPosition(), false, 8);
-        while (it.hasNext()) {
-            Tile ct = map.getTile(it.next());
-            if (ct.getColony() != null && ct.getColony().getOwner() == owner) {
-                return 5;
-            }
-        }
-        return 0;
-    }
-
     /**
      * Gets the value of building a <code>Colony</code> on the given tile.
      * This method adds bonuses to the colony value if the tile is close to (but
@@ -2591,26 +2543,46 @@ public class Player extends FreeColGameObject implements Nameable {
         if (value == 0) {
             return 0;
         } else {
-            Iterator<Position> it = getGame().getMap().getCircleIterator(tile.getPosition(), true, 4);
-            while (it.hasNext()) {
-                Tile ct = getGame().getMap().getTile(it.next());
-                if (ct.getColony() != null && ct.getColony().getOwner() != this) {
-                    if (getStance(ct.getColony().getOwner()) == Stance.WAR) {
-                        value -= Math.max(0, 20 - tile.getDistanceTo(tile) * 4);
-                    } else {
-                        value -= Math.max(0, 8 - tile.getDistanceTo(tile) * 2);
+            Iterator<Position> it;
+            for (int radius = 1; radius < 5; radius++) {
+                it = getGame().getMap().getCircleIterator(tile.getPosition(), false, radius);
+                while (it.hasNext()) {
+                    Tile ct = getGame().getMap().getTile(it.next());
+                    if (ct.getColony() != null) {
+                        if (ct.getColony().getOwner() == this) {
+                            switch(radius) {
+                            case 1:
+                                // this should not happen
+                                return 0;
+                            case 2:
+                                value -= 40;
+                                break;
+                            case 3:
+                                value += 40;
+                                break;
+                            case 4:
+                                value += 20;
+                                break;
+                            }
+                        } else {
+                            if (getStance(ct.getColony().getOwner()) == Stance.WAR) {
+                                value -= Math.max(0, 20 - radius * 4);
+                            } else {
+                                value -= Math.max(0, 8 - radius * 2);
+                            }
+                        }
                     }
-                }
-                Iterator<Unit> ui = ct.getUnitIterator();
-                while (ui.hasNext()) {
-                    Unit u = ui.next();
-                    if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()
-                        && getStance(u.getOwner()) == Stance.WAR) {
-                        value -= Math.max(0, 40 - tile.getDistanceTo(tile) * 9);
+                    Iterator<Unit> ui = ct.getUnitIterator();
+                    while (ui.hasNext()) {
+                        Unit u = ui.next();
+                        if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()
+                            && getStance(u.getOwner()) == Stance.WAR) {
+                            value -= Math.max(0, 40 - radius * 9);
+                        }
                     }
                 }
             }
-            return Math.max(0, value + getNearbyColonyBonus(this, tile));
+            return Math.max(0, value);
         }
     }
 
