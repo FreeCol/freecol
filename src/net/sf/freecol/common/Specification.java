@@ -497,6 +497,28 @@ public final class Specification {
     }
 
     /**
+     * Return all types which have any of the given abilities.
+     *
+     * @param abilities The abilities for the search
+     * @return a <code>List</code> of <code>UnitType</code>
+     */
+    public <T extends FreeColGameObjectType> List<T>
+                      getTypesWithAbility(Class<T> resultType, String... abilities) {
+        ArrayList<T> result = new ArrayList<T>();
+        for (FreeColGameObjectType type : allTypes.values()) {
+            if (resultType.isInstance(type)) {
+                for (String ability : abilities) {
+                    if (type.hasAbility(ability)) {
+                        result.add(resultType.cast(type));
+                        break;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * Is option with this ID present?  This is helpful when options are
      * optionally(!) present, for example model.option.priceIncrease.artillery
      * exists but model.option.priceIncrease.frigate does not.
@@ -774,16 +796,7 @@ public final class Specification {
      * @return a <code>List</code> of <code>UnitType</code>
      */
     public List<UnitType> getUnitTypesWithAbility(String... abilities) {
-        ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
-        for (UnitType unitType : getUnitTypeList()) {
-            for (String ability : abilities) {
-                if (unitType.hasAbility(ability)) {
-                    unitTypes.add(unitType);
-                    break;
-                }
-            }
-        }
-        return unitTypes;
+        return getTypesWithAbility(UnitType.class, abilities);
     }
 
     /**
