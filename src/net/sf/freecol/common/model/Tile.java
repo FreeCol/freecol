@@ -407,7 +407,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                         advantages *= 0.5f;
                     }
                 } else {
-                    for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+                    for (AbstractGoods production : getType().getProduction()) {
+                        GoodsType type = production.getType();
                         int potential = tile.potential(type, null);
                         value += potential * type.getInitialSellPrice();
                         // a few tiles with high production are better
@@ -1390,17 +1391,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public List<AbstractGoods> getSortedPotential() {
         List<AbstractGoods> goodsTypeList = new ArrayList<AbstractGoods>();
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            int potential = potential(goodsType, null);
-            if (potential > 0) {
-                goodsTypeList.add(new AbstractGoods(goodsType, potential));
+        if (getType() != null) {
+            for (AbstractGoods production : getType().getProduction()) {
+                GoodsType goodsType = production.getType();
+                goodsTypeList.add(new AbstractGoods(goodsType, potential(goodsType, null)));
             }
+            Collections.sort(goodsTypeList, new Comparator<AbstractGoods>() {
+                    public int compare(AbstractGoods o, AbstractGoods p) {
+                        return p.getAmount() - o.getAmount();
+                    }
+                });
         }
-        Collections.sort(goodsTypeList, new Comparator<AbstractGoods>() {
-                public int compare(AbstractGoods o, AbstractGoods p) {
-                    return p.getAmount() - o.getAmount();
-                }
-            });
         return goodsTypeList;
     }
 
