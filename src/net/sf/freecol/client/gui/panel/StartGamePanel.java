@@ -347,13 +347,14 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         table.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx");
 
         NationOptions nationOptions = getGame().getNationOptions();
+        Nation playerNation = getMyPlayer().getNation();
         for (final Nation nation : Specification.getSpecification().getNations()) {
             NationState state = nationOptions.getNations().get(nation);
             if (state == null) {
                 continue;
             }
             table.add(new JLabel(nation.getName()), "newline");
-            if (nation != getMyPlayer().getNation() 
+            if (nation != playerNation 
                 && (singlePlayerGame || getClient().isAdmin())) {
                 final JComboBox stateBox = new JComboBox(nation.isSelectable() ? allStates : aiStates);
                 stateBox.setSelectedItem(state);
@@ -367,10 +368,10 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             } else {
                 table.add(new JLabel(state.getName()));
             }
-            if (nation == getMyPlayer().getNation()
+            if (nation == playerNation
                 && nationOptions.getNationalAdvantages() == NationOptions.Advantages.SELECTABLE) {
                 final JComboBox nationBox = new JComboBox(europeans);
-                nationBox.setSelectedItem(nation.getType());
+                nationBox.setSelectedItem(getMyPlayer().getNationType());
                 nationBox.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
                             controller.setNationType((NationType) nationBox.getSelectedItem());
@@ -382,7 +383,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 table.add(new JLabel(nation.getType().getName()));
             }
             ColorButton colorButton;
-            if (nation == getMyPlayer().getNation()) {
+            if (nation == playerNation) {
                 colorButton = new ColorButton(getMyPlayer().getColor());
                 colorButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {

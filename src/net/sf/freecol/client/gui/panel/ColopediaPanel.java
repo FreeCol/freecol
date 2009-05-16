@@ -1140,6 +1140,13 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (nation == null) {
             return;
         }
+        NationType currentNationType = null;
+        for (Player player : getGame().getPlayers()) {
+            if (player.getNation() == nation) {
+                currentNationType = player.getNationType();
+                break;
+            }
+        }
 
         detailPanel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 
@@ -1157,7 +1164,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.add(getButton(nation.getType()));
 
         detailPanel.add(new JLabel(Messages.message("colopedia.nation.currentAdvantage")));
-        detailPanel.add(getButton(nation.getType()), "wrap push");
+        detailPanel.add(getButton(currentNationType), "wrap push");
 
         detailPanel.revalidate();
         detailPanel.repaint();

@@ -206,7 +206,7 @@ public final class PreGameInputHandler extends InputHandler {
                 || (advantages == Advantages.FIXED && nationType.equals(fixedNationType))) {
                 player.setNationType(nationType);
                 Element updateNationType = Message.createNewRootElement("updateNationType");
-                updateNationType.setAttribute("nationType", player.getId());
+                updateNationType.setAttribute("player", player.getId());
                 updateNationType.setAttribute("value", nationType.getId());
                 getFreeColServer().getServer().sendToAll(updateNationType, player.getConnection());
             } else {
