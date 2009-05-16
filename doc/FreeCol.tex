@@ -179,6 +179,17 @@ resolution of at least 1024x768 pixels. You can still use the game
 with a smaller screen, but some dialogs will not be completely
 displayed.
 
+\hypertarget{FreeCol on Intel Macs}{\subsection{FreeCol on Intel Macs}}
+
+Some users report that they can not start FreeCol on their 64-bit
+Intel Macs. It seems that these Macs use a 32-bit version of Java 1.5
+by default. In order to solve this problem, you can either edit the
+file "info.plist" to select 1.6+, or you can change the default Java
+version under "/Applications/Utilities/Java/Java Preferences". Just
+drag "1.5 64-bit" or "1.6 64-bit" to the top of the list and FreeCol
+should run without any changes in "info.plist".
+
+
 \hypertarget{Compiling FreeCol}{\section{Compiling FreeCol}}
 
 In order to compile FreeCol you will need Java and
