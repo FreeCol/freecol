@@ -74,8 +74,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
         chooseFoundingFatherDialog = this;
 
         setFocusCycleRoot(false);
-        setBorder(null);
-        setOpaque(false);
 
         tb = new JTabbedPane(JTabbedPane.TOP);
 
