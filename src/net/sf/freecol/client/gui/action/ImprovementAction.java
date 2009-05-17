@@ -130,7 +130,7 @@ public class ImprovementAction extends MapboardAction {
 
         Tile tile = selectedOne.getTile();
         if (tile == null)
-            return false;
+             return false;
         
         // Check if there is an ImprovementType that can be performed by this unit on this tile
         for (TileImprovementType impType : iaType.getImpTypes()) {

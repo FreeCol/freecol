@@ -64,7 +64,8 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed( ActionEvent event ) {
                     List<String> result = new ArrayList<String>();
-                    result.add(nationField.getText());
+                    // Sanitize user input, used in save file name
+                    result.add(nationField.getText().replaceAll("[^\\s\\w]", ""));
                     result.add(countryField.getText());
                     setResponse(result);
                 }
