@@ -24,8 +24,17 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractCellEditor;
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
@@ -35,10 +44,17 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -70,6 +86,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
     private static final int START = 0, CANCEL = 1,
         READY = 3, CHAT = 4, GAME_OPTIONS = 5, MAP_GENERATOR_OPTIONS = 6;
 
+    public static final int NATION_COLUMN = 0, AVAILABILITY_COLUMN = 1, ADVANTAGE_COLUMN = 2,
+        COLOR_COLUMN = 3, PLAYER_COLUMN = 4;
+
     private static final EuropeanNationType[] europeans = 
         FreeCol.getSpecification().getEuropeanNationTypes().toArray(new EuropeanNationType[0]);
 
@@ -79,14 +98,17 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         NationState.NOT_AVAILABLE
     };
 
-    private static final NationState[] aiStates = new NationState[] {
-        NationState.AI_ONLY,
-        NationState.NOT_AVAILABLE
+    private static final String[] allStateNames = new String[] {
+        NationState.AVAILABLE.getName(),
+        NationState.AI_ONLY.getName(),
+        NationState.NOT_AVAILABLE.getName()
     };
 
-    private Game game;
+    private static final String[] aiStateNames = new String[] {
+        NationState.AI_ONLY.getName(),
+        NationState.NOT_AVAILABLE.getName()
+    };
 
-    private Player thisPlayer;
 
     private boolean singlePlayerGame;
 
@@ -102,9 +124,11 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     private JButton mapGeneratorOptions;
 
-    private JPanel table = new JPanel();
+    private JTable table = new JTable();
 
     private final ListCellRenderer stateBoxRenderer = new NationStateRenderer();
+
+    private PlayersTableModel tableModel;
 
     /**
      * The constructor that will add the items to this panel.
@@ -115,17 +139,12 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         super(parent);
     }
 
-    /**
-     * Describe <code>initialize</code> method here.
-     *
-     * @param singlePlayerGame <code>true</code> if the user wants to start a
-     *            single player game, <code>false</code> otherwise.
-     */
-    public void initialize(boolean singlePlayerGame) {
-        this.singlePlayerGame = singlePlayerGame;
-        FreeColClient freeColClient = getClient();
-        game = freeColClient.getGame();
-        thisPlayer = getMyPlayer();
+    public void initialize(boolean singlePlayer) {
+
+        removeAll();
+        this.singlePlayerGame = singlePlayer;
+
+        NationOptions nationOptions = getGame().getNationOptions();
 
         JButton cancel = new JButton(Messages.message("cancel"));
 
@@ -133,10 +152,67 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         setCancelComponent(cancel);
 
+        tableModel = new PlayersTableModel(getClient().getPreGameController(), nationOptions, getMyPlayer());
+        table = new JTable(tableModel);
+        table.setRowHeight(22);
+
+        JButton nationButton = new JButton(Messages.message("nation"));
+        JLabel availabilityLabel = new JLabel(Messages.message("availability"));
+        JButton advantageButton = new JButton(Messages.message("advantage"));
+        JLabel colorLabel = new JLabel(Messages.message("color"));
+        JLabel playerLabel = new JLabel(Messages.message("player"));
+
+        nationButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    getCanvas().showColopediaPanel(PanelType.NATIONS);
+                }
+            });
+
+        advantageButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    getCanvas().showColopediaPanel(PanelType.NATION_TYPES);
+                }
+            });
+
+        HeaderRenderer renderer = new HeaderRenderer(nationButton, availabilityLabel,
+                                                     advantageButton, colorLabel, playerLabel);
+        JTableHeader header = table.getTableHeader();
+        header.addMouseListener(new HeaderListener(header, renderer));
+
+        TableColumn advantagesColumn = table.getColumnModel().getColumn(ADVANTAGE_COLUMN);
+        if (nationOptions.getNationalAdvantages() == NationOptions.Advantages.SELECTABLE) {
+            advantagesColumn.setCellEditor(new AdvantageCellEditor());
+        }
+        advantagesColumn.setCellRenderer(new AdvantageCellRenderer(nationOptions.getNationalAdvantages()));
+        advantagesColumn.setHeaderRenderer(renderer);
+
+        TableColumn availableColumn = table.getColumnModel().getColumn(AVAILABILITY_COLUMN);
+        availableColumn.setCellRenderer(new AvailableCellRenderer());
+        availableColumn.setCellEditor(new AvailableCellEditor());
+        
+        TableColumn colorsColumn = table.getColumnModel().getColumn(COLOR_COLUMN);
+        ColorCellEditor colorCellEditor = new ColorCellEditor(getCanvas(), this);
+        colorsColumn.setCellEditor(colorCellEditor);
+        colorsColumn.setCellRenderer(new ColorCellRenderer(true));
+        colorCellEditor.setData(getGame().getPlayers(), getMyPlayer());
+
+        TableColumn playerColumn = table.getColumnModel().getColumn(PLAYER_COLUMN);
+        playerColumn.setCellEditor(new PlayerCellEditor());
+        
         start = new JButton(Messages.message("startGame"));
         gameOptions = new JButton(Messages.message("gameOptions"));
         mapGeneratorOptions = new JButton(Messages.message("mapGeneratorOptions"));
         readyBox = new JCheckBox(Messages.message("iAmReady"));
+
+        if (singlePlayerGame) {
+            // If we set the ready flag to false then the player will
+            // be able to change the settings as he likes.
+            getMyPlayer().setReady(false);
+            // Pretend as if the player is ready.
+            readyBox.setSelected(true);
+        } else {
+            readyBox.setSelected(getMyPlayer().isReady());
+        }
 
         chat = new JTextField();
         chatArea = new JTextArea();
@@ -149,7 +225,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                                       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.getViewport().setOpaque(false);
 
-        removeAll();
         setLayout(new MigLayout("wrap 3", "", ""));
 
         add(tableScroll, "span 2, grow");
@@ -183,17 +258,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatArea.setWrapStyleWord(true);
 
         setSize(getPreferredSize());
-
-        if (singlePlayerGame) {
-            // If we set the ready flag to false then the player will
-            // be able to change the settings as he likes.
-            thisPlayer.setReady(false);
-
-            // Pretend as if the player is ready.
-            readyBox.setSelected(true);
-        } else {
-            readyBox.setSelected(thisPlayer.isReady());
-        }
 
         chatArea.setText("");
 
@@ -262,7 +326,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
                 // mode in order to allow the player to change
                 // whatever he wants.
                 if (singlePlayerGame) {
-                    thisPlayer.setReady(true);
+                    getMyPlayer().setReady(true);
                 }
 
                 getClient().getPreGameController().requestLaunch();
@@ -319,164 +383,60 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * they've made.
      */
     public void refreshPlayersTable() {
-        final PreGameController controller = getClient().getPreGameController();
-
-        table.removeAll();
-        JLabel playerLabel = new JLabel(Messages.message("player"));
-        JButton nationButton = new JButton(Messages.message("nation"));
-        JButton advantageButton = new JButton(Messages.message("advantage"));
-        JLabel colorLabel = new JLabel(Messages.message("color"));
-
-        nationButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showColopediaPanel(PanelType.NATIONS);
-                }
-            });
-
-        advantageButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showColopediaPanel(PanelType.NATION_TYPES);
-                }
-            });
-        
-        table.add(nationButton);
-        table.add(new JLabel(Messages.message("availability")));
-        table.add(advantageButton);
-        table.add(colorLabel);
-        table.add(playerLabel);
-        table.add(new JSeparator(JSeparator.HORIZONTAL), "newline, span, growx");
-
-        NationOptions nationOptions = getGame().getNationOptions();
-        Nation playerNation = getMyPlayer().getNation();
-        for (final Nation nation : Specification.getSpecification().getNations()) {
-            NationState state = nationOptions.getNations().get(nation);
-            if (state == null) {
-                continue;
-            }
-            table.add(new JLabel(nation.getName()), "newline");
-            if (nation != playerNation 
-                && (singlePlayerGame || getClient().isAdmin())) {
-                final JComboBox stateBox = new JComboBox(nation.isSelectable() ? allStates : aiStates);
-                stateBox.setSelectedItem(state);
-                stateBox.setRenderer(stateBoxRenderer);
-                stateBox.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            controller.setAvailable(nation, (NationState) stateBox.getSelectedItem());
-                        }
-                    });
-                table.add(stateBox);
-            } else {
-                table.add(new JLabel(state.getName()));
-            }
-            if (nation == playerNation
-                && nationOptions.getNationalAdvantages() == NationOptions.Advantages.SELECTABLE) {
-                final JComboBox nationBox = new JComboBox(europeans);
-                nationBox.setSelectedItem(getMyPlayer().getNationType());
-                nationBox.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            controller.setNationType((NationType) nationBox.getSelectedItem());
-                            refreshPlayersTable();
-                        }
-                    });
-                table.add(nationBox);
-            } else {
-                table.add(new JLabel(nation.getType().getName()));
-            }
-            ColorButton colorButton;
-            if (nation == playerNation) {
-                colorButton = new ColorButton(getMyPlayer().getColor());
-                colorButton.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            Color newColor = getCanvas().showFreeColDialog(new ColorChooserDialog(getCanvas()));
-                            if (newColor != null) {
-                                controller.setColor(newColor);
-                                refreshPlayersTable();
-                            }
-                        }
-                    });
-            } else {
-                colorButton = new ColorButton(nation.getColor());
-                colorButton.setEnabled(false);
-            }
-            table.add(colorButton);
-            Player player = getGame().getPlayer(nation.getId());
-            if (player == null) {
-                if (state == NationState.AVAILABLE) {
-                    JButton selectButton = new JButton(Messages.message("select"));
-                    selectButton.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent event) {
-                                controller.setNation(nation);
-                                controller.setColor(nation.getColor());
-                                refreshPlayersTable();
-                            }
-                        });
-                    table.add(selectButton);
-                }
-            } else {
-                table.add(new JLabel(player.getName()));
-            }
-        }
-        table.revalidate();
-        table.repaint();
+        tableModel.update();
     }
 
+    private class HeaderRenderer implements TableCellRenderer {
 
-    public class ColorButton extends JButton {
+        private static final int NO_COLUMN = -1;
+        private int pressedColumn = NO_COLUMN;
+        private Component[] components;
 
-        public ColorButton(Color color) {
-            super(Messages.message("color"));
-            setBackground(color);
-            setOpaque(true);
-            setToolTipText("RGB value: " + color.getRed() + ", " + color.getGreen() + ", "
-                           + color.getBlue());
+        public HeaderRenderer(Component... components) {
+            this.components = components;
         }
 
-        protected void paintComponent(Graphics g) {
-            g.setColor(getBackground());
-            g.fillRect(0, 0, getWidth(), getHeight());
+        public Component getTableCellRendererComponent(JTable table,
+                                                       Object value,
+                                                       boolean isSelected,
+                                                       boolean hasFocus,
+                                                       int row,
+                                                       int column) {
+            if (components[column] instanceof JButton) {
+                boolean isPressed = (column == pressedColumn);
+                ((JButton) components[column]).getModel().setPressed(isPressed);
+                ((JButton) components[column]).getModel().setArmed(isPressed);
+            }
+            return components[column];
+        }
+
+        public void setPressedColumn(int column) {
+            pressedColumn = column;
         }
     }
 
-    /**
-     * This class represents a panel that holds a JColorChooser and OK
-     * and cancel buttons.  Once constructed this panel is comparable
-     * to the dialog that is returned from
-     * JColorChooser::createDialog.
-    */
-    private class ColorChooserDialog extends FreeColDialog<Color> {
+    private class HeaderListener extends MouseAdapter {
+        JTableHeader header;
 
-        private final JColorChooser colorChooser = new JColorChooser();
+        HeaderRenderer renderer;
 
-        /**
-         * The constructor to use.
-         * @param l The ActionListener for the OK and cancel buttons.
-         */
-        public ColorChooserDialog(Canvas canvas) {
-            super(canvas);
-
-            JButton cancelButton = new JButton( Messages.message("cancel") );
-
-            setLayout(new MigLayout("", "", ""));
-
-            add(colorChooser);
-            add(okButton, "newline 20, split 2, tag ok");
-            add(cancelButton, "tag cancel");
-
-            cancelButton.addActionListener(this);
-            setOpaque(true);
-            setSize(getPreferredSize());
+        HeaderListener(JTableHeader header, HeaderRenderer renderer) {
+            this.header = header;
+            this.renderer = renderer;
         }
 
-        public void actionPerformed(ActionEvent event) {
-            String command = event.getActionCommand();
-            if (OK.equals(command)) {
-                setResponse(colorChooser.getColor());
-            } else {
-                setResponse(null);
-            }
+        public void mousePressed(MouseEvent e) {
+            int col = header.columnAtPoint(e.getPoint());
+            renderer.setPressedColumn(col);
+            header.repaint();
         }
 
+        public void mouseReleased(MouseEvent e) {
+            renderer.setPressedColumn(HeaderRenderer.NO_COLUMN);
+            header.repaint();
+        }
     }
+
 
     class NationStateRenderer extends JLabel implements ListCellRenderer {
         public Component getListCellRendererComponent(JList list, Object value, int index,
@@ -486,5 +446,263 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         }
     }
 
+    class AvailableCellRenderer implements TableCellRenderer {
 
+        /**
+         * Returns the component used to render the cell's value.
+         * @param table The table whose cell needs to be rendered.
+         * @param value The value of the cell being rendered.
+         * @param hasFocus Indicates whether or not the cell in question has focus.
+         * @param row The row index of the cell that is being rendered.
+         * @param column The column index of the cell that is being rendered.
+         * @return The component used to render the cell's value.
+         */
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
+            return new JLabel(((NationState) value).getName());
+        }
+    }
+
+    public final class AvailableCellEditor extends AbstractCellEditor implements TableCellEditor {
+
+        private JComboBox aiStateBox = new JComboBox(aiStateNames);
+        private JComboBox allStateBox = new JComboBox(allStateNames);
+        private JComboBox activeBox;
+
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+                                                     int row, int column) {
+            NationType nationType = ((Nation) table.getValueAt(row, StartGamePanel.NATION_COLUMN)).getType();
+            if (nationType instanceof EuropeanNationType) {
+                activeBox = allStateBox;
+            } else {
+                activeBox = aiStateBox;
+            }
+            return activeBox;
+        }
+
+        public Object getCellEditorValue() {
+            String available = (String) activeBox.getSelectedItem();
+            for (int index = 0; index < allStateNames.length; index++) {
+                if (allStateNames[index].equals(available)) {
+                    return allStates[index];
+                }
+            }
+            return NationState.NOT_AVAILABLE;
+        }
+    }
+
+    public final class PlayerCellEditor extends AbstractCellEditor implements TableCellEditor {
+
+        private JLabel label = new JLabel(Messages.message("select"));
+
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
+                                                     int row, int column) {
+            return label;
+        }
+
+        public Object getCellEditorValue() {
+            return true;
+        }
+
+    }
+
+}
+
+/**
+ * The TableModel for the players table.
+ */
+class PlayersTableModel extends AbstractTableModel {
+
+    private List<Nation> nations;
+
+    private Map<Nation, Player> players;
+
+    private Player thisPlayer;
+
+    private final PreGameController preGameController;
+
+    private NationOptions nationOptions;
+
+    private static final String[] columnNames = {
+        Messages.message("nation"),
+        Messages.message("availability"),
+        Messages.message("advantage"),
+        Messages.message("color"),
+        Messages.message("player")
+    };
+
+
+    /**
+     * A standard constructor.
+     * 
+     * @param pgc The PreGameController to use when updates need to be notified
+     *            across the network.
+     * @param advantages an <code>Advantages</code> value
+     */
+    public PlayersTableModel(PreGameController pgc, NationOptions nationOptions, Player owningPlayer) {
+        nations = new ArrayList<Nation>();
+        players = new HashMap<Nation, Player>();
+        for (Nation nation : Specification.getSpecification().getNations()) {
+            NationState state = nationOptions.getNations().get(nation);
+            if (state != null) {
+                nations.add(nation);
+                players.put(nation, null);
+            }
+        }
+        thisPlayer = owningPlayer;
+        players.put(thisPlayer.getNation(), thisPlayer);
+        preGameController = pgc;
+        this.nationOptions = nationOptions;
+    }
+
+    public void update() {
+        for (Nation nation : nations) {
+            players.put(nation, null);
+        }
+        for (Player player : thisPlayer.getGame().getPlayers()) {
+            players.put(player.getNation(), player);
+        }
+        fireTableDataChanged();
+    }
+
+    /**
+     * Returns the Class of the objects in the given column.
+     * 
+     * @param column The column to return the Class of.
+     * @return The Class of the objects in the given column.
+     */
+    public Class<?> getColumnClass(int column) {
+        switch(column) {
+        case StartGamePanel.NATION_COLUMN:
+            return Nation.class;
+        case StartGamePanel.AVAILABILITY_COLUMN:
+            return NationOptions.NationState.class;
+        case StartGamePanel.ADVANTAGE_COLUMN:
+            return NationType.class;
+        case StartGamePanel.COLOR_COLUMN:
+            return Color.class;
+        case StartGamePanel.PLAYER_COLUMN:
+            return Player.class;
+        }
+        return String.class;
+    }
+
+    /**
+     * Returns the amount of columns in this statesTable.
+     * 
+     * @return The amount of columns in this statesTable.
+     */
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    /**
+     * Returns the name of the specified column.
+     * 
+     * @return The name of the specified column.
+     */
+    public String getColumnName(int column) {
+        return columnNames[column];
+    }
+
+    /**
+     * Returns the amount of rows in this statesTable.
+     * 
+     * @return The amount of rows in this statesTable.
+     */
+    public int getRowCount() {
+        return nations.size();
+    }
+
+    /**
+     * Returns the value at the requested location.
+     * 
+     * @param row The requested row.
+     * @param column The requested column.
+     * @return The value at the requested location.
+     */
+    public Object getValueAt(int row, int column) {
+        if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
+            Nation nation = nations.get(row);
+            switch (column) {
+            case StartGamePanel.NATION_COLUMN:
+                return nation;
+            case StartGamePanel.AVAILABILITY_COLUMN:
+                return nationOptions.getNationState(nation);
+            case StartGamePanel.ADVANTAGE_COLUMN:
+                if (players.get(nation) == null) {
+                    return nation.getType();
+                } else {
+                    return players.get(nation).getNationType();
+                }
+            case StartGamePanel.COLOR_COLUMN:
+                if (players.get(nation) == null) {
+                    return nation.getColor();
+                } else {
+                    return players.get(nation).getColor();
+                }
+            case StartGamePanel.PLAYER_COLUMN:
+                return players.get(nation);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns 'true' if the specified cell is editable, 'false' otherwise.
+     * 
+     * @param row The specified row.
+     * @param column The specified column.
+     * @return 'true' if the specified cell is editable, 'false' otherwise.
+     */
+    public boolean isCellEditable(int row, int column) {
+        if ((row >= 0) && (row < nations.size())) {
+            Nation nation = nations.get(row);
+            boolean ownRow = (thisPlayer == players.get(nation) && !thisPlayer.isReady());
+            switch(column) {
+            case StartGamePanel.AVAILABILITY_COLUMN:
+                return thisPlayer.isAdmin();
+            case StartGamePanel.ADVANTAGE_COLUMN:
+                return (nation.getType() instanceof EuropeanNationType && ownRow);
+            case StartGamePanel.COLOR_COLUMN:
+                return (ownRow || thisPlayer.isAdmin());
+            case StartGamePanel.PLAYER_COLUMN:
+                return (nation.getType() instanceof EuropeanNationType && players.get(nation) == null);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Sets the value at the specified location.
+     * 
+     * @param value The new value.
+     * @param row The specified row.
+     * @param column The specified column.
+     */
+    public void setValueAt(Object value, int row, int column) {
+        if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
+            // Column 0 can't be updated.
+
+            switch(column) {
+            case StartGamePanel.ADVANTAGE_COLUMN:
+                preGameController.setNationType((NationType) value);
+                break;
+            case StartGamePanel.AVAILABILITY_COLUMN:
+                preGameController.setAvailable(nations.get(row), (NationState) value);
+                break;
+            case StartGamePanel.COLOR_COLUMN:
+                preGameController.setColor((Color) value);
+                break;
+            case StartGamePanel.PLAYER_COLUMN:
+                Nation nation = nations.get(row);
+                preGameController.setNation(nation);
+                preGameController.setColor(nation.getColor());
+                update();
+                break;
+            }
+
+            fireTableCellUpdated(row, column);
+        }
+    }
 }

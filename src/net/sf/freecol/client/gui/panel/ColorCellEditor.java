@@ -48,7 +48,7 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
         ActionListener {
 
 
-    private static final Logger logger = Logger.getLogger(EuropePanel.class.getName());
+    private static final Logger logger = Logger.getLogger(ColorCellEditor.class.getName());
 
     private static final String EDIT = "EDIT",
                                 OK = "OK",

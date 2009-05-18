@@ -25,14 +25,15 @@ import java.awt.Component;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.EuropeanNationType;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.NationType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.NationOptions.Advantages;
 
@@ -42,43 +43,16 @@ import net.sf.freecol.common.model.NationOptions.Advantages;
 */
 public final class AdvantageCellRenderer implements TableCellRenderer {
 
-
     private static Vector<EuropeanNationType> europeans = 
-        new Vector<EuropeanNationType>(FreeCol.getSpecification().getEuropeanNationTypes());
-    private static final JComboBox standardNationsComboBox = new JComboBox(europeans);
+        new Vector<EuropeanNationType>(Specification.getSpecification().getEuropeanNationTypes());
 
-    private List<Player> players;
-    private Player thisPlayer;
     private Advantages advantages;
 
     /**
     * The default constructor.
     */
-    public AdvantageCellRenderer() {
-    }
-
-
-    /**
-    * Gives this table model the data that is being used in the table.
-    *
-    * @param players The players that should be rendered in the table.
-    * @param owningPlayer The player running the client that is displaying the table.
-    * @param advantages Indicates whether advantages can be selected.
-    */
-    public void setData(List<Player> players, Player owningPlayer, Advantages advantages) {
-        this.players = players;
-        thisPlayer = owningPlayer;
+    public AdvantageCellRenderer(Advantages advantages) {
         this.advantages = advantages;
-    }
-
-    private Player getPlayer(int i) {
-        if (i == 0) {
-            return thisPlayer;
-        } else if (players.get(i) == thisPlayer) {
-            return players.get(0);
-        } else {
-            return players.get(i);
-        }
     }
 
     /**
@@ -93,37 +67,32 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
 
-        Player player = getPlayer(row);
+        Player player = (Player) table.getValueAt(row, StartGamePanel.PLAYER_COLUMN);
+        NationType nationType = ((Nation) table.getValueAt(row, StartGamePanel.NATION_COLUMN)).getType();
 
-        Component component;
-        component = standardNationsComboBox;
-        if (player == thisPlayer) {
-            switch(advantages) {
-            case FIXED:
-                component = new JLabel(player.getNationType().getName());
-                break;
-            case SELECTABLE:
-                component = standardNationsComboBox;
-                ((JComboBox) component).setSelectedItem(player.getNationType());
-                break;
-            case NONE:
-            default:
-                component = new JLabel(Messages.message("model.nationType.none.name"));
-                break;
+        JLabel label;
+        switch(advantages) {
+        case FIXED:
+            label = new JLabel(nationType.getName());
+            break;
+        case SELECTABLE:
+            if (player == null) {
+                return new JLabel(nationType.getName());
+            } else {
+                return new JLabel(player.getNationType().getName());
             }
-        } else if (player.isEuropean()) {
-            component = new JLabel(player.getNationType().getName());
-        } else {
-            component = new JLabel();
+        case NONE:
+        default:
+            label = new JLabel(Messages.message("model.nationType.none.name"));
+            break;
         }
-
-        if (player.isReady()) {
-            component.setForeground(Color.GRAY);
+        if (player != null && player.isReady()) {
+            label.setForeground(Color.GRAY);
         } else {
-            component.setForeground(table.getForeground());
+            label.setForeground(table.getForeground());
         }
-        component.setBackground(table.getBackground());
+        label.setBackground(table.getBackground());
 
-        return component;
+        return label;
     }
 }
