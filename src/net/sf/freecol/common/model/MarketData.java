@@ -48,11 +48,6 @@ public class MarketData extends FreeColObject {
     private int amountInMarket;
 
     /**
-     * Describe oldPrice here.
-     */
-    private int oldPrice;
-
-    /**
      * Describe initialPrice here.
      */
     private int initialPrice;
@@ -154,24 +149,6 @@ public class MarketData extends FreeColObject {
      */
     public final void setAmountInMarket(final int newAmountInMarket) {
         this.amountInMarket = newAmountInMarket;
-    }
-
-    /**
-     * Get the <code>OldPrice</code> value.
-     *
-     * @return an <code>int</code> value
-     */
-    public final int getOldPrice() {
-        return oldPrice;
-    }
-
-    /**
-     * Set the <code>OldPrice</code> value.
-     *
-     * @param newOldPrice The new OldPrice value.
-     */
-    public final void setOldPrice(final int newOldPrice) {
-        this.oldPrice = newOldPrice;
     }
 
     /**

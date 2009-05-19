@@ -44,8 +44,6 @@ public final class Market extends FreeColGameObject implements Ownable {
 
     private Player owner;
     
-    private boolean initialized = false;
-
     /**
      * Constant for specifying the access to this <code>Market</code>
      * when {@link #buy(GoodsType, int, Player) buying} and
@@ -76,7 +74,6 @@ public final class Market extends FreeColGameObject implements Ownable {
                 data.setAmountInMarket(goodsType.getInitialAmount());
                 data.setPaidForSale(goodsType.getInitialSellPrice());
                 data.setCostToBuy(goodsType.getInitialBuyPrice());
-                data.setOldPrice(goodsType.getInitialBuyPrice());
                 data.setInitialPrice(goodsType.getInitialSellPrice());
             }
             marketData.put(goodsType, data);
@@ -158,7 +155,6 @@ public final class Market extends FreeColGameObject implements Ownable {
         return owner;
     }
 
-    
     /**
      * Sets the owner of this <code>Market</code>.
      *
@@ -253,6 +249,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Sells a particular amount of a particular type of good with the proceeds
      * of the sale being paid to a particular player. The goods is
      * sold using {@link #EUROPE} as the accesspoint for this market.
+     * Note that post-independence this no longer refers to a specific
+     * port.
      *
      * @param  goods  The Goods object being sold.
      * @param  player      the player selling the goods
@@ -315,7 +313,8 @@ public final class Market extends FreeColGameObject implements Ownable {
         }
         int oldAmount = data.getAmountInMarket();
         data.setAmountInMarket(oldAmount + amount);
-        priceGoods(goodsType, true);
+        ModelMessage m = priceGoods(goodsType);
+        if (m != null) addModelMessage(m);
     }
 
     /**
@@ -333,7 +332,8 @@ public final class Market extends FreeColGameObject implements Ownable {
         /* this is a bottomless market: goods cannot be owed by the
          * market */
         data.setAmountInMarket(Math.max(oldAmount - amount, 100));
-        priceGoods(goodsType, true);
+        ModelMessage m = priceGoods(goodsType);
+        if (m != null) addModelMessage(m);
     }
 
     /**
@@ -378,23 +378,45 @@ public final class Market extends FreeColGameObject implements Ownable {
         return getSalePrice(goods.getType(), goods.getAmount());
     }
 
+
+    /**
+     * Adds a transaction listener for notification of any transaction
+     *
+     * @param listener the listener
+     */
+    public void addTransactionListener(TransactionListener listener) {
+        transactionListeners.add(listener);
+    }
+
+    /**
+     * Removes a transaction listener
+     *
+     * @param listener the listener
+     */
+    public void removeTransactionListener(TransactionListener listener) {
+        transactionListeners.remove(listener);
+    }
+
+    /**
+     * Returns an array of all the TransactionListener added to this Market.
+     *
+     * @return all of the TransactionListener added or an empty array if no
+     * listeners have been added
+     */
+    public TransactionListener[] getTransactionListener() {
+        return transactionListeners.toArray(new TransactionListener[0]);
+    }
+
+
     // -------------------------------------------------------- support methods
 
     /**
      * Adjusts the prices for all goods.
      */
     private void priceGoods() {
-        priceGoods(initialized);
-        initialized = true;
-    }
-
-    /**
-     * Adjusts the prices for all goods.
-     */
-    private void priceGoods(boolean addMessages) {        
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
             if (goodsType.isStorable()) {
-                priceGoods(goodsType, addMessages);
+                priceGoods(goodsType);
             }
         }
     }
@@ -403,44 +425,42 @@ public final class Market extends FreeColGameObject implements Ownable {
      * Adjust the price for a particular type of goods.
      *
      * @param goodsType a <code>GoodsType</code> value
-     * @param addMessages a <code>boolean</code> value
+     *
+     * @return A <code>ModelMessage</code> describing the price change,
+     *         or null if none.
      */
-    private void priceGoods(GoodsType goodsType, boolean addMessages) {
+    public ModelMessage priceGoods(GoodsType goodsType) {
         MarketData data = marketData.get(goodsType);
         if (data != null) {
-            data.setOldPrice(data.getCostToBuy());
-            int newPrice = Math.round(goodsType.getInitialAmount() * data.getInitialPrice() /
-                                      (float) data.getAmountInMarket());
-            if (newPrice + goodsType.getPriceDifference() > MAXIMUM_PRICE) {
-                data.setCostToBuy(MAXIMUM_PRICE);
-                data.setPaidForSale(MAXIMUM_PRICE - goodsType.getPriceDifference());
-            } else {
-                if (newPrice < MINIMUM_PRICE) {
-                    newPrice = MINIMUM_PRICE;
-                }
-                data.setPaidForSale(newPrice);
-                data.setCostToBuy(data.getPaidForSale() + goodsType.getPriceDifference());
+            int oldPrice = data.getCostToBuy();
+            int newSalePrice = Math.round(goodsType.getInitialAmount() * data.getInitialPrice()
+                                          / (float) data.getAmountInMarket());
+            int newPrice = newSalePrice + goodsType.getPriceDifference();
+
+            if (newPrice > MAXIMUM_PRICE) {
+                newPrice = MAXIMUM_PRICE;
+                newSalePrice = newPrice - goodsType.getPriceDifference();
+            } else if (newSalePrice < MINIMUM_PRICE) {
+                newSalePrice = MINIMUM_PRICE;
+                newPrice = newSalePrice + goodsType.getPriceDifference();
             }
-            if (addMessages && owner != null && owner.getEurope() != null && 
-                goodsType.isStorable()) {
-                if (data.getOldPrice() > data.getCostToBuy()) {
-                    addModelMessage(owner.getEurope(), ModelMessage.MessageType.MARKET_PRICES, goodsType,
-                                    "model.market.priceDecrease",
-                                    "%europe%", owner.getEurope().getName(),
-                                    "%goods%", goodsType.getName(),
-                                    "%buy%", String.valueOf(data.getCostToBuy()),
-                                    "%sell%", String.valueOf(data.getPaidForSale()));
-                             
-                } else if (data.getOldPrice() < data.getCostToBuy()) {
-                    addModelMessage(owner.getEurope(), ModelMessage.MessageType.MARKET_PRICES, goodsType,
-                                    "model.market.priceIncrease",
-                                    "%europe%", owner.getEurope().getName(),
-                                    "%goods%", goodsType.getName(),
-                                    "%buy%", String.valueOf(data.getCostToBuy()),
-                                    "%sell%", String.valueOf(data.getPaidForSale()));
-                }
+            data.setPaidForSale(newSalePrice);
+            data.setCostToBuy(newPrice);
+
+            if (owner != null && newPrice != oldPrice) {
+                return new ModelMessage(owner,
+                                        ModelMessage.MessageType.MARKET_PRICES,
+                                        goodsType,
+                                        ((newPrice > oldPrice)
+                                         ? "model.market.priceIncrease"
+                                         : "model.market.priceDecrease"),
+                                        "%market%", owner.getMarketName(),
+                                        "%goods%", goodsType.getName(),
+                                        "%buy%", String.valueOf(newPrice),
+                                        "%sell%", String.valueOf(newSalePrice));
             }
         }
+        return null;
     }
 
     public void newTurn() {
@@ -509,7 +529,7 @@ public final class Market extends FreeColGameObject implements Ownable {
             }
         }
         
-        priceGoods();
+        priceGoods(); //TODO: remove when server sends all market changes
 
     }
 
@@ -521,36 +541,4 @@ public final class Market extends FreeColGameObject implements Ownable {
     public static String getXMLElementTagName() {
         return "market";
     }
-    
-    /**
-     * Adds a transaction listener for notification of any transaction
-     *
-     * @param listener the listener
-     */
-    public void addTransactionListener(TransactionListener listener) {
-        transactionListeners.add(listener);
-    }
-
-    /**
-     * Removes a transaction listener
-     *
-     * @param listener the listener
-     */
-    public void removeTransactionListener(TransactionListener listener) {
-        transactionListeners.remove(listener);
-    }
-
-    /**
-     * Returns an array of all the TransactionListener added to this Market.
-     *
-     * @return all of the TransactionListener added or an empty array if no
-     * listeners have been added
-     */
-    public TransactionListener[] getTransactionListener() {
-        return transactionListeners.toArray(new TransactionListener[0]);
-    }
-
-    
-    // ---------------------------------------------------------- inner classes
-
 }

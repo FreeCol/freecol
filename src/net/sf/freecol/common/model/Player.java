@@ -580,6 +580,20 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * What is the name of the player's market?
+     * Following a declaration of independence we are assumed to trade
+     * broadly with any European market rather than a specific port.
+     *
+     * @return A name for the player's market.
+     */
+    public String getMarketName() {
+        Europe europe = getEurope();
+
+        return (europe == null) ? Messages.message("model.market.independent")
+            : europe.getName();
+    }
+
+    /**
      * Checks if this player owns the given <code>Settlement</code>.
      *
      * @param s The <code>Settlement</code>.
