@@ -26,6 +26,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,19 +37,26 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.IndianNationType;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Resource;
 import net.sf.freecol.common.model.ResourceType;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.generator.River;
 import net.sf.freecol.server.generator.RiverSection;
 
@@ -59,7 +67,7 @@ import net.sf.freecol.server.generator.RiverSection;
  * <br><br>
  *
  * This panel is only used when running in
- * {@link FreeColClient#isMapEditor() map editor mode}.
+ * {@link SpecificationClient#isMapEditor() map editor mode}.
  *
  * @see MapEditorController#getMapTransform()
  * @see MapTransform
@@ -70,11 +78,17 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
 
     private final JPanel listPanel;
+    private JButton settlementButton;
 
     private ButtonGroup group;
 
     private static final TileImprovementType riverType =
-        FreeCol.getSpecification().getTileImprovementType("model.improvement.River");
+        Specification.getSpecification().getTileImprovementType("model.improvement.River");
+
+    /**
+     * Describe nativePlayer here.
+     */
+    private Player nativePlayer;
 
     /**
      * The constructor that will add the items to this panel.
@@ -100,19 +114,26 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * Builds the buttons for all the terrains.
      */
     private void buildList() {
-        List<TileType> tileList = FreeCol.getSpecification().getTileTypeList();
+        List<TileType> tileList = Specification.getSpecification().getTileTypeList();
         for (TileType type : tileList) {
-            buildButton(getLibrary().getScaledTerrainImage(type, 1f),
-                        type.getName(), new TileTypeTransform(type));
+            listPanel.add(buildButton(getLibrary().getScaledTerrainImage(type, 1f),
+                                      type.getName(), new TileTypeTransform(type)));
         }
-        buildButton(getLibrary().getRiverImage(10), Messages.message("minorRiver"),
-                    new RiverTransform(TileImprovement.SMALL_RIVER));
-        buildButton(getLibrary().getRiverImage(20), Messages.message("majorRiver"),
-                    new RiverTransform(TileImprovement.LARGE_RIVER));
-        buildButton(getLibrary().getBonusImage(FreeCol.getSpecification().getResourceTypeList().get(0)),
-                    Messages.message("editor.resource"), new ResourceTransform());
-        buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR),
-                    Messages.message("model.message.LOST_CITY_RUMOUR"), new LostCityRumourTransform());
+        listPanel.add(buildButton(getLibrary().getRiverImage(10), Messages.message("minorRiver"),
+                                  new RiverTransform(TileImprovement.SMALL_RIVER)));
+        listPanel.add(buildButton(getLibrary().getRiverImage(20), Messages.message("majorRiver"),
+                                  new RiverTransform(TileImprovement.LARGE_RIVER)));
+        listPanel.add(buildButton(getLibrary().getBonusImage(Specification.getSpecification()
+                                                             .getResourceTypeList().get(0)),
+                                  Messages.message("editor.resource"), new ResourceTransform()));
+        listPanel.add(buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR),
+                                  Messages.message("model.message.LOST_CITY_RUMOUR"),
+                                  new LostCityRumourTransform()));
+        SettlementType settlementType = nativePlayer == null ? SettlementType.INDIAN_CAMP :
+            ((IndianNationType) nativePlayer.getNationType()).getTypeOfSettlement();
+        settlementButton = buildButton(getLibrary().getSettlementImage(settlementType),
+                                       Messages.message("Settlement"), new SettlementTransform());
+        listPanel.add(settlementButton);
     }
 
     /**
@@ -122,7 +143,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * @param text a <code>String</code> value
      * @param mt a <code>MapTransform</code> value
      */
-    private void buildButton(Image image, String text, final MapTransform mt) {
+    private JButton buildButton(Image image, String text, final MapTransform mt) {
 
         Image scaledImage = getLibrary().scaleImage(image, 0.5f);
 
@@ -143,7 +164,25 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             }
         });
         button.setBorder(null);
-        listPanel.add(button);
+        return button;
+    }
+
+    /**
+     * Get the <code>NativePlayer</code> value.
+     *
+     * @return a <code>Player</code> value
+     */
+    public Player getNativePlayer() {
+        return nativePlayer;
+    }
+
+    /**
+     * Set the <code>NativePlayer</code> value.
+     *
+     * @param newNativePlayer The new NativePlayer value.
+     */
+    public void setNativePlayer(final Player newNativePlayer) {
+        this.nativePlayer = newNativePlayer;
     }
 
     /**
@@ -303,6 +342,28 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 t.add(new LostCityRumour(t.getGame(), t));
             } else {
                 t.removeLostCityRumour();
+            }
+        }
+    }
+
+    private class SettlementTransform extends MapTransform {
+        public void transform(Tile t) {
+            Settlement settlement = t.getSettlement();
+            if (settlement == null) {
+                if (nativePlayer == null) {
+                    nativePlayer = t.getGame().getPlayers().get(0);
+                    SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType())
+                        .getTypeOfSettlement();
+                    Image image = getLibrary().getSettlementImage(settlementType);
+                    settlementButton.setIcon(new ImageIcon(getLibrary().scaleImage(image, 0.5f)));
+                }
+                UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
+                    .getObject();
+                t.setSettlement(new IndianSettlement(t.getGame(), nativePlayer, t, "", false,
+                                                     skill, new HashSet<Player>(), null));
+            } else {
+                t.setSettlement(null);
+                settlement.dispose();
             }
         }
     }

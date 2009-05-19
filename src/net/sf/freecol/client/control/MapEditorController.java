@@ -44,6 +44,8 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
@@ -173,6 +175,9 @@ public final class MapEditorController {
             return;
         }
         
+        for (Nation nation : FreeCol.getSpecification().getIndianNations()) {
+            game.addPlayer(new Player(game, nation.getName(), false, nation));
+        }
         try {
             mapGenerator.createMap(game);
             freeColClient.getGUI().setFocus(1, 1);

@@ -34,18 +34,19 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.server.generator.MapGenerator;
+import net.sf.freecol.server.model.ServerPlayer;
 
 /**
  * Creates a new empty map.
  */
 public class NewEmptyMapAction extends MapboardAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(NewEmptyMapAction.class.getName());
-
-
-
 
     public static final String id = "newEmptyMapAction";
 
@@ -91,6 +92,9 @@ public class NewEmptyMapAction extends MapboardAction {
         MapSize size = showMapSizeDialog();
         if (size == null) {
             return;
+        }
+        for (Nation nation : Specification.getSpecification().getIndianNations()) {
+            game.addPlayer(new ServerPlayer(game, nation.getRulerName(), false, true, null, null, nation));
         }
         //TODO: Use an interface
         final MapGenerator mapGenerator = (MapGenerator) freeColClient.getFreeColServer().getMapGenerator();

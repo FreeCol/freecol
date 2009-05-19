@@ -1384,25 +1384,6 @@ public class IndianSettlement extends Settlement {
         
         ownedUnits.clear();
         
-        // TODO: this is support for 0.7 savegames, remove sometime
-        final String ownedUnitsStr = in.getAttributeValue(null, "ownedUnits");
-        if (ownedUnitsStr != null) {
-            StringTokenizer st = new StringTokenizer(ownedUnitsStr, ", ", false);
-            while (st.hasMoreTokens()) {
-                final String token = st.nextToken();
-                Unit u = (Unit) getGame().getFreeColGameObject(token);
-                if (u == null) {
-                    u = new Unit(getGame(), token);
-                    owner.setUnit(u);
-                }
-                ownedUnits.add(u);
-            }
-        }
-        if (getAttribute(in, "hasBeenVisited", false)) {
-            visitedBy = new HashSet<Player>(getGame().getEuropeanPlayers());
-        }
-        // end TODO
-
         for (int i = 0; i < wantedGoods.length; i++) {
             String tag = WANTED_GOODS_TAG_NAME + Integer.toString(i);
             String wantedGoodsId = getAttribute(in, tag, null);
