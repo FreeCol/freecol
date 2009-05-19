@@ -141,7 +141,6 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("removeGoods")) {
                 } else if (type.equals("indianDemand")) {
                     reply = indianDemand((DummyConnection) connection, element);
-                } else if (type.equals("giveIndependence")) {
                 } else if (type.equals("lostCityRumour")) {
                 } else if (type.equals("updateMarket")) {
                 } else if (type.equals("marketElement")) {

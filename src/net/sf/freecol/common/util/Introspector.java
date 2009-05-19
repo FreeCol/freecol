@@ -42,9 +42,9 @@ public class Introspector {
     private String field;
 
     /**
-     * Build a new Introspector for the specified field name.
+     * Build a new Introspector for the specified class and field name.
      *
-     * @param theClass The class of interest.
+     * @param theClass The <code>Class</code> of interest.
      * @param field The field name within the class of interest.
      * @throws IllegalArgumentException
      */
@@ -100,7 +100,7 @@ public class Introspector {
     }
 
     /**
-     * Get the return type from a <code>Methode</code>.
+     * Get the return type from a <code>Method</code>.
      *
      * @param method The <code>Method</code> to examine.
      * @return The method return type, or null on error.
@@ -123,30 +123,41 @@ public class Introspector {
 
     /**
      * Get a function that converts to String from a given class.
-     * We just try String.valueOf(argType) so far.
+     * We use Enum.name() for enums, and String.valueOf(argType) for the rest.
      *
      * @param argType A <code>Class</code> to find a converter for.
      * @return A conversion function, or null on error.
      * @throws IllegalArgumentException
      */
-    private Method getToStringConverter(Class argType)
+    private Method getToStringConverter(Class<?> argType)
         throws IllegalArgumentException {
         Method method;
 
-        try {
-            method = String.class.getMethod("valueOf", argType);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("String.valueOf("
-                                               + argType.getName()
-                                               + "): " + e.toString());
+        if (argType.isEnum()) {
+            try {
+                method = argType.getMethod("name", (Class<?>[]) null);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(argType.getName()
+                                                   + ".name(): "
+                                                   + e.toString());
+            }
+        } else {
+            try {
+                method = String.class.getMethod("valueOf", argType);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("String.valueOf("
+                                                   + argType.getName()
+                                                   + "): " + e.toString());
+            }
         }
         return method;
     }
 
     /**
      * Get a function that converts from String to a given class.
-     * We try for argType.valueOf(String) but first have to
-     * dodge the primitive types.
+     * We use Enum.valueOf(Class, String) for enums, and
+     * argType.valueOf(String) for the rest, having first dodged
+     * the primitive types.
      *
      * @param argType A <code>Class</code> to find a converter for.
      * @return A conversion function, or null on error.
@@ -156,27 +167,36 @@ public class Introspector {
         throws IllegalArgumentException {
         Method method;
 
-        if (argType.isPrimitive()) {
-            if (argType == Integer.TYPE) {
-                argType = Integer.class;
-            } else if (argType == Boolean.TYPE) {
-                argType = Boolean.class;
-            } else if (argType == Float.TYPE) {
-                argType = Float.class;
-            } else if (argType == Double.TYPE) {
-                argType = Double.class;
-            } else if (argType == Character.TYPE) {
-                argType = Character.class;
-            } else {
-                throw new IllegalArgumentException("Need compatible class for primitive " + argType.getName());
+        if (argType.isEnum()) {
+            try {
+                method = Enum.class.getMethod("valueOf", Class.class, String.class);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Enum.valueOf(Class, String): "
+                                                   + e.toString());
             }
-        }
-        try {
-            method = argType.getMethod("valueOf", String.class);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(argType.getName()
-                                               + ".valueOf(String): "
-                                               + e.toString());
+        } else {
+            if (argType.isPrimitive()) {
+                if (argType == Integer.TYPE) {
+                    argType = Integer.class;
+                } else if (argType == Boolean.TYPE) {
+                    argType = Boolean.class;
+                } else if (argType == Float.TYPE) {
+                    argType = Float.class;
+                } else if (argType == Double.TYPE) {
+                    argType = Double.class;
+                } else if (argType == Character.TYPE) {
+                    argType = Character.class;
+                } else {
+                    throw new IllegalArgumentException("Need compatible class for primitive " + argType.getName());
+                }
+            }
+            try {
+                method = argType.getMethod("valueOf", String.class);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(argType.getName()
+                                                   + ".valueOf(String): "
+                                                   + e.toString());
+            }
         }
         return method;
     }
@@ -194,16 +214,32 @@ public class Introspector {
         throws IllegalArgumentException {
         Method getMethod = getGetMethod();
         Class<?> fieldType = getMethodReturnType(getMethod);
-        Method convertMethod = getToStringConverter(fieldType);
 
-        try {
-            return (String) convertMethod.invoke(null, getMethod.invoke(obj));
-        } catch (Exception e) {
-            throw new IllegalArgumentException(convertMethod.getName()
-                                               + "(null, "
-                                               + getMethod.getName()
-                                               + "(obj)): "
-                                               + e.toString());
+        if (fieldType == String.class) {
+            try {
+                return (String) getMethod.invoke(obj);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(getMethod.getName()
+                                                   + "(obj)): "
+                                                   + e.toString());
+            }
+        } else {
+            Object result = null;
+            try {
+                result = getMethod.invoke(obj);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(getMethod.getName()
+                                                   + "(obj): "
+                                                   + e.toString());
+            }
+            Method convertMethod = getToStringConverter(fieldType);
+            try {
+                return (String) convertMethod.invoke(result);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(convertMethod.getName()
+                                                   + "(result): "
+                                                   + e.toString());
+            }
         }
     }
 
@@ -220,16 +256,44 @@ public class Introspector {
         Method getMethod = getGetMethod();
         Class<?> fieldType = getMethodReturnType(getMethod);
         Method setMethod = getSetMethod(fieldType);
-        Method convertMethod = getFromStringConverter(fieldType);
 
-        try {
-            setMethod.invoke(obj, convertMethod.invoke(null, value));
-        } catch (Exception e) {
-            throw new IllegalArgumentException(setMethod.getName()
-                                               + "(obj, "
-                                               + convertMethod.getName()
-                                               + "(null, " + value + ")): "
-                                               + e.toString());
+        if (fieldType == String.class) {
+            try {
+                setMethod.invoke(obj, value);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(setMethod.getName()
+                                                   + "(obj, " + value + ")): "
+                                                   + e.toString());
+            }
+        } else {
+            Method convertMethod = getFromStringConverter(fieldType);
+            Object result = null;
+
+            if (fieldType.isEnum()) {
+                try {
+                    result = convertMethod.invoke(null, fieldType, value);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(convertMethod.getName()
+                                                       + "(null, " + fieldType.getName()
+                                                       + ", " + value + "):"
+                                                       + e.toString());
+                }
+            } else {
+                try {
+                    result = convertMethod.invoke(null, value);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(convertMethod.getName()
+                                                       + "(null, " + value + "):"
+                                                       + e.toString());
+                }
+            }
+            try {
+                setMethod.invoke(obj, result);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(setMethod.getName()
+                                                   + "(result): "
+                                                   + e.toString());
+            }
         }
     }
 }

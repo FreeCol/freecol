@@ -81,6 +81,7 @@ import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
+import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -429,10 +430,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new DeclareIndependenceMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("giveIndependence", new CurrentPlayerNetworkRequestHandler() {
+        register(GiveIndependenceMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return giveIndependence(connection, element);
+                return new GiveIndependenceMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("foreignAffairs", new NetworkRequestHandler() {
@@ -2426,26 +2427,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Tile oldTile = unit.getTile();
         unit.cashInTreasureTrain();
         sendUpdatedTileToAll(oldTile, player);
-        return null;
-    }
-
-    /**
-     * Handles a "giveIndependence"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element giveIndependence(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Player independent = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
-        if (independent.getREFPlayer() != player) {
-            throw new IllegalStateException("Cannot give independence to a country we do not own.");
-        }
-        independent.giveIndependence();
-        Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
-        giveIndependenceElement.setAttribute("player", independent.getId());
-        getFreeColServer().getServer().sendToAll(giveIndependenceElement, connection);
         return null;
     }
 

@@ -21,22 +21,34 @@
 package net.sf.freecol.server.model;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
+import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitType.DowngradeType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.common.util.Utils;
 
 
 /**
@@ -140,6 +152,113 @@ public class ServerPlayer extends Player implements ServerModelObject {
     
     public void setRemainingEmigrants(int emigrants) {
         remainingEmigrants = emigrants;
+    }
+
+    /**
+     * Declare independence.
+     *
+     * @param nationName The new name for the independent nation.
+     * @param countryName The new name for its residents.
+     */
+    public List<FreeColObject> declareIndependence(String nationName,
+                                                   String countryName) {
+        ArrayList<FreeColObject> result = new ArrayList<FreeColObject>();
+        // Cross the Rubicon
+        setIndependentNationName(nationName);
+        setNewLandName(countryName);
+        setPlayerType(PlayerType.REBEL);
+        getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+        modifyScore(SCORE_INDEPENDENCE_DECLARED);
+        history.add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                     HistoryEvent.Type.DECLARE_INDEPENDENCE));
+
+        // Dispose of units in Europe.
+        ArrayList<String> unitNames = new ArrayList<String>();
+        for (Unit unit : europe.getUnitList()) {
+            unitNames.add(unit.getName());
+            result.add(unit);
+        }
+        europe.disposeUnitList();
+        if (!unitNames.isEmpty()) {
+            result.add(new ModelMessage(this, ModelMessage.MessageType.UNIT_LOST,
+                                        this,
+                                        "model.player.independence.unitsSeized",
+                                        "%units%", Utils.join(", ", unitNames)));
+        }
+
+        // Continental army muster
+        for (Colony colony : getColonies()) {
+            int sol = colony.getSoL();
+            if (sol > 50) {
+                List<Unit> veterans = new ArrayList<Unit>();
+                for (Unit unit : colony.getTile().getUnitList()) {
+                    if (unit.hasAbility("model.ability.expertSoldier")) {
+                        veterans.add(unit);
+                    }
+                }
+                int limit = (veterans.size() + 2) * (sol - 50) / 100;
+                if (limit > 0) {
+                    for (int index = 0; index < limit; index++) {
+                        Unit unit = veterans.get(index);
+                        if (unit == null) break;
+                        // TODO: use a new upgrade type?
+                        unit.setType(unit.getType().getPromotion());
+                        result.add(unit);
+                    }
+                    result.add(new ModelMessage(this, ModelMessage.MessageType.UNIT_IMPROVED,
+                                                colony,
+                                                "model.player.continentalArmyMuster",
+                                                "%colony%", colony.getName(),
+                                                "%number%", String.valueOf(limit)));
+                }
+            }
+        }
+
+        // Clean up unwanted connections
+        divertModelMessages(europe, null);
+        europe.dispose();
+        europe = null;
+        monarch = null; // "No more kings"
+
+        // inelegant, but a lot happens here, once
+        result.add(this);
+        return result;
+    }
+
+    /**
+     * Gives independence to this player.
+     */
+    public List<ModelMessage> giveIndependence(ServerPlayer REFplayer) {
+        ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
+        setPlayerType(PlayerType.INDEPENDENT);
+        modifyScore(SCORE_INDEPENDENCE_GRANTED - getGame().getTurn().getNumber());
+        setTax(0);
+        reinitialiseMarket();
+        getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
+                                          HistoryEvent.Type.INDEPENDENCE));
+        messages.add(new ModelMessage(this, ModelMessage.MessageType.DEFAULT,
+                                      this,
+                                      "model.player.independence"));
+        ArrayList<Unit> surrenderUnits = new ArrayList<Unit>();
+        ArrayList<String> unitNames = new ArrayList<String>();
+        for (Unit u : REFplayer.getUnits()) {
+            if (!u.isNaval()) surrenderUnits.add(u);
+        }
+        for (Unit u : surrenderUnits) {
+            if (u.getType().hasAbility("model.ability.refUnit")) {
+                // Make sure the independent player does not end up owning
+                // any Kings Regulars!
+                UnitType downgrade = u.getType().getDowngrade(DowngradeType.CAPTURE);
+                if (downgrade != null) u.setType(downgrade);
+            }
+            u.setOwner(this);
+            unitNames.add(u.getName());
+        }
+        messages.add(new ModelMessage(this, ModelMessage.MessageType.DEFAULT,
+                                      this,
+                                      "model.player.independence.unitsAcquired",
+                                      "%units%", Utils.join(", ", unitNames)));
+        return messages;
     }
 
     /**

@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -146,8 +147,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = lostCityRumour(element);
             } else if (type.equals("setStance")) {
                 reply = setStance(element);
-            } else if (type.equals("giveIndependence")) {
-                reply = giveIndependence(element);
             } else if (type.equals("newConvert")) {
                 reply = newConvert(element);
             } else if (type.equals("diplomacy")) {
@@ -158,6 +157,10 @@ public final class InGameInputHandler extends InputHandler {
                 reply = addPlayer(element);
             } else if (type.equals("spanishSuccession")) {
                 reply = spanishSuccession(element);
+            } else if (type.equals("addMessages")) {
+                reply = addMessages(element);
+            } else if (type.equals("multiple")) {
+                reply = multiple(connection, element);
             } else {
                 logger.warning("Message is of unsupported type \"" + type + "\".");
             }
@@ -979,18 +982,6 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles a "giveIndependence"-request.
-     * 
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element giveIndependence(Element element) {
-        Player player = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
-        player.giveIndependence();
-        return null;
-    }
-
-    /**
      * Handles an "addPlayer"-message.
      *
      * @param element The element (root element in a DOM-parsed XML tree) that
@@ -1233,6 +1224,55 @@ public final class InGameInputHandler extends InputHandler {
 
         return null;
     }
+
+    /**
+     * Add the ModelMessages which are the children of this Element.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    public Element addMessages(Element element) {
+        Game game = getGame();
+        NodeList nodes = element.getChildNodes();
+        String attr;
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            ModelMessage m = new ModelMessage();
+            Element e = (Element) nodes.item(i);
+
+            m.readFromXMLElement(e);
+            // ModelMessage.readFromXMLImpl does not handle the
+            // FreeColGameObject fields.
+            if ((attr = e.getAttribute("display")) != null) {
+                m.setDisplay(game.getFreeColGameObjectSafely(attr));
+            }
+            if ((attr = e.getAttribute("owner")) != null) {
+                m.setOwner((Player) game.getFreeColGameObjectSafely(attr));
+            }
+            if ((attr = e.getAttribute("source")) != null) {
+                m.setSource(game.getFreeColGameObjectSafely(attr));
+            }
+            getFreeColClient().getMyPlayer().addModelMessage(m);
+        }
+        return null;
+    }
+
+    /**
+     * Handle all the children of this element.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    public Element multiple(Connection connection, Element element) {
+        NodeList nodes = element.getChildNodes();
+        Element reply = null;
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            reply = handle(connection, (Element) nodes.item(i));
+        }
+        return reply;
+    }
+
 
     /**
      *

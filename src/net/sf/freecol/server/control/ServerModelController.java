@@ -397,7 +397,7 @@ public class ServerModelController implements ModelController {
         Iterator<Player> enemyPlayerIterator = first.getGame().getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (!enemyPlayer.equals(first)) {
+            if (!enemyPlayer.equals(first) && enemyPlayer.isConnected()) {
                 try {
                     enemyPlayer.getConnection().send(element);
                 } catch (IOException e) {

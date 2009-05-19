@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
@@ -341,9 +342,7 @@ public abstract class AIPlayer extends AIObject {
         }
         
         for (Player p : dominions) {
-            Element giveIndependenceElement = Message.createNewRootElement("giveIndependence");
-            giveIndependenceElement.setAttribute("player", p.getId());
-            sendAndWaitSafely(giveIndependenceElement);
+            sendAndWaitSafely(new GiveIndependenceMessage(p).toXMLElement());
         }
         return true;
     }

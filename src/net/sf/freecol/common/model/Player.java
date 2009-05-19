@@ -48,7 +48,6 @@ import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.RandomChoice;
-import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
 
@@ -176,9 +175,11 @@ public class Player extends FreeColGameObject implements Nameable {
     /** The market for Europe. */
     private Market market;
 
-    private Europe europe;
+    /** The European port/location for this player. */
+    protected Europe europe;
 
-    private Monarch monarch;
+    /** The monarch for this player. */
+    protected Monarch monarch;
 
     private boolean ready;
 
@@ -248,7 +249,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Describe history here.
      */
-    private List<HistoryEvent> history = new ArrayList<HistoryEvent>();
+    protected List<HistoryEvent> history = new ArrayList<HistoryEvent>();
 
 
     /**
@@ -1128,89 +1129,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public final void setIndependentNationName(final String newIndependentNationName) {
         this.independentNationName = newIndependentNationName;
-    }
-
-    /**
-     * Declares independence.
-     */
-    public void declareIndependence() {
-        if (getSoL() < 50) {
-            throw new IllegalStateException("Cannot declare independence. SoL is only: " + getSoL());
-        }
-        if (playerType != PlayerType.COLONIAL) {
-            throw new IllegalStateException("Independence has already been declared.");
-        }
-        setPlayerType(PlayerType.REBEL);
-        featureContainer.addAbility(new Ability("model.ability.independenceDeclared"));
-
-        changeRelationWithPlayer(getREFPlayer(), Stance.WAR);
-
-        setTax(0);
-        // Reset all arrears
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            resetArrears(goodsType);
-        }
-
-        // Dispose all units in Europe.
-        ArrayList<String> unitNames = new ArrayList<String>();
-        for (Unit unit : europe.getUnitList()) {
-            unitNames.add(unit.getName());
-        }
-        europe.disposeUnitList();
-        if (!unitNames.isEmpty()) {
-            addModelMessage(this, ModelMessage.MessageType.UNIT_LOST, "model.player.independence.unitsSeized",
-                            "%units%", Utils.join(", ", unitNames));
-        }
-        for (Colony colony : getColonies()) {
-            int sol = colony.getSoL();
-            if (sol > 50) {
-                List<Unit> veterans = new ArrayList<Unit>();
-                for (Unit unit : colony.getTile().getUnitList()) {
-                    if (unit.hasAbility("model.ability.expertSoldier")) {
-                        veterans.add(unit);
-                    }
-                }
-                int limit = (veterans.size() + 2) * (sol - 50) / 100;
-                if (limit > 0) {
-                    for (int index = 0; index < limit && limit < veterans.size(); index++) {
-                        Unit unit = veterans.get(index);
-                        // TODO: use a new upgrade type?
-                        unit.setType(unit.getType().getPromotion());
-                    }
-                    addModelMessage(colony, ModelMessage.MessageType.DEFAULT, "model.player.continentalArmyMuster",
-                                    "%colony%", colony.getName(), "%number%", String.valueOf(limit));
-                }
-            }
-        }
-        // Drop the price{Inc,Dec}reases already prepared but now irrelevant
-        divertModelMessages(europe, null);
-
-        europe.dispose();
-        europe = null;
-        monarch = null;
-        modifyScore(SCORE_INDEPENDENCE_DECLARED);
-        history.add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                     HistoryEvent.Type.DECLARE_INDEPENDENCE));
-
-    }
-
-    /**
-     * Gives independence to this <code>Player</code>.
-     */
-    public void giveIndependence() {
-        if (!isEuropean()) {
-            throw new IllegalStateException("The player \"" + getName() + "\" is not European.");
-        }
-        if (playerType != PlayerType.REBEL) {
-            throw new IllegalStateException("The player \"" + getName() + "\" is not a Rebel.");
-        }
-        setPlayerType(PlayerType.INDEPENDENT);
-        changeRelationWithPlayer(getREFPlayer(), Stance.PEACE);
-        modifyScore(SCORE_INDEPENDENCE_GRANTED - getGame().getTurn().getNumber());
-        addModelMessage(this, ModelMessage.MessageType.DEFAULT, "model.player.independence");
-        history.add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                     HistoryEvent.Type.INDEPENDENCE));
-
     }
 
     /**
@@ -3518,8 +3436,12 @@ public class Player extends FreeColGameObject implements Nameable {
             break;
         }
 
-        tension = new HashMap<Player, Tension>();
-        stance = new HashMap<String, Stance>();
+        tension.clear();
+        stance.clear();
+        allFathers.clear();
+        europe = null;
+        monarch = null;
+        history.clear();
         tradeRoutes.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(TENSION_TAG)) {
@@ -3635,6 +3557,12 @@ public class Player extends FreeColGameObject implements Nameable {
                 intro.setter(this, in.getAttributeValue(i));
             } catch (IllegalArgumentException e) {
                 logger.warning("Could not set field " + name
+                               + ": " + e.toString());
+            }
+            try {
+                Introspector intro = new Introspector(getClass(), name);
+            } catch (IllegalArgumentException e) {
+                logger.warning("ARGH " + name
                                + ": " + e.toString());
             }
         }

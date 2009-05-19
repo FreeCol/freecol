@@ -315,38 +315,23 @@ public final class InGameController implements NetworkConstants {
         }
 
         List<String> names = canvas.showFreeColDialog(new ConfirmDeclarationDialog(canvas));
-        if (names == null) return;
+        if (names == null
+            || names.get(0) == null || names.get(0).length() == 0
+            || names.get(1) == null || names.get(1).length() == 0) return;
         String nationName = names.get(0);
         String countryName = names.get(1);
         player.setIndependentNationName(nationName);
         player.setNewLandName(countryName);
-
-        DeclareIndependenceMessage message = new DeclareIndependenceMessage(nationName, countryName);
-        Element reply = freeColClient.getClient().ask(message.toXMLElement());
-        if (reply == null) {
-            throw new IllegalStateException("Illegal reply to "
-                                            + message.getXMLElementTagName()
-                                            + " message.");
-        }
-        //TODO clean up client work more
-        NodeList childNodes = reply.getChildNodes();
-        Element playerElement = (Element) childNodes.item(0);
-        Player refPlayer = (Player) game.getFreeColGameObject(playerElement.getAttribute("ID"));
-        if (refPlayer == null) {
-            refPlayer = new Player(game, playerElement);
-        }
-        for (int index = 1; index < childNodes.getLength(); index++) {
-            final Element unitElement = (Element) childNodes.item(index);
-            if (game.getFreeColGameObject(unitElement.getAttribute("ID")) == null) {
-                new Unit(game, (Element) childNodes.item(index));
-            } // Else: This unit has already been updated since it's on a carrier.
-        }
-        game.addPlayer(refPlayer);
-        freeColClient.getMyPlayer().declareIndependence();
-        //END TODO
-        freeColClient.getActionManager().update();
         canvas.showFreeColDialog(new DeclarationDialog(canvas));
-        nextModelMessage();
+
+        Client client = freeColClient.getClient();
+        DeclareIndependenceMessage message = new DeclareIndependenceMessage(nationName, countryName);
+        Element reply = askExpecting(client, message.toXMLElement(), "multiple");
+        if (reply != null) {
+            freeColClient.getInGameInputHandler().handle(freeColClient.getClient().getConnection(), reply);
+            freeColClient.getActionManager().update();
+            nextModelMessage();
+        }
     }
 
     /**

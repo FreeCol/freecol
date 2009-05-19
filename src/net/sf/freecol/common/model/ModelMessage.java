@@ -321,14 +321,23 @@ public class ModelMessage extends FreeColObject {
     }
 
     /**
-    * Returns the owner of this message. The owner of this method
-    * is the owner of the {@link #getSource source}.
-    * 
-    * @return The owner of the message. This is the <code>Player</code>
-    *       who should receive the message.
-    */
+     * Returns the owner of this message. The owner of this method
+     * is the owner of the {@link #getSource source}.
+     *
+     * @return The owner of the message. This is the <code>Player</code>
+     *       who should receive the message.
+     */
     public Player getOwner() {
         return owner;
+    }
+
+    /**
+     * Set the owner of this message.
+     *
+     * @param newOwner A <code>Player</code> to own this message.
+     */
+    public void setOwner(Player newOwner) {
+        newOwner = owner;
     }
 
 
@@ -422,11 +431,9 @@ public class ModelMessage extends FreeColObject {
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("data")) {
-                data =  readFromArrayElement("data", in, new String[0]);
+                data = readFromArrayElement("data", in, new String[0]);
             }
         }
-
-        in.nextTag();
     }
 
     /**
