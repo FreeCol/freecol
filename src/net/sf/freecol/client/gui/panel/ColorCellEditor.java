@@ -24,7 +24,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractCellEditor;
@@ -36,7 +35,6 @@ import javax.swing.table.TableCellEditor;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.Player;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -57,13 +55,9 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     private final JButton              colorEditButton;
     private final JColorChooser        colorChooser;
     private final ColorChooserPanel    colorChooserPanel;
-    private final JPanel               parent;
     private final Canvas               canvas;
 
     private Color currentColor;
-    private List<Player> players;
-    private int lastRow;
-    private Player thisPlayer;
 
 
     /**
@@ -79,7 +73,6 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
         */
         public ColorChooserPanel(ActionListener l) {
             super(canvas);
-            lastRow = -1;
 
             JButton okButton = new JButton( Messages.message("ok") );
             JButton cancelButton = new JButton( Messages.message("cancel") );
@@ -107,9 +100,8 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     * @param canvas The top level component that holds all other components.
     * @param parent The parent JPanel of the table
     */
-    public ColorCellEditor(Canvas canvas, JPanel parent) {
+    public ColorCellEditor(Canvas canvas) {
         this.canvas = canvas;
-        this.parent = parent;
 
         colorEditButton = new JButton();
         colorEditButton.setActionCommand(EDIT);
@@ -125,27 +117,6 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
 
 
     /**
-    * Gives this table model the data that is being used in the table.
-    *
-    * @param players The players that should be edited in the table.
-    * @param owningPlayer The player running the client that is displaying the table.
-    */
-    public void setData(List<Player> players, Player owningPlayer) {
-        this.players = players;
-        thisPlayer = owningPlayer;
-    }
-
-    private Player getPlayer(int i) {
-        if (i == 0) {
-            return thisPlayer;
-        } else if (players.get(i) == thisPlayer) {
-            return players.get(0);
-        } else {
-            return players.get(i);
-        }
-    }
-
-    /**
     * This function analyzes an event and calls the right methods to take
     * care of the user's requests.
     * @param event The incoming ActionEvent.
@@ -158,34 +129,17 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
                 // Add the colorChooserPanel.
                 canvas.addAsFrame(colorChooserPanel);
                 colorChooserPanel.requestFocus();
-                parent.setEnabled(false);
-                // No repainting needed apparently.
             }
-        }
-        else if (event.getActionCommand().equals(OK)) {
+        } else if (event.getActionCommand().equals(OK)) {
             currentColor = colorChooser.getColor();
-
-            if ((lastRow >= 0) && (lastRow < players.size())) {
-                Player player = getPlayer(lastRow);
-                player.setColor(currentColor);
-            }
-
             // Remove the colorChooserPanel.
             canvas.remove(colorChooserPanel);
-            parent.setEnabled(true);
-            // No repainting needed apparently.
-
             fireEditingStopped();
-        }
-        else if (event.getActionCommand().equals(CANCEL)) {
+        } else if (event.getActionCommand().equals(CANCEL)) {
             // Remove the colorChooserPanel.
             canvas.remove(colorChooserPanel);
-            parent.setEnabled(true);
-            // No repainting needed apparently.
-            
             fireEditingCanceled();
-        }
-        else {
+        } else {
             logger.warning("Invalid action command");
         }
     }
@@ -204,7 +158,6 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
             boolean hasFocus, int row, int column) {
 
         currentColor = (Color)value;
-        lastRow = row;
         return colorEditButton;
     }
 

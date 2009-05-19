@@ -19,58 +19,24 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.AbstractCellEditor;
-import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.ListCellRenderer;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.EuropeanNationType;
-import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
-import net.sf.freecol.common.model.NationOptions.Advantages;
 import net.sf.freecol.common.model.NationOptions.NationState;
-import net.sf.freecol.common.model.NationType;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import net.miginfocom.swing.MigLayout;
@@ -124,11 +90,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     private JButton mapGeneratorOptions;
 
-    private JTable table = new JTable();
-
-    private final ListCellRenderer stateBoxRenderer = new NationStateRenderer();
-
-    private PlayersTableModel tableModel;
+    private PlayersTable table;
 
     /**
      * The constructor that will add the items to this panel.
@@ -152,52 +114,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         setCancelComponent(cancel);
 
-        tableModel = new PlayersTableModel(getClient().getPreGameController(), nationOptions, getMyPlayer());
-        table = new JTable(tableModel);
-        table.setRowHeight(22);
-
-        JButton nationButton = new JButton(Messages.message("nation"));
-        JLabel availabilityLabel = new JLabel(Messages.message("availability"));
-        JButton advantageButton = new JButton(Messages.message("advantage"));
-        JLabel colorLabel = new JLabel(Messages.message("color"));
-        JLabel playerLabel = new JLabel(Messages.message("player"));
-
-        nationButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showColopediaPanel(PanelType.NATIONS);
-                }
-            });
-
-        advantageButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    getCanvas().showColopediaPanel(PanelType.NATION_TYPES);
-                }
-            });
-
-        HeaderRenderer renderer = new HeaderRenderer(nationButton, availabilityLabel,
-                                                     advantageButton, colorLabel, playerLabel);
-        JTableHeader header = table.getTableHeader();
-        header.addMouseListener(new HeaderListener(header, renderer));
-
-        TableColumn advantagesColumn = table.getColumnModel().getColumn(ADVANTAGE_COLUMN);
-        if (nationOptions.getNationalAdvantages() == NationOptions.Advantages.SELECTABLE) {
-            advantagesColumn.setCellEditor(new AdvantageCellEditor());
-        }
-        advantagesColumn.setCellRenderer(new AdvantageCellRenderer(nationOptions.getNationalAdvantages()));
-        advantagesColumn.setHeaderRenderer(renderer);
-
-        TableColumn availableColumn = table.getColumnModel().getColumn(AVAILABILITY_COLUMN);
-        availableColumn.setCellRenderer(new AvailableCellRenderer());
-        availableColumn.setCellEditor(new AvailableCellEditor());
-        
-        TableColumn colorsColumn = table.getColumnModel().getColumn(COLOR_COLUMN);
-        ColorCellEditor colorCellEditor = new ColorCellEditor(getCanvas(), this);
-        colorsColumn.setCellEditor(colorCellEditor);
-        colorsColumn.setCellRenderer(new ColorCellRenderer(true));
-        colorCellEditor.setData(getGame().getPlayers(), getMyPlayer());
-
-        TableColumn playerColumn = table.getColumnModel().getColumn(PLAYER_COLUMN);
-        playerColumn.setCellEditor(new PlayerCellEditor());
+        table = new PlayersTable(getCanvas(), nationOptions, getMyPlayer());
         
         start = new JButton(Messages.message("startGame"));
         gameOptions = new JButton(Messages.message("gameOptions"));
@@ -219,15 +136,14 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         chatScroll = new JScrollPane(chatArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        table.setLayout(new MigLayout("insets 10 10 10 40", "", ""));
         refreshPlayersTable();
         tableScroll = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                                       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.getViewport().setOpaque(false);
 
-        setLayout(new MigLayout("wrap 3", "", ""));
+        setLayout(new MigLayout("wrap 3, fill", "", ""));
 
-        add(tableScroll, "span 2, grow");
+        add(tableScroll, "width 600:, span 2, grow");
         add(chatScroll, "width 250:, grow");
         add(mapGeneratorOptions, "grow");
         add(gameOptions, "grow");
@@ -383,326 +299,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
      * they've made.
      */
     public void refreshPlayersTable() {
-        tableModel.update();
+        table.update();
     }
 
-    private class HeaderRenderer implements TableCellRenderer {
-
-        private static final int NO_COLUMN = -1;
-        private int pressedColumn = NO_COLUMN;
-        private Component[] components;
-
-        public HeaderRenderer(Component... components) {
-            this.components = components;
-        }
-
-        public Component getTableCellRendererComponent(JTable table,
-                                                       Object value,
-                                                       boolean isSelected,
-                                                       boolean hasFocus,
-                                                       int row,
-                                                       int column) {
-            if (components[column] instanceof JButton) {
-                boolean isPressed = (column == pressedColumn);
-                ((JButton) components[column]).getModel().setPressed(isPressed);
-                ((JButton) components[column]).getModel().setArmed(isPressed);
-            }
-            return components[column];
-        }
-
-        public void setPressedColumn(int column) {
-            pressedColumn = column;
-        }
-    }
-
-    private class HeaderListener extends MouseAdapter {
-        JTableHeader header;
-
-        HeaderRenderer renderer;
-
-        HeaderListener(JTableHeader header, HeaderRenderer renderer) {
-            this.header = header;
-            this.renderer = renderer;
-        }
-
-        public void mousePressed(MouseEvent e) {
-            int col = header.columnAtPoint(e.getPoint());
-            renderer.setPressedColumn(col);
-            header.repaint();
-        }
-
-        public void mouseReleased(MouseEvent e) {
-            renderer.setPressedColumn(HeaderRenderer.NO_COLUMN);
-            header.repaint();
-        }
-    }
-
-
-    class NationStateRenderer extends JLabel implements ListCellRenderer {
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
-            setText(((NationState) value).getName());
-            return this;
-        }
-    }
-
-    class AvailableCellRenderer implements TableCellRenderer {
-
-        /**
-         * Returns the component used to render the cell's value.
-         * @param table The table whose cell needs to be rendered.
-         * @param value The value of the cell being rendered.
-         * @param hasFocus Indicates whether or not the cell in question has focus.
-         * @param row The row index of the cell that is being rendered.
-         * @param column The column index of the cell that is being rendered.
-         * @return The component used to render the cell's value.
-         */
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                       boolean hasFocus, int row, int column) {
-            return new JLabel(((NationState) value).getName());
-        }
-    }
-
-    public final class AvailableCellEditor extends AbstractCellEditor implements TableCellEditor {
-
-        private JComboBox aiStateBox = new JComboBox(aiStateNames);
-        private JComboBox allStateBox = new JComboBox(allStateNames);
-        private JComboBox activeBox;
-
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                     int row, int column) {
-            NationType nationType = ((Nation) table.getValueAt(row, StartGamePanel.NATION_COLUMN)).getType();
-            if (nationType instanceof EuropeanNationType) {
-                activeBox = allStateBox;
-            } else {
-                activeBox = aiStateBox;
-            }
-            return activeBox;
-        }
-
-        public Object getCellEditorValue() {
-            String available = (String) activeBox.getSelectedItem();
-            for (int index = 0; index < allStateNames.length; index++) {
-                if (allStateNames[index].equals(available)) {
-                    return allStates[index];
-                }
-            }
-            return NationState.NOT_AVAILABLE;
-        }
-    }
-
-    public final class PlayerCellEditor extends AbstractCellEditor implements TableCellEditor {
-
-        private JLabel label = new JLabel(Messages.message("select"));
-
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
-                                                     int row, int column) {
-            return label;
-        }
-
-        public Object getCellEditorValue() {
-            return true;
-        }
-
-    }
-
-}
-
-/**
- * The TableModel for the players table.
- */
-class PlayersTableModel extends AbstractTableModel {
-
-    private List<Nation> nations;
-
-    private Map<Nation, Player> players;
-
-    private Player thisPlayer;
-
-    private final PreGameController preGameController;
-
-    private NationOptions nationOptions;
-
-    private static final String[] columnNames = {
-        Messages.message("nation"),
-        Messages.message("availability"),
-        Messages.message("advantage"),
-        Messages.message("color"),
-        Messages.message("player")
-    };
-
-
-    /**
-     * A standard constructor.
-     * 
-     * @param pgc The PreGameController to use when updates need to be notified
-     *            across the network.
-     * @param advantages an <code>Advantages</code> value
-     */
-    public PlayersTableModel(PreGameController pgc, NationOptions nationOptions, Player owningPlayer) {
-        nations = new ArrayList<Nation>();
-        players = new HashMap<Nation, Player>();
-        for (Nation nation : Specification.getSpecification().getNations()) {
-            NationState state = nationOptions.getNations().get(nation);
-            if (state != null) {
-                nations.add(nation);
-                players.put(nation, null);
-            }
-        }
-        thisPlayer = owningPlayer;
-        players.put(thisPlayer.getNation(), thisPlayer);
-        preGameController = pgc;
-        this.nationOptions = nationOptions;
-    }
-
-    public void update() {
-        for (Nation nation : nations) {
-            players.put(nation, null);
-        }
-        for (Player player : thisPlayer.getGame().getPlayers()) {
-            players.put(player.getNation(), player);
-        }
-        fireTableDataChanged();
-    }
-
-    /**
-     * Returns the Class of the objects in the given column.
-     * 
-     * @param column The column to return the Class of.
-     * @return The Class of the objects in the given column.
-     */
-    public Class<?> getColumnClass(int column) {
-        switch(column) {
-        case StartGamePanel.NATION_COLUMN:
-            return Nation.class;
-        case StartGamePanel.AVAILABILITY_COLUMN:
-            return NationOptions.NationState.class;
-        case StartGamePanel.ADVANTAGE_COLUMN:
-            return NationType.class;
-        case StartGamePanel.COLOR_COLUMN:
-            return Color.class;
-        case StartGamePanel.PLAYER_COLUMN:
-            return Player.class;
-        }
-        return String.class;
-    }
-
-    /**
-     * Returns the amount of columns in this statesTable.
-     * 
-     * @return The amount of columns in this statesTable.
-     */
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    /**
-     * Returns the name of the specified column.
-     * 
-     * @return The name of the specified column.
-     */
-    public String getColumnName(int column) {
-        return columnNames[column];
-    }
-
-    /**
-     * Returns the amount of rows in this statesTable.
-     * 
-     * @return The amount of rows in this statesTable.
-     */
-    public int getRowCount() {
-        return nations.size();
-    }
-
-    /**
-     * Returns the value at the requested location.
-     * 
-     * @param row The requested row.
-     * @param column The requested column.
-     * @return The value at the requested location.
-     */
-    public Object getValueAt(int row, int column) {
-        if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
-            Nation nation = nations.get(row);
-            switch (column) {
-            case StartGamePanel.NATION_COLUMN:
-                return nation;
-            case StartGamePanel.AVAILABILITY_COLUMN:
-                return nationOptions.getNationState(nation);
-            case StartGamePanel.ADVANTAGE_COLUMN:
-                if (players.get(nation) == null) {
-                    return nation.getType();
-                } else {
-                    return players.get(nation).getNationType();
-                }
-            case StartGamePanel.COLOR_COLUMN:
-                if (players.get(nation) == null) {
-                    return nation.getColor();
-                } else {
-                    return players.get(nation).getColor();
-                }
-            case StartGamePanel.PLAYER_COLUMN:
-                return players.get(nation);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns 'true' if the specified cell is editable, 'false' otherwise.
-     * 
-     * @param row The specified row.
-     * @param column The specified column.
-     * @return 'true' if the specified cell is editable, 'false' otherwise.
-     */
-    public boolean isCellEditable(int row, int column) {
-        if ((row >= 0) && (row < nations.size())) {
-            Nation nation = nations.get(row);
-            boolean ownRow = (thisPlayer == players.get(nation) && !thisPlayer.isReady());
-            switch(column) {
-            case StartGamePanel.AVAILABILITY_COLUMN:
-                return thisPlayer.isAdmin();
-            case StartGamePanel.ADVANTAGE_COLUMN:
-                return (nation.getType() instanceof EuropeanNationType && ownRow);
-            case StartGamePanel.COLOR_COLUMN:
-                return (ownRow || thisPlayer.isAdmin());
-            case StartGamePanel.PLAYER_COLUMN:
-                return (nation.getType() instanceof EuropeanNationType && players.get(nation) == null);
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Sets the value at the specified location.
-     * 
-     * @param value The new value.
-     * @param row The specified row.
-     * @param column The specified column.
-     */
-    public void setValueAt(Object value, int row, int column) {
-        if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
-            // Column 0 can't be updated.
-
-            switch(column) {
-            case StartGamePanel.ADVANTAGE_COLUMN:
-                preGameController.setNationType((NationType) value);
-                break;
-            case StartGamePanel.AVAILABILITY_COLUMN:
-                preGameController.setAvailable(nations.get(row), (NationState) value);
-                break;
-            case StartGamePanel.COLOR_COLUMN:
-                preGameController.setColor((Color) value);
-                break;
-            case StartGamePanel.PLAYER_COLUMN:
-                Nation nation = nations.get(row);
-                preGameController.setNation(nation);
-                preGameController.setColor(nation.getColor());
-                update();
-                break;
-            }
-
-            fireTableCellUpdated(row, column);
-        }
-    }
 }
