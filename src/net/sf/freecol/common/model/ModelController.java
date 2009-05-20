@@ -144,12 +144,4 @@ public interface ModelController {
      */
     public TradeRoute getNewTradeRoute(Player player);
 
-    /**
-     * Check if a game object should receive a newTurn call. 
-     * 
-     * @param freeColGameObject The game object.
-     * @return true if newTurn should be called.
-     */
-    public boolean shouldCallNewTurn(FreeColGameObject freeColGameObject);
-
 }

@@ -262,18 +262,4 @@ public class ClientModelController implements ModelController {
         return tradeRoute;
     }
 
-    /**
-     * Check if game object should receive newTurn call.
-     * 
-     * @param freeColGameObject The game object.
-     * @return true if owned by client player or not ownable.
-     */
-    public boolean shouldCallNewTurn(FreeColGameObject freeColGameObject) {
-        if (freeColGameObject instanceof Ownable) {
-            Ownable o = (Ownable) freeColGameObject;
-            return o.getOwner() == freeColClient.getMyPlayer();
-        }
-        return true;
-    }
-
 }
