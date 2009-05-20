@@ -138,16 +138,16 @@ public class Introspector {
                 method = argType.getMethod("name", (Class<?>[]) null);
             } catch (Exception e) {
                 throw new IllegalArgumentException(argType.getName()
-                                                   + ".name(): "
+                                                   + ".getMethod(name()): "
                                                    + e.toString());
             }
         } else {
             try {
                 method = String.class.getMethod("valueOf", argType);
             } catch (Exception e) {
-                throw new IllegalArgumentException("String.valueOf("
+                throw new IllegalArgumentException("String.getMethod(valueOf("
                                                    + argType.getName()
-                                                   + "): " + e.toString());
+                                                   + ")): " + e.toString());
             }
         }
         return method;
@@ -171,7 +171,7 @@ public class Introspector {
             try {
                 method = Enum.class.getMethod("valueOf", Class.class, String.class);
             } catch (Exception e) {
-                throw new IllegalArgumentException("Enum.valueOf(Class, String): "
+                throw new IllegalArgumentException("Enum.getMethod(valueOf(Class, String)): "
                                                    + e.toString());
             }
         } else {
@@ -194,7 +194,7 @@ public class Introspector {
                 method = argType.getMethod("valueOf", String.class);
             } catch (Exception e) {
                 throw new IllegalArgumentException(argType.getName()
-                                                   + ".valueOf(String): "
+                                                   + ".getMethod(valueOf(String)): "
                                                    + e.toString());
             }
         }
@@ -234,10 +234,10 @@ public class Introspector {
             }
             Method convertMethod = getToStringConverter(fieldType);
             try {
-                return (String) convertMethod.invoke(result);
+                return (String) convertMethod.invoke(null, result);
             } catch (Exception e) {
                 throw new IllegalArgumentException(convertMethod.getName()
-                                                   + "(result): "
+                                                   + "(null, result): "
                                                    + e.toString());
             }
         }
