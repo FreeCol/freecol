@@ -337,33 +337,37 @@ public final class MapEditorTransformPanel extends FreeColPanel {
 
     private class LostCityRumourTransform extends MapTransform {
         public void transform(Tile t) {
-            LostCityRumour rumour = t.getLostCityRumour();
-            if (rumour == null) {
-                t.add(new LostCityRumour(t.getGame(), t));
-            } else {
-                t.removeLostCityRumour();
+            if (t.isLand()) {
+                LostCityRumour rumour = t.getLostCityRumour();
+                if (rumour == null) {
+                    t.add(new LostCityRumour(t.getGame(), t));
+                } else {
+                    t.removeLostCityRumour();
+                }
             }
         }
     }
 
     private class SettlementTransform extends MapTransform {
         public void transform(Tile t) {
-            Settlement settlement = t.getSettlement();
-            if (settlement == null) {
-                if (nativePlayer == null) {
-                    nativePlayer = t.getGame().getPlayers().get(0);
-                    SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType())
-                        .getTypeOfSettlement();
-                    Image image = getLibrary().getSettlementImage(settlementType);
-                    settlementButton.setIcon(new ImageIcon(getLibrary().scaleImage(image, 0.5f)));
+            if (t.isLand()) {
+                Settlement settlement = t.getSettlement();
+                if (settlement == null) {
+                    if (nativePlayer == null) {
+                        nativePlayer = t.getGame().getPlayers().get(0);
+                        SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType())
+                            .getTypeOfSettlement();
+                        Image image = getLibrary().getSettlementImage(settlementType);
+                        settlementButton.setIcon(new ImageIcon(getLibrary().scaleImage(image, 0.5f)));
+                    }
+                    UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
+                        .getObject();
+                    t.setSettlement(new IndianSettlement(t.getGame(), nativePlayer, t, "", false,
+                                                         skill, new HashSet<Player>(), null));
+                } else {
+                    t.setSettlement(null);
+                    settlement.dispose();
                 }
-                UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
-                    .getObject();
-                t.setSettlement(new IndianSettlement(t.getGame(), nativePlayer, t, "", false,
-                                                     skill, new HashSet<Player>(), null));
-            } else {
-                t.setSettlement(null);
-                settlement.dispose();
             }
         }
     }
