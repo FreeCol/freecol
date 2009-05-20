@@ -25,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.gui.panel.RiverStylePanel;
+import net.sf.freecol.client.gui.panel.EditSettlementDialog;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -121,17 +123,23 @@ public final class CanvasMapEditorMouseListener implements MouseListener {
             if (e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger()) {
                 Position p = gui.convertToMapCoordinates(e.getX(), e.getY());
                 Tile tile = getMap().getTile(p);
-                if (tile != null && tile.hasRiver()) {
-                    TileImprovement river = tile.getRiver();
-                    int style = canvas.showFreeColDialog(new RiverStylePanel(canvas));
-                    if (style == -1) {
-                        // user canceled
-                    } else if (style == 0) {
-                        tile.getTileItemContainer().removeTileItem(river);
-                    } else if (0 < style && style < ImageLibrary.RIVER_STYLES) {
-                        river.setStyle(style);
-                    } else {
-                        logger.warning("Unknown river style: " + style);
+                if (tile != null) {
+                    if (tile.hasRiver()) {
+                        TileImprovement river = tile.getRiver();
+                        int style = canvas.showFreeColDialog(new RiverStylePanel(canvas));
+                        if (style == -1) {
+                            // user canceled
+                        } else if (style == 0) {
+                            tile.getTileItemContainer().removeTileItem(river);
+                        } else if (0 < style && style < ImageLibrary.RIVER_STYLES) {
+                            river.setStyle(style);
+                        } else {
+                            logger.warning("Unknown river style: " + style);
+                        }
+                    }
+                    if (tile.getSettlement() instanceof IndianSettlement) {
+                        IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
+                        canvas.showFreeColDialog(new EditSettlementDialog(canvas, settlement));
                     }
                 } else {
                     gui.setSelectedTile(p, true);
