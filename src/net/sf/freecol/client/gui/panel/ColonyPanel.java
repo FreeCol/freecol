@@ -35,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -831,6 +832,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         public void initialize() {
             removeAll();
 
+            MouseAdapter mouseAdapter = new MouseAdapter() {
+                    BuildQueuePanel queuePanel = new BuildQueuePanel(colony, getCanvas());
+                    public void mousePressed(MouseEvent e) {
+                        getCanvas().showSubPanel(queuePanel);
+                    }
+                };
             ASingleBuildingPanel aSingleBuildingPanel;
 
             List<Building> buildings = getColony().getBuildings();
@@ -842,9 +849,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     aSingleBuildingPanel.setTransferHandler(defaultTransferHandler);
                 }
                 aSingleBuildingPanel.setOpaque(false);
+                aSingleBuildingPanel.addMouseListener(mouseAdapter);
                 add(aSingleBuildingPanel);
             }
             add(new BuildingSitePanel(colony, getCanvas()));
+
         }
 
         public void removePropertyChangeListeners() {
