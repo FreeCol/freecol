@@ -94,7 +94,7 @@ public class NewEmptyMapAction extends MapboardAction {
             return;
         }
         for (Nation nation : Specification.getSpecification().getIndianNations()) {
-            game.addPlayer(new ServerPlayer(game, nation.getRulerName(), false, true, null, null, nation));
+            freeColClient.getFreeColServer().addAIPlayer(nation);
         }
         //TODO: Use an interface
         final MapGenerator mapGenerator = (MapGenerator) freeColClient.getFreeColServer().getMapGenerator();

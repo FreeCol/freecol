@@ -176,7 +176,7 @@ public final class MapEditorController {
         }
         
         for (Nation nation : FreeCol.getSpecification().getIndianNations()) {
-            game.addPlayer(new Player(game, nation.getName(), false, nation));
+            freeColClient.getFreeColServer().addAIPlayer(nation);
         }
         try {
             mapGenerator.createMap(game);

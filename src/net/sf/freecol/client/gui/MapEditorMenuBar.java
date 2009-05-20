@@ -126,7 +126,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         JMenuItem playItem = new JMenuItem(Messages.message("startGame"));
         playItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    File saveGameFile = new File(FreeCol.getAutosaveDirectory(), "tempMap");
+                    File saveGameFile = new File(FreeCol.getAutosaveDirectory(), "tempMap.fsg");
                     MapGeneratorOptions options = freeColClient.getPreGameController().getMapGeneratorOptions();
                     if (options == null) {
                         options = new MapGeneratorOptions();
