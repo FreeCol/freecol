@@ -1944,7 +1944,7 @@
     </optionGroup>
     <optionGroup id="mapGeneratorOptions.landGenerator" >
       <!-- Option for setting the size of the map -->
-      <rangeOption id="model.option.mapSize" defaultValue="0" localizedLabels="true">
+      <rangeOption id="model.option.mapSize" defaultValue="1" localizedLabels="true">
         <rangeValue label="small" value="0"/>
         <rangeValue label="medium" value="1"/>
         <rangeValue label="large" value="2"/>
