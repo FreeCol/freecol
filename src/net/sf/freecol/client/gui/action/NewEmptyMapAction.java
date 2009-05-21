@@ -93,9 +93,6 @@ public class NewEmptyMapAction extends MapboardAction {
         if (size == null) {
             return;
         }
-        for (Nation nation : Specification.getSpecification().getIndianNations()) {
-            freeColClient.getFreeColServer().addAIPlayer(nation);
-        }
         //TODO: Use an interface
         final MapGenerator mapGenerator = (MapGenerator) freeColClient.getFreeColServer().getMapGenerator();
         mapGenerator.getTerrainGenerator().createMap(game, new boolean[size.width][size.height]);        

@@ -56,7 +56,10 @@ import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.generator.River;
 import net.sf.freecol.server.generator.RiverSection;
 
@@ -77,6 +80,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapEditorTransformPanel.class.getName());
 
+    private static final UnitType BRAVE = Specification.getSpecification().getUnitType("model.unit.brave");
+
     private final JPanel listPanel;
     private JButton settlementButton;
 
@@ -88,7 +93,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     /**
      * Describe nativePlayer here.
      */
-    private Player nativePlayer;
+    private static Player nativePlayer;
 
     /**
      * The constructor that will add the items to this panel.
@@ -97,6 +102,17 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     public MapEditorTransformPanel(Canvas parent) {
         super(parent, new BorderLayout());
 
+        // assume we have only native players for the moment
+        if (getGame().getPlayers().isEmpty()) {
+            FreeColServer server = getClient().getFreeColServer();
+            if (server.getAIMain() == null) {
+                server.setAIMain(new AIMain(server));
+            }
+            for (Nation nation : Specification.getSpecification().getIndianNations()) {
+                server.addAIPlayer(nation);
+            }
+        }
+        nativePlayer = getGame().getPlayers().get(0);
         listPanel = new JPanel(new GridLayout(2, 0));
 
         group = new ButtonGroup();
@@ -108,6 +124,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         sl.getViewport().setOpaque(false);
         add(sl);
     }
+
 
 
     /**
@@ -129,8 +146,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel.add(buildButton(getLibrary().getMiscImage(getLibrary().LOST_CITY_RUMOUR),
                                   Messages.message("model.message.LOST_CITY_RUMOUR"),
                                   new LostCityRumourTransform()));
-        SettlementType settlementType = nativePlayer == null ? SettlementType.INDIAN_CAMP :
-            ((IndianNationType) nativePlayer.getNationType()).getTypeOfSettlement();
+        SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType()).getTypeOfSettlement();
         settlementButton = buildButton(getLibrary().getSettlementImage(settlementType),
                                        Messages.message("Settlement"), new SettlementTransform());
         listPanel.add(settlementButton);
@@ -172,7 +188,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      *
      * @return a <code>Player</code> value
      */
-    public Player getNativePlayer() {
+    public static Player getNativePlayer() {
         return nativePlayer;
     }
 
@@ -181,8 +197,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      *
      * @param newNativePlayer The new NativePlayer value.
      */
-    public void setNativePlayer(final Player newNativePlayer) {
-        this.nativePlayer = newNativePlayer;
+    public static void setNativePlayer(final Player newNativePlayer) {
+        nativePlayer = newNativePlayer;
     }
 
     /**
@@ -353,6 +369,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (t.isLand()) {
                 Settlement settlement = t.getSettlement();
                 if (settlement == null) {
+                    /*
                     if (nativePlayer == null) {
                         nativePlayer = t.getGame().getPlayers().get(0);
                         SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType())
@@ -360,10 +377,16 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         Image image = getLibrary().getSettlementImage(settlementType);
                         settlementButton.setIcon(new ImageIcon(getLibrary().scaleImage(image, 0.5f)));
                     }
+                    */
                     UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
                         .getObject();
-                    t.setSettlement(new IndianSettlement(t.getGame(), nativePlayer, t, "", false,
-                                                         skill, new HashSet<Player>(), null));
+                    String name = nativePlayer.getDefaultSettlementName(false);
+                    settlement = new IndianSettlement(t.getGame(), nativePlayer, t, name, false,
+                                                      skill, new HashSet<Player>(), null);
+                    t.setSettlement(settlement);
+                    for (int index = 0; index < 5; index++) {
+                        settlement.add(new Unit(settlement.getGame(), settlement.getOwner(), BRAVE));
+                    }
                 } else {
                     t.setSettlement(null);
                     settlement.dispose();

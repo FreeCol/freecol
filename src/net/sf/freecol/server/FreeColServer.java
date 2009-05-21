@@ -1177,9 +1177,6 @@ public final class FreeColServer {
             new DummyConnection("Server connection - " + name, getInGameInputHandler());
         ServerPlayer aiPlayer = 
             new ServerPlayer(getGame(), name, false, true, null, theConnection, nation);
-        if (aiMain == null) {
-            aiMain = new AIMain(this);
-        }
         DummyConnection aiConnection = 
             new DummyConnection("AI connection - " + name,
                                 new AIInGameInputHandler(this, aiPlayer, getAIMain()));
