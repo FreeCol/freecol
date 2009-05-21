@@ -368,11 +368,6 @@ public class ColonyPlan {
             }
         }
 
-        System.out.println(colony.getName());
-        for (BuildableType type : highPriority) {
-            System.out.println(type.getName());
-        }
-
         return highPriority.iterator();
     }
 
