@@ -101,17 +101,18 @@ public class GetTransactionMessage extends Message {
             && unit.getMovesLeft() <= 0) {
             return Message.clientError("Unit " + unitId + "has no moves left.");
         }
-        // Sets unit moves to zero to avoid cheating
-        // If no action was done, the moves will be restored when closing
-        // the session
-        unit.setMovesLeft(0);
 
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
         Element reply = Message.createNewRootElement("getTransactionAnswer");
         reply.setAttribute("canBuy", ((Boolean) session.get("canBuy")).toString());
         reply.setAttribute("canSell", ((Boolean) session.get("canSell")).toString());
         reply.setAttribute("canGift", ((Boolean) session.get("canGift")).toString());
-        reply.setAttribute("hasSpaceLeft", ((Boolean) session.get("hasSpaceLeft")).toString());
+
+        // Sets unit moves to zero to avoid cheating.
+        // If no action was done, the moves will be restored when closing
+        // the session
+        unit.setMovesLeft(0);
+
         return reply;
     }
 

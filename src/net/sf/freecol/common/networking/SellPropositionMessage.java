@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -147,10 +148,11 @@ public class SellPropositionMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
+        Document doc = result.getOwnerDocument();
         result.setAttribute("unit", unitId);
         result.setAttribute("settlement", settlementId);
         result.setAttribute("gold", Integer.toString(gold));
-        result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
+        result.appendChild(goods.toXMLElement(null, doc));
         return result;
     }
 

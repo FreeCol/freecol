@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
@@ -158,14 +159,9 @@ public class IndianBringGiftMission extends Mission {
             if (r != null && 
                 getGame().getMap().getNeighbourOrNull(r, getUnit().getTile()) == target.getTile()) {
                 // We have arrived.
-                Element deliverGiftElement = Message.createNewRootElement("deliverGift");
-                deliverGiftElement.setAttribute("unit", getUnit().getId());
-                deliverGiftElement.setAttribute("settlement", target.getId());
-                deliverGiftElement.appendChild(getUnit().getGoodsIterator().next().toXMLElement(null,
-                        deliverGiftElement.getOwnerDocument()));
-
+                DeliverGiftMessage message = new DeliverGiftMessage(getUnit(), target, getUnit().getGoodsIterator().next());
                 try {
-                    connection.sendAndWait(deliverGiftElement);
+                    connection.sendAndWait(message.toXMLElement());
                 } catch (IOException e) {
                     logger.warning("Could not send \"deliverGift\"-message!");
                 }

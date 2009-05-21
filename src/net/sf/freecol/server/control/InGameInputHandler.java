@@ -74,11 +74,13 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.BuildColonyMessage;
+import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
+import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
@@ -87,6 +89,8 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.SellMessage;
+import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
@@ -352,18 +356,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new CloseTransactionMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("tradeProposition", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return tradeProposition(connection, element);
-            }
-        });
-        register("trade", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return trade(connection, element);
-            }
-        });
         register(GoodsForSaleMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
@@ -376,16 +368,28 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new BuyPropositionMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("buy", new CurrentPlayerNetworkRequestHandler() {
+        register(SellPropositionMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return buy(connection, element);
+                return new SellPropositionMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("deliverGift", new CurrentPlayerNetworkRequestHandler() {
+        register(BuyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return deliverGift(connection, element);
+                return new BuyMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
+        register(SellMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new SellMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
+        register(DeliverGiftMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new DeliverGiftMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("indianDemand", new CurrentPlayerNetworkRequestHandler() {
@@ -2577,198 +2581,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(unit.toXMLElement(player,reply.getOwnerDocument()));
         }
         return reply;
-    }
-
-    /**
-     * Checks general conditions for several types of trade queries
-     * 
-     * @param element
-     * @param player
-     * @param unit
-     * @param settlement
-     * @param goods
-     */
-    private void checkGeneralCondForTradeQuery(Element element, Player player, Unit unit, Settlement settlement, Goods goods){
-        if (goods != null && goods.getAmount() > 100) {
-            throw new IllegalArgumentException("Amount of goods exceeds 100: " + goods.getAmount());
-        }
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (settlement == null) {
-            throw new IllegalArgumentException("Could not find 'Settlement' with specified ID: "
-                    + element.getAttribute("settlement"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
-            throw new IllegalStateException("Not adjacent to settlement!");
-        }
-        if (settlement.getOwner().isIndian() && !player.hasContacted(settlement.getOwner())) {
-            throw new IllegalStateException("Player has not established contact with the Indians!");
-        }
-    }
-
-    /**
-     * Handles a "tradeProposition"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element tradeProposition(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
-        
-        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
-        
-        // Verify session
-        InGameController controller = (InGameController) getFreeColServer().getController();     
-        if(!controller.isTransactionSessionOpen(unit, settlement)){
-            throw new IllegalStateException("trying to trade without opening a transaction session");
-        }
-        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if(!(Boolean)session.get("canSell")){
-            throw new IllegalStateException("trying to sell with a session where selling not allowed");
-        }
-        
-        int gold = -1;
-        if (element.hasAttribute("gold")) {
-            gold = Integer.parseInt(element.getAttribute("gold"));
-        }
-        int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner()))
-                .tradeProposition(unit, settlement, goods, gold);
-        
-        Element tpaElement = Message.createNewRootElement("tradePropositionAnswer");
-        tpaElement.setAttribute("gold", Integer.toString(returnGold));
-        return tpaElement;
-    }
-
-    /**
-     * Handles a "trade"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element trade(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
-        
-        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
-        
-        // Verify session
-        InGameController controller = (InGameController) getFreeColServer().getController();     
-        if(!controller.isTransactionSessionOpen(unit, settlement)){
-            throw new IllegalStateException("trying to trade without opening a transaction session");
-        }
-        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if(!(Boolean)session.get("canSell")){
-            throw new IllegalStateException("trying to sell with a session where selling not allowed");
-        }
-        
-        int gold = Integer.parseInt(element.getAttribute("gold"));
-        if (gold <= 0) {
-            throw new IllegalArgumentException();
-        }
-        
-        AIPlayer aiPlayer = (AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner());
-        int returnGold = aiPlayer.tradeProposition(unit, settlement, goods, gold);
-        if (returnGold != gold) {
-            throw new IllegalArgumentException("This was not the price we agreed upon! Cheater?");
-        }
-        unit.trade(settlement, goods, gold);
-        session.put("actionTaken", true);
-        session.put("hasSpaceLeft", unit.getSpaceLeft() != 0);
-        
-        return null;
-    }
-    
-    /**
-     * Handles a "buy"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element buy(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
-        IndianSettlement settlement = (IndianSettlement) goods.getLocation();
-        
-        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
-        
-        // Verify session
-        InGameController controller = (InGameController) getFreeColServer().getController();     
-        if(!controller.isTransactionSessionOpen(unit, settlement)){
-            throw new IllegalStateException("trying to trade without opening a transaction session");
-        }
-        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        if(!(Boolean)session.get("canBuy") && !(Boolean)session.get("hasSpaceLeft")){
-            throw new IllegalStateException("trying to buy with a session where buying not allowed");
-        }
-        
-        int gold = Integer.parseInt(element.getAttribute("gold"));
-        if (gold <= 0) {
-            throw new IllegalArgumentException();
-        }
-        int returnGold = ((AIPlayer) getFreeColServer().getAIMain().getAIObject(settlement.getOwner()))
-                .buyProposition(unit, goods, gold);
-        if (returnGold != gold) {
-            throw new IllegalArgumentException("This was not the price we agreed upon! Cheater?");
-        }
-        unit.buy(settlement, goods, gold);
-        session.put("actionTaken", true);
-        
-        return null;
-    }
-
-    /**
-     * Handles a "deliverGift"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element deliverGift(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
-        
-        checkGeneralCondForTradeQuery(element, player, unit, settlement, goods);
-        
-        InGameController controller = (InGameController) getFreeColServer().getController();     
-        if(!controller.isTransactionSessionOpen(unit, settlement)){
-            throw new IllegalStateException("trying to trade without opening a transaction session");
-        }
-        
-        ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
-        if (!receiver.isAI() && receiver.isConnected()) {
-            Element deliverGiftElement = Message.createNewRootElement("deliverGift");
-            Element unitElement = unit.toXMLElement(receiver, deliverGiftElement.getOwnerDocument());
-            Element goodsContainerElement = unit.getGoodsContainer().toXMLElement(receiver,
-                    deliverGiftElement.getOwnerDocument());
-            unitElement.replaceChild(goodsContainerElement, unitElement.getElementsByTagName(
-                    GoodsContainer.getXMLElementTagName()).item(0));
-            deliverGiftElement.appendChild(unitElement);
-            deliverGiftElement.setAttribute("settlement", settlement.getId());
-            deliverGiftElement.appendChild(goods.toXMLElement(receiver, deliverGiftElement.getOwnerDocument()));
-            try {
-                receiver.getConnection().sendAndWait(deliverGiftElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"deliverGift\"-message!");
-            }
-        }
-        unit.deliverGift(settlement, goods);
-        return null;
     }
 
     /**

@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.ChatMessage;
@@ -131,8 +132,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = error(element);
             } else if (type.equals("chooseFoundingFather")) {
                 reply = chooseFoundingFather(element);
-            } else if (type.equals("deliverGift")) {
-                reply = deliverGift(element);
             } else if (type.equals("indianDemand")) {
                 reply = indianDemand(element);
             } else if (type.equals("reconnect")) {
@@ -716,32 +715,6 @@ public final class InGameInputHandler extends InputHandler {
             if (agreement.isAccept()) message.setAccept();
         }
         return message.toXMLElement();
-    }
-
-    /**
-     * Handles an "deliverGift"-request.
-     * 
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element deliverGift(Element element) {
-        Element unitElement = Message.getChildElement(element, Unit.getXMLElementTagName());
-        Unit unit = null;
-
-        if (unitElement != null) {
-            unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-            if (unit == null) {
-                unit = new Unit(getGame(), unitElement);
-            } else {
-                unit.readFromXMLElement(unitElement);
-            }
-        }
-        Settlement settlement = (Settlement) getGame().getFreeColGameObject(element.getAttribute("settlement"));
-        Goods goods = new Goods(getGame(), Message.getChildElement(element, Goods.getXMLElementTagName()));
-
-        unit.deliverGift(settlement, goods);
-
-        return null;
     }
 
     /**

@@ -21,6 +21,7 @@ package net.sf.freecol.common.networking;
 
 import java.util.Map;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -98,14 +99,21 @@ public class CloseTransactionMessage extends Message {
             return Message.clientError("Trying to close a non-existent session.");
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
-        // restore unit movements if no action made
-        boolean isActionTaken = ((Boolean)(session.get("actionTaken"))).booleanValue();
-        if (!isActionTaken) {
+        // restore unit movement if no action made
+        boolean actionTaken = ((Boolean)(session.get("actionTaken"))).booleanValue();
+        if (!actionTaken) {
             Integer unitMoves = (Integer) session.get("unitMoves");
             unit.setMovesLeft(unitMoves);
+            logger.info("Restoring moves for unit " + unit.getId()
+                        + " to " + Integer.toString(unitMoves));
         }
         controller.closeTransactionSession(unit, settlement);
-        return null;
+
+        // Return update for the unit as its moves left may have changed
+        Element reply = Message.createNewRootElement("update");
+        Document doc = reply.getOwnerDocument();
+        reply.appendChild(unit.toXMLElement(player, doc));
+        return reply;
     }
 
     /**

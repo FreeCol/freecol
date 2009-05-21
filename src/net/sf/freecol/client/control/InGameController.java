@@ -105,17 +105,20 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.networking.BuildColonyMessage;
+import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
+import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
@@ -1416,100 +1419,12 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Uses the given unit to trade with a <code>Settlement</code> in the
-     * given direction.
-     * 
-     * @param unit The <code>Unit</code> that is a carrier containing goods.
-     * @param direction The direction the unit could move in order to enter the
-     *            <code>Settlement</code>.
-     * @exception IllegalArgumentException if the unit is not a carrier, or if
-     *                there is no <code>Settlement</code> in the given
-     *                direction.
-     * @see Settlement
+     * Get the transaction session for a trade.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return The transaction session.
      */
-    private void tradeWithSettlement(Unit unit, Direction direction) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        } else if (!unit.canCarryGoods()) {
-            throw new IllegalArgumentException("The unit has to be able to carry goods in order to trade!");
-        }
-
-        Canvas canvas = freeColClient.getCanvas();
-        Map map = freeColClient.getGame().getMap();
-        Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
-        if (settlement == null) {
-            throw new IllegalArgumentException("No settlement in given direction!");
-        }
-
-        if (unit.getGoodsCount() == 0) {
-            canvas.errorMessage("trade.noGoodsOnboard");
-            return;
-        }
-        // Save moves to restore if no action taken
-        int initialUnitMoves = unit.getMovesLeft();
-        boolean actionTaken = false; 
-        
-        java.util.Map<String, Boolean> transactionSession = getTransactionSession(unit, settlement);
-        unit.setMovesLeft(0);
-        
-        boolean canBuy  = transactionSession.get("canBuy") && unit.getSpaceLeft() != 0;
-        boolean canSell = transactionSession.get("canSell");
-        boolean canGift = transactionSession.get("canGift");
-        
-        // Show main dialog
-        TradeAction tradeType = canvas.showIndianSettlementTradeDialog(settlement, canBuy, canSell, canGift);
-        while (tradeType != null) {
-            boolean tradeFinished = false;
-            switch(tradeType) {
-            case BUY:
-                tradeFinished = attemptBuyFromIndianSettlement(unit, settlement);
-                if (tradeFinished) {
-                    actionTaken = true;
-                    canBuy = false;
-                }
-                break;
-            case SELL:
-                tradeFinished = attemptSellToIndianSettlement(unit, settlement);
-                if (tradeFinished) {
-                    actionTaken = true;
-                    canSell = false;
-                    // we may not have been able to buy only because of space constraints
-                    // after selling, space is available, so a recheck is required
-                    canBuy  = transactionSession.get("canBuy") && unit.getSpaceLeft() != 0;
-                }
-                break;
-            case GIFT:
-                tradeFinished = deliverGiftToSettlement(unit, settlement, null);
-                if (tradeFinished) {
-                    actionTaken = true;
-                    canGift = false;
-                }
-                break;
-            default:
-                logger.warning("Unknown trade type");
-                break;
-            }
-            // no more options available
-            if (!canBuy && !canSell && !canGift) {
-                break;
-            }
-            // Still has options for trade, show the main menu again
-            tradeType = canvas.showIndianSettlementTradeDialog(settlement, canBuy, canSell, canGift);
-        }
-        CloseTransactionMessage message = new CloseTransactionMessage(unit, settlement);
-        freeColClient.getClient().ask(message.toXMLElement());
-
-        // if no action taken, restore movement points
-        GUI gui = freeColClient.getGUI();
-        if (actionTaken) {
-            nextActiveUnit();
-        } else {
-            unit.setMovesLeft(initialUnitMoves);
-            gui.setActiveUnit(unit);
-        }
-    }
-
     private java.util.Map<String,Boolean> getTransactionSession(Unit unit, Settlement settlement) {
         GetTransactionMessage message = new GetTransactionMessage(unit, settlement);
         Element reply = askExpecting(freeColClient.getClient(),
@@ -1525,33 +1440,132 @@ public final class InGameController implements NetworkConstants {
         return null;
     }
 
-    private ArrayList<Goods> getGoodsForSaleInIndianSettlement(Unit unit, Settlement settlement) {
-        // Get goods for sale from server
+    /**
+     * Close a transaction session.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     */
+    private void closeTransactionSession(Unit unit, Settlement settlement) {
+        CloseTransactionMessage message = new CloseTransactionMessage(unit, settlement);
+        Element reply = askExpecting(freeColClient.getClient(),
+                                     message.toXMLElement(),
+                                     "update");
+        if (reply != null) {
+            freeColClient.getInGameInputHandler().update(reply);
+        }
+    }
+
+    /**
+     * Get a list of goods for sale from a settlement.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @return The list of goods for sale, or null if there is a problem.
+     */
+    private List<Goods> getGoodsForSaleInSettlement(Unit unit,
+                                                    Settlement settlement) {
+        Game game = freeColClient.getGame();
         GoodsForSaleMessage message = new GoodsForSaleMessage(unit, settlement);
         Element reply = askExpecting(freeColClient.getClient(),
                                      message.toXMLElement(),
                                      message.getXMLElementTagName());
         if (reply != null) {
-            // Get goods for sell from server response
             ArrayList<Goods> goodsOffered = new ArrayList<Goods>();
             NodeList childNodes = reply.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
-                goodsOffered.add(new Goods(freeColClient.getGame(), (Element) childNodes.item(i)));
+                goodsOffered.add(new Goods(game, (Element) childNodes.item(i)));
             }
             return goodsOffered;
         }
         return null;
     }
-    
-    private boolean attemptBuyFromIndianSettlement(Unit unit,
-                                                   Settlement settlement) {
+
+    /**
+     * Trading with the natives, including buying, selling and delivering gifts.
+     * (Deliberate use of Settlement rather than IndianSettlement throughout
+     * these routines as some unification with colony trading is anticipated,
+     * and the native AI already uses the same DeliverGiftMessage to deliver
+     * gifts to Colonies)
+     * 
+     * @param unit The <code>Unit</code> that is a carrier containing goods.
+     * @param direction The direction the unit could move in order to enter a
+     *            <code>Settlement</code>.
+     * @exception IllegalArgumentException if the unit is not a carrier, or if
+     *                there is no <code>Settlement</code> in the given
+     *                direction.
+     * @see Settlement
+     */
+    private void tradeWithSettlement(Unit unit, Direction direction) {
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+        if (!unit.canCarryGoods()) {
+            throw new IllegalArgumentException("The unit has to be able to carry goods in order to trade!");
+        }
+        Map map = freeColClient.getGame().getMap();
+        Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+        if (settlement == null) {
+            throw new IllegalArgumentException("No settlement in given direction!");
+        }
+        if (unit.getGoodsCount() == 0) {
+            canvas.errorMessage("trade.noGoodsOnboard");
+            return;
+        }
+
+        java.util.Map<String, Boolean> session;
+        TradeAction tradeType;
+        while ((session = getTransactionSession(unit, settlement)) != null) {
+            // The session tracks buy/sell/gift events and disables
+            // canFoo when one happens.  So only offer such options if
+            // the session allows it and the carrier is in good shape.
+            boolean buy = session.get("canBuy") && (unit.getSpaceLeft() > 0);
+            boolean sel = session.get("canSell") && (unit.getGoodsCount() > 0);
+            boolean gif = session.get("canGift") && (unit.getGoodsCount() > 0);
+
+            if (!buy && !sel && !gif) break;
+            tradeType = canvas.showIndianSettlementTradeDialog(settlement,
+                                                               buy, sel, gif);
+            if (tradeType == null) break; // Aborted
+            switch (tradeType) {
+            case BUY:
+                attemptBuyFromSettlement(unit, settlement);
+                break;
+            case SELL:
+                attemptSellToSettlement(unit, settlement);
+                break;
+            case GIFT:
+                attemptGiftToSettlement(unit, settlement);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown trade type");
+            }
+        }
+
+        closeTransactionSession(unit, settlement);
+        if (unit.getMovesLeft() > 0) { // may have been restored if no trade
+            freeColClient.getGUI().setActiveUnit(unit);
+        } else {
+            nextActiveUnit();
+        }
+    }
+
+    /**
+     * User interaction for buying from the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     */
+    private void attemptBuyFromSettlement(Unit unit, Settlement settlement) {
         Canvas canvas = freeColClient.getCanvas();
         Client client = freeColClient.getClient();
         Goods goods = null;
         
         // Get list of goods for sale
         List<ChoiceItem<Goods>> goodsOffered = new ArrayList<ChoiceItem<Goods>>();
-        for (Goods sell : getGoodsForSaleInIndianSettlement(unit, settlement)) {
+        for (Goods sell : getGoodsForSaleInSettlement(unit, settlement)) {
             goodsOffered.add(new ChoiceItem<Goods>(sell));
         }
 
@@ -1564,16 +1578,12 @@ public final class InGameController implements NetworkConstants {
             
             int gold = -1; // Initially ask for a price
             for (;;) {
-                // Propose to purchase
-                BuyPropositionMessage message = new BuyPropositionMessage(unit, settlement, goods, gold);
-                Element reply = askExpecting(client, message.toXMLElement(),
-                                             message.getXMLElementTagName());
-                if (reply == null) break;
-                gold = new BuyPropositionMessage(freeColClient.getGame(), reply).getGold();
-                if (gold <= NO_TRADE) {
-                    // Proposal was refused
+                gold = proposeToBuyFromSettlement(unit, settlement, goods, gold);
+                if (gold == NO_TRADE) { // Proposal was refused
                     canvas.showInformationMessage("trade.noTrade");
-                    return true;
+                    return;
+                } else if (gold < NO_TRADE) { // failure
+                    return;
                 }
                 
                 // Show dialog for buy proposal
@@ -1591,21 +1601,70 @@ public final class InGameController implements NetworkConstants {
                 }
                 switch (offerReply.intValue()) {
                 case 1: // Accept price, make purchase
-                    buyFromSettlement(unit, (IndianSettlement) settlement, goods, gold);
-                    return true;
+                    buyFromSettlement(unit, settlement, goods, gold);
+                    return;
                 case 2: // Try to negotiate a lower price
                     gold = gold * 9 / 10;
                     break;
                 default:
-                    throw new IllegalStateException("Unknown choice for buying goods from Indian Settlement.");
+                    throw new IllegalStateException("Unknown choice.");
                 }
             }
         }
-        return false;
     }
+
+    /**
+     * Ask the natives if a purchase is acceptable.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @param goods The <code>Goods</code> to trade.
+     * @param gold The proposed price (including query on negative).
+     * @return The asking price,
+     *         or NO_TRADE if the trade is outright refused,
+     *         or NO_TRADE-1 on error.
+     */
+    private int proposeToBuyFromSettlement(Unit unit, Settlement settlement,
+                                           Goods goods, int gold) {
+        BuyPropositionMessage message = new BuyPropositionMessage(unit, settlement, goods, gold);
+        Element reply = askExpecting(freeColClient.getClient(),
+                                     message.toXMLElement(),
+                                     message.getXMLElementTagName());
+        if (reply == null) {
+            gold = NO_TRADE - 1; // signal failure
+        } else {
+            gold = new BuyPropositionMessage(freeColClient.getGame(), reply).getGold();
+        }
+        return gold;
+    }
+
+    /**
+     * Buys the given goods from the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @param goods The <code>Goods</code> to buy.
+     * @param gold The agreed price.
+     */
+    private void buyFromSettlement(Unit unit, Settlement settlement,
+                                   Goods goods, int gold) {
+        BuyMessage message = new BuyMessage(unit, settlement, goods, gold);
+        Element reply = askExpecting(freeColClient.getClient(),
+                                     message.toXMLElement(), "update");
+        if (reply != null) {
+            freeColClient.getInGameInputHandler().update(reply);
+            freeColClient.getCanvas().updateGoldLabel();
+        }
+    }
+
     
-    private boolean attemptSellToIndianSettlement(Unit unit,
-                                                  Settlement settlement) {
+    /**
+     * User interaction for selling to the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     */
+    private void attemptSellToSettlement(Unit unit, Settlement settlement) {
         Canvas canvas = freeColClient.getCanvas();
         Client client = freeColClient.getClient();
         Goods goods = null;
@@ -1619,21 +1678,16 @@ public final class InGameController implements NetworkConstants {
 
             int gold = -1; // Initially ask for a price
             for (;;) {
-                // Propose to sell
-                SellPropositionMessage message = new SellPropositionMessage(unit, settlement, goods, gold);
-                Element reply = askExpecting(client, message.toXMLElement(),
-                                             message.getXMLElementTagName());
-                if (reply == null) break;
-                gold = new SellPropositionMessage(freeColClient.getGame(), reply).getGold();
+                gold = proposeToSellToSettlement(unit, settlement, goods, gold);
                 if (gold == NO_NEED_FOR_THE_GOODS) {
-                    // Indians do not need the goods, refuse and end trade
                     canvas.showInformationMessage("trade.noNeedForTheGoods",
                                                   "%goods%", goods.getName());
-                    return true;
-                } else if (gold <= NO_TRADE) {
-                    // Proposal was refused
+                    return;
+                } else if (gold == NO_TRADE) {
                     canvas.showInformationMessage("trade.noTrade");
-                    return true;
+                    return;
+                } else if (gold < NO_TRADE) { // error
+                    return;
                 }
 
                 // Show dialog for sale proposal
@@ -1654,186 +1708,98 @@ public final class InGameController implements NetworkConstants {
                 switch (offerReply.intValue()) {
                 case 1: // Accepted price, make the sale
                     sellToSettlement(unit, settlement, goods, gold);
-                    return true;
+                    return;
                 case 2: // Ask for more money
                     gold = (gold * 11) / 10;
                     break;
                 case 3: // Decide to make a gift of the goods
                     deliverGiftToSettlement(unit, settlement, goods);
-                    return true;
+                    return;
                 default:
-                    throw new IllegalStateException("Unknown choice for selling goods to Indian Settlement.");
+                    throw new IllegalStateException("Unknown choice.");
                 }
             }
         }
-        return false;
     }
     
     /**
-     * Sells the given goods. The goods gets transferred from the given
-     * <code>Unit</code> to the given <code>Settlement</code>, and the
-     * {@link Unit#getOwner unit's owner} collects the payment.
+     * Ask the natives if a sale is acceptable.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @param goods The <code>Goods</code> to trade.
+     * @param gold The proposed price (including query on negative).
+     * @return The asking price, or NO_NEED_FOR_GOODS if they do not want them,
+     *         NO_TRADE if the trade is outright refused,
+     *         or NO_TRADE-1 on error.
      */
-    private void sellToSettlement(Unit unit, Settlement settlement, Goods goods, int gold) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }        
+    private int proposeToSellToSettlement(Unit unit, Settlement settlement,
+                                          Goods goods, int gold) {
+        SellPropositionMessage message = new SellPropositionMessage(unit, settlement, goods, gold);
+        Element reply = askExpecting(freeColClient.getClient(),
+                                     message.toXMLElement(),
+                                     message.getXMLElementTagName());
+        if (reply == null) {
+            gold = NO_TRADE - 1;
+        } else {
+            gold = new SellPropositionMessage(freeColClient.getGame(), reply).getGold();
+        }
+        return gold;
+    }
 
-        // send the transaction to the server
-        Element tradeElement = Message.createNewRootElement("trade");
-        tradeElement.setAttribute("unit", unit.getId());
-        tradeElement.setAttribute("settlement", settlement.getId());
-        tradeElement.setAttribute("gold", Integer.toString(gold));
-        tradeElement.appendChild(goods.toXMLElement(null, tradeElement.getOwnerDocument()));
-        Client client = freeColClient.getClient();
-        Element reply = client.ask(tradeElement);
-
-        // Update local data 
-        unit.trade(settlement, goods, gold);
-        freeColClient.getCanvas().updateGoldLabel();
-        
-        /*
+    /**
+     * Sells the given goods to the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @param goods The <code>Goods</code> to sell.
+     * @param gold The agreed price.
+     */
+    private void sellToSettlement(Unit unit, Settlement settlement,
+                                  Goods goods, int gold) {
+        SellMessage message = new SellMessage(unit, settlement, goods, gold);
+        Element reply = askExpecting(freeColClient.getClient(),
+                                     message.toXMLElement(), "update");
         if (reply != null) {
-            if (!reply.getTagName().equals("sellProposition")) {
-                logger.warning("Illegal reply.");
-                throw new IllegalStateException();
-            }
-            
-            ArrayList<Goods> goodsOffered = new ArrayList<Goods>();
-            NodeList childNodes = reply.getChildNodes();
-            for (int i = 0; i < childNodes.getLength(); i++) {
-                goodsOffered.add(new Goods(freeColClient.getGame(), (Element) childNodes.item(i)));
-            }
-            ChoiceItem choice = (ChoiceItem) freeColClient.getCanvas()
-                .showChoiceDialog(Messages.message("buyProposition.text"),
-                                  Messages.message("buyProposition.cancel"),
-                                  goodsOffered.iterator());
-            if (choice != null) {
-                Goods goodsToBuy = (Goods) choice.getObject();
-                buyFromSettlement(unit, goodsToBuy);
-            }
+            freeColClient.getInGameInputHandler().update(reply);
+            freeColClient.getCanvas().updateGoldLabel();
         }
-        */
-        
-        //nextActiveUnit(unit.getTile());
     }
 
     /**
-     * Uses the given unit to try buying the given goods from an
-     * <code>IndianSettlement</code>.
+     * User interaction for delivering a gift to the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
      */
-    /*
-    private void buyFromSettlement(Unit unit, Goods goods) {
+    private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
         Canvas canvas = freeColClient.getCanvas();
-        Client client = freeColClient.getClient();
-        
-        Element buyPropositionElement = Message.createNewRootElement("buyProposition");
-        buyPropositionElement.setAttribute("unit", unit.getId());
-        buyPropositionElement.appendChild(goods.toXMLElement(null, buyPropositionElement.getOwnerDocument()));
+        Goods goods;
 
-        Element reply = client.ask(buyPropositionElement);
-        while (reply != null) {
-            if (!reply.getTagName().equals("buyPropositionAnswer")) {
-                logger.warning("Illegal reply.");
-                throw new IllegalStateException();
-            }
-
-            int gold = Integer.parseInt(reply.getAttribute("gold"));
-            if (gold <= NO_TRADE) {
-                canvas.showInformationMessage("noTrade");
-                return;
-            } else {
-                IndianSettlement settlement = (IndianSettlement) goods.getLocation();
-                String text = Messages.message("buy.text",
-                                               "%nation%", settlement.getOwner().getNationAsString(),
-                                               "%goods%", goods.getName(),
-                                               "%gold%", Integer.toString(gold));
-                ChoiceItem ci = (ChoiceItem) canvas
-                    .showChoiceDialog(text, Messages.message("buy.cancel"),
-                                      new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), 1),
-                                      new ChoiceItem<Integer>(Messages.message("buy.moreGold"), 2));
-                if (ci == null) { // == Trade aborted by the player.
-                    return;
-                }
-                int ret = ci.getChoice();
-                if (ret == 1) {
-                    buyFromSettlement(unit, goods, gold);
-                    return;
-                }
-            } // Ask for more gold (ret == 2):
-
-            buyPropositionElement = Message.createNewRootElement("buyProposition");
-            buyPropositionElement.setAttribute("unit", unit.getId());
-            buyPropositionElement.appendChild(goods.toXMLElement(null, buyPropositionElement.getOwnerDocument()));
-            buyPropositionElement.setAttribute("gold", Integer.toString((gold * 9) / 10));
-
-            reply = client.ask(buyPropositionElement);
+        goods = canvas.showSimpleChoiceDialog(Messages.message("gift.text"),
+                                              Messages.message("cancel"),
+                                              unit.getGoodsList());
+        if (goods != null) {
+            deliverGiftToSettlement(unit, settlement, goods);
         }
-    }
-    */
-    
-    /**
-     * Buys the given goods. The goods gets transferred from their location
-     * to the given <code>Unit</code>, and the {@link Unit#getOwner unit's owner}
-     * pays the given gold.
-     */
-    private void buyFromSettlement(Unit unit, IndianSettlement settlement, Goods goods, int gold) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-
-        // send transaction to the server
-        Element buyElement = Message.createNewRootElement("buy");
-        buyElement.setAttribute("unit", unit.getId());
-        buyElement.setAttribute("gold", Integer.toString(gold));
-        buyElement.appendChild(goods.toXMLElement(null, buyElement.getOwnerDocument()));
-        Client client = freeColClient.getClient();
-        client.ask(buyElement);
-
-        // add goods to settlement in order to client will be able to transfer the goods
-        settlement.add(goods);
-        
-        // update local data
-        unit.buy(settlement, goods, gold);
-        freeColClient.getCanvas().updateGoldLabel();
     }
 
     /**
-     * Trades the given goods. The goods gets transferred from the given
-     * <code>Unit</code> to the given <code>Settlement</code>.
+     * Give the given goods to the natives.
+     *
+     * @param unit The <code>Unit</code> that is trading.
+     * @param settlement The <code>Settlement</code> that is trading.
+     * @param goods The <code>Goods</code> to give.
      */
-    private boolean deliverGiftToSettlement(Unit unit, Settlement settlement, Goods goods) {
-        Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return false;
+    private void deliverGiftToSettlement(Unit unit, Settlement settlement,
+                                         Goods goods) {
+        DeliverGiftMessage message = new DeliverGiftMessage(unit, settlement, goods);
+        Element reply = askExpecting(freeColClient.getClient(),
+                                     message.toXMLElement(), "update");
+        if (reply != null) {
+            freeColClient.getInGameInputHandler().update(reply);
+            freeColClient.getCanvas().updateGoldLabel();
         }
-
-        // no goods were chosen as gift, show dialog to decide
-        if (goods == null){
-            goods = canvas.showSimpleChoiceDialog(Messages.message("gift.text"),
-                                                  Messages.message("cancel"),
-                                                  unit.getGoodsList());
-            
-            if (goods == null) { // == Trade aborted by the player.
-                return false;
-            }
-        }
-        
-        // Send gift proposal to server
-        Element deliverGiftElement = Message.createNewRootElement("deliverGift");
-        deliverGiftElement.setAttribute("unit", unit.getId());
-        deliverGiftElement.setAttribute("settlement", settlement.getId());
-        deliverGiftElement.appendChild(goods.toXMLElement(null, deliverGiftElement.getOwnerDocument()));
-
-        Client client = freeColClient.getClient();
-        client.sendAndWait(deliverGiftElement);
-
-        unit.deliverGift(settlement, goods);
-        //nextActiveUnit(unit.getTile());
-        return true;
     }
 
     /**

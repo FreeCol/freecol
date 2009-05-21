@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.networking;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -131,7 +132,7 @@ public class BuyPropositionMessage extends Message {
         }
         java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
         if (!(Boolean) session.get("canBuy")
-            && !(Boolean) session.get("hasSpaceLeft")) {
+            || !(Boolean) session.get("hasSpaceLeft")) {
             return Message.clientError("Trying to buy in a session where buying is not allowed.");
         }
 
@@ -148,10 +149,11 @@ public class BuyPropositionMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
+        Document doc = result.getOwnerDocument();
         result.setAttribute("unit", unitId);
         result.setAttribute("settlement", settlementId);
         result.setAttribute("gold", Integer.toString(gold));
-        result.appendChild(goods.toXMLElement(null, result.getOwnerDocument()));
+        result.appendChild(goods.toXMLElement(null, doc));
         return result;
     }
 
