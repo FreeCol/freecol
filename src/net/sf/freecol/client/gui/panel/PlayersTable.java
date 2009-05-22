@@ -248,7 +248,7 @@ public final class PlayersTable extends JTable {
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
                                                      int row, int column) {
-            NationType nationType = ((Nation) getValueAt(row, StartGamePanel.NATION_COLUMN)).getType();
+            NationType nationType = ((Nation) getValueAt(row, NATION_COLUMN)).getType();
             if (nationType instanceof EuropeanNationType) {
                 activeBox = allStateBox;
             } else {
@@ -366,15 +366,15 @@ public final class PlayersTable extends JTable {
          */
         public Class<?> getColumnClass(int column) {
             switch(column) {
-            case StartGamePanel.NATION_COLUMN:
+            case NATION_COLUMN:
                 return Nation.class;
-            case StartGamePanel.AVAILABILITY_COLUMN:
+            case AVAILABILITY_COLUMN:
                 return NationOptions.NationState.class;
-            case StartGamePanel.ADVANTAGE_COLUMN:
+            case ADVANTAGE_COLUMN:
                 return NationType.class;
-            case StartGamePanel.COLOR_COLUMN:
+            case COLOR_COLUMN:
                 return Color.class;
-            case StartGamePanel.PLAYER_COLUMN:
+            case PLAYER_COLUMN:
                 return Player.class;
             }
             return String.class;
@@ -418,23 +418,23 @@ public final class PlayersTable extends JTable {
             if ((row < getRowCount()) && (column < getColumnCount()) && (row >= 0) && (column >= 0)) {
                 Nation nation = nations.get(row);
                 switch (column) {
-                case StartGamePanel.NATION_COLUMN:
+                case NATION_COLUMN:
                     return nation;
-                case StartGamePanel.AVAILABILITY_COLUMN:
+                case AVAILABILITY_COLUMN:
                     return nationOptions.getNationState(nation);
-                case StartGamePanel.ADVANTAGE_COLUMN:
+                case ADVANTAGE_COLUMN:
                     if (players.get(nation) == null) {
                         return nation.getType();
                     } else {
                         return players.get(nation).getNationType();
                     }
-                case StartGamePanel.COLOR_COLUMN:
+                case COLOR_COLUMN:
                     if (players.get(nation) == null) {
                         return nation.getColor();
                     } else {
                         return players.get(nation).getColor();
                     }
-                case StartGamePanel.PLAYER_COLUMN:
+                case PLAYER_COLUMN:
                     return players.get(nation);
                 }
             }
@@ -453,12 +453,12 @@ public final class PlayersTable extends JTable {
                 Nation nation = nations.get(row);
                 boolean ownRow = (thisPlayer == players.get(nation) && !thisPlayer.isReady());
                 switch(column) {
-                case StartGamePanel.AVAILABILITY_COLUMN:
+                case AVAILABILITY_COLUMN:
                     return (!ownRow && thisPlayer.isAdmin());
-                case StartGamePanel.ADVANTAGE_COLUMN:
-                case StartGamePanel.COLOR_COLUMN:
+                case ADVANTAGE_COLUMN:
+                case COLOR_COLUMN:
                     return (nation.getType() instanceof EuropeanNationType && ownRow);
-                case StartGamePanel.PLAYER_COLUMN:
+                case PLAYER_COLUMN:
                     return (nation.getType() instanceof EuropeanNationType && players.get(nation) == null);
                 }
             }
@@ -477,16 +477,16 @@ public final class PlayersTable extends JTable {
                 // Column 0 can't be updated.
 
                 switch(column) {
-                case StartGamePanel.ADVANTAGE_COLUMN:
+                case ADVANTAGE_COLUMN:
                     preGameController.setNationType((NationType) value);
                     break;
-                case StartGamePanel.AVAILABILITY_COLUMN:
+                case AVAILABILITY_COLUMN:
                     preGameController.setAvailable(nations.get(row), (NationState) value);
                     break;
-                case StartGamePanel.COLOR_COLUMN:
+                case COLOR_COLUMN:
                     preGameController.setColor((Color) value);
                     break;
-                case StartGamePanel.PLAYER_COLUMN:
+                case PLAYER_COLUMN:
                     Nation nation = nations.get(row);
                     preGameController.setNation(nation);
                     preGameController.setColor(nation.getColor());

@@ -67,8 +67,8 @@ public final class AdvantageCellRenderer implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
 
-        Player player = (Player) table.getValueAt(row, StartGamePanel.PLAYER_COLUMN);
-        NationType nationType = ((Nation) table.getValueAt(row, StartGamePanel.NATION_COLUMN)).getType();
+        Player player = (Player) table.getValueAt(row, PlayersTable.PLAYER_COLUMN);
+        NationType nationType = ((Nation) table.getValueAt(row, PlayersTable.NATION_COLUMN)).getType();
 
         JLabel label;
         switch(advantages) {
