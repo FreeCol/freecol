@@ -364,6 +364,58 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Calculates the value of a temporary future colony at this tile.
+     * 
+     * @return The value of a future colony located on this tile. This value is
+     *         used by the AI when deciding where to build a new colony.
+     */
+    public int getOutpostValue() {
+        if (getType().canSettle() && getSettlement() == null) {
+            boolean nearbyTileIsOcean = false;
+            float advantages = 1f;
+            int value = 0;
+            for (Tile tile : getGame().getMap().getSurroundingTiles(this, 1)) {
+                if (tile.getColony() != null) {
+                    // can't build next to colony
+                    return 0;
+                } else if (tile.getSettlement() != null) {
+                    // can build next to an indian settlement, but shouldn't
+                    SettlementType type = ((IndianNationType) tile.getSettlement().getOwner().getNationType())
+                        .getTypeOfSettlement();
+                    if (type == SettlementType.INCA_CITY || type == SettlementType.AZTEC_CITY) {
+                        // really shouldn't build next to cities
+                        advantages *= 0.25f;
+                    } else {
+                        advantages *= 0.5f;
+                    }
+                } else {
+                    if (tile.isConnected()) {
+                        nearbyTileIsOcean = true;
+                    }
+                    for (AbstractGoods production : getType().getProduction()) {
+                        GoodsType type = production.getType();
+                        int potential = tile.potential(type, null) * type.getInitialSellPrice();
+                        if (tile.getOwner() != null &&
+                            tile.getOwner() != getGame().getCurrentPlayer()) {
+                            // tile is already owned by someone (and not by us!)
+                            if (tile.getOwner().isEuropean()) {
+                                continue;
+                            } else {
+                                potential /= 2;
+                            }
+                        }
+                        value = Math.max(value, potential);
+                    }
+                }
+            }
+            if (nearbyTileIsOcean) {
+                return Math.max(0, (int) (value * advantages));
+            }
+        }
+        return 0;
+    }
+
+    /**
      * Calculates the value of a future colony at this tile.
      * 
      * @return The value of a future colony located on this tile. This value is
