@@ -63,6 +63,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     
     private int x, y;
 
+    //used for caching tile values, to avoid recalculating too often
+    private static final int VALUE_RADIUS = 1;
+    private int outpostValue;
+    private int colonyValue;
+    private boolean outpostValueIsValid = false;
+    private boolean colonyValueIsValid = false;
+
     /** The player that consider this tile to be their land. */
     private Player owner;
 
@@ -329,6 +336,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setTileItemContainer(TileItemContainer newTileItemContainer) {
         tileItemContainer = newTileItemContainer;
+        
+        //setting this means tile values may change!
+        invalidateTileValues();
     }
 
     /**
@@ -370,14 +380,19 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         used by the AI when deciding where to build a new colony.
      */
     public int getOutpostValue() {
+        if (outpostValueIsValid) {
+            return outpostValue;
+        }
         if (getType().canSettle() && getSettlement() == null) {
             boolean nearbyTileIsOcean = false;
             float advantages = 1f;
             int value = 0;
-            for (Tile tile : getGame().getMap().getSurroundingTiles(this, 1)) {
+            for (Tile tile : getGame().getMap().getSurroundingTiles(this, VALUE_RADIUS)) {
                 if (tile.getColony() != null) {
                     // can't build next to colony
-                    return 0;
+                    outpostValue = 0;
+                    outpostValueIsValid = true;
+                    return outpostValue;
                 } else if (tile.getSettlement() != null) {
                     // can build next to an indian settlement, but shouldn't
                     SettlementType type = ((IndianNationType) tile.getSettlement().getOwner().getNationType())
@@ -409,10 +424,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
             }
             if (nearbyTileIsOcean) {
-                return Math.max(0, (int) (value * advantages));
+                outpostValue = Math.max(0, (int) (value * advantages));
+                outpostValueIsValid = true;
             }
+        } else {
+            outpostValue = 0;
+            outpostValueIsValid = true;
         }
-        return 0;
+        return outpostValue;
     }
 
     /**
@@ -422,6 +441,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         used by the AI when deciding where to build a new colony.
      */
     public int getColonyValue() {
+        if (colonyValueIsValid) {
+            return colonyValue;
+        }
         // TODO: tune magic numbers
         if (getType().canSettle() && getSettlement() == null) {
             int value = potential(primaryGoods(), null) * 30;
@@ -444,10 +466,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
             }
 
-            for (Tile tile : getGame().getMap().getSurroundingTiles(this, 1)) {
+            for (Tile tile : getGame().getMap().getSurroundingTiles(this, VALUE_RADIUS)) {
                 if (tile.getColony() != null) {
                     // can't build next to colony
-                    return 0;
+                    colonyValue = 0;
+                    colonyValueIsValid = true;
+                    return colonyValue;
                 } else if (tile.getSettlement() != null) {
                     // can build next to an indian settlement, but shouldn't
                     SettlementType type = ((IndianNationType) tile.getSettlement().getOwner().getNationType())
@@ -523,9 +547,31 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 advantages *= 0.75f;
             }
 
-            return Math.max(0, (int) (value * advantages));
+            colonyValue = Math.max(0, (int) (value * advantages));
+            colonyValueIsValid = true;
         } else {
-            return 0;
+            colonyValue = 0;
+            colonyValueIsValid = true;
+        }
+        return colonyValue;
+    }
+
+    /**
+     * Sets cache validity for this tile's value to false.
+     * Tile values will be recalculated by get*Value() the next time it is being called.
+     */              
+    public void setTileValueFalse() {
+        outpostValueIsValid = false;
+        colonyValueIsValid = false;
+    }
+
+    /**
+     * Sets cache validity to false for all tiles affected by a change to THIS tile.
+     */         
+    public void invalidateTileValues() {
+        setTileValueFalse();
+        for (Tile tile : getGame().getMap().getSurroundingTiles(this, VALUE_RADIUS)) {
+            tile.setTileValueFalse();
         }
     }
 
@@ -708,6 +754,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setConnected(final boolean newConnected) {
         this.connected = newConnected;
+        
+        //setting this means tile values may change!
+        invalidateTileValues();
     }
 
     /**
@@ -838,6 +887,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setOwner(Player owner) {
         this.owner = owner;
+        
+        //setting this means tile values may change!
+        invalidateTileValues();
+        
         updatePlayerExploredTiles();
     }
 
@@ -961,6 +1014,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public void setSettlement(Settlement s) {
         settlement = s;
         owningSettlement = s;
+        
+        //setting this means tile values may change!
+        invalidateTileValues();
+        
         updatePlayerExploredTiles();
     }
 
@@ -1030,6 +1087,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         Resource resource = new Resource(getGame(), this, r);
         tileItemContainer.addTileItem(resource);
+        
+        //setting this means tile values may change!
+        invalidateTileValues();
+        
         updatePlayerExploredTiles();
     }
     
@@ -1049,6 +1110,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (!isLand()) {
             settlement = null;
         }
+        
+        //setting this means tile values may change!
+        invalidateTileValues();
+        
         updatePlayerExploredTiles();
     }
 
