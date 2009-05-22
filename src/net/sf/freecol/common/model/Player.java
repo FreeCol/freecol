@@ -2472,6 +2472,8 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public int getColonyValue(Tile tile) {
         int value = tile.getColonyValue();
+        float advantage = 1f;
+        boolean supportingColony = false;
         if (value == 0) {
             return 0;
         } else {
@@ -2482,22 +2484,25 @@ public class Player extends FreeColGameObject implements Nameable {
                     Tile ct = getGame().getMap().getTile(it.next());
                     if (ct.getColony() != null) {
                         if (ct.getColony().getOwner() == this) {
-                            switch(radius) {
-                            case 1:
-                                // this should not happen
-                                return 0;
-                            case 2:
-                                return (int) (value * 0.5);
-                            case 3:
-                                return (int) (value * 1.25);
-                            case 4:
-                                return (int) (value * 1.1);
+                            if (!supportingColony) {
+                                supportingColony = true;
+                                switch(radius) {
+                                case 1:
+                                    // this should not happen
+                                    return 0;
+                                case 2:
+                                    advantage *= 0.5f;
+                                case 3:
+                                    advantage *= 1.25f;
+                                case 4:
+                                    advantage *= 1.1f;
+                                }
                             }
                         } else {
                             if (getStance(ct.getColony().getOwner()) == Stance.WAR) {
-                                return (int) (value * (0.4 + 0.1 * radius));
+                                advantage *= (0.4 + 0.1 * radius);
                             } else {
-                                return (int) (value * (0.8 + 0.05 * radius));
+                                advantage *= (0.8 + 0.05 * radius);
                             }
                         }
                     }
@@ -2506,13 +2511,12 @@ public class Player extends FreeColGameObject implements Nameable {
                         Unit u = ui.next();
                         if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()
                             && getStance(u.getOwner()) == Stance.WAR) {
-                            return (int) (value * (0.4 + 0.1 * radius));
+                            advantage *= (0.4 + 0.1 * radius);
                         }
                     }
                 }
             }
-            // nothing found
-            return value;
+            return (int) (value * advantage);
         }
     }
 
