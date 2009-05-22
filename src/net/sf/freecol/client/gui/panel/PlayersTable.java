@@ -35,7 +35,9 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JTable;
+import javax.swing.ListCellRenderer;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -83,17 +85,10 @@ public final class PlayersTable extends JTable {
         NationState.NOT_AVAILABLE
     };
 
-    private static final String[] allStateNames = new String[] {
-        NationState.AVAILABLE.getName(),
-        NationState.AI_ONLY.getName(),
-        NationState.NOT_AVAILABLE.getName()
+    private static final NationState[] aiStates = new NationState[] {
+        NationState.AI_ONLY,
+        NationState.NOT_AVAILABLE
     };
-
-    private static final String[] aiStateNames = new String[] {
-        NationState.AI_ONLY.getName(),
-        NationState.NOT_AVAILABLE.getName()
-    };
-
 
     /**
      * The constructor that will add the items to this panel.
@@ -214,7 +209,7 @@ public final class PlayersTable extends JTable {
     }
 
 
-    class AvailableCellRenderer implements TableCellRenderer {
+    class AvailableCellRenderer extends JLabel implements TableCellRenderer {
 
         /**
          * Returns the component used to render the cell's value.
@@ -227,15 +222,29 @@ public final class PlayersTable extends JTable {
          */
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
-            return new JLabel(((NationState) value).getName());
+            setText(((NationState) value).getName());
+            return this;
+        }
+    }
+
+    class NationStateRenderer extends JLabel implements ListCellRenderer {
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
+            setText(((NationState) value).getName());
+            return this;
         }
     }
 
     public final class AvailableCellEditor extends AbstractCellEditor implements TableCellEditor {
 
-        private JComboBox aiStateBox = new JComboBox(aiStateNames);
-        private JComboBox allStateBox = new JComboBox(allStateNames);
+        private JComboBox aiStateBox = new JComboBox(aiStates);
+        private JComboBox allStateBox = new JComboBox(allStates);
         private JComboBox activeBox;
+
+        public AvailableCellEditor() {
+            aiStateBox.setRenderer(new NationStateRenderer());
+            allStateBox.setRenderer(new NationStateRenderer());
+        }
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
                                                      int row, int column) {
@@ -249,13 +258,7 @@ public final class PlayersTable extends JTable {
         }
 
         public Object getCellEditorValue() {
-            String available = (String) activeBox.getSelectedItem();
-            for (int index = 0; index < allStateNames.length; index++) {
-                if (allStateNames[index].equals(available)) {
-                    return allStates[index];
-                }
-            }
-            return NationState.NOT_AVAILABLE;
+            return activeBox.getSelectedItem();
         }
     }
 

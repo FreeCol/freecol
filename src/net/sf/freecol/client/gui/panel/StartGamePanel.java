@@ -34,9 +34,7 @@ import javax.swing.ScrollPaneConstants;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.NationOptions;
-import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import net.miginfocom.swing.MigLayout;
@@ -51,30 +49,6 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
     private static final int START = 0, CANCEL = 1,
         READY = 3, CHAT = 4, GAME_OPTIONS = 5, MAP_GENERATOR_OPTIONS = 6;
-
-    public static final int NATION_COLUMN = 0, AVAILABILITY_COLUMN = 1, ADVANTAGE_COLUMN = 2,
-        COLOR_COLUMN = 3, PLAYER_COLUMN = 4;
-
-    private static final EuropeanNationType[] europeans = 
-        FreeCol.getSpecification().getEuropeanNationTypes().toArray(new EuropeanNationType[0]);
-
-    private static final NationState[] allStates = new NationState[] {
-        NationState.AVAILABLE,
-        NationState.AI_ONLY,
-        NationState.NOT_AVAILABLE
-    };
-
-    private static final String[] allStateNames = new String[] {
-        NationState.AVAILABLE.getName(),
-        NationState.AI_ONLY.getName(),
-        NationState.NOT_AVAILABLE.getName()
-    };
-
-    private static final String[] aiStateNames = new String[] {
-        NationState.AI_ONLY.getName(),
-        NationState.NOT_AVAILABLE.getName()
-    };
-
 
     private boolean singlePlayerGame;
 
