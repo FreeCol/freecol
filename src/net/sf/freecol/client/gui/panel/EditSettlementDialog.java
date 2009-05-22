@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -49,6 +50,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
@@ -56,7 +58,8 @@ import net.miginfocom.swing.MigLayout;
 /**
  * This dialog is used to edit an Indian settlement (map editor only).
  */
-public final class EditSettlementDialog extends FreeColDialog<IndianSettlement> {
+public final class EditSettlementDialog extends FreeColDialog<IndianSettlement> 
+    implements ItemListener {
 
     private static final Logger logger = Logger.getLogger(EditSettlementDialog.class.getName());
 
@@ -107,21 +110,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement> 
         add(new JLabel(Messages.message("nation")));
         owner = new JComboBox(natives);
         owner.setSelectedItem(settlement.getOwner().getNation());
-        /*
-        owner.addItemListener(new ItemListener() {
-                public void itemStateChanged(ItemEvent e) {
-                    IndianNationType ownerType = (IndianNationType)
-                        ((Nation) owner.getSelectedItem()).getType();
-                    UnitType[] skills = new UnitType[ownerType.getSkills().size()];
-                    for (int index = 0; index < skills.length; index++) {
-                        skills[index] = ownerType.getSkills().get(index).getObject();
-                    }
-                    DefaultComboBoxModel model = new DefaultComboBoxModel(skills);
-                    skill.setModel(model);
-                    skill.setSelectedItem(settlement.getLearnableSkill());
-                }
-            });
-        */
+        owner.addItemListener(this);
         add(owner);
 
         add(new JLabel(Messages.message("capital")));
@@ -155,6 +144,18 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement> 
         setSize(getPreferredSize());
     }
 
+    public void itemStateChanged(ItemEvent e) {
+        IndianNationType ownerType = (IndianNationType)
+            ((Nation) owner.getSelectedItem()).getType();
+        UnitType[] skills = new UnitType[ownerType.getSkills().size()];
+        for (int index = 0; index < skills.length; index++) {
+            skills[index] = ownerType.getSkills().get(index).getObject();
+        }
+        DefaultComboBoxModel model = new DefaultComboBoxModel(skills);
+        skill.setModel(model);
+        skill.setSelectedItem(settlement.getLearnableSkill());
+    }
+
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
@@ -175,14 +176,17 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement> 
                 settlement.setCapital(false);
             }
             settlement.setLearnableSkill((UnitType) skill.getSelectedItem());
-            int numberOfUnits = (Integer) units.getValue()- settlement.getUnitCount();
+            int numberOfUnits = (Integer) units.getValue() - settlement.getUnitCount();
             if (numberOfUnits > 0) {
                 for (int index = 0; index < numberOfUnits; index++) {
-                    settlement.add(new Unit(settlement.getGame(), settlement.getOwner(), BRAVE));
+                    settlement.add(new Unit(settlement.getGame(), settlement, settlement.getOwner(),
+                                            BRAVE, UnitState.ACTIVE));
                 }
             } else if (numberOfUnits < 0) {
-                List<Unit> unitList = settlement.getUnitList();
-                unitList = unitList.subList(0, -numberOfUnits);
+                List<Unit> unitList = new ArrayList<Unit>(settlement.getUnitList().subList(0, -numberOfUnits));
+                for (Unit unit : unitList) {
+                    unit.dispose();
+                }
             } 
         }                   
         getCanvas().remove(this);

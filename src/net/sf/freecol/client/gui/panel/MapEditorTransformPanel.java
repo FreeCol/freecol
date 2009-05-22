@@ -57,6 +57,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
@@ -385,7 +386,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                                       skill, new HashSet<Player>(), null);
                     t.setSettlement(settlement);
                     for (int index = 0; index < 5; index++) {
-                        settlement.add(new Unit(settlement.getGame(), settlement.getOwner(), BRAVE));
+                        settlement.add(new Unit(settlement.getGame(), settlement, settlement.getOwner(),
+                                                BRAVE, UnitState.ACTIVE));
                     }
                 } else {
                     t.setSettlement(null);
