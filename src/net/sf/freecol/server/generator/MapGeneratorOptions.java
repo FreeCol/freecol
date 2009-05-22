@@ -220,7 +220,7 @@ public class MapGeneratorOptions extends OptionMap {
         return getWidth(getInteger(MAP_SIZE));
     }
 
-    private int getWidth(final int size) {
+    public static int getWidth(final int size) {
         switch (size) {
         case MAP_SIZE_SMALL:
             return 28;
@@ -246,7 +246,7 @@ public class MapGeneratorOptions extends OptionMap {
         return getHeight(getInteger(MAP_SIZE));
     }
 
-    private int getHeight(int size) {
+    public static int getHeight(int size) {
         switch (size) {
         case MAP_SIZE_SMALL:
             return 70;

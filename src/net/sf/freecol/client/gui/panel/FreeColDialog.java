@@ -23,6 +23,7 @@ import java.awt.AWTEvent;
 import java.awt.ActiveEvent;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.MenuComponent;
@@ -48,6 +49,7 @@ import javax.swing.filechooser.FileFilter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.server.generator.MapGeneratorOptions;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -379,6 +381,66 @@ public class FreeColDialog<T> extends FreeColPanel {
         return inputDialog;
     }
 
+
+    public static FreeColDialog<Dimension> createMapSizeDialog() {
+
+        final int defaultSize = FreeCol.getSpecification().getRangeOption("model.option.mapSize")
+            .getValue();
+        final int defaultHeight = MapGeneratorOptions.getHeight(defaultSize);
+        final int defaultWidth = MapGeneratorOptions.getWidth(defaultSize);
+        final int COLUMNS = 5;
+        
+        final String widthText = Messages.message("width");
+        final String heightText = Messages.message("height");
+        
+        final JTextField inputWidth = new JTextField(Integer.toString(defaultWidth), COLUMNS);
+        final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
+
+        final FreeColDialog<Dimension> mapSizeDialog =
+            new FreeColDialog<Dimension>(FreeCol.getFreeColClient().getCanvas()) {
+            public void requestFocus() {
+                okButton.requestFocus();
+            }
+        };
+
+        mapSizeDialog.setLayout(new MigLayout("wrap 2", "", ""));
+
+        JButton cancelButton = new JButton(Messages.message("cancel"));
+        JButton okButton = new JButton(Messages.message("ok"));
+        okButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    try {
+                        int width = Integer.parseInt(inputWidth.getText());
+                        int height = Integer.parseInt(inputHeight.getText());
+                        if (width <= 0 || height <= 0) {
+                            throw new NumberFormatException();
+                        }
+                        mapSizeDialog.setResponse(new Dimension(width, height));
+                    } catch (NumberFormatException nfe) {
+                        FreeCol.getFreeColClient().getCanvas().errorMessage("integerAboveZero");
+                    }
+                }
+            });
+
+        
+        JLabel widthLabel = new JLabel(widthText);
+        widthLabel.setLabelFor(inputWidth);
+        JLabel heightLabel = new JLabel(heightText);
+        heightLabel.setLabelFor(inputHeight);
+
+        mapSizeDialog.add(new JLabel(Messages.message("editor.mapSize")), "span, align center");
+        mapSizeDialog.add(widthLabel, "newline 20");
+        mapSizeDialog.add(inputWidth);
+        mapSizeDialog.add(heightLabel);
+        mapSizeDialog.add(inputHeight);
+
+        mapSizeDialog.add(okButton, "newline 20, span, split2, tag ok");
+        mapSizeDialog.add(cancelButton, "tag cancel");
+
+        mapSizeDialog.setSize(mapSizeDialog.getPreferredSize());
+
+        return mapSizeDialog;
+    }
 
     /**
     * Creates a new <code>FreeColDialog</code> in which the user
