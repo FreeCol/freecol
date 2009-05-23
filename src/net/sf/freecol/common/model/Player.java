@@ -2505,6 +2505,16 @@ public class Player extends FreeColGameObject implements Nameable {
                                 advantage *= (0.8 + 0.05 * radius);
                             }
                         }
+                    } else {
+                        if (radius==2 && tile.getOwner() != null &&
+                        tile.getOwner() != this) {
+                            // tile is already owned by someone (and not by us!)
+                            if (tile.getOwner().isEuropean()) {
+                                advantage *= 0.8f;
+                            } else {
+                                advantage *= 0.9f;
+                            }
+                        }
                     }
                     Iterator<Unit> ui = ct.getUnitIterator();
                     while (ui.hasNext()) {

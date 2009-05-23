@@ -380,9 +380,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         used by the AI when deciding where to build a new colony.
      */
     public int getOutpostValue() {
-        if (outpostValueIsValid) {
-            return outpostValue;
-        }
+        //TODO: For the moment, disable caching of outpostValue
+        //return value depends on player this is being called for!
+         
+        //if (outpostValueIsValid) {
+        //    return outpostValue;
+        //}
+        
         if (getType().canSettle() && getSettlement() == null) {
             boolean nearbyTileIsOcean = false;
             float advantages = 1f;
@@ -506,15 +510,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
                     if (tile.isConnected()) {
                         nearbyTileIsOcean = true;
-                    }
-                    if (tile.getOwner() != null &&
-                        tile.getOwner() != getGame().getCurrentPlayer()) {
-                        // tile is already owned by someone (and not by us!)
-                        if (tile.getOwner().isEuropean()) {
-                            advantages *= 0.8f;
-                        } else {
-                            advantages *= 0.9f;
-                        }
                     }
                 }
             }
