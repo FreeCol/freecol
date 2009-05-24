@@ -2227,11 +2227,10 @@ another Player attempts to enter that tile, combat ensues. The combat
 mechanism of FreeCol is very simple: Each unit has an attack strength
 and a defence strength. Attack bonuses and defence bonuses granted by
 terrain, fortifications or \hyperlink{Founding Fathers}{Founding
-Fathers} are added to the base values of the units. If the attack
-value of the attacker is greater than the defence value of the
-defender, the attacker wins. Otherwise the defender wins. If a tile is
-occupied by more than one unit, the attacker will fight against the
-defender with the strongest defence.
+  Fathers} are added to the base values of the units. A random element
+is then added to the calculations in order to determine the winner of
+the battle. If a tile is occupied by more than one unit, the attacker
+will fight against the defender with the strongest defence.
 
 Most units that win a battle may be \hypertarget{promotion}{promoted},
 and all units that lose a battle will always be captured, demoted,
