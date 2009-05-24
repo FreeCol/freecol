@@ -374,19 +374,24 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Calculates the value of a temporary future colony at this tile.
-     * 
+     * Calculates the value of an outpost-type colony at this tile.
+     * An "outpost" is supposed to be a colony containing one worker, exporting
+     * its whole production to europe. The value of such colony is the maximum
+     * amount of money it can make in one turn, assuming sale of its secondary
+     * goods plus farmed goods from one of the surrounding tiles.
+     *     
      * @return The value of a future colony located on this tile. This value is
      *         used by the AI when deciding where to build a new colony.
      */
     public int getOutpostValue() {
-        //TODO: For the moment, disable caching of outpostValue
-        //return value depends on player this is being called for!
+        //TODO: For the moment, disable caching of outpostValue.
+        //Return value depends on player this is being called for!
          
         //if (outpostValueIsValid) {
         //    return outpostValue;
         //}
         
+        Market market = getGame().getCurrentPlayer().getMarket();
         if (getType().canSettle() && getSettlement() == null) {
             boolean nearbyTileIsOcean = false;
             float advantages = 1f;
@@ -413,7 +418,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                     for (AbstractGoods production : getType().getProduction()) {
                         GoodsType type = production.getType();
-                        int potential = tile.potential(type, null) * type.getInitialSellPrice();
+                        int potential = market.getSalePrice(type, tile.potential(type, null));
                         if (tile.getOwner() != null &&
                             tile.getOwner() != getGame().getCurrentPlayer()) {
                             // tile is already owned by someone (and not by us!)
@@ -427,6 +432,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     }
                 }
             }
+            
+            //add secondary goods being produced by a colony on this tile
+            GoodsType secondary = getType().getSecondaryGoods();
+            value += market.getSalePrice(secondary,potential(secondary, null));
+            
             if (nearbyTileIsOcean) {
                 outpostValue = Math.max(0, (int) (value * advantages));
                 outpostValueIsValid = true;
