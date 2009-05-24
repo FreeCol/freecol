@@ -32,10 +32,10 @@ import java.util.logging.Logger;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
 
 import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.Canvas;
@@ -84,7 +84,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
     private static final UnitType BRAVE = Specification.getSpecification().getUnitType("model.unit.brave");
 
     private final JPanel listPanel;
-    private JButton settlementButton;
+    private JToggleButton settlementButton;
 
     private ButtonGroup group;
 
@@ -160,7 +160,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
      * @param text a <code>String</code> value
      * @param mt a <code>MapTransform</code> value
      */
-    private JButton buildButton(Image image, String text, final MapTransform mt) {
+    private JToggleButton buildButton(Image image, String text, final MapTransform mt) {
 
         Image scaledImage = getLibrary().scaleImage(image, 0.5f);
 
@@ -171,7 +171,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         mt.setDescriptionPanel(descriptionPanel);
 
         ImageIcon icon = new ImageIcon(scaledImage);
-        final JButton button = new JButton(icon);
+        final JToggleButton button = new JToggleButton(icon);
         button.setToolTipText(text);
         button.setOpaque(false);
         group.add(button);
