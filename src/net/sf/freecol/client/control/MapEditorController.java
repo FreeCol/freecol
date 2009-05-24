@@ -33,7 +33,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.CanvasMapEditorMouseListener;
-import net.sf.freecol.client.gui.CanvasMapEditorMouseMotionListener;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.MapEditorMenuBar;
@@ -44,8 +43,6 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.server.FreeColServer;
@@ -112,9 +109,9 @@ public final class MapEditorController {
             f.setLocation(f.getX(), 50);
             
             canvas.repaint();            
-
-            canvas.addMouseListener(new CanvasMapEditorMouseListener(canvas, gui));
-            canvas.addMouseMotionListener(new CanvasMapEditorMouseMotionListener(canvas, gui));
+            CanvasMapEditorMouseListener listener = new CanvasMapEditorMouseListener(canvas, gui);
+            canvas.addMouseListener(listener);
+            canvas.addMouseMotionListener(listener);
         } catch (NoRouteToServerException e) {
             freeColClient.getCanvas().errorMessage("server.noRouteToServer");
             return;
