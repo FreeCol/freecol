@@ -1230,7 +1230,7 @@ public class Player extends FreeColGameObject implements Nameable {
             while (Messages.containsKey(prefix + Integer.toString(settlementNameIndex))) {
                 name = Messages.message(prefix + Integer.toString(settlementNameIndex));
                 settlementNameIndex++;
-                if (getSettlement(name) == null) return name;
+                if (getGame().getSettlement(name) == null) return name;
             }
         }
 
