@@ -102,6 +102,7 @@ import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -952,14 +953,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
 
-        List<Tile> surroundingTiles = getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight());
-        for (int i = 0; i < surroundingTiles.size(); i++) {
-            Tile t = surroundingTiles.get(i);
-            reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument(), false, false));
-        }
         if (newTile.hasLostCityRumour() && player.isEuropean()) {
             exploreLostCityRumour(unit, player);
             newTile.removeLostCityRumour();
+        }
+        Document doc = reply.getOwnerDocument();
+        reply.appendChild(newTile.toXMLElement(player, doc, false, false));
+        for (Tile t : getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight())) {
+            reply.appendChild(t.toXMLElement(player, doc, false, false));
         }
         return reply;
     }
