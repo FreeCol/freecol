@@ -276,14 +276,20 @@ public final class InGameController implements NetworkConstants {
         if (reply == null) {
             logger.warning("Received null reply to " + element);
         } else if ("error".equals(reply.getTagName())) {
+            String messageID = null;
+            String message = null;
+
             if (element.hasAttribute("message")) {
-                logger.warning(element.getAttribute("message"));
+                message = element.getAttribute("message");
+                logger.warning(message);
             } else {
                 logger.warning("Received error response to " + element);
             }
-            if (element.hasAttribute("messageID") || FreeCol.isInDebugMode()) {
-                InGameInputHandler handler = freeColClient.getInGameInputHandler();
-                handler.handle(client.getConnection(), reply);
+            if (element.hasAttribute("messageID")) {
+                messageID = element.getAttribute("messageID");
+            }
+            if (messageID != null || FreeCol.isInDebugMode()) {
+                freeColClient.getCanvas().errorMessage(messageID, message);
             }
         } else if (tag.equals(reply.getTagName())) {
             return reply;
