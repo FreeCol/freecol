@@ -110,6 +110,7 @@ import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
+import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -522,10 +523,13 @@ public final class InGameController implements NetworkConstants {
         }
 
         BuildColonyMessage message = new BuildColonyMessage(name, unit);
-        Element reply = askExpecting(client, message.toXMLElement(), "update");
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
         if (reply != null) {
+            Connection conn = freeColClient.getClient().getConnection();
+
             freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
-            freeColClient.getInGameInputHandler().update(reply);
+            freeColClient.getInGameInputHandler().handle(conn, reply);
 
             // There should be a colony here now.  Check units present
             // for treasure cash-in.

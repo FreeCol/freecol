@@ -158,6 +158,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = spanishSuccession(element);
             } else if (type.equals("addMessages")) {
                 reply = addMessages(element);
+            } else if (type.equals("addHistory")) {
+                reply = addHistory(element);
             } else if (type.equals("multiple")) {
                 reply = multiple(connection, element);
             } else {
@@ -1226,6 +1228,27 @@ public final class InGameInputHandler extends InputHandler {
                 m.setSource(game.getFreeColGameObjectSafely(attr));
             }
             getFreeColClient().getMyPlayer().addModelMessage(m);
+        }
+        return null;
+    }
+
+    /**
+     * Add the HistoryEvents which are the children of this Element.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    public Element addHistory(Element element) {
+        Game game = getGame();
+        NodeList nodes = element.getChildNodes();
+        String attr;
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            HistoryEvent h = new HistoryEvent();
+            Element e = (Element) nodes.item(i);
+
+            h.readFromXMLElement(e);
+            getFreeColClient().getMyPlayer().getHistory().add(h);
         }
         return null;
     }

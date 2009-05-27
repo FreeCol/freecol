@@ -19,10 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
@@ -104,16 +106,26 @@ public class BuildColonyMessage extends Message {
         }
         Colony colony = new Colony(game, serverPlayer, colonyName, unit.getTile());
         unit.buildColony(colony);
+        HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
+                                          HistoryEvent.Type.FOUND_COLONY,
+                                          "%colony%", colony.getName());
+        player.getHistory().add(h);
         server.getInGameInputHandler().sendUpdatedTileToAll(unit.getTile(), serverPlayer);
 
-        Element reply = Message.createNewRootElement("update");
-        reply.appendChild(unit.getTile().toXMLElement(player, reply.getOwnerDocument()));
+        Element reply = Message.createNewRootElement("multiple");
+        Document doc = reply.getOwnerDocument();
+        Element update = doc.createElement("update");
+        Element history = doc.createElement("addHistory");
+        reply.appendChild(update);
+        reply.appendChild(history);
+        update.appendChild(unit.getTile().toXMLElement(player, doc));
         int range = colony.getLineOfSight();
         if (range > unit.getLineOfSight()) {
             for (Tile t : game.getMap().getSurroundingTiles(unit.getTile(), range)) {
-                reply.appendChild(t.toXMLElement(player, reply.getOwnerDocument()));
+                update.appendChild(t.toXMLElement(player, doc));
             }
         }
+        history.appendChild(h.toXMLElement(player, doc));
         return reply;
     }
 
