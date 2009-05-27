@@ -3262,35 +3262,44 @@ public final class InGameController implements NetworkConstants {
                 // unit killed
                 unit.dispose();
                 canvas.showInformationMessage("scoutSettlement.speakDie", settlement);
-            } else if (action.equals("speak") && result.equals("tales")) {
-                // receive an update of the surrounding tiles.
-                Element updateElement = getChildElement(reply, "update");
-                if (updateElement != null) {
-                    freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
+            } else if (action.equals("speak")) {
+                if (result.equals("tales")) {
+                    // receive an update of the surrounding tiles.
+                    Element updateElement = getChildElement(reply, "update");
+                    if (updateElement != null) {
+                        freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
+                    }
+                    canvas.showInformationMessage("scoutSettlement.speakTales", settlement);
+                } else if (result.equals("beads")) {
+                    // receive a small gift of gold
+                    String amount = reply.getAttribute("amount");
+                    unit.getOwner().modifyGold(Integer.parseInt(amount));
+                    freeColClient.getCanvas().updateGoldLabel();
+                    canvas.showInformationMessage("scoutSettlement.speakBeads", settlement,
+                                                  "%replace%", amount);
+                } else if (result.equals("nothing")) {
+                    // nothing special
+                    canvas.showInformationMessage("scoutSettlement.speakNothing", settlement);
+                } else if (result.equals("expert")) {
+                    Element updateElement = getChildElement(reply, "update");
+                    if (updateElement != null) {
+                        freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
+                    }
+                    canvas.showInformationMessage("scoutSettlement.expertScout", settlement,
+                                                  "%unit%", unit.getType().getName());
+                }                    
+            } else if (action.equals("tribute")) {
+                if (result.equals("agree")) {
+                    // receive a tribute
+                    String amount = reply.getAttribute("amount");
+                    unit.getOwner().modifyGold(Integer.parseInt(amount));
+                    freeColClient.getCanvas().updateGoldLabel();
+                    canvas.showInformationMessage("scoutSettlement.tributeAgree", settlement,
+                                                  "%replace%", amount);
+                } else if (result.equals("disagree")) {
+                    // no tribute
+                    canvas.showInformationMessage("scoutSettlement.tributeDisagree", settlement);
                 }
-                canvas.showInformationMessage("scoutSettlement.speakTales", settlement);
-            } else if (action.equals("speak") && result.equals("beads")) {
-                // receive a small gift of gold
-                String amount = reply.getAttribute("amount");
-                unit.getOwner().modifyGold(Integer.parseInt(amount));
-                freeColClient.getCanvas().updateGoldLabel();
-                canvas.showInformationMessage("scoutSettlement.speakBeads", 
-                                              settlement,
-                                              "%replace%", amount);
-            } else if (action.equals("speak") && result.equals("nothing")) {
-                // nothing special
-                canvas.showInformationMessage("scoutSettlement.speakNothing", settlement);
-            } else if (action.equals("tribute") && result.equals("agree")) {
-                // receive a tribute
-                String amount = reply.getAttribute("amount");
-                unit.getOwner().modifyGold(Integer.parseInt(amount));
-                freeColClient.getCanvas().updateGoldLabel();
-                canvas.showInformationMessage("scoutSettlement.tributeAgree",
-                                              settlement,
-                                              "%replace%", amount);
-            } else if (action.equals("tribute") && result.equals("disagree")) {
-                // no tribute
-                canvas.showInformationMessage("scoutSettlement.tributeDisagree", settlement);
             }
         } else {
             logger.warning("Server gave an invalid reply to an scoutIndianSettlement message");

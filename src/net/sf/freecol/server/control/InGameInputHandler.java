@@ -1658,10 +1658,13 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else if (action.equals("speak")) {
             unit.contactAdjacent(settlement.getTile());
             if (!settlement.hasBeenVisited()) {
-                // This can probably be randomized, I don't think the AI needs
-                // to do anything here.
-                double random = Math.random();
-                if (random < 0.33) {
+                if (settlement.getLearnableSkill().hasAbility("model.ability.expertScout")) {
+                    unit.setType(settlement.getLearnableSkill());
+                    reply.setAttribute("result", "expert");
+                    Element update = reply.getOwnerDocument().createElement("update");
+                    update.appendChild(unit.toXMLElement(player, update.getOwnerDocument(), false, false));
+                    reply.appendChild(update);
+                } else if (getPseudoRandom().nextInt(9) < 3) {
                     reply.setAttribute("result", "tales");
                     Element update = reply.getOwnerDocument().createElement("update");
                     Position center = new Position(settlement.getTile().getX(), settlement.getTile().getY());
@@ -1677,7 +1680,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     }
                     reply.appendChild(update);
                 } else {
-                    int beadsGold = (int) (Math.random() * (400 * settlement.getBonusMultiplier())) + 50;
+                    int beadsGold = (getPseudoRandom().nextInt(400) * settlement.getBonusMultiplier()) + 50;
                     if (unit.hasAbility("model.ability.expertScout")) {
                         beadsGold = (beadsGold * 11) / 10;
                     }
