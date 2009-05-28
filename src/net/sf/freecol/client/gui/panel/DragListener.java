@@ -99,7 +99,14 @@ public final class DragListener extends MouseAdapter {
                         if (menu.getComponent(lastIndex) instanceof JPopupMenu.Separator) {
                             menu.remove(lastIndex);
                         }
-                        menu.show(comp, e.getX(), e.getY());
+                        if (System.getProperty("os.name").startsWith("Windows")) {
+                            // work-around: JRE on Windows is unable
+                            // to display popup menus that extend
+                            // beyond the canvas
+                            menu.show(parentPanel.getCanvas(), 0, parentPanel.getCanvas().getMenuBarHeight());
+                        } else {
+                            menu.show(comp, e.getX(), e.getY());
+                        }
                     }
                 }
             }
