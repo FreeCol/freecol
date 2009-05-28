@@ -155,11 +155,10 @@ public final class ImageLibrary extends ImageProvider {
         // to go.
         if ("".equals(freeColHome)) {
             dataDirectory = "data/";
-            init(true);
         } else {
             dataDirectory = freeColHome;
-            init(false);
         }
+        init();
     }
 
     private ImageLibrary(String dataDirectory, float scalingFactor) {
@@ -171,14 +170,20 @@ public final class ImageLibrary extends ImageProvider {
     /**
      * Performs all necessary init operations such as loading of data files.
      * 
-     * @param doLookup Must be set to 'false' if the path to the image files has
-     *            been manually provided by the user. If set to 'true' then a
-     *            lookup will be done to search for image files from
-     *            net.sf.freecol, in this case the images need to be placed in
-     *            net.sf.freecol/images.
      * @throws FreeColException If one of the data files could not be found. *
      */
-    private void init(boolean doLookup) throws FreeColException {
+    public void init() throws FreeColException {
+        /* doLookup must be set to 'false' if the path to the image
+         * files has been manually provided by the user. If set to
+         * 'true' then a lookup will be done to search for image files
+         * from net.sf.freecol, in this case the images need to be
+         * placed in net.sf.freecol/images.
+         */
+        boolean doLookup = false;
+        if ("data/".equals(dataDirectory)) {
+            doLookup = true;
+        }
+        logger.info("initializing image library");
         GraphicsConfiguration gc = null;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         if (!GraphicsEnvironment.isHeadless()) {
@@ -369,6 +374,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadTerrain(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
+        logger.fine("loading terrain images");
         terrain1 = new HashMap<String, ImageIcon>();
         terrain2 = new HashMap<String, ImageIcon>();
         overlay1 = new HashMap<String, ImageIcon>();
@@ -448,6 +454,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadRivers(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
+        logger.fine("loading river images");
         rivers = new ArrayList<ImageIcon>(RIVER_STYLES);
         for (int i = 0; i < RIVER_STYLES; i++) {
             String filePath = dataDirectory + path + riverDirectory + riverName + i + extension;
@@ -470,6 +477,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadForests(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
+        logger.fine("loading forest images");
         forests = new HashMap<String, ImageIcon>();
         
         for (TileType type : FreeCol.getSpecification().getTileTypeList()) {
@@ -495,6 +503,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     private void loadUnitButtons(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
             throws FreeColException {
+        logger.fine("loading unit buttons");
         unitButtons = new ArrayList<ArrayList<ImageIcon>>(4);
         for (int i = 0; i < 4; i++) {
             unitButtons.add(new ArrayList<ImageIcon>(UNIT_BUTTON_COUNT));
@@ -535,6 +544,7 @@ public final class ImageLibrary extends ImageProvider {
      * @param c The color of the color chip to create.
      */
     private void loadColorChip(GraphicsConfiguration gc, Color c) {
+        logger.fine("creating color chips");
         BufferedImage tempImage = gc.createCompatibleImage(11, 17);
         Graphics g = tempImage.getGraphics();
         if (c.equals(Color.BLACK)) {
@@ -558,6 +568,7 @@ public final class ImageLibrary extends ImageProvider {
      *            should represent an expert missionary.
      */
     private void loadMissionChip(GraphicsConfiguration gc, Color c, boolean expertMission) {
+        logger.fine("creating mission chips");
         BufferedImage tempImage = gc.createCompatibleImage(10, 17);
         Graphics2D g = (Graphics2D) tempImage.getGraphics();
 
@@ -608,6 +619,7 @@ public final class ImageLibrary extends ImageProvider {
      * @param visited whether the village was visited before.
      */
     private void loadAlarmChip(GraphicsConfiguration gc, Tension.Level alarm, final boolean visited) {
+        logger.fine("creating alarm chips");
         BufferedImage tempImage = gc.createCompatibleImage(10, 17);
         Graphics2D g = (Graphics2D) tempImage.getGraphics();
 

@@ -434,32 +434,15 @@ public class DebugMenu extends JMenu {
 
         this.addSeparator();
 
-        final JMenuItem loadResource = new JMenuItem("Load resource");
+        final JMenuItem loadResource = new JMenuItem("Reload images");
         loadResource.setOpaque(false);
-        // loadResource.setMnemonic(KeyEvent.VK_A);
-        // loadResource.setAccelerator(KeyStroke.getKeyStroke('A',
-        // Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) |
-        // InputEvent.ALT_MASK));
         this.add(loadResource);
         loadResource.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    FileFilter ff = new FileFilter() {
-                        public boolean accept(File f) {
-                            return true;
-                        }
-
-                        public String getDescription() {
-                            return "resource filter";
-                        }
-
-                    };
-
-                    File resourceFile = freeColClient.getCanvas().showLoadDialog(FreeCol.getSaveDirectory(),
-                            new FileFilter[] { ff });
-                    Messages.loadResources(resourceFile);
+                    canvas.getGUI().getImageLibrary().init();
                 } catch (Exception ex) {
-                    System.out.println("Failed to load resource bundle");
+                    System.out.println("Failed to reload images.");
                 }
             }
         });
