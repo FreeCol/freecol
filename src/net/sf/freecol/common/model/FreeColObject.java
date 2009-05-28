@@ -102,6 +102,16 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Describe <code>hasAbility</code> method here.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean hasAbility(String id) {
+        return false;
+    }
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *

@@ -220,7 +220,7 @@ public final class Scope extends FreeColObject implements Cloneable {
      * @param object a <code>FreeColGameObjectType</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean appliesTo(FreeColGameObjectType object) {
+    public boolean appliesTo(FreeColObject object) {
         if (object == null) {
             return matchesNull;
         }
