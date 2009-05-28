@@ -37,23 +37,26 @@ public class ModelMessage extends FreeColObject {
 
     /** Constants describing the type of message. */
     public static enum MessageType { 
-            DEFAULT,
-            WARNING,
-            SONS_OF_LIBERTY,
-            GOVERNMENT_EFFICIENCY,
-            WAREHOUSE_CAPACITY,
-            UNIT_IMPROVED,
-            UNIT_DEMOTED,
-            UNIT_LOST,
-            UNIT_ADDED,
-            BUILDING_COMPLETED,
-            FOREIGN_DIPLOMACY,
-            MARKET_PRICES,
-            LOST_CITY_RUMOUR,
-            GIFT_GOODS,
-            MISSING_GOODS,
-            TUTORIAL,
-            COMBAT_RESULT }
+        DEFAULT,
+        WARNING,
+        SONS_OF_LIBERTY,
+        GOVERNMENT_EFFICIENCY,
+        WAREHOUSE_CAPACITY,
+        UNIT_IMPROVED,
+        UNIT_DEMOTED,
+        UNIT_LOST,
+        UNIT_ADDED,
+        BUILDING_COMPLETED,
+        FOREIGN_DIPLOMACY,
+        MARKET_PRICES,
+        LOST_CITY_RUMOUR,
+        GIFT_GOODS,
+        MISSING_GOODS,
+        TUTORIAL,
+        COMBAT_RESULT,
+        ACCEPTED_DEMANDS,
+        REJECTED_DEMANDS
+    }
 
     private Player owner;
     private FreeColGameObject source;

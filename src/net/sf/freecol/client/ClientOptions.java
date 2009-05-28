@@ -334,6 +334,14 @@ public class ClientOptions extends OptionMap {
     public static final int LABOUR_REPORT_COMPACT = 1;
 
     /**
+     * The Indian demand action.
+     */
+    public static final String INDIAN_DEMAND_RESPONSE = "model.option.indianDemandResponse";
+    public static final int INDIAN_DEMAND_RESPONSE_ASK = 0;
+    public static final int INDIAN_DEMAND_RESPONSE_ACCEPT = 1;
+    public static final int INDIAN_DEMAND_RESPONSE_REJECT = 2;
+
+    /**
      * Comparators for sorting colonies.
      */
     private static Comparator<Colony> colonyAgeComparator = new Comparator<Colony>() {
