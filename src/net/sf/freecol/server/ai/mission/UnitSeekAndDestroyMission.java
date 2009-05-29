@@ -227,6 +227,12 @@ public class UnitSeekAndDestroyMission extends Mission {
         if (!getUnit().isOffensiveUnit()) {
             return false;
         }
+        
+        // do not pursue units in colonies
+        if (target instanceof Unit && 
+            target.getTile().getSettlement() != null){
+        		return false;
+        }
 
         targetPlayer = ((Ownable) target).getOwner();
         Stance stance = owner.getStance(targetPlayer);
