@@ -3701,8 +3701,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         }
 
+        units.clear();
+        if (goodsContainer != null) goodsContainer.removeAll();
         equipment.clear();
-
+        workImprovement = null;
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
                 units = new ArrayList<Unit>();

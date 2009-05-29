@@ -647,6 +647,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         recruitPrice = getAttribute(in, "recruitPrice", RECRUIT_PRICE_INITIAL);
         recruitLowerCap = getAttribute(in, "recruitLowerCap", LOWER_CAP_INITIAL);
 
+        units.clear();
         unitPrices.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(UNITS_TAG_NAME)) {
