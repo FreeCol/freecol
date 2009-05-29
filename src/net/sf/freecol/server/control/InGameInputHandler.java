@@ -69,6 +69,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
@@ -1568,8 +1569,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (settlement == null) {
             throw new IllegalStateException("No settlement to learn skill from.");
         }
-        if (!unit.getType().canBeUpgraded(settlement.getLearnableSkill(),
-                                          UnitTypeChange.Type.NATIVES)) {
+        if (!unit.getType().canBeUpgraded(settlement.getLearnableSkill(), ChangeType.NATIVES)) {
             throw new IllegalStateException("Unit can't learn that skill from settlement!");
         }
         

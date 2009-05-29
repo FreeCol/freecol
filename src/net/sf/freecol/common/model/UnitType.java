@@ -30,8 +30,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 public final class UnitType extends BuildableType {
 
@@ -119,9 +119,9 @@ public final class UnitType extends BuildableType {
     private EquipmentType defaultEquipment;
 
     /**
-     * Describe education here.
+     * The possible type changes for this unit type.
      */
-    private HashMap<String, UnitTypeChange> typeChanges = new HashMap<String, UnitTypeChange>();
+    private List<UnitTypeChange> typeChanges = new ArrayList<UnitTypeChange>();
     
 
     
@@ -486,13 +486,17 @@ public final class UnitType extends BuildableType {
     /**
      * Describe <code>getUnitTypeChange</code> method here.
      *
-     * @param type an <code>UnitTypeChange.Type</code> value
+     * @param changeType an <code>UnitTypeChange.Type</code> value
+     * @param player a <code>Player</code> value
      * @return an <code>UnitType</code> value
      */
-    public UnitType getUnitTypeChange(UnitTypeChange.Type type) {
-        for (Entry<String, UnitTypeChange> entry : typeChanges.entrySet()) {
-            if (entry.getValue().asResultOf(type)) {
-                return FreeCol.getSpecification().getUnitType(entry.getKey());
+    public UnitType getUnitTypeChange(ChangeType changeType, Player player) {
+        for (UnitTypeChange change : typeChanges) {
+            if (change.asResultOf(changeType) && change.appliesTo(player)) {
+                UnitType result = Specification.getSpecification().getUnitType(change.getUnitTypeId());
+                if (result.isAvailableTo(player)) {
+                    return result;
+                }
             }
         }
         return null;
@@ -505,12 +509,18 @@ public final class UnitType extends BuildableType {
      * the given means of education.
      *
      * @param newType the UnitType to learn
-     * @param educationType an <code>UnitTypeChange.Type</code> value
+     * @param changeType an <code>ChangeType</code> value
      * @return <code>true</code> if can learn the given UnitType
      */
-    public boolean canBeUpgraded(UnitType newType, UnitTypeChange.Type educationType) {
-        UnitTypeChange upgrade = typeChanges.get(newType.getSkillTaught());
-        return upgrade != null && upgrade.asResultOf(educationType);
+    public boolean canBeUpgraded(UnitType newType, ChangeType changeType) {
+        for (UnitTypeChange change : typeChanges) {
+            if (change.asResultOf(changeType)) {
+                if (newType == Specification.getSpecification().getUnitType(change.getUnitTypeId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -520,12 +530,10 @@ public final class UnitType extends BuildableType {
      * maximum
      */
     public List<UnitType> getUnitTypesLearntInLostCity() {
-        Iterator<Entry<String, UnitTypeChange>> iterator = typeChanges.entrySet().iterator();
-        ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
-        while (iterator.hasNext()) {
-            Entry<String, UnitTypeChange> pair = iterator.next();
-            if (pair.getValue().asResultOf(UnitTypeChange.Type.LOST_CITY)) {
-                unitTypes.add(FreeCol.getSpecification().getUnitType(pair.getKey()));
+        List<UnitType> unitTypes = new ArrayList<UnitType>();
+        for (UnitTypeChange change : typeChanges) {
+            if (change.asResultOf(ChangeType.LOST_CITY)) {
+                unitTypes.add(Specification.getSpecification().getUnitType(change.getUnitTypeId()));
             }
         }
         return unitTypes;
@@ -539,9 +547,9 @@ public final class UnitType extends BuildableType {
      * maximum
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        for (Entry<String, UnitTypeChange> entry : typeChanges.entrySet()) {
-            if (entry.getValue().canBeTaught()) {
-                UnitType unitType = FreeCol.getSpecification().getUnitType(entry.getKey());
+        for (UnitTypeChange change : typeChanges) {
+            if (change.canBeTaught()) {
+                UnitType unitType = Specification.getSpecification().getUnitType(change.getUnitTypeId());
                 if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
                     return unitType;
                 }
@@ -556,12 +564,14 @@ public final class UnitType extends BuildableType {
      * @return a <code>int</code> value
      */
     public int getEducationTurns(UnitType unitType) {
-        UnitTypeChange upgrade = typeChanges.get(unitType.getId());
-        if (upgrade != null) {
-            return upgrade.getTurnsToLearn();
-        } else {
-            return UNDEFINED;
+        for (UnitTypeChange change : typeChanges) {
+            if (change.asResultOf(UnitTypeChange.ChangeType.EDUCATION)) {
+                if (unitType.getId().equals(change.getUnitTypeId())) {
+                    return change.getTurnsToLearn();
+                }
+            }
         }
+        return UNDEFINED;
     }
 
     public void readAttributes(XMLStreamReader in, Specification specification)
@@ -594,8 +604,7 @@ public final class UnitType extends BuildableType {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
             if ("upgrade".equals(nodeName) || "downgrade".equals(nodeName)) {
-                UnitTypeChange upgrade = new UnitTypeChange(in);
-                typeChanges.put(upgrade.getUnitTypeId(), upgrade);
+                typeChanges.add(new UnitTypeChange(in));
             } else if ("default-equipment".equals(nodeName)) {
                 String equipmentString = in.getAttributeValue(null, "id");
                 if (equipmentString != null) {

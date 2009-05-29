@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitTypeChange;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class DemotionTest extends FreeColTestCase {
@@ -248,7 +248,6 @@ public class DemotionTest extends FreeColTestCase {
         CombatModel combatModel = game.getCombatModel();
         Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
-        assertEquals(colonistType, veteranType.getUnitTypeChange(UnitTypeChange.Type.CAPTURE));
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -259,6 +258,8 @@ public class DemotionTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
+
+        assertEquals(colonistType, veteranType.getUnitTypeChange(ChangeType.CAPTURE, dutch));
 
         Unit soldier1 = new Unit(game, tile1, dutch, veteranType, UnitState.ACTIVE);
         soldier1.equipWith(muskets, true);
@@ -283,7 +284,6 @@ public class DemotionTest extends FreeColTestCase {
         CombatModel combatModel = game.getCombatModel();
         Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
-        assertEquals(damagedArtilleryType, artilleryType.getUnitTypeChange(UnitTypeChange.Type.DEMOTION));
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -294,6 +294,8 @@ public class DemotionTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
+
+        assertEquals(damagedArtilleryType, artilleryType.getUnitTypeChange(ChangeType.DEMOTION, dutch));
 
         Unit artillery = new Unit(game, tile1, dutch, artilleryType, UnitState.ACTIVE);
         Unit soldier = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
@@ -310,22 +312,24 @@ public class DemotionTest extends FreeColTestCase {
 
     public void testPromotion() throws Exception {
         
-        // UnitType promotion
-        assertEquals(indenturedServantType, pettyCriminalType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
-        assertEquals(colonistType, indenturedServantType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
-        assertEquals(veteranType, colonistType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
-        assertEquals(colonialRegularType, veteranType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
-        assertEquals(null, colonialRegularType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
-        assertEquals(null, artilleryType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
-        assertEquals(null, kingsRegularType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
-        assertEquals(null, indianConvertType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
-        
-        // Unit promotion
         Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
         Method promoteMethod = SimpleCombatModel.class.getDeclaredMethod("promote", Unit.class);
         promoteMethod.setAccessible(true);
         Player player = game.getPlayer("model.nation.dutch");
+
+        // UnitType promotion
+        assertEquals(indenturedServantType, pettyCriminalType.getUnitTypeChange(ChangeType.PROMOTION, player));
+        assertEquals(colonistType, indenturedServantType.getUnitTypeChange(ChangeType.PROMOTION, player));
+        assertEquals(veteranType, colonistType.getUnitTypeChange(ChangeType.PROMOTION, player));
+        // only independent players can own colonial regulars
+        assertEquals(null, veteranType.getUnitTypeChange(ChangeType.PROMOTION, player));
+        assertEquals(null, colonialRegularType.getUnitTypeChange(ChangeType.PROMOTION, player));
+        assertEquals(null, artilleryType.getUnitTypeChange(ChangeType.PROMOTION, player));
+        assertEquals(null, kingsRegularType.getUnitTypeChange(ChangeType.PROMOTION, player));
+        assertEquals(null, indianConvertType.getUnitTypeChange(ChangeType.PROMOTION, player));
+        
+        // Unit promotion
         Map map = getTestMap(plains);
         game.setMap(map);
         Tile tile1 = map.getTile(5, 8);
@@ -349,5 +353,9 @@ public class DemotionTest extends FreeColTestCase {
         assertTrue(colonialRegularType.isAvailableTo(player));
         promoteMethod.invoke(combatModel, unit);
         assertEquals(unit.getType(), colonialRegularType);
+
+        // only independent players can own colonial regulars
+        player.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
+        assertEquals(colonialRegularType, veteranType.getUnitTypeChange(ChangeType.PROMOTION, player));
     }
 }

@@ -42,7 +42,7 @@ import net.sf.freecol.common.model.Map.PathType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
-import net.sf.freecol.common.model.UnitTypeChange;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.util.EmptyIterator;
 import net.sf.freecol.common.util.Utils;
 
@@ -618,8 +618,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *
      */
     public static UnitType getUnitTypeTeaching(UnitType typeTeacher, UnitType typeStudent) {
-        if (typeStudent.canBeUpgraded(typeTeacher, UnitTypeChange.Type.EDUCATION)) {
-            return typeTeacher;
+        UnitType skillTaught = Specification.getSpecification().getUnitType(typeTeacher.getSkillTaught());
+        if (typeStudent.canBeUpgraded(skillTaught, ChangeType.EDUCATION)) {
+            return skillTaught;
         } else {
             return typeStudent.getEducationUnit(0);
         }
@@ -3348,7 +3349,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * UnitType to the UnitType specified for clearing.
      */
     public void clearSpeciality() {
-        UnitType newType = unitType.getUnitTypeChange(UnitTypeChange.Type.CLEAR_SKILL);
+        UnitType newType = unitType.getUnitTypeChange(ChangeType.CLEAR_SKILL, owner);
         if (newType != null) {
             setType(newType);
         }
@@ -3422,7 +3423,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     private void checkExperiencePromotion() {
         UnitType learnType = FreeCol.getSpecification().getExpertForProducing(getWorkType());
         if (learnType != null && learnType != unitType &&
-            unitType.canBeUpgraded(learnType, UnitTypeChange.Type.EXPERIENCE)) {
+            unitType.canBeUpgraded(learnType, ChangeType.EXPERIENCE)) {
             int random = getGame().getModelController().getRandom(getId() + "experience", 5000);
             if (random < Math.min(experience, 200)) {
                 logger.finest("About to change type of unit due to experience.");

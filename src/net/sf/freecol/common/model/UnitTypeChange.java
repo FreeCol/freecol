@@ -38,18 +38,18 @@ public class UnitTypeChange extends FreeColObject {
      */
     private String unitTypeId;
 
-    public static enum Type { EDUCATION, NATIVES, EXPERIENCE,
+    public static enum ChangeType { EDUCATION, NATIVES, EXPERIENCE,
             LOST_CITY, PROMOTION, CREATION, ENTER_COLONY, INDEPENDENCE,
             CLEAR_SKILL, DEMOTION, CAPTURE }
 
     protected int turnsToLearn = 0;
 
-    protected Set<Type> changeTypes = new HashSet<Type>();
+    protected Set<ChangeType> changeTypes = new HashSet<ChangeType>();
 
     /**
      * A list of Scopes limiting the applicability of this Feature.
      */
-    private List<Scope> scopes;
+    private List<Scope> scopes = new ArrayList<Scope>();
 
 
     /**
@@ -65,11 +65,30 @@ public class UnitTypeChange extends FreeColObject {
     /**
      * Describe <code>asResultOf</code> method here.
      *
-     * @param type a <code>Type</code> value
+     * @param type a <code>ChangeType</code> value
      * @return a <code>boolean</code> value
      */
-    public boolean asResultOf(Type type) {
+    public boolean asResultOf(ChangeType type) {
         return changeTypes.contains(type);
+    }
+
+    /**
+     * Describe <code>appliesTo</code> method here.
+     *
+     * @param player a <code>Player</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean appliesTo(Player player) {
+        if (scopes.isEmpty()) {
+            return true;
+        } else {
+            for (Scope scope : scopes) {
+                if (scope.appliesTo(player)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /**
@@ -91,7 +110,7 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     public boolean canBeTaught() {
-        return asResultOf(Type.EDUCATION) && turnsToLearn > 0;
+        return asResultOf(ChangeType.EDUCATION) && turnsToLearn > 0;
     }
 
     /**
@@ -116,38 +135,38 @@ public class UnitTypeChange extends FreeColObject {
         unitTypeId = in.getAttributeValue(null, "unit");
         turnsToLearn = getAttribute(in, "turnsToLearn", UnitType.UNDEFINED);
         if (getAttribute(in, "learnInSchool", false) || turnsToLearn > 0) {
-            changeTypes.add(Type.EDUCATION);
+            changeTypes.add(ChangeType.EDUCATION);
         }
         if (getAttribute(in, "learnFromNatives", false)) {
-            changeTypes.add(Type.NATIVES);
+            changeTypes.add(ChangeType.NATIVES);
         }
         if (getAttribute(in, "learnFromExperience", false)) {
-            changeTypes.add(Type.EXPERIENCE);
+            changeTypes.add(ChangeType.EXPERIENCE);
         }
         if (getAttribute(in, "learnInLostCity", false)) {
-            changeTypes.add(Type.LOST_CITY);
+            changeTypes.add(ChangeType.LOST_CITY);
         }
         if (getAttribute(in, "promotion", false)) {
-            changeTypes.add(Type.PROMOTION);
+            changeTypes.add(ChangeType.PROMOTION);
         }
         // default downgrade type
         if (getAttribute(in, "clearSkill", true)) {
-            changeTypes.add(Type.CLEAR_SKILL);
+            changeTypes.add(ChangeType.CLEAR_SKILL);
         }
         if (getAttribute(in, "demotion", false)) {
-            changeTypes.add(Type.DEMOTION);
+            changeTypes.add(ChangeType.DEMOTION);
         }
         if (getAttribute(in, "capture", false)) {
-            changeTypes.add(Type.CAPTURE);
+            changeTypes.add(ChangeType.CAPTURE);
         }
         if (getAttribute(in, "creation", false)) {
-            changeTypes.add(Type.CREATION);
+            changeTypes.add(ChangeType.CREATION);
         }
         if (getAttribute(in, "enterColony", false)) {
-            changeTypes.add(Type.ENTER_COLONY);
+            changeTypes.add(ChangeType.ENTER_COLONY);
         }
         if (getAttribute(in, "independence", false)) {
-            changeTypes.add(Type.INDEPENDENCE);
+            changeTypes.add(ChangeType.INDEPENDENCE);
         }
     }
 
@@ -155,7 +174,7 @@ public class UnitTypeChange extends FreeColObject {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
             if ("scope".equals(nodeName)) {
-                Scope scope = new Scope(in);
+                scopes.add(new Scope(in));
             }
         }
     }

@@ -48,7 +48,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitTypeChange;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 
 /**
@@ -323,7 +323,7 @@ public final class DragListener extends MouseAdapter {
         if (experience > 0 && tempUnit.getWorkType() != null) {
             UnitType workType = Specification.getSpecification()
                 .getExpertForProducing(tempUnit.getWorkType());
-            if (tempUnit.getType().canBeUpgraded(workType, UnitTypeChange.Type.EXPERIENCE)) {
+            if (tempUnit.getType().canBeUpgraded(workType, ChangeType.EXPERIENCE)) {
                 JMenuItem experienceItem = new JMenuItem(Messages.message("menuBar.experience") +
                                                          ": " + experience + "/5000");
                 experienceItem.setEnabled(false);
@@ -463,7 +463,7 @@ public final class DragListener extends MouseAdapter {
             separatorNeeded = false;
         }
 
-        if (tempUnit.getType().getUnitTypeChange(UnitTypeChange.Type.CLEAR_SKILL) != null) {
+        if (tempUnit.getType().getUnitTypeChange(ChangeType.CLEAR_SKILL, tempUnit.getOwner()) != null) {
             JMenuItem menuItem = new JMenuItem(Messages.message("clearSpeciality"));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);

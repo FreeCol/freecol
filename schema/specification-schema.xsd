@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.17 -->
+<!-- XSD for specification version 0.18 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="freecol-specification">
     <xs:complexType>
@@ -648,17 +648,26 @@
   </xs:element>
   <xs:element name="upgrade">
     <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+      </xs:sequence>
       <xs:attribute name="unit" use="required" type="xs:string"/>
       <xs:attribute name="learnFromNatives" type="xs:boolean"/>
       <xs:attribute name="learnFromExperience" type="xs:boolean"/>
       <xs:attribute name="learnInLostCity" type="xs:boolean"/>
       <xs:attribute name="learnInSchool" type="xs:boolean"/>
       <xs:attribute name="promotion" type="xs:boolean"/>
+      <xs:attribute name="creation" type="xs:boolean"/>
+      <xs:attribute name="independence" type="xs:boolean"/>
+      <xs:attribute name="enterColony" type="xs:boolean"/>
       <xs:attribute name="turnsToLearn" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="downgrade">
     <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="scope"/>
+      </xs:sequence>
       <xs:attribute name="unit" use="required" type="xs:string"/>
       <xs:attribute name="capture" type="xs:boolean"/>
       <xs:attribute name="demotion" type="xs:boolean"/>

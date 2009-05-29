@@ -348,7 +348,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             }
 
             units.add(unit);
-            // TOO: can we cheaply report the real change?
+            // TODO: can we cheaply report the real change?
             GoodsType output = getGoodsOutputType();
             if (output != null) {
                 firePropertyChange(output.getId(),

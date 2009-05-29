@@ -101,7 +101,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitTypeChange;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
@@ -2415,7 +2415,7 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         } else {
-            UnitType newUnit = unit.getType().getUnitTypeChange(UnitTypeChange.Type.CLEAR_SKILL);
+            UnitType newUnit = unit.getType().getUnitTypeChange(ChangeType.CLEAR_SKILL, unit.getOwner());
             if (newUnit == null) {
                 freeColClient.getCanvas().showInformationMessage("clearSpeciality.impossible",
                                                                  "%unit%", unit.getName());
@@ -3095,7 +3095,7 @@ public final class InGameController implements NetworkConstants {
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
-            } else if (!unit.getType().canBeUpgraded(skill, UnitTypeChange.Type.NATIVES)) {
+            } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
                 canvas.showInformationMessage("indianSettlement.cantLearnSkill",
                                               settlement,
                                               "%unit%", unit.getName(),
