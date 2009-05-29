@@ -171,7 +171,7 @@ public class DebugMenu extends JMenu {
             }
         });
         add(cvpMenu);
-        JRadioButtonMenuItem cv3 = new JRadioButtonMenuItem("Common values", gui.displayColonyValue
+        JRadioButtonMenuItem cv3 = new JRadioButtonMenuItem("Common outpost value", gui.displayColonyValue
                 && gui.displayColonyValuePlayer == null);
         cv3.setOpaque(false);
         cv3.setMnemonic(KeyEvent.VK_C);

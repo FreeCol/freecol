@@ -307,7 +307,7 @@ public class BuildColonyMission extends Mission {
             Tile tile = game.getMap().getTile(it.next());
             int newColonyValue = -1;
 
-            if (tile.getColonyValue() > 0) {
+            if (unit.getOwner().getBasicColonyValue(tile) > 0) {
                 if (tile != startTile) {
                     PathNode path;
 

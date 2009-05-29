@@ -2259,8 +2259,7 @@ public final class GUI {
         if (displayColonyValue && tile.isExplored() && tile.isLand()) {
             String valueString;
             if (displayColonyValuePlayer == null) {
-                valueString = Integer.toString(tile.getOutpostValue()) + "/" +
-                    Integer.toString(tile.getColonyValue());
+                valueString = Integer.toString(freeColClient.getGame().getCurrentPlayer().getOutpostValue(tile));
             } else {
                 valueString = Integer.toString(displayColonyValuePlayer.getColonyValue(tile));
             }

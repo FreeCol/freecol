@@ -63,13 +63,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     
     private int x, y;
 
-    //used for caching tile values, to avoid recalculating too often
-    private static final int VALUE_RADIUS = 1;
-    private int outpostValue;
-    private int colonyValue;
-    private boolean outpostValueIsValid = false;
-    private boolean colonyValueIsValid = false;
-
     /** The player that consider this tile to be their land. */
     private Player owner;
 
@@ -336,9 +329,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setTileItemContainer(TileItemContainer newTileItemContainer) {
         tileItemContainer = newTileItemContainer;
-        
-        //setting this means tile values may change!
-        invalidateTileValues();
     }
 
     /**
@@ -370,213 +360,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                 }
             }
             return result;
-        }
-    }
-
-    /**
-     * Calculates the value of an outpost-type colony at this tile.
-     * An "outpost" is supposed to be a colony containing one worker, exporting
-     * its whole production to europe. The value of such colony is the maximum
-     * amount of money it can make in one turn, assuming sale of its secondary
-     * goods plus farmed goods from one of the surrounding tiles.
-     *     
-     * @return The value of a future colony located on this tile. This value is
-     *         used by the AI when deciding where to build a new colony.
-     */
-    public int getOutpostValue() {
-        //TODO: For the moment, disable caching of outpostValue.
-        //Return value depends on player this is being called for!
-         
-        //if (outpostValueIsValid) {
-        //    return outpostValue;
-        //}
-        
-        Market market = getGame().getCurrentPlayer().getMarket();
-        if (getType().canSettle() && getSettlement() == null) {
-            boolean nearbyTileIsOcean = false;
-            float advantages = 1f;
-            int value = 0;
-            for (Tile tile : getGame().getMap().getSurroundingTiles(this, VALUE_RADIUS)) {
-                if (tile.getColony() != null) {
-                    // can't build next to colony
-                    outpostValue = 0;
-                    outpostValueIsValid = true;
-                    return outpostValue;
-                } else if (tile.getSettlement() != null) {
-                    // can build next to an indian settlement, but shouldn't
-                    SettlementType type = ((IndianNationType) tile.getSettlement().getOwner().getNationType())
-                        .getTypeOfSettlement();
-                    if (type == SettlementType.INCA_CITY || type == SettlementType.AZTEC_CITY) {
-                        // really shouldn't build next to cities
-                        advantages *= 0.25f;
-                    } else {
-                        advantages *= 0.5f;
-                    }
-                } else {
-                    if (tile.isConnected()) {
-                        nearbyTileIsOcean = true;
-                    }
-                    for (AbstractGoods production : getType().getProduction()) {
-                        GoodsType type = production.getType();
-                        int potential = market.getSalePrice(type, tile.potential(type, null));
-                        if (tile.getOwner() != null &&
-                            tile.getOwner() != getGame().getCurrentPlayer()) {
-                            // tile is already owned by someone (and not by us!)
-                            if (tile.getOwner().isEuropean()) {
-                                continue;
-                            } else {
-                                potential /= 2;
-                            }
-                        }
-                        value = Math.max(value, potential);
-                    }
-                }
-            }
-            
-            //add secondary goods being produced by a colony on this tile
-            GoodsType secondary = getType().getSecondaryGoods();
-            value += market.getSalePrice(secondary,potential(secondary, null));
-            
-            if (nearbyTileIsOcean) {
-                outpostValue = Math.max(0, (int) (value * advantages));
-                outpostValueIsValid = true;
-            }
-        } else {
-            outpostValue = 0;
-            outpostValueIsValid = true;
-        }
-        return outpostValue;
-    }
-
-    /**
-     * Calculates the value of a future colony at this tile.
-     * 
-     * @return The value of a future colony located on this tile. This value is
-     *         used by the AI when deciding where to build a new colony.
-     */
-    public int getColonyValue() {
-        if (colonyValueIsValid) {
-            return colonyValue;
-        }
-        // TODO: tune magic numbers
-        if (getType().canSettle() && getSettlement() == null) {
-            int value = potential(primaryGoods(), null) * 30;
-            float advantages = 1f;
-
-            if (hasResource()) {
-                // because production can not be improved much
-                advantages *= 0.75f;
-            }
-
-            boolean nearbyTileIsOcean = false;
-
-            TypeCountMap<GoodsType> buildingMaterialMap = new TypeCountMap<GoodsType>();
-            TypeCountMap<GoodsType> foodMap = new TypeCountMap<GoodsType>();
-            for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
-                if (type.isRawBuildingMaterial()) {
-                    buildingMaterialMap.incrementCount(type, 0);
-                } else if (type.isFoodType()) {
-                    foodMap.incrementCount(type, 0);
-                }
-            }
-
-            for (Tile tile : getGame().getMap().getSurroundingTiles(this, VALUE_RADIUS)) {
-                if (tile.getColony() != null) {
-                    // can't build next to colony
-                    colonyValue = 0;
-                    colonyValueIsValid = true;
-                    return colonyValue;
-                } else if (tile.getSettlement() != null) {
-                    // can build next to an indian settlement, but shouldn't
-                    SettlementType type = ((IndianNationType) tile.getSettlement().getOwner().getNationType())
-                        .getTypeOfSettlement();
-                    if (type == SettlementType.INCA_CITY || type == SettlementType.AZTEC_CITY) {
-                        // really shouldn't build next to cities
-                        advantages *= 0.25f;
-                    } else {
-                        advantages *= 0.5f;
-                    }
-                } else {
-                    for (AbstractGoods production : getType().getProduction()) {
-                        GoodsType type = production.getType();
-                        int potential = tile.potential(type, null);
-                        value += potential * type.getInitialSellPrice();
-                        // a few tiles with high production are better
-                        // than many tiles with low production
-                        int highProductionValue = 0;
-                        if (potential > 8) {
-                            advantages *= 1.2f;
-                            highProductionValue = 2;
-                        } else if (potential > 4) {
-                            advantages *= 1.1f;
-                            highProductionValue = 1;
-                        }
-                        if (type.isRawBuildingMaterial()) {
-                            buildingMaterialMap.incrementCount(type, highProductionValue);
-                        } else if (type.isFoodType()) {
-                            foodMap.incrementCount(type, highProductionValue);
-                        }
-                    }
-
-                    if (tile.isConnected()) {
-                        nearbyTileIsOcean = true;
-                    }
-                }
-            }
-
-            for (Integer buildingMaterial : buildingMaterialMap.values()) {
-                if (buildingMaterial == 0) {
-                    advantages *= 0.75;
-                }
-            }
-            int foodProduction = 0;
-            for (Integer food : foodMap.values()) {
-                foodProduction += food;
-            }
-            if (foodProduction < 2) {
-                advantages *= 0.5f;
-            } else if (foodProduction < 4) {
-                advantages *= 0.75f;
-            }
-            /*
-            if (!nearbyTileIsOcean) {
-                advantages *= 0.75f;
-            }
-            */
-            final PathNode n = getMap().findPathToEurope(this);
-            if (n == null) {
-                // no path to Europe, therefore it is a poor location
-                // TODO: at the moment, this means we are land-locked
-                advantages *= 0.5f;
-            } else if (n.getTotalTurns() > 3) {
-                advantages *= 0.75f;
-            }
-
-            colonyValue = Math.max(0, (int) (value * advantages));
-            colonyValueIsValid = true;
-        } else {
-            colonyValue = 0;
-            colonyValueIsValid = true;
-        }
-        return colonyValue;
-    }
-
-    /**
-     * Sets cache validity for this tile's value to false.
-     * Tile values will be recalculated by get*Value() the next time it is being called.
-     */              
-    public void setTileValueFalse() {
-        outpostValueIsValid = false;
-        colonyValueIsValid = false;
-    }
-
-    /**
-     * Sets cache validity to false for all tiles affected by a change to THIS tile.
-     */         
-    public void invalidateTileValues() {
-        setTileValueFalse();
-        for (Tile tile : getGame().getMap().getSurroundingTiles(this, VALUE_RADIUS)) {
-            tile.setTileValueFalse();
         }
     }
 
@@ -759,9 +542,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setConnected(final boolean newConnected) {
         this.connected = newConnected;
-        
-        //setting this means tile values may change!
-        invalidateTileValues();
     }
 
     /**
@@ -892,10 +672,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setOwner(Player owner) {
         this.owner = owner;
-        
-        //setting this means tile values may change!
-        invalidateTileValues();
-        
+
         updatePlayerExploredTiles();
     }
 
@@ -1020,9 +797,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         settlement = s;
         owningSettlement = s;
         
-        //setting this means tile values may change!
-        invalidateTileValues();
-        
         updatePlayerExploredTiles();
     }
 
@@ -1093,9 +867,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         Resource resource = new Resource(getGame(), this, r);
         tileItemContainer.addTileItem(resource);
         
-        //setting this means tile values may change!
-        invalidateTileValues();
-        
         updatePlayerExploredTiles();
     }
     
@@ -1115,9 +886,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         if (!isLand()) {
             settlement = null;
         }
-        
-        //setting this means tile values may change!
-        invalidateTileValues();
         
         updatePlayerExploredTiles();
     }
