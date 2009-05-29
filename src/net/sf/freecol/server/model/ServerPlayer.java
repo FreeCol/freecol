@@ -44,7 +44,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.UnitType.DowngradeType;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.option.BooleanOption;
@@ -201,8 +201,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
                     for (int index = 0; index < limit; index++) {
                         Unit unit = veterans.get(index);
                         if (unit == null) break;
-                        // TODO: use a new upgrade type?
-                        unit.setType(unit.getType().getPromotion());
+                        unit.setType(unit.getType().getUnitTypeChange(UnitTypeChange.Type.INDEPENDENCE));
                         result.add(unit);
                     }
                     result.add(new ModelMessage(this, ModelMessage.MessageType.UNIT_IMPROVED,
@@ -248,7 +247,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
             if (u.getType().hasAbility("model.ability.refUnit")) {
                 // Make sure the independent player does not end up owning
                 // any Kings Regulars!
-                UnitType downgrade = u.getType().getDowngrade(DowngradeType.CAPTURE);
+                UnitType downgrade = u.getType().getUnitTypeChange(UnitTypeChange.Type.CAPTURE);
                 if (downgrade != null) u.setType(downgrade);
             }
             u.setOwner(this);

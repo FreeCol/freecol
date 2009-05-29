@@ -38,11 +38,6 @@ public final class UnitType extends BuildableType {
     public static final int DEFAULT_OFFENCE = 0;
     public static final int DEFAULT_DEFENCE = 1;
 
-    public static enum UpgradeType { EDUCATION, NATIVES, EXPERIENCE,
-            LOST_CITY, PROMOTION }
-
-    public static enum DowngradeType { CLEAR_SKILL, DEMOTION, CAPTURE }
-
     /**
      * Describe offence here.
      */
@@ -126,13 +121,8 @@ public final class UnitType extends BuildableType {
     /**
      * Describe education here.
      */
-    private HashMap<String, Upgrade> upgrades = new HashMap<String, Upgrade>();
+    private HashMap<String, UnitTypeChange> typeChanges = new HashMap<String, UnitTypeChange>();
     
-    /**
-     * Describe education here.
-     */
-    private HashMap<String, Downgrade> downgrades = new HashMap<String, Downgrade>();
-
 
     
     /**
@@ -493,26 +483,16 @@ public final class UnitType extends BuildableType {
         return true;
     }
 
-    public UnitType getPromotion() {
-        for (Entry<String, Upgrade> entry : upgrades.entrySet()) {
-            if (entry.getValue().asResultOf.get(UpgradeType.PROMOTION)) {
-                return FreeCol.getSpecification().getUnitType(entry.getKey());
-            }
-        }
-        return null;
-    }
-
     /**
-     * Describe <code>getDowngrade</code> method here.
+     * Describe <code>getUnitTypeChange</code> method here.
      *
+     * @param type an <code>UnitTypeChange.Type</code> value
      * @return an <code>UnitType</code> value
      */
-    public UnitType getDowngrade(DowngradeType downgradeType) {
-        Iterator<Entry<String, Downgrade>> iterator = downgrades.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Entry<String, Downgrade> pair = iterator.next();
-            if (pair.getValue().asResultOf.get(downgradeType)) {
-                return FreeCol.getSpecification().getUnitType(pair.getKey());
+    public UnitType getUnitTypeChange(UnitTypeChange.Type type) {
+        for (Entry<String, UnitTypeChange> entry : typeChanges.entrySet()) {
+            if (entry.getValue().asResultOf(type)) {
+                return FreeCol.getSpecification().getUnitType(entry.getKey());
             }
         }
         return null;
@@ -525,12 +505,12 @@ public final class UnitType extends BuildableType {
      * the given means of education.
      *
      * @param newType the UnitType to learn
-     * @param educationType an <code>UpgradeType</code> value
+     * @param educationType an <code>UnitTypeChange.Type</code> value
      * @return <code>true</code> if can learn the given UnitType
      */
-    public boolean canBeUpgraded(UnitType newType, UpgradeType educationType) {
-        Upgrade upgrade = upgrades.get(newType.getSkillTaught());
-        return upgrade != null && upgrade.asResultOf.get(educationType);
+    public boolean canBeUpgraded(UnitType newType, UnitTypeChange.Type educationType) {
+        UnitTypeChange upgrade = typeChanges.get(newType.getSkillTaught());
+        return upgrade != null && upgrade.asResultOf(educationType);
     }
 
     /**
@@ -540,11 +520,11 @@ public final class UnitType extends BuildableType {
      * maximum
      */
     public List<UnitType> getUnitTypesLearntInLostCity() {
-        Iterator<Entry<String, Upgrade>> iterator = upgrades.entrySet().iterator();
+        Iterator<Entry<String, UnitTypeChange>> iterator = typeChanges.entrySet().iterator();
         ArrayList<UnitType> unitTypes = new ArrayList<UnitType>();
         while (iterator.hasNext()) {
-            Entry<String, Upgrade> pair = iterator.next();
-            if (pair.getValue().asResultOf.get(UpgradeType.LOST_CITY)) {
+            Entry<String, UnitTypeChange> pair = iterator.next();
+            if (pair.getValue().asResultOf(UnitTypeChange.Type.LOST_CITY)) {
                 unitTypes.add(FreeCol.getSpecification().getUnitType(pair.getKey()));
             }
         }
@@ -559,7 +539,7 @@ public final class UnitType extends BuildableType {
      * maximum
      */
     public UnitType getEducationUnit(int maximumSkill) {
-        for (Entry<String, Upgrade> entry : upgrades.entrySet()) {
+        for (Entry<String, UnitTypeChange> entry : typeChanges.entrySet()) {
             if (entry.getValue().canBeTaught()) {
                 UnitType unitType = FreeCol.getSpecification().getUnitType(entry.getKey());
                 if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
@@ -576,9 +556,9 @@ public final class UnitType extends BuildableType {
      * @return a <code>int</code> value
      */
     public int getEducationTurns(UnitType unitType) {
-        Upgrade upgrade = upgrades.get(unitType.getId());
+        UnitTypeChange upgrade = typeChanges.get(unitType.getId());
         if (upgrade != null) {
-            return upgrade.turnsToLearn;
+            return upgrade.getTurnsToLearn();
         } else {
             return UNDEFINED;
         }
@@ -613,25 +593,9 @@ public final class UnitType extends BuildableType {
     public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
-            if ("upgrade".equals(nodeName)) {
-                Upgrade upgrade = new Upgrade();
-                String educationUnit = in.getAttributeValue(null, "unit");
-                upgrade.turnsToLearn = getAttribute(in, "turnsToLearn", UNDEFINED);
-                upgrade.asResultOf.put(UpgradeType.EDUCATION, getAttribute(in, "learnInSchool", true));
-                upgrade.asResultOf.put(UpgradeType.NATIVES, getAttribute(in, "learnFromNatives", false));
-                upgrade.asResultOf.put(UpgradeType.EXPERIENCE, getAttribute(in, "learnFromExperience", false));
-                upgrade.asResultOf.put(UpgradeType.LOST_CITY, getAttribute(in, "learnInLostCity", false));
-                upgrade.asResultOf.put(UpgradeType.PROMOTION, getAttribute(in, "promotion", false));
-                upgrades.put(educationUnit, upgrade);
-                in.nextTag(); // close this element
-            } else if ("downgrade".equals(nodeName)) {
-                Downgrade downgrade = new Downgrade();
-                String educationUnit = in.getAttributeValue(null, "unit");
-                downgrade.asResultOf.put(DowngradeType.CLEAR_SKILL, getAttribute(in, "clearSkill", true));
-                downgrade.asResultOf.put(DowngradeType.DEMOTION, getAttribute(in, "demotion", false));
-                downgrade.asResultOf.put(DowngradeType.CAPTURE, getAttribute(in, "capture", false));
-                downgrades.put(educationUnit, downgrade);
-                in.nextTag(); // close this element
+            if ("upgrade".equals(nodeName) || "downgrade".equals(nodeName)) {
+                UnitTypeChange upgrade = new UnitTypeChange(in);
+                typeChanges.put(upgrade.getUnitTypeId(), upgrade);
             } else if ("default-equipment".equals(nodeName)) {
                 String equipmentString = in.getAttributeValue(null, "id");
                 if (equipmentString != null) {
@@ -686,18 +650,4 @@ public final class UnitType extends BuildableType {
 
 
     
-    private class Upgrade {
-        protected int turnsToLearn;
-        protected EnumMap<UpgradeType, Boolean> asResultOf = 
-            new EnumMap<UpgradeType, Boolean>(UpgradeType.class);
-        
-        public boolean canBeTaught() {
-            return asResultOf.get(UpgradeType.EDUCATION) && turnsToLearn > 0;
-        }
-    }
-
-    private class Downgrade {
-        protected EnumMap<DowngradeType, Boolean> asResultOf = 
-            new EnumMap<DowngradeType, Boolean>(DowngradeType.class);
-    }
 }

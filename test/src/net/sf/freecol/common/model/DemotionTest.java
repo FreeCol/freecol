@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitType.DowngradeType;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class DemotionTest extends FreeColTestCase {
@@ -248,7 +248,7 @@ public class DemotionTest extends FreeColTestCase {
         CombatModel combatModel = game.getCombatModel();
         Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
-        assertEquals(colonistType, veteranType.getDowngrade(DowngradeType.CAPTURE));
+        assertEquals(colonistType, veteranType.getUnitTypeChange(UnitTypeChange.Type.CAPTURE));
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -283,7 +283,7 @@ public class DemotionTest extends FreeColTestCase {
         CombatModel combatModel = game.getCombatModel();
         Method method = SimpleCombatModel.class.getDeclaredMethod("loseCombat", Unit.class, Unit.class);
         method.setAccessible(true);
-        assertEquals(damagedArtilleryType, artilleryType.getDowngrade(DowngradeType.DEMOTION));
+        assertEquals(damagedArtilleryType, artilleryType.getUnitTypeChange(UnitTypeChange.Type.DEMOTION));
         Player dutch = game.getPlayer("model.nation.dutch");
         Player french = game.getPlayer("model.nation.french");
         Map map = getTestMap(plains);
@@ -311,14 +311,14 @@ public class DemotionTest extends FreeColTestCase {
     public void testPromotion() throws Exception {
         
         // UnitType promotion
-        assertEquals(indenturedServantType, pettyCriminalType.getPromotion());
-        assertEquals(colonistType, indenturedServantType.getPromotion());
-        assertEquals(veteranType, colonistType.getPromotion());
-        assertEquals(colonialRegularType, veteranType.getPromotion());
-        assertEquals(null, colonialRegularType.getPromotion());
-        assertEquals(null, artilleryType.getPromotion());
-        assertEquals(null, kingsRegularType.getPromotion());
-        assertEquals(null, indianConvertType.getPromotion());
+        assertEquals(indenturedServantType, pettyCriminalType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
+        assertEquals(colonistType, indenturedServantType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
+        assertEquals(veteranType, colonistType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
+        assertEquals(colonialRegularType, veteranType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
+        assertEquals(null, colonialRegularType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
+        assertEquals(null, artilleryType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
+        assertEquals(null, kingsRegularType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
+        assertEquals(null, indianConvertType.getUnitTypeChange(UnitTypeChange.Type.PROMOTION));
         
         // Unit promotion
         Game game = getStandardGame();

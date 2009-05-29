@@ -33,7 +33,7 @@ import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitType.DowngradeType;
+import net.sf.freecol.common.model.UnitTypeChange;
 
 /**
  * This class implements the original Colonization combat model.
@@ -711,7 +711,7 @@ public class SimpleCombatModel implements CombatModel {
             for (Unit capturedUnit : colony.getUnitList()) {
                 enemy.divertModelMessages(capturedUnit, enemy);
                 if (!capturedUnit.getType().isAvailableTo(myPlayer)) {
-                    UnitType downgrade = capturedUnit.getType().getDowngrade(DowngradeType.CAPTURE);
+                    UnitType downgrade = capturedUnit.getType().getUnitTypeChange(UnitTypeChange.Type.CAPTURE);
                     if (downgrade != null && downgrade.isAvailableTo(myPlayer)) {
                         capturedUnit.setType(downgrade);
                     } else {
@@ -732,7 +732,7 @@ public class SimpleCombatModel implements CombatModel {
                 if (attacker.isUndead()) {
                     capturedUnit.setType(attacker.getType());
                 } else {
-                    UnitType downgrade = capturedUnit.getType().getDowngrade(DowngradeType.CAPTURE);
+                    UnitType downgrade = capturedUnit.getType().getUnitTypeChange(UnitTypeChange.Type.CAPTURE);
                     if (downgrade != null) {
                         capturedUnit.setType(downgrade);
                     }
@@ -1176,7 +1176,7 @@ public class SimpleCombatModel implements CombatModel {
             slaughterUnit(unit, enemyUnit);
         } else if ((typeToLose = findEquipmentTypeToLose(unit)) != null) {
             disarmUnit(unit, typeToLose, enemyUnit);
-        } else if ((downgrade = unit.getType().getDowngrade(DowngradeType.DEMOTION))
+        } else if ((downgrade = unit.getType().getUnitTypeChange(UnitTypeChange.Type.DEMOTION))
                    != null) {
             demoteUnit(unit, downgrade, enemyUnit);
         } else if (unit.hasAbility("model.ability.canBeCaptured")
@@ -1217,7 +1217,7 @@ public class SimpleCombatModel implements CombatModel {
         if (enemyUnit.isUndead()) {
             unit.setType(enemyUnit.getType());
         } else {
-            UnitType downgrade = unit.getType().getDowngrade(DowngradeType.CAPTURE);
+            UnitType downgrade = unit.getType().getUnitTypeChange(UnitTypeChange.Type.CAPTURE);
             if (downgrade != null) unit.setType(downgrade);
         }
         enemyUnit.addModelMessage(enemyUnit,
@@ -1387,7 +1387,7 @@ public class SimpleCombatModel implements CombatModel {
     private void promote(Unit unit) {
         String oldName = unit.getName();
         String nation = unit.getOwner().getNationAsString();
-        UnitType newType = unit.getType().getPromotion();
+        UnitType newType = unit.getType().getUnitTypeChange(UnitTypeChange.Type.PROMOTION);
         
         if (newType != null && newType.isAvailableTo(unit.getOwner())) {
             unit.setType(newType);

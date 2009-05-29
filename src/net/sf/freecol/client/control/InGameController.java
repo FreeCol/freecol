@@ -38,7 +38,6 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.control.InGameInputHandler;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
@@ -53,7 +52,6 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
 import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
@@ -103,6 +101,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
@@ -2416,7 +2415,7 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         } else {
-            UnitType newUnit = unit.getType().getDowngrade(UnitType.DowngradeType.CLEAR_SKILL);
+            UnitType newUnit = unit.getType().getUnitTypeChange(UnitTypeChange.Type.CLEAR_SKILL);
             if (newUnit == null) {
                 freeColClient.getCanvas().showInformationMessage("clearSpeciality.impossible",
                                                                  "%unit%", unit.getName());
@@ -3096,7 +3095,7 @@ public final class InGameController implements NetworkConstants {
 
             if (skillName == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
-            } else if (!unit.getType().canBeUpgraded(skill, UnitType.UpgradeType.NATIVES)) {
+            } else if (!unit.getType().canBeUpgraded(skill, UnitTypeChange.Type.NATIVES)) {
                 canvas.showInformationMessage("indianSettlement.cantLearnSkill",
                                               settlement,
                                               "%unit%", unit.getName(),
