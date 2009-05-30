@@ -72,4 +72,57 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
     }
 
+    public void testCreation() {
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        UnitType gardener = new UnitType(1234);
+        UnitType farmer = Specification.getSpecification().getUnitType("model.unit.expertFarmer");
+
+        UnitTypeChange.ChangeType creation = UnitTypeChange.ChangeType.CREATION;
+        UnitTypeChange change = new UnitTypeChange();
+        change.setUnitTypeId(farmer.getId());
+        change.getChangeTypes().add(creation);
+
+        gardener.getTypeChanges().add(change);
+
+        assertTrue(gardener.canBeUpgraded(farmer, creation));
+        assertTrue(change.appliesTo(dutch));
+        assertEquals(farmer, gardener.getUnitTypeChange(creation, dutch));
+
+        Unit gardenerUnit = new Unit(game, dutch, gardener);
+        assertEquals(farmer, gardenerUnit.getType());
+
+    }
+
+    public void testEnterColony() {
+
+        Game game = getStandardGame();
+    	game.setMap(getTestMap(plainsType, true));
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Colony colony = getStandardColony();
+
+        UnitType gardener = new UnitType(1234);
+        UnitType farmer = Specification.getSpecification().getUnitType("model.unit.expertFarmer");
+
+        UnitTypeChange.ChangeType enterColony = UnitTypeChange.ChangeType.ENTER_COLONY;
+        UnitTypeChange change = new UnitTypeChange();
+        change.setUnitTypeId(farmer.getId());
+        change.getChangeTypes().add(enterColony);
+
+        gardener.getTypeChanges().add(change);
+
+        assertTrue(gardener.canBeUpgraded(farmer, enterColony));
+        assertTrue(change.appliesTo(dutch));
+        assertEquals(farmer, gardener.getUnitTypeChange(enterColony, dutch));
+
+        Unit gardenerUnit = new Unit(game, dutch, gardener);
+        assertEquals(gardener, gardenerUnit.getType());
+
+        gardenerUnit.setLocation(colony.getVacantWorkLocationFor(gardenerUnit));
+        assertEquals(farmer, gardenerUnit.getType());
+
+    }
+
 }

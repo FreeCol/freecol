@@ -187,6 +187,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
 
         // Continental army muster
+        // TODO: extend this to cover any UnitType that may have a
+        // ChangeType.INDEPENDENCE upgrade
         for (Colony colony : getColonies()) {
             int sol = colony.getSoL();
             if (sol > 50) {

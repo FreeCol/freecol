@@ -250,8 +250,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             goodsContainer = new GoodsContainer(game, this);
         }
 
+        UnitType newType = type.getUnitTypeChange(ChangeType.CREATION, owner);
+        if (newType == null) {
+            unitType = type;
+        } else {
+            unitType = newType;
+        }
         this.owner = owner;
-        unitType = type;
         naval = unitType.hasAbility("model.ability.navalUnit");
         setLocation(location);
 
@@ -1839,18 +1844,30 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     // this should always be the case, except possibly for unit tests
                     int newPopulation = oldColony.getUnitCount();
                     oldColony.updatePopulation(-1);
-                    if (getState()!=UnitState.ACTIVE) {
-                        logger.warning("Removing unit "+getId()+" with state=="+getState()+" (should not be IN_COLONY) from WorkLocation in "+oldLocation.getColony().getName()+". Fixing: ");
+                    if (getState() != UnitState.ACTIVE) {
+                        logger.warning("Removing unit " + getId() + " with state==" + getState() 
+                                       + " (should not be IN_COLONY) from WorkLocation in "
+                                       + oldLocation.getColony().getName() + ". Fixing: ");
                         setState(UnitState.ACTIVE);
                     }
                 }
             }
         } else if (newLocation instanceof WorkLocation) {
-            getOwner().modifyScore(getType().getScoreValue());
+            // entering colony
+            UnitType newType = unitType.getUnitTypeChange(ChangeType.ENTER_COLONY, owner);
+            if (newType == null) {
+                getOwner().modifyScore(getType().getScoreValue());
+            } else {
+                getOwner().modifyScore(-getType().getScoreValue());
+                setType(newType);
+                getOwner().modifyScore(getType().getScoreValue() * 2);
+            }
             int oldPopulation = newLocation.getColony().getUnitCount();
             newLocation.getColony().updatePopulation(1);
-            if (getState()!=UnitState.IN_COLONY) {
-                logger.warning("Adding unit "+getId()+" with state=="+getState()+" (should be IN_COLONY) to WorkLocation in "+newLocation.getColony().getName()+". Fixing: ");
+            if (getState() != UnitState.IN_COLONY) {
+                logger.warning("Adding unit " + getId() + " with state==" + getState()
+                               + " (should be IN_COLONY) to WorkLocation in "
+                               + newLocation.getColony().getName() + ". Fixing: ");
                 setState(UnitState.IN_COLONY);
             }
         }
