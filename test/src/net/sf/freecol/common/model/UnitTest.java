@@ -65,6 +65,7 @@ public class UnitTest extends FreeColTestCase {
     GoodsType foodType = spec().getGoodsType("model.goods.food");
     GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
 
+    BuildingType schoolHouseType = spec().getBuildingType("model.building.Schoolhouse");
     /**
      * Test Plowing with a hardy pioneer
      * 
@@ -905,4 +906,25 @@ public class UnitTest extends FreeColTestCase {
         assertFalse("Unit was not cleared of its specialty", unit.getType() == hardyPioneerType);
     }
 
+    public void testInvalidSpecialtyClearing(){
+        Game game = getStandardGame();
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        
+        Colony colony = getStandardColony();
+        
+        Building school = new Building(game, colony, schoolHouseType);
+        colony.addBuilding(school);
+        
+        Unit unit = new Unit(game, school, colony.getOwner(), hardyPioneerType, UnitState.ACTIVE);
+        
+        assertTrue("Unit should be a hardy pioneer",unit.getType() == hardyPioneerType);
+                
+        try{
+            unit.clearSpeciality();
+            fail("Unit specialty cannot be cleared, a IllegalStateException should have been raised");
+        }
+        catch(IllegalStateException e){   
+        }
+    }
 }

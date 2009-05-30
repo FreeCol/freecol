@@ -463,11 +463,16 @@ public final class DragListener extends MouseAdapter {
             separatorNeeded = false;
         }
 
-        if (tempUnit.getType().getUnitTypeChange(ChangeType.CLEAR_SKILL, tempUnit.getOwner()) != null) {
+        UnitType newUnitType = tempUnit.getType().getUnitTypeChange(ChangeType.CLEAR_SKILL, tempUnit.getOwner());
+        if (newUnitType != null) {
             JMenuItem menuItem = new JMenuItem(Messages.message("clearSpeciality"));
             menuItem.setActionCommand(UnitAction.CLEAR_SPECIALITY.toString());
             menuItem.addActionListener(unitLabel);
             menu.add(menuItem);
+            if(tempUnit.getLocation() instanceof Building &&
+               !((Building)tempUnit.getLocation()).canAdd(newUnitType)){
+                    menuItem.setEnabled(false);
+            }
             separatorNeeded = true;
         }
         return separatorNeeded;
