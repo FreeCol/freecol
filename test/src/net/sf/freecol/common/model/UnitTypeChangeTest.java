@@ -1,0 +1,75 @@
+/**
+ *  Copyright (C) 2002-2007  The FreeCol Team
+ *
+ *  This file is part of FreeCol.
+ *
+ *  FreeCol is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  FreeCol is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package net.sf.freecol.common.model;
+
+import net.sf.freecol.common.Specification;
+import net.sf.freecol.util.test.FreeColTestCase;
+
+public class UnitTypeChangeTest extends FreeColTestCase {
+
+
+    public void testEmptyScope() {
+    	
+        UnitTypeChange change = new UnitTypeChange();
+
+        assertTrue(change.getScopes().isEmpty());
+
+        // empty scope applies to all players
+        for (Player player : getStandardGame().getPlayers()) {
+            assertTrue(change.appliesTo(player));
+        }
+
+    }
+
+    public void testAbilityScope() {
+
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player inca = game.getPlayer("model.nation.inca");
+
+        UnitType gardener = new UnitType(1234);
+        UnitType farmer = Specification.getSpecification().getUnitType("model.unit.expertFarmer");
+
+        Scope scope = new Scope();
+        scope.setAbilityID("model.ability.native");
+
+        UnitTypeChange.ChangeType education = UnitTypeChange.ChangeType.EDUCATION;
+        UnitTypeChange change = new UnitTypeChange();
+        change.setUnitTypeId(farmer.getId());
+        change.getChangeTypes().add(education);
+        change.getScopes().add(scope);
+
+        gardener.getTypeChanges().add(change);
+
+        assertTrue(gardener.canBeUpgraded(farmer, education));
+        assertEquals(null, gardener.getUnitTypeChange(education, dutch));
+        assertEquals(farmer, gardener.getUnitTypeChange(education, inca));
+        assertFalse(change.appliesTo(dutch));
+        assertTrue(change.appliesTo(inca));
+
+        scope.setMatchNegated(true);
+        assertTrue(change.appliesTo(dutch));
+        assertFalse(change.appliesTo(inca));
+        assertEquals(farmer, gardener.getUnitTypeChange(education, dutch));
+        assertEquals(null, gardener.getUnitTypeChange(education, inca));
+
+    }
+
+}

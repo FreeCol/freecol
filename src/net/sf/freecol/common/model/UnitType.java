@@ -430,6 +430,10 @@ public final class UnitType extends BuildableType {
         }
     }
 
+    List<UnitTypeChange> getTypeChanges() {
+        return typeChanges;
+    }
+
     /**
      * Get the <code>PathImage</code> value.
      *

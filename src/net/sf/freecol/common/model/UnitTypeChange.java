@@ -52,6 +52,10 @@ public class UnitTypeChange extends FreeColObject {
     private List<Scope> scopes = new ArrayList<Scope>();
 
 
+    public UnitTypeChange() {
+        // empty constructor
+    }
+
     /**
      * Creates a new <code>UnitTypeChange</code> instance.
      *
@@ -60,6 +64,14 @@ public class UnitTypeChange extends FreeColObject {
      */
     public UnitTypeChange(XMLStreamReader in) throws XMLStreamException {
         readFromXMLImpl(in);
+    }
+
+    public List<Scope> getScopes() {
+        return scopes;
+    }
+
+    public Set<ChangeType> getChangeTypes() {
+        return changeTypes;
     }
 
     /**
