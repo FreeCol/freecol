@@ -1032,15 +1032,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                     }
 
                     oldParent.remove(comp);
+                    initialize();
+                    return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this ColonistsPanel.");
                     return null;
                 }
+            } else {
+                ((UnitLabel) comp).setSmall(false);
+                Component c = add(comp);
+                return c;
             }
-
-            ((UnitLabel) comp).setSmall(false);
-            Component c = add(comp);
-            return c;
         }
 
         public void propertyChange(PropertyChangeEvent event) {
