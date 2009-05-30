@@ -233,12 +233,7 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                 if (carrier.canAdd(unit)) {
                     ((UnitLabel) comp).setSmall(false);
                     if (getController().boardShip(unit, carrier)) {
-                        if (oldParent != null) {
-                            oldParent.remove(comp);
-                            oldParent.repaint();
-                        }
-                        add(comp);
-                        updateTitle();
+                        initialize();
                         return comp;
                     }
                 }
@@ -256,14 +251,6 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                 goods.setAmount(goods.getAmount() - loadableAmount);
                 getController().loadCargo(goodsToAdd, carrier);
                 initialize();
-                Container oldParent = comp.getParent();
-                if (oldParent instanceof ColonyPanel.WarehousePanel) {
-                    //((ColonyPanel.WarehousePanel) oldParent).initialize();
-                } else {
-                    if (oldParent != null){
-                        oldParent.remove(comp);
-                    }
-                }
                 return comp;
             } else if (comp instanceof MarketLabel) {
                 MarketLabel label = (MarketLabel) comp;
@@ -272,7 +259,6 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
                     getController().buyGoods(label.getType(), label.getAmount(), carrier);
                     getController().nextModelMessage();
                     initialize();
-                    updateTitle();
                     return comp;
                 } else {
                     getController().payArrears(label.getType());
@@ -294,13 +280,11 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
         if (comp instanceof UnitLabel) {
             Unit unit = ((UnitLabel) comp).getUnit();
             getController().leaveShip(unit);
-            updateTitle();
-            super.remove(comp);
+            initialize();
         } else if (comp instanceof GoodsLabel) {
             Goods g = ((GoodsLabel) comp).getGoods();
             getController().unloadCargo(g);
-            updateTitle();
-            super.remove(comp);
+            initialize();
         }
     }
 
