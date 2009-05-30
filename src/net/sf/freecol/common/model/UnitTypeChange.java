@@ -161,8 +161,7 @@ public class UnitTypeChange extends FreeColObject {
         if (getAttribute(in, "promotion", false)) {
             changeTypes.add(ChangeType.PROMOTION);
         }
-        // default downgrade type
-        if (getAttribute(in, "clearSkill", true)) {
+        if (getAttribute(in, "clearSkill", false)) {
             changeTypes.add(ChangeType.CLEAR_SKILL);
         }
         if (getAttribute(in, "demotion", false)) {

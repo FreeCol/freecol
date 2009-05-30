@@ -607,8 +607,15 @@ public final class UnitType extends BuildableType {
     public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
-            if ("upgrade".equals(nodeName) || "downgrade".equals(nodeName)) {
+            if ("upgrade".equals(nodeName)) {
                 typeChanges.add(new UnitTypeChange(in));
+            } else if ("downgrade".equals(nodeName)) {
+                UnitTypeChange change = new UnitTypeChange(in);
+                if (change.getChangeTypes().isEmpty()) {
+                    // add default downgrade type
+                    change.getChangeTypes().add(ChangeType.CLEAR_SKILL);
+                }
+                typeChanges.add(change);
             } else if ("default-equipment".equals(nodeName)) {
                 String equipmentString = in.getAttributeValue(null, "id");
                 if (equipmentString != null) {

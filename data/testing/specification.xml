@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.18 -->
+<!-- specification version 0.19 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -829,7 +829,7 @@
                movement="3" lineOfSight="1" price="2000"
                skill="2" recruitProbability="1" scoreValue="5" pathImage="foot">
       <default-equipment id="model.equipment.muskets"/>
-      <downgrade unit="model.unit.freeColonist" capture="true"/>
+      <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
       <ability id="model.ability.mercenaryUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
@@ -842,7 +842,7 @@
     <unit-type id="model.unit.jesuitMissionary" offence="0"  defence="1" movement="3" lineOfSight="1" price="1400" 
                skill="3" recruitProbability="1" scoreValue="5" pathImage="foot">
       <default-equipment id="model.equipment.missionary"/>
-      <downgrade unit="model.unit.freeColonist" capture="true"/>
+      <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -924,7 +924,7 @@
     <unit-type id="model.unit.colonialRegular" movement="3" lineOfSight="1"
                offence="0" defence="1"
                pathImage="foot" skillTaught="model.unit.veteranSoldier" skill="4">
-      <downgrade unit="model.unit.freeColonist" capture="true"/>
+      <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
       <ability id="model.ability.canBeCaptured" value="true"/>
@@ -936,7 +936,7 @@
     </unit-type>
     <unit-type id="model.unit.kingsRegular" movement="3" lineOfSight="1" skill="4"
                offence="0" defence="1">
-      <downgrade unit="model.unit.freeColonist" capture="true"/>
+      <downgrade unit="model.unit.freeColonist" capture="true" clearSkill="true"/>
       <ability id="model.ability.refUnit" value="true"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
