@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
@@ -939,13 +940,11 @@ public class TransportMission extends Mission {
                     if (au.getTransportDestination() != null
                             && au.getTransportDestination().getTile() == carrier.getTile()
                             && carrier.getState() != UnitState.TO_EUROPE && carrier.getState() != UnitState.TO_AMERICA) {
-                        if (u.getLocation() instanceof Europe || u.getColony() != null) {
-                            Element leaveShipElement = Message.createNewRootElement("leaveShip");
-                            leaveShipElement.setAttribute("unit", u.getId());
+                        if (carrier.getLocation() instanceof Europe || u.getColony() != null) {
                             try {
-                                connection.sendAndWait(leaveShipElement);
+                                connection.sendAndWait(new DisembarkMessage(u).toXMLElement());
                             } catch (IOException e) {
-                                logger.warning("Could not send \"leaveShipElement\"-message!");
+                                logger.warning("Could not send \"disembark\"-message!");
                             }
                         }
                         mission.doMission(connection);

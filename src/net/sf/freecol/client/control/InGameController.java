@@ -113,6 +113,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.Message;
@@ -1828,7 +1829,7 @@ public final class InGameController implements NetworkConstants {
 
         Client client = freeColClient.getClient();
 
-        if (unit.canCashInTreasureTrain()) {
+        if (unit.canCarryTreasure() && unit.canCashInTreasureTrain()) {
             boolean cash;
             if (unit.getOwner().getEurope() == null) {
                 canvas.showInformationMessage("cashInTreasureTrain.text.independence",
@@ -2450,13 +2451,14 @@ public final class InGameController implements NetworkConstants {
         }
 
         Client client = freeColClient.getClient();
-
-        unit.leaveShip();
-
-        Element leaveShipElement = Message.createNewRootElement("leaveShip");
-        leaveShipElement.setAttribute("unit", unit.getId());
-
-        client.sendAndWait(leaveShipElement);
+        DisembarkMessage message = new DisembarkMessage(unit);
+        Element reply = askExpecting(client, message.toXMLElement(), "update");
+        if (reply != null) {
+            freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
+            if (checkCashInTreasureTrain(unit)) {
+                nextActiveUnit();
+            }
+        }
     }
 
     /**

@@ -1487,31 +1487,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Leave the ship. This method should only be invoked if the ship is in a
-     * harbour.
-     * 
-     * @exception IllegalStateException If not in harbour.
-     * @exception ClassCastException If not this unit is located on a ship.
-     */
-    public void leaveShip() {
-        Unit carrier = (Unit) getLocation();
-        Location l = carrier.getLocation();
-
-        if (carrier.isInEurope()) {
-            setLocation(l);
-        } else if (getTile().getSettlement() != null) {
-            setLocation(getTile());
-            if (canCarryTreasure() && canCashInTreasureTrain()) {
-                cashInTreasureTrain();
-            }
-        } else {
-            throw new IllegalStateException("A unit may only leave a ship while in a harbour.");
-        }
-
-        setState(UnitState.ACTIVE);
-    }
-    
-    /**
      * Verifies if the unit is aboard a carrier
      */
     public boolean isOnCarrier(){

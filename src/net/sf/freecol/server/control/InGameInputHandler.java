@@ -79,6 +79,7 @@ import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
+import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
@@ -203,10 +204,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return armedUnitDemandTribute(connection, element);
             }
         });
-        register("leaveShip", new CurrentPlayerNetworkRequestHandler() {
+        register(DisembarkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return leaveShip(connection, element);
+                return new DisembarkMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("loadCargo", new CurrentPlayerNetworkRequestHandler() {
@@ -1844,26 +1845,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             enemy.modifyTension(player, 250);
         }
         // else: no need to do anything: unit's moves are already zero.
-        return null;
-    }
-
-    /**
-     * Handles a "leaveShip"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param leaveShipElement The element containing the request.
-     */
-    private Element leaveShip(Connection connection, Element leaveShipElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(leaveShipElement.getAttribute("unit"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        unit.leaveShip();
-        Tile newTile = unit.getTile();
-        if (newTile != null) {
-            sendUpdatedTileToAll(newTile, player);
-        }
         return null;
     }
 
