@@ -107,6 +107,7 @@ import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
+import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -895,13 +896,13 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been
         // moved into a coastal colony:
-        if (unit.canCarryTreasure() && checkCashInTreasureTrain(unit)) {
+        if (checkCashInTreasureTrain(unit)) {
             unit = null;
         }
 
         if (unit != null && unit.getMovesLeft() > 0 && unit.getTile() != null) {
             freeColClient.getGUI().setActiveUnit(unit);
-        } else if (freeColClient.getGUI().getActiveUnit() == unit) {
+        } else if (unit == null || freeColClient.getGUI().getActiveUnit() == unit) {
             nextActiveUnit();
         }
         return;
@@ -1261,11 +1262,8 @@ public final class InGameController implements NetworkConstants {
 
         // Display a "cash in"-dialog if a treasure train have been moved into a
         // colony:
-        if (unit.canCarryTreasure()) {
-            checkCashInTreasureTrain(unit);
-            if (unit.isDisposed()) {
-                nextActiveUnit();
-            }
+        if (checkCashInTreasureTrain(unit)) {
+            nextActiveUnit();
         }
 
         nextModelMessage();
@@ -1813,14 +1811,17 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Check if a unit is a treasure train, and if it should be cashed in.
      * Transfers the gold carried by this unit to the {@link Player owner}.
      * 
-     * @param unit an <code>Unit</code> value
-     * @return a <code>boolean</code> value
-     * @exception IllegalStateException if this unit is not a treasure train. or
-     *                if it cannot be cashed in at it's current location.
+     * @param unit The <code>Unit</code> to be checked.
+     * @return True if the unit was cashed in (and disposed).
      */
     public boolean checkCashInTreasureTrain(Unit unit) {
+        if (!unit.canCarryTreasure() || !unit.canCashInTreasureTrain()) {
+            return false; // fail quickly if just not a candidate
+        }
+
         Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             canvas.showInformationMessage("notYourTurn");
@@ -1828,30 +1829,29 @@ public final class InGameController implements NetworkConstants {
         }
 
         Client client = freeColClient.getClient();
-
-        if (unit.canCarryTreasure() && unit.canCashInTreasureTrain()) {
-            boolean cash;
-            if (unit.getOwner().getEurope() == null) {
-                canvas.showInformationMessage("cashInTreasureTrain.text.independence",
-                                              "%nation%", unit.getOwner().getNationAsString());
-                cash = true;
-            } else {
-                int transportFee = unit.getTransportFee();
-                String message = (transportFee == 0) ? 
-                    "cashInTreasureTrain.text.free" :
-                    "cashInTreasureTrain.text.pay";
-                cash = canvas.showConfirmDialog(message, "cashInTreasureTrain.yes", "cashInTreasureTrain.no");
-            }
-            if (cash) {
-                // Inform the server:
-                Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
-                cashInTreasureTrainElement.setAttribute("unit", unit.getId());
-
-                client.sendAndWait(cashInTreasureTrainElement);
-
-                unit.cashInTreasureTrain();
-
-                freeColClient.getCanvas().updateGoldLabel();
+        boolean cash;
+        Europe europe = unit.getOwner().getEurope();
+        if (europe == null || unit.getLocation() == europe) {
+            cash = true; // no need to check for transport
+        } else {
+            String confirm = (unit.getTransportFee() == 0)
+                ? "cashInTreasureTrain.free"
+                : "cashInTreasureTrain.pay";
+            cash = canvas.showConfirmDialog(confirm,
+                                            "cashInTreasureTrain.yes",
+                                            "cashInTreasureTrain.no");
+        }
+        if (cash) {
+            Connection conn = freeColClient.getClient().getConnection();
+            CashInTreasureTrainMessage message = new CashInTreasureTrainMessage(unit);
+            Element reply = askExpecting(client, message.toXMLElement(),
+                                         "multiple");
+            if (reply != null) {
+                if (freeColClient.getGUI().getActiveUnit() == unit) {
+                    nextActiveUnit(); // it is about to disappear
+                }
+                freeColClient.getInGameInputHandler().handle(conn, reply);
+                canvas.updateGoldLabel();
                 return true;
             }
         }

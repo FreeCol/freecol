@@ -283,6 +283,37 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Cash in a treasure train.
+     *
+     * @param unit The treasure train <code>Unit</code> to cash in.
+     */
+    public ModelMessage cashInTreasureTrain(Unit unit) {
+        ModelMessage m;
+        int fullAmount = unit.getTreasureAmount();
+        int cashInAmount = (fullAmount - unit.getTransportFee())
+            * (100 - getTax()) / 100;
+
+        modifyGold(cashInAmount);
+        switch (getPlayerType()) {
+        case REBEL: case INDEPENDENT:
+            m = new ModelMessage(this, ModelMessage.MessageType.DEFAULT,
+                                 unit,
+                                 "model.unit.cashInTreasureTrain.independent",
+                                 "%amount%", Integer.toString(fullAmount));
+            break;
+        default:
+            m = new ModelMessage(this, ModelMessage.MessageType.DEFAULT,
+                                 unit,
+                                 "model.unit.cashInTreasureTrain.colonial",
+                                 "%amount%", Integer.toString(fullAmount),
+                                 "%cashInAmount%", Integer.toString(cashInAmount));
+            break;
+        }
+        unit.dispose();
+        return m;
+    }
+
+    /**
     * Resets this player's explored tiles. This is done by setting
     * all the tiles within a {@link Unit}s line of sight visible.
     * The other tiles are made unvisible.

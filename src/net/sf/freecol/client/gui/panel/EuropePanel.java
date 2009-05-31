@@ -842,6 +842,8 @@ public final class EuropePanel extends FreeColPanel {
                     Unit unit = ((UnitLabel) comp).getUnit();
                     getController().leaveShip(unit);
                     */
+                    europePanel.refreshDocks();
+                    return comp;
                 } else {
                     logger.warning("An invalid component got dropped on this DocksPanel.");
                     return null;

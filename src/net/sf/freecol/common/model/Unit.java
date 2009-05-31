@@ -536,33 +536,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Transfers the gold carried by this unit to the {@link Player owner}.
-     * 
-     * @exception IllegalStateException if this unit is not a treasure train. or
-     *                if it cannot be cashed in at it's current location.
-     */
-    public void cashInTreasureTrain() {
-        if (!canCarryTreasure()) {
-            throw new IllegalStateException("Unit with ID " + getId() + " can't carry a treasure");
-        } else if (canCashInTreasureTrain()) {
-            int cashInAmount = getTreasureAmount() - getTransportFee();
-            cashInAmount = cashInAmount * (100 - getOwner().getTax()) / 100;
-            FreeColGameObject owner = getOwner();
-            if (isInEurope()) {
-                owner = getOwner().getEurope();
-            }
-            getOwner().modifyGold(cashInAmount);
-            addModelMessage(owner, ModelMessage.MessageType.DEFAULT,
-                            "model.unit.cashInTreasureTrain",
-                            "%amount%", Integer.toString(getTreasureAmount()),
-                            "%cashInAmount%", Integer.toString(cashInAmount));
-            dispose();
-        } else {
-            throw new IllegalStateException("Cannot cash in treasure train at the current location.");
-        }
-    }
-
-    /**
      * Checks if this <code>Unit</code> is a colonist. A <code>Unit</code>
      * is a colonist if it can build a new <code>Colony</code>.
      * 
@@ -3013,12 +2986,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                     "model.unit.arriveInEurope",
                                     "%europe%", getOwner().getEurope().getName());
                     setState(UnitState.ACTIVE);
-                    ArrayList<Unit> unitList = new ArrayList<Unit>(getUnitList());
-                    for (Unit u : unitList) {
-                        if (u.canCarryTreasure()) {
-                            u.cashInTreasureTrain();
-                        }
-                    }
                     break;
                 case TO_AMERICA:
                 	logger.info("Unit " + getId() + " arrives in America");

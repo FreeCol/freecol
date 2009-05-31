@@ -1079,17 +1079,20 @@ public final class FreeColServer {
      *         in any way.
      *         In the worst case this may be indicative of a malign client.
      */
-    public Unit getUnitSafely(String unitId, ServerPlayer serverPlayer) {
+    public Unit getUnitSafely(String unitId, ServerPlayer serverPlayer)
+        throws IllegalStateException {
         Game game = serverPlayer.getGame();
+        FreeColGameObject obj;
         Unit unit;
 
         if (unitId == null || unitId.length() == 0) {
             throw new IllegalStateException("ID must not be empty.");
         }
-        if (!(game.getFreeColGameObject(unitId) instanceof Unit)) {
+        obj = game.getFreeColGameObjectSafely(unitId);
+        if (!(obj instanceof Unit)) {
             throw new IllegalStateException("Not a unit ID: " + unitId);
         }
-        unit = (Unit) game.getFreeColGameObject(unitId);
+        unit = (Unit) obj;
         if (unit.getOwner() != serverPlayer) {
             throw new IllegalStateException("Not the owner of unit: " + unitId);
         }
@@ -1109,14 +1112,15 @@ public final class FreeColServer {
      *         in any way.
      *         In the worst case this may be indicative of a malign client.
      */
-    public Settlement getAdjacentSettlementSafely(String settlementId, Unit unit) {
+    public Settlement getAdjacentSettlementSafely(String settlementId, Unit unit)
+        throws IllegalStateException {
         Game game = unit.getOwner().getGame();
         Settlement settlement;
 
-        if (settlementId == null) {
-            throw new IllegalStateException("settlementId is null");
+        if (settlementId == null || settlementId.length() == 0) {
+            throw new IllegalStateException("ID must not be empty.");
         } else if (!(game.getFreeColGameObject(settlementId) instanceof Settlement)) {
-            throw new IllegalStateException("Not a Settlement: " + settlementId);
+            throw new IllegalStateException("Not a settlement ID: " + settlementId);
         }
         settlement = (Settlement) game.getFreeColGameObject(settlementId);
         if (settlement.getTile() == null) {
@@ -1129,12 +1133,13 @@ public final class FreeColServer {
         }
         if (unit.getTile().getDistanceTo(settlement.getTile()) > 1) {
             throw new IllegalStateException("Unit " + unit.getId()
-                                            + " is not adjacent to settlement " + settlementId);
+                                            + " is not adjacent to settlement: " + settlementId);
         }
         if (unit.getOwner() == settlement.getOwner()) {
-            throw new IllegalStateException("Unit " + unit.getId()
-                                            + " and settlement " + settlementId
-                                            + " are owned by the same player.");
+            throw new IllegalStateException("Unit: " + unit.getId()
+                                            + " and settlement: " + settlementId
+                                            + " are both owned by player: "
+                                            + unit.getOwner().getId());
         }
         return settlement;
     }
@@ -1153,10 +1158,11 @@ public final class FreeColServer {
      *         in any way.
      *         In the worst case this may be indicative of a malign client.
      */
-    public IndianSettlement getAdjacentIndianSettlementSafely(String settlementId, Unit unit) {
+    public IndianSettlement getAdjacentIndianSettlementSafely(String settlementId, Unit unit)
+        throws IllegalStateException {
         Settlement settlement = getAdjacentSettlementSafely(settlementId, unit);
         if (!(settlement instanceof IndianSettlement)) {
-            throw new IllegalStateException("Not an IndianSettlement: " + settlementId);
+            throw new IllegalStateException("Not an indianSettlement: " + settlementId);
         }
         if (!unit.getOwner().hasContacted(settlement.getOwner())) {
             throw new IllegalStateException("Player has not established contact with the " + settlement.getOwner().getNationAsString());

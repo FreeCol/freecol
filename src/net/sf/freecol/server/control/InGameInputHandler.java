@@ -74,6 +74,7 @@ import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
+import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
@@ -336,10 +337,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return disbandUnit(connection, element);
             }
         });
-        register("cashInTreasureTrain", new CurrentPlayerNetworkRequestHandler() {
+        register(CashInTreasureTrainMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return cashInTreasureTrain(connection, element);
+                return new CashInTreasureTrainMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(GetTransactionMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -2387,29 +2388,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.dispose();
-        sendUpdatedTileToAll(oldTile, player);
-        return null;
-    }
-
-    /**
-     * Handles a "cashInTreasureTrain"-message.
-     * 
-     * @param connection The <code>Connection</code> the message was received
-     *            on.
-     * @param element The element containing the request.
-     */
-    private Element cashInTreasureTrain(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile oldTile = unit.getTile();
-        unit.cashInTreasureTrain();
         sendUpdatedTileToAll(oldTile, player);
         return null;
     }

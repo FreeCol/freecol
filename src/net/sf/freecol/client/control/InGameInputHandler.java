@@ -208,19 +208,22 @@ public final class InGameInputHandler extends InputHandler {
         new RefreshCanvasSwingTask().invokeLater();
         return null;
     }
-    
+
     /**
      * Updates all FreeColGameObjects from the childNodes of the message
      * @param nodeList The list of nodes from the message
      */
     private void updateGameObjects(NodeList nodeList) {
+        Game game = getGame();
+
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element element = (Element) nodeList.item(i);
-            FreeColGameObject fcgo = getGame().getFreeColGameObjectSafely(element.getAttribute("ID"));
-            if (fcgo != null) {
-                fcgo.readFromXMLElement(element);
-            } else {
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(element.getAttribute("ID"));
+
+            if (fcgo == null) {
                 logger.warning("Could not find 'FreeColGameObject' with ID: " + element.getAttribute("ID"));
+            } else {
+                fcgo.readFromXMLElement(element);
             }
         }
     }
@@ -1269,6 +1272,35 @@ public final class InGameInputHandler extends InputHandler {
                                                  "%nation%", winner.getNationAsString(),
                                                  "%loserNation%", loser.getNationAsString()));
 
+        return null;
+    }
+
+    /**
+     * Disposes of the <code>Unit</code>s which are the children of
+     * this Element.
+     *
+     * @param element The element (root element in a DOM-parsed XML tree) that
+     *                holds all the information.
+     */
+    public Element disposeUnits(Element element) {
+        Game game = getGame();
+        NodeList nodes = element.getChildNodes();
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            // Do not read the whole unit out of the element as we are
+            // only going to dispose of it, not forgetting that the
+            // server may have already done so and its view will only
+            // mislead us here in the client.
+            Element e = (Element) nodes.item(i);
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(e.getAttribute("ID"));
+
+            if (fcgo instanceof Unit) {
+                ((Unit) fcgo).dispose();
+            } else {
+                logger.warning("Object is not a unit: "
+                               + ((fcgo == null) ? "null" : fcgo.getId()));
+            }
+        }
         return null;
     }
 
