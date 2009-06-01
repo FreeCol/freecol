@@ -2099,7 +2099,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 if (size > 0) {
                     for (int x = 0; x < size; x++) {
                         String typeId = in.getAttributeValue(null, "x" + Integer.toString(x));
-                        buildQueue.add((BuildableType) Specification.getSpecification().getType(typeId));
+                        buildQueue.add(Specification.getSpecification().getType(typeId, BuildableType.class));
                     }
                 }
                 in.nextTag();

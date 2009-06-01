@@ -50,22 +50,14 @@ public class Nation extends FreeColGameObjectType {
     private boolean selectable;
 
     /**
-     * Describe refId here.
-     */
-    private String refId;
-
-    /**
      * Describe anthem here.
      */
     private String anthem;
 
-
     /**
-     * Sole constructor.
+     * Describe refNation here.
      */
-    public Nation(int index) {
-        setIndex(index);
-    }
+    private Nation refNation;
 
 
     /**
@@ -141,21 +133,21 @@ public class Nation extends FreeColGameObjectType {
     }
 
     /**
-     * Get the <code>RefId</code> value.
+     * Get the <code>RefNation</code> value.
      *
-     * @return a <code>String</code> value
+     * @return a <code>Nation</code> value
      */
-    public final String getRefId() {
-        return refId;
+    public final Nation getRefNation() {
+        return refNation;
     }
 
     /**
-     * Set the <code>RefId</code> value.
+     * Set the <code>RefNation</code> value.
      *
-     * @param newRefId The new RefId value.
+     * @param newRefNation The new RefNation value.
      */
-    public final void setRefId(final String newRefId) {
-        this.refId = newRefId;
+    public final void setRefNation(final Nation newRefNation) {
+        this.refNation = newRefNation;
     }
 
     /**
@@ -176,7 +168,10 @@ public class Nation extends FreeColGameObjectType {
         setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));
         type = specification.getNationType(in.getAttributeValue(null, "nation-type"));
         selectable = getAttribute(in, "selectable", false);
-        refId = getAttribute(in, "ref", null);
+        String refId = getAttribute(in, "ref", null);
+        if (refId != null) {
+            refNation = specification.getNation(refId);
+        }
         anthem = in.getAttributeValue(null, "anthem");
    }
 

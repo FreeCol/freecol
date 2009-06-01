@@ -316,7 +316,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         rebelLabel.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getId()
                                                                   + ".coat-of-arms.image", 0.5)));
         rebelLabel.setHorizontalTextPosition(SwingConstants.RIGHT);
-        royalistLabel.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getRefId()
+        royalistLabel.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getRefNation().getId()
                                                                      + ".coat-of-arms.image", 0.5)));
         royalistLabel.setHorizontalTextPosition(SwingConstants.LEFT);
 

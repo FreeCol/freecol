@@ -31,7 +31,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 
 public abstract class FreeColGameObjectType extends FreeColObject {
 
-    private int index;
+    private int index = -1;
 
     /**
      * Describe featureContainer here.
@@ -56,7 +56,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         this.featureContainer = newFeatureContainer;
     }
 
-    protected final void setIndex(final int index) {
+    public final void setIndex(final int index) {
         this.index = index;
     }
 

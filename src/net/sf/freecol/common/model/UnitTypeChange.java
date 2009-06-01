@@ -34,9 +34,9 @@ import net.sf.freecol.common.Specification;
 public class UnitTypeChange extends FreeColObject {
 
     /**
-     * Describe unitTypeId here.
+     * Describe newUnitType here.
      */
-    private String unitTypeId;
+    private UnitType newUnitType;
 
     public static enum ChangeType { EDUCATION, NATIVES, EXPERIENCE,
             LOST_CITY, PROMOTION, CREATION, ENTER_COLONY, INDEPENDENCE,
@@ -63,7 +63,13 @@ public class UnitTypeChange extends FreeColObject {
      * @exception XMLStreamException if an error occurs
      */
     public UnitTypeChange(XMLStreamReader in) throws XMLStreamException {
-        readFromXMLImpl(in);
+        this(in, Specification.getSpecification());
+    }
+
+    public UnitTypeChange(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        readAttributes(in, specification);
+        readChildren(in, specification);
     }
 
     public List<Scope> getScopes() {
@@ -126,25 +132,25 @@ public class UnitTypeChange extends FreeColObject {
     }
 
     /**
-     * Get the <code>UnitTypeId</code> value.
+     * Get the <code>NewUnitType</code> value.
      *
-     * @return a <code>String</code> value
+     * @return an <code>UnitType</code> value
      */
-    public final String getUnitTypeId() {
-        return unitTypeId;
+    public final UnitType getNewUnitType() {
+        return newUnitType;
     }
 
     /**
-     * Set the <code>UnitTypeId</code> value.
+     * Set the <code>NewUnitType</code> value.
      *
-     * @param newUnitTypeId The new UnitTypeId value.
+     * @param newNewUnitType The new NewUnitType value.
      */
-    public final void setUnitTypeId(final String newUnitTypeId) {
-        this.unitTypeId = newUnitTypeId;
+    public final void setNewUnitType(final UnitType newNewUnitType) {
+        this.newUnitType = newNewUnitType;
     }
 
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        unitTypeId = in.getAttributeValue(null, "unit");
+    protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        newUnitType = specification.getType(in.getAttributeValue(null, "unit"), UnitType.class);
         turnsToLearn = getAttribute(in, "turnsToLearn", UnitType.UNDEFINED);
         if (getAttribute(in, "learnInSchool", false) || turnsToLearn > 0) {
             changeTypes.add(ChangeType.EDUCATION);

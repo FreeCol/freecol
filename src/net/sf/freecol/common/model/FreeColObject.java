@@ -64,7 +64,7 @@ public abstract class FreeColObject {
 
     // this is what we use for the specification
     // TODO: standardize on this spelling
-    protected static final String ID_ATTRIBUTE_TAG = "id";
+    public static final String ID_ATTRIBUTE_TAG = "id";
 
     /**
      * XML tag name for array elements.

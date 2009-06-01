@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -129,6 +130,8 @@ public final class Specification {
 
     private int storableTypes = 0;
 
+    private boolean initialized = false;
+
     /**
      * Creates a new Specification object by loading it from the
      * specification.xml.
@@ -144,6 +147,7 @@ public final class Specification {
      */
     protected Specification(InputStream in) {
         logger.info("Initializing Specification");
+        initialized = false;
 
         allTypes = new HashMap<String, FreeColGameObjectType>();
         allOptions = new HashMap<String, AbstractOption>();
@@ -274,9 +278,12 @@ public final class Specification {
 
                     int unitIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        UnitType unitType = new UnitType(unitIndex++);
+                        UnitType unitType = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG),
+                                                    UnitType.class);
+                        if (unitType.getIndex() < 0) {
+                            unitType.setIndex(unitIndex++);
+                        }
                         unitType.readFromXML(xsr, this);
-                        allTypes.put(unitType.getId(), unitType);
                         unitTypeList.add(unitType);
                         if (unitType.getExpertProduction() != null) {
                             experts.put(unitType.getExpertProduction(), unitType);
@@ -327,9 +334,12 @@ public final class Specification {
 
                     int nationIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        Nation nation = new Nation(nationIndex++);
+                        Nation nation = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG),
+                                                Nation.class);
+                        if (nation.getIndex() < 0) {
+                            nation.setIndex(nationIndex++);
+                        }
                         nation.readFromXML(xsr, this);
-                        allTypes.put(nation.getId(), nation);
                         nations.add(nation);
 
                         if (nation.getType().isEuropean()) {
@@ -411,10 +421,12 @@ public final class Specification {
                 }
             }
 
+            // TODO: get rid of this stuff, which is only used by AI
             // Post specification actions
             // Get Food, Bells, Crosses and Hammers
             Goods.initialize(getGoodsTypeList(), numberOfGoodsTypes());
 
+            initialized = true;
             logger.info("Specification initialization complete");
         } catch (XMLStreamException e) {
             StringWriter sw = new StringWriter();
@@ -478,23 +490,42 @@ public final class Specification {
     }
 
     /**
-     * Returns the <code>FreeColGameObjectType</code> with the given ID.
-     * Throws an IllegalArgumentException if the ID is null, or if no such Type
-     * can be retrieved.
+     * Returns the <code>FreeColGameObjectType</code> with the given
+     * ID.  Throws an IllegalArgumentException if the ID is
+     * null. Throws and IllegalArgumentException if no such Type
+     * can be retrieved and initialization is complete.
      *
      * @param Id a <code>String</code> value
+     * @param type a <code>Class</code> value
      * @return a <code>FreeColGameObjectType</code> value
+     * @exception IllegalArgumentException if an error occurs
      */
-    public FreeColGameObjectType getType(String Id) throws IllegalArgumentException {
+    public <T extends FreeColGameObjectType> T getType(String Id, Class<T> type)
+        throws IllegalArgumentException {
         if (Id == null) {
             throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" + " with ID 'null'.");
-        } else if (!allTypes.containsKey(Id)) {
+        } else if (allTypes.containsKey(Id)) {
+            return type.cast(allTypes.get(Id));
+        } else if (initialized) {
             throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" + " with ID '" + Id
-                    + "' returned 'null'.");
+                                               + "' returned 'null'.");
         } else {
-            return allTypes.get(Id);
+            // forward declaration of new type
+            try {
+                T result = type.newInstance();
+                allTypes.put(Id, result);
+                return result;
+            } catch(Exception e) {
+                logger.warning(e.toString());
+                return null;
+            }
         }
     }
+
+    public FreeColGameObjectType getType(String Id) throws IllegalArgumentException {
+        return getType(Id, FreeColGameObjectType.class);
+    }
+
 
     /**
      * Return all types which have any of the given abilities.
@@ -668,7 +699,7 @@ public final class Specification {
     }
 
     public BuildingType getBuildingType(String id) {
-        return (BuildingType) getType(id);
+        return getType(id, BuildingType.class);
     }
 
     // -- Goods --
@@ -721,7 +752,7 @@ public final class Specification {
      * @return a <code>GoodsType</code> value
      */
     public GoodsType getGoodsType(String id) {
-        return (GoodsType) getType(id);
+        return getType(id, GoodsType.class);
     }
 
     public List<GoodsType> getGoodsFood() {
@@ -738,7 +769,7 @@ public final class Specification {
     }
 
     public ResourceType getResourceType(String id) {
-        return (ResourceType) getType(id);
+        return getType(id, ResourceType.class);
     }
 
     // -- Tiles --
@@ -751,7 +782,7 @@ public final class Specification {
     }
 
     public TileType getTileType(String id) {
-        return (TileType) getType(id);
+        return getType(id, TileType.class);
     }
 
     // -- Improvements --
@@ -760,7 +791,7 @@ public final class Specification {
     }
 
     public TileImprovementType getTileImprovementType(String id) {
-        return (TileImprovementType) getType(id);
+        return getType(id, TileImprovementType.class);
     }
 
     // -- Improvement Actions --
@@ -769,7 +800,7 @@ public final class Specification {
     }
 
     public ImprovementActionType getImprovementActionType(String id) {
-        return (ImprovementActionType) getType(id);
+        return getType(id, ImprovementActionType.class);
     }
 
     // -- Units --
@@ -782,7 +813,7 @@ public final class Specification {
     }
 
     public UnitType getUnitType(String id) {
-        return (UnitType) getType(id);
+        return getType(id, UnitType.class);
     }
 
     public UnitType getExpertForProducing(GoodsType goodsType) {
@@ -824,7 +855,7 @@ public final class Specification {
     }
 
     public FoundingFather getFoundingFather(String id) {
-        return (FoundingFather) getType(id);
+        return getType(id, FoundingFather.class);
     }
 
     // -- NationTypes --
@@ -850,7 +881,7 @@ public final class Specification {
     }
 
     public NationType getNationType(String id) {
-        return (NationType) getType(id);
+        return getType(id, NationType.class);
     }
 
     // -- Nations --
@@ -860,7 +891,7 @@ public final class Specification {
     }
 
     public Nation getNation(String id) {
-        return (Nation) getType(id);
+        return getType(id, Nation.class);
     }
 
     public List<Nation> getEuropeanNations() {
@@ -881,7 +912,7 @@ public final class Specification {
     }
 
     public EquipmentType getEquipmentType(String id) {
-        return (EquipmentType) getType(id);
+        return getType(id, EquipmentType.class);
     }
 
     // -- DifficultyLevels --
@@ -896,7 +927,7 @@ public final class Specification {
      * @return a <code>DifficultyLevel</code> value
      */
     public DifficultyLevel getDifficultyLevel(String id) {
-        return (DifficultyLevel) getType(id);
+        return getType(id, DifficultyLevel.class);
     }
 
     /**
@@ -958,7 +989,7 @@ public final class Specification {
                                                        Class<T> returnClass, T defaultValue) {
         final String attributeString = in.getAttributeValue(null, attributeName);
         if (attributeString != null) {
-            return returnClass.cast(getType(attributeString));
+            return getType(attributeString, returnClass);
         } else {
             return defaultValue;
         }

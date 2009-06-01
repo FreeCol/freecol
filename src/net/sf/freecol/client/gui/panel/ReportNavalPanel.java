@@ -75,7 +75,7 @@ public final class ReportNavalPanel extends ReportPanel {
 
         reportPanel.setLayout(new MigLayout("fillx, wrap 12", "", ""));
 
-        reportPanel.add(new JLabel(Messages.message(player.getNation().getRefId() + ".name")),
+        reportPanel.add(new JLabel(Messages.message(player.getNation().getRefNation().getId() + ".name")),
                         "span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 

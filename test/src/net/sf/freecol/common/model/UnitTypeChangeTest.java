@@ -52,7 +52,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
         UnitTypeChange.ChangeType education = UnitTypeChange.ChangeType.EDUCATION;
         UnitTypeChange change = new UnitTypeChange();
-        change.setUnitTypeId(farmer.getId());
+        change.setNewUnitType(farmer);
         change.getChangeTypes().add(education);
         change.getScopes().add(scope);
 
@@ -82,7 +82,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
         UnitTypeChange.ChangeType creation = UnitTypeChange.ChangeType.CREATION;
         UnitTypeChange change = new UnitTypeChange();
-        change.setUnitTypeId(farmer.getId());
+        change.setNewUnitType(farmer);
         change.getChangeTypes().add(creation);
 
         gardener.getTypeChanges().add(change);
@@ -108,7 +108,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
 
         UnitTypeChange.ChangeType enterColony = UnitTypeChange.ChangeType.ENTER_COLONY;
         UnitTypeChange change = new UnitTypeChange();
-        change.setUnitTypeId(farmer.getId());
+        change.setNewUnitType(farmer);
         change.getChangeTypes().add(enterColony);
 
         gardener.getTypeChanges().add(change);

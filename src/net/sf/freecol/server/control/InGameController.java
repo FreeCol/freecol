@@ -637,7 +637,7 @@ public final class InGameController extends Controller {
     }
 
     public ServerPlayer createREFPlayer(ServerPlayer player){
-        Nation refNation = Specification.getSpecification().getNation(player.getNation().getRefId());
+        Nation refNation = player.getNation().getRefNation();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
         refPlayer.setEntryLocation(player.getEntryLocation());
         // This will change later, just for setup

@@ -124,6 +124,9 @@ public final class UnitType extends BuildableType {
     private List<UnitTypeChange> typeChanges = new ArrayList<UnitTypeChange>();
     
 
+    public UnitType() {
+        // empty constructor
+    }
     
     /**
      * Creates a new <code>UnitType</code> instance.
@@ -497,7 +500,7 @@ public final class UnitType extends BuildableType {
     public UnitType getUnitTypeChange(ChangeType changeType, Player player) {
         for (UnitTypeChange change : typeChanges) {
             if (change.asResultOf(changeType) && change.appliesTo(player)) {
-                UnitType result = Specification.getSpecification().getUnitType(change.getUnitTypeId());
+                UnitType result = change.getNewUnitType();
                 if (result.isAvailableTo(player)) {
                     return result;
                 }
@@ -519,7 +522,7 @@ public final class UnitType extends BuildableType {
     public boolean canBeUpgraded(UnitType newType, ChangeType changeType) {
         for (UnitTypeChange change : typeChanges) {
             if (change.asResultOf(changeType)) {
-                if (newType == Specification.getSpecification().getUnitType(change.getUnitTypeId())) {
+                if (newType == change.getNewUnitType()) {
                     return true;
                 }
             }
@@ -537,7 +540,7 @@ public final class UnitType extends BuildableType {
         List<UnitType> unitTypes = new ArrayList<UnitType>();
         for (UnitTypeChange change : typeChanges) {
             if (change.asResultOf(ChangeType.LOST_CITY)) {
-                unitTypes.add(Specification.getSpecification().getUnitType(change.getUnitTypeId()));
+                unitTypes.add(change.getNewUnitType());
             }
         }
         return unitTypes;
@@ -553,7 +556,7 @@ public final class UnitType extends BuildableType {
     public UnitType getEducationUnit(int maximumSkill) {
         for (UnitTypeChange change : typeChanges) {
             if (change.canBeTaught()) {
-                UnitType unitType = Specification.getSpecification().getUnitType(change.getUnitTypeId());
+                UnitType unitType = change.getNewUnitType();
                 if (unitType.hasSkill() && unitType.getSkill() <= maximumSkill) {
                     return unitType;
                 }
@@ -570,7 +573,7 @@ public final class UnitType extends BuildableType {
     public int getEducationTurns(UnitType unitType) {
         for (UnitTypeChange change : typeChanges) {
             if (change.asResultOf(UnitTypeChange.ChangeType.EDUCATION)) {
-                if (unitType.getId().equals(change.getUnitTypeId())) {
+                if (unitType == change.getNewUnitType()) {
                     return change.getTurnsToLearn();
                 }
             }
@@ -608,9 +611,9 @@ public final class UnitType extends BuildableType {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             String nodeName = in.getLocalName();
             if ("upgrade".equals(nodeName)) {
-                typeChanges.add(new UnitTypeChange(in));
+                typeChanges.add(new UnitTypeChange(in, specification));
             } else if ("downgrade".equals(nodeName)) {
-                UnitTypeChange change = new UnitTypeChange(in);
+                UnitTypeChange change = new UnitTypeChange(in, specification);
                 if (change.getChangeTypes().isEmpty()) {
                     // add default downgrade type
                     change.getChangeTypes().add(ChangeType.CLEAR_SKILL);
