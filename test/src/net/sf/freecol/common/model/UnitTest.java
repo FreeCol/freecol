@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class UnitTest extends FreeColTestCase {
@@ -561,35 +560,6 @@ public class UnitTest extends FreeColTestCase {
         UnitType braveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
         Unit brave = new Unit(game, tile1, sioux, braveType, UnitState.ACTIVE, braveType.getDefaultEquipment());
         assertFalse(brave.canBuildColony());
-    }
-    
-    public void testCashInTreasure() {
-        Game game = getStandardGame();
-        Player dutch = game.getPlayer("model.nation.dutch");
-        TileType plains = FreeCol.getSpecification().getTileType("model.tile.ocean");
-        Map map = getTestMap(plains, true);
-        game.setMap(map);
-        Tile tile = map.getTile(10, 4);
-        
-        UnitType shipType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
-        Unit ship = new Unit(game, tile, dutch, shipType, UnitState.ACTIVE, shipType.getDefaultEquipment());
-        
-        UnitType treasureType = FreeCol.getSpecification().getUnitType("model.unit.treasureTrain");
-        Unit treasure = new Unit(game, tile, dutch, treasureType, UnitState.ACTIVE, treasureType.getDefaultEquipment());
-        assertTrue(treasure.canCarryTreasure());
-        treasure.setTreasureAmount(100);
-        
-        assertFalse(treasure.canCashInTreasureTrain()); // from a tile
-        treasure.setLocation(ship);
-        assertFalse(treasure.canCashInTreasureTrain()); // from a ship
-        ship.setLocation(dutch.getEurope());    
-        assertTrue(treasure.canCashInTreasureTrain()); // from a ship in Europe
-        int fee = treasure.getTransportFee();
-        assertEquals(0, fee);
-        // Disabled as cashInTreasureTrain has been moved to ServerPlayer
-        // and we need a mechanism to attach a server to this Game.
-        //treasure.cashInTreasureTrain();
-        //assertEquals(100, dutch.getGold());
     }
 
     public void testIndianDies() {
