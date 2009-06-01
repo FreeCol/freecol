@@ -56,6 +56,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.NationType;
+import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
@@ -135,7 +136,9 @@ public class MapGenerator implements IMapGenerator {
         Map map = game.getMap();        
         createIndianSettlements(map, game.getPlayers());
         createEuropeanUnits(map, game.getPlayers());
-        createLostCityRumours(map, importGame);        
+        createLostCityRumours(map, importGame);
+        
+        fixRiverConnectivity(map);
     }
     
     /**
@@ -484,6 +487,25 @@ public class MapGenerator implements IMapGenerator {
         }
 
         logger.info("Created " + counter + " Indian settlements of maximum " + potential);
+    }
+
+    /**
+     * Fixes river connectivity, so that all great river and lake tiles on a map
+     * return isConnected()==true if they are connected to the ocean.
+     * 
+     * TODO: Fix this during river generation?                
+     * 
+     * @param map The <code>Map</code> to fix connectivity on.
+     */
+    private void fixRiverConnectivity(Map map) {
+        for (Tile t : map.getAllTiles()) {
+            if (!t.isConnected() && !t.isLand()) {
+                final PathNode n = map.findPathToEurope(t);
+                if (n != null) {
+                    t.setConnected(true);
+                }
+            }
+        }
     }
 
     private Tile getClosestTile(Map map, Position center, List<Tile> tiles) {
