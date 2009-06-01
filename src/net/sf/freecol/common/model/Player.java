@@ -2526,116 +2526,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Calculates the value of a future colony at this tile.
-     * 
-     * @return The value of a future colony located on this tile. This value is
-     *         used by the AI when deciding where to build a new colony.
-     */
-    public int getBasicColonyValue(Tile t) {
-        // TODO: tune magic numbers
-        if (t.getType().canSettle() && t.getSettlement() == null) {
-            int value = t.potential(t.primaryGoods(), null) * 30;
-            
-            //value += t.potential(t.secondaryGoods(), null) * t.secondaryGoods().getInitialSellPrice();
-            
-            float advantages = 1f;
-
-            if (t.hasResource()) {
-                // because production can not be improved much
-                advantages *= 0.75f;
-            }
-
-            boolean nearbyTileIsOcean = false;
-
-            TypeCountMap<GoodsType> buildingMaterialMap = new TypeCountMap<GoodsType>();
-            TypeCountMap<GoodsType> foodMap = new TypeCountMap<GoodsType>();
-            for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
-                if (type.isRawBuildingMaterial()) {
-                    buildingMaterialMap.incrementCount(type, 0);
-                } else if (type.isFoodType()) {
-                    foodMap.incrementCount(type, 0);
-                }
-            }
-
-            for (Tile tile : getGame().getMap().getSurroundingTiles(t, 1)) {
-                if (tile.getColony() != null) {
-                    // can't build next to colony
-                    return 0;
-                } else if (tile.getSettlement() != null) {
-                    // can build next to an indian settlement, but shouldn't
-                    SettlementType type = ((IndianNationType) tile.getSettlement().getOwner().getNationType())
-                        .getTypeOfSettlement();
-                    if (type == SettlementType.INCA_CITY || type == SettlementType.AZTEC_CITY) {
-                        // really shouldn't build next to cities
-                        advantages *= 0.25f;
-                    } else {
-                        advantages *= 0.5f;
-                    }
-                } else {
-                    if (tile.getType()!=null) {
-                        for (AbstractGoods production : tile.getType().getProduction()) {
-                            GoodsType type = production.getType();
-                            int potential = tile.potential(type, null);
-                            value += potential * type.getInitialSellPrice();
-                            // a few tiles with high production are better
-                            // than many tiles with low production
-                            int highProductionValue = 0;
-                            if (potential > 8) {
-                                advantages *= 1.2f;
-                                highProductionValue = 2;
-                            } else if (potential > 4) {
-                                advantages *= 1.1f;
-                                highProductionValue = 1;
-                            }
-                            if (type.isRawBuildingMaterial()) {
-                                buildingMaterialMap.incrementCount(type, highProductionValue);
-                            } else if (type.isFoodType()) {
-                                foodMap.incrementCount(type, highProductionValue);
-                            }
-                        }
-                    }
-
-                    if (tile.isConnected()) {
-                        nearbyTileIsOcean = true;
-                    }
-                }
-            }
-
-            for (Integer buildingMaterial : buildingMaterialMap.values()) {
-                if (buildingMaterial == 0) {
-                    advantages *= 0.75;
-                }
-            }
-            int foodProduction = 0;
-            for (Integer food : foodMap.values()) {
-                foodProduction += food;
-            }
-            if (foodProduction < 2) {
-                advantages *= 0.5f;
-            } else if (foodProduction < 4) {
-                advantages *= 0.75f;
-            }
-            /*
-            if (!nearbyTileIsOcean) {
-                advantages *= 0.75f;
-            }
-            */
-            final PathNode n = getGame().getMap().findPathToEurope(t);
-            if (n == null) {
-                // no path to Europe, therefore it is a poor location
-                // TODO: at the moment, this means we are land-locked
-                advantages *= 0.5f;
-            } else if (n.getTotalTurns() > 3) {
-                advantages *= 0.75f;
-            }
-
-            return Math.max(0, (int) (value * advantages));
-        } else {
-            return 0;
-        }
-    }
-
-    /**
      * Gets the value of building a <code>Colony</code> on the given tile.
      * This method adds bonuses to the colony value if the tile is close to (but
      * not overlapping with) another friendly colony. Penalties for enemy
@@ -2643,66 +2533,207 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @param tile The <code>Tile</code>
      * @return The value of building a colony on the given tile.
-     * @see Tile#getColonyValue()
      */
-    public int getColonyValue(Tile tile) {
-        int value = getBasicColonyValue(tile);
-        float advantage = 1f;
-        boolean supportingColony = false;
-        if (value == 0) {
+    public int getColonyValue(Tile t) {
+        //----- TODO: tune magic numbers
+        //applied once
+        final float MOD_HAS_RESOURCE           = 0.75f;
+        final float MOD_NO_PATH                = 0.5f;
+        final float MOD_LONG_PATH              = 0.75f;
+        final float MOD_FOOD_LOW               = 0.75f;
+        final float MOD_FOOD_VERY_LOW          = 0.5f;
+
+        //applied per goods
+        final float MOD_BUILD_MATERIAL_MISSING = 0.75f;
+
+        //applied per surrounding tile
+        final float MOD_ADJ_SETTLEMENT_BIG     = 0.25f;
+        final float MOD_ADJ_SETTLEMENT         = 0.5f;
+        final float MOD_OWNED_EUROPEAN         = 0.8f;
+        final float MOD_OWNED_NATIVE           = 0.9f;
+
+        //applied per goods production, per surrounding tile
+        final float MOD_HIGH_PRODUCTION        = 1.2f;
+        final float MOD_GOOD_PRODUCTION        = 1.1f;
+
+        //applied per occurrence (own colony only one-time), range-dependent.
+        final float[] MOD_OWN_COLONY     = {0.0f, 0.0f, 0.5f, 1.25f, 1.1f};
+        final float[] MOD_ENEMY_COLONY   = {0.0f, 0.0f, 0.6f, 0.7f,  0.8f};
+        final float[] MOD_NEUTRAL_COLONY = {0.0f, 0.0f, 0.9f, 0.95f, 1.0f};
+        final float[] MOD_ENEMY_UNIT     = {0.0f, 0.5f, 0.6f, 0.7f,  0.8f};
+
+        final int LONG_PATH_TURNS = 3;
+        final int PRIMARY_GOODS_VALUE = 30;
+        
+        //goods production in excess of this on a tile counts as good/high
+        final int GOOD_PRODUCTION = 4;
+        final int HIGH_PRODUCTION = 8;
+
+        //counting "high" production as 2, "good" production as 1
+        //overall food production is considered low/very low if less than...
+        final int FOOD_LOW = 4;
+        final int FOOD_VERY_LOW = 2;
+        
+        //----- END MAGIC NUMBERS
+        
+        //return 0 if a colony can't be built on tile t
+        if (!t.getType().canSettle() || t.getSettlement() != null) {
             return 0;
-        } else {
-            Iterator<Position> it;
-            for (int radius = 1; radius < 5; radius++) {
-                it = getGame().getMap().getCircleIterator(tile.getPosition(), false, radius);
-                while (it.hasNext()) {
-                    Tile ct = getGame().getMap().getTile(it.next());
-                    if (ct.getColony() != null) {
-                        if (ct.getColony().getOwner() == this) {
-                            if (!supportingColony) {
-                                supportingColony = true;
-                                switch(radius) {
-                                case 1:
-                                    // this should not happen
-                                    return 0;
-                                case 2:
-                                    advantage *= 0.5f;
-                                case 3:
-                                    advantage *= 1.25f;
-                                case 4:
-                                    advantage *= 1.1f;
-                                }
-                            }
+        }
+
+        //also return 0 if a neighbouring tile contains a colony
+        for (Tile tile : getGame().getMap().getSurroundingTiles(t, 1)) {
+            if (tile.getColony() != null) {
+                return 0;
+            }
+        }
+
+        //initialize tile value        
+        int value = t.potential(t.primaryGoods(), null) * PRIMARY_GOODS_VALUE;
+        //value += t.potential(t.secondaryGoods(), null) * t.secondaryGoods().getInitialSellPrice();
+
+        //multiplicative modifier, to be applied to value later
+        float advantage = 1f;
+
+        //set up maps for all foods and building materials
+        TypeCountMap<GoodsType> buildingMaterialMap = new TypeCountMap<GoodsType>();
+        TypeCountMap<GoodsType> foodMap = new TypeCountMap<GoodsType>();
+        for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
+            if (type.isRawBuildingMaterial()) {
+                buildingMaterialMap.incrementCount(type, 0);
+            } else if (type.isFoodType()) {
+                foodMap.incrementCount(type, 0);
+            }
+        }
+
+        //penalty for building on a resource tile,
+        //because production can not be improved much
+        if (t.hasResource()) {
+            advantage *= MOD_HAS_RESOURCE;
+        }
+
+        //penalty if path to europe doesn't exist, or is too long
+        //TODO: instead check tile.isConnected() for neighbouring tiles,
+        // should be more efficient?
+        final PathNode n = getGame().getMap().findPathToEurope(t);
+        if (n == null) {
+            // no path to Europe, therefore it is a poor location
+            // TODO: at the moment, this means we are land-locked
+            advantage *= MOD_NO_PATH;
+        } else if (n.getTotalTurns() > LONG_PATH_TURNS) {
+            advantage *= MOD_LONG_PATH;
+        }
+
+        boolean supportingColony = false;
+        Iterator<Position> it;
+        for (int radius = 1; radius < 5; radius++) {
+            it = getGame().getMap().getCircleIterator(t.getPosition(), false, radius);
+            while (it.hasNext()) {
+                Tile tile = getGame().getMap().getTile(it.next());
+                Settlement set = tile.getSettlement(); //may be null!
+                Colony col = tile.getColony(); //may be null!
+                
+                if (radius==1) {
+                    //already checked: no colony here - if set!=null, it's indian
+                    if (set != null) {
+                        //penalize building next to native settlement
+                        SettlementType type = ((IndianNationType) set.getOwner().getNationType())
+                            .getTypeOfSettlement();
+                        if (type == SettlementType.INCA_CITY || type == SettlementType.AZTEC_CITY) {
+                            // really shouldn't build next to cities
+                            advantage *= MOD_ADJ_SETTLEMENT_BIG;
                         } else {
-                            if (getStance(ct.getColony().getOwner()) == Stance.WAR) {
-                                advantage *= (0.4 + 0.1 * radius);
+                            advantage *= MOD_ADJ_SETTLEMENT;
+                        }
+                        
+                    //no settlement on neighbouring tile
+                    } else {
+                        //apply penalty for owned neighbouring tiles
+                        if (tile.getOwner() != null && tile.getOwner() != this) {
+                            if (tile.getOwner().isEuropean()) {
+                                advantage *= MOD_OWNED_EUROPEAN;
                             } else {
-                                advantage *= (0.8 + 0.05 * radius);
+                                advantage *= MOD_OWNED_NATIVE;
                             }
                         }
-                    } else {
-                        if (radius==2 && tile.getOwner() != null &&
-                        tile.getOwner() != this) {
-                            // tile is already owned by someone (and not by us!)
-                            if (tile.getOwner().isEuropean()) {
-                                advantage *= 0.8f;
-                            } else {
-                                advantage *= 0.9f;
+                        
+                        //count production
+                        if (tile.getType()!=null) {
+                            for (AbstractGoods production : tile.getType().getProduction()) {
+                                GoodsType type = production.getType();
+                                int potential = tile.potential(type, null);
+                                value += potential * type.getInitialSellPrice();
+                                // a few tiles with high production are better
+                                // than many tiles with low production
+                                int highProductionValue = 0;
+                                if (potential > HIGH_PRODUCTION) {
+                                    advantage *= MOD_HIGH_PRODUCTION;
+                                    highProductionValue = 2;
+                                } else if (potential > GOOD_PRODUCTION) {
+                                    advantage *= MOD_GOOD_PRODUCTION;
+                                    highProductionValue = 1;
+                                }
+                                if (type.isRawBuildingMaterial()) {
+                                    buildingMaterialMap.incrementCount(type, highProductionValue);
+                                } else if (type.isFoodType()) {
+                                    foodMap.incrementCount(type, highProductionValue);
+                                }
                             }
                         }
                     }
-                    Iterator<Unit> ui = ct.getUnitIterator();
-                    while (ui.hasNext()) {
-                        Unit u = ui.next();
-                        if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()
-                            && getStance(u.getOwner()) == Stance.WAR) {
-                            advantage *= (0.4 + 0.1 * radius);
+
+                //radius > 1
+                } else {
+                    if (value <= 0) {
+                        //value no longer changes, so return if still <=0
+                        return 0;
+                    }
+                    if (col != null) {
+                        //apply modifier for own colony at this distance
+                        if (col.getOwner()==this) {
+                            if (!supportingColony) {
+                                supportingColony = true;
+                                advantage *= MOD_OWN_COLONY[radius];
+                            }
+                        //apply modifier for other colonies at this distance
+                        } else {
+                            if (getStance(col.getOwner()) == Stance.WAR) {
+                                advantage *= MOD_ENEMY_COLONY[radius];
+                            } else {
+                                advantage *= MOD_NEUTRAL_COLONY[radius];
+                            }
                         }
                     }
                 }
+                
+                Iterator<Unit> ui = tile.getUnitIterator();
+                while (ui.hasNext()) {
+                    Unit u = ui.next();
+                    if (u.getOwner() != this && u.isOffensiveUnit() && u.getOwner().isEuropean()
+                        && getStance(u.getOwner()) == Stance.WAR) {
+                        advantage *= MOD_ENEMY_UNIT[radius];
+                    }
+                }
             }
-            return (int) (value * advantage);
         }
+
+        //check availability of key goods        
+        for (Integer buildingMaterial : buildingMaterialMap.values()) {
+            if (buildingMaterial == 0) {
+                advantage *= MOD_BUILD_MATERIAL_MISSING;
+            }
+        }
+        int foodProduction = 0;
+        for (Integer food : foodMap.values()) {
+            foodProduction += food;
+        }
+        if (foodProduction < FOOD_VERY_LOW) {
+            advantage *= MOD_FOOD_VERY_LOW;
+        } else if (foodProduction < FOOD_LOW) {
+            advantage *= MOD_FOOD_LOW;
+        }
+        
+        return (int) (value * advantage);
     }
 
     /**
