@@ -771,7 +771,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         float defencePower = -1.0f;
         for (Unit nextUnit : getUnitList()) {
             float tmpPower = getGame().getCombatModel().getDefencePower(attacker, nextUnit);
-            if (tmpPower > defencePower) {
+            if (tmpPower > defencePower || defender == null) {
                 defender = nextUnit;
                 defencePower = tmpPower;
             }
