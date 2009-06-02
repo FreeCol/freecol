@@ -761,15 +761,23 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * 
      * @param attacker The unit that would be attacking this colony.
      * @return The <code>Unit</code> that has been chosen to defend this
-     *         colony.
+     *         colony, or <code>null</code> if the colony belongs to another
+     *         player and client is not permitted to view contents.
      * @see Tile#getDefendingUnit(Unit)
      * @throws IllegalStateException if there are units in the colony
      */
     @Override
     public Unit getDefendingUnit(Unit attacker) {
+        List<Unit> unitList = getUnitList();
+        
+        if (unitCount != -1 && unitList.isEmpty()) {
+            // There are units, but we don't see them
+            return null;
+        }
+        
         Unit defender = null;
         float defencePower = -1.0f;
-        for (Unit nextUnit : getUnitList()) {
+        for (Unit nextUnit : unitList) {
             float tmpPower = getGame().getCombatModel().getDefencePower(attacker, nextUnit);
             if (tmpPower > defencePower || defender == null) {
                 defender = nextUnit;
