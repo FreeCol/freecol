@@ -552,11 +552,12 @@ public class SimpleCombatModel implements CombatModel {
                     for (Ability ability : autoDefence) {
                         if (ability.appliesTo(equipment) && 
                             settlement.canBuildEquipment(equipment)) {
+                            
                             defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT,
                                                      defender,
                                                      "model.unit.automaticDefence",
                                                      "%unit%", defender.getName(),
-                                                     "%colony%", defender.getColony().getName());
+                                                     "%colony%", settlement.getName());
                             break outer;
                         }
                     }
