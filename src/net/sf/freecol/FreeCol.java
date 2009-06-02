@@ -660,15 +660,22 @@ public final class FreeCol {
          * Ugly hack: try to determine language first, so that usage,
          * etc. will be localized.
          */
-        for (int index = 0; index < args.length; index++) {
-            if ("--default-locale".equals(args[index])
-                && index + 1 < args.length
-                && !args[index + 1].startsWith("--")) {
-                Locale locale = LanguageOption.getLocale(args[index + 1]);
-                Locale.setDefault(locale);
-                Messages.setMessageBundle(locale);
-                break;
+        String localeArg = null;
+        String locationArg = null;
+        for (int index = 0; index < args.length - 1; index++) {
+            if ("--default-locale".equals(args[index])) {
+                localeArg = args[++index];
+            } else if ("--freecol-data".equals(args[index])) {
+                locationArg = args[++index];
             }
+        }
+        if (locationArg != null) {
+            dataFolder = locationArg;
+        }
+        if (localeArg != null) {
+            Locale locale = LanguageOption.getLocale(localeArg);
+            Locale.setDefault(locale);
+            Messages.setMessageBundle(locale);
         }
 
         // create the Options
