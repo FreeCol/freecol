@@ -19,7 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
@@ -51,7 +53,7 @@ public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionLi
 
         errorLabels = null;
 
-        add(okButton);
+       //   add(okButton);
     }
 
     /**
@@ -117,9 +119,20 @@ public final class ErrorPanel extends FreeColDialog<Boolean> implements ActionLi
         }
 
         okButton.setLocation(130, 25 + (lines.size() - 1) * 20);
+        Rectangle2D rect = getFontMetrics(getFont()).getStringBounds(okButton.getText(), getGraphics());
+        okButton.setSize((int)rect.getWidth() + 40, 25);
+        
         add(okButton);
 
         setSize(340, 50 + (lines.size() - 1) * 20);
     }
 
+    /**
+     * Release the blocked thread when an action is performed.
+     */
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        super.actionPerformed(event);
+        setResponse(true);
+    }
 }
