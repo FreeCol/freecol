@@ -474,6 +474,32 @@ public class CombatTest extends FreeColTestCase {
     }
 
 
+    public void testDefendColonyWithUnarmedColonist() {
+    	Game game = getGame();
+    	Map map = getTestMap(plainsType,true);
+    	game.setMap(map);
+    	
+        Colony colony = getStandardColony();
+
+        SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player inca = game.getPlayer("model.nation.inca");
+
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(inca, true);
+
+        Unit colonist = colony.getUnitIterator().next();
+        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, indianHorses, indianMuskets);
+
+        assertEquals(colonist, colony.getDefendingUnit(attacker));
+        assertEquals(colonist, colony.getTile().getDefendingUnit(attacker));
+
+        Unit defender = new Unit(getGame(), colony.getTile(), dutch, colonistType, UnitState.ACTIVE);
+        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
+
+    }
+
     public void testDefendColonyWithRevere() {
     	Game game = getGame();
     	Map map = getTestMap(plainsType,true);
@@ -550,7 +576,7 @@ public class CombatTest extends FreeColTestCase {
         }
     }
     
-    public void testPionnerDiesNotLosesEquipment() {
+    public void testPioneerDiesNotLosesEquipment() {
     	Game game = getStandardGame();
         CombatModel combatModel = game.getCombatModel();
         Player dutch = game.getPlayer("model.nation.dutch");
@@ -565,16 +591,16 @@ public class CombatTest extends FreeColTestCase {
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
 
-        Unit pionner = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
+        Unit pioneer = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
         Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
 
         soldier.equipWith(muskets, true);
         soldier.equipWith(horses, true);
         soldier.setMovesLeft(1);
-        pionner.equipWith(tools, true);
+        pioneer.equipWith(tools, true);
 
-        combatModel.attack(soldier, pionner, victory, 0, null);
-        assertTrue("Pionner should be dead",pionner.isDisposed());
+        combatModel.attack(soldier, pioneer, victory, 0, null);
+        assertTrue("Pioneer should be dead", pioneer.isDisposed());
     }
 
 }
