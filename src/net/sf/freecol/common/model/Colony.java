@@ -1774,12 +1774,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         saveWarehouseState();
 
         addColonyTileProduction();
-        updateFood();
-        if (getUnitCount() == 0) {
-            dispose();
-            return;
-        }
-
         List<GoodsType> goodsForBuilding = new ArrayList<GoodsType>();
         if (canBuild()) {
             for (AbstractGoods goodsRequired : getCurrentlyBuilding().getGoodsRequired()) {
@@ -1808,36 +1802,53 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
         }
         
-        List<Building> buildings1 = new ArrayList<Building>();
-        List<Building> buildings2 = new ArrayList<Building>();
+        List<Building> buildingsProducingBuildingMaterials = new ArrayList<Building>();
+        List<Building> buildingsProducingFood = new ArrayList<Building>();
+        List<Building> otherBuildings = new ArrayList<Building>();
         for (Building building : getBuildings()) {
             if (building.getType().hasAbility("model.ability.autoProduction")) {
                 // call auto-producing buildings immediately
                 logger.finest("Calling newTurn for building " + building.getName());
                 building.newTurn();
+            } else if (building.getGoodsOutputType() != null &&
+                       building.getGoodsOutputType().isFoodType()) {
+                buildingsProducingFood.add(building);
             } else if (goodsForBuilding.contains(building.getGoodsOutputType())) {
-                buildings1.add(building);
+                buildingsProducingBuildingMaterials.add(building);
             } else {
                 int index = -1;
                 GoodsType outputType = building.getGoodsOutputType();
                 if (outputType != null) {
-                    for (int i = 0; i < buildings2.size(); i++) {
-                        if (outputType.equals(buildings2.get(i).getGoodsInputType())) {
+                    for (int i = 0; i < otherBuildings.size(); i++) {
+                        if (outputType.equals(otherBuildings.get(i).getGoodsInputType())) {
                             index = i;
                         }
                     }
                 }
                 if (index == -1) {
-                    buildings2.add(building);
+                    otherBuildings.add(building);
                 } else {
                     // insert before consumer
-                    buildings2.add(index, building);
+                    otherBuildings.add(index, building);
                 }
             }
         }
 
+        // buildings that produce food (none in the standard rule set)
+        for (Building building : buildingsProducingFood) {
+            logger.finest("Calling newTurn for building " + building.getName());
+            building.newTurn();
+        }
+
+        // check for starvation
+        updateFood();
+        if (getUnitCount() == 0) {
+            dispose();
+            return;
+        }
+
         // buildings that produce building materials
-        for (Building building : buildings1) {
+        for (Building building : buildingsProducingBuildingMaterials) {
             logger.finest("Calling newTurn for building " + building.getName());
             building.newTurn();
         }
@@ -1848,7 +1859,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
         // buildings that do not produce building materials, but might
         // consume them
-        for (Building building : buildings2) {
+        for (Building building : otherBuildings) {
             logger.finest("Calling newTurn for building " + building.getName());
             building.newTurn();
         }
