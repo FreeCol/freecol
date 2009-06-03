@@ -769,14 +769,15 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Returns true if this tile has at least one adjacent land tile.
+     * Returns true if this tile has at least one adjacent land tile (if water),
+     * or at least one adjacent water tile (if land).
      *
      * @return a <code>boolean</code> value
      */
     public boolean isCoast() {
         for (Direction direction : Direction.values()) {
             Tile otherTile = getMap().getNeighbourOrNull(direction, this);
-            if (otherTile != null && otherTile.isLand()) {
+            if (otherTile != null && otherTile.isLand()!=this.isLand()) {
                 return true;
             }
         }
