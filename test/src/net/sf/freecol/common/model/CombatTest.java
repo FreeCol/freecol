@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -496,6 +497,7 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(colonist, colony.getTile().getDefendingUnit(attacker));
 
         Unit defender = new Unit(getGame(), colony.getTile(), dutch, colonistType, UnitState.ACTIVE);
+        assertFalse("Colonist should not be defensive unit",defender.isDefensiveUnit());
         assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
 
     }
@@ -533,6 +535,47 @@ public class CombatTest extends FreeColTestCase {
         }
         for (Modifier defenceModifier : horses.getModifierSet("model.modifier.defence")) {
             assertFalse(defenceModifiers.contains(defenceModifier));
+        }
+    }
+    
+    public void testLoseColonyDefenceWithRevere() {
+        Game game = getGame();
+        Map map = getTestMap(plainsType,true);
+        game.setMap(map);
+        
+        Colony colony = getStandardColony();
+
+        SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player inca = game.getPlayer("model.nation.inca");
+        dutch.changeRelationWithPlayer(inca, Stance.WAR);
+        
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(inca, true);
+
+        Unit colonist = colony.getUnitIterator().next();
+        Unit attacker = new Unit(getGame(), tile2, inca, braveType, UnitState.ACTIVE, indianHorses, indianMuskets);
+
+        assertEquals(colonist, colony.getDefendingUnit(attacker));
+
+        dutch.addFather(spec().getFoundingFather("model.foundingFather.paulRevere"));
+        
+        java.util.Map<GoodsType,Integer> goodsAdded = new HashMap<GoodsType,Integer>();
+        for (AbstractGoods goods : muskets.getGoodsRequired()) {
+            colony.addGoods(goods);
+            goodsAdded.put(goods.getType(), goods.getAmount());
+        }
+        
+        combatModel.attack(attacker, colonist, victory, 0, null);
+        
+        assertFalse("Colonist should not be disposed",colonist.isDisposed());
+        assertFalse("Colonist should not be captured",colonist.getOwner() == attacker.getOwner());
+        
+        for (AbstractGoods goods : muskets.getGoodsRequired()) {
+            boolean goodsLost = colony.getGoodsCount(goods.getType()) < goodsAdded.get(goods.getType());
+            String errMsg = "Colony should have lose " + goods.getType().getName();
+            assertTrue(errMsg,goodsLost);
         }
     }
 

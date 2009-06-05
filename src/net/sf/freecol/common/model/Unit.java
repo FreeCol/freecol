@@ -3780,4 +3780,65 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return unitType.getPathImage();
         }
     }
+    
+    /*
+     * Get the available equipment that can be equipped automatically in case of an attack
+     * Returns null if it cannot be automatically equipped. 
+     */
+    public TypeCountMap<EquipmentType> getAutomaticEquipment(){
+        // Paul Revere makes an unarmed colonist in a settlement pick up
+        // a stock-piled musket if attacked, so the bonus should be applied
+        // for unarmed colonists inside colonies where there are muskets
+        // available. Indians can also pick up equipment.        
+        if(isArmed()){
+            return null;
+        }
+        
+        if(!getOwner().hasAbility("model.ability.automaticEquipment")){
+            return null;
+        }
+
+        Settlement settlement = null;
+        if (getLocation() instanceof WorkLocation) {
+            settlement = getColony();
+        }
+        if (getLocation() instanceof IndianSettlement) {
+            settlement = (Settlement) getLocation();
+        }       
+        if(settlement == null){
+            return null;
+        }
+    
+        TypeCountMap<EquipmentType> equipmentList = null;
+
+        // Check for necessary equipment in the settlement
+        Set<Ability> autoDefence = getOwner().getFeatureContainer().getAbilitySet("model.ability.automaticEquipment");
+
+        for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {          
+                for (Ability ability : autoDefence) {
+                    if (!ability.appliesTo(equipment)){
+                        continue;
+                    }
+                    if (!canBeEquippedWith(equipment)) {
+                        continue;
+                    }
+        
+                    boolean hasReqGoods = true;
+                    for(AbstractGoods goods : equipment.getGoodsRequired()){
+                        if(settlement.getGoodsCount(goods.getType()) < goods.getAmount()){
+                            hasReqGoods = false;
+                            break;
+                        }
+                    }
+                    if(hasReqGoods){
+                        // lazy initialization, required
+                        if(equipmentList == null){
+                            equipmentList = new TypeCountMap<EquipmentType>();
+                        }
+                        equipmentList.incrementCount(equipment, 1);
+                    }   
+                }
+        }
+        return equipmentList;
+    }
 }

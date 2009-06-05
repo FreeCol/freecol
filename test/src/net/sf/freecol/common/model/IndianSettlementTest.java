@@ -7,7 +7,8 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class IndianSettlementTest extends FreeColTestCase {
-	
+	private static GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+    
 	/**
 	 * Changes the ownership of a number of tiles from and around camp1 to camp2.
 	 * The param 'nTiles' defines the number of tiles to change ownership of.
@@ -307,7 +308,26 @@ public class IndianSettlementTest extends FreeColTestCase {
         assertEquals("Wrong number of units armed",bravesToEquip,armed);
         assertEquals("Wrong number of units mounted",bravesToEquip,mounted);
 	}
-	
+
+	public void testAutomaticEquipBraves(){
+	    Game game = getStandardGame();
+	    Map map = getTestMap();
+	    game.setMap(map);
+
+	    FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+	    IndianSettlement camp = builder.initialBravesInCamp(1).build();
+
+	    Unit indianBrave = camp.getFirstUnit();
+	    
+	    String errMsg = "Unit should not be able to automatically equip, no muskets available";
+	    assertTrue(errMsg, indianBrave.getAutomaticEquipment() == null);
+	    
+	    camp.addGoods(musketsType, 100);
+	    
+	    errMsg = "Unit should be able to automatically equip, camp has muskets available";
+	    assertFalse(errMsg, indianBrave.getAutomaticEquipment() == null);
+	}
+	   
 	public void testWarDeclarationAffectsSettlementAlarm(){
 	    Game game = getStandardGame();
 	    Map map = getTestMap();

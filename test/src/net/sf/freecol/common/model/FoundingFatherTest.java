@@ -36,6 +36,7 @@ public class FoundingFatherTest extends FreeColTestCase {
     private static UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     private static UnitType statesmanType = spec().getUnitType("model.unit.elderStatesman");
 
+    private static GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
 
     public void testFeatures() {
 
@@ -305,5 +306,29 @@ public class FoundingFatherTest extends FreeColTestCase {
         player.setTax(30);
         int expected = Math.round(((float) (3 * 6 + 1) * 130) / 100);
         assertEquals(expected, townHall.getProductionOf(bells));
+    }
+    
+    public void testRevere() {
+        Game game = getGame();
+        game.setMap(getTestMap());
+        
+        Colony colony = getStandardColony();
+        Player player = colony.getOwner();
+        Unit colonist = colony.getRandomUnit();
+           
+        String errMsg = "Unit should not be able to automatically arm, Revere not in congress yet";
+        assertTrue(errMsg, colonist.getAutomaticEquipment() == null);
+        
+        // adding Revere to congress
+        FoundingFather father = spec().getFoundingFather("model.foundingFather.paulRevere");
+        player.addFather(father);
+
+        errMsg = "Unit should not be able to automatically arm, no muskets available";
+        assertTrue(errMsg, colonist.getAutomaticEquipment() == null);
+        
+        colony.addGoods(musketsType, 100);
+        
+        errMsg = "Unit be able to automatically arm, has muskets and Paul Revere";
+        assertFalse(errMsg, colonist.getAutomaticEquipment() == null);
     }
 }

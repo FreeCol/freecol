@@ -441,27 +441,11 @@ public class SimpleCombatModel implements CombatModel {
             // a stock-piled musket if attacked, so the bonus should be applied
             // for unarmed colonists inside colonies where there are muskets
             // available. Indians can also pick up equipment.
-            if (!defender.isArmed() &&
-                (defender.getLocation() instanceof WorkLocation ||
-                 defender.getLocation() instanceof IndianSettlement) &&
-                defender.getOwner().hasAbility("model.ability.automaticEquipment")) {
-                Set<Ability> autoDefence = defender.getOwner().getFeatureContainer()
-                    .getAbilitySet("model.ability.automaticEquipment");
-                Settlement settlement;
-                if (defender.getLocation() instanceof WorkLocation) {
-                    settlement = defender.getColony();
-                } else {
-                    settlement = (Settlement) defender.getLocation();
-                }
-                for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {
-                    if (defender.canBeEquippedWith(equipment)) {
-                        for (Ability ability : autoDefence) {
-                            if (ability.appliesTo(equipment) && 
-                                settlement.canBuildEquipment(equipment)) {
-                                result.addAll(equipment.getModifierSet("model.modifier.defence"));
-                            }
-                        }
-                    }
+            TypeCountMap<EquipmentType> autoEquipList = defender.getAutomaticEquipment();
+            if (autoEquipList != null) {
+                // add modifiers given by equipment of defense
+                for(EquipmentType equipment : autoEquipList.keySet()){
+                    result.addAll(equipment.getModifierSet("model.modifier.defence"));
                 }
             }
 
@@ -537,32 +521,14 @@ public class SimpleCombatModel implements CombatModel {
         //attacker.adjustTension(defender);
         Settlement settlement = newTile.getSettlement();
 
-        /*
-         * TODO: This is a bit clumsy. Should we make information like
-         * this part of the CombatResult?
-         */
-        if (!defender.isArmed() &&
-            (defender.getLocation() instanceof WorkLocation ||
-             defender.getLocation() instanceof IndianSettlement) &&
-            defender.getOwner().hasAbility("model.ability.automaticEquipment")) {
-            Set<Ability> autoDefence = defender.getOwner().getFeatureContainer()
-                .getAbilitySet("model.ability.automaticEquipment");
-            outer: for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {
-                if (defender.canBeEquippedWith(equipment)) {
-                    for (Ability ability : autoDefence) {
-                        if (ability.appliesTo(equipment) && 
-                            settlement.canBuildEquipment(equipment)) {
-                            
-                            defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT,
-                                                     defender,
-                                                     "model.unit.automaticDefence",
-                                                     "%unit%", defender.getName(),
-                                                     "%colony%", settlement.getName());
-                            break outer;
-                        }
-                    }
-                }
-            }
+        // Warn of automatic arming
+        TypeCountMap<EquipmentType> autoEquipList = defender.getAutomaticEquipment();
+        if (autoEquipList != null) {
+            defender.addModelMessage(defender, ModelMessage.MessageType.COMBAT_RESULT,
+                    defender,
+                    "model.unit.automaticDefence",
+                    "%unit%", defender.getName(),
+                    "%colony%", settlement.getName());
         }
 
         switch (result.type) {
@@ -609,7 +575,8 @@ public class SimpleCombatModel implements CombatModel {
             } else if (attacker.hasAbility("model.ability.pillageUnprotectedColony") && 
                        !defender.isDefensiveUnit() &&
                        defender.getColony() != null &&
-                       !defender.getColony().hasStockade()) {
+                       !defender.getColony().hasStockade() &&
+                       defender.getAutomaticEquipment() == null) {
                 pillageColony(attacker, defender.getColony(), repairLocation);
             } else {
                 if (!defender.isNaval()) {
@@ -1152,8 +1119,16 @@ public class SimpleCombatModel implements CombatModel {
     private EquipmentType findEquipmentTypeToLose(Unit victim) {
         EquipmentType toLose = null;
         int combatLossPriority = 0;
+        
+        TypeCountMap<EquipmentType> equipmentList = victim.getEquipment();
+        if(equipmentList.isEmpty()){
+            TypeCountMap<EquipmentType> autoEquipment = victim.getAutomaticEquipment(); 
+            if(autoEquipment != null){
+                equipmentList = autoEquipment;
+            }
+        }
 
-        for (EquipmentType equipmentType : victim.getEquipment().keySet()) {
+        for (EquipmentType equipmentType : equipmentList.keySet()) {
             if (equipmentType.getCombatLossPriority() > combatLossPriority) {
                 toLose = equipmentType;
                 combatLossPriority = equipmentType.getCombatLossPriority();
@@ -1282,9 +1257,28 @@ public class SimpleCombatModel implements CombatModel {
         String messageID = Messages.getKey(unit.getType().getId() + ".demoted",
                                            "model.unit.unitDemoted");
 
-        unit.removeEquipment(typeToLose, 1, true);
-        if (unit.getEquipment().isEmpty()) {
-            messageID = "model.unit.unitDemotedToUnarmed";
+        boolean hasAutoEquipment = unit.getEquipment().isEmpty() && unit.getAutomaticEquipment() != null;
+
+        if(hasAutoEquipment){
+            // auto equipment isnt actually equiped by the unit (cannot be)
+            // its kept stored in the settlement of the unit
+            // we need to remove it from there if its lost
+            Settlement settlement = null;
+            if(unit.getLocation() instanceof IndianSettlement){
+                settlement = unit.getIndianSettlement();
+            }
+            else{
+                settlement = unit.getColony();
+            }
+            for(AbstractGoods goods : typeToLose.getGoodsRequired()){
+                settlement.removeGoods(goods);
+            }
+        }
+        else{
+            unit.removeEquipment(typeToLose, 1, true);
+            if (unit.getEquipment().isEmpty()) {
+                messageID = "model.unit.unitDemotedToUnarmed";
+            }
         }
         enemyUnit.addModelMessage(enemyUnit,
                                   ModelMessage.MessageType.COMBAT_RESULT,
