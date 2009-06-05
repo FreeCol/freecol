@@ -37,7 +37,8 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
 public class MockModelController implements ModelController {
-
+    private PseudoRandom setPseudoRandom = null;
+    
     public Unit createUnit(String taskID, Location location, Player owner, int type) {
         // TODO Auto-generated method stub
         return null;
@@ -54,6 +55,10 @@ public class MockModelController implements ModelController {
     }
 
     public PseudoRandom getPseudoRandom() {
+        if(setPseudoRandom != null){
+            return setPseudoRandom;
+        }
+        
         return new PseudoRandom(){
 
             Random r = new Random(0);
@@ -63,6 +68,10 @@ public class MockModelController implements ModelController {
             }
 			
         };
+    }
+    
+    public void setPseudoRandom(PseudoRandom newPseudoRandom){
+        setPseudoRandom = newPseudoRandom;
     }
 
     public int getRandom(String taskID, int n) {
