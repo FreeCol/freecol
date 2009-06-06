@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -74,7 +75,6 @@ import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItem;
-import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
@@ -92,6 +92,122 @@ import net.sf.freecol.common.resources.ResourceManager;
 public final class GUI {
 
     private static final Logger logger = Logger.getLogger(GUI.class.getName());
+    
+    /**
+     * Custom component to paint turn progress.
+     * <p>
+     * Currently the component darken out background using alpha channel and
+     * then paints the player's icon and wait message.
+     */
+    @SuppressWarnings("serial")
+    static class GrayLayer extends Component {
+
+        /** Color for graying out background component */
+        private static final Color MASK_COLOR = new Color(0f, 0f, 0f, .6f);
+        /** Default font size for message text */
+        private static final int DEFAULT_FONT_SIZE = 18;
+        /** Font size decrement for message text to reduce length */
+        private static final int FONT_SIZE_DECREMENT = 2;
+        /**
+         * Maximum text width to show. This is additional constraint to the
+         * component's bounds
+         */
+        private static final int MAX_TEXT_WIDTH = 640;
+
+        /** Image library for icon lookup */
+        private ImageLibrary imageLibrary;
+        /** Player object or <code>null</code> */
+        private Player player;
+
+        public GrayLayer(ImageLibrary imageLibrary) {
+            this.imageLibrary = imageLibrary;
+        }
+
+        /**
+         * Executes painting. The method shadows the background image, and
+         * paints the message with icon (if available) and text.
+         */
+        public void paint(Graphics g) {
+            Rectangle clipArea = g.getClipBounds();
+            if (clipArea == null) {
+                clipArea = getBounds();
+                clipArea.x = clipArea.y = 0;
+            }
+            if (clipArea.isEmpty()) {
+                // we are done - the picture is OK
+                return;
+            }
+            g.setColor(MASK_COLOR);
+            g.fillRect(clipArea.x, clipArea.y, clipArea.width, clipArea.height);
+
+            if (player == null) {
+                // we are done, no player information
+                return;
+            }
+
+            ImageIcon coatOfArmsIcon = imageLibrary
+                    .getCoatOfArmsImageIcon(player.getNation());
+
+            Rectangle iconBounds = new Rectangle();
+            if (coatOfArmsIcon != null) {
+                iconBounds.width = coatOfArmsIcon.getIconWidth();
+                iconBounds.height = coatOfArmsIcon.getIconHeight();
+            }
+
+            Font nameFont = getFont();
+            FontMetrics nameFontMetrics = getFontMetrics(nameFont);
+            String message = Messages.message("waitingFor", "%nation%", player
+                    .getNationAsString());
+
+            Rectangle textBounds;
+            int fontSize = DEFAULT_FONT_SIZE;
+            int maxWidth = Math.min(MAX_TEXT_WIDTH, getSize().width);
+            do {
+                nameFont = nameFont.deriveFont(Font.BOLD, fontSize);
+                nameFontMetrics = getFontMetrics(nameFont);
+                textBounds = nameFontMetrics.getStringBounds(message, g)
+                        .getBounds();
+                fontSize -= FONT_SIZE_DECREMENT;
+            } while (textBounds.width > maxWidth);
+
+            Dimension size = getSize();
+            textBounds.x = (size.width - textBounds.width) / 2;
+            textBounds.y = (size.height - textBounds.height - iconBounds.height) / 2;
+
+            iconBounds.x = (size.width - iconBounds.width) / 2;
+            iconBounds.y = (size.height - iconBounds.height) / 2
+                    + textBounds.height;
+
+            if (textBounds.intersects(clipArea)) {
+                // show message
+                g.setFont(nameFont);
+                g.setColor(player.getColor());
+                g.drawString(message, textBounds.x, textBounds.y
+                        + textBounds.height);
+            }
+            if (coatOfArmsIcon != null && iconBounds.intersects(clipArea)) {
+                // show icon
+                coatOfArmsIcon.paintIcon(this, g, iconBounds.x, iconBounds.y);
+            }
+        }
+
+        /**
+         * Set the player for which we paint. If the player is already set, then
+         * nothing happens, otherwise a repaint event is sent.
+         * 
+         * @param player
+         *            Player for status information
+         * 
+         * @see #paint(Graphics)
+         */
+        public void setPlayer(Player player) {
+            if (this.player == player) {
+                return;
+            }
+            this.player = player;
+            repaint();
+        }
+    }
 
     private final FreeColClient freeColClient;
     private Dimension size;
@@ -183,9 +299,7 @@ public final class GUI {
     
     private Image cursorImage;
     
-    private JLabel coatOfArms;
-    private JLabel greyLayer;
-    private JLabel waitingForMsg;
+    private GrayLayer greyLayer;
     
     private java.util.Map<Unit, Integer> unitsOutForAnimation;
     private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
@@ -1239,54 +1353,22 @@ public final class GUI {
         Grey out the map if it is not my turn (and a multiplayer game).
          */
         Canvas canvas = freeColClient.getCanvas();
-        // Remove the last coat of arms and waiting for message if it was set
-        if (coatOfArms != null) {
-            canvas.remove(coatOfArms, false);
-            coatOfArms = null;
-        }
-        if (waitingForMsg != null) {
-            canvas.remove(waitingForMsg, false);
-            waitingForMsg = null;
-        }
         
         if (!freeColClient.isMapEditor()
                 && freeColClient.getGame() != null
                 && freeColClient.getMyPlayer() != freeColClient.getGame().getCurrentPlayer()) {
             
             if (greyLayer == null) {
-                greyLayer = buildGreyLayer();
-            } else if (!greyLayer.getSize().equals(size)) {
-                canvas.remove(greyLayer, false);
-                greyLayer = buildGreyLayer();
+                greyLayer = new GrayLayer(lib);
             }
             if (greyLayer.getParent() == null) { // Not added to the canvas yet.
                 canvas.add(greyLayer, JLayeredPane.DEFAULT_LAYER, false);
                 canvas.moveToFront(greyLayer);
             }
-            
-            final Color currentPlayerColor = freeColClient.getGame().getCurrentPlayer().getColor();
-            final String nation = freeColClient.getGame().getCurrentPlayer().getNationAsString();
-            Image im = createStringImage(g, 
-                    Messages.message("waitingFor", "%nation%", nation),
-                    currentPlayerColor,
-                    640,
-                    18);
                         
-            final ImageIcon coatOfArmsIcon = lib.getCoatOfArmsImageIcon(freeColClient.getGame().getCurrentPlayer().getNation());
-            final int cHeight = (coatOfArmsIcon != null) ? coatOfArmsIcon.getIconHeight() : 0;
-            final int cWidth = (coatOfArmsIcon != null) ? coatOfArmsIcon.getIconWidth() : 0;
+            greyLayer.setBounds(0,0,canvas.getSize().width, canvas.getSize().height);
+            greyLayer.setPlayer(freeColClient.getGame().getCurrentPlayer());
             
-            waitingForMsg = new JLabel(new ImageIcon(im));
-            waitingForMsg.setBounds((size.width - im.getWidth(null)) / 2, (size.height - im.getHeight(null) - cHeight) / 2, im.getWidth(null), im.getHeight(null));
-            canvas.add(waitingForMsg, JLayeredPane.DEFAULT_LAYER, false);
-            canvas.moveToFront(waitingForMsg);
-            
-            if (coatOfArmsIcon != null) {
-                coatOfArms = new JLabel(coatOfArmsIcon);
-                coatOfArms.setBounds((size.width - cWidth) / 2, (size.height - cHeight) / 2 + im.getHeight(null), cWidth, cHeight);
-                canvas.add(coatOfArms, JLayeredPane.DEFAULT_LAYER, false);
-                canvas.moveToFront(coatOfArms);
-            }
         }
         else {
             if (greyLayer != null && greyLayer.getParent() != null) {
@@ -1313,25 +1395,7 @@ public final class GUI {
                 yy += si.getHeight();
             }
         }
-    }
-    
-    /**
-     * Builds a JLabel object which is a image of a black rectangle with 60% opacity.
-     * The size will be the GUI's size and coordinates 0,0
-     * @return The JLabel containing the grey layer
-     */
-    private JLabel buildGreyLayer() {
-        BufferedImage greyLayerImg = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D greyG = greyLayerImg.createGraphics();
-        greyG.setColor(Color.BLACK);
-        Composite oldComposite = greyG.getComposite();
-        greyG.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
-        greyG.fill(new Rectangle(0, 0, size.width, size.height));
-        greyG.setComposite(oldComposite);
-        JLabel toReturn = new JLabel(new ImageIcon(greyLayerImg));
-        toReturn.setBounds(0, 0, size.width, size.height);
         
-        return toReturn;
     }
     
     /**
