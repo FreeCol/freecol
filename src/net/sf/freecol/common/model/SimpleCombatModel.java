@@ -175,7 +175,8 @@ public class SimpleCombatModel implements CombatModel {
         if (result.compareTo(CombatResultType.WIN) >= 0 &&
             defender.getTile().getSettlement() != null) {
             if (defender.getTile().getSettlement() instanceof Colony) {
-                if (!defender.isDefensiveUnit()) {
+                if (!defender.isDefensiveUnit() &&
+                    defender.getAutomaticEquipment() == null) {
                     result = CombatResultType.DONE_SETTLEMENT;
                 }
             } else if (defender.getTile().getSettlement() instanceof IndianSettlement) {

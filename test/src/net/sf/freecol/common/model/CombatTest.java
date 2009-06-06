@@ -19,14 +19,19 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
+import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.MockPseudoRandom;
 
 public class CombatTest extends FreeColTestCase {
 
@@ -544,8 +549,7 @@ public class CombatTest extends FreeColTestCase {
         game.setMap(map);
         
         Colony colony = getStandardColony();
-
-        SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
+     
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
         dutch.changeRelationWithPlayer(inca, Stance.WAR);
@@ -566,6 +570,17 @@ public class CombatTest extends FreeColTestCase {
             colony.addGoods(goods);
             goodsAdded.put(goods.getType(), goods.getAmount());
         }
+
+        // We need a deterministic random
+        List<Integer> setValues = new ArrayList<Integer>();
+        setValues.add(1);
+        PseudoRandom mockRandom = new MockPseudoRandom(setValues,false);
+        SimpleCombatModel combatModel = new SimpleCombatModel(mockRandom);
+
+        CombatResult result = combatModel.generateAttackResult(attacker, colonist);
+        
+        String errMsg = "Wrong combat result, cannot be DONE_SETTLEMENT";
+        assertFalse(errMsg,result.type == CombatResultType.DONE_SETTLEMENT);
         
         combatModel.attack(attacker, colonist, victory, 0, null);
         
@@ -574,7 +589,7 @@ public class CombatTest extends FreeColTestCase {
         
         for (AbstractGoods goods : muskets.getGoodsRequired()) {
             boolean goodsLost = colony.getGoodsCount(goods.getType()) < goodsAdded.get(goods.getType());
-            String errMsg = "Colony should have lose " + goods.getType().getName();
+            errMsg = "Colony should have lose " + goods.getType().getName();
             assertTrue(errMsg,goodsLost);
         }
     }
