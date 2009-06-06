@@ -32,16 +32,24 @@ public class MockPseudoRandom implements PseudoRandom {
     @Override
     public int nextInt(int n) {
         if(pos < setNumberList.size()){
+            int number = setNumberList.get(pos);
+            if(number >= n){
+                throw new IllegalArgumentException("Number in queue is bigger than " + n);
+            }
             pos++;
-            return setNumberList.get(pos-1);
+            return number;
         }
         if(cycleNumbers && !setNumberList.isEmpty()){
+            int number = setNumberList.get(0);
             pos = 1;
-            return setNumberList.get(pos-1);
+            if(number >= n){
+                throw new IllegalArgumentException("Number in queue is bigger than " + n);
+            }
+            return number;
         }
         if(random == null){
             random = new Random(0);
         }
-        return random.nextInt();
+        return random.nextInt(n);
     }
 }
