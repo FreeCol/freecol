@@ -1781,7 +1781,14 @@ public final class GUI {
                     g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
                                                     tile.getX(), tile.getY()),
                                                     x, y, null);
-                } else if (tile.isExplored() && borderingTile.isExplored()) {
+                    if (borderingTile.getRiver() != null &&
+                        (direction == Direction.SE || direction == Direction.SW ||
+                         direction == Direction.NE || direction == Direction.NW)) {
+                        g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(),
+                                                           tile.getX(), tile.getY()),
+                                    x, y, null);
+                    }
+               } else if (tile.isExplored() && borderingTile.isExplored()) {
                     if (tile.getType().getArtBasic().equals(borderingTile.getType().getArtBasic())) {
                         // Do not draw limit between tile that share same graphics (ocean & great river)
                         continue;

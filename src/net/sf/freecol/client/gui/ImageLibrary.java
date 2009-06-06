@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.server.generator.River;
 
 /**
  * Holds various images that can be called upon by others in order to display
@@ -99,13 +100,17 @@ public final class ImageLibrary extends ImageProvider {
 
     private final String dataDirectory;
 
+    private static final String deltaName = "delta_";
+    private static final String small = "_small";
+    private static final String large = "_large";
+
     /**
      * A ArrayList of Image objects.
      */
     private List<ImageIcon> rivers;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
-        forests;
+        forests, deltas;
 
     private Map<String, ArrayList<ImageIcon>> border1, border2, coast1, coast2;
 
@@ -195,6 +200,7 @@ public final class ImageLibrary extends ImageProvider {
         loadTerrain(gc, resourceLocator, doLookup);
         loadForests(gc, resourceLocator, doLookup);
         loadRivers(gc, resourceLocator, doLookup);
+        loadRiverMouths(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
 
         alarmChips = new EnumMap<Tension.Level, Image>(Tension.Level.class);
@@ -222,6 +228,7 @@ public final class ImageLibrary extends ImageProvider {
     public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
         ImageLibrary scaledLibrary = new ImageLibrary("", scalingFactor);
         scaledLibrary.rivers = scaleImages(rivers, scalingFactor);
+        scaledLibrary.deltas = scaleImages(deltas, scalingFactor);
 
         scaledLibrary.terrain1 = scaleImages(terrain1, scalingFactor);
         scaledLibrary.terrain2 = scaleImages(terrain2, scalingFactor);
@@ -459,6 +466,33 @@ public final class ImageLibrary extends ImageProvider {
         for (int i = 0; i < RIVER_STYLES; i++) {
             String filePath = dataDirectory + path + riverDirectory + riverName + i + extension;
             rivers.add(findImage(filePath, resourceLocator, doLookup));
+        }
+    }
+
+    /**
+     * Loads the river mouth images from file into memory.
+     * 
+     * @param gc The GraphicsConfiguration is needed to create images that are
+     *            compatible with the local environment.
+     * @param resourceLocator The class that is used to locate data files.
+     * @param doLookup Must be set to 'false' if the path to the image files has
+     *            been manually provided by the user. If set to 'true' then a
+     *            lookup will be done to search for image files from
+     *            net.sf.freecol, in this case the images need to be placed in
+     *            net.sf.freecol/images.
+     * @throws FreeColException If one of the data files could not be found.
+     */
+    private void loadRiverMouths(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
+            throws FreeColException {
+        logger.fine("loading river mouth images");
+        deltas = new HashMap<String, ImageIcon>();
+        for (Direction d : River.directions) {
+            String key = deltaName + d + small;
+            String filePath = dataDirectory + path + riverDirectory + key + extension;
+            deltas.put(key, findImage(filePath, resourceLocator, doLookup));
+            key = deltaName + d + large;
+            filePath = dataDirectory + path + riverDirectory + key + extension;
+            deltas.put(key, findImage(filePath, resourceLocator, doLookup));
         }
     }
 
@@ -869,6 +903,23 @@ public final class ImageLibrary extends ImageProvider {
         } else {
             return border2.get(key).get(borderType).getImage();
         }
+    }
+
+    /**
+     * Returns the river mouth terrain-image for the direction and magnitude.
+     * 
+     * @param direction a <code>Direction</code> value
+     * @param magnitude an <code>int</code> value
+     * @param x The x-coordinate of the location of the tile that is being
+     *            drawn (ignored).
+     * @param y The x-coordinate of the location of the tile that is being
+     *            drawn (ignored).
+     * @return The terrain-image at the given index.
+     */
+    public Image getRiverMouthImage(Direction direction, int magnitude, int x, int y) {
+
+        String key = deltaName + direction + (magnitude == 1 ? small : large);
+        return deltas.get(key).getImage();
     }
 
     /**
