@@ -21,24 +21,15 @@ public class Animations {
 
     /**
      * Animates a unit move.
-     * 
+     *
      * @param canvas The canvas where the animation should be drawn.
      * @param unit The unit to be animated.
-     * @param direction The direction to move the unit.
-     */
-    public static void unitMove(Canvas canvas, Unit unit, Direction direction) {
-        new UnitMoveAnimation(canvas, unit, direction).animate();
-    }
-    
-    /**
-     * Animates a unit move.
-     * 
-     * @param canvas The canvas where the animation should be drawn.
-     * @param unit The unit to be animated.
+     * @param source The source tile for the unit.
      * @param destination The destination tile for the unit.
      */
-    public static void unitMove(Canvas canvas, Unit unit, Tile destination) {
-        new UnitMoveAnimation(canvas, unit, destination).animate();
+    public static void unitMove(Canvas canvas, Unit unit, Tile source,
+                                Tile destination) {
+        new UnitMoveAnimation(canvas, unit, source, destination).animate();
     }
     
     /**
@@ -56,9 +47,9 @@ public class Animations {
         final Map map = attacker.getGame().getMap();
         final Direction direction = map.getDirection(attacker.getTile(), defender.getTile());
         
-        gui.executeWithUnitOutForAnimation(attacker, new OutForAnimationCallback() {
+        gui.executeWithUnitOutForAnimation(attacker, attacker.getTile(), new OutForAnimationCallback() {
             public void executeWithUnitOutForAnimation(final JLabel attackerLabel) {
-                gui.executeWithUnitOutForAnimation(defender, new OutForAnimationCallback() {
+                gui.executeWithUnitOutForAnimation(defender, defender.getTile(), new OutForAnimationCallback() {
                     public void executeWithUnitOutForAnimation(final JLabel defenderLabel) {
                         final SimpleZippedAnimation attackerAnimation = getAnimation(canvas, attacker, direction, "attack");
                         if (attackerAnimation != null) {

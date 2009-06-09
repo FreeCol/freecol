@@ -1865,7 +1865,8 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the Unit.
      */
     private void reallyMove(Unit unit, Direction direction) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Game game = freeColClient.getGame();
+        if (game.getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
@@ -1882,11 +1883,12 @@ public final class InGameController implements NetworkConstants {
         
         // Play an animation showing the unit movement
         if (!freeColClient.isHeadless()) {
-            final String key = (freeColClient.getMyPlayer() == unit.getOwner()) ?
+            String key = (freeColClient.getMyPlayer() == unit.getOwner()) ?
                 ClientOptions.MOVE_ANIMATION_SPEED :
                 ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
             if (freeColClient.getClientOptions().getInteger(key) > 0) {
-                Animations.unitMove(canvas, unit, direction);
+                Animations.unitMove(canvas, unit, unit.getTile(),
+                                    game.getMap().getNeighbourOrNull(direction, unit.getTile()));
             }
         }
         
@@ -2313,12 +2315,11 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         GUI gui = freeColClient.getGUI();
         Canvas canvas = freeColClient.getCanvas();
-        
-        // Animate the units movement
-        Animations.unitMove(canvas, unit, direction);
-
         Tile destinationTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         Unit destinationUnit = null;
+
+        // Animate the units movement
+        Animations.unitMove(canvas, unit, unit.getTile(), destinationTile);
 
         if (destinationTile.getUnitCount() == 1) {
             destinationUnit = destinationTile.getFirstUnit();

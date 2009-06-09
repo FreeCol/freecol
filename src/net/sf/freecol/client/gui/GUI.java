@@ -355,8 +355,10 @@ public final class GUI {
      * @param unit The unit to be hidden.
      * @param r The code to be executed.
      */
-    public void executeWithUnitOutForAnimation(final Unit unit, final OutForAnimationCallback r) {
-        final JLabel unitLabel = enterUnitOutForAnimation(unit);
+    public void executeWithUnitOutForAnimation(final Unit unit,
+                                               final Tile sourceTile,
+                                               final OutForAnimationCallback r) {
+        final JLabel unitLabel = enterUnitOutForAnimation(unit, sourceTile);
         try {
             r.executeWithUnitOutForAnimation(unitLabel);
         } finally {
@@ -364,13 +366,16 @@ public final class GUI {
         }
     }
     
-    private JLabel enterUnitOutForAnimation(final Unit unit) {
+    private JLabel enterUnitOutForAnimation(final Unit unit, final Tile sourceTile) {
         Integer i = unitsOutForAnimation.get(unit);
         if (i == null) {
-            i = 1;
             final JLabel unitLabel = getUnitLabel(unit);
-            unitsOutForAnimationLabels.put(unit, unitLabel);
             final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
+
+            i = 1;
+            unitLabel.setLocation(getUnitLabelPositionInTile(unitLabel,
+                    getTilePosition(sourceTile)));
+            unitsOutForAnimationLabels.put(unit, unitLabel);
             freeColClient.getCanvas().add(unitLabel, UNIT_LABEL_LAYER, false);
         } else {
             i++;
@@ -391,6 +396,33 @@ public final class GUI {
             i--;
             unitsOutForAnimation.put(unit, i); 
         }
+    }
+
+    /**
+     * Draw the unit's image and occupation indicator in one JLabel object.
+     * @param unit The unit to be drawn
+     * @return A JLabel object with the unit's image.
+     */
+    private JLabel getUnitLabel(Unit unit) {
+        final Image unitImg = lib.getUnitImageIcon(unit).getImage();
+        //final Image chipImg = getOccupationIndicatorImage(unit);
+
+        final int width = tileWidth/2 + unitImg.getWidth(null)/2;
+        final int height = unitImg.getHeight(null);
+
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = img.getGraphics();
+
+        final int unitX = (width - unitImg.getWidth(null)) / 2;
+        g.drawImage(unitImg, unitX, 0, null);
+
+        //final int chipX = ((int) (STATE_OFFSET_X * lib.getScalingFactor()));
+        //final int chipY = (int) (((height / 2 + UNIT_OFFSET*lib.getScalingFactor())) - tileHeight / 2);
+        //g.drawImage(chipImg, chipX, chipY, null);
+
+        final JLabel label = new JLabel(new ImageIcon(img));
+        label.setSize(width, height);
+        return label;
     }
 
     private void updateMapDisplayVariables() {
@@ -2684,38 +2716,6 @@ public final class GUI {
         } else {
             return null;
         }
-    }
-    
-    /**
-     * Draw the unit's image and occupation indicator in one JLabel object.
-     * @param unit The unit to be drawn
-     * @return A JLabel object with the unit's image.
-     */
-    private JLabel getUnitLabel(Unit unit) {
-        final Image unitImg = lib.getUnitImageIcon(unit).getImage();
-        //final Image chipImg = getOccupationIndicatorImage(unit);
-        
-        final int width = tileWidth/2 + unitImg.getWidth(null)/2;
-        final int height = unitImg.getHeight(null);
-        
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = img.getGraphics();
-        
-        final int unitX = (width - unitImg.getWidth(null)) / 2;
-        g.drawImage(unitImg, unitX, 0, null);
-        
-        //final int chipX = ((int) (STATE_OFFSET_X * lib.getScalingFactor()));
-        //final int chipY = (int) (((height / 2 + UNIT_OFFSET*lib.getScalingFactor())) - tileHeight / 2);
-        //g.drawImage(chipImg, chipX, chipY, null);
-        
-        final JLabel label = new JLabel(new ImageIcon(img));
-        label.setSize(width, height);
-        if (unit.getTile() != null && getTilePosition(unit.getTile()) != null) {
-            label.setLocation(getUnitLabelPositionInTile(label, getTilePosition(unit.getTile())));
-        } else {
-            label.setVisible(false);
-        }
-        return label;
     }
     
     private void drawCursor(Graphics2D g, int x, int y) {

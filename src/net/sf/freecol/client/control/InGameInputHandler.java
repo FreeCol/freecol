@@ -298,7 +298,7 @@ public final class InGameInputHandler extends InputHandler {
                 if (getFreeColClient().getClientOptions().getInteger(key) > 0) {
                     //Playing the animation before actually moving the unit
                     try {
-                        new UnitMoveAnimationCanvasSwingTask(unit, toTile).invokeAndWait();
+                        new UnitMoveAnimationCanvasSwingTask(unit, fromTile, toTile).invokeAndWait();
                     } catch (InvocationTargetException exception) {
                         logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
                     }
@@ -360,9 +360,9 @@ public final class InGameInputHandler extends InputHandler {
             
             final Tile newTile = (Tile) getGame().getFreeColGameObject(tileID);
             
+            final Tile oldTile = map.getNeighbourOrNull(direction.getReverseDirection(), newTile);
             if (unit.getLocation() == null) {
                 // Getting the previous tile so we can animate the movement properly
-                final Tile oldTile = map.getNeighbourOrNull(direction.getReverseDirection(), newTile);
                 unit.setLocationNoUpdate(oldTile); 
             }
             
@@ -372,7 +372,7 @@ public final class InGameInputHandler extends InputHandler {
             if (getFreeColClient().getClientOptions().getInteger(key) > 0) {
                 //Playing the animation before actually moving the unit
                 try {
-                    new UnitMoveAnimationCanvasSwingTask(unit, newTile).invokeAndWait();
+                    new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile).invokeAndWait();
                 } catch (InvocationTargetException exception) {
                     logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
                 }
@@ -1582,49 +1582,46 @@ public final class InGameInputHandler extends InputHandler {
      */
     class UnitMoveAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
                 
+        private final Unit _unit;
+        private final Tile _destinationTile;
+        private final Tile _sourceTile;
+        private boolean _focus;
+
         /**
          * Constructor - Play the unit movement animation, focusing the unit
          * @param unit The unit that is moving
+         * @param sourceTile The Tile from which the unit is moving.
          * @param destinationTile The Tile where the unit will be moving to.
          */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile destinationTile) {
-            this(unit, destinationTile, true);
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile,
+                                                Tile destinationTile) {
+            this(unit, sourceTile, destinationTile, true);
         }
-        
-        /**
-         * Constructor - Play the unit movement animation, focusing the unit
-         * @param unit The unit that is moving
-         * @param direction The Direction in which the Unit will be moving.
-         */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Direction direction) {
-            this(unit, unit.getGame().getMap().getNeighbourOrNull(direction, unit.getTile()), true);
-        }
-        
+
         /**
          * Constructor
          * @param unit The unit that is moving
+         * @param sourceTile The Tile from which the unit is moving.
          * @param destinationTile The Tile where the unit will be moving to.
          * @param focus If before the animation the screen should focus the unit
          */
-        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile destinationTile, boolean focus) {
+        public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile,
+                                                Tile destinationTile,
+                                                boolean focus) {
             _unit = unit;
+            _sourceTile = sourceTile;
             _destinationTile = destinationTile;
             _focus = focus;
         }
 
         protected void doWork(Canvas canvas) {
-            
-            if (_focus)
-                canvas.getGUI().setFocusImmediately(_unit.getTile().getPosition());
-                        
-            Animations.unitMove(canvas, _unit, _destinationTile);
+            if (_focus) {
+                canvas.getGUI().setFocusImmediately(_sourceTile.getPosition());
+            }
+            Animations.unitMove(canvas, _unit, _sourceTile, _destinationTile);
             canvas.refresh();
         }
-        
-        private final Unit _unit;
-        private final Tile _destinationTile;
-        private boolean _focus;
-    }
+   }
     
     /**
      * This task reconnects to the server.
