@@ -302,6 +302,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (!(tile.isLand()
               || colony.hasAbility("model.ability.produceInWater"))) {
             return false;
+        } else if (tile.hasLostCityRumour()) {
+            return false;
         }
 
         if (!unit.getType().hasSkill()) {

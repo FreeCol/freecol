@@ -1390,20 +1390,28 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             //colonyPanel.updateSoLLabel();
                         } else {
                             // could not add the unit on the tile
-                            Settlement s = colonyTile.getWorkTile().getOwningSettlement();
+                            Canvas canvas = getCanvas();
+                            Tile workTile = colonyTile.getWorkTile();
+                            Settlement s = workTile.getOwningSettlement();
+
                             if (s != null && s != getColony()) {
                                 if (s.getOwner() == player) {
                                     // Its one of ours
-                                    getCanvas().errorMessage("tileTakenSelf");
+                                    canvas.errorMessage("tileTakenSelf");
                                 } else if (s.getOwner().isEuropean()) {
                                     // occupied by a foreign european colony
-                                    getCanvas().errorMessage("tileTakenEuro");
-                                } else if (s instanceof IndianSettlement && price > 0) { 
+                                    canvas.errorMessage("tileTakenEuro");
+                                } else if (s instanceof IndianSettlement && price > 0) {
                                     // occupied by an indian settlement
-                                    getCanvas().errorMessage("tileTakenInd");
+                                    canvas.errorMessage("tileTakenInd");
+                                }
+                            } else {
+                                if (!workTile.isLand()) { // no docks
+                                    canvas.errorMessage("tileNeedsDocks");
+                                } else if (workTile.hasLostCityRumour()) {
+                                    canvas.errorMessage("tileHasRumour");
                                 }
                             }
-                            // else perhaps water tile with no docks
                             return null;
                         }
                     } else {
