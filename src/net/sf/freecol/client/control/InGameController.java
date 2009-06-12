@@ -1287,7 +1287,7 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit an <code>Unit</code> value
      * @param direction an <code>Direction</code> value
-     */
+     */ 
     private void negotiate(Unit unit, Direction direction) {
         Player player = freeColClient.getMyPlayer();
         Client client = freeColClient.getClient();
@@ -1300,6 +1300,13 @@ public final class InGameController implements NetworkConstants {
         Element reply;
 
         if (settlement == null) return;
+        
+        // Player cannot negotiate with REF
+        boolean isPlayersREF = settlement.getOwner() == unit.getOwner().getREFPlayer();
+        if(isPlayersREF){
+            throw new IllegalStateException("Unit tried to negociate with REF");
+        }
+        
         for (;;) {
             newAgreement = canvas.showNegotiationDialog(unit, settlement,
                                                         oldAgreement);

@@ -1122,8 +1122,13 @@ public final class Canvas extends JDesktopPane {
                                            "%unit%", unit.getName(), 
                                            "%colony%", colony.getName());
         List<ChoiceItem<ScoutAction>> choices = new ArrayList<ChoiceItem<ScoutAction>>();
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.negotiate"), 
+        
+        // We cannot negotiate with the REF
+        boolean isPlayersREF = colony.getOwner() == unit.getOwner().getREFPlayer();
+        if(!isPlayersREF){
+            choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.negotiate"), 
                                                 ScoutAction.FOREIGN_COLONY_NEGOTIATE));
+        }
         choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.spy"),
                                                 ScoutAction.FOREIGN_COLONY_SPY));
         choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.attack"),

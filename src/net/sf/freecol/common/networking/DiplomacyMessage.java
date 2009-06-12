@@ -439,6 +439,11 @@ public class DiplomacyMessage extends Message {
             return Message.clientError("DiplomaticTrade recipient: " + enemyPlayer.getId()
                                        + " does not match Settlement owner: " + settlementPlayer);
         }
+        if(enemyPlayer == serverPlayer.getREFPlayer()){
+            return Message.clientError("Player " + serverPlayer.getId()
+                    + " tried to negotiate with his REF");
+        }
+        
         Connection enemyConnection = enemyPlayer.getConnection();
         if (enemyConnection == null) {
             return Message.createError("server.communicate",
