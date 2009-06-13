@@ -849,7 +849,7 @@ public final class InGameController implements NetworkConstants {
                 path = null;
                 break;
             default:
-                if (path == path.getLastNode() && mt != MoveType.ILLEGAL_MOVE
+                if (path == path.getLastNode() && mt.isLegal()
                     && (mt != MoveType.ATTACK || knownEnemyOnLastTile(path))) {
                     move(unit, path.getDirection());
                     // unit may have been destroyed while moving
@@ -1253,11 +1253,13 @@ public final class InGameController implements NetworkConstants {
         case EXPLORE_LOST_CITY_RUMOUR:
             exploreLostCityRumour(unit, direction);
             break;
-        case ILLEGAL_MOVE:
-            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            break;
         default:
-            throw new RuntimeException("unrecognised move: " + move);
+            if (!move.isLegal()) {
+                freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            } else {
+                throw new RuntimeException("unrecognised move: " + move);
+            }
+            break;
         }
 
         // Display a "cash in"-dialog if a treasure train have been moved into a

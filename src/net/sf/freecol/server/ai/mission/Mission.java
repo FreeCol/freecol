@@ -93,7 +93,7 @@ public abstract class Mission extends AIObject {
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left and
     *         {@link #NO_PATH_TO_TARGET} if there is no path to follow.
     *         If a direction is returned, it is guaranteed that moving in that direction
-    *         is not an {@link Unit#ILLEGAL_MOVE}, but a direction also gets returned
+    *         is not an illegal move, but a direction also gets returned
     *         if the resulting move would be an {@link Unit#ATTACK} etc. A direction
     *         can also be returned during the path, if the path has been blocked.
     */
@@ -119,7 +119,7 @@ public abstract class Mission extends AIObject {
     * @return The direction to continue moving the path (greater than or equal to zero),
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left.
     *         If a direction is returned, it is guaranteed that moving in that direction
-    *         is not an {@link Unit#ILLEGAL_MOVE}. A directions gets returned when
+    *         is not an illegal move. A directions gets returned when
     *         moving in the given direction would not be a {@link Unit#MOVE} or
     *         {@link Unit#MOVE_HIGH_SEAS}.
     */
@@ -129,15 +129,13 @@ public abstract class Mission extends AIObject {
         }
         
         while (pathNode.next != null 
-                && pathNode.getTurns() == 0
-                && this.isValid() == true
-                && (getUnit().getMoveType(pathNode.getDirection()) == MoveType.MOVE
-                || getUnit().getMoveType(pathNode.getDirection()) == MoveType.MOVE_HIGH_SEAS
-                || getUnit().getMoveType(pathNode.getDirection()) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
+               && pathNode.getTurns() == 0
+               && this.isValid() == true
+               && getUnit().getMoveType(pathNode.getDirection()).isProgress()) {
             move(connection, pathNode.getDirection());         
             pathNode = pathNode.next;
         }
-        if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()) != MoveType.ILLEGAL_MOVE) {
+        if (pathNode.getTurns() == 0 && getUnit().getMoveType(pathNode.getDirection()).isLegal()) {
             return pathNode.getDirection();
         }
         return null;
@@ -186,13 +184,8 @@ public abstract class Mission extends AIObject {
     
     protected void moveButDontAttack(Connection connection, Direction direction) {
         if (direction != null) {
-            switch (getUnit().getMoveType(direction)) {
-            case MOVE: case MOVE_HIGH_SEAS: case EXPLORE_LOST_CITY_RUMOUR:
-                // The three cases acceptable to Unit.move()
+            if (getUnit().getMoveType(direction).isProgress()) {
                 move(connection, direction);
-                break;
-            default:
-                break;
             }
         }
     }

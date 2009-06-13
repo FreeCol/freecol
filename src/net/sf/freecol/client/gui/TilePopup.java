@@ -101,7 +101,7 @@ public final class TilePopup extends JPopupMenu {
                     victoryPercent = Integer.toString((int)(combatOdds.win * 100));
                 }
                 gotoMenuItem = new JMenuItem(Messages.message("attackTileOdds", "%chance%", victoryPercent));
-            } else if (activeUnit.getMoveType(null, tile, Integer.MAX_VALUE) != MoveType.ILLEGAL_MOVE) {
+            } else if (activeUnit.getSimpleMoveType(null, tile).isLegal()) {
                 //final Image gotoImage = (Image) UIManager.get("cursor.go.image");
                 //JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));
                 gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"));

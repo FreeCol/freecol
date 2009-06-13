@@ -300,7 +300,7 @@ public class CombatTest extends FreeColTestCase {
         assertTrue(soldier.isOffensiveUnit());
 
         assertEquals("Unarmed colonial regular can not attack!",
-                     Unit.MoveType.ILLEGAL_MOVE, colonial.getMoveType(tile2));
+                     Unit.MoveType.MOVE_NO_ATTACK_CIVILIAN, colonial.getMoveType(tile2));
 
 
         combatModel.attack(soldier, colonial, victory, 0, null);

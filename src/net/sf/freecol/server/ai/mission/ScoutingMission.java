@@ -181,7 +181,7 @@ public class ScoutingMission extends Mission {
                 Direction direction = moveTowards(connection, bestPath);
                 if (direction != null) {
                     final MoveType mt = getUnit().getMoveType(direction);             
-                    if (getUnit().getMoveType(direction) == MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
+                    if (mt == MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
                         Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
                         scoutMessage.setAttribute("unit", getUnit().getId());
                         scoutMessage.setAttribute("direction", direction.toString());
@@ -202,7 +202,7 @@ public class ScoutingMission extends Mission {
                         if (getUnit().isDisposed()) {
                             return;
                         }
-                    } else if (mt != MoveType.ILLEGAL_MOVE && mt != MoveType.ATTACK) {
+                    } else if (mt.isProgress()) {
                         move(connection, direction);
                     }
                 }

@@ -317,9 +317,8 @@ public class PioneeringMission extends Mission {
                     PathNode pathToTarget = getUnit().findPath(tileImprovementPlan.getTarget());
                     if (pathToTarget != null) {
                         Direction direction = moveTowards(connection, pathToTarget);
-                        if (direction != null &&
-                            (getUnit().getMoveType(direction) == MoveType.MOVE
-                             || getUnit().getMoveType(direction) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
+                        if (direction != null
+                            && getUnit().getMoveType(direction).isProgress()) {
                             move(connection, direction);
                         }
                     }

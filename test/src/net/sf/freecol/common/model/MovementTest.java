@@ -179,7 +179,7 @@ public class MovementTest extends FreeColTestCase {
         assertEquals(tile1.getColony(), colony);
 
         Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
-        assertEquals(Unit.MoveType.ILLEGAL_MOVE, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.MOVE_NO_ACCESS_SETTLEMENT, colonist.getMoveType(tile1));
         colonist.equipWith(horses, true);
         assertEquals(Unit.MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT, colonist.getMoveType(tile1));
         colonist.equipWith(muskets, true);
