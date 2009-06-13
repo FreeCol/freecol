@@ -273,7 +273,10 @@ public final class Monarch extends FreeColGameObject {
             }
         }
 
-        if (player.getTax() > MINIMUM_TAX_RATE) {
+        if (player.getTax() > MINIMUM_TAX_RATE + 10) {
+            // Play it safe: we don't want to lower the rate below the
+            // minimum tax rate, since it might actually be raised by
+            // getNewTax() in that case.
             choices.add(new RandomChoice<MonarchAction>(MonarchAction.LOWER_TAX, 10 - dx));
         }
 
