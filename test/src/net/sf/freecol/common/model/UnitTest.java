@@ -19,10 +19,17 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.MockModelController;
+import net.sf.freecol.util.test.MockPseudoRandom;
 
 public class UnitTest extends FreeColTestCase {
 
@@ -57,6 +64,7 @@ public class UnitTest extends FreeColTestCase {
 
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     UnitType hardyPioneerType = spec().getUnitType("model.unit.hardyPioneer");
+    UnitType expertFarmerType = spec().getUnitType("model.unit.expertFarmer");
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
     UnitType caravelType = spec().getUnitType("model.unit.caravel");
     UnitType wagonType = spec().getUnitType("model.unit.wagonTrain");
@@ -65,6 +73,8 @@ public class UnitTest extends FreeColTestCase {
     GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
 
     BuildingType schoolHouseType = spec().getBuildingType("model.building.Schoolhouse");
+    BuildingType carpenterHouseType = spec().getBuildingType("model.building.CarpenterHouse");
+    
     /**
      * Test Plowing with a hardy pioneer
      * 
@@ -898,5 +908,52 @@ public class UnitTest extends FreeColTestCase {
         }
         catch(IllegalStateException e){   
         }
+    }
+    
+    public void testUnitPromotionWorkingInWorkTile(){
+        Game game = getStandardGame();
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        
+        Colony colony = getStandardColony();
+        
+        assertTrue("Colony should only have 1 colonist for test setup",colony.getUnitCount() == 1);
+        
+        Unit colonist = colony.getRandomUnit();
+        String errMsg = "Error setting test, colonist should not be an expert";
+        assertTrue(errMsg, colonist.getType() == colonistType);
+        
+        ColonyTile workTile = colony.getColonyTile(map.getNeighbourOrNull(Direction.N, colony.getTile()));
+        
+        // set colonist as farmer
+        colonist.setLocation(workTile);
+        colonist.setWorkType(foodType);
+        assertEquals("Wrong work allocation",foodType,colonist.getWorkType());
+        
+        // set some experience
+        int expectXP = 10;
+        colonist.modifyExperience(expectXP);
+        assertEquals("Wrong colonist experience",expectXP,colonist.getExperience());
+        
+        // We need a deterministic random
+        List<Integer> setValues = new ArrayList<Integer>();
+        setValues.add(1);
+        PseudoRandom mockRandom = new MockPseudoRandom(setValues,true);
+        MockModelController controller = (MockModelController) game.getModelController();
+        controller.setPseudoRandom(mockRandom);
+        
+        // Verify initial state
+        boolean isExpert = colonist.getType() == expertFarmerType;
+        assertFalse("Unit should not be an expert", isExpert);
+        
+        // Make upgrade
+        colonist.newTurn();
+
+        // verify upgrade
+        isExpert = colonist.getType() == expertFarmerType;
+        assertTrue("Unit should now be an expert", isExpert);
+        
+        // necessary to undo the deterministic random
+        controller.setPseudoRandom(null);
     }
 }

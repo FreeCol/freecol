@@ -3417,21 +3417,32 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Checks if a colonist can get promoted by experience.
      */
     private void checkExperiencePromotion() {
-        UnitType learnType = FreeCol.getSpecification().getExpertForProducing(getWorkType());
-        if (learnType != null && learnType != unitType &&
-            unitType.canBeUpgraded(learnType, ChangeType.EXPERIENCE)) {
-            int random = getGame().getModelController().getRandom(getId() + "experience", 5000);
-            if (random < Math.min(experience, 200)) {
-                logger.finest("About to change type of unit due to experience.");
-                String oldName = getName();
-                setType(learnType);
-                addModelMessage(getColony(), ModelMessage.MessageType.UNIT_IMPROVED, this,
-                                "model.unit.experience",
-                                "%oldName%", oldName,
-                                "%unit%", getName(),
-                                "%colony%", getColony().getName());
-            }
+        GoodsType produce = getWorkType();
+        
+        if(produce == null){
+            return;
         }
+        
+        UnitType learnType = FreeCol.getSpecification().getExpertForProducing(produce);
+        if (learnType == null || 
+            learnType == unitType ||
+            !unitType.canBeUpgraded(learnType, ChangeType.EXPERIENCE)) {
+                return;
+        }
+        
+        int random = getGame().getModelController().getRandom(getId() + "experience", 5000);
+        if (random >= Math.min(experience, 200)) {
+            return;
+        }
+
+        logger.finest("About to change type of unit due to experience.");
+        String oldName = getName();
+        setType(learnType);
+        addModelMessage(getColony(), ModelMessage.MessageType.UNIT_IMPROVED, this,
+                "model.unit.experience",
+                "%oldName%", oldName,
+                "%unit%", getName(),
+                "%colony%", getColony().getName());        
     }
 
     /**
