@@ -77,6 +77,7 @@ import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
+import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
@@ -499,6 +500,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         register(SpySettlementMessage.getXMLElementTagName(), new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return new SpySettlementMessage(getGame(), element).handle(freeColServer, connection);
+            }
+        });
+        register(DebugForeignColonyMessage.getXMLElementTagName(), new NetworkRequestHandler() {
+            public Element handle(Connection connection, Element element) {
+                return new DebugForeignColonyMessage(getGame(), element).handle(freeColServer, connection);
             }
         });
         register("abandonColony", new NetworkRequestHandler() {

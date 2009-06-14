@@ -543,10 +543,14 @@ public final class GUI {
                 Tile t = gameData.getMap().getTile(selectedTile);
                 if (t != null && t.getSettlement() != null) {
                     Settlement s = t.getSettlement();
-                    if (s instanceof Colony && s.getOwner().equals(freeColClient.getMyPlayer())) {
-                        // show my colony
-                        setFocus(selectedTile);
-                        freeColClient.getCanvas().showColonyPanel((Colony) s);
+                    if (s instanceof Colony) {
+                        if (s.getOwner().equals(freeColClient.getMyPlayer())) {
+                            // show my colony
+                            setFocus(selectedTile);
+                            freeColClient.getCanvas().showColonyPanel((Colony) s);
+                        } else if (FreeCol.isInDebugMode()) {
+                            freeColClient.getInGameController().debugForeignColony(t);
+                        }
                         return;
                     } else if (s instanceof IndianSettlement) {
                         // show the Indian camp
@@ -611,13 +615,12 @@ public final class GUI {
 
         if (viewMode.getView() == ViewMode.MOVE_UNITS_MODE) {
             Tile t = gameData.getMap().getTile(selectedTile);
-            if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony
-                && t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
-                
-                setFocus(selectedTile);
-                stopBlinking();
-                freeColClient.getCanvas().showColonyPanel((Colony) t.getSettlement());
-                return;
+            if (t != null && t.getSettlement() != null && t.getSettlement() instanceof Colony) {
+                if (t.getSettlement().getOwner().equals(freeColClient.getMyPlayer())) {
+                    setFocus(selectedTile);
+                    stopBlinking();
+                    freeColClient.getCanvas().showColonyPanel((Colony) t.getSettlement());
+                }
             }
         }
     }

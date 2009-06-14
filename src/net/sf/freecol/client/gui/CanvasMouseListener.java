@@ -24,6 +24,7 @@ import java.awt.event.MouseListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -59,7 +60,15 @@ public final class CanvasMouseListener implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         try {
             if (e.getClickCount() > 1) {
-                gui.showColonyPanel(gui.convertToMapCoordinates(e.getX(), e.getY()));
+                Map.Position position = gui.convertToMapCoordinates(e.getX(), e.getY());
+                if (FreeCol.isInDebugMode()) {
+                    Tile tile = canvas.getClient().getGame().getMap().getTile(position);
+                    if (tile.getSettlement() != null) {
+                        canvas.getClient().getInGameController().debugForeignColony(tile);
+                    }
+                } else {
+                    gui.showColonyPanel(position);
+                }
             } else {
                 canvas.requestFocus();
             }

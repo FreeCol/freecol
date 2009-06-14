@@ -112,6 +112,7 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
+import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
@@ -1370,7 +1371,7 @@ public final class InGameController implements NetworkConstants {
             // Sleight of hand here.  The update contains two versions
             // of the colony tile.  The first child node is a detailed
             // view, which is read explicitly, displayed, removed, then
-            // superceded as the update is processed normally.
+            // superseded as the update is processed normally.
             Element tileElement = (Element) reply.getFirstChild();
             tile.readFromXMLElement(tileElement);
             freeColClient.getCanvas().showColonyPanel(tile.getColony());
@@ -1379,6 +1380,26 @@ public final class InGameController implements NetworkConstants {
         }
         nextActiveUnit();
     }
+
+    public void debugForeignColony(Tile tile) {
+        if (FreeCol.isInDebugMode() && tile != null) {
+            DebugForeignColonyMessage message = new DebugForeignColonyMessage(tile);
+            Element reply = askExpecting(freeColClient.getClient(), message.toXMLElement(),
+                                         "update");
+            if (reply != null) {
+                // Sleight of hand here.  The update contains two versions
+                // of the colony tile.  The first child node is a detailed
+                // view, which is read explicitly, displayed, removed, then
+                // superseded as the update is processed normally.
+                Element tileElement = (Element) reply.getFirstChild();
+                tile.readFromXMLElement(tileElement);
+                freeColClient.getCanvas().showColonyPanel(tile.getColony());
+                reply.removeChild(tileElement);
+                freeColClient.getInGameInputHandler().update(reply);
+            }
+        }
+    }
+    
 
     /**
      * Ask for explore a lost city rumour, and move unit if player accepts
