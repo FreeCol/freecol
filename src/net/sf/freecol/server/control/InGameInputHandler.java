@@ -1370,8 +1370,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 	}
                     // always update the attacker, defender needs its location
                 	opponentAttackElement.setAttribute("update", "unit");
+                	//Note: We should not send every info on the unit to the enemy player
                     opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
-                            opponentAttackElement.getOwnerDocument()));
+                            opponentAttackElement.getOwnerDocument(),false,false));
                 } else if (!defender.isVisibleTo(enemyPlayer)) {
                     opponentAttackElement.setAttribute("update", "defender");
                     /*
@@ -1384,12 +1385,18 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                         opponentAttackElement.appendChild(defender.getTile()
                             .toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
                     }
+                	//Note: We should not send every info on the unit to the player
+                	// Ex: defender is in Colony Tile, player does not (and should not) have access to
+                	// this info; with showAll=false, only the necessary info is sent
                     opponentAttackElement.appendChild(defender.toXMLElement(enemyPlayer,
-                            opponentAttackElement.getOwnerDocument()));
+                            opponentAttackElement.getOwnerDocument(),false,false));
                 } else if (!unit.isVisibleTo(enemyPlayer)) {
+                	//Note: We should not send every info on the unit to the player
+                	// Ex: defender is in Colony Tile, player does not (and should not) have access to
+                	// this info; with showAll=false, only the necessary info is sent
                     opponentAttackElement.setAttribute("update", "unit");
-                    opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer,
-                            opponentAttackElement.getOwnerDocument()));
+                    Element unitElm = unit.toXMLElement(enemyPlayer,opponentAttackElement.getOwnerDocument(),false,false);
+                    opponentAttackElement.appendChild(unitElm);
                 }
                 try {
                     enemyPlayer.getConnection().sendAndWait(opponentAttackElement);
@@ -1415,7 +1422,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(newTile.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
             reply.appendChild(defender.toXMLElement(newTile.getColony().getOwner(), reply.getOwnerDocument()));
         } else {
-            reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument()));
+        	//Note: We should not send every info on the unit to the player
+        	// Ex: defender is in Colony Tile, player does not (and should not) have access to
+        	// this info; with showAll=false, only the necessary info is sent
+            reply.appendChild(defender.toXMLElement(player, reply.getOwnerDocument(), false, false));
         }
         
         // Destroyed settlement was an indian capital, indians surrender
