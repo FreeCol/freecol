@@ -93,4 +93,26 @@ public class MessagesTest extends FreeColTestCase {
 
         assertEquals("Handelsberater", Messages.message("menuBar.report.trade"));
     }
+    
+    // Tests if messages with special chars (like $) are well processed
+    public void testMessageWithSpecialChars(){
+    	String errMsg = "Error setting up test.";
+    	String expected = "You establish the colony of %colony%.";
+        String message = Messages.message("model.history.FOUND_COLONY");
+    	assertEquals(errMsg, expected, message);
+        
+        String colNameWithSpecialChars="$specialColName";
+        errMsg = "Wrong message";
+        expected = "You establish the colony of $specialColName.";
+        try{
+        	message = Messages.message("model.history.FOUND_COLONY","%colony%",colNameWithSpecialChars);
+        }
+        catch(IllegalArgumentException e){
+        	if(e.getMessage().contains("Illegal group reference")){
+        		fail("Does not process messages with special chars");
+        	}
+        	throw e;
+        }
+        assertEquals(errMsg, expected, message);
+    }
 }

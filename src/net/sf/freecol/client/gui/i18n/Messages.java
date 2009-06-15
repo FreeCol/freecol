@@ -134,7 +134,10 @@ public class Messages {
                 if (data[i] == null || data[i+1] == null) {
                     throw new IllegalArgumentException("Programming error, no data should be <null>.");
                 }
-                message = message.replaceAll(data[i], data[i+1]);
+                // if there is a $ in the substituting string, a IllegalArgumentException will be raised
+                //we need to escape it first
+                String escapedStr = data[i+1].replaceAll("\\$","\\\\\\$");
+                message = message.replaceAll(data[i], escapedStr);
             }
         }
         return message.trim();
