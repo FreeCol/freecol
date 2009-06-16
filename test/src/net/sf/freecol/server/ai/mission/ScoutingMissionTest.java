@@ -26,6 +26,7 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -79,7 +80,8 @@ public class ScoutingMissionTest extends FreeColTestCase {
 
             Tile settlementTile = map.getTile(2, 1);
             FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-            builder.player(player1).settlementTile(settlementTile).build();
+            Settlement settlement = builder.player(player1).settlementTile(settlementTile).build();
+            settlement.placeSettlement();
 
             Tile unitTile = map.getTile(2, 2);
             Unit scout = new Unit(game, unitTile, player2, scoutType, UnitState.ACTIVE);

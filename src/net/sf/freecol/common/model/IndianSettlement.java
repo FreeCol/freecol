@@ -154,9 +154,6 @@ public class IndianSettlement extends Settlement {
         if (tile == null) {
             throw new IllegalArgumentException("Parameter 'tile' must not be 'null'.");
         }
-        
-        tile.setOwner(player);
-        tile.setSettlement(this);
 
         goodsContainer = new GoodsContainer(game, this);
 

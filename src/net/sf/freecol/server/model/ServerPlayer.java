@@ -40,10 +40,13 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -155,6 +158,30 @@ public class ServerPlayer extends Player implements ServerModelObject {
     
     public void setRemainingEmigrants(int emigrants) {
         remainingEmigrants = emigrants;
+    }
+
+    /**
+     * Claim the given land.
+     *
+     * @param tile The <code>Tile</code> to claim.
+     * @param colony The <code>Settlement</code> that will own the tile, if any.
+     * @param price The price to pay for the land, which must agree with
+     *              the owner valuation, unless negative which denotes stealing.
+     */
+    public void claimLand(Tile tile, Settlement settlement, int price) {
+        Player owner = tile.getOwner();
+        Settlement ownerSettlement = tile.getOwningSettlement();
+
+        if (price > 0) {
+            modifyGold(-price);
+            owner.modifyGold(price);
+        } else if (price < 0 && ownerSettlement instanceof IndianSettlement) {
+            owner.modifyTension(this, Tension.TENSION_ADD_LAND_TAKEN,
+                                (IndianSettlement) ownerSettlement);
+        }
+        tile.setOwningSettlement(settlement);
+        tile.setOwner(this);
+        tile.updatePlayerExploredTiles();
     }
 
     /**

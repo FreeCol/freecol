@@ -557,17 +557,6 @@ public class MapGenerator implements IMapGenerator {
         SettlementType kind = settlement.getTypeOfSettlement();
         logger.fine("Generated skill: " + settlement.getLearnableSkill().getName());
 
-        tile.setSettlement(settlement);
-        
-        tile.setOwningSettlement(settlement);
-        
-        Iterator<Position> circleIterator = map.getCircleIterator(position, true, settlement.getRadius());
-        while (circleIterator.hasNext()) {
-            Tile newTile = map.getTile(circleIterator.next());
-            newTile.setOwningSettlement(settlement);
-            newTile.setOwner(player);
-        }
-
         int unitCount = settlement.getGeneratedUnitCount();
         for (int i = 0; i < unitCount; i++) {
             UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
@@ -581,7 +570,8 @@ public class MapGenerator implements IMapGenerator {
                 unit.setLocation(settlement);
             }
         }
-        
+        settlement.placeSettlement();
+
         // START DEBUG:
         if (FreeCol.isInDebugMode()) {
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {

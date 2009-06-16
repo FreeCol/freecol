@@ -105,10 +105,10 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
-import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
@@ -126,7 +126,6 @@ import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
-import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 
 import org.w3c.dom.Element;
@@ -486,7 +485,8 @@ public final class InGameController implements NetworkConstants {
      * Uses the active unit to build a colony.
      */
     public void buildColony() {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
@@ -494,7 +494,6 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         GUI gui = freeColClient.getGUI();
-
         Unit unit = freeColClient.getGUI().getActiveUnit();
 
         if (unit == null || !unit.canBuildColony()) {
@@ -530,6 +529,7 @@ public final class InGameController implements NetworkConstants {
         if (reply != null) {
             Connection conn = freeColClient.getClient().getConnection();
 
+            player.invalidateCanSeeTiles();
             freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
             freeColClient.getInGameInputHandler().handle(conn, reply);
 
@@ -1419,41 +1419,62 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Buys the given land from the indians.
+     * Claim a piece of land.
      * 
-     * @param tile The land which should be bought from the indians.
+     * @param tile The land to claim.
+     * @param colony An optional colony to own the land
+     * @param offer An offer to pay.
+     * @return True if the claim succeeded.
      */
-    public void buyLand(Tile tile) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
+    public boolean claimLand(Tile tile, Colony colony, int offer) {
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        int price = (tile.getOwner() == null) ? 0
+            : tile.getOwner().getLandPrice(tile);
+
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return false;
         }
+        if (price < 0) { // not for sale
+            return false;
+        } else if (price > 0) { // for sale by natives
+            if (offer >= price || offer < 0) {
+                price = offer;
+            } else {
+                List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
+                if (price <= player.getGold()) {
+                    choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
+                                                                         Integer.toString(price)), 1));
+                }
+                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
+                Integer ci = canvas.showChoiceDialog(Messages.message("indianLand.text",
+                                                                      "%player%", player.getNationAsString()),
+                                                     Messages.message("indianLand.cancel"),
+                                                     choices);
+                if (ci == null) { // cancelled
+                    return false;
+                } else if (ci.intValue() == 1) { // accepted price
+                    ;
+                } else if (ci.intValue() == 2) {
+                    price = -1; // steal
+                } else {
+                    logger.warning("Impossible choice");
+                    return false;
+                }
+            }
+        } // else price == 0 and we can just proceed
 
-        BuyLandMessage message = new BuyLandMessage(tile);
         Client client = freeColClient.getClient();
-        client.sendAndWait(message.toXMLElement());
-
-        freeColClient.getMyPlayer().buyLand(tile);
-        freeColClient.getCanvas().updateGoldLabel();
-    }
-
-    /**
-     * Steals the given land from the indians.
-     * 
-     * @param tile The land which should be stolen from the indians.
-     * @param colony a <code>Colony</code> value
-     */
-    public void stealLand(Tile tile, Colony colony) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
+        ClaimLandMessage message = new ClaimLandMessage(tile, colony, price);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "update");
+        if (reply != null) {
+            freeColClient.getInGameInputHandler().update(reply);
+            canvas.updateGoldLabel();
+            return true;
         }
-
-        StealLandMessage message = new StealLandMessage(tile, colony);
-        Client client = freeColClient.getClient();
-        client.sendAndWait(message.toXMLElement());
-
-        tile.takeOwnership(freeColClient.getMyPlayer(), colony);
+        return false;
     }
 
     /**
@@ -2741,8 +2762,16 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        Client client = freeColClient.getClient();
+        Tile tile = workLocation.getTile();
+        if ((tile.getOwner() != unit.getOwner()
+             || tile.getOwningSettlement() != workLocation.getColony())
+            && !claimLand(tile, workLocation.getColony(), 0)) {
+            logger.warning("Unit " + unit.getId()
+                           + " is unable to claim tile " + tile.toString());
+            return;
+        }
 
+        Client client = freeColClient.getClient();
         Element workElement = Message.createNewRootElement("work");
         workElement.setAttribute("unit", unit.getId());
         workElement.setAttribute("workLocation", workLocation.getId());
@@ -2819,32 +2848,12 @@ public final class InGameController implements NetworkConstants {
             return; // Don't bother (and don't log, this is not exceptional)
         }
 
-        if (improvementType.getId().equals("model.improvement.Road") ||
-            improvementType.getId().equals("model.improvement.Plow") ||
-            improvementType.getId().equals("model.improvement.ClearForest")) {
-            // Buy the land from the Indians first?
-            int price = unit.getOwner().getLandPrice(unit.getTile());
-            if (price > 0) {
-                Player nation = unit.getTile().getOwner();
-                List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay" ,"%amount%",
-                                                                     Integer.toString(price)), 1));
-                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
-                Integer ci = freeColClient.getCanvas()
-                    .showChoiceDialog(Messages.message("indianLand.text",
-                                                       "%player%", nation.getName()),
-                                      Messages.message("indianLand.cancel"), choices);
-                if (ci == null) {
-                    return;
-                } else if (ci.intValue() == 1) {
-                    if (price > freeColClient.getMyPlayer().getGold()) {
-                        freeColClient.getCanvas().errorMessage("notEnoughGold");
-                        return;
-                    }
-
-                    buyLand(unit.getTile());
-                }
-            }
+        if (!improvementType.isNatural()
+            && freeColClient.getMyPlayer() != unit.getTile().getOwner()
+            && !claimLand(unit.getTile(), null, 0)) {
+            logger.warning("Unit " + unit.getId()
+                           + " is unable to claim tile " + unit.getTile().toString());
+            return;
         }
 
         Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");

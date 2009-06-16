@@ -98,6 +98,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(false, plain.hasImprovement(plow));
 
+        plain.setOwner(dutch);
         TileImprovement plowImprovement = new TileImprovement(game, plain, plow);
         plain.add(plowImprovement);
         hardyPioneer.work(plowImprovement);
@@ -222,6 +223,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
 
         // Now do it
+        plain.setOwner(dutch);
         TileImprovement roadImprovement = new TileImprovement(game, plain, road);
         plain.add(roadImprovement);
         hardyPioneer.work(roadImprovement);
@@ -253,6 +255,7 @@ public class UnitTest extends FreeColTestCase {
         EquipmentType tools = spec().getEquipmentType("model.equipment.tools");
         Unit unit = new Unit(game, tile, dutch, unitType, UnitState.ACTIVE, tools, tools, tools, tools, tools);
 
+        tile.setOwner(dutch);
         TileImprovement improvement = tile.findTileImprovementType(whichWork);
         if (improvement == null) {
             improvement = new TileImprovement(game, tile, whichWork);

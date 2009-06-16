@@ -89,19 +89,10 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
         featureContainer.addModifier(DEFENCE_MODIFIER);
         
-        Iterator<Position> exploreIt = game.getMap().getCircleIterator(tile.getPosition(), true,
-                                                                       getLineOfSight());
-        while (exploreIt.hasNext()) {
-            Tile t = game.getMap().getTile(exploreIt.next());
-            t.setExploredBy(owner, true);
-        }
-        this.tile.setExploredBy(owner, true);
-        owner.invalidateCanSeeTiles();
-
         // Relocate any worker already on the Tile (from another Settlement):
         if (tile.getOwningSettlement() != null) {
             if (tile.getOwningSettlement() instanceof Colony) {
-                Colony oc = tile.getColony();
+                Colony oc = (Colony) tile.getOwningSettlement();
                 ColonyTile ct = oc.getColonyTile(tile);
                 ct.relocateWorkers();
             } else if (tile.getOwningSettlement() instanceof IndianSettlement) {
@@ -110,7 +101,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
                 logger.warning("An unknown type of settlement is already owning the tile.");
             }
         }
-        
+
         owner.addSettlement(this);
     }
 
@@ -241,7 +232,40 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         }
     }
 
+    /**
+     * Claim and explore the surrounding tiles.
+     * Try to be as greedy as possible.
+     */
+    private void claimTiles() {
+        Map map = getGame().getMap();
+        Tile settlementTile = getTile();
 
+        settlementTile.setOwningSettlement(this);
+        settlementTile.setOwner(owner);
+        owner.setExplored(settlementTile);
+        settlementTile.updatePlayerExploredTiles();
+        for (Tile tile : map.getSurroundingTiles(settlementTile, getRadius())) {
+            if (tile.getOwner() == null
+                || tile.getOwningSettlement() == null
+                || tile.getOwningSettlement() == this) {
+                tile.setOwningSettlement(this);
+                tile.setOwner(owner);
+                tile.updatePlayerExploredTiles();
+            }
+        }
+        for (Tile tile : map.getSurroundingTiles(settlementTile, getLineOfSight())) {
+            owner.setExplored(tile);
+        }
+    }
+
+    /**
+     * Put a prepared settlement onto the map.
+     */
+    public void placeSettlement() {
+        claimTiles();
+        tile.setSettlement(this);
+        owner.invalidateCanSeeTiles();
+    }
 
     /**
      * Gets the owner of this <code>Settlement</code>.
@@ -253,7 +277,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         return owner;
     }
 
-    
     /**
      * Sets the owner of this <code>Settlement</code>.
      *
@@ -271,26 +294,10 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
             owner.addSettlement(this);
         }
         
+        claimTiles();
         oldOwner.invalidateCanSeeTiles();
-        
-        getTile().setOwner(owner);
-        Map map = getGame().getMap();
-        Position position = getTile().getPosition();
-        Iterator<Position> positionIterator = map.getCircleIterator(position, true, getRadius());
-        while (positionIterator.hasNext()) {
-            Tile tile = map.getTile(positionIterator.next());
-            if (tile.getOwner() == oldOwner) {
-                tile.setOwner(owner);
-            }
-        }
+        owner.invalidateCanSeeTiles();
 
-        owner.setExplored(getTile());
-        positionIterator = map.getCircleIterator(position, true, getLineOfSight());
-        while (positionIterator.hasNext()) {
-            Tile tile = map.getTile(positionIterator.next());
-            owner.setExplored(tile);
-        }
-        
         if (getGame().getFreeColGameObjectListener() != null) {
             getGame().getFreeColGameObjectListener().ownerChanged(this, oldOwner, owner);
         }
@@ -349,30 +356,29 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public abstract boolean contains(Locatable locatable);
 
 
-
+    /**
+     * Dispose of this <code>Settlement</code>.
+     */
     public void dispose() {
-        
+        Player oldOwner = owner;
         Tile settlementTile = getTile();
-        
         Map map = getGame().getMap();
-        Position position = settlementTile.getPosition();
-        Iterator<Position> circleIterator = map.getCircleIterator(position, true, getRadius());
-        
-        settlementTile.setOwner(null);
-        while (circleIterator.hasNext()) {
-            Tile tile = map.getTile(circleIterator.next());
-            if (tile.getOwningSettlement() == this) {
+
+        for (Tile tile : map.getSurroundingTiles(settlementTile, getRadius())) {
+            if (tile.getOwningSettlement() == this
+                || (tile.getOwningSettlement() == null && tile.getOwner() == owner)) {
                 tile.setOwningSettlement(null);
                 tile.setOwner(null);
+                tile.updatePlayerExploredTiles();
             }
         }
-        Player oldOwner = owner;        
-        owner = null;
-        
         settlementTile.setSettlement(null);
+        settlementTile.setOwner(null);
+        settlementTile.updatePlayerExploredTiles();
+
+        owner = null;
         oldOwner.removeSettlement(this);
         oldOwner.invalidateCanSeeTiles();
-        
         goodsContainer.dispose();
         super.dispose();
     }

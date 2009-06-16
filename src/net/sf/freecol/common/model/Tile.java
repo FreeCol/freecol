@@ -672,32 +672,30 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setOwner(Player owner) {
         this.owner = owner;
-
-        updatePlayerExploredTiles();
     }
 
     /**
-     * Makes the given player take the ownership of this <code>Tile</code>.
-     * The tension level is modified accordingly.
-     * 
-     * @param player The <code>Player</code>.
-     * @param settlement a <code>Settlement</code> value
+     * Can the ownership of this tile be claimed?
+     * Quick test that does not handle the curly case of tile transfer between
+     * colonies, or guarantee success (natives may want to be paid), but
+     * just that success is possible.
+     *
+     * @param player The <code>Player</code> that may wish to claim the tile.
+     *
+     * @return True if the tile ownership can be claimed.
      */
-    public void takeOwnership(Player player, Settlement settlement) {
-        if (player.getLandPrice(this) > 0) {
-            Player otherPlayer = getOwner();
-            if (otherPlayer != null) {
-                if (!otherPlayer.isEuropean()) {
-                    otherPlayer.modifyTension(player, Tension.TENSION_ADD_LAND_TAKEN,
-                                              (IndianSettlement) owningSettlement);
-                }
-            } else {
-                logger.warning("Could not find player with nation: " + getOwner());
-            }
+    public boolean claimable(Player player) {
+        Player owner = getOwner();
+
+        if (owner == null) {
+            return true;
+        } else if (owner == player) {
+            return true;
+        } else if (owner.isEuropean()) {
+            return getOwningSettlement() == null;
+        } else {
+            return owner.getLandPrice(this) >= 0;
         }
-        setOwner(player);
-        owningSettlement = settlement;
-        updatePlayerExploredTiles();
     }
 
     /**
@@ -797,8 +795,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public void setSettlement(Settlement s) {
         settlement = s;
         owningSettlement = s;
-        
-        updatePlayerExploredTiles();
     }
 
     /**
@@ -841,7 +837,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public void setOwningSettlement(Settlement owner) {
         this.owningSettlement = owner;
-        updatePlayerExploredTiles();
     }
 
     /**

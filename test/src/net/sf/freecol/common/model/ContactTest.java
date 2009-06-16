@@ -136,7 +136,7 @@ public class ContactTest extends FreeColTestCase {
 
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement settlement = builder.player(iroquois).settlementTile(tile2).skillToTeach(null).build();
-        
+        settlement.placeSettlement();
         Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
 
         assertTrue(iroquois.hasContacted(dutch));
@@ -252,8 +252,8 @@ public class ContactTest extends FreeColTestCase {
 
         // build settlement
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        builder.player(iroquois).settlementTile(tile2).skillToTeach(null).build();
-       
+        IndianSettlement settlement = builder.player(iroquois).settlementTile(tile2).skillToTeach(null).build();
+        settlement.placeSettlement();
         Unit brave = new Unit(game, tile1, apache, braveType, UnitState.FORTIFIED);
 
         assertTrue(iroquois.hasContacted(apache));

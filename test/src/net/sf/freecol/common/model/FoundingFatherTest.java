@@ -251,7 +251,8 @@ public class FoundingFatherTest extends FreeColTestCase {
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(getGame());
         IndianSettlement indianSettlement = builder.player(iroquois).settlementTile(settlementTile).skillToTeach(null).build();
-        
+        indianSettlement.placeSettlement();
+
         disputedTile.setOwner(iroquois);
         disputedTile.setOwningSettlement(indianSettlement);
 

@@ -1747,6 +1747,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (workLocation.getColony() != this.getColony()) {
             throw new IllegalStateException("Can only set a 'Unit'  to a 'WorkLocation' that is in the same 'Colony'.");
         }
+        if (workLocation.getTile().getOwner() != getOwner()) {
+            throw new IllegalStateException("Can only set a 'Unit' to a 'WorkLocation' owned by the same player.");
+        }
         setState(UnitState.IN_COLONY);
         setLocation(workLocation);
     }
@@ -1797,18 +1800,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         Location oldLocation = location;
         
         if (location != null) {
-            if (location instanceof ColonyTile){
-                // the unit is leaving a colony tile reset the
-                // ownership of the tile, so that others may claim it
-                if (((ColonyTile)location).getWorkTile() != null) {
-                    ((ColonyTile)location).getWorkTile().setOwner(null);
-                }
-            }
             location.remove(this);
         }
-
         location = newLocation;
-
         if (newLocation != null) {
             newLocation.add(this);
         }
@@ -2651,6 +2645,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         case FORTIFIED:
             return getState() == UnitState.FORTIFYING;
         case IMPROVING:
+            if (location instanceof Tile
+                && location.getTile().claimable(getOwner())) {
+                return getMovesLeft() > 0;
+            }
+            return false;
         case FORTIFYING:
         case SKIPPED:
             return (getMovesLeft() > 0);
@@ -2722,7 +2721,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             break;
         case IMPROVING:
             movesLeft = 0;
-            getTile().takeOwnership(getOwner(), null);
             workLeft = -1;
             if (workImprovement != null) {
                 workLeft = workImprovement.getTurnsToComplete();
@@ -2878,8 +2876,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             throw new IllegalStateException("A Unit can only build a colony if on the same tile as the colony");
         }
 
-        getTile().setOwner(owner);
-        getTile().setSettlement(colony);
+        colony.placeSettlement();
         setState(UnitState.IN_COLONY);
         setLocation(colony);
         setMovesLeft(0);

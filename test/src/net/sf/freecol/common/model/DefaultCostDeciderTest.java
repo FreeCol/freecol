@@ -131,7 +131,8 @@ public class DefaultCostDeciderTest extends FreeColTestCase {
         //Setup
         Tile settlementTile = map.getTile(2,1);
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        builder.settlementTile(settlementTile).build();
+        IndianSettlement settlement = builder.settlementTile(settlementTile).build();
+        settlement.placeSettlement();
 
         Tile unitTile = map.getTile(1, 1);
         Unit unit = new Unit(game, unitTile, game.getCurrentPlayer(), pioneerType, UnitState.ACTIVE);
@@ -186,6 +187,7 @@ public class DefaultCostDeciderTest extends FreeColTestCase {
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         Settlement settlement = builder.settlementTile(settlementTile).build();
+        settlement.placeSettlement();
 
         // unit is trying go to settlement
         unit.setDestination(settlementTile);

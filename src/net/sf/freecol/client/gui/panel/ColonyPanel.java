@@ -1347,29 +1347,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 if (editState) {
                     if (comp instanceof UnitLabel) {
                         Unit unit = ((UnitLabel) comp).getUnit();
-                        int price = unit.getOwner().getLandPrice(colonyTile.getWorkTile());
-                        Player player = colonyTile.getWorkTile().getOwner();
-                        if (price > 0) {
-                            List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                            choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
-                                                                                 Integer.toString(price)), 1));
-                            choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
-                            Integer ci = getCanvas().
-                                showChoiceDialog(Messages.message("indianLand.text",
-                                                                  "%player%", player.getNationAsString()),
-                                                 Messages.message("indianLand.cancel"), choices);
-                            if (ci == null) {
-                                return null;
-                            } else if (ci.intValue() == 1) {
-                                if (price > getMyPlayer().getGold()) {
-                                    getCanvas().errorMessage("notEnoughGold");
-                                    return null;
-                                }
+                        Tile tile = colonyTile.getWorkTile();
+                        Player player = unit.getOwner();
 
-                                getController().buyLand(colonyTile.getWorkTile());
-                            } else if (ci.intValue() == 2) {
-                                getController().stealLand(colonyTile.getWorkTile(), colony);
-                            }
+                        logger.warning("Colony " + colony.getName()
+                                       + " claims tile " + tile.toString()
+                                       + " with unit " + unit.getId());
+                        if ((tile.getOwner() != player
+                             || tile.getOwningSettlement() != colony)
+                            && !getController().claimLand(tile, colony, 0)) {
+                            logger.warning("Colony " + colony.getName()
+                                           + " could not claim tile " + tile.toString()
+                                           + " with unit " + unit.getId());
                         }
 
                         if (colonyTile.canAdd(unit)) { 
@@ -1401,7 +1390,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                                 } else if (s.getOwner().isEuropean()) {
                                     // occupied by a foreign european colony
                                     canvas.errorMessage("tileTakenEuro");
-                                } else if (s instanceof IndianSettlement && price > 0) {
+                                } else if (s instanceof IndianSettlement) {
                                     // occupied by an indian settlement
                                     canvas.errorMessage("tileTakenInd");
                                 }

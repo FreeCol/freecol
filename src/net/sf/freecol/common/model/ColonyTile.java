@@ -282,12 +282,12 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
         if (settlement != null) {
             if (settlement instanceof Colony) {
-                // Disallow if owned by other Europeans, or by the
-                // player but already in use.
+                // Disallow if owned by other Europeans,
+                // or by the player but already in use.
                 Colony otherColony = (Colony) settlement;
                 if (otherColony != colony) {
                     if (otherColony.getOwner() != getOwner()
-                        || !otherColony.getColonyTile(tile).canAdd(locatable)) {
+                        || otherColony.getColonyTile(tile).getUnit() != null) {
                         return false;
                     }
                 }
@@ -310,6 +310,10 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             return false;
         }
 
+        if (tile.hasLostCityRumour()) {
+            return false;
+        }
+
         return getUnit() == null || unit == getUnit();
     }
 
@@ -325,24 +329,14 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
         if (!canAdd(locatable)) {
             if (getWorkTile().getOwningSettlement() != null && getWorkTile().getOwningSettlement() != getColony()) {
-                throw new IllegalArgumentException("Cannot add locatable to this location: somebody else owns this land!");
+                throw new IllegalArgumentException("Cannot add locatable to this location: another colony claims this land!");
             }
             throw new IllegalArgumentException("Cannot add locatable to this location: there is a unit here already!");
         }
 
         Unit u = (Unit) locatable;
-
-        getWorkTile().takeOwnership(u.getOwner(), getColony());
-
         u.removeAllEquipment(false);
-
         setUnit(u);
-        
-        if (unit != null) {
-            getWorkTile().setOwningSettlement(getColony());
-        } else {
-            getWorkTile().setOwningSettlement(null);
-        }
     }
     
 
@@ -361,7 +355,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
         Unit oldUnit = getUnit();
         oldUnit.setMovesLeft(0);
-        getWorkTile().setOwningSettlement(null);
         setUnit(null);
     }
 
@@ -458,12 +451,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (type2 != null)
                 colony.addGoods(type2, getProductionOf(type2));
 
-        // TODO: why is this here?
-        if (unit != null) {
-            getWorkTile().setOwningSettlement(getColony());
-        } else {
-            getWorkTile().setOwningSettlement(null);
-        }
     }
    
     /**
@@ -564,7 +551,6 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
     public void dispose() {
         if (unit != null) {
-            getWorkTile().setOwningSettlement(null);
             unit.dispose();
         }
 

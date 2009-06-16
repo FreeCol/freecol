@@ -1294,44 +1294,32 @@ public class Player extends FreeColGameObject implements Nameable {
      * Returns the price of the given land.
      *
      * @param tile The <code>Tile</code> to get the price for.
-     * @return The price of the land.
+     * @return The price of the land if it is for sale, zero if it is already
+     *         ours, unclaimed or unwanted, negative if it is not for sale.
      */
     public int getLandPrice(Tile tile) {
         Player nationOwner = tile.getOwner();
-        if (nationOwner == null || nationOwner == this || nationOwner.isEuropean() || tile.getSettlement() != null) {
-            return 0;
-        }
         int price = 0;
+
+        if (nationOwner == null || nationOwner == this) {
+            return 0; // Freely available
+        } else if (tile.getSettlement() != null) {
+            return -1; // Not for sale
+        } else if (nationOwner.isEuropean()) {
+            if (tile.getOwningSettlement() != null
+                && tile.getOwningSettlement().getOwner() == nationOwner) {
+                return -1; // Nailed down by a European colony
+            } else {
+                return 0; // Claim abandoned or only by tile improvement
+            }
+        } // Else, native ownership
         for (GoodsType type : FreeCol.getSpecification().getGoodsTypeList()) {
             price += tile.potential(type, null);
         }
-        price = price * Specification.getSpecification().getIntegerOption("model.option.landPriceFactor").getValue()
-            + 100;
-        return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier", null, getGame()
-                                                    .getTurn());
-    }
-
-    /**
-     * Buys the given land.
-     *
-     * @param tile The <code>Tile</code> to buy.
-     */
-    public void buyLand(Tile tile) {
-        Player owner = tile.getOwner();
-        if (owner == null) {
-            throw new IllegalStateException("The Tile is not owned by any nation!");
-        }
-        if (owner == this) {
-            throw new IllegalStateException("The Player already owns the Tile.");
-        }
-        if (owner.isEuropean()) {
-            throw new IllegalStateException("The owner is an european player");
-        }
-        int price = getLandPrice(tile);
-        modifyGold(-price);
-        owner.modifyGold(price);
-        tile.setOwner(this);
-        tile.setOwningSettlement(null);
+        price *= Specification.getSpecification().getIntegerOption("model.option.landPriceFactor").getValue();
+        price += 100;
+        return (int) featureContainer.applyModifier(price, "model.modifier.landPaymentModifier",
+                                                    null, getGame().getTurn());
     }
 
     /**

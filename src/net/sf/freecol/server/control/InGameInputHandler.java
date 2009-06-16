@@ -72,10 +72,10 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
-import net.sf.freecol.common.networking.BuyLandMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
@@ -94,7 +94,6 @@ import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
-import net.sf.freecol.common.networking.StealLandMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.util.RandomChoice;
@@ -398,16 +397,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return indianDemand(connection, element);
             }
         });
-        register(BuyLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+        register(ClaimLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return new BuyLandMessage(getGame(), element).handle(freeColServer, player, connection);
-            }
-        });
-        register(StealLandMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return new StealLandMessage(getGame(), element).handle(freeColServer, player, connection);
+                return new ClaimLandMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("payForBuilding", new CurrentPlayerNetworkRequestHandler() {
