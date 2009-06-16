@@ -248,7 +248,16 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
     	if(listModel.getSize() < 2){
     		 getCanvas().errorMessage("traderouteDialog.notEnoughStops");
     		 return false;
-    	} 	
+    	}
+    	
+    	Player player = getCanvas().getClient().getMyPlayer();
+        for (int index = 0; index < listModel.getSize(); index++) {
+            Stop stop = (Stop) listModel.getElementAt(index);
+            if(!TradeRoute.isStopValid(player, stop)){
+            	return false;
+            }
+        }
+        
     	return true;
     }
 

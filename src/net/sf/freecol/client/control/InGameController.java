@@ -783,7 +783,19 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         if (unit.getTradeRoute() != null) {
-            if (unit.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()) {
+        	Stop currStop = unit.getCurrentStop();
+        	
+        	if(!TradeRoute.isStopValid(unit, currStop)){
+        		String oldTradeRouteName = unit.getTradeRoute().getName();
+                logger.info("Trade unit " + unit.getId() + " in route " + 
+                		oldTradeRouteName + " cannot continue, stop invalid");
+                freeColClient.getCanvas().showInformationMessage("traderoute.broken",
+                        "%name%", oldTradeRouteName);
+        		clearOrders(unit);
+        		return;
+        	}
+        	
+            if (unit.getLocation().getTile() == currStop.getLocation().getTile()) {
                 // Trade unit is at current stop
                 logger.info("Trade unit " + unit.getId() + " in route " + 
                             unit.getTradeRoute().getName() + " is at " + 
@@ -938,7 +950,7 @@ public final class InGameController implements NetworkConstants {
     
     private void followTradeRoute(Unit unit) {
         Stop stop = unit.getCurrentStop();
-        if (stop == null || stop.getLocation() == null) {
+        if (!TradeRoute.isStopValid(unit, stop)) {
             freeColClient.getCanvas().showInformationMessage("traderoute.broken",
                                                              "%name%",
                                                              unit.getTradeRoute().getName());

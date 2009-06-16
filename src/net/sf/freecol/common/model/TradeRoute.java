@@ -28,7 +28,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.PlayerType;
 
 import org.w3c.dom.Element;
 
@@ -368,7 +370,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         public String toString() {
             Location l = getLocation();
-            return l != null ? l.getLocationName() : locationId;
+            return l != null ? l.getLocationName() : Messages.message("traderouteDialog.invalidStop");
         }
 
         public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
@@ -427,6 +429,29 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
                 stops.add(new Stop(in));
             }
         }
+    }
+    
+    public static boolean isStopValid(Unit unit, Stop stop){
+    	return TradeRoute.isStopValid(unit.getOwner(), stop);
+    }
+    
+    public static boolean isStopValid(Player player, Stop stop){
+    	if(stop == null){
+    		return false;
+    	}
+    	
+    	Location location = stop.getLocation();
+    	
+    	if(location == null){
+    		return false;
+    	}
+    	
+    	if(location instanceof Europe &&
+    	   player.getPlayerType() == PlayerType.REBEL){
+    		return false;
+    	}
+    	   
+    	return true;
     }
 
     /**
