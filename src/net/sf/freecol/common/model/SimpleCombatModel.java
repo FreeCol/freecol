@@ -516,6 +516,10 @@ public class SimpleCombatModel implements CombatModel {
         // Other units can only attack once
         if (!attacker.hasAbility("model.ability.multipleAttacks")) {
             attacker.setMovesLeft(0);
+        } else {
+            //spend at least the eventual cost of moving to the tile
+            int movecost = attacker.getMoveCost(defender.getTile());
+            attacker.setMovesLeft(attacker.getMovesLeft()-movecost);
         }
 
         Tile newTile = defender.getTile();
