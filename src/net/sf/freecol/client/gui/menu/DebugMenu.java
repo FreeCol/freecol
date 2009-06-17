@@ -261,6 +261,25 @@ public class DebugMenu extends JMenu {
                 }
             });
 
+        final JMenuItem addCrosses = new JMenuItem("Add Immigration");
+        addCrosses.setOpaque(false);
+        // addCrosses.setMnemonic(KeyEvent.VK_????);
+        this.add(addCrosses);
+        addCrosses.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    String response = freeColClient.getCanvas()
+                        .showInputDialog("menuBar.debug.addImmigration",
+                                         Integer.toString(100),
+                                         "ok", "cancel");
+                    Player player = freeColClient.getMyPlayer();
+                    int crosses = Integer.parseInt(response);
+                    Player serverPlayer = (Player) freeColClient.getFreeColServer()
+                        .getGame().getFreeColGameObject(player.getId());
+                    player.incrementImmigration(crosses);
+                    serverPlayer.incrementImmigration(crosses);
+                }
+            });
+
         // random number generator
         final JMenuItem rng = new JMenuItem("Step random number generator");
         rng.setOpaque(false);
