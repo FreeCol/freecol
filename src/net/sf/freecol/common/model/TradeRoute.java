@@ -446,9 +446,8 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
     		return false;
     	}
     	
-    	if(location instanceof Europe &&
-    	   player.getPlayerType() == PlayerType.REBEL){
-    		return false;
+    	if (((FreeColGameObject) location).isDisposed()) {
+          return false;
     	}
     	   
     	return true;
