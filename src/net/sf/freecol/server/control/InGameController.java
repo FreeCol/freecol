@@ -37,31 +37,33 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
+import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelController;
+import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
-import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -983,4 +985,46 @@ public final class InGameController extends Controller {
         }
         return true;
     }
+
+    /**
+     * A unit migrates from Europe.
+     *
+     * @param player The <code>ServerPlayer</code> whose unit it will be.
+     * @param slot The slot within <code>Europe</code> to select the unit from.
+     * @param fountain True if this occurs as a result of a Fountain of Youth.
+     */
+    public ModelMessage emigrate(ServerPlayer player, int slot, boolean fountain) {
+        // Valid slots are in [1,3], recruitable indices are in [0,2].
+        // An invalid slot is normal when the player has no control over
+        // recruit type.
+        boolean validSlot = 1 <= slot && slot <= Europe.RECRUIT_COUNT;
+        int index = (validSlot) ? slot-1
+            : getPseudoRandom().nextInt(Europe.RECRUIT_COUNT);
+
+        // Create the recruit, move it to the docks.
+        Europe europe = player.getEurope();
+        UnitType recruitType = europe.getRecruitable(index);
+        Unit unit = new Unit(getGame(), europe, player, recruitType,
+                             UnitState.ACTIVE, recruitType.getDefaultEquipment());
+        unit.setLocation(europe);
+
+        // Update immigration counters if this was an ordinary decision to migrate.
+        if (!fountain) {
+            player.updateImmigrationRequired();
+            player.reduceImmigration();
+        }
+
+        // Replace the recruit we used.
+        europe.setRecruitable(index, player.generateRecruitable());
+
+        // Return an informative message only if this was an ordinary migration
+        // where we did not select the unit type.
+        // Fountain of Youth migrants have already been announced in bulk.
+        return (fountain || validSlot) ? null
+            : new ModelMessage(player, ModelMessage.MessageType.UNIT_ADDED,
+                               unit, "model.europe.emigrate",
+                               "%europe%", europe.getName(),
+                               "%unit%", unit.getName());
+    }
+
 }

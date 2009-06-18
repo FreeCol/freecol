@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.GoodsType;
@@ -149,7 +150,22 @@ public final class PreGameController extends Controller {
             
             if (player.isEuropean() && !player.isREF()) {
                 player.modifyGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
-                player.getEurope().generateInitialRecruits();
+
+                // Generates the initial recruits for this player.
+                // Recruits may be determined by the difficulty level,
+                // or generated randomly.
+                Europe europe = player.getEurope();
+                for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
+                    String optionId = "model.option.recruitable.slot" + index;
+                    if (Specification.getSpecification().hasOption(optionId)) {
+                        String unitTypeId = Specification.getSpecification()
+                            .getStringOption(optionId).getValue();
+                        europe.setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
+                    } else {
+                        europe.setRecruitable(index, player.generateRecruitable());
+                    }
+                }
+
                 Market market = player.getMarket();
                 for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                     if (goodsType.isNewWorldGoodsType() || goodsType.isNewWorldLuxuryType()) {

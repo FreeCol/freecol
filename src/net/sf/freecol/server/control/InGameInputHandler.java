@@ -82,6 +82,7 @@ import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
@@ -259,10 +260,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return recruitUnitInEurope(connection, element);
             }
         });
-        register("emigrateUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
+        register(EmigrateUnitMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return emigrateUnitInEurope(connection, element);
+                return new EmigrateUnitMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("trainUnitInEurope", new CurrentPlayerNetworkRequestHandler() {
@@ -1152,7 +1153,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 } else {
                     for (int k = 0; k < dx; k++) {
                         newUnit = new Unit(getGame(), player.getEurope(), player,
-                                           player.generateRecruitable(String.valueOf(k)), UnitState.ACTIVE);
+                                           player.generateRecruitable(),
+                                           UnitState.ACTIVE);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
                     }
                 }
@@ -1205,7 +1207,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(element.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable(String.valueOf(remaining));
+        UnitType newRecruitable = player.generateRecruitable();
         europe.setRecruitable(slot, newRecruitable);
         
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE);
@@ -1981,44 +1983,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param recruitUnitInEuropeElement The element containing the request.
      */
     private Element recruitUnitInEurope(Connection connection, Element recruitUnitInEuropeElement) {
-        Player player = getFreeColServer().getPlayer(connection);
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable("abc" + getPseudoRandom().nextInt(10000));
+        UnitType newRecruitable = player.generateRecruitable();
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
         reply.setAttribute("newRecruitable", newRecruitable.getId());
         reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
         europe.recruit(slot, unit, newRecruitable);
-        return reply;
-    }
-
-    /**
-     * Handles an "emigrateUnitInEurope"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param emigrateUnitInEuropeElement The element containing the request.
-     */
-    private Element emigrateUnitInEurope(Connection connection, Element emigrateUnitInEuropeElement) {
-        Player player = getFreeColServer().getPlayer(connection);
-        Europe europe = player.getEurope();
-        int slot;
-        if (player.hasAbility("model.ability.selectRecruit")) {
-            slot = Integer.parseInt(emigrateUnitInEuropeElement.getAttribute("slot"));
-        } else {
-            slot = (int) (Math.random() * 3);
-        }
-        UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable("xyzzy" + getPseudoRandom().nextInt(10000));
-        Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
-        Element reply = Message.createNewRootElement("emigrateUnitInEuropeConfirmed");
-        if (!player.hasAbility("model.ability.selectRecruit")) {
-            reply.setAttribute("slot", Integer.toString(slot));
-        }
-        reply.setAttribute("newRecruitable", newRecruitable.getId());
-        reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
-        europe.emigrate(slot, unit, newRecruitable);
         return reply;
     }
 
@@ -2029,7 +2003,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param trainUnitInEuropeElement The element containing the request.
      */
     private Element trainUnitInEurope(Connection connection, Element trainUnitInEuropeElement) {
-        Player player = getFreeColServer().getPlayer(connection);
+        ServerPlayer player = getFreeColServer().getPlayer(connection);
         Europe europe = player.getEurope();
         String unitId = trainUnitInEuropeElement.getAttribute("unitType");
         UnitType unitType = FreeCol.getSpecification().getUnitType(unitId);

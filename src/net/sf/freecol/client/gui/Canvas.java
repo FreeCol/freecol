@@ -1568,17 +1568,6 @@ public final class Canvas extends JDesktopPane {
      * from Europe. This method may only be called if the user has William
      * Brewster in congress.
      * 
-     * @return The emigrant that was chosen by the user.
-     */
-    public int showEmigrationPanel() {
-        return showEmigrationPanel(false);
-    }
-
-    /**
-     * Shows the panel that allows the user to choose which unit will emigrate
-     * from Europe. This method may only be called if the user has William
-     * Brewster in congress.
-     * 
      * @param fountainOfYouth a <code>boolean</code> value
      * @return The emigrant that was chosen by the user.
      */

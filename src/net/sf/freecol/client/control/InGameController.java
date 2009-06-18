@@ -116,6 +116,7 @@ import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.Message;
@@ -393,7 +394,8 @@ public final class InGameController implements NetworkConstants {
             if (currentPlayer.checkEmigrate()) {
                 if (currentPlayer.hasAbility("model.ability.selectRecruit") &&
                     currentPlayer.getEurope().recruitablesDiffer()) {
-                    emigrateUnitInEurope(freeColClient.getCanvas().showEmigrationPanel());
+                    int slot = freeColClient.getCanvas().showEmigrationPanel(false);
+                    emigrateUnitInEurope(slot);
                 } else {
                     emigrateUnitInEurope(0);
                 }
@@ -3690,52 +3692,26 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Cause a unit to emigrate from a specified "slot" in Europe. If the player
-     * doesn't have William Brewster in the congress then the value of the slot
-     * parameter is not important (it won't be used).
+     * Request a unit to migrate from a specified "slot" in Europe.
      * 
-     * @param slot The slot from which the unit emigrates. Either 1, 2 or 3 if
-     *            William Brewster is in the congress.
+     * @param slot The slot from which the unit migrates, 1-3 selects a specific
+     *             one, otherwise the server will choose one.
      */
     private void emigrateUnitInEurope(int slot) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Client client = freeColClient.getClient();
+        Game game = freeColClient.getGame();
+        Player player = freeColClient.getMyPlayer();
+        if (game.getCurrentPlayer() != player) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
 
-        Client client = freeColClient.getClient();
-        Game game = freeColClient.getGame();
-        Player myPlayer = freeColClient.getMyPlayer();
-        Europe europe = myPlayer.getEurope();
+        EmigrateUnitMessage message = new EmigrateUnitMessage(slot);
+        Element reply = askExpecting(client, message.toXMLElement(), "multiple");
+        if (reply == null) return;
 
-        Element emigrateUnitInEuropeElement = Message.createNewRootElement("emigrateUnitInEurope");
-        if (myPlayer.hasAbility("model.ability.selectRecruit")) {
-            emigrateUnitInEuropeElement.setAttribute("slot", Integer.toString(slot));
-        }
-
-        Element reply = client.ask(emigrateUnitInEuropeElement);
-
-        if (reply == null || !reply.getTagName().equals("emigrateUnitInEuropeConfirmed")) {
-            logger.warning("Could not recruit unit: " + myPlayer.getImmigration() + "/" + myPlayer.getImmigrationRequired());
-            throw new IllegalStateException();
-        }
-
-        if (!myPlayer.hasAbility("model.ability.selectRecruit")) {
-            slot = Integer.parseInt(reply.getAttribute("slot"));
-        }
-
-        Element unitElement = (Element) reply.getFirstChild();
-        Unit unit = (Unit) game.getFreeColGameObject(unitElement.getAttribute("ID"));
-        if (unit == null) {
-            unit = new Unit(game, unitElement);
-        } else {
-            unit.readFromXMLElement(unitElement);
-        }
-        String unitId = reply.getAttribute("newRecruitable");
-        UnitType newRecruitable = FreeCol.getSpecification().getUnitType(unitId);
-        europe.emigrate(slot, unit, newRecruitable);
-
-        freeColClient.getCanvas().updateGoldLabel();
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
     }
 
     /**

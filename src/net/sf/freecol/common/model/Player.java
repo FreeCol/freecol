@@ -1803,10 +1803,10 @@ public class Player extends FreeColGameObject implements Nameable {
                     colony.addGoods(Goods.BELLS, requiredLiberty - colony.getGoodsCount(Goods.BELLS));
                 }
             } else if (event.equals("model.event.newRecruits")) {
-                for (int index = 0; index < 3; index++) {
+                for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                     UnitType recruitable = getEurope().getRecruitable(index);
                     if (featureContainer.hasAbility("model.ability.canNotRecruitUnit", recruitable)) {
-                        getEurope().setRecruitable(index, generateRecruitable("newRecruits" + index));
+                        getEurope().setRecruitable(index, generateRecruitable());
                     }
                 }
             }
@@ -2218,10 +2218,44 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #reduceImmigration
      */
     public int getImmigration() {
-        if (!canRecruitUnits()) {
-            return 0;
+        return (canRecruitUnits()) ? immigration : 0;
+    }
+
+    /**
+     * Sets the number of immigration this player possess.
+     *
+     * @param immigration The immigration value for this player.
+     */
+    public void setImmigration(int immigration) {
+        if (canRecruitUnits()) {
+            this.immigration = immigration;
         }
-        return immigration;
+    }
+
+
+    /**
+     * Generates a random unit type. The unit type that is returned represents
+     * the type of a unit that is recruitable in Europe.
+     *
+     * @return A random unit type of a unit that is recruitable in Europe.
+     *
+     * @todo This is correctly called from server pre and in-game controllers,
+     *       but it is also still called client side when Brewster arrives.
+     *       When fathers get moved server-side, revisit this routine.
+     *
+     */
+    public UnitType generateRecruitable() {
+        ArrayList<RandomChoice<UnitType>> recruitables = new ArrayList<RandomChoice<UnitType>>();
+        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+            if (unitType.isRecruitable()
+                && !getFeatureContainer().hasAbility("model.ability.canNotRecruitUnit",
+                                                     unitType)) {
+                int prob = unitType.getRecruitProbability();
+                recruitables.add(new RandomChoice<UnitType>(unitType, prob));
+            }
+        }
+        PseudoRandom random = getGame().getModelController().getPseudoRandom();
+        return RandomChoice.getWeightedRandom(random, recruitables);
     }
 
     /**
@@ -2283,10 +2317,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *         emigrate.
      */
     public int getImmigrationRequired() {
-        if (!canRecruitUnits()) {
-            return 0;
-        }
-        return immigrationRequired;
+        return (canRecruitUnits()) ? immigrationRequired : 0;
     }
 
     /**
@@ -2296,10 +2327,9 @@ public class Player extends FreeColGameObject implements Nameable {
      *            colonist to emigrate.
      */
     public void setImmigrationRequired(int immigrationRequired) {
-        if (!canRecruitUnits()) {
-            return;
+        if (canRecruitUnits()) {
+            this.immigrationRequired = immigrationRequired;
         }
-        this.immigrationRequired = immigrationRequired;
     }
 
     /**
@@ -2998,27 +3028,6 @@ public class Player extends FreeColGameObject implements Nameable {
             }
         }
         getGame().getModelController().exploreTiles(this, tiles);
-    }
-
-    /**
-     * Generates a random unit type. The unit type that is returned represents
-     * the type of a unit that is recruitable in Europe.
-     *
-     * @param unique a <code>String</code> value
-     * @return A random unit type of a unit that is recruitable in Europe.
-     */
-    public UnitType generateRecruitable(String unique) {
-        ArrayList<RandomChoice<UnitType>> recruitableUnits = new ArrayList<RandomChoice<UnitType>>();
-        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-            if (unitType.isRecruitable() &&
-                !featureContainer.hasAbility("model.ability.canNotRecruitUnit", unitType)) {
-                recruitableUnits.add(new RandomChoice<UnitType>(unitType, unitType.getRecruitProbability()));
-            }
-        }
-        int totalProbability = RandomChoice.getTotalProbability(recruitableUnits);
-        int random = getGame().getModelController().getRandom(getId() + "newRecruitableUnit" + unique,
-                                                              totalProbability);
-        return RandomChoice.select(recruitableUnits, random);
     }
 
     /**

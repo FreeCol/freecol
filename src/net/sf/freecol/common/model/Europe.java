@@ -60,6 +60,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * exactly 3 elements and element 0 corresponds to recruit slot 1.
      */
     private UnitType[] recruitables = { null, null, null };
+    public static final int RECRUIT_COUNT = 3;
 
     private java.util.Map<UnitType, Integer> unitPrices = new HashMap<UnitType, Integer>();
 
@@ -148,25 +149,6 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
 
     /**
-     * Generates the initial recruits for the player who owns this
-     * instance of Europe. Recruits may be determined by the
-     * difficulty level, or generated randomly.
-     *
-     */
-    public void generateInitialRecruits() {
-        for (int index = 0; index < recruitables.length; index++) {
-            String optionId = "model.option.recruitable.slot" + index;
-            if (Specification.getSpecification().hasOption(optionId)) {
-                String unitTypeId = Specification.getSpecification()
-                    .getStringOption(optionId).getValue();
-                setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
-            } else {
-                setRecruitable(index, owner.generateRecruitable("recruitable" + index));
-            }
-        }
-    }
-
-    /**
      * Returns true if not all recruitables are of the same type.
      * 
      * @return a <code>boolean</code> value
@@ -187,7 +169,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      *                not exist.
      */
     public UnitType getRecruitable(int slot) {
-        if ((slot >= 0) && (slot < 3)) {
+        if ((slot >= 0) && (slot < RECRUIT_COUNT)) {
             return recruitables[slot];
         }
         throw new IllegalArgumentException("Wrong recruitement slot: " + slot);
@@ -205,7 +187,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      */
     public void setRecruitable(int slot, UnitType type) {
         // Note - changed in order to match getRecruitable
-        if (slot >= 0 && slot < 3) {
+        if (slot >= 0 && slot < RECRUIT_COUNT) {
             recruitables[slot] = type;
         } else {
             logger.warning("setRecruitable: invalid slot(" + slot + ") given.");
@@ -235,41 +217,6 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         unit.setLocation(this);
         unit.getOwner().updateImmigrationRequired();
         unit.getOwner().reduceImmigration();
-
-        setRecruitable(slot, newRecruitable);
-    }
-
-    /**
-     * Causes a unit to emigrate from Europe.
-     * 
-     * @param slot The slot the emigrated unit(type) came from. This is needed
-     *            for setting a new recruitable to this slot.
-     * @param unit The recruited unit.
-     * @param newRecruitable The recruitable that will fill the now empty slot.
-     * @exception IllegalArgumentException If <code>unit == null</code>.
-     * @exception IllegalStateException If there is not enough immigration to
-     *                emigrate the <code>Unit</code>.
-     */
-    public void emigrate(int slot, Unit unit, UnitType newRecruitable) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit must not be 'null'.");
-        } else if (!unit.getOwner().checkEmigrate()) {
-            throw new IllegalStateException("Not enough immigration to emigrate unit: " + unit.getOwner().getImmigration()
-                    + "/" + unit.getOwner().getImmigrationRequired());
-        }
-
-        unit.setLocation(this);
-        unit.getOwner().updateImmigrationRequired();
-        unit.getOwner().reduceImmigration();
-
-        if (!unit.getOwner().hasAbility("model.ability.selectRecruit")) {
-            addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit, "model.europe.emigrate",
-                            "%europe%", getName(),
-                            "%unit%", unit.getName());
-        }
-        // In case William Brewster is in the congress we don't need
-        // to show a message to the user because he has already been
-        // busy picking a unit.
 
         setRecruitable(slot, newRecruitable);
     }
