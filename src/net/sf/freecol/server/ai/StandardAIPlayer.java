@@ -30,15 +30,13 @@ package net.sf.freecol.server.ai;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -67,8 +65,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
@@ -76,11 +72,12 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -1313,17 +1310,29 @@ public class StandardAIPlayer extends AIPlayer {
             
             if (unit.canCarryTreasure()) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
-            } else if (unit.hasAbility("model.ability.scoutIndianSettlement") &&
+                continue;
+            }
+            
+            if (unit.hasAbility("model.ability.scoutIndianSettlement") &&
                        ScoutingMission.isValid(aiUnit)) {
                 aiUnit.setMission(new ScoutingMission(getAIMain(), aiUnit));
-            } else if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
+                continue;
+            }
+            
+            if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
                        && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") || 
                         getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
-            } else if (unit.hasAbility("model.ability.improveTerrain")
+                continue;
+            }
+            
+            if (unit.hasAbility("model.ability.improveTerrain")
                        && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
-            } else if (unit.isColonist()) {                
+                continue;
+            }
+            
+            if (unit.isColonist()) {                
                 /*
                  * Motivated by (speed) performance: This map stores the
                  * distance between the unit and the destination of a Wish:
@@ -1374,9 +1383,9 @@ public class StandardAIPlayer extends AIPlayer {
                 Tile colonyTile = null;
                 if (getPlayer().canBuildColonies()) {
                     colonyTile = BuildColonyMission.findColonyLocation(aiUnit.getUnit());
-                }
-                if (colonyTile != null) {
-                    bestTurns = unit.getTurnsToReach(colonyTile);
+                    if (colonyTile != null) {
+                        bestTurns = unit.getTurnsToReach(colonyTile);
+                    }
                 }
                 
                 // Check if we can find a better site to work than a new colony:
@@ -1441,6 +1450,7 @@ public class StandardAIPlayer extends AIPlayer {
                     continue;
                 }
             }
+            
             if (!aiUnit.hasMission()) {
                 if (aiUnit.getUnit().isOffensiveUnit()) {
                     aiUnit.setMission(new UnitWanderHostileMission(getAIMain(), aiUnit));
