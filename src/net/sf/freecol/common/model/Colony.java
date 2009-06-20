@@ -853,8 +853,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             int amountNeeded = requiredGoods.getAmount();
             int amountAvailable = getGoodsCount(requiredGoods.getType());
             if (amountAvailable < amountNeeded) {
-                int amountProduced = getBuildingForProducing(requiredGoods.getType())
-                    .getProductionNextTurn();
+                int amountProduced = getProductionNextTurn(requiredGoods.getType());
                 if (amountProduced <= 0) {
                     return -1;
                 } else {
