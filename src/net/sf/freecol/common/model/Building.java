@@ -534,14 +534,27 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
 
     public Unit findStudent(final Unit teacher) {
         Unit student = null;
-        int skill = Integer.MIN_VALUE;
+        GoodsType expertProduction = teacher.getType().getExpertProduction();
+        boolean leastSkilled = getGameOptions().getBoolean(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST);
+        int skill = leastSkilled ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         for (Unit potentialStudent : getColony().getUnitList()) {
-            if (potentialStudent.canBeStudent(teacher) &&
-                potentialStudent.getTeacher() == null &&
-                potentialStudent.getSkillLevel() > skill) {
-                // prefer students with higher skill levels
-                student = potentialStudent;
-                skill = student.getSkillLevel();
+            /**
+             * If two potential students have the same skill level,
+             * select the one working in the teacher's trade. If not,
+             * select the one with the lower skill level if the option
+             * "educateLeastSkilledUnitFirst" is set, the one with the
+             * higher level otherwise.
+             */
+            if (potentialStudent.getTeacher() == null &&
+                potentialStudent.canBeStudent(teacher)) {                
+                if ((student == null || potentialStudent.getSkillLevel() == skill) &&
+                    potentialStudent.getWorkType() == expertProduction) {
+                    student = potentialStudent;
+                } else if (leastSkilled && potentialStudent.getSkillLevel() < skill ||
+                           !leastSkilled && potentialStudent.getSkillLevel() > skill) {
+                    student = potentialStudent;
+                    skill = student.getSkillLevel();
+                }
             }
         }
         return student;

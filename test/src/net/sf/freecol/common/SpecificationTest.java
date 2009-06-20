@@ -135,6 +135,7 @@ public final class SpecificationTest extends TestCase {
       assertFalse(spec.getBooleanOption(GameOptions.CUSTOM_IGNORE_BOYCOTT).getValue());
       assertFalse(spec.getBooleanOption(GameOptions.EXPERTS_HAVE_CONNECTIONS).getValue());
       assertFalse(spec.getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
+      assertFalse(spec.getBooleanOption(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST).getValue());
     }
 
     // Check difficulty levels presence and values

@@ -37,8 +37,6 @@ import org.w3c.dom.Element;
 */
 public class GameOptions extends OptionMap {
 
-
-
     /** The amount of money each player will receive before the game starts. */
     public static final String STARTING_MONEY = "model.option.startingMoney";
 
@@ -81,6 +79,13 @@ public class GameOptions extends OptionMap {
      */
     public static final String VICTORY_DEFEAT_HUMANS = "model.option.victoryDefeatHumans";
 
+    /**
+     * Whether to educate the least skilled unit first. This is the
+     * behaviour of the original game and disallows manually assigning
+     * students to teachers.
+     */
+    public static final String EDUCATE_LEAST_SKILLED_UNIT_FIRST =
+        "model.option.educateLeastSkilledUnitFirst";
 
     /**
      * The difficulty of the game.

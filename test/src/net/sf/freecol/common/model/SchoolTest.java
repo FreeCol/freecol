@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.common.option.BooleanOption;
 
 public class SchoolTest extends FreeColTestCase {
 
@@ -1104,4 +1105,51 @@ public class SchoolTest extends FreeColTestCase {
         colony.dispose();
     }
 
+    public void testEducationOption() {
+
+        GoodsType lumber = spec().getGoodsType("model.goods.lumber");
+        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
+
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType, true));
+    	
+        Colony colony = getStandardColony(5);
+
+        Iterator<Unit> units = colony.getUnitIterator();
+
+        Unit lumberJack = units.next();
+        lumberJack.setType(expertLumberJackType);
+        Unit criminal1 = units.next();
+        criminal1.setType(pettyCriminalType);
+        Unit criminal2 = units.next();
+        criminal2.setType(pettyCriminalType);
+        Unit colonist1 = units.next();
+        colonist1.setType(freeColonistType);
+        Unit colonist2 = units.next();
+        colonist2.setType(freeColonistType);
+
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        colony.addBuilding(new Building(getGame(), colony, schoolType));
+        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        assertTrue(schoolType.hasAbility("model.ability.teach"));
+        assertTrue(colony.canTrain(lumberJack));
+        assertFalse(game.getGameOptions().getBoolean(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST));
+        lumberJack.setLocation(school);
+
+        colonist1.setWorkType(cotton);
+        colonist2.setWorkType(lumber);
+        assertEquals(cotton, colonist1.getWorkType());
+        assertEquals(expertLumberJackType.getExpertProduction(), colonist2.getWorkType());
+        assertEquals(colonist2, school.findStudent(lumberJack));
+
+        lumberJack.setStudent(null);
+        colonist2.setTeacher(null);
+
+        ((BooleanOption) game.getGameOptions().getObject(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST))
+        .setValue(true);
+        criminal1.setWorkType(cotton);
+        criminal2.setWorkType(lumber);
+        assertEquals(criminal2, school.findStudent(lumberJack));
+
+    }
 }
