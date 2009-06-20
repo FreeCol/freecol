@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Unit;
@@ -299,16 +300,18 @@ public final class DragListener extends MouseAdapter {
         Unit tempUnit = unitLabel.getUnit();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         boolean separatorNeeded = false;
-        for (Unit teacher : tempUnit.getColony().getTeachers()) {
-            if (tempUnit.canBeStudent(teacher) &&
-                tempUnit.getLocation() instanceof WorkLocation &&
-                teacher.getStudent() != tempUnit) {
-                JMenuItem menuItem = new JMenuItem(Messages.message("assignToTeacher"),
-                                                   imageLibrary.getScaledImageIcon(imageLibrary.getUnitImageIcon(teacher), 0.5f));
-                menuItem.setActionCommand(UnitAction.ASSIGN.toString() + ":" + teacher.getId());
-                menuItem.addActionListener(unitLabel);
-                menu.add(menuItem);
-                separatorNeeded = true;
+        if (!tempUnit.getGame().getGameOptions().getBoolean(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST)) {
+            for (Unit teacher : tempUnit.getColony().getTeachers()) {
+                if (tempUnit.canBeStudent(teacher) &&
+                    tempUnit.getLocation() instanceof WorkLocation &&
+                    teacher.getStudent() != tempUnit) {
+                    JMenuItem menuItem = new JMenuItem(Messages.message("assignToTeacher"),
+                                                       imageLibrary.getScaledImageIcon(imageLibrary.getUnitImageIcon(teacher), 0.5f));
+                    menuItem.setActionCommand(UnitAction.ASSIGN.toString() + ":" + teacher.getId());
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                    separatorNeeded = true;
+                }
             }
         }
         if (tempUnit.getTurnsOfTraining() > 0 && tempUnit.getStudent() != null) {
