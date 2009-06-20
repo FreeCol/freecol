@@ -1360,13 +1360,17 @@ public final class GUI {
                 if (tile != null && tile.getSettlement() != null
                     && tile.getSettlement().getName() != null) {
                     Settlement settlement = tile.getSettlement();
-                    BufferedImage stringImage =
-                        createSettlementNameImage(g, settlement,
+
+                    if (!(settlement instanceof IndianSettlement)
+                        ||(((IndianSettlement)settlement).hasBeenVisited(freeColClient.getMyPlayer()))) {
+                        BufferedImage stringImage =
+                            createSettlementNameImage(g, settlement,
                                                   lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
-                    g.drawImage(stringImage, 
-                                xx + (lib.getTerrainImageWidth(tile.getType()) - 
-                                      stringImage.getWidth())/2 + 1,
-                                yy + (lib.getSettlementImage(settlement).getHeight(null) + 1), null);
+                        g.drawImage(stringImage, 
+                                    xx + (lib.getTerrainImageWidth(tile.getType()) - 
+                                          stringImage.getWidth())/2 + 1,
+                                    yy + (lib.getSettlementImage(settlement).getHeight(null) + 1), null);
+                    }
                 }
                 xx += tileWidth;
             }

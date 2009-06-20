@@ -86,7 +86,12 @@ public final class ReportIndianPanel extends ReportPanel {
         result.add(new JLabel(Messages.message("report.indian.tradeInterests")));
 
         for (IndianSettlement settlement : opponent.getIndianSettlements()) {
-            String locationName = settlement.getName()
+            String settlementName = Messages.message("indianSettlement.nameUnknown");
+            if (settlement.hasBeenVisited(player)) {
+                settlementName = settlement.getName();
+            }
+            
+            String locationName = settlementName
                 + ((settlement.isCapital()) ? "*" : "")
                 + ((settlement.getMissionary() != null) ? "+" : "")
                 + " (" + settlement.getTile().getX()
