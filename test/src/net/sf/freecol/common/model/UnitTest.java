@@ -42,7 +42,8 @@ public class UnitTest extends FreeColTestCase {
     TileType marsh = spec().getTileType("model.tile.marsh");
     TileType swamp = spec().getTileType("model.tile.swamp");
     TileType arctic = spec().getTileType("model.tile.arctic");
-        
+    TileType ocean = spec().getTileType("model.tile.ocean");    
+    
     TileType plainsForest = spec().getTileType("model.tile.mixedForest");
     TileType desertForest = spec().getTileType("model.tile.scrubForest");
     TileType grasslandForest = spec().getTileType("model.tile.coniferForest");
@@ -868,10 +869,12 @@ public class UnitTest extends FreeColTestCase {
         wagon.boardShip(galleon);
         assertEquals(galleon, wagon.getLocation());
         assertEquals(UnitState.SENTRY, wagon.getState());
+        assertEquals("Wrong number of units aboard the carrier",1,galleon.getUnitCount());
 
         colonist.boardShip(galleon);
         assertEquals(galleon, colonist.getLocation());
         assertEquals(UnitState.SENTRY, colonist.getState());
+        assertEquals("Wrong number of units aboard the carrier",2,galleon.getUnitCount());
 
     }
     
@@ -958,5 +961,53 @@ public class UnitTest extends FreeColTestCase {
         
         // necessary to undo the deterministic random
         controller.setPseudoRandom(null);
+    }
+    
+    public void testOwnerChange(){
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+                
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        
+        Unit colonist = new Unit(game, map.getTile(6, 8), dutch, colonistType, UnitState.ACTIVE);
+        
+        assertTrue("Colonist should be dutch",colonist.getOwner() == dutch);
+        assertTrue("Dutch player should have 1 unit",dutch.getUnits().size() == 1);
+        assertTrue("French player should have no units",french.getUnits().size() == 0);
+        // change owner
+        colonist.setOwner(french);
+        assertTrue("Colonist should be french",colonist.getOwner() == french);
+        assertTrue("Dutch player should have no units",dutch.getUnits().size() == 0);
+        assertTrue("French player should have 1 unit",french.getUnits().size() == 1);
+    }
+    
+    public void testCarrierOwnerChange(){
+        Game game = getStandardGame();
+        Map map = getTestMap(ocean);
+        game.setMap(map);
+                
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        
+        Unit galleon = new Unit(game, map.getTile(6, 8), dutch, galleonType, UnitState.ACTIVE);
+        assertTrue("Galleon should be empty",galleon.getUnitCount() == 0);
+        assertTrue("Galleon should be able to carry units",galleon.canCarryUnits());
+        Unit colonist = new Unit(game, galleon, dutch, colonistType, UnitState.SENTRY);
+        assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
+        assertEquals("Wrong number of units th galleon is carrying",1,galleon.getUnitCount());
+        
+        assertTrue("Colonist should be dutch",galleon.getOwner() == dutch);
+        assertTrue("Colonist should be dutch",colonist.getOwner() == dutch);
+        assertTrue("Dutch player should have 2 units",dutch.getUnits().size() == 2);
+        assertTrue("French player should have no units",french.getUnits().size() == 0);
+        
+        // change carrier owner
+        galleon.setOwner(french);
+        assertTrue("Galleon should be french",galleon.getOwner() == french);
+        assertTrue("Colonist should be french",colonist.getOwner() == french);
+        assertTrue("Dutch player should have no units",dutch.getUnits().size() == 0);
+        assertTrue("French player should have 2 units",french.getUnits().size() == 2);
     }
 }

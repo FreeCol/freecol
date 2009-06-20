@@ -26,7 +26,8 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class PlayerTest extends FreeColTestCase {
-    
+    UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
+    UnitType galleonType = spec().getUnitType("model.unit.galleon");
 
     public void testUnits() {
 
@@ -326,9 +327,6 @@ public class PlayerTest extends FreeColTestCase {
         
         Player dutch = game.getPlayer("model.nation.dutch");
         
-        
-        UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
-        UnitType galleonType = spec().getUnitType("model.unit.galleon");
         Unit galleon = new Unit(game,dutch.getEurope() , dutch, galleonType, UnitState.ACTIVE);
         Unit colonist = new Unit(game, galleon, dutch, freeColonist, UnitState.SENTRY);
         assertTrue("Colonist should be aboard the galleon",colonist.getLocation() == galleon);
@@ -339,5 +337,33 @@ public class PlayerTest extends FreeColTestCase {
         
         game.setTurn(new Turn(1600));
         assertTrue("Should be game over, no new world presence after 1600",Player.checkForDeath(dutch));
+    }
+    
+    public void testAddAnotherPlayersUnit(){
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Player dutch =  game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        
+        assertEquals("Wrong number of units for dutch player",0,dutch.getUnits().size());
+        assertEquals("Wrong number of units for french player",0,french.getUnits().size());
+        
+        Unit colonist = new Unit(game, map.getTile(6, 8), dutch, freeColonist, UnitState.ACTIVE);
+        assertTrue("Colonist should be dutch", colonist.getOwner() == dutch);
+        assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
+        
+        try{
+            french.setUnit(colonist);
+            fail("An IllegalStateException should have been raised");
+        }
+        catch(IllegalStateException e){
+            assertTrue("Colonist owner should not have been changed", colonist.getOwner() == dutch);
+            assertEquals("Wrong number of units for dutch player",1,dutch.getUnits().size());
+            assertEquals("Wrong number of units for french player",0,french.getUnits().size());
+            
+        }
+
     }
 }

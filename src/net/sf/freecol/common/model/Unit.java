@@ -2276,24 +2276,38 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public void setOwner(Player owner) {
         Player oldOwner = this.owner;
         
-        if(oldOwner == null){
-        	logger.warning("Unit " + getId() + " had no previous owner");
-        	this.owner = owner;
-        	return;
+        // safeguard
+        if(oldOwner == owner){
+            return;
         }
         
-        oldOwner.removeUnit(this);
-        oldOwner.modifyScore(-getType().getScoreValue());
-        owner.setUnit(this);
-        owner.modifyScore(getType().getScoreValue());
+        if(oldOwner == null){
+            logger.warning("Unit " + getId() + " had no previous owner");
+        }
 
+        // This need to be set right away
+        this.owner = owner;
+        // If its a carrier, we need to update the units it has loaded 
+        //before finishing with it
         for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
         }
-        this.owner = owner;
+                
+        if(oldOwner != null){
+            oldOwner.removeUnit(this);
+            oldOwner.modifyScore(-getType().getScoreValue());
+            // for speed optimizations
+            if(!isOnCarrier()){
+                oldOwner.invalidateCanSeeTiles();
+            }
+        }
+        owner.setUnit(this);
+        owner.modifyScore(getType().getScoreValue());
 
-        oldOwner.invalidateCanSeeTiles();
-        getOwner().setExplored(this);
+        // for speed optimizations
+        if(!isOnCarrier()){
+            getOwner().setExplored(this);
+        }
 
         if (getGame().getFreeColGameObjectListener() != null) {
             getGame().getFreeColGameObjectListener().ownerChanged(this, oldOwner, owner);

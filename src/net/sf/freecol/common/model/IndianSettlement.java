@@ -1429,8 +1429,13 @@ public class IndianSettlement extends Settlement {
                 }
             } else if (OWNED_UNITS_TAG_NAME.equals(in.getLocalName())) {
                 Unit unit = getFreeColGameObject(in, ID_ATTRIBUTE, Unit.class);
-                ownedUnits.add(unit);
-                owner.setUnit(unit);
+                if(unit.getOwner() != null && unit.getOwner() != owner){
+                	logger.warning("Error in savegame: unit " + unit.getId() + " does not belong to settlement " + getId());
+                }
+                else{
+                	ownedUnits.add(unit);
+                	owner.setUnit(unit);
+                }
                 in.nextTag();
             } else if (in.getLocalName().equals(GoodsContainer.getXMLElementTagName())) {
                 goodsContainer = (GoodsContainer) getGame().getFreeColGameObject(in.getAttributeValue(null, ID_ATTRIBUTE));
