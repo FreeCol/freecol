@@ -87,6 +87,11 @@ public class CombatTest extends FreeColTestCase {
         soldier.equipWith(horses, true);
         soldier.setMovesLeft(1);
 
+        Modifier bigMovementPenalty = spec().getModifiers(SimpleCombatModel.BIG_MOVEMENT_PENALTY)
+            .get(0);
+        Modifier attackBonus = spec().getModifiers(SimpleCombatModel.ATTACK_BONUS).get(0);
+        Modifier fortified = spec().getModifiers(SimpleCombatModel.FORTIFIED).get(0);
+
         Set<Modifier> veteranModifierSet = veteranType.getModifierSet("model.modifier.offence");
         assertEquals(1, veteranModifierSet.size());
         Modifier veteranModifier = veteranModifierSet.iterator().next();
@@ -101,18 +106,18 @@ public class CombatTest extends FreeColTestCase {
 
         Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(soldier, colonist);
         assertEquals(6, offenceModifiers.size());
-        assertTrue(offenceModifiers.contains(SimpleCombatModel.BIG_MOVEMENT_PENALTY));
-        offenceModifiers.remove(SimpleCombatModel.BIG_MOVEMENT_PENALTY);
+        assertTrue(offenceModifiers.contains(bigMovementPenalty));
+        offenceModifiers.remove(bigMovementPenalty);
         assertTrue(offenceModifiers.contains(veteranModifier));
         offenceModifiers.remove(veteranModifier);
         assertTrue(offenceModifiers.contains(musketModifier));
         offenceModifiers.remove(musketModifier);
         assertTrue(offenceModifiers.contains(horsesModifier));
         offenceModifiers.remove(horsesModifier);
-        assertTrue(offenceModifiers.contains(SimpleCombatModel.ATTACK_BONUS));
-        offenceModifiers.remove(SimpleCombatModel.ATTACK_BONUS);
+        assertTrue(offenceModifiers.contains(attackBonus));
+        offenceModifiers.remove(attackBonus);
         // this was also added by the combat model
-        assertEquals(SimpleCombatModel.BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
+        assertEquals(spec().BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
 
         Set<Modifier> hillsModifierSet = hills.getDefenceBonus();
         assertFalse(soldier.hasAbility("model.ability.ambushBonus"));
@@ -124,10 +129,10 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(3, defenceModifiers.size());
         assertTrue(defenceModifiers.contains(hillsModifier));
         defenceModifiers.remove(hillsModifier);
-        assertTrue(defenceModifiers.contains(SimpleCombatModel.FORTIFICATION_BONUS));
-        defenceModifiers.remove(SimpleCombatModel.FORTIFICATION_BONUS);
+        assertTrue(defenceModifiers.contains(fortified));
+        defenceModifiers.remove(fortified);
         // this was also added by the combat model
-        assertEquals(SimpleCombatModel.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
+        assertEquals(spec().BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
 
     }
 
@@ -154,11 +159,11 @@ public class CombatTest extends FreeColTestCase {
          */
         Set<Modifier> offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         assertEquals(1, offenceModifiers.size());
-        assertEquals(SimpleCombatModel.BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
+        assertEquals(spec().BASE_OFFENCE_SOURCE, offenceModifiers.iterator().next().getSource());
 
         Set<Modifier> defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         assertEquals(1, defenceModifiers.size());
-        assertEquals(SimpleCombatModel.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
+        assertEquals(spec().BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
 
         /**
          * Fortification should have no effect.
@@ -167,7 +172,7 @@ public class CombatTest extends FreeColTestCase {
         galleon.setState(UnitState.FORTIFIED);
         defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         assertEquals(1, defenceModifiers.size());
-        assertEquals(SimpleCombatModel.BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
+        assertEquals(spec().BASE_DEFENCE_SOURCE, defenceModifiers.iterator().next().getSource());
 
         /**
          * Penalties due to cargo.
@@ -177,9 +182,9 @@ public class CombatTest extends FreeColTestCase {
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         Iterator<Modifier> privIt = offenceModifiers.iterator();
         assertEquals(2, offenceModifiers.size());
-        assertEquals(SimpleCombatModel.BASE_OFFENCE_SOURCE, privIt.next().getSource());
+        assertEquals(spec().BASE_OFFENCE_SOURCE, privIt.next().getSource());
         Modifier goodsPenalty1 = privIt.next();
-        assertEquals(SimpleCombatModel.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
+        assertEquals(spec().CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
         Goods goods2 = new Goods(game, null, Goods.LUMBER, 150);
@@ -188,9 +193,9 @@ public class CombatTest extends FreeColTestCase {
         defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
         Iterator<Modifier> gallIt = defenceModifiers.iterator();
         assertEquals(2, defenceModifiers.size());
-        assertEquals(SimpleCombatModel.BASE_DEFENCE_SOURCE, gallIt.next().getSource());
+        assertEquals(spec().BASE_DEFENCE_SOURCE, gallIt.next().getSource());
         Modifier goodsPenalty2 = gallIt.next();
-        assertEquals(SimpleCombatModel.CARGO_PENALTY_SOURCE, goodsPenalty2.getSource());
+        assertEquals(spec().CARGO_PENALTY_SOURCE, goodsPenalty2.getSource());
         assertEquals(-25f, goodsPenalty2.getValue());
 
         /**
@@ -211,11 +216,11 @@ public class CombatTest extends FreeColTestCase {
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         privIt = offenceModifiers.iterator();
         assertEquals(3, offenceModifiers.size());
-        assertEquals(SimpleCombatModel.BASE_OFFENCE_SOURCE, privIt.next().getSource());
+        assertEquals(spec().BASE_OFFENCE_SOURCE, privIt.next().getSource());
         Modifier newDrakeModifier = privIt.next();
         assertEquals(drakeModifier, newDrakeModifier);
         goodsPenalty1 = privIt.next();
-        assertEquals(SimpleCombatModel.CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
+        assertEquals(spec().CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
     }

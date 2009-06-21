@@ -61,7 +61,14 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             defence = new LinkedHashSet<Modifier>();
             defence.add(BASE_DEFENCE_MODIFIER);
             defence.addAll(sortModifiers(settlement.getFeatureContainer()
-                                         .getModifierSet("model.modifier.defence", attacker.getType())));
+                                         .getModifierSet(Modifier.DEFENCE, attacker.getType())));
+            defence.addAll(sortModifiers(settlement.getOwner().getFeatureContainer()
+                                         .getModifierSet(Modifier.SETTLEMENT_DEFENCE, attacker.getType())));
+            if (settlement.isCapital()) {
+                defence.addAll(sortModifiers(settlement.getOwner().getFeatureContainer()
+                                             .getModifierSet(Modifier.CAPITAL_DEFENCE,
+                                                             attacker.getType())));
+            }
         } else {
             defence = sortModifiers(combatModel.getDefensiveModifiers(attacker, defender));
         }
@@ -142,7 +149,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         Font bigFont = getFont().deriveFont(Font.BOLD, 20f);
 
         float offenceResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), offence);
-        JLabel finalOffenceLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
+        JLabel finalOffenceLabel = new JLabel(Messages.message("model.source.finalResult.name"));
         finalOffenceLabel.setFont(bigFont);
 
         add(new JSeparator(JSeparator.HORIZONTAL), "newline, span 3, growx");
@@ -153,7 +160,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         add(finalOffenceResult);
 
         float defenceResult = FeatureContainer.applyModifierSet(0, attacker.getGame().getTurn(), defence);
-        JLabel finalDefenceLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
+        JLabel finalDefenceLabel = new JLabel(Messages.message("model.source.finalResult.name"));
         finalDefenceLabel.setFont(bigFont);
         add(finalDefenceLabel, "skip");
         JLabel finalDefenceResult = new JLabel(getModifierFormat().format(defenceResult));

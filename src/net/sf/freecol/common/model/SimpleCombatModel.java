@@ -48,43 +48,19 @@ public class SimpleCombatModel implements CombatModel {
      */
     public static final int MAXIMUM_BOMBARD_POWER = 48;
 
-    public static final BonusOrPenalty MOVEMENT_PENALTY_SOURCE = 
-        new BonusOrPenalty("modifiers.movementPenalty");
-    public static final BonusOrPenalty ARTILLERY_PENALTY_SOURCE =
-        new BonusOrPenalty("modifiers.artilleryPenalty");
-    public static final BonusOrPenalty ATTACK_BONUS_SOURCE =
-        new BonusOrPenalty("modifiers.attackBonus");
-    public static final BonusOrPenalty FORTIFICATION_BONUS_SOURCE =
-        new BonusOrPenalty("modifiers.fortified");
-    public static final BonusOrPenalty INDIAN_RAID_BONUS_SOURCE =
-        new BonusOrPenalty("modifiers.artilleryAgainstRaid");
-    public static final BonusOrPenalty BASE_OFFENCE_SOURCE =
-        new BonusOrPenalty("modifiers.baseOffence");
-    public static final BonusOrPenalty BASE_DEFENCE_SOURCE =
-        new BonusOrPenalty("modifiers.baseDefence");
-    public static final BonusOrPenalty CARGO_PENALTY_SOURCE = 
-        new BonusOrPenalty("modifiers.cargoPenalty");
-    public static final BonusOrPenalty AMBUSH_BONUS_SOURCE = 
-        new BonusOrPenalty("modifiers.ambushBonus");
+    public static final String SMALL_MOVEMENT_PENALTY =
+        "model.modifier.smallMovementPenalty";
+    public static final String BIG_MOVEMENT_PENALTY =
+        "model.modifier.bigMovementPenalty";
+    public static final String ARTILLERY_IN_THE_OPEN =
+        "model.modifier.artilleryInTheOpen";
+    public static final String ATTACK_BONUS =
+        "model.modifier.attackBonus";
+    public static final String FORTIFIED =
+        "model.modifier.fortified";
+    public static final String ARTILLERY_AGAINST_RAID =
+        "model.modifier.artilleryAgainstRaid";
 
-    public static final Modifier SMALL_MOVEMENT_PENALTY =
-        new Modifier(Modifier.OFFENCE, MOVEMENT_PENALTY_SOURCE,
-                     -33, Modifier.Type.PERCENTAGE);
-    public static final Modifier BIG_MOVEMENT_PENALTY =
-        new Modifier(Modifier.OFFENCE, MOVEMENT_PENALTY_SOURCE,
-                     -66, Modifier.Type.PERCENTAGE);
-    public static final Modifier ARTILLERY_PENALTY =
-        new Modifier(Modifier.OFFENCE, ARTILLERY_PENALTY_SOURCE,
-                     -75, Modifier.Type.PERCENTAGE);
-    public static final Modifier ATTACK_BONUS =
-        new Modifier(Modifier.OFFENCE, ATTACK_BONUS_SOURCE,
-                     50, Modifier.Type.PERCENTAGE);
-    public static final Modifier FORTIFICATION_BONUS =
-        new Modifier(Modifier.DEFENCE, FORTIFICATION_BONUS_SOURCE,
-                     50, Modifier.Type.PERCENTAGE);
-    public static final Modifier INDIAN_RAID_BONUS =
-        new Modifier(Modifier.DEFENCE, INDIAN_RAID_BONUS_SOURCE,
-                     100, Modifier.Type.PERCENTAGE);
 
     private PseudoRandom random;
 
@@ -294,9 +270,10 @@ public class SimpleCombatModel implements CombatModel {
      * @return a <code>List</code> of Modifiers
      */
     public Set<Modifier> getOffensiveModifiers(Unit attacker, Unit defender) {
+        Specification spec = Specification.getSpecification();
         Set<Modifier> result = new LinkedHashSet<Modifier>();
 
-        result.add(new Modifier(Modifier.OFFENCE, BASE_OFFENCE_SOURCE,
+        result.add(new Modifier(Modifier.OFFENCE, spec.BASE_OFFENCE_SOURCE,
                                 attacker.getType().getOffence(),
                                 Modifier.Type.ADDITIVE));
 
@@ -311,7 +288,7 @@ public class SimpleCombatModel implements CombatModel {
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
-                result.add(new Modifier(Modifier.OFFENCE, CARGO_PENALTY_SOURCE,
+                result.add(new Modifier(Modifier.OFFENCE, spec.CARGO_PENALTY_SOURCE,
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }
@@ -320,13 +297,13 @@ public class SimpleCombatModel implements CombatModel {
                 result.addAll(equipment.getFeatureContainer().getModifierSet(Modifier.OFFENCE));
             }
             // 50% attack bonus
-            result.add(ATTACK_BONUS);
+            result.addAll(spec.getModifiers(ATTACK_BONUS));
             // movement penalty
             int movesLeft = attacker.getMovesLeft();
             if (movesLeft == 1) {
-                result.add(BIG_MOVEMENT_PENALTY);
+                result.addAll(spec.getModifiers(BIG_MOVEMENT_PENALTY));
             } else if (movesLeft == 2) {
-                result.add(SMALL_MOVEMENT_PENALTY);
+                result.addAll(spec.getModifiers(SMALL_MOVEMENT_PENALTY));
             }
 
             if (defender != null && defender.getTile() != null) {
@@ -345,7 +322,7 @@ public class SimpleCombatModel implements CombatModel {
                         for (Modifier modifier : ambushModifiers) {
                             Modifier ambushModifier = new Modifier(modifier);
                             ambushModifier.setId(Modifier.OFFENCE);
-                            ambushModifier.setSource(AMBUSH_BONUS_SOURCE);
+                            ambushModifier.setSource(spec.AMBUSH_BONUS_SOURCE);
                             result.add(ambushModifier);
                         }
                     }
@@ -353,7 +330,7 @@ public class SimpleCombatModel implements CombatModel {
                     // 75% Artillery in the open penalty
                     if (attacker.hasAbility("model.ability.bombard") &&
                         attacker.getTile().getSettlement() == null) {
-                        result.add(ARTILLERY_PENALTY);
+                        result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                     }
                 } else {
                     // Attacking a settlement
@@ -415,13 +392,13 @@ public class SimpleCombatModel implements CombatModel {
      * @return a <code>List</code> of Modifiers
      */
     public Set<Modifier> getDefensiveModifiers(Unit attacker, Unit defender) {
-
+        Specification spec = Specification.getSpecification();
         Set<Modifier> result = new LinkedHashSet<Modifier>();
         if (defender == null) {
             return result;
         }
 
-        result.add(new Modifier(Modifier.DEFENCE, BASE_DEFENCE_SOURCE,
+        result.add(new Modifier(Modifier.DEFENCE, spec.BASE_DEFENCE_SOURCE,
                                 defender.getType().getDefence(),
                                 Modifier.Type.ADDITIVE));
         result.addAll(defender.getType().getFeatureContainer()
@@ -433,7 +410,7 @@ public class SimpleCombatModel implements CombatModel {
             if (goodsCount > 0) {
                 // -12.5% penalty for every unit of cargo.
                 // TODO: shouldn't this be -cargo/capacity?
-                result.add(new Modifier(Modifier.DEFENCE, CARGO_PENALTY_SOURCE,
+                result.add(new Modifier(Modifier.DEFENCE, spec.CARGO_PENALTY_SOURCE,
                                         -12.5f * goodsCount,
                                         Modifier.Type.PERCENTAGE));
             }
@@ -455,7 +432,7 @@ public class SimpleCombatModel implements CombatModel {
             }
             // 50% fortify bonus
             if (defender.getState() == UnitState.FORTIFIED) {
-                result.add(FORTIFICATION_BONUS);
+                result.addAll(spec.getModifiers(FORTIFIED));
             }
 
             if (defender.getTile() != null) {
@@ -470,15 +447,19 @@ public class SimpleCombatModel implements CombatModel {
                     if (defender.hasAbility("model.ability.bombard") &&
                         defender.getState() != UnitState.FORTIFIED) {
                         // -75% Artillery in the Open penalty
-                        result.add(ARTILLERY_PENALTY);
+                        result.addAll(spec.getModifiers(ARTILLERY_IN_THE_OPEN));
                     }
                 } else {
-                    result.addAll(tile.getSettlement().getFeatureContainer()
-                                  .getModifierSet(Modifier.DEFENCE));
+                    result.addAll(tile.getSettlement().getOwner().getFeatureContainer()
+                                  .getModifierSet(Modifier.SETTLEMENT_DEFENCE));
+                    if (tile.getSettlement().isCapital()) {
+                        result.addAll(tile.getSettlement().getOwner().getFeatureContainer()
+                                      .getModifierSet(Modifier.CAPITAL_DEFENCE));
+                    }
                     if (defender.hasAbility("model.ability.bombard") &&
                         attacker.getOwner().isIndian()) {
                         // 100% defence bonus against an Indian raid
-                        result.add(INDIAN_RAID_BONUS);
+                        result.addAll(spec.getModifiers(ARTILLERY_AGAINST_RAID));
                     }
                 }
             }

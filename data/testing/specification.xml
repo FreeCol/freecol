@@ -19,11 +19,34 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.19 -->
+<!-- specification version 0.20 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
-  <!-- types of goods.  an element must be defined before it is referenced -->
+
+  <!-- Modifiers that are not attached to other game object
+       types. They may be modified, but MUST NOT be removed. -->
+  <modifiers>
+    <modifier id="model.modifier.smallMovementPenalty"
+              source="model.source.movementPenalty"
+              value="-33" type="percentage" />
+    <modifier id="model.modifier.bigMovementPenalty"
+              source="model.source.movementPenalty"
+              value="-66" type="percentage" />
+    <modifier id="model.modifier.artilleryInTheOpen"
+              source="model.source.artilleryInTheOpen"
+              value="-75" type="percentage" />
+    <modifier id="model.modifier.attackBonus"
+              source="model.source.attackBonus"
+              value="50" type="percentage" />
+    <modifier id="model.modifier.fortified"
+              source="model.source.fortified"
+              value="50" type="percentage" />
+    <modifier id="model.modifier.artilleryAgainstRaid"
+              source="model.source.artilleryAgainstRaid"
+              value="100" type="percentage" />
+  </modifiers>
+
   <goods-types>
     <goods-type id="model.goods.food" is-farmed="false" ignore-limit="true" is-food="true">
       <market initial-amount="10000" initial-price="1"  price-difference="7"/>
@@ -1490,12 +1513,16 @@
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <!-- default REF nation -->
     <european-nation-type id="model.nationType.ref" ref="true">
       <modifier id="model.modifier.bombardBonus" type="percentage" value="50"/>
       <ability id="model.ability.ambushPenalty" value="true"/>
       <ability id="model.ability.royalExpeditionaryForce" value="true"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">
@@ -1505,6 +1532,8 @@
       <unit id="model.unit.merchantman"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the French player -->
     <european-nation-type id="model.nationType.cooperation">
@@ -1514,6 +1543,8 @@
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the English player -->
     <european-nation-type id="model.nationType.immigration">
@@ -1523,6 +1554,8 @@
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <!-- this was the Spanish player -->
     <european-nation-type id="model.nationType.conquest">
@@ -1533,6 +1566,8 @@
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <european-nation-type id="model.nationType.naval">
       <modifier id="model.modifier.movementBonus" type="additive" value="1">
@@ -1543,6 +1578,8 @@
       <unit id="model.unit.merchantman"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <european-nation-type id="model.nationType.building">
       <modifier id="model.goods.lumber" type="additive" value="2"/>
@@ -1552,6 +1589,8 @@
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <european-nation-type id="model.nationType.agriculture">
       <modifier id="model.goods.food" type="additive" value="2"/>
@@ -1560,6 +1599,8 @@
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
     <european-nation-type id="model.nationType.furTrapping">
       <modifier id="model.goods.furs" type="additive" value="2"/>
@@ -1569,6 +1610,8 @@
       <unit id="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
     </european-nation-type>
 
     <indian-nation-type id="model.nationType.apache" number-of-settlements="average"
@@ -1585,6 +1628,10 @@
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.west" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.sioux" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_camp">
@@ -1600,6 +1647,10 @@
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.northWest" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.tupi" number-of-settlements="low"
                         aggression="high" type-of-settlement="indian_camp">
@@ -1616,6 +1667,10 @@
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.southEast" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.arawak" number-of-settlements="low"
                         aggression="low" type-of-settlement="indian_village">
@@ -1629,6 +1684,10 @@
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.east" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.cherokee" number-of-settlements="average"
                         aggression="low" type-of-settlement="indian_village">
@@ -1647,6 +1706,10 @@
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.northEast" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.iroquois" number-of-settlements="average"
                         aggression="average" type-of-settlement="indian_village">
@@ -1665,6 +1728,10 @@
       </ability>
       <ability id="model.ability.native"/>
       <region id="model.region.north" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
                         aggression="low" type-of-settlement="inca_city">
@@ -1682,6 +1749,10 @@
       <ability id="model.ability.native"/>
       <region id="model.region.southWest" />
       <region id="model.region.south" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.aztec" number-of-settlements="high"
                         aggression="high" type-of-settlement="aztec_city">
@@ -1699,6 +1770,10 @@
       <ability id="model.ability.native"/>
       <region id="model.region.center" />
       <region id="model.region.east" />
+      <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
+                type="percentage" value="50" />
+      <modifier id="model.modifier.capitalDefence" source="model.source.inCapital"
+                type="percentage" value="50" />
     </indian-nation-type>
   </nation-types>
 

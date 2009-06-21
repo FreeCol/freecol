@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- XSD for specification version 0.19 -->
+<!-- XSD for specification version 0.20 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
   <xs:element name="freecol-specification">
     <xs:complexType>
@@ -17,6 +17,7 @@
         <xs:element ref="nations"/>
         <xs:element ref="difficultyLevels"/>
         <xs:element ref="options"/>
+        <xs:element ref="modifiers"/>
       </xs:choice>
     </xs:complexType>
   </xs:element>
@@ -489,6 +490,13 @@
         <xs:element ref="stringOption"/>
       </xs:choice>
       <xs:attribute name="id" use="required" type="xs:ID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="modifiers">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="modifier"/>
+      </xs:choice>
     </xs:complexType>
   </xs:element>
   <xs:element name="options">

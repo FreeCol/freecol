@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.model.Ability;
+import net.sf.freecol.common.model.BonusOrPenalty;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.EquipmentType;
@@ -71,6 +72,29 @@ import net.sf.freecol.common.option.StringOption;
  * resource named "specification.xml" in the same package as this class.
  */
 public final class Specification {
+
+    public static final BonusOrPenalty MOVEMENT_PENALTY_SOURCE = 
+        new BonusOrPenalty("model.source.movementPenalty");
+    public static final BonusOrPenalty ARTILLERY_PENALTY_SOURCE =
+        new BonusOrPenalty("model.source.artilleryPenalty");
+    public static final BonusOrPenalty ATTACK_BONUS_SOURCE =
+        new BonusOrPenalty("model.source.attackBonus");
+    public static final BonusOrPenalty FORTIFICATION_BONUS_SOURCE =
+        new BonusOrPenalty("model.source.fortified");
+    public static final BonusOrPenalty INDIAN_RAID_BONUS_SOURCE =
+        new BonusOrPenalty("model.source.artilleryAgainstRaid");
+    public static final BonusOrPenalty BASE_OFFENCE_SOURCE =
+        new BonusOrPenalty("model.source.baseOffence");
+    public static final BonusOrPenalty BASE_DEFENCE_SOURCE =
+        new BonusOrPenalty("model.source.baseDefence");
+    public static final BonusOrPenalty CARGO_PENALTY_SOURCE = 
+        new BonusOrPenalty("model.source.cargoPenalty");
+    public static final BonusOrPenalty AMBUSH_BONUS_SOURCE = 
+        new BonusOrPenalty("model.source.ambushBonus");
+    public static final BonusOrPenalty IN_SETTLEMENT = 
+        new BonusOrPenalty("model.source.inSettlement");
+    public static final BonusOrPenalty IN_CAPITAL = 
+        new BonusOrPenalty("model.source.inCapital");
 
     /**
      * Singleton
@@ -190,6 +214,22 @@ public final class Specification {
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
 
+        for (BonusOrPenalty source : new BonusOrPenalty[] {
+                MOVEMENT_PENALTY_SOURCE,
+                ARTILLERY_PENALTY_SOURCE,
+                ATTACK_BONUS_SOURCE,
+                FORTIFICATION_BONUS_SOURCE,
+                INDIAN_RAID_BONUS_SOURCE,
+                BASE_OFFENCE_SOURCE,
+                BASE_DEFENCE_SOURCE, 
+                CARGO_PENALTY_SOURCE,
+                AMBUSH_BONUS_SOURCE,
+                IN_SETTLEMENT,
+                IN_CAPITAL
+            }) {
+            allTypes.put(source.getId(), source);
+        }
+
         try {
             XMLStreamReader xsr = XMLInputFactory.newInstance().createXMLStreamReader(in);
             xsr.nextTag();
@@ -197,7 +237,14 @@ public final class Specification {
                 String childName = xsr.getLocalName();
                 logger.finest("Found child named " + childName);
 
-                if ("goods-types".equals(childName)) {
+                if ("modifiers".equals(childName)) {
+
+                    while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                        Modifier modifier = new Modifier(xsr, this);
+                        addModifier(modifier);
+                    }
+
+                } else if ("goods-types".equals(childName)) {
 
                     int goodsIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -950,6 +997,18 @@ public final class Specification {
             allOptions.put(key, difficultyLevels.get(difficultyLevel).getOptions().get(key));
         }
     }
+
+    // -- Bonus or Penalty --
+    /**
+     * Returns the <code>getBonusOrPenalty</code> with the given id.
+     *
+     * @param id a <code>String</code> value
+     * @return a <code>BonusOrPenalty</code> value
+     */
+    public BonusOrPenalty getBonusOrPenalty(String id) {
+        return getType(id, BonusOrPenalty.class);
+    }
+
 
     /**
      * Loads the specification.

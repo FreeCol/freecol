@@ -23,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.Specification;
+
 import org.w3c.dom.Element;
 
 
@@ -82,10 +84,12 @@ public final class Ability extends Feature {
      * Creates a new <code>Ability</code> instance.
      *
      * @param in a <code>XMLStreamReader</code> value
+     * @param specification a <code>Specification</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public Ability(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public Ability(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        readFromXMLImpl(in, specification);
     }
     
     /**
@@ -124,8 +128,9 @@ public final class Ability extends Feature {
         out.writeEndElement();
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
-        super.readAttributes(in);
+    public void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        super.readAttributes(in, specification);
         value = getAttribute(in, "value", true);
     }
     

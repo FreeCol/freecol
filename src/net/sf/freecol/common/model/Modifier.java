@@ -23,7 +23,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.Specification;
+
 import org.w3c.dom.Element;
+
 
 /**
  * The <code>Modifier</code> class encapsulates a bonus or penalty
@@ -35,6 +38,8 @@ public final class Modifier extends Feature {
 
     public static final String OFFENCE = "model.modifier.offence";
     public static final String DEFENCE = "model.modifier.defence";
+    public static final String CAPITAL_DEFENCE = "model.modifier.capitalDefence";
+    public static final String SETTLEMENT_DEFENCE = "model.modifier.settlementDefence";
 
     public static final BonusOrPenalty COLONY_GOODS_PARTY =
         new BonusOrPenalty("model.monarch.colonyGoodsParty");
@@ -124,10 +129,11 @@ public final class Modifier extends Feature {
      * Creates a new <code>Modifier</code> instance.
      *
      * @param in a <code>XMLStreamReader</code> value
+     * @param specification a <code>Specification</code> value
      * @exception XMLStreamException if an error occurs
      */
-    public Modifier(XMLStreamReader in) throws XMLStreamException {
-        readFromXML(in);
+    public Modifier(XMLStreamReader in, Specification specification) throws XMLStreamException {
+        readFromXMLImpl(in, specification);
     }
     
     /**
@@ -274,7 +280,9 @@ public final class Modifier extends Feature {
         return "modifier";
     }
 
-    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    public void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        super.readAttributes(in, specification);
         setType(Enum.valueOf(Type.class, in.getAttributeValue(null, "type").toUpperCase()));
         value = Float.parseFloat(in.getAttributeValue(null, "value"));
         String incrementString = in.getAttributeValue(null, "incrementType");

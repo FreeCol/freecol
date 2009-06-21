@@ -123,7 +123,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         throws XMLStreamException {
         String childName = in.getLocalName();
         if (Ability.getXMLElementTagName().equals(childName)) {
-            Ability ability = new Ability(in);
+            Ability ability = new Ability(in, specification);
             if (ability.getSource() == null) {
                 ability.setSource(this);
             }
@@ -131,7 +131,7 @@ public abstract class FreeColGameObjectType extends FreeColObject {
             specification.addAbility(ability);
             return ability;
         } else if (Modifier.getXMLElementTagName().equals(childName)) {
-            Modifier modifier = new Modifier(in);
+            Modifier modifier = new Modifier(in, specification);
             if (modifier.getSource() == null) {
                 modifier.setSource(this);
             }

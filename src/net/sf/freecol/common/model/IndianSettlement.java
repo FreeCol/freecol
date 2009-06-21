@@ -92,11 +92,6 @@ public class IndianSettlement extends Settlement {
      */
     private Set<Player> visitedBy = new HashSet<Player>();
 
-    /**
-     * Whether this is the capital of the tribe.
-     */
-    private boolean isCapital = false;
-
     private List<Unit> units = Collections.emptyList();
 
     private ArrayList<Unit> ownedUnits = new ArrayList<Unit>();
@@ -158,12 +153,11 @@ public class IndianSettlement extends Settlement {
         goodsContainer = new GoodsContainer(game, this);
 
         this.learnableSkill = learnableSkill;
-        this.isCapital = isCapital;
+        setCapital(isCapital);
         this.visitedBy = isVisited;
         this.missionary = missionary;
 
         convertProgress = 0;
-        
         updateWantedGoods();
     }
 
@@ -535,21 +529,6 @@ public class IndianSettlement extends Settlement {
             return 1;
         }
     }
-
-    /**
-     * Returns <code>true</code> if this is the Nation's capital.
-     *
-     * @return <code>true</code> if this is the Nation's capital.
-     */
-    public boolean isCapital() {
-        return isCapital;
-    }
-
-
-    public void setCapital(boolean isCapital) {
-        this.isCapital = isCapital;
-    }
-
 
     /**
      * Adds a <code>Locatable</code> to this Location.
@@ -1268,7 +1247,7 @@ public class IndianSettlement extends Settlement {
         out.writeAttribute("tile", tile.getId());
         out.writeAttribute("name", getName());
         out.writeAttribute("owner", owner.getId());
-        out.writeAttribute("isCapital", Boolean.toString(isCapital));
+        out.writeAttribute("isCapital", Boolean.toString(isCapital()));
 
         if (full) {
             out.writeAttribute("lastTribute", Integer.toString(lastTribute));
@@ -1366,18 +1345,17 @@ public class IndianSettlement extends Settlement {
         if (tile == null) {
             tile = new Tile(getGame(), in.getAttributeValue(null, "tile"));
         }
-        owner = (Player)getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
+        owner = (Player) getGame().getFreeColGameObject(in.getAttributeValue(null, "owner"));
         if (owner == null) {
             owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
         }
-        isCapital = getAttribute(in, "isCapital", false);
+        setCapital(getAttribute(in, "isCapital", false));
         // TODO: >=0.8.2, setName(in.getAttributeValue(null, "name"))
         String name = in.getAttributeValue(null, "name");
-        if (name == null) name = owner.getDefaultSettlementName(isCapital);
+        if (name == null) name = owner.getDefaultSettlementName(isCapital());
         setName(name);
 
         owner.addSettlement(this);
-        featureContainer.addModifier(Settlement.DEFENCE_MODIFIER);
         
         ownedUnits.clear();
         

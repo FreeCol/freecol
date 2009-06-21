@@ -2054,7 +2054,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             featureContainer.addAbility(HAS_PORT);
         }
         unitCount = getAttribute(in, "unitCount", -1);
-        featureContainer.addModifier(Settlement.DEFENCE_MODIFIER);
         // Read child elements:
         loop: while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
@@ -2091,7 +2090,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 data.readFromXML(in);
                 exportData.put(data.getId(), data);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
-                Modifier modifier = new Modifier(in);
+                Modifier modifier = new Modifier(in, Specification.getSpecification());
                 if (Modifier.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
                     Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
                     for (Modifier existingModifier : bellsBonus) {

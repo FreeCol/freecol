@@ -52,10 +52,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     public static final int RADIUS = 1;
     public static final int FOOD_CONSUMPTION = 2;
 
-    public static final Modifier DEFENCE_MODIFIER =
-        new Modifier("model.modifier.defence", new BonusOrPenalty("modifiers.inSettlement"), 
-                     50, Modifier.Type.PERCENTAGE);
-
     /** The <code>Player</code> owning this <code>Settlement</code>. */
     protected Player owner;
 
@@ -67,6 +63,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     
     protected GoodsContainer goodsContainer;
     
+    /**
+     * Whether this is the capital of the nation.
+     */
+    private boolean isCapital = false;
+
     /**
      * Contains the abilities and modifiers of this Colony.
      */
@@ -87,8 +88,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         this.name = name;
         this.tile = tile;
 
-        featureContainer.addModifier(DEFENCE_MODIFIER);
-        
         // Relocate any worker already on the Tile (from another Settlement):
         if (tile.getOwningSettlement() != null) {
             if (tile.getOwningSettlement() instanceof Colony) {
@@ -161,6 +160,24 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      */
     public void setName(String newName) {
         this.name = newName;
+    }
+
+    /**
+     * Returns <code>true</code> if this is the Nation's capital.
+     *
+     * @return <code>true</code> if this is the Nation's capital.
+     */
+    public boolean isCapital() {
+        return isCapital;
+    }
+
+    /**
+     * Sets the capital value.
+     *
+     * @param isCapital a <code>boolean</code> value
+     */
+    public void setCapital(boolean isCapital) {
+        this.isCapital = isCapital;
     }
 
 

@@ -228,12 +228,32 @@ public abstract class Feature extends FreeColObject {
         }
     }
 
-    protected void readAttributes(XMLStreamReader in) throws XMLStreamException {
+    /**
+     * Initialize this object from an XML-representation of this object.
+     *
+     * @param in The input stream with the XML.
+     * @param specification a <code>Specification</code> value
+     * @exception XMLStreamException if a problem was encountered
+     *      during parsing.
+     */
+    protected void readFromXMLImpl(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        // TODO: get rid of compatibility code
+        if (getId() == null) {
+            setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+        }
+        readAttributes(in, specification);
+        readChildren(in);
+    }
+
+    protected void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
         String sourceId = in.getAttributeValue(null, "source");
         if (sourceId == null) {
             setSource(null);
-        } else {
-            setSource(Specification.getSpecification().getType(sourceId));
+        } else if (specification != null) {
+            setSource(specification.getType(sourceId));
         }
 
         String firstTurn = in.getAttributeValue(null, "firstTurn");
