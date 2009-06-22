@@ -37,7 +37,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.BonusOrPenalty;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.DifficultyLevel;
 import net.sf.freecol.common.model.EquipmentType;
@@ -73,28 +72,28 @@ import net.sf.freecol.common.option.StringOption;
  */
 public final class Specification {
 
-    public static final BonusOrPenalty MOVEMENT_PENALTY_SOURCE = 
-        new BonusOrPenalty("model.source.movementPenalty");
-    public static final BonusOrPenalty ARTILLERY_PENALTY_SOURCE =
-        new BonusOrPenalty("model.source.artilleryPenalty");
-    public static final BonusOrPenalty ATTACK_BONUS_SOURCE =
-        new BonusOrPenalty("model.source.attackBonus");
-    public static final BonusOrPenalty FORTIFICATION_BONUS_SOURCE =
-        new BonusOrPenalty("model.source.fortified");
-    public static final BonusOrPenalty INDIAN_RAID_BONUS_SOURCE =
-        new BonusOrPenalty("model.source.artilleryAgainstRaid");
-    public static final BonusOrPenalty BASE_OFFENCE_SOURCE =
-        new BonusOrPenalty("model.source.baseOffence");
-    public static final BonusOrPenalty BASE_DEFENCE_SOURCE =
-        new BonusOrPenalty("model.source.baseDefence");
-    public static final BonusOrPenalty CARGO_PENALTY_SOURCE = 
-        new BonusOrPenalty("model.source.cargoPenalty");
-    public static final BonusOrPenalty AMBUSH_BONUS_SOURCE = 
-        new BonusOrPenalty("model.source.ambushBonus");
-    public static final BonusOrPenalty IN_SETTLEMENT = 
-        new BonusOrPenalty("model.source.inSettlement");
-    public static final BonusOrPenalty IN_CAPITAL = 
-        new BonusOrPenalty("model.source.inCapital");
+    public static final FreeColGameObjectType MOVEMENT_PENALTY_SOURCE = 
+        new FreeColGameObjectType("model.source.movementPenalty");
+    public static final FreeColGameObjectType ARTILLERY_PENALTY_SOURCE =
+        new FreeColGameObjectType("model.source.artilleryPenalty");
+    public static final FreeColGameObjectType ATTACK_BONUS_SOURCE =
+        new FreeColGameObjectType("model.source.attackBonus");
+    public static final FreeColGameObjectType FORTIFICATION_BONUS_SOURCE =
+        new FreeColGameObjectType("model.source.fortified");
+    public static final FreeColGameObjectType INDIAN_RAID_BONUS_SOURCE =
+        new FreeColGameObjectType("model.source.artilleryAgainstRaid");
+    public static final FreeColGameObjectType BASE_OFFENCE_SOURCE =
+        new FreeColGameObjectType("model.source.baseOffence");
+    public static final FreeColGameObjectType BASE_DEFENCE_SOURCE =
+        new FreeColGameObjectType("model.source.baseDefence");
+    public static final FreeColGameObjectType CARGO_PENALTY_SOURCE = 
+        new FreeColGameObjectType("model.source.cargoPenalty");
+    public static final FreeColGameObjectType AMBUSH_BONUS_SOURCE = 
+        new FreeColGameObjectType("model.source.ambushBonus");
+    public static final FreeColGameObjectType IN_SETTLEMENT = 
+        new FreeColGameObjectType("model.source.inSettlement");
+    public static final FreeColGameObjectType IN_CAPITAL = 
+        new FreeColGameObjectType("model.source.inCapital");
 
     /**
      * Singleton
@@ -214,7 +213,7 @@ public final class Specification {
         equipmentTypes = new ArrayList<EquipmentType>();
         difficultyLevels = new ArrayList<DifficultyLevel>();
 
-        for (BonusOrPenalty source : new BonusOrPenalty[] {
+        for (FreeColGameObjectType source : new FreeColGameObjectType[] {
                 MOVEMENT_PENALTY_SOURCE,
                 ARTILLERY_PENALTY_SOURCE,
                 ATTACK_BONUS_SOURCE,
@@ -1000,14 +999,16 @@ public final class Specification {
 
     // -- Bonus or Penalty --
     /**
-     * Returns the <code>getBonusOrPenalty</code> with the given id.
+     * Returns the <code>getFreeColGameObjectType</code> with the given id.
      *
      * @param id a <code>String</code> value
-     * @return a <code>BonusOrPenalty</code> value
+     * @return a <code>FreeColGameObjectType</code> value
      */
-    public BonusOrPenalty getBonusOrPenalty(String id) {
-        return getType(id, BonusOrPenalty.class);
+    /*
+    public FreeColGameObjectType getFreeColGameObjectType(String id) {
+        return getType(id, FreeColGameObjectType.class);
     }
+    */
 
 
     /**

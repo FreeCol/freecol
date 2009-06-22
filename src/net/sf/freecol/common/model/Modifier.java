@@ -41,8 +41,8 @@ public final class Modifier extends Feature {
     public static final String CAPITAL_DEFENCE = "model.modifier.capitalDefence";
     public static final String SETTLEMENT_DEFENCE = "model.modifier.settlementDefence";
 
-    public static final BonusOrPenalty COLONY_GOODS_PARTY =
-        new BonusOrPenalty("model.monarch.colonyGoodsParty");
+    public static final FreeColGameObjectType COLONY_GOODS_PARTY =
+        new FreeColGameObjectType("model.monarch.colonyGoodsParty");
 
     public static final float UNKNOWN = Float.MIN_VALUE;
 

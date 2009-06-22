@@ -61,8 +61,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     public static final Ability HAS_PORT = new Ability("model.ability.hasPort");
 
-    public static final BonusOrPenalty SOL_MODIFIER_SOURCE = 
-        new BonusOrPenalty("modifiers.solModifier");
+    public static final FreeColGameObjectType SOL_MODIFIER_SOURCE = 
+        new FreeColGameObjectType("model.source.solModifier");
 
     public static enum ColonyChangeEvent {
         POPULATION_CHANGE,

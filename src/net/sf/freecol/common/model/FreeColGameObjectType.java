@@ -29,7 +29,13 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 
-public abstract class FreeColGameObjectType extends FreeColObject {
+/**
+ * The base class for all types defined by the specification. It can
+ * be instantiated in order to provide a source for modifiers and
+ * abilities that are provided by the code rather than defined in the
+ * specification, such as the "artillery in the open" penalty.
+ */
+public class FreeColGameObjectType extends FreeColObject {
 
     private int index = -1;
 
@@ -37,6 +43,14 @@ public abstract class FreeColGameObjectType extends FreeColObject {
      * Describe featureContainer here.
      */
     protected FeatureContainer featureContainer = new FeatureContainer();
+
+    public FreeColGameObjectType() {
+        // empty constructor
+    }
+
+    public FreeColGameObjectType(String id) {
+        setId(id);
+    }
 
     /**
      * Get the <code>FeatureContainer</code> value.
@@ -110,8 +124,10 @@ public abstract class FreeColGameObjectType extends FreeColObject {
         readChildren(in, specification);
     }
 
-    // TODO: make this abstract
-    protected void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {}
+    protected void readAttributes(XMLStreamReader in, Specification specification)
+        throws XMLStreamException {
+        // do nothing
+    }
 
     public void readChildren(XMLStreamReader in, Specification specification) throws XMLStreamException {
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
