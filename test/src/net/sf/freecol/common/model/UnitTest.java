@@ -451,6 +451,34 @@ public class UnitTest extends FreeColTestCase {
 
     }
     
+    public void testFailedAddGoods(){
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Colony colony = this.getStandardColony();
+        int foodInColony = 300;
+        colony.addGoods(foodType, foodInColony);
+        assertEquals("Setup error, colony does not have expected goods quantities",foodInColony,colony.getGoodsCount(foodType));
+        
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Unit wagonTrain = new Unit(game, colony.getTile(), dutch, spec().getUnitType("model.unit.wagonTrain"),
+                UnitState.ACTIVE);
+        int initialMoves = wagonTrain.getInitialMovesLeft();
+        assertEquals("Setup error, unit has wrong initial moves", initialMoves, wagonTrain.getMovesLeft());
+        assertTrue("Setup error, unit should not carry anything", wagonTrain.getGoodsCount() == 0);
+        
+        Goods tooManyGoods = colony.goodsContainer.getGoods(foodType);
+        try{
+        	wagonTrain.add(tooManyGoods);
+        	fail("Should have thrown an IllegalStateException");
+        }
+        catch(IllegalStateException e){
+        	assertTrue("Unit should not carry anything", wagonTrain.getGoodsCount() == 0);
+        	assertEquals("Unit moves should not have been modified", initialMoves, wagonTrain.getMovesLeft());
+        }
+    }
+        
     public void testMissionary() {
         Game game = getStandardGame();
         Map map = getTestMap(plains, true);

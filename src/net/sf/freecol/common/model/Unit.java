@@ -1528,23 +1528,28 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (locatable instanceof Unit && canCarryUnits()) {
             if (getSpaceLeft() < locatable.getSpaceTaken()) {
                 throw new IllegalStateException();
-            } else if (!units.contains(locatable)) {
-                if (units.equals(Collections.emptyList())) {
-                    units = new ArrayList<Unit>();
-                } 
-                units.add((Unit) locatable);
-                firePropertyChange(CARGO_CHANGE, null, locatable);
             }
-            spendAllMoves();
-        } else if (locatable instanceof Goods && canCarryGoods()) {
-            goodsContainer.addGoods((Goods) locatable);
+            if (units.contains(locatable)) {
+            	logger.warning("Tried to add a 'Locatable' already in the carrier.");
+            	return;
+            }
+            
+            if (units.equals(Collections.emptyList())) {
+            	units = new ArrayList<Unit>();
+            } 
+            units.add((Unit) locatable);
             firePropertyChange(CARGO_CHANGE, null, locatable);
-            if (getSpaceLeft() < 0) {
+			spendAllMoves();
+        } else if (locatable instanceof Goods && canCarryGoods()) {
+        	Goods goods = (Goods) locatable;
+        	if(getLoadableAmount(goods.getType()) < goods.getAmount()){
                 throw new IllegalStateException("Not enough space for the given locatable!");
             }
+        	goodsContainer.addGoods(goods);
+			firePropertyChange(CARGO_CHANGE, null, locatable);
             spendAllMoves();
         } else {
-            logger.warning("Tried to add a 'Locatable' to a non-carrier unit.");
+        	throw new IllegalStateException("Tried to add a 'Locatable' to a non-carrier unit.");
         }
     }
 
