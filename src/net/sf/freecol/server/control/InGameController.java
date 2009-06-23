@@ -770,6 +770,9 @@ public final class InGameController extends Controller {
             case HAPPY: case CONTENT: case DISPLEASED:
                 settlement.setMissionary(missionary);
                 return true;
+            case ANGRY: case HATEFUL:
+                missionary.dispose();
+                return false;
             }
         }
         return false;

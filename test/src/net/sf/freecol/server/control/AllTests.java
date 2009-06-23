@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.server;
+package net.sf.freecol.server.control;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -25,13 +25,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.server");
+		TestSuite suite = new TestSuite("Test for net.sf.freecol.server.control");
 		//$JUnit-BEGIN$
-		suite.addTestSuite(SaveLoadTest.class);
+		suite.addTestSuite(InGameControllerTest.class);
 		//$JUnit-END$
-		suite.addTest(net.sf.freecol.server.ai.AllTests.suite());
-		suite.addTest(net.sf.freecol.server.control.AllTests.suite());
-	    suite.addTest(net.sf.freecol.server.model.AllTests.suite());
 		return suite;
 	}
 
