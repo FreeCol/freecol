@@ -38,6 +38,7 @@ import net.sf.freecol.util.test.MockMapGenerator;
 public class ServerPlayerTest extends FreeColTestCase {	
     TileType plains = spec().getTileType("model.tile.plains");
     
+	UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
     UnitType treasureType = spec().getUnitType("model.unit.treasureTrain");
     
 	FreeColServer server = null;
@@ -96,4 +97,44 @@ public class ServerPlayerTest extends FreeColTestCase {
         dutch.cashInTreasureTrain(treasure);
         assertEquals(100, dutch.getGold());
 	}
+	
+	    public void testHasExploredTile() {
+		// start a server
+        server = ServerTestHelper.startServer(false, true);
+                
+        server.setMapGenerator(new MockMapGenerator(getTestMap()));
+        
+        PreGameController pgc = (PreGameController) server.getController();
+        
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+        Map map = game.getMap();
+        
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
+        
+        Tile tile1 = map.getTile(6, 8);
+        Tile tile2 = map.getTile(8, 6);
+                
+        assertFalse("Setup error, tile1 should not be explored by dutch player",dutch.hasExplored(tile1));
+        assertFalse("Setup error, tile1 should not be explored by french player",french.hasExplored(tile1));
+        
+        assertFalse("Setup error, tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
+        assertFalse("Setup error, tile2 should not be explored by french player",french.hasExplored(tile2));
+        
+        new Unit(game, tile1, dutch, freeColonist, UnitState.SENTRY);
+        new Unit(game, tile2, french, freeColonist, UnitState.SENTRY);
+        
+        assertTrue("Tile1 should be explored by dutch player",dutch.hasExplored(tile1));
+        assertFalse("Tile1 should not be explored by french player",french.hasExplored(tile1));
+        
+        assertFalse("Tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
+        assertTrue("Tile2 should be explored by french player",french.hasExplored(tile2));
+    }
 }
