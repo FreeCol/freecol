@@ -1551,6 +1551,10 @@ public class Player extends FreeColGameObject implements Nameable {
                     Iterator<Position> positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = positionIterator.next();
+                        // inside the line of sight, but not yet explored
+                        if(!hasExplored(getGame().getMap().getTile(p))){
+                            continue;
+                        }
                         canSeeTiles[p.getX()][p.getY()] = true;
                         /*
                          * if (getGame().getViewOwner() == null &&
@@ -1587,6 +1591,10 @@ public class Player extends FreeColGameObject implements Nameable {
                                                                                 .getLineOfSight());
                     while (positionIterator.hasNext()) {
                         Map.Position p = positionIterator.next();
+                        // inside the line of sight, but not yet explored
+                        if(!hasExplored(getGame().getMap().getTile(p))){
+                            continue;
+                        }
                         canSeeTiles[p.getX()][p.getY()] = true;
                         /*
                          * if (getGame().getViewOwner() == null &&
