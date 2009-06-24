@@ -675,7 +675,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             // remove property listeners
             if (colony != null) {
                 colony.removePropertyChangeListener(this);
-                colony.getTile().removePropertyChangeListener(outsideColonyPanel);
+                colony.getTile().removePropertyChangeListener(Tile.UNIT_CHANGE, outsideColonyPanel);
                 colony.getGoodsContainer().removePropertyChangeListener(warehousePanel);
             }
             if (getSelectedUnit() != null) {
@@ -959,7 +959,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         public void setColony(Colony newColony) {
             if (colony != null) {
-                colony.getTile().removePropertyChangeListener(this);
+                colony.getTile().removePropertyChangeListener(Tile.UNIT_CHANGE, this);
             }
             this.colony = newColony;
             if (colony != null) {
