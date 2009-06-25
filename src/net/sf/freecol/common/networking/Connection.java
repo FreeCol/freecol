@@ -507,7 +507,7 @@ public class Connection {
                                 if (reply == null) {
                                     reply = Message.createNewRootElement("reply");
                                     reply.setAttribute("networkReplyId", networkReplyId);
-                                    logger.info("reply == null");
+                                    logger.finest("reply == null");
                                 } else {
                                     Element replyHeader = reply.getOwnerDocument().createElement("reply");
                                     replyHeader.setAttribute("networkReplyId", networkReplyId);
