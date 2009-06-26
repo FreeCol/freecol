@@ -1513,108 +1513,113 @@ public class Player extends FreeColGameObject implements Nameable {
         Map map = getGame().getMap();
         if (map == null) {
             return false;
+        }
+        canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
+        if (!getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)) {
+            Iterator<Position> positionIterator = getGame().getMap().getWholeMapIterator();
+            while (positionIterator.hasNext()) {
+                Map.Position p = positionIterator.next();
+                Tile tile = getGame().getMap().getTile(p);
+                // may be null while loading savegame
+                if (tile == null) {
+                    continue;
+                }
+                canSeeTiles[p.getX()][p.getY()] = hasExplored(tile);
+            }
         } else {
-            canSeeTiles = new boolean[map.getWidth()][map.getHeight()];
-            if (!getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)) {
-                Iterator<Position> positionIterator = getGame().getMap().getWholeMapIterator();
+            Iterator<Unit> unitIterator = getUnitIterator();
+            while (unitIterator.hasNext()) {
+                Unit unit = unitIterator.next();
+                if (!(unit.getLocation() instanceof Tile)) {
+                    continue;
+                }
+                Map.Position position = unit.getTile().getPosition();
+                if (position == null) {
+                    logger.warning("position == null");
+                }
+                canSeeTiles[position.getX()][position.getY()] = true;
+                /*
+                 * if (getGame().getViewOwner() == null &&
+                 * !hasExplored(map.getTile(position))) {
+                 *
+                 * logger.warning("Trying to set a non-explored Tile to be
+                 * visible (1). Unit: " + unit.getName() + ", Tile: " +
+                 * position);
+                 *
+                 * throw new IllegalStateException("Trying to set a
+                 * non-explored Tile to be visible. Unit: " + unit.getName() + ",
+                 * Tile: " + position); }
+                 */
+                Iterator<Position> positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
                 while (positionIterator.hasNext()) {
                     Map.Position p = positionIterator.next();
-                    Tile tile = getGame().getMap().getTile(p);
-                    if (tile != null) {
-                        canSeeTiles[p.getX()][p.getY()] = hasExplored(tile);
-                    }
-                }
-            } else {
-                Iterator<Unit> unitIterator = getUnitIterator();
-                while (unitIterator.hasNext()) {
-                    Unit unit = unitIterator.next();
-                    if (!(unit.getLocation() instanceof Tile)) {
+                    Tile t = map.getTile(p);
+                    // may be null while loading savegame
+                    // can be inside the line of sight, but not yet explored
+                    if(t == null || !hasExplored(t)){
                         continue;
                     }
-                    Map.Position position = unit.getTile().getPosition();
-                    if (position == null) {
-                        logger.warning("position == null");
-                    }
-                    canSeeTiles[position.getX()][position.getY()] = true;
+                    canSeeTiles[p.getX()][p.getY()] = true;
                     /*
                      * if (getGame().getViewOwner() == null &&
-                     * !hasExplored(map.getTile(position))) {
+                     * !hasExplored(map.getTile(p))) {
                      *
-                     * logger.warning("Trying to set a non-explored Tile to be
-                     * visible (1). Unit: " + unit.getName() + ", Tile: " +
-                     * position);
+                     * logger.warning("Trying to set a non-explored Tile to
+                     * be visible (2). Unit: " + unit.getName() + ", Tile: " +
+                     * p);
                      *
                      * throw new IllegalStateException("Trying to set a
-                     * non-explored Tile to be visible. Unit: " + unit.getName() + ",
-                     * Tile: " + position); }
+                     * non-explored Tile to be visible. Unit: " +
+                     * unit.getName() + ", Tile: " + p); }
                      */
-                    Iterator<Position> positionIterator = map.getCircleIterator(position, true, unit.getLineOfSight());
-                    while (positionIterator.hasNext()) {
-                        Map.Position p = positionIterator.next();
-                        // inside the line of sight, but not yet explored
-                        if(!hasExplored(getGame().getMap().getTile(p))){
-                            continue;
-                        }
-                        canSeeTiles[p.getX()][p.getY()] = true;
-                        /*
-                         * if (getGame().getViewOwner() == null &&
-                         * !hasExplored(map.getTile(p))) {
-                         *
-                         * logger.warning("Trying to set a non-explored Tile to
-                         * be visible (2). Unit: " + unit.getName() + ", Tile: " +
-                         * p);
-                         *
-                         * throw new IllegalStateException("Trying to set a
-                         * non-explored Tile to be visible. Unit: " +
-                         * unit.getName() + ", Tile: " + p); }
-                         */
-                    }
                 }
-                for (Settlement settlement : getSettlements()) {
-                    Map.Position position = settlement.getTile().getPosition();
-                    canSeeTiles[position.getX()][position.getY()] = true;
+            }
+            for (Settlement settlement : getSettlements()) {
+                Map.Position position = settlement.getTile().getPosition();
+                canSeeTiles[position.getX()][position.getY()] = true;
+                /*
+                 * if (getGame().getViewOwner() == null &&
+                 * !hasExplored(map.getTile(position))) {
+                 *
+                 * logger.warning("Trying to set a non-explored Tile to be
+                 * visible (3). Settlement: " + settlement + "(" +
+                 * settlement.getTile().getPosition() + "), Tile: " +
+                 * position);
+                 *
+                 * throw new IllegalStateException("Trying to set a
+                 * non-explored Tile to be visible. Settlement: " +
+                 * settlement + "(" + settlement.getTile().getPosition() +
+                 * "), Tile: " + position); }
+                 */
+                Iterator<Position> positionIterator = map.getCircleIterator(position, true, settlement
+                        .getLineOfSight());
+                while (positionIterator.hasNext()) {
+                    Map.Position p = positionIterator.next();
+                    Tile t = map.getTile(p);
+                    // may be null while loading savegame
+                    // can be inside the line of sight, but not yet explored
+                    if(t == null || !hasExplored(t)){
+                        continue;
+                    }
+                    canSeeTiles[p.getX()][p.getY()] = true;
                     /*
                      * if (getGame().getViewOwner() == null &&
-                     * !hasExplored(map.getTile(position))) {
+                     * !hasExplored(map.getTile(p))) {
                      *
-                     * logger.warning("Trying to set a non-explored Tile to be
-                     * visible (3). Settlement: " + settlement + "(" +
+                     * logger.warning("Trying to set a non-explored Tile to
+                     * be visible (4). Settlement: " + settlement + "(" +
                      * settlement.getTile().getPosition() + "), Tile: " +
-                     * position);
+                     * p);
                      *
                      * throw new IllegalStateException("Trying to set a
                      * non-explored Tile to be visible. Settlement: " +
                      * settlement + "(" + settlement.getTile().getPosition() +
-                     * "), Tile: " + position); }
+                     * "), Tile: " + p); }
                      */
-                    Iterator<Position> positionIterator = map.getCircleIterator(position, true, settlement
-                                                                                .getLineOfSight());
-                    while (positionIterator.hasNext()) {
-                        Map.Position p = positionIterator.next();
-                        // inside the line of sight, but not yet explored
-                        if(!hasExplored(getGame().getMap().getTile(p))){
-                            continue;
-                        }
-                        canSeeTiles[p.getX()][p.getY()] = true;
-                        /*
-                         * if (getGame().getViewOwner() == null &&
-                         * !hasExplored(map.getTile(p))) {
-                         *
-                         * logger.warning("Trying to set a non-explored Tile to
-                         * be visible (4). Settlement: " + settlement + "(" +
-                         * settlement.getTile().getPosition() + "), Tile: " +
-                         * p);
-                         *
-                         * throw new IllegalStateException("Trying to set a
-                         * non-explored Tile to be visible. Settlement: " +
-                         * settlement + "(" + settlement.getTile().getPosition() +
-                         * "), Tile: " + p); }
-                         */
-                    }
                 }
             }
-            return true;
         }
+        return true;
     }
 
     /**
