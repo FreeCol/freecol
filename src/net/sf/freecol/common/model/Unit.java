@@ -1682,15 +1682,36 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         given <code>Player</code>.
      */
     public boolean isVisibleTo(Player player) {
-        return player == getOwner()
-            || (getTile() != null
-                && player.canSee(getTile())
-                && (getTile().getSettlement() == null
-                    || getTile().getSettlement().getOwner() == player
-                    || (!getGameOptions().getBoolean(GameOptions.UNIT_HIDING)
-                        && getLocation() instanceof Tile))
-                && (!isOnCarrier() || ((Unit) getLocation()).getOwner() == player
-                    || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING)));
+    	if(player == getOwner()){
+    		return true;
+    	}
+    	
+    	Tile unitTile = getTile();
+    	if(unitTile == null){
+    		return false;
+    	}
+    	
+    	if(!player.canSee(unitTile)){
+    		return false;
+    	}
+    	
+    	// pruano, 2009/06/27
+    	// XXX: removed GameOptions.UNIT_HIDING verification in both cases below
+    	//since it was causing quite some desynchronization bugs
+    	// Proper implementation requires client update code in several other places
+    	//that is lacking
+    	// Considered preferable to possibly break his feature than continue having 
+    	//desynchronization problems
+    	Settlement settlement = unitTile.getSettlement();
+    	if(settlement != null && settlement.getOwner() != player){
+    		return false;
+    	}
+
+    	if(isOnCarrier() && ((Unit) getLocation()).getOwner() != player){
+    		return false;
+    	}
+    	
+    	return true;
     }
 
     /**
