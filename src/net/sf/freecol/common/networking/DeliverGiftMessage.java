@@ -185,11 +185,15 @@ public class DeliverGiftMessage extends Message {
                                               "%type%", goods.getName(),
                                               "%amount%", Integer.toString(goods.getAmount()),
                                               "%colony%", settlement.getName());
-            Element update = Message.createNewRootElement("update");
-            Document doc = update.getOwnerDocument();
-            update.appendChild(m.toXMLElement(receiver, doc));
+            Element reply = Message.createNewRootElement("multiple");
+            Document doc = reply.getOwnerDocument();
+            Element update = doc.createElement("update");
+            Element messages = doc.createElement("addMessages");
+            reply.appendChild(update);
+            reply.appendChild(messages);
             update.appendChild(unit.toXMLElement(receiver, doc, false, false));
             update.appendChild(settlement.toXMLElement(receiver, doc));
+            messages.appendChild(m.toXMLElement(receiver, doc));
             try {
                 receiver.getConnection().send(update);
             } catch (IOException e) {
