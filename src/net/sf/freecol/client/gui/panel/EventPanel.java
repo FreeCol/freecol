@@ -20,18 +20,15 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -41,6 +38,8 @@ public final class EventPanel extends FreeColDialog<Boolean> {
 
     private static final Logger logger = Logger.getLogger(EventPanel.class.getName());
 
+    private static final int OK = 0;
+    
     public static enum EventType {
         FIRST_LANDING,
         MEETING_NATIVES,
@@ -103,8 +102,35 @@ public final class EventPanel extends FreeColDialog<Boolean> {
         add(header, "align center, wrap 20");
         add(imageLabel);
         add(okButton, "newline 20, tag ok");
+        okButton.setActionCommand(String.valueOf(OK));
+        okButton.addActionListener(this);
 
         setSize(getPreferredSize());
+        enterPressesWhenFocused(okButton);
+    }
+    
+    public void requestFocus() {
+        okButton.requestFocus();
     }
 
+    /**
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        try {
+            switch (Integer.valueOf(command).intValue()) {
+            case OK:
+                setResponse(new Boolean(true));
+                break;
+            default:
+                logger.warning("Invalid Actioncommand: invalid number.");
+            }
+        } catch (NumberFormatException e) {
+            logger.warning("Invalid Actioncommand: not a number.");
+        }
+    }
 }
