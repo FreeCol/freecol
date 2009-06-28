@@ -112,6 +112,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     private Boolean moveToEurope;
 
     /**
+     * Describe style here.
+     */
+    private int style;
+
+    /**
      * A constructor to use.
      * 
      * @param game The <code>Game</code> this <code>Tile</code> belongs to.
@@ -291,6 +296,24 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         } else {
             return settlement.getLocationName();
         }
+    }
+
+    /**
+     * Get the <code>Style</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getStyle() {
+        return style;
+    }
+
+    /**
+     * Set the <code>Style</code> value.
+     *
+     * @param newStyle The new Style value.
+     */
+    public void setStyle(final int newStyle) {
+        this.style = newStyle;
     }
 
     /**
@@ -1658,6 +1681,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         out.writeAttribute(ID_ATTRIBUTE, getId());
         out.writeAttribute("x", Integer.toString(x));
         out.writeAttribute("y", Integer.toString(y));
+        out.writeAttribute("style", Integer.toString(style));
 
         writeAttribute(out, "type", getType());
         writeAttribute(out, "region", getRegion());
@@ -1731,6 +1755,8 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         x = Integer.parseInt(in.getAttributeValue(null, "x"));
         y = Integer.parseInt(in.getAttributeValue(null, "y"));
+        style = getAttribute(in, "style", 0);
+
         String typeString = in.getAttributeValue(null, "type");
         if (typeString != null) {
             type = FreeCol.getSpecification().getTileType(typeString);

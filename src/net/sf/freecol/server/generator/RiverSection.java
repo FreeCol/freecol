@@ -127,7 +127,12 @@ public class RiverSection {
     }
 
     /**
-     * Encodes the style
+     * Encodes the style as a four-digit base-three number. The digits
+     * correspond to the four directions valid for rivers, namely
+     * north east, south east, south west and north west. Each digit
+     * is either zero (no river), one (minor river) or two (major
+     * river).
+     *
      * @return style
      */
     public int encodeStyle() {

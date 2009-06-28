@@ -97,7 +97,7 @@ public final class FreeCol {
 
     private static final Logger logger = Logger.getLogger(FreeCol.class.getName());
 
-    private static final String FREECOL_VERSION = "0.9.0-svn";
+    private static final String FREECOL_VERSION = "h";
     private static String FREECOL_REVISION;
     
     private static final String MIN_JDK_VERSION = "1.5";

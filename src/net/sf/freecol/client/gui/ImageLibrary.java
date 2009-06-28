@@ -72,6 +72,7 @@ public final class ImageLibrary extends ImageProvider {
     private static final Logger logger = Logger.getLogger(ImageLibrary.class.getName());    
     
     public static final int RIVER_STYLES = 81;
+    public static final int BEACH_STYLES = 256;
  
     public static final String UNIT_SELECT = "unitSelect.image",
                                DELETE = "delete.image",
@@ -89,6 +90,8 @@ public final class ImageLibrary extends ImageProvider {
     private static final String path = new String("images/"),
         extension = new String(".png"),
         terrainDirectory = new String("terrain/"),
+        beachDirectory = new String("beach/"),
+        beachName = new String("beach"),
         tileName = new String("center"),
         borderName = new String("border"),
         unexploredDirectory = new String("unexplored/"),
@@ -108,6 +111,8 @@ public final class ImageLibrary extends ImageProvider {
      * A ArrayList of Image objects.
      */
     private List<ImageIcon> rivers;
+
+    private List<ImageIcon> beaches;
 
     private Map<String, ImageIcon> terrain1, terrain2, overlay1, overlay2,
         forests, deltas;
@@ -199,6 +204,7 @@ public final class ImageLibrary extends ImageProvider {
 
         loadTerrain(gc, resourceLocator, doLookup);
         loadForests(gc, resourceLocator, doLookup);
+        loadBeaches(gc, resourceLocator, doLookup);
         loadRivers(gc, resourceLocator, doLookup);
         loadRiverMouths(gc, resourceLocator, doLookup);
         loadUnitButtons(gc, resourceLocator, doLookup);
@@ -227,6 +233,7 @@ public final class ImageLibrary extends ImageProvider {
      */
     public ImageLibrary getScaledImageLibrary(float scalingFactor) throws FreeColException {
         ImageLibrary scaledLibrary = new ImageLibrary("", scalingFactor);
+        scaledLibrary.beaches = scaleImages(beaches, scalingFactor);
         scaledLibrary.rivers = scaleImages(rivers, scalingFactor);
         scaledLibrary.deltas = scaleImages(deltas, scalingFactor);
 
@@ -444,6 +451,31 @@ public final class ImageLibrary extends ImageProvider {
 
         border1.put(unexploredName, unexploredArrayList1);
         border2.put(unexploredName, unexploredArrayList2);
+    }
+
+    /**
+     * Loads the beach images from file into memory.
+     * 
+     * @param gc The GraphicsConfiguration is needed to create images that are
+     *            compatible with the local environment.
+     * @param resourceLocator The class that is used to locate data files.
+     * @param doLookup Must be set to 'false' if the path to the image files has
+     *            been manually provided by the user. If set to 'true' then a
+     *            lookup will be done to search for image files from
+     *            net.sf.freecol, in this case the images need to be placed in
+     *            net.sf.freecol/images.
+     * @throws FreeColException If one of the data files could not be found.
+     */
+    private void loadBeaches(GraphicsConfiguration gc, Class<FreeCol> resourceLocator, boolean doLookup)
+            throws FreeColException {
+        logger.fine("loading beach images");
+        beaches = new ArrayList<ImageIcon>(BEACH_STYLES);
+        beaches.add(new ImageIcon());
+        for (int i = 1; i < BEACH_STYLES; i++) {
+            String filePath = dataDirectory + path + terrainDirectory + beachDirectory
+                + beachName + i + extension;
+            beaches.add(findImage(filePath, resourceLocator, doLookup));
+        }
     }
 
     /**
@@ -959,6 +991,16 @@ public final class ImageLibrary extends ImageProvider {
      */
     public Image getRiverImage(int index) {
         return rivers.get(index).getImage();
+    }
+
+    /**
+     * Returns the beach image at the given index.
+     * 
+     * @param index The index of the image to return.
+     * @return The image at the given index.
+     */
+    public Image getBeachImage(int index) {
+        return beaches.get(index).getImage();
     }
 
     /**

@@ -176,7 +176,25 @@ public class TerrainGenerator {
         while (iterator.hasNext()) {
             Tile tile = map.getTile(iterator.next());
             perhapsAddBonus(game, tile, !importBonuses);
+            if (!tile.isLand()) {
+                encodeStyle(tile);
+            }
         }
+    }
+
+    private void encodeStyle(Tile tile) {
+        int x = tile.getX();
+        int y = tile.getY();
+        int base = 1;
+        int style = 0;
+        for (Direction d : Direction.values()) {
+            Tile otherTile = tile.getMap().getNeighbourOrNull(d, x, y);
+            if (otherTile != null && otherTile.isLand()) {
+                style += base;
+            }
+            base *= 2;
+        }
+        tile.setStyle(style);
     }
 
 

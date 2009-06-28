@@ -1855,6 +1855,10 @@ public final class GUI {
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
 
+        if (!tile.isLand() && tile.getStyle() > 0) {
+            g.drawImage(lib.getBeachImage(tile.getStyle()), x, y, null);
+        }
+
         for (Direction direction : Direction.values()) {
             Tile borderingTile = map.getAdjacentTile(pos, direction);
             if (borderingTile!=null) {
@@ -1875,11 +1879,13 @@ public final class GUI {
                 }
                 else if (!tile.isLand() && borderingTile.isLand() && borderingTile.isExplored()) {
                     // If there is a Coast image (eg. beach) defined, use it, otherwise skip
+                    /*
                     if (borderingTile.getType().getArtCoast() != null) {
                         g.drawImage(lib.getCoastImage(borderingTile.getType(), direction,
                                                         tile.getX(), tile.getY()),
                                                         x, y, null);
                     }
+                    */
                     // Draw the grass from the neighboring tile, spilling over on the side of this tile
                     g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
                                                     tile.getX(), tile.getY()),
