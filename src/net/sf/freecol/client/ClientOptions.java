@@ -342,6 +342,14 @@ public class ClientOptions extends OptionMap {
     public static final int INDIAN_DEMAND_RESPONSE_REJECT = 2;
 
     /**
+     * The warehouse overflow on unload action.
+     */
+    public static final String UNLOAD_OVERFLOW_RESPONSE = "model.option.unloadOverflowResponse";
+    public static final int UNLOAD_OVERFLOW_RESPONSE_ASK = 0;
+    public static final int UNLOAD_OVERFLOW_RESPONSE_NEVER = 1;
+    public static final int UNLOAD_OVERFLOW_RESPONSE_ALWAYS = 2;
+
+    /**
      * Comparators for sorting colonies.
      */
     private static Comparator<Colony> colonyAgeComparator = new Comparator<Colony>() {

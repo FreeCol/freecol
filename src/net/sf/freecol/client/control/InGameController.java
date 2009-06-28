@@ -1115,20 +1115,75 @@ public final class InGameController implements NetworkConstants {
             if(toKeep)
                 continue;
                 
-            // do not unload more than the warehouse can store
-            int capacity = ((Colony) location).getWarehouseCapacity() - warehouse.getGoodsCount(goods.getType());
-            if (capacity < goods.getAmount() &&
-                !freeColClient.getCanvas().showConfirmDialog(Messages.message("traderoute.warehouseCapacity",
-                                                                              "%unit%", unit.getName(),
-                                                                              "%colony%", ((Colony) location).getName(),
-                                                                              "%amount%", String.valueOf(goods.getAmount() - capacity),
-                                                                              "%goods%", goods.getName()),
-                                                             "yes", "no")) {
-                logger.finest("Automatically unloading " + capacity + " " + goods.getName());
-                unloadCargo(new Goods(freeColClient.getGame(), unit, goods.getType(), capacity));
-            } else {
-                logger.finest("Automatically unloading " + goods.getAmount() + " " + goods.getName());
+            // Unload more than the warehouse can store, or not?
+            String colonyName = ((Colony) location).getName();
+            boolean all;
+            int capacity = ((Colony) location).getWarehouseCapacity()
+                - warehouse.getGoodsCount(goods.getType());
+            int overflow = goods.getAmount() - capacity;
+            if (overflow <= 0) { // Safe to unload the whole load
+                all = true;
+                logger.finest("Automatically unloading: "
+                              + Integer.toString(goods.getAmount())
+                              + " " + goods.getName()
+                              + " at " + colonyName);
+            } else { // Either overflow the warehouse, or retain some load
+                Canvas canvas = freeColClient.getCanvas();
+                int option = freeColClient.getClientOptions()
+                    .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
+                switch (option) {
+                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK:
+                    String msg = Messages.message("traderoute.warehouseCapacity",
+                                                  "%unit%", unit.getName(),
+                                                  "%colony%", colonyName,
+                                                  "%amount%", String.valueOf(overflow),
+                                                  "%goods%", goods.getName());
+                    all = canvas.showConfirmDialog(msg, "yes", "no");
+                    break;
+                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_NEVER:
+                    all = false;
+                    break;
+                case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ALWAYS:
+                    all = true;
+                    break;
+                default:
+                    logger.warning("Illegal UNLOAD_OVERFLOW_RESPONSE: "
+                                   + Integer.toString(option));
+                    continue; // back to while loop
+                }
+                if (all) {
+                    logger.finest("Automatically unloading: "
+                                  + Integer.toString(goods.getAmount())
+                                  + " " + goods.getName()
+                                  + " at " + colonyName
+                                  + " overflowing " + Integer.toString(overflow));
+                } else {
+                    logger.finest("Automatically unloading: "
+                                  + Integer.toString(capacity)
+                                  + " " + goods.getName()
+                                  + " at " + colonyName
+                                  + " retaining " + Integer.toString(overflow));
+                }
+                if (option != ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK) {
+                    String whichMessage = (all) ? "traderoute.overflow"
+                        : "traderoute.nounload";
+                    Player player = freeColClient.getMyPlayer();
+                    ModelMessage m = new ModelMessage(player,
+                                                      ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                                      player,
+                                                      whichMessage,
+                                                      "%colony%", colonyName,
+                                                      "%unit%", unit.getName(),
+                                                      "%overflow%", String.valueOf(overflow),
+                                                      "%goods%", goods.getName());
+                    player.addModelMessage(m);
+                }
+            }
+            if (all) {
                 unloadCargo(goods);
+            } else {
+                unloadCargo(new Goods(freeColClient.getGame(), unit,
+                                      goods.getType(), capacity));
             }
         }
     }
