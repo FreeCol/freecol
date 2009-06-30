@@ -352,4 +352,33 @@ public class IndianSettlementTest extends FreeColTestCase {
 	    campAlarm = camp.getAlarm(dutch);
 	    assertEquals("Camp should be hateful", Tension.Level.HATEFUL, campAlarm.getLevel());
 	}
+	
+	/*
+	 * Test settlement adjacent tiles ownership
+	 * Per Col1 rules, Indian settlements do not own water tiles
+	 */
+	public void testSettlementDoesNotOwnWaterTiles(){
+	    Game game = getStandardGame();
+        Map map = getCoastTestMap(plainsType);
+        game.setMap(map);
+        
+        Tile campTile = map.getTile(9, 9);
+        Tile landTile = map.getTile(8, 9);
+        Tile waterTile = map.getTile(10, 9);
+        
+        assertTrue("Setup error, camp tile should be land", campTile.isLand());
+        assertTrue("Setup error, tile should be land", landTile.isLand());
+        assertFalse("Setup error, tile should be water", waterTile.isLand());
+        assertTrue("Setup error, tiles should be adjacent", campTile.isAdjacent(waterTile));
+        assertTrue("Setup error, tiles should be adjacent", campTile.isAdjacent(landTile));
+        
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        
+        IndianSettlement camp = builder.settlementTile(campTile).build();
+        
+        Player indianPlayer = camp.getOwner();
+        assertTrue("Indian player should own camp tile", campTile.getOwner() == indianPlayer);
+        assertTrue("Indian player should own land tile", landTile.getOwner() == indianPlayer);
+        assertFalse("Indian player should not own water tile", waterTile.getOwner() == indianPlayer);
+	}
 }

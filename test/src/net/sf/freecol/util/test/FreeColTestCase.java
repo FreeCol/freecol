@@ -522,7 +522,7 @@ public class FreeColTestCase extends TestCase {
                     indianBraveType.getDefaultEquipment());
             	camp.addOwnedUnit(brave);
             }
-            
+            camp.placeSettlement();
             return camp;
     	}
     	

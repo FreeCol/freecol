@@ -262,6 +262,10 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         owner.setExplored(settlementTile);
         settlementTile.updatePlayerExploredTiles();
         for (Tile tile : map.getSurroundingTiles(settlementTile, getRadius())) {
+            // Indian players do not own water tiles per Col1 rules
+            if(owner.isIndian() && !tile.isLand()){
+                continue;
+            }
             if (tile.getOwner() == null
                 || tile.getOwningSettlement() == null
                 || tile.getOwningSettlement() == this) {
