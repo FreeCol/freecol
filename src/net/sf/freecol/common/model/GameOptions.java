@@ -58,9 +58,6 @@ public class GameOptions extends OptionMap {
     /** Enables/disables fog of war. */
     public static final String FOG_OF_WAR = "model.option.fogOfWar";
 
-    /** No units are hidden on carriers or settlements if this option is set to <code>false</code>. */
-    public static final String UNIT_HIDING = "model.option.unitHiding";
-    
     /** 
      * Victory condition: Should the <code>Player</code> who first defeats the
      * Royal Expeditionary Force win the game?

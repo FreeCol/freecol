@@ -444,7 +444,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
             setExplored(getGame().getMap().getTile(p));
         }
         
-        ((BooleanOption) getGame().getGameOptions().getObject(GameOptions.UNIT_HIDING)).setValue(false);
         ((BooleanOption) getGame().getGameOptions().getObject(GameOptions.FOG_OF_WAR)).setValue(false);
         
         resetCanSeeTiles();

@@ -1695,13 +1695,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     		return false;
     	}
     	
-    	// pruano, 2009/06/27
-    	// XXX: removed GameOptions.UNIT_HIDING verification in both cases below
-    	//since it was causing quite some desynchronization bugs
-    	// Proper implementation requires client update code in several other places
-    	//that is lacking
-    	// Considered preferable to possibly break his feature than continue having 
-    	//desynchronization problems
     	Settlement settlement = unitTile.getSettlement();
     	if(settlement != null && settlement.getOwner() != player){
     		return false;
@@ -3610,8 +3603,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         writeFreeColGameObject(workImprovement, out, player, showAll, toSavedGame);
 
         // Do not show enemy units hidden in a carrier:
-        if (getGame().isClientTrusted() || showAll || getOwner().equals(player)
-            || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(getTile())) {
+        if (getGame().isClientTrusted() || showAll || getOwner().equals(player)) {
             unitsToXML(out, player, showAll, toSavedGame);
             if (canCarryGoods()) {
                 goodsContainer.toXML(out, player, showAll, toSavedGame);

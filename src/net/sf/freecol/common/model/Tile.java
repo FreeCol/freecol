@@ -1709,8 +1709,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         // Check if the player can see the tile:
         // Do not show enemy units or any tileitems on a tile out-of-sight.
         if (getGame().isClientTrusted() || showAll
-            || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))
-            || !getGameOptions().getBoolean(GameOptions.UNIT_HIDING) && player.canSee(this)) {
+            || (player.canSee(this) && (settlement == null || settlement.getOwner() == player))) {
             if (!units.isEmpty()) {
                 out.writeStartElement(UNITS_TAG_NAME);
                 for (Unit unit : units) {

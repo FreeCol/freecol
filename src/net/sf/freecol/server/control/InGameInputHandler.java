@@ -844,8 +844,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     opponentMoveElement.setAttribute("unit", unit.getId());
                     enemyPlayer.getConnection().sendAndWait(opponentMoveElement);
                 } else if (enemyPlayer.canSee(newTile)
-                        && (newTile.getSettlement() == null || 
-                            !getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING))) {
+                           && newTile.getSettlement() == null) {
                     // the unit reveals itself, after leaving a settlement or carrier
                     Element opponentMoveElement = Message.createNewRootElement("opponentMove");
                     opponentMoveElement.setAttribute("direction", direction.toString());
@@ -1433,13 +1432,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         	reply.setAttribute("indianCapitalBurned", Boolean.toString(isIndianCapitalBurned));
         }
         
-        Hashtable<String, Integer> oldGoodsCounts = new Hashtable<String, Integer>();
-        if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
-            List<Goods> goodsInUnit = unit.getGoodsContainer().getFullGoods();
-            for (Goods goods : goodsInUnit) {
-                oldGoodsCounts.put(goods.getType().getId(), goods.getAmount());
-            }
-        }
         int oldUnits = unit.getTile().getUnitCount();
         
         // update server info
@@ -1462,22 +1454,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
         }
         
-        // Send capturedGoods if UNIT_HIDING is true because when it's
-        // false unit is already sent with carried goods and units
-        if (unit.canCaptureGoods() && getGame().getGameOptions().getBoolean(GameOptions.UNIT_HIDING)) {
-            List<Goods> goodsInUnit = unit.getGoodsContainer().getCompactGoods();
-            for (Goods newGoods : goodsInUnit) {
-                Integer oldGoodsAmount = oldGoodsCounts.get(newGoods.getType().getId());
-                int capturedGoods = newGoods.getAmount() - (oldGoodsAmount!=null?oldGoodsAmount.intValue():0);
-                if (capturedGoods > 0) {
-                    Element captured = reply.getOwnerDocument().createElement("capturedGoods");
-                    captured.setAttribute("type", newGoods.getType().getId());
-                    captured.setAttribute("amount", Integer.toString(capturedGoods));
-                    reply.appendChild(captured);
-                }
-            }
-        }
-
         if (result.type.compareTo(CombatResultType.EVADES) >= 0 && unit.getTile().equals(newTile)) {
             // In other words, we moved...
             Element update = reply.getOwnerDocument().createElement("update");

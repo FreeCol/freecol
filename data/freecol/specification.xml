@@ -1838,8 +1838,6 @@
     <optionGroup id="gameOptions.map">
       <!-- Enables/disables fog of war -->
       <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
-      <!-- No units are hidden on carriers or settlements if this option is set to false -->
-      <booleanOption id="model.option.unitHiding" defaultValue="true"/>
       <!-- Whether to award exploration points or not -->
       <booleanOption id="model.option.explorationPoints" defaultValue="false"/>
     </optionGroup>
