@@ -179,7 +179,9 @@ public final class FreeCol {
         createAndSetDirectories();
         initLogging();
 
-        Locale.setDefault(getLocale());
+        Locale locale = getLocale();
+        Locale.setDefault(locale);
+        Messages.setMessageBundle(locale);
         
         if (javaCheck && !checkJavaVersion()) {
             removeSplash(splash);
