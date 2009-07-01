@@ -1498,13 +1498,13 @@ public final class InGameController implements NetworkConstants {
     public boolean claimLand(Tile tile, Colony colony, int offer) {
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        int price = (tile.getOwner() == null) ? 0
-            : tile.getOwner().getLandPrice(tile);
-
         if (freeColClient.getGame().getCurrentPlayer() != player) {
             canvas.showInformationMessage("notYourTurn");
             return false;
         }
+
+        Player owner = tile.getOwner();
+        int price = (owner == null) ? 0 : player.getLandPrice(tile);
         if (price < 0) { // not for sale
             return false;
         } else if (price > 0) { // for sale by natives
@@ -1518,7 +1518,7 @@ public final class InGameController implements NetworkConstants {
                 }
                 choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
                 Integer ci = canvas.showChoiceDialog(Messages.message("indianLand.text",
-                                                                      "%player%", player.getNationAsString()),
+                                                                      "%player%", owner.getNationAsString()),
                                                      Messages.message("indianLand.cancel"),
                                                      choices);
                 if (ci == null) { // cancelled

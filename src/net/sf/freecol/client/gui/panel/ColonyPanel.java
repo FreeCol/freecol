@@ -1359,6 +1359,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             logger.warning("Colony " + colony.getName()
                                            + " could not claim tile " + tile.toString()
                                            + " with unit " + unit.getId());
+                            return null;
                         }
 
                         if (colonyTile.canAdd(unit)) { 

@@ -709,16 +709,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public boolean claimable(Player player) {
         Player owner = getOwner();
-
-        if (owner == null) {
-            return true;
-        } else if (owner == player) {
-            return true;
-        } else if (owner.isEuropean()) {
-            return getOwningSettlement() == null;
-        } else {
-            return owner.getLandPrice(this) >= 0;
-        }
+        return owner == null || owner == player || player.getLandPrice(this) >= 0;
     }
 
     /**
