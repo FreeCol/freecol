@@ -707,6 +707,7 @@ public class StandardAIPlayer extends AIPlayer {
                 }
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
+                    // TODO: cleanup magic numbers 50 and 1
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.MUSKETS, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.HORSES, 50));
                     
@@ -716,12 +717,12 @@ public class StandardAIPlayer extends AIPlayer {
                     Element equipMusketsElement = Message.createNewRootElement("equipUnit");
                     equipMusketsElement.setAttribute("unit", unit.getId());
                     equipMusketsElement.setAttribute("type", "model.equipment.muskets");
-                    equipMusketsElement.setAttribute("amount", Integer.toString(50));
+                    equipMusketsElement.setAttribute("amount", Integer.toString(1));
                     sendAndWaitSafely(equipMusketsElement);
                     Element equipHorsesElement = Message.createNewRootElement("equipUnit");
                     equipHorsesElement.setAttribute("unit", unit.getId());
                     equipHorsesElement.setAttribute("type", "model.equipment.horses");
-                    equipHorsesElement.setAttribute("amount", Integer.toString(50));
+                    equipHorsesElement.setAttribute("amount", Integer.toString(1));
                     sendAndWaitSafely(equipHorsesElement);
                 }
             }

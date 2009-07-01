@@ -279,7 +279,12 @@ public final class Market extends FreeColGameObject implements Ownable {
     public void buy(GoodsType goodsType, int amount, Player player) {
         int price = getBidPrice(goodsType, amount);
         if (price > player.getGold()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Player " + player.getName()
+                                            + " tried to buy " + Integer.toString(amount)
+                                            + " " + goodsType.toString()
+                                            + " for " + Integer.toString(price)
+                                            + " but has " + Integer.toString(player.getGold())
+                                            + " gold.");
         }
 
         int unitPrice = costToBuy(goodsType);
