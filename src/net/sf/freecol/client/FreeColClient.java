@@ -731,6 +731,13 @@ public final class FreeColClient {
             sfxPlayer.play(sfxLibrary.get(sound));
         }
     }
+    
+    /**
+     * Verifies if the client can play music
+     */
+    public boolean canPlayMusic(){
+        return musicPlayer != null;
+    }
 
     /**
      * Returns <i>true</i> if this client is logged in to a server or <i>false</i>

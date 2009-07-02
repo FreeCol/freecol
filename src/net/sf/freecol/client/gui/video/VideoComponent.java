@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -47,7 +48,7 @@ public class VideoComponent extends JPanel {
      * Creates a component for displaying the given video.
      * @param video The <code>Video</code> to be displayed.
      */
-    public VideoComponent(Video video) {
+    public VideoComponent(Video video, boolean mute) {
         final String url = video.getURL().toExternalForm();
         
         setBorder(createBorder());
@@ -57,13 +58,17 @@ public class VideoComponent extends JPanel {
         applet.setSize(655, 480);
         // FIXME: -1 avoids transparent part of border.
         applet.setLocation(insets.left - 1, insets.top - 1);
-
+        
         applet.setParam ("url", url);
         applet.setParam ("local", "false");
         applet.setParam ("framerate", "60");
         applet.setParam ("keepaspect", "true");
         applet.setParam ("video", "true");
-        applet.setParam ("audio", "true");
+        String withAudio = "true";
+        if(mute){
+            withAudio = "false";
+        }
+        applet.setParam ("audio", withAudio);
         applet.setParam ("kateIndex", "0");
         applet.setParam ("bufferSize", "200");
         applet.setParam ("showStatus", "hide");

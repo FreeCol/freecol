@@ -2162,7 +2162,8 @@ public final class Canvas extends JDesktopPane {
     public void showOpeningVideoPanel() {
         closeMenus();
         final Video video = ResourceManager.getVideo("Opening.video");
-        final VideoComponent vp = new VideoComponent(video);
+        boolean muteAudio = !getClient().canPlayMusic();
+        final VideoComponent vp = new VideoComponent(video, muteAudio);
         addCentered(vp, MAIN_LAYER);
         vp.play();
         
