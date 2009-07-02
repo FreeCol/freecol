@@ -69,6 +69,7 @@ public class UnitTest extends FreeColTestCase {
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
     UnitType caravelType = spec().getUnitType("model.unit.caravel");
     UnitType wagonType = spec().getUnitType("model.unit.wagonTrain");
+    UnitType soldierType = spec().getUnitType("model.unit.veteranSoldier");
     
     GoodsType foodType = spec().getGoodsType("model.goods.food");
     GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
@@ -146,8 +147,7 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(10, Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue());
 
         // Found colony on 6,8
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"),
-                                UnitState.ACTIVE);
+        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, soldierType, UnitState.ACTIVE);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
         soldier.setWorkType(Goods.FOOD);
@@ -766,6 +766,31 @@ public class UnitTest extends FreeColTestCase {
         assertEquals(spec().getEquipmentType("model.equipment.horses"), scout.getDefaultEquipmentType());
         assertEquals(1, scout.getDefaultEquipment().length);
 
+    }
+    
+    public void testEquipmentChange(){
+        Game game = getStandardGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Map map = getTestMap();
+        game.setMap(map);
+
+        Tile unitTile = map.getTile(6, 8);
+        
+        Unit unit = new Unit(game, unitTile, dutch, colonistType, UnitState.ACTIVE);
+        
+        assertFalse("Soldier should not have muskets",unit.getEquipmentCount(musketsType) > 0);
+        assertFalse("Soldier should not have horses",unit.getEquipmentCount(horsesType) > 0);
+        assertFalse("Soldier should not have tools",unit.getEquipmentCount(toolsType) > 0);
+        unit.equipWith(musketsType, 50, true);
+        unit.equipWith(horsesType, 50, true);
+        assertTrue("Soldier should be equiped with muskets",unit.getEquipmentCount(musketsType) > 0);
+        assertTrue("Soldier should be equiped with horses",unit.getEquipmentCount(horsesType) > 0);
+        assertFalse("Soldier should not have tools",unit.getEquipmentCount(toolsType) > 0);
+        
+        unit.equipWith(toolsType, 50, true);
+        assertFalse("Soldier should no longer have muskets",unit.getEquipmentCount(musketsType) > 0);
+        assertFalse("Soldier should no longer have horses",unit.getEquipmentCount(horsesType) > 0);
+        assertTrue("Soldier should be equiped with tools",unit.getEquipmentCount(toolsType) > 0);
     }
     
     public void testUnitLocationAfterBuildingColony() {

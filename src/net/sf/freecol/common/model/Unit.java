@@ -2137,7 +2137,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         equipment.incrementCount(equipmentType, amount);
         Set<EquipmentType> equipmentTypes = equipment.keySet();
-        for (EquipmentType oldEquipment : equipmentTypes) {
+        // We are changing the set, so we need to create a copy for iteration, to avoid
+        //a ConcurrentModificationException being thrown
+        Set<EquipmentType> eqLst = new HashSet<EquipmentType>(equipmentTypes);
+        for (EquipmentType oldEquipment : eqLst) {
             if (!oldEquipment.isCompatibleWith(equipmentType)) {
                 dumpEquipment(oldEquipment, equipment.getCount(oldEquipment), asResultOfCombat);
                 equipmentTypes.remove(oldEquipment);
