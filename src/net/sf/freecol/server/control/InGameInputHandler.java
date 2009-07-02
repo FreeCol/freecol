@@ -1100,6 +1100,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, eventDorado));
             }
             rumour = RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
+        } else {
+            if (rumour == RumourType.LEARN && learntUnitTypes.isEmpty()) {
+                rumour = RumourType.NOTHING;
+            }
         }
 
         Element rumourElement = Message.createNewRootElement("lostCityRumour");

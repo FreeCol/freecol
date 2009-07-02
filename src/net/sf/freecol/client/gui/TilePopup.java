@@ -23,6 +23,8 @@ import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.JMenu;
@@ -33,12 +35,15 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.LostCityRumour;
+import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
@@ -237,6 +242,25 @@ public final class TilePopup extends JPopupMenu {
                 add(takeOwnership);
                 hasAnItem = true;
             }
+        }
+        if (FreeCol.isInDebugMode() && tile.hasLostCityRumour()) {
+            JMenuItem rumourItem = new JMenuItem("Set Lost City Rumour type");
+            rumourItem.setOpaque(false);
+            rumourItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        List<ChoiceItem<RumourType>> rumours = new ArrayList<ChoiceItem<RumourType>>();
+                        for (RumourType rumour : RumourType.values()) {
+                            if (rumour == RumourType.NO_SUCH_RUMOUR) continue;
+                            rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
+                        }
+                        RumourType rumourChoice = freeColClient.getCanvas()
+                            .showChoiceDialog("Select Lost City Rumour", "Cancel", rumours);
+                        tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
+                        final Tile serverTile = (Tile) freeColClient.getFreeColServer().getGame().getFreeColGameObject(tile.getId());
+                        serverTile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
+                    }
+                });
+            add(rumourItem);
         }
         // END DEBUG
     }
