@@ -46,25 +46,16 @@ public class Animations {
         final GUI gui = canvas.getGUI();
         final Map map = attacker.getGame().getMap();
         final Direction direction = map.getDirection(attacker.getTile(), defender.getTile());
-        
-        gui.executeWithUnitOutForAnimation(attacker, attacker.getTile(), new OutForAnimationCallback() {
-            public void executeWithUnitOutForAnimation(final JLabel attackerLabel) {
-                gui.executeWithUnitOutForAnimation(defender, defender.getTile(), new OutForAnimationCallback() {
-                    public void executeWithUnitOutForAnimation(final JLabel defenderLabel) {
-                        final SimpleZippedAnimation attackerAnimation = getAnimation(canvas, attacker, direction, "attack");
-                        if (attackerAnimation != null) {
-                            new UnitImageAnimation(canvas, attacker, attackerAnimation, direction).animate();
-                        }
-                        if (!result.isSuccess()) {
-                            final SimpleZippedAnimation defenderAnimation = getAnimation(canvas, defender, direction.getReverseDirection(), "attack");
-                            if (defenderAnimation != null) {
-                                new UnitImageAnimation(canvas, defender, defenderAnimation, direction).animate();
-                            }
-                        }
-                    }
-                });
+        final SimpleZippedAnimation attackerAnimation = getAnimation(canvas, attacker, direction, "attack");
+        if (attackerAnimation != null) {
+            new UnitImageAnimation(canvas, attacker, attackerAnimation, direction).animate();
+        }
+        if (!result.isSuccess()) {
+            final SimpleZippedAnimation defenderAnimation = getAnimation(canvas, defender, direction.getReverseDirection(), "attack");
+            if (defenderAnimation != null) {
+                new UnitImageAnimation(canvas, defender, defenderAnimation, direction).animate();
             }
-        });
+        }
     }
     
     private static SimpleZippedAnimation getAnimation(Canvas canvas, Unit unit, Direction direction, String animation) {

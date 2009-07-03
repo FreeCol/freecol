@@ -372,6 +372,15 @@ public final class GUI {
             final JLabel unitLabel = getUnitLabel(unit);
             final Integer UNIT_LABEL_LAYER = JLayeredPane.DEFAULT_LAYER;
 
+            if (unitLabel == null) {
+                logger.warning("GUI lose: null unitLabel");
+            } else if (sourceTile == null) {
+                logger.warning("GUI lose: null sourceTile");
+            } else if (getTilePosition(sourceTile) == null) {
+                logger.warning("GUI lose: null getTilePosition");
+            } else if (getUnitLabelPositionInTile(unitLabel, getTilePosition(sourceTile)) == null) {
+                logger.warning("GUI lose: null getUnitLabelPostionInTile");
+            }
             i = 1;
             unitLabel.setLocation(getUnitLabelPositionInTile(unitLabel,
                     getTilePosition(sourceTile)));
