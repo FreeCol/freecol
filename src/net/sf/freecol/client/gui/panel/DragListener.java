@@ -399,7 +399,7 @@ public final class DragListener extends MouseAdapter {
                     });
                 menu.add(newItem);
             }
-            if (tempUnit.canBeEquippedWith(equipmentType)) {
+            if (tempUnit.canBeEquippedWith(equipmentType) && count == 0) {
                 // "add new equipment" action
                 JMenuItem newItem = null;
                 count = equipmentType.getMaximumCount() - count;
