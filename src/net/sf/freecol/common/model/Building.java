@@ -42,6 +42,8 @@ import org.w3c.dom.Element;
  */
 public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named {
 
+    public static final String UNIT_CHANGE = "UNIT_CHANGE";
+
     /** The colony containing this building. */
     private Colony colony;
 
@@ -52,7 +54,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     private List<Unit> units = Collections.emptyList();
 
     private BuildingType buildingType;
-    
+
 
     /**
      * Creates a new <code>Building</code>.

@@ -2860,9 +2860,14 @@ public final class InGameController implements NetworkConstants {
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             throw new IllegalStateException("Not your turn.");
+        } else if (unit.getColony() == null) {
+            throw new IllegalStateException("Unit is not in colony.");
         } else if (!unit.getColony().canReducePopulation()) {
-            throw new IllegalStateException("Can not reduce population.");
+            throw new IllegalStateException("Colony can not reduce population.");
         }
+
+        int oldPopulation = unit.getColony().getUnitCount();
+        Location oldLocation = unit.getLocation();
 
         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
         putOutsideColonyElement.setAttribute("unit", unit.getId());
@@ -2871,6 +2876,15 @@ public final class InGameController implements NetworkConstants {
         Element reply = client.ask(putOutsideColonyElement);
         if (reply != null && reply.getTagName().equals("update")) {
             freeColClient.getInGameInputHandler().update(reply);
+            // TODO: this really should be handled by the update
+            if (oldLocation instanceof Building) {
+                ((Building) oldLocation).firePropertyChange(Building.UNIT_CHANGE, unit, null);
+            } else if (oldLocation instanceof ColonyTile) {
+                ((ColonyTile) oldLocation).firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
+            }
+            unit.getColony().firePropertyChange(Colony.ColonyChangeEvent.POPULATION_CHANGE.toString(), 
+                                                oldPopulation, unit.getColony().getUnitCount());
+            unit.getTile().firePropertyChange(Tile.UNIT_CHANGE, null, unit);
         } else {
             logger.warning("putOutsideColony message missing update");
         }

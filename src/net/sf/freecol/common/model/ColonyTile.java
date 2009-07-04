@@ -46,6 +46,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
     private static final Logger logger = Logger.getLogger(ColonyTile.class.getName());
 
+    public static final String UNIT_CHANGE = "UNIT_CHANGE";
+
     private Colony colony;
     private Tile workTile;
     private Unit unit;

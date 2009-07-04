@@ -2234,10 +2234,19 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (unit.getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
+        Location oldLocation = unit.getLocation();
         unit.putOutsideColony();
-        sendUpdatedTileToAll(unit.getTile(), player);
+        // Don't send updated tile! Other players can't see the unit.
+        // sendUpdatedTileToAll(unit.getTile(), player);
         Element updateElement = Message.createNewRootElement("update");
         updateElement.appendChild(unit.getTile().toXMLElement(player, updateElement.getOwnerDocument()));
+        if (oldLocation instanceof Building) {
+            updateElement.appendChild(((Building) oldLocation)
+                                      .toXMLElement(player, updateElement.getOwnerDocument()));
+        } else if (oldLocation instanceof ColonyTile) {
+            updateElement.appendChild(((ColonyTile) oldLocation)
+                                      .toXMLElement(player, updateElement.getOwnerDocument()));
+        }
         return updateElement;
     }
 
