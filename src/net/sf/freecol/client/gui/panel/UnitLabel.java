@@ -377,4 +377,20 @@ public final class UnitLabel extends JLabel implements ActionListener {
         // repaint(0, 0, getWidth(), getHeight());
         // uc.refresh();
     }
+    
+    public boolean canUnitBeEquipedWith(JLabel data){
+        if(!getUnit().hasAbility("model.ability.canBeEquipped")){
+            return false;
+        }
+        
+        if(data instanceof GoodsLabel && ((GoodsLabel)data).isToEquip()){
+            return true;
+        }
+                
+        if(data instanceof MarketLabel && ((MarketLabel)data).isToEquip()){
+            return true;
+        }
+        
+        return false;
+    }
 }

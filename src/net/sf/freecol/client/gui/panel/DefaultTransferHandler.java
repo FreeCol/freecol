@@ -201,8 +201,7 @@ public final class DefaultTransferHandler extends TransferHandler {
                     }
                     ((ColonyPanel) parentPanel).setSelectedUnitLabel(unitLabel);
                     comp = ((ColonyPanel) parentPanel).getCargoPanel();
-                } else if (unitLabel.getUnit().hasAbility("model.ability.canBeEquipped")
-                           && (data instanceof GoodsLabel || data instanceof MarketLabel)) {
+                } else if (unitLabel.canUnitBeEquipedWith(data)) {
                     // don't do anything before partial amount has been checked
                 } else {
                     try {

@@ -121,6 +121,12 @@ public final class DragListener extends MouseAdapter {
                 } else if (comp instanceof MarketLabel) {
                     ((MarketLabel) comp).setPartialChosen(true);
                 }
+            } else if(e.isAltDown()){
+                if (comp instanceof GoodsLabel) {
+                    ((GoodsLabel) comp).toEquip(true);
+                } else if (comp instanceof MarketLabel) {
+                    ((MarketLabel) comp).toEquip(true);
+                }
             } else {
                 if (comp instanceof GoodsLabel) {
                     ((GoodsLabel) comp).setPartialChosen(false);
@@ -129,7 +135,7 @@ public final class DragListener extends MouseAdapter {
                     ((MarketLabel) comp).setAmount(100);
                 }
             }
-
+        
             if ((comp instanceof UnitLabel) && (((UnitLabel) comp).getUnit().isCarrier())) {
                 Unit u = ((UnitLabel) comp).getUnit();
                 if (parentPanel instanceof EuropePanel) {

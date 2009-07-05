@@ -54,6 +54,8 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
     
     private boolean partialChosen;
     
+    private boolean toEquip;
+    
     
     /**
      * Initializes this JLabel with the given goods data.
@@ -68,6 +70,7 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
         this.parent = parent;
         selected = false;
         partialChosen = false;
+        toEquip = false;
         initializeDisplay();
     }
     
@@ -129,6 +132,15 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
     public void setPartialChosen(boolean partialChosen) {
         this.partialChosen = partialChosen;
     }
+    
+    public boolean isToEquip() {
+        return toEquip;
+    }
+    
+    public void toEquip(boolean toEquip) {
+        this.toEquip = toEquip;
+    }
+    
     
     /**
      * Returns the parent Canvas object.

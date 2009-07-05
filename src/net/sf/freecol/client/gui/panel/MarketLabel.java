@@ -49,6 +49,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
     private final Market market;
     private final Canvas parent;
     private boolean partialChosen;
+    private boolean toEquip;
 
     /**
     * Initializes this JLabel with the given goods type.
@@ -100,6 +101,14 @@ public final class MarketLabel extends JLabel implements ActionListener {
     
     public void setPartialChosen(boolean partialChosen) {
         this.partialChosen = partialChosen;
+    }
+    
+    public boolean isToEquip() {
+        return toEquip;
+    }
+    
+    public void toEquip(boolean toEquip) {
+        this.toEquip = toEquip;
     }
 
 
