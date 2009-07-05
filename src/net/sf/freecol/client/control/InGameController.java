@@ -2561,6 +2561,11 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
+        if(!unit.isOnCarrier()){
+            throw new IllegalStateException("Trying to leave ship, unit not on carrier");
+        }
+        Unit carrier = (Unit) unit.getLocation();
+        
         Client client = freeColClient.getClient();
         DisembarkMessage message = new DisembarkMessage(unit);
         Element reply = askExpecting(client, message.toXMLElement(), "update");
@@ -2568,6 +2573,11 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
             if (checkCashInTreasureTrain(unit)) {
                 nextActiveUnit();
+                return;
+            }
+            carrier.firePropertyChange(Unit.CARGO_CHANGE,null,unit);
+            if(carrier.getTile() != null){
+                carrier.getTile().firePropertyChange(Tile.UNIT_CHANGE,null,unit);
             }
         }
     }
