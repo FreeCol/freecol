@@ -39,7 +39,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -62,6 +61,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
@@ -82,8 +82,6 @@ import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This is a panel for the Colony display. It shows the units that are working
@@ -354,57 +352,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         cargoPanel.removeAll();
         warehousePanel.removeAll();
-        //outsideColonyPanel.removeAll();
-        inPortPanel.removeAll();
         tilePanel.removeAll();
 
         //
-        // Units outside the colony:
+        // Carriers in the colony
         //
-
-        Tile tile = colony.getTile();
-
-        UnitLabel lastCarrier = null;
-        UnitLabel preSelectedUnitLabel = null;
-        selectedUnit = null;
-
-        Iterator<Unit> tileUnitIterator = tile.getUnitIterator();
-        while (tileUnitIterator.hasNext()) {
-            Unit unit = tileUnitIterator.next();
-
-            UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
-            if (isEditable()) {
-                unitLabel.setTransferHandler(defaultTransferHandler);
-            }
-            if (isEditable() || unit.isCarrier()) {
-                unitLabel.addMouseListener(pressListener);
-            }
-
-            if (!unit.isCarrier()) {
-                //outsideColonyPanel.add(unitLabel, false);
-            } else {
-                TradeRoute tradeRoute;
-                if ((tradeRoute = unit.getTradeRoute()) != null) {
-                    unitLabel.setDescriptionLabel(unit.getName() + " ("
-                                                  + tradeRoute.getName() + ")");
-                }
-                inPortPanel.add(unitLabel);
-                lastCarrier = unitLabel;
-                if (unit == preSelectedUnit) {
-                    preSelectedUnitLabel = unitLabel;
-                }
-
-            }
-        }
-
-        if (preSelectedUnitLabel == null) {
-            setSelectedUnitLabel(lastCarrier);
-        } else {
-            setSelectedUnitLabel(preSelectedUnitLabel);
-        }
-
-        updateCarrierButtons();
-
+        
+        inPortPanel.initialize(preSelectedUnit);
+        
         //
         // Warehouse panel:
         //
@@ -470,6 +425,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         royalistLabel.setText(Messages.message("colonyPanel.royalistLabel", "%number%",
                                                Integer.toString(getColony().getTory())));
         //"%toryNumber%", Integer.toString(getColony().getUnitCount() - getColony().getMembers()),
+    }
+    
+    public void updateInPortPanel(){
+        inPortPanel.initialize(null);
     }
 
     public void updateNameBox() {
@@ -1061,6 +1020,54 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         public String getUIClassID() {
             return "InPortPanelUI";
         }
+        
+        public void initialize(Unit selectedUnit) {
+            // This is required
+            UnitLabel oldSelectedUnitLabel = ColonyPanel.this.getSelectedUnitLabel();
+            if(oldSelectedUnitLabel != null){
+                if(selectedUnit == null){
+                    selectedUnit = oldSelectedUnitLabel.getUnit();
+                }
+                ColonyPanel.this.setSelectedUnit(null);
+            }
+            
+            removeAll();
+            if (colony == null) {
+                return;
+            }
+
+            Tile colonyTile = colony.getTile();
+            Unit lastCarrier = null;
+            for (Unit unit : colonyTile.getUnitList()) {
+                if(!unit.isCarrier()){
+                    continue;
+                }
+                
+                lastCarrier = unit;
+                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                TradeRoute tradeRoute = unit.getTradeRoute();
+                if (tradeRoute != null) {
+                    unitLabel.setDescriptionLabel(unit.getName() + " ("
+                                                  + tradeRoute.getName() + ")");
+                }
+                if (isEditable()) {
+                    unitLabel.setTransferHandler(defaultTransferHandler);
+                    unitLabel.addMouseListener(pressListener);
+                }
+                add(unitLabel, false);
+            }
+            revalidate();
+            repaint();
+            
+            // last carrier is selected by default, if no other should be
+            if(selectedUnit == null && lastCarrier != null){
+                selectedUnit = lastCarrier;
+            }
+            // select the unit
+            if(selectedUnit != null){
+                ColonyPanel.this.setSelectedUnit(selectedUnit);
+            }
+        }
     }
 
     /**
@@ -1484,7 +1491,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         String property = e.getPropertyName();
 
         if (Unit.CARGO_CHANGE.equals(property)) {
-            updateCarrierButtons();
+            updateInPortPanel();
         } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
             updateSoLLabel();
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {

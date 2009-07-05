@@ -131,13 +131,17 @@ public final class DragListener extends MouseAdapter {
             }
 
             if ((comp instanceof UnitLabel) && (((UnitLabel) comp).getUnit().isCarrier())) {
+                Unit u = ((UnitLabel) comp).getUnit();
                 if (parentPanel instanceof EuropePanel) {
-                    Unit u = ((UnitLabel) comp).getUnit();
                     if (u.getState() != UnitState.TO_AMERICA && u.getState() != UnitState.TO_EUROPE) {
                         ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
                     }
                 } else if (parentPanel instanceof ColonyPanel) {
-                    ((ColonyPanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
+                    ColonyPanel colonyPanel = (ColonyPanel) parentPanel;
+                    if(colonyPanel.getSelectedUnit() != u){
+                        colonyPanel.setSelectedUnit(u);
+                        colonyPanel.updateInPortPanel();
+                    }
                 }
             }
 
