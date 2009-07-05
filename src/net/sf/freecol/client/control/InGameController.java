@@ -863,6 +863,11 @@ public final class InGameController implements NetworkConstants {
                 disembark(unit, path.getDirection());
                 path = null;
                 break;
+            case MOVE_NO_MOVES:
+                // the unit may have some moves left,
+                //but not enough to move to the destination
+                unit.setMovesLeft(0);
+                return;
             default:
                 if (path == path.getLastNode() && mt.isLegal()
                     && (mt != MoveType.ATTACK || knownEnemyOnLastTile(path))) {
@@ -872,23 +877,8 @@ public final class InGameController implements NetworkConstants {
                         return;
                     }
                 } else {
-                    Tile target = map.getNeighbourOrNull(path.getDirection(), unit.getTile());
-                    if (unit.getMovesLeft() == 0 ||
-                        (unit.getMoveCost(target) > unit.getMovesLeft() &&
-                         (target.getFirstUnit() == null ||
-                          target.getFirstUnit().getOwner() == unit.getOwner()) &&
-                         (target.getSettlement() == null ||
-                          target.getSettlement().getOwner() == unit.getOwner()))) {
-                        // we can't go there now, but we don't want to wake up
-                        unit.setMovesLeft(0);
-                        nextActiveUnit();
-                        return;
-                    } else {
-                        // Active unit to show path and permit to move it
-                        // manually
-                        freeColClient.getGUI().setActiveUnit(unit);
-                        return;
-                    }
+                    freeColClient.getGUI().setActiveUnit(unit);
+                    return;
                 }
             }
             if (path != null) {
