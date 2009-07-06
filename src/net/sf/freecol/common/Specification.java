@@ -75,7 +75,7 @@ public final class Specification {
     public static final FreeColGameObjectType MOVEMENT_PENALTY_SOURCE = 
         new FreeColGameObjectType("model.source.movementPenalty");
     public static final FreeColGameObjectType ARTILLERY_PENALTY_SOURCE =
-        new FreeColGameObjectType("model.source.artilleryPenalty");
+        new FreeColGameObjectType("model.source.artilleryInTheOpen");
     public static final FreeColGameObjectType ATTACK_BONUS_SOURCE =
         new FreeColGameObjectType("model.source.attackBonus");
     public static final FreeColGameObjectType FORTIFICATION_BONUS_SOURCE =
