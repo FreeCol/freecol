@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -165,10 +166,13 @@ public final class CanvasMouseListener implements MouseListener {
 
                 // Move the unit:
                 Unit unit = gui.getActiveUnit();
-                canvas.getClient().getInGameController().setDestination(unit, temp.getLastNode().getTile());
+                InGameController ctlr = canvas.getClient().getInGameController();
+                ctlr.setDestination(unit, temp.getLastNode().getTile());
                 if (canvas.getClient().getGame().getCurrentPlayer() == canvas.getClient().getMyPlayer()) {
-                    canvas.getClient().getInGameController().moveToDestination(unit);
+                    ctlr.moveToDestination(unit);
+                    ctlr.nextActiveUnit();
                 }
+                
             } else if (gui.isGotoStarted()) {
                 gui.stopGoto();
             }
