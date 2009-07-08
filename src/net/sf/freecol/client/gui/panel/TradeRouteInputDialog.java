@@ -29,6 +29,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -49,6 +52,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Player;
@@ -201,7 +205,14 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
         if (player.getEurope() != null) {
             destinationSelector.addItem(player.getEurope());
         }
-        for (Settlement settlement : player.getSettlements()) {
+        List<Settlement> settlements = player.getSettlements();
+        final Comparator<Colony> comparator = getClient().getClientOptions().getColonyComparator();
+        Collections.sort(settlements, new Comparator<Settlement>() {
+                public int compare(final Settlement s1, final Settlement s2) {
+                    return comparator.compare((Colony) s1, (Colony) s2);
+                }
+            });
+        for (Settlement settlement : settlements) {
             destinationSelector.addItem(settlement);
         }
 
