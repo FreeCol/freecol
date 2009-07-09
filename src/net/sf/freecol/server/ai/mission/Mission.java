@@ -26,7 +26,9 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -367,6 +369,39 @@ public abstract class Mission extends AIObject {
         } else {
             return 0;
         }
+    }
+    
+    protected boolean unloadCargoInColony(Connection connection, Unit carrier, Goods goods) {
+        Element unloadCargoElement = Message.createNewRootElement("unloadCargo");
+        unloadCargoElement.appendChild(goods.toXMLElement(carrier.getOwner(),
+                unloadCargoElement.getOwnerDocument()));
+        try {
+            connection.sendAndWait(unloadCargoElement);
+        } catch (IOException e) {
+            logger.warning("Could not send \"unloadCargoElement\"-message!");
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean sellCargoInEurope(Connection connection, Unit carrier, Goods goods) {
+        // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
+        Player p = carrier.getOwner();
+        if (p.isAI() && getAIMain().getFreeColServer().isSingleplayer()) {
+            // Double the income by adding this bonus:
+            p.modifyGold(p.getMarket().getSalePrice(goods));
+        }
+        // END: TODO-AI-CHEATING.
+        Element sellGoodsElement = Message.createNewRootElement("sellGoods");
+        sellGoodsElement.appendChild(goods.toXMLElement(carrier.getOwner(),
+                sellGoodsElement.getOwnerDocument()));
+        try {
+            connection.sendAndWait(sellGoodsElement);
+        } catch (IOException e) {
+            logger.warning("Could not send \"sellGoodsElement\"-message!");
+            return false;
+        }
+        return true;
     }
     
     /**

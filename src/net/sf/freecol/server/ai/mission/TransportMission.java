@@ -990,35 +990,18 @@ public class TransportMission extends Mission {
                         && ag.getTransportDestination().getTile() == carrier.getLocation().getTile()
                         && carrier.getState() != UnitState.TO_EUROPE && carrier.getState() != UnitState.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
-                        // TODO-AI-CHEATING: REMOVE WHEN THE AI IS GOOD ENOUGH:
-                        Player p = carrier.getOwner();
-                        if (p.isAI() && getAIMain().getFreeColServer().isSingleplayer()) {
-                            // Double the income by adding this bonus:
-                            p.modifyGold(p.getMarket().getSalePrice(ag.getGoods()));
-                        }
-                        // END: TODO-AI-CHEATING.
-                        Element sellGoodsElement = Message.createNewRootElement("sellGoods");
-                        sellGoodsElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(),
-                                sellGoodsElement.getOwnerDocument()));
-                        try {
-                            connection.sendAndWait(sellGoodsElement);
+                        boolean success = sellCargoInEurope(connection, carrier, ag.getGoods());
+                        if(success){
                             removeFromTransportList(ag);
                             ag.dispose();
                             transportListChanged = true;
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"sellGoodsElement\"-message!");
                         }
                     } else {
-                        Element unloadCargoElement = Message.createNewRootElement("unloadCargo");
-                        unloadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(),
-                                unloadCargoElement.getOwnerDocument()));
-                        try {
-                            connection.sendAndWait(unloadCargoElement);
+                        boolean success = unloadCargoInColony(connection, carrier, ag.getGoods());
+                        if(success){
                             removeFromTransportList(ag);
                             ag.dispose();
                             transportListChanged = true;
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"unloadCargoElement\"-message!");
                         }
                     }
                 }
