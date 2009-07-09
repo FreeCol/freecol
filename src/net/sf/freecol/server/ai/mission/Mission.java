@@ -182,6 +182,27 @@ public abstract class Mission extends AIObject {
         }
     }
     
+    protected void moveUnitToAmerica(Connection connection, Unit unit) {
+        Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
+        moveToAmericaElement.setAttribute("unit", unit.getId());
+        try {
+            connection.sendAndWait(moveToAmericaElement);
+        } catch (IOException e) {
+            logger.warning("Could not send \"moveToAmericaElement\"-message!");
+        }
+    }
+    
+    protected void moveUnitToEurope(Connection connection, Unit unit) {
+        Element moveToAmericaElement = Message.createNewRootElement("moveToEurope");
+        moveToAmericaElement.setAttribute("unit", unit.getId());
+        try {
+            connection.sendAndWait(moveToAmericaElement);
+        } catch (IOException e) {
+            logger.warning("Could not send \"moveToAmericaElement\"-message!");
+        }
+    }
+    
+    
     protected void moveButDontAttack(Connection connection, Direction direction) {
         if (direction != null) {
             if (getUnit().getMoveType(direction).isProgress()) {

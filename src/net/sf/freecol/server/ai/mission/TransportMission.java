@@ -473,13 +473,7 @@ public class TransportMission extends Mission {
                     // Tile target = getGame().getMap().getNeighbourOrNull(r,
                     // carrier.getTile());
                     if (carrier.getMoveType(r) == MoveType.MOVE_HIGH_SEAS && moveToEurope) {
-                        Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
-                        moveToEuropeElement.setAttribute("unit", carrier.getId());
-                        try {
-                            connection.sendAndWait(moveToEuropeElement);
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"moveToEuropeElement\"-message!");
-                        }
+                        moveUnitToEurope(connection, carrier);
                     } else {
                         move(connection, r);
                     }
@@ -491,13 +485,7 @@ public class TransportMission extends Mission {
 
                 transportListChanged = restockCargoAtDestination(connection);
             } else if (moveToEurope && carrier.canMoveToEurope()) {
-                Element moveToEuropeElement = Message.createNewRootElement("moveToEurope");
-                moveToEuropeElement.setAttribute("unit", carrier.getId());
-                try {
-                    connection.sendAndWait(moveToEuropeElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send \"moveToEuropeElement\"-message (2)!");
-                }
+                moveUnitToEurope(connection, carrier);
             }
         }
     }
@@ -1162,13 +1150,7 @@ public class TransportMission extends Mission {
         // Move back to America:
         Unit carrier = getUnit();
         if (carrier.getOwner().getGold() < MINIMUM_GOLD_TO_STAY_IN_EUROPE || transportList.size() > 0) {
-            Element moveToAmericaElement = Message.createNewRootElement("moveToAmerica");
-            moveToAmericaElement.setAttribute("unit", carrier.getId());
-            try {
-                connection.sendAndWait(moveToAmericaElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"moveToAmericaElement\"-message!");
-            }
+            moveUnitToAmerica(connection, carrier);
         }        
     }
     
