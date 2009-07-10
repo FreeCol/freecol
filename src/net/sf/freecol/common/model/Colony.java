@@ -1342,6 +1342,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     "model.colony.unitReady",
                     "%colony%", getName(),
                     "%unit%", unit.getName());
+            if (buildQueue.size() > 1) {
+                // Remove the unit-to-build unless it is the last entry.
+                buildQueue.remove(0);
+            }
         } else if (buildable instanceof BuildingType) {
             // building completed
             BuildingType upgradesFrom = ((BuildingType) buildable).getUpgradesFrom();
@@ -1355,13 +1359,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     "%colony%", getName(),
                     "%building%", buildable.getName());
             buildQueue.remove(0);
+        }
             
-            // warn player that no build queue is empty
-            if (buildQueue.isEmpty()) {
-                addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
-                                "model.colony.cannotBuild", 
-                                "%colony%", getName());
-            }
+        // warn player that no build queue is empty
+        if (buildQueue.isEmpty()) {
+            addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
+                            "model.colony.cannotBuild", 
+                            "%colony%", getName());
         }
     }
 
