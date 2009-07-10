@@ -1760,6 +1760,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
                 .getSettlement();
         unit.setMovesLeft(0);
+        settlement.setVisited(unit.getOwner());
         if (action.equals("cancel")) {
             return null;
         } else if (action.equals("establish")) {
