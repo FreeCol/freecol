@@ -1921,7 +1921,6 @@ public final class GUI {
         Player owner = tile.getOwner();
         if (displayBorders && owner != null) {
             Map map = tile.getMap();
-            Tile otherTile = map.getNeighbourOrNull(Map.Direction.NE, tile);
             int dx = lib.getTerrainImageWidth(tile.getType());
             int dy = lib.getTerrainImageHeight(tile.getType());
             Color oldColor = g.getColor();
@@ -1929,22 +1928,23 @@ public final class GUI {
                                  owner.getColor().getGreen(),
                                  owner.getColor().getBlue()));
             GeneralPath line = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-            if (otherTile.getOwner() != owner) {
+            Tile otherTile = map.getNeighbourOrNull(Map.Direction.NE, tile);
+            if (otherTile == null || otherTile.getOwner() != owner) {
                 line.moveTo(x + dx/2, y + 2);
                 line.lineTo(x + dx - 2, y + dy/2);
             }
             otherTile = map.getNeighbourOrNull(Map.Direction.SE, tile);
-            if (otherTile.getOwner() != owner) {
+            if (otherTile == null || otherTile.getOwner() != owner) {
                 line.moveTo(x + dx - 2, y + dy/2);
                 line.lineTo(x + dx/2, y + dy - 2);
             }
             otherTile = map.getNeighbourOrNull(Map.Direction.SW, tile);
-            if (otherTile.getOwner() != owner) {
+            if (otherTile == null || otherTile.getOwner() != owner) {
                 line.moveTo(x + dx/2, y + dy - 2);
                 line.lineTo(x + 2, y + dy/2);
             }
             otherTile = map.getNeighbourOrNull(Map.Direction.NW, tile);
-            if (otherTile.getOwner() != owner) {
+            if (otherTile == null || otherTile.getOwner() != owner) {
                 line.moveTo(x + 2, y + dy/2);
                 line.lineTo(x + dx/2, y + 2);
             }
