@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -104,25 +105,37 @@ public class BuildColonyMessage extends Message {
                                        "Unit " + builderId
                                        + " can not build colony " + colonyName);
         }
-        Colony colony = new Colony(game, serverPlayer, colonyName, unit.getTile());
+        Tile tile = unit.getTile();
+        Colony colony = new Colony(game, serverPlayer, colonyName, tile);
         unit.buildColony(colony);
         HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
                                           HistoryEvent.Type.FOUND_COLONY,
                                           "%colony%", colony.getName());
         player.getHistory().add(h);
-        server.getInGameInputHandler().sendUpdatedTileToAll(unit.getTile(), serverPlayer);
+        server.getInGameInputHandler().sendUpdatedTileToAll(tile, serverPlayer);
 
+        Map map = game.getMap();
         Element reply = Message.createNewRootElement("multiple");
         Document doc = reply.getOwnerDocument();
         Element update = doc.createElement("update");
         Element history = doc.createElement("addHistory");
         reply.appendChild(update);
         reply.appendChild(history);
-        update.appendChild(unit.getTile().toXMLElement(player, doc));
-        int range = colony.getLineOfSight();
-        if (range > unit.getLineOfSight()) {
-            for (Tile t : game.getMap().getSurroundingTiles(unit.getTile(), range)) {
+        update.appendChild(tile.toXMLElement(player, doc));
+        // Send the surrounding tiles that are now owned by the colony
+        for (Tile t : map.getSurroundingTiles(tile, colony.getRadius())) {
+            if (t.getOwningSettlement() == colony) {
                 update.appendChild(t.toXMLElement(player, doc));
+            }
+        }
+        // Send any tiles that can now be seen because the colony can see
+        // further than the founding unit.
+        for (int range = unit.getLineOfSight() + 1; 
+             range <= colony.getLineOfSight(); range++) {
+            CircleIterator circle = map.getCircleIterator(tile.getPosition(),
+                                                          false, range);
+            while (circle.hasNext()) {
+                update.appendChild(map.getTile(circle.next()).toXMLElement(player, doc));
             }
         }
         history.appendChild(h.toXMLElement(player, doc));
