@@ -1119,7 +1119,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // Using +2 in order to make 1/3 and 2/3 move count as 3/3, only when
         // getMovesLeft > 0
         if (cost > ml) {
-            if ((ml + 2 >= getInitialMovesLeft() || cost <= ml + 2) && ml != 0) {
+            if ((ml + 2 >= getInitialMovesLeft() || cost <= ml + 2 || target.getSettlement()!=null) && ml != 0) {
                 return ml;
             }
 
