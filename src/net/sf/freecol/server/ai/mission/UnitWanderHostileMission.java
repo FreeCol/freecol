@@ -116,16 +116,7 @@ public class UnitWanderHostileMission extends Mission {
             Direction direction = moveTowards(connection, pathToTarget);
             if (direction != null &&
                 unit.getMoveType(direction) == MoveType.ATTACK) {
-                Element element = Message.createNewRootElement("attack");
-                element.setAttribute("unit", unit.getId());
-                element.setAttribute("direction", direction.toString());
-
-                try {
-                    connection.ask(element);
-                } catch (IOException e) {
-                    logger.warning("Could not send message!");
-                }
-
+                attack(connection, unit, direction);
             }
         } else {
             // Just make a random move if no target can be found.

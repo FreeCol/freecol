@@ -161,16 +161,7 @@ public class DefendSettlementMission extends Mission {
             if (bestTarget != null) {
                 // this must be true, since it is the only way to get
                 // a bestTarget
-                assert bestDirection != null;
-                Element element = Message.createNewRootElement("attack");
-                element.setAttribute("unit", unit.getId());
-                element.setAttribute("direction", bestDirection.toString());
-
-                try {
-                    connection.ask(element);
-                } catch (IOException e) {
-                    logger.warning("Could not send message!");
-                }               
+                attack(connection, unit, bestDirection);               
                 return;
             }
         }
@@ -194,7 +185,7 @@ public class DefendSettlementMission extends Mission {
                 }
             }
         }
-    }    
+    }
 
     /**
      * Returns the destination for this <code>Transportable</code>.

@@ -155,15 +155,7 @@ public class UnitSeekAndDestroyMission extends Mission {
                     Player enemy = defender.getOwner();
                     if (unit.getOwner().getStance(enemy) == Stance.WAR
                         || ((Ownable) target).getOwner() == enemy) {
-                        Element element = Message.createNewRootElement("attack");
-                        element.setAttribute("unit", unit.getId());
-                        element.setAttribute("direction", direction.toString());
-
-                        try {
-                            connection.ask(element);
-                        } catch (IOException e) {
-                            logger.warning("Could not send message!");
-                        }
+                        attack(connection, unit, direction);
                     }
                 }
             }

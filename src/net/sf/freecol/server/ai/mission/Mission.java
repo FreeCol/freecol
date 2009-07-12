@@ -477,4 +477,18 @@ public abstract class Mission extends AIObject {
     public String getDebuggingInfo() {
         return "";
     }
+
+
+    public void attack(Connection connection, Unit unit, Direction direction) {
+        assert direction != null;
+        Element element = Message.createNewRootElement("attack");
+        element.setAttribute("unit", unit.getId());
+        element.setAttribute("direction", direction.toString());
+    
+        try {
+            connection.ask(element);
+        } catch (IOException e) {
+            logger.warning("Could not send message!");
+        }
+    }
 }

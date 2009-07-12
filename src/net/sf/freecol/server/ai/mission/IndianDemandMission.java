@@ -201,15 +201,7 @@ public class IndianDemandMission extends Mission {
                     unit.getOwner().modifyTension(enemy, tension);
                     if (unitTension >= Tension.Level.CONTENT.getLimit()) {
                         // if we didn't get what we wanted, attack
-                        Element element = Message.createNewRootElement("attack");
-                        element.setAttribute("unit", unit.getId());
-                        element.setAttribute("direction", r.toString());
-
-                        try {
-                            connection.ask(element);
-                        } catch (IOException e) {
-                            logger.warning("Could not send message!");
-                        }
+                        attack(connection, unit, r);
                     }
                 }
                 completed = true;
