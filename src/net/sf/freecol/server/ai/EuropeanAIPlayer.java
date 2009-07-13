@@ -747,6 +747,10 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
         Iterator<AIUnit> aui = getAIUnitIterator();
         while (aui.hasNext()) {
             AIUnit au = aui.next();
+            // naval units do not need transports
+            if(au.getUnit().isNaval()){
+                continue;
+            }
             if (au.getTransportDestination() != null && au.getTransport() == null) {
                 transportables.add(au);
             }
