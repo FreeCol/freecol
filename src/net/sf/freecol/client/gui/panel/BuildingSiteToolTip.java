@@ -84,8 +84,7 @@ public class BuildingSiteToolTip extends JToolTip {
             for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
                 int amountNeeded = requiredGoods.getAmount();
                 int amountAvailable = colony.getGoodsCount(requiredGoods.getType());
-                int amountProduced = colony.getBuildingForProducing(requiredGoods.getType())
-                    .getProductionNextTurn();
+                int amountProduced = colony.getProductionNetOf(requiredGoods.getType());
                 progressBars.add(new FreeColProgressBar(parent, requiredGoods.getType(), 0,
                                                         amountNeeded, amountAvailable, amountProduced));
             }
