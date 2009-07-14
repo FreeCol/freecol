@@ -850,12 +850,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     opponentMoveElement.setAttribute("direction", direction.toString());
                     opponentMoveElement.setAttribute("toTile", newTile.getId());
                     opponentMoveElement.appendChild(unit.toXMLElement(enemyPlayer, opponentMoveElement
-                            .getOwnerDocument()));
+                            .getOwnerDocument(), false, false));
                     if (unit.isOnCarrier() && !((Unit) unit.getLocation()).isVisibleTo(enemyPlayer)) {
                         Unit location = (Unit) unit.getLocation();
                         opponentMoveElement.setAttribute("inUnit", location.getId());
                         opponentMoveElement.appendChild(location.toXMLElement(enemyPlayer, opponentMoveElement
-                                .getOwnerDocument()));
+                                .getOwnerDocument(), false, false));
                     }
                     enemyPlayer.getConnection().sendAndWait(opponentMoveElement);
                 }
