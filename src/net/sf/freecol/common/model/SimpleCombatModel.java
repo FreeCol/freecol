@@ -1048,8 +1048,8 @@ public class SimpleCombatModel implements CombatModel {
         damagedShip.setHitpoints(1);
         damagedShip.disposeAllUnits();
         damagedShip.getGoodsContainer().removeAll();
+        damagedShip.setDestination(null);
         damagedShip.sendToRepairLocation(repairLocation);
-
     }
 
     /**

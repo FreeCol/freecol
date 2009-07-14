@@ -244,6 +244,9 @@ public class CombatTest extends FreeColTestCase {
         Tile tile2 = map.getTile(4, 8);
         tile2.setExploredBy(dutch, true);
         tile2.setExploredBy(french, true);
+        Tile tile3 = map.getTile(6, 8);
+        tile3.setExploredBy(dutch, true);
+        tile3.setExploredBy(french, true);
 
         Unit galleon = new Unit(game, tile1, dutch, galleonType, UnitState.ACTIVE);
         Unit privateer = new Unit(game, tile2, french, privateerType, UnitState.ACTIVE);
@@ -260,6 +263,10 @@ public class CombatTest extends FreeColTestCase {
         errMsg = "Galeon should not be repairing";
         assertFalse(errMsg,galleon.isUnderRepair());
         
+        galleon.setDestination(tile3);
+        errMsg = "Wrong destination for Galeon";
+        assertEquals(errMsg, tile3, galleon.getDestination());
+        
         int damage = galleon.getHitpoints() -1;
         CombatModel.CombatResultType combatResolution = CombatModel.CombatResultType.WIN;
         
@@ -272,6 +279,9 @@ public class CombatTest extends FreeColTestCase {
         
         errMsg = "Galleon should be empty";
         assertEquals(errMsg,galleon.getGoodsCount(),0);
+        
+        errMsg = "Galeon should no longer have a destination";
+        assertTrue(errMsg, galleon.getDestination() == null);
     }
 
     public void testUnarmedAttack() {
