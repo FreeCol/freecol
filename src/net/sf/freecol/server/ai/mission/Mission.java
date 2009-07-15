@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
@@ -489,6 +490,15 @@ public abstract class Mission extends AIObject {
             connection.ask(element);
         } catch (IOException e) {
             logger.warning("Could not send message!");
+        }
+    }
+    
+    
+    protected void unitLeavesShip(Connection connection, Unit u) {
+        try {
+            connection.sendAndWait(new DisembarkMessage(u).toXMLElement());
+        } catch (IOException e) {
+            logger.warning("Could not send \"disembark\"-message!");
         }
     }
 }

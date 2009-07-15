@@ -39,18 +39,17 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Locatable;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
-import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
@@ -928,11 +927,7 @@ public class TransportMission extends Mission {
                             && au.getTransportDestination().getTile() == carrier.getTile()
                             && carrier.getState() != UnitState.TO_EUROPE && carrier.getState() != UnitState.TO_AMERICA) {
                         if (carrier.getLocation() instanceof Europe || u.getColony() != null) {
-                            try {
-                                connection.sendAndWait(new DisembarkMessage(u).toXMLElement());
-                            } catch (IOException e) {
-                                logger.warning("Could not send \"disembark\"-message!");
-                            }
+                            unitLeavesShip(connection, u);
                         }
                         mission.doMission(connection);
                         if (u.getLocation() != getUnit()) {
