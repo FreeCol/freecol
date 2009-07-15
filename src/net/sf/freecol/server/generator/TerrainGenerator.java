@@ -417,8 +417,9 @@ public class TerrainGenerator {
         ServerRegion southAtlantic =
             new ServerRegion(game, "model.region.southAtlantic", RegionType.OCEAN, atlantic);
 
-        for (ServerRegion region : new ServerRegion[] { northPacific, southPacific,
-                                                        atlantic, northAtlantic, southAtlantic } ) {
+        for (ServerRegion region : new ServerRegion[] {
+                northPacific, southPacific,
+                atlantic, northAtlantic, southAtlantic }) {
             region.setPrediscovered(true);
             map.setRegion(region);
         }
@@ -427,24 +428,81 @@ public class TerrainGenerator {
         pacific.setDiscoverable(true);
         pacific.setScoreValue(PACIFIC_SCORE_VALUE);
 
-        for (int y = 0; y < map.getHeight(); y++) {
-            for (int x = 0; x < map.getWidth(); x++) {
-                if (map.isValid(x, y)) {
-                    Tile tile = map.getTile(x, y);
-                    if (!tile.isLand()) {
-                        if (isNorth(map.getHeight(),y)) {
-                            if (isWest(map.getWidth(),x)) {
-                                northPacific.addTile(tile);
-                            } else {
-                                northAtlantic.addTile(tile);
-                            }
-                        } else {
-                            if (isWest(map.getWidth(),x)) {
-                                southPacific.addTile(tile);
-                            } else {
-                                southAtlantic.addTile(tile);
-                            }
-                        }
+        // Fill the ocean regions by first filling the quadrants individually,
+        // then allow the quadrants to overflow into their horizontally
+        // opposite quadrant, then finally into the whole map.
+        // This correctly handles cases like:
+        //
+        //   NP NP NP NA NA NA      NP NP NP NA NA NA
+        //   NP L  L  L  L  NA      NP L  L  NA L  NA
+        //   NP L  NA NA NA NA  or  NP L  NA NA L  NA
+        //   SP L  SA SA SA SA      SP L  NA L  L  SA
+        //   SP L  L  L  L  SA      SP L  L  L  L  SA
+        //   SP SP SP SA SA SA      SP SP SP SA SA SA
+        //
+        // or multiple such incursions across the nominal quadrant divisions.
+        //
+        int maxx = map.getWidth();
+        int midx = maxx / 2;
+        int maxy = map.getHeight();
+        int midy = maxy / 2;
+        Position pNP = new Position(0,      midy-1);
+        Position pSP = new Position(0,      midy+1);
+        Position pNA = new Position(maxx-1, midy-1);
+        Position pSA = new Position(maxx-1, midy+1);
+
+        Rectangle rNP = new Rectangle(0,0,       midx,midy);
+        Rectangle rSP = new Rectangle(0,midy,    midx,maxy);
+        Rectangle rNA = new Rectangle(midx,0,    maxx,midy);
+        Rectangle rSA = new Rectangle(midx,midy, maxx,maxy);
+        fillOcean(map, pNP, northPacific,  rNP);
+        fillOcean(map, pSP, southPacific,  rSP);
+        fillOcean(map, pNA, northAtlantic, rNA);
+        fillOcean(map, pSA, southAtlantic, rSA);
+
+        Rectangle rN = new Rectangle(0,0,    maxx,midy);
+        Rectangle rS = new Rectangle(0,midy, maxx,maxy);
+        fillOcean(map, pNP, northPacific,  rN);
+        fillOcean(map, pSP, southPacific,  rS);
+        fillOcean(map, pNA, northAtlantic, rN);
+        fillOcean(map, pSA, southAtlantic, rS);
+
+        Rectangle rAll = new Rectangle(0,0, maxx,maxy);
+        fillOcean(map, pNP, northPacific,  rAll);
+        fillOcean(map, pSP, southPacific,  rAll);
+        fillOcean(map, pNA, northAtlantic, rAll);
+        fillOcean(map, pSA, southAtlantic, rAll);
+    }
+
+    /**
+     * Flood fill ocean regions.
+     *
+     * @param map The <code>Map</code> to fill in.
+     * @param pos A valid starting <code>Position</code>.
+     * @param region A <code>Region<code> to fill with.
+     * @param bounds A <code>Rectangle</code> that bounds the filling.
+     */
+    private void fillOcean(Map map, Position p, Region region,
+                           Rectangle bounds) {
+        Queue<Position> q = new LinkedList<Position>();
+        boolean[][] visited = new boolean[map.getWidth()][map.getHeight()];
+        visited[p.getX()][p.getY()] = true;
+        q.add(p);
+
+        while ((p = q.poll()) != null) {
+            Tile tile = map.getTile(p);
+            tile.setRegion(region);
+
+            for (Direction direction : Direction.values()) {
+                Position n = Map.getAdjacent(p, direction);
+                if (map.isValid(n)
+                    && !visited[n.getX()][n.getY()]
+                    && bounds.contains(n.getX(), n.getY())) {
+                    visited[n.getX()][n.getY()] = true;
+                    Tile next = map.getTile(n);
+                    if ((next.getRegion() == null || next.getRegion() == region)
+                        && !next.isLand()) {
+                        q.add(n);
                     }
                 }
             }
