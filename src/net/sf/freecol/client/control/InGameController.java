@@ -3702,7 +3702,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (colony.getPriceForBuilding() > freeColClient.getMyPlayer().getGold()) {
+        if (!colony.canPayToFinishBuilding()) {
             freeColClient.getCanvas().errorMessage("notEnoughGold");
             return;
         }

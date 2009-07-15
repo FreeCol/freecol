@@ -71,6 +71,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
     private JList buildQueueList;
     private JList unitList;
     private JList buildingList;
+    private JButton buyBuilding;
     private Colony colony; 
 
     public BuildQueuePanel(Colony colony, Canvas parent) {
@@ -119,9 +120,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         JLabel headLine = new JLabel(Messages.message("colonyPanel.buildQueue"));
         headLine.setFont(bigHeaderFont);
 
-        JButton buyBuilding = new JButton(Messages.message("colonyPanel.buyBuilding"));
+        buyBuilding = new JButton(Messages.message("colonyPanel.buyBuilding"));
         buyBuilding.setActionCommand(BUY);
         buyBuilding.addActionListener(this);
+        updateBuyBuildingButton();
 
         add(headLine, "span 3, align center, wrap 40");
         add(new JLabel(Messages.message("menuBar.colopedia.unit")), "align center");
@@ -134,6 +136,15 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         add(okButton, "tag ok");
     }
 
+    private void updateBuyBuildingButton(){
+        boolean canBuy = true;
+        if(!colony.canPayToFinishBuilding() 
+                || colony.getPriceForBuilding() == 0){
+            canBuy = false;
+        }
+        buyBuilding.setEnabled(canBuy);
+        buyBuilding.repaint();
+    }
 
     private boolean hasBuildingType(Colony colony, BuildingType buildingType) {
         if (colony.getBuilding(buildingType) == null) {
@@ -219,6 +230,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
             getController().setBuildQueue(colony, getBuildableTypes(buildQueueList));
             getController().payForBuilding(colony);
             getCanvas().updateGoldLabel();
+            updateBuyBuildingButton();
         } else {
             logger.warning("Invalid ActionCommand: " + command);
         }

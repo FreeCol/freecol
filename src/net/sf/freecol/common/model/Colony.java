@@ -1405,7 +1405,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public void payForBuilding() {
         // Any changes in this method should also be reflected in
         // "getPriceForBuilding()"
-        if (getPriceForBuilding() > getOwner().getGold()) {
+        if (!canPayToFinishBuilding()) {
             throw new IllegalStateException("Not enough gold.");
         }
         for (AbstractGoods goodsRequired : getCurrentlyBuilding().getGoodsRequired()) {
@@ -1420,6 +1420,25 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 addGoods(requiredGoodsType, remaining);
             }
         }
+    }
+    
+    /**
+     * Check if the owner can buy the remaining hammers and tools for 
+     * the {@link Building} that is currently being built.
+     * 
+     * @exception IllegalStateException If the owner of this <code>Colony</code>
+     *                has an insufficient amount of gold.
+     * @see #getPriceForBuilding
+     */
+    public boolean canPayToFinishBuilding() {
+        if(getCurrentlyBuilding() == null){
+            return false;
+        }
+        
+        if (getPriceForBuilding() > getOwner().getGold()) {
+            return false;
+        }
+        return true;
     }
 
     /**
