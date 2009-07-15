@@ -32,12 +32,12 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.GoalDecider;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -56,7 +56,7 @@ import org.w3c.dom.Element;
 /**
  * Mission for controlling a pioneer.
  * 
- * @see Unit#Role#PIONNER
+ * @see net.sf.freecol.common.model.Unit.Role#PIONEER
  */
 public class PioneeringMission extends Mission {
     /* 

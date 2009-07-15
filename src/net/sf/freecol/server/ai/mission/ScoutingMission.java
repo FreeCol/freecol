@@ -51,7 +51,7 @@ import org.w3c.dom.Element;
 /**
  * Mission for controlling a scout.
  * 
- * @see Unit#Role#SCOUT
+ * @see net.sf.freecol.common.model.Unit.Role#SCOUT
  */
 public class ScoutingMission extends Mission {
 

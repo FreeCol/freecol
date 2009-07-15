@@ -97,7 +97,7 @@ public abstract class Mission extends AIObject {
     *         {@link #NO_PATH_TO_TARGET} if there is no path to follow.
     *         If a direction is returned, it is guaranteed that moving in that direction
     *         is not an illegal move, but a direction also gets returned
-    *         if the resulting move would be an {@link Unit#ATTACK} etc. A direction
+    *         if the resulting move would be an {@link MoveType#ATTACK} etc. A direction
     *         can also be returned during the path, if the path has been blocked.
     */
     protected Direction moveTowards(Connection connection, Tile tile) {
@@ -123,8 +123,8 @@ public abstract class Mission extends AIObject {
     *         or {@link #NO_MORE_MOVES_LEFT} if there are no more moves left.
     *         If a direction is returned, it is guaranteed that moving in that direction
     *         is not an illegal move. A directions gets returned when
-    *         moving in the given direction would not be a {@link Unit#MOVE} or
-    *         {@link Unit#MOVE_HIGH_SEAS}.
+    *         moving in the given direction would not be a {@link MoveType#MOVE} or
+    *         {@link MoveType#MOVE_HIGH_SEAS}.
     */
     protected Direction moveTowards(Connection connection, PathNode pathNode) {
         if (getUnit().getMovesLeft() <= 0) {            

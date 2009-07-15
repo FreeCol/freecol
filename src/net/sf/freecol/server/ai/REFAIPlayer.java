@@ -54,8 +54,8 @@ import org.w3c.dom.Element;
  * Objects of this class contains AI-information for a single {@link Player} and
  * is used for controlling this getPlayer().
  *
- * <br />
- * <br />
+ * @deprecated Currently unused, outdated copy of {@link AIPlayer}. Eventual
+ * specialization of AI should extend AIPlayer, see {@link ColonialAIPlayer}.
  *
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.
@@ -298,8 +298,7 @@ public class REFAIPlayer extends EuropeanAIPlayer {
 
     /**
      * Gets the number of King's units.
-     * @return The number of units of type
-     *      {@link Unit#KINGS_REGULAR} this player owns.
+     * @return The number of units with ability "model.ability.refUnit" this player owns.
      */
     private int getNumberOfKingUnits() {
         int n = 0;

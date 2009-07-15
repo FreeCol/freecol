@@ -50,8 +50,8 @@ import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
  * Objects of this class contains AI-information for a single {@link Player} and
  * is used for controlling this getPlayer().
  *
- * <br />
- * <br />
+ * @deprecated Currently unused, outdated copy of {@link AIPlayer}. Eventual
+ * specialization of AI should extend AIPlayer, see {@link ColonialAIPlayer}.
  *
  * The method {@link #startWorking} gets called by the
  * {@link AIInGameInputHandler} when it is this player's turn.

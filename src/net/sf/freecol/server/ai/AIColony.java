@@ -575,8 +575,8 @@ public class AIColony extends AIObject {
      * Returns an unequipped pioneer that is either inside this colony or
      * standing on the same <code>Tile</code>.
      * 
-     * @return A unit with a {@link PioneeringMission} or a unit being a
-     *         {@link Unit#HARDY_PIONEER hardy pioneer} - and with no tools.
+     * @return A unit with a {@link PioneeringMission} or a unit with ability
+     *         "model.ability.expertPioneer" - and with no tools.
      *         Returns <code>null</code> if no such unit was found.
      */
     private AIUnit getUnequippedHardyPioneer() {

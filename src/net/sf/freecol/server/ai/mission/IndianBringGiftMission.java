@@ -192,8 +192,8 @@ public class IndianBringGiftMission extends Mission {
      * <BR>
      * 
      * This mission will be invalidated when the gift has been delivered. In
-     * case of the stances {@link Player#Stance#WAR WAR} or
-     * {@link Player#Stance#CEASE_FIRE CEASE_FIRE} towards the target player, the
+     * case of the stances {@link Stance#WAR WAR} or
+     * {@link Stance#CEASE_FIRE CEASE_FIRE} towards the target player, the
      * mission would be invalidated as well.
      * 
      * @return <code>true</code> if this mission is still valid.

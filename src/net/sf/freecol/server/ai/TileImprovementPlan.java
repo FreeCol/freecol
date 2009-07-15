@@ -183,8 +183,7 @@ public class TileImprovementPlan extends AIObject {
     /**
      * Returns the <code>TileImprovementType</code> of this plan.
      * 
-     * @return The type of the improvement, either 
-     *      {@link #PLOW} or {@link #BUILD_ROAD}.
+     * @return The type of the improvement.
      */
     public TileImprovementType getType() {
         return type;
