@@ -1193,7 +1193,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 move = MoveType.MOVE_NO_MOVES;
             }
         } else {
-            logger.warning(move.whyIllegal());
+            //getMoveType is used in checking for legal moves in the first place,
+            //so this shouldn't be a warning message
+            logger.finest(move.whyIllegal());
         }
         return move;
     }
