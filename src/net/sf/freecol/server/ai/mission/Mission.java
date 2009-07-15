@@ -247,6 +247,7 @@ public abstract class Mission extends AIObject {
         
         GoalDecider gd = new GoalDecider() {
             private PathNode bestTarget = null;
+            private int higherTension = 0;
             
             public PathNode getGoal() {
                 return bestTarget;              
@@ -303,10 +304,14 @@ public abstract class Mission extends AIObject {
                 if (tension > Tension.Level.CONTENT.getLimit()) {
                     if (bestTarget == null) {
                         bestTarget = pathNode;
-                    } else if (bestTarget.getTurns() == pathNode.getTurns()) {
-                        // TODO: Check if the new target is better than the previous:
+                        higherTension = tension;
+                        return true;
+                    } else if (bestTarget.getTurns() == pathNode.getTurns()
+                            && tension > higherTension) {
+                        bestTarget = pathNode;
+                        higherTension = tension;
+                        return true;
                     }
-                    return true;
                 }
                 return false;
             }
