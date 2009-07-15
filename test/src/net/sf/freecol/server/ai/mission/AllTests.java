@@ -30,6 +30,7 @@ public class AllTests {
         TestSuite suite = new TestSuite("Test for net.sf.freecol.server.ai.mission");
         //$JUnit-BEGIN$
         suite.addTestSuite(PioneeringMissionTest.class);
+        suite.addTestSuite(PrivateerMissionTest.class);
         suite.addTestSuite(ScoutingMissionTest.class);
         suite.addTestSuite(TransportMissionTest.class);
         suite.addTestSuite(UnitSeekAndDestroyMissionTest.class);

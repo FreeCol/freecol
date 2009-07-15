@@ -158,8 +158,10 @@ public abstract class Mission extends AIObject {
                     break;
                 }
             }
-            if (j == randomDirections.length)
+            if (j == randomDirections.length){
+                unit.setMovesLeft(0);
                 break;
+            }
             thisTile = unit.getGame().getMap().getNeighbourOrNull(direction, thisTile);
 
             move(connection, direction);
@@ -294,6 +296,9 @@ public abstract class Mission extends AIObject {
                 if (defender.hasAbility("model.ability.expertSoldier") &&
                         !defender.isArmed()) {
                     tension += 50 - combatModel.getDefencePower(unit, defender) * 2;
+                }
+                if (unit.hasAbility("model.ability.piracy")){
+                    tension += PrivateerMission.getModifierValueForTarget(combatModel, unit, defender);
                 }
                 // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:
                 if (unit.getOwner().isIndian() 

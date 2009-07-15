@@ -29,6 +29,7 @@ import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockPseudoRandom;
@@ -223,6 +224,8 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(spec().CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
+        // Verify that the move is correctly interpreted
+        assertEquals("Wrong move type",MoveType.ATTACK, privateer.getMoveType(tile1));
     }
 
     public void testAtackedNavalUnitIsDamaged(){

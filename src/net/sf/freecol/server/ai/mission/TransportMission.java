@@ -1086,16 +1086,59 @@ public class TransportMission extends Mission {
     }
 
     /**
+     * Checks if this mission is valid for the given unit.
+     *
+     * @param aiUnit The unit.
+     * @return <code>true</code> if this mission is valid to perform
+     *         and <code>false</code> otherwise.
+     */    
+    public static boolean isValid(AIUnit aiUnit) {
+        Unit unit = aiUnit.getUnit();
+        
+        if(!unit.isNaval()){
+        	return true;
+        }
+        
+        if(unit.isUnderRepair()){
+        	return false;
+        }
+
+        boolean hasCargo = unit.getGoodsCount() > 0 || unit.getUnitCount() > 0;
+        if(hasCargo){
+        	return true;
+        }
+    
+        // Verify if empty unit is a privateer and able to be assigned a PrivateerMisison 
+        if(unit.hasAbility("model.ability.piracy")){
+            AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(unit.getOwner().getId());
+        	// Do not consider this unit mission
+        	int transportMissions = getPlayerNavalTransportMissionCount(aiPlayer,unit);
+        	if(transportMissions > 0){
+        		// there are other naval units doing Transport missions
+        		// this one can do some pirating
+        		logger.finest("Privateer (" + unit.getId() + ") at " + unit.getTile() + " does no longer have TransportMission");
+        		return false;
+        	}
+        }
+        
+        return true;
+    }
+    
+    /**
      * Checks if this mission is still valid to perform.
      * 
      * @return <code>true</code>
      */
     public boolean isValid() {
-        Unit unit = this.getAIUnit().getUnit();
-        if (unit.isNaval() && unit.isUnderRepair())
+        if(!super.isValid()){
             return false;
-        else
-            return true;
+        }
+        
+        AIUnit aiUnit = getAIUnit(); 
+        if(!isValid(aiUnit)){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -1142,6 +1185,28 @@ public class TransportMission extends Mission {
      */
     protected PathNode findPathToEurope(Tile start) {
         return getGame().getMap().findPathToEurope(getUnit(), start);
+    }
+    
+    /**
+     * Gives the number of naval units assigned with a Transport Mission
+     */
+    public static int getPlayerNavalTransportMissionCount(AIPlayer aiPlayer, Unit unitExcluded){
+        Player player = aiPlayer.getPlayer();
+        int units = 0;
+        
+        for(Unit unit : player.getUnits()){
+        	if(unit == unitExcluded){
+        		continue;
+        	}
+            if(!unit.isNaval()){
+                continue;
+            }
+            AIUnit aiUnit = (AIUnit) aiPlayer.getAIMain().getAIObject(unit);
+            if(aiUnit.getMission() instanceof TransportMission){
+                units++;
+            }
+        }
+        return units;
     }
 
     /**

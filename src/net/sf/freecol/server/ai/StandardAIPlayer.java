@@ -88,6 +88,7 @@ import net.sf.freecol.server.ai.mission.IndianBringGiftMission;
 import net.sf.freecol.server.ai.mission.IndianDemandMission;
 import net.sf.freecol.server.ai.mission.Mission;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
+import net.sf.freecol.server.ai.mission.PrivateerMission;
 import net.sf.freecol.server.ai.mission.ScoutingMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
@@ -878,8 +879,15 @@ public class StandardAIPlayer extends AIPlayer {
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
-            if (aiUnit.getUnit().isNaval() && !aiUnit.hasMission()) {
-                // TODO: privateers should have military naval mission?
+            Unit unit = aiUnit.getUnit();
+            if (aiUnit.hasMission() || !unit.isNaval()){
+                continue;
+            }
+
+            if (PrivateerMission.isValid(aiUnit)) {
+                aiUnit.setMission(new PrivateerMission(getAIMain(), aiUnit));
+            }
+            else{
                 aiUnit.setMission(new TransportMission(getAIMain(), aiUnit));
             }
         }
