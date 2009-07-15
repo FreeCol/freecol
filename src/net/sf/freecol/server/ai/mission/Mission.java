@@ -260,46 +260,55 @@ public abstract class Mission extends AIObject {
                 CombatModel combatModel = getGame().getCombatModel();
                 Tile newTile = pathNode.getTile();
                 Unit defender = newTile.getDefendingUnit(unit);
-                if ((newTile.isLand() && !unit.isNaval() || !newTile.isLand() && unit.isNaval()) &&
-                        defender != null && defender.getOwner() != unit.getOwner()) {
-
-                    int tension = 0;
-                    Tension alarm = unit.getOwner().getTension(defender.getOwner());
-                    if (alarm != null) {
-                        tension = alarm.getValue();
-                    }
-                    if (unit.getIndianSettlement() != null &&
-                        unit.getIndianSettlement().getAlarm(defender.getOwner()) != null) {
-                        tension += unit.getIndianSettlement().getAlarm(defender.getOwner()).getValue();
-                    }
-                    if (defender.canCarryTreasure()) {
-                        tension += Math.min(defender.getTreasureAmount() / 10, 600);
-                    }
-                    if (defender.getType().getDefence() > 0 &&
-                        newTile.getSettlement() == null) {
-                        tension += 100 - combatModel.getDefencePower(unit, defender) * 2;
-                    }
-                    if (defender.hasAbility("model.ability.expertSoldier") &&
-                        !defender.isArmed()) {
-                        tension += 50 - combatModel.getDefencePower(unit, defender) * 2;
-                    }
-                    // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:
-                    if (unit.getOwner().isIndian() 
-                            && defender.getOwner().isAI()) {
-                        tension -= 200;
-                    }
-                    // END: TODO-AI-CHEATING
-                    if (tension > Tension.Level.CONTENT.getLimit()) {
-                        if (bestTarget == null) {
-                            bestTarget = pathNode;                           
-                        } else if (bestTarget.getTurns() == pathNode.getTurns()) {
-                            // TODO: Check if the new target is better than the previous:
-                        }
-                    }
-                    return true;
-                } else {
+                
+                if( defender == null){
                     return false;
                 }
+
+                if( defender.getOwner() == unit.getOwner()){
+                    return false;
+                }
+
+                if (newTile.isLand() && unit.isNaval() || !newTile.isLand() && !unit.isNaval()) {
+                    return false;
+                }
+
+                int tension = 0;
+                Tension alarm = unit.getOwner().getTension(defender.getOwner());
+                if (alarm != null) {
+                    tension = alarm.getValue();
+                }
+
+                if (unit.getIndianSettlement() != null &&
+                        unit.getIndianSettlement().getAlarm(defender.getOwner()) != null) {
+                    tension += unit.getIndianSettlement().getAlarm(defender.getOwner()).getValue();
+                }
+                if (defender.canCarryTreasure()) {
+                    tension += Math.min(defender.getTreasureAmount() / 10, 600);
+                }
+                if (defender.getType().getDefence() > 0 &&
+                        newTile.getSettlement() == null) {
+                    tension += 100 - combatModel.getDefencePower(unit, defender) * 2;
+                }
+                if (defender.hasAbility("model.ability.expertSoldier") &&
+                        !defender.isArmed()) {
+                    tension += 50 - combatModel.getDefencePower(unit, defender) * 2;
+                }
+                // TODO-AI-CHEATING: REMOVE WHEN THE AI KNOWNS HOW TO HANDLE PEACE WITH THE INDIANS:
+                if (unit.getOwner().isIndian() 
+                        && defender.getOwner().isAI()) {
+                    tension -= 200;
+                }
+                // END: TODO-AI-CHEATING
+                if (tension > Tension.Level.CONTENT.getLimit()) {
+                    if (bestTarget == null) {
+                        bestTarget = pathNode;
+                    } else if (bestTarget.getTurns() == pathNode.getTurns()) {
+                        // TODO: Check if the new target is better than the previous:
+                    }
+                    return true;
+                }
+                return false;
             }
         };
         return getGame().getMap().search(getUnit(), gd, maxTurns);
