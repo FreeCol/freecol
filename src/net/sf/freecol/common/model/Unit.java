@@ -1199,9 +1199,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 move = MoveType.MOVE_NO_MOVES;
             }
         } else {
-            //getMoveType is used in checking for legal moves in the first place,
-            //so this shouldn't be a warning message
-            logger.finest(move.whyIllegal());
+            logger.warning(move.whyIllegal());
         }
         return move;
     }
@@ -1220,6 +1218,36 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return (isNaval())
             ? getNavalMoveType(from, target)
             : getLandMoveType(from, target);
+    }
+
+    /**
+     * Gets the type of a move that is made when moving from one tile
+     * to another, without checking if the unit has moves left or
+     * logging errors.
+     * 
+     * @param target The target <code>Tile</code> of the move.
+     * @return The move type, which will be one of the extended illegal move
+     *         types on failure.
+     */
+    public MoveType getSimpleMoveType(Tile target) {
+        return getSimpleMoveType(getTile(), target);
+    }
+
+    /**
+     * Gets the type of a move made in a specified direction,
+     * without checking if the unit has moves left or logging errors.
+     * 
+     * @param direction The direction of the move.
+     * @return The move type.
+     */
+    public MoveType getSimpleMoveType(Direction direction) {
+        if (getTile() == null) {
+            throw new IllegalStateException("getTile() == null");
+        }
+
+        Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
+
+        return getSimpleMoveType(target);
     }
 
     /**
