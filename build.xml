@@ -689,6 +689,21 @@
         </java>
     </target>
 
+    <!-- Merges new translations from trunk. You can specify a
+        particular language by setting the localeKey property
+        ("-DlocaleKey=fi", for example), or all translations. -->
+    <target name="merge-translations" depends="build"
+            description="Merges translations from trunk.">
+        <condition property="localeKey" else="">
+            <isset property="localeKey" />
+        </condition>
+        <java classname="net.sf.freecol.tools.MergeTranslations" classpath="build/" >
+            <arg value="../../trunk/src/net/sf/freecol/client/gui/i18n/" />
+            <arg value="src/net/sf/freecol/client/gui/i18n/" />
+            <arg value="${localeKey}" />
+        </java>
+    </target>
+
     <target name="pmd">
       <taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask"
                classpath="./pmd-4.1/lib/pmd-4.1.jar"/>
