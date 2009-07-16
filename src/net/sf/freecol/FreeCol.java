@@ -803,7 +803,22 @@ public final class FreeCol {
                 tc = line.getOptionValue("tc");
             }
             if (line.hasOption("home-directory")) {
-                mainUserDirectory = (File) line.getOptionObject("home-directory");
+                String arg = line.getOptionValue("home-directory");
+                mainUserDirectory = new File(arg);
+                String errMsg = null;
+                if(!mainUserDirectory.exists()){
+                    errMsg = Messages.message("cli.error.home.notExists", "%string%", arg);
+                }
+                if(!mainUserDirectory.canRead()){
+                    errMsg = Messages.message("cli.error.home.noRead", "%string%", arg);
+                }
+                if(!mainUserDirectory.canWrite()){
+                    errMsg = Messages.message("cli.error.home.noWrite", "%string%", arg);
+                }
+                if(errMsg != null){
+                    System.out.println(errMsg);
+                    System.exit(1);
+                }
             }
             if (line.hasOption("log-console")) {
                 consoleLogging = true;
