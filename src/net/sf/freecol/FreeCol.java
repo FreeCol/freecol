@@ -893,6 +893,9 @@ public final class FreeCol {
             if (line.hasOption("server-name")) {
                 serverName = line.getOptionValue("server-name");
             }
+            if (line.hasOption("experimentalAI")) {
+                usesExperimentalAI = true;
+            }
         } catch(ParseException e) {
             System.out.println("\n" + e.getMessage() + "\n");
             printUsage();
