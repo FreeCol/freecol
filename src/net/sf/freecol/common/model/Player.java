@@ -2176,8 +2176,11 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public Location getRepairLocation(Unit unit) {
         if (!unit.isNaval()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Repair for non-naval unit!?!");
+        } else if (unit.getTile() == null) {
+            throw new IllegalArgumentException("Repair for unit not on the map!?!");
         }
+
         Location closestLocation = null;
         int shortestDistance = Integer.MAX_VALUE;
         for (Colony colony : getColonies()) {
@@ -2201,7 +2204,9 @@ public class Player extends FreeColGameObject implements Nameable {
         if (closestLocation != null) {
             return closestLocation;
         }
-        return getEurope();
+        Tile tile = unit.getTile();
+        return ((tile.getColony() != null && tile.getColony().isConnected())
+                || tile.isConnected()) ? getEurope() : null;
     }
 
     public void incrementLiberty(int amount) {
