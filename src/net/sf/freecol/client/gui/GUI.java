@@ -64,6 +64,7 @@ import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
@@ -2223,7 +2224,7 @@ public final class GUI {
      */
     private void displayFogOfWar(Graphics2D g, Map map, Tile tile, int x, int y) {  
         if (tile.isExplored()) {
-            final boolean displayFogOfWar = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR);
+            final boolean displayFogOfWar = freeColClient.getGame().getGameOptions().getBoolean(GameOptions.FOG_OF_WAR);
             if (displayFogOfWar
                     && freeColClient.getMyPlayer() != null
                     && !freeColClient.getMyPlayer().canSee(tile)) {
