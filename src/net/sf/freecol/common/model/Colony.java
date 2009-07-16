@@ -43,6 +43,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PlayerExploredTile;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 
 import org.w3c.dom.Element;
@@ -308,13 +309,31 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Returns whether this colony is landlocked, or has access to the ocean.
+     * Returns whether this colony is landlocked, or has access to water.
      * 
      * @return <code>true</code> if there are no adjacent tiles to this
-     *         <code>Colony</code>'s tile being ocean tiles.
+     *         <code>Colony</code>'s tile being water tiles.
      */
     public boolean isLandLocked() {
         return landLocked;
+    }
+
+    /**
+     * Returns whether this colony is connected by water to Europe.
+     *
+     * @return <code>true</code> if this <code>Colony</code> is connected
+     *         to Europe.
+     */
+    public boolean isConnected() {
+        Map map = getGame().getMap();
+        Tile tile = getTile();
+        for (Direction direction : Direction.values()) {
+            Tile t = map.getNeighbourOrNull(direction, tile);
+            if (t != null && t.getType().isWater() && t.isConnected()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

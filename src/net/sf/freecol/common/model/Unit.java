@@ -562,12 +562,18 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (!canCarryTreasure()) {
             throw new IllegalStateException("Can't carry treasure");
         }
-        if (getOwner().getEurope() != null) {
-            return (loc.getColony() != null && !loc.getColony().isLandLocked()) || loc instanceof Europe
-                || (loc instanceof Unit && ((Unit) loc).getLocation() instanceof Europe);
-        } else {
+        if (getOwner().getEurope() == null) {
+            // Any colony will do once independent, as the treasure stays
+            // in the New World.
             return loc.getColony() != null;
         }
+        if (loc.getColony() != null) {
+            // Cash in if at a colony which has connectivity to Europe
+            return loc.getColony().isConnected();
+        }
+        // Otherwise, cash in if in Europe.
+        return loc instanceof Europe
+            || (loc instanceof Unit && ((Unit) loc).getLocation() instanceof Europe);
     }
 
     /**

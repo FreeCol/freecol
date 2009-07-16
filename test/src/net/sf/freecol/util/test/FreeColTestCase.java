@@ -181,6 +181,10 @@ public class FreeColTestCase extends TestCase {
         return builder.build();
     }
     
+    public static Map getCoastTestMap(TileType landTileType) {
+        return getCoastTestMap(landTileType, false);
+    }
+
     /**
      * Creates a standardized map, half land (left), half sea (right)
      * 
@@ -196,13 +200,16 @@ public class FreeColTestCase extends TestCase {
      * 
      * @return The map created as described above.
      */
-    public static Map getCoastTestMap(TileType landTileType) {        
+    public static Map getCoastTestMap(TileType landTileType, boolean explored) {
         int totalWidth = 20;
         int totalHeight = 15;
         TileType oceanType = spec().getTileType("model.tile.ocean");
         
         MapBuilder builder = new MapBuilder(getGame());
         builder.setDimensions(totalWidth, totalHeight).setBaseTileType(oceanType);
+        if (explored) {
+            builder.setExploredByAll(true);
+        }
 
         // Fill half with land, the builder will fill the rest with ocean
         int landWidth = (int) Math.floor(totalWidth/2);

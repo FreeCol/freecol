@@ -21,6 +21,7 @@ package net.sf.freecol.server.model;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
@@ -52,7 +53,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 		}
 		super.tearDown();
 	}
-	
+
 	/*
 	 * Tests worker allocation regarding building tasks
 	 */
@@ -60,7 +61,7 @@ public class ServerPlayerTest extends FreeColTestCase {
 		// start a server
         server = ServerTestHelper.startServer(false, true);
         
-        Map map = getTestMap(plains, true);
+        Map map = getCoastTestMap(plains, true);
         server.setMapGenerator(new MockMapGenerator(map));
         
         Controller c = server.getController();
@@ -96,7 +97,29 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertEquals(0, fee);
         dutch.cashInTreasureTrain(treasure);
         assertEquals(100, dutch.getGold());
-	}
+
+        // Succeed from a port with a connection to Europe
+        Colony port = getStandardColony(1, 9, 4);
+        assertFalse(port.isLandLocked());
+        assertTrue(port.isConnected());
+        treasure.setLocation(port);
+        assertTrue(treasure.canCashInTreasureTrain());
+
+        // Fail from a landlocked colony
+        Colony inland = getStandardColony(1, 7, 7);
+        assertTrue(inland.isLandLocked());
+        assertFalse(inland.isConnected());
+        treasure.setLocation(inland);
+        assertFalse(treasure.canCashInTreasureTrain());
+
+        // Fail from a colony with a port but no connection to Europe
+        map.getTile(5, 5).setType(FreeCol.getSpecification().getTileType("model.tile.lake"));
+        Colony lake = getStandardColony(1, 4, 5);
+        assertFalse(lake.isLandLocked());
+        assertFalse(lake.isConnected());
+        treasure.setLocation(lake);
+        assertFalse(treasure.canCashInTreasureTrain());
+    }
 	
 	    public void testHasExploredTile() {
 		// start a server
