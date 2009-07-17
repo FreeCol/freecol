@@ -422,6 +422,7 @@ public class StandardAIPlayer extends AIPlayer {
     }
 
     public boolean acceptDiplomaticTrade(DiplomaticTrade agreement) {
+        boolean validOffer = true;
         Stance stance = null;
         int value = 0;
         Iterator<TradeItem> itemIterator = agreement.iterator();
@@ -437,10 +438,31 @@ public class StandardAIPlayer extends AIPlayer {
             } else if (item instanceof StanceTradeItem) {
                 // TODO: evaluate whether we want this stance change
                 stance = ((StanceTradeItem) item).getStance();
+                switch (stance) {
+                    case UNCONTACTED:
+                        validOffer = false; //never accept invalid stance change
+                        break;
+                    case WAR: // always accept war without cost
+                        break;
+                    case CEASE_FIRE:
+                        value -= 500;
+                        break;
+                    case PEACE:
+                        if (!agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace")) {
+                            // TODO: introduce some kind of counter in order to avoid
+                            // Benjamin Franklin exploit
+                            value -= 1000;
+                            break;
+                        }
+                    case ALLIANCE:
+                        value -= 2000;
+                        break;
+                    }
+                
             } else if (item instanceof ColonyTradeItem) {
                 // TODO: evaluate whether we might wish to give up a colony
                 if (item.getSource() == getPlayer()) {
-                    value = Integer.MIN_VALUE;
+                    validOffer = false;
                     break;
                 } else {
                     value += 1000;
@@ -448,7 +470,7 @@ public class StandardAIPlayer extends AIPlayer {
             } else if (item instanceof UnitTradeItem) {
                 // TODO: evaluate whether we might wish to give up a unit
                 if (item.getSource() == getPlayer()) {
-                    value = Integer.MIN_VALUE;
+                    validOffer = false;
                     break;
                 } else {
                     value += 100;
@@ -462,35 +484,12 @@ public class StandardAIPlayer extends AIPlayer {
                 }
             }
         }
-
-        boolean accept = false;
-        switch (stance) {
-        case UNCONTACTED:
-            accept = false;
-            break;
-        case WAR: // always accept war without cost
-            accept = value >= 0;
-            break;
-        case CEASE_FIRE:
-            accept = value >= 500;
-            break;
-        case PEACE:
-            if (agreement.getSender().hasAbility("model.ability.alwaysOfferedPeace")
-                && value >= 0) {
-                // TODO: introduce some kind of counter in order to avoid
-                // Benjamin Franklin exploit
-                accept = true;
-            } else if (value >= 1000) {
-                accept = true;
-            }
-            break;
-        case ALLIANCE:
-            accept = value >= 2000;
-            break;
+        if (validOffer) {
+            logger.info("Trade value is " + value + ", accept if >=0");
+        } else {
+            logger.info("Trade offer is considered invalid!");
         }
-
-        logger.info("Trade value is " + value + ", accept is " + accept);
-        return accept;
+        return (value>=0)&&validOffer;
     }
 
     
