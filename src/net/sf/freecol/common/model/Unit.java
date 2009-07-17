@@ -1367,7 +1367,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 }
                 return (isOffensiveUnit()) ? MoveType.ATTACK
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
-            } else if (target.hasLostCityRumour()) {
+            } else if (target.hasLostCityRumour() && getOwner().isEuropean()) {
+                //natives do not explore rumours, see:
+                //  server/control/InGameInputHandler.java:move()
                 return MoveType.EXPLORE_LOST_CITY_RUMOUR;
             } else {
                 return MoveType.MOVE;
