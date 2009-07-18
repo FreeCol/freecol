@@ -25,18 +25,25 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
+import javax.swing.border.Border;
 import javax.swing.DefaultListModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JLabel;
@@ -57,6 +64,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -64,7 +72,7 @@ import net.sf.freecol.common.resources.ResourceManager;
 import net.miginfocom.swing.MigLayout;
 
 
-public class BuildQueuePanel extends FreeColPanel implements ActionListener {
+public class BuildQueuePanel extends FreeColPanel implements ActionListener, ItemListener {
 
     private static Logger logger = Logger.getLogger(BuildQueuePanel.class.getName());
 
@@ -72,10 +80,12 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
 
     private final BuildQueueTransferHandler buildQueueHandler = new BuildQueueTransferHandler();
 
+    private ListCellRenderer cellRenderer;
     private JList buildQueueList;
     private JList unitList;
     private JList buildingList;
     private JButton buyBuilding;
+    private JCheckBox compact;
     private Colony colony; 
 
     private FeatureContainer featureContainer = new FeatureContainer();
@@ -91,7 +101,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
             featureContainer.add(type.getFeatureContainer());
         }
 
-        BuildQueueCellRenderer cellRenderer = new BuildQueueCellRenderer();
+        cellRenderer = new DefaultBuildQueueCellRenderer();
+
         buildQueueList = new JList(current);
         buildQueueList.setTransferHandler(buildQueueHandler);
         buildQueueList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -122,6 +133,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         buyBuilding.addActionListener(this);
         updateBuyBuildingButton();
 
+        compact = new JCheckBox(Messages.message("colonyPanel.compactView"));
+        compact.addItemListener(this);
+
         add(headLine, "span 3, align center, wrap 40");
         add(new JLabel(Messages.message("menuBar.colopedia.unit")), "align center");
         add(new JLabel(Messages.message("colonyPanel.buildQueue")), "align center");
@@ -129,7 +143,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         add(new JScrollPane(unitList), "grow");
         add(new JScrollPane(buildQueueList), "grow");
         add(new JScrollPane(buildingList), "grow, wrap 20");
-        add(buyBuilding, "span, split 2");
+        add(buyBuilding, "span, split 3");
+        add(compact);
         add(okButton, "tag ok");
     }
 
@@ -268,6 +283,19 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         } else {
             logger.warning("Invalid ActionCommand: " + command);
         }
+    }
+
+    public void itemStateChanged(ItemEvent event) {
+        if (compact.isSelected()) {
+            if (cellRenderer instanceof DefaultBuildQueueCellRenderer) {
+                cellRenderer = new SimpleBuildQueueCellRenderer();
+            }
+        } else if (cellRenderer instanceof SimpleBuildQueueCellRenderer) {
+            cellRenderer = new DefaultBuildQueueCellRenderer();
+        }
+        buildQueueList.setCellRenderer(cellRenderer);
+        buildingList.setCellRenderer(cellRenderer);
+        unitList.setCellRenderer(cellRenderer);
     }
 
     /**
@@ -507,54 +535,93 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         }
     }
 
-    class BuildQueueCellRenderer implements ListCellRenderer {
+    class DefaultBuildQueueCellRenderer implements ListCellRenderer {
 
-        public BuildQueueCellRenderer() {
+        JPanel itemPanel = new JPanel(new MigLayout("", "", ""));
+        JLabel imageLabel = new JLabel();
+        JLabel nameLabel = new JLabel();
+
+        Map<FreeColGameObjectType, ImageIcon> imageCache
+            = new HashMap<FreeColGameObjectType, ImageIcon>();
+
+        public DefaultBuildQueueCellRenderer() {
+            // do nothing
         }
 
         public Component getListCellRendererComponent(JList list,
                                                       Object value,
                                                       int index,
                                                       boolean isSelected,
-                                                      boolean cellHasFocus)
-        {
+                                                      boolean cellHasFocus) {
             BuildableType item = (BuildableType) value;
 
-            JPanel itemPanel = new JPanel(new MigLayout("", "", ""));
-            JLabel imageLabel = new JLabel();
-            Image buildableImage = ResourceManager.getImage(item.getId() + ".image");
-            if (buildableImage != null) {
-                buildableImage = buildableImage.getScaledInstance(-1, 48, Image.SCALE_SMOOTH);
-                imageLabel = new JLabel(new ImageIcon(buildableImage));
+            itemPanel.removeAll();
+
+            ImageIcon buildableIcon = imageCache.get(value);
+            if (buildableIcon == null) {
+                Image buildableImage = ResourceManager.getImage(item.getId() + ".image");
+                if (buildableImage != null) {
+                    buildableImage = buildableImage.getScaledInstance(-1, 48, Image.SCALE_SMOOTH);
+                    buildableIcon = new ImageIcon(buildableImage);
+                    imageCache.put(item, buildableIcon);
+                }
             }
+            imageLabel.setIcon(buildableIcon);
+
+            nameLabel.setText(item.getName());
             itemPanel.add(imageLabel, "span 1 2");
-            itemPanel.add(new JLabel(item.getName()), "wrap");
+            itemPanel.add(nameLabel, "wrap");
 
             List<AbstractGoods> goodsRequired = item.getGoodsRequired();
             int size = goodsRequired.size();
-            if (size > 0) {
-                AbstractGoods goods = goodsRequired.get(0);
+            for (int i = 0; i < size; i++) {
+                AbstractGoods goods = goodsRequired.get(i);
+                ImageIcon goodsIcon = imageCache.get(goods.getType());
+                if (goodsIcon == null) {
+                    goodsIcon = getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f);
+                    imageCache.put(goods.getType(), goodsIcon);
+                }
                 JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()), 
-                                               getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f),
+                                               goodsIcon,
                                                SwingConstants.CENTER);
-                if (size == 1) {
-                    itemPanel.add(goodsLabel);
-                } else {
+                if (i == 0 && size > 1) {
                     itemPanel.add(goodsLabel, "split " + size);
-                    for (int i = 1; i < size; i++) {
-                        goods = goodsRequired.get(i);
-                        goodsLabel = new JLabel(Integer.toString(goods.getAmount()),
-                                                getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f),
-                                                SwingConstants.CENTER);
-                        itemPanel.add(goodsLabel);
-                    }
+                } else {
+                    itemPanel.add(goodsLabel);
                 }
             }
             if (isSelected) {
                 itemPanel.setBorder(BorderFactory.createLineBorder(LINK_COLOR, 2));
+            } else {
+                itemPanel.setBorder(null);
             }
             return itemPanel;
         }
     }
+
+    class SimpleBuildQueueCellRenderer implements ListCellRenderer {
+
+        JLabel label = new JLabel();
+        Border emptyBorder = BorderFactory.createEmptyBorder(2, 5, 2, 5);
+
+        public SimpleBuildQueueCellRenderer() {
+            label.setBorder(emptyBorder);
+        }
+
+        public Component getListCellRendererComponent(JList list,
+                                                      Object value,
+                                                      int index,
+                                                      boolean isSelected,
+                                                      boolean cellHasFocus) {
+            label.setText(((BuildableType) value).getName());
+            if (isSelected) {
+                label.setBorder(BorderFactory.createLineBorder(LINK_COLOR, 2));
+            } else {
+                label.setBorder(emptyBorder);
+            }
+            return label;
+        }
+    }
+
 }
 
