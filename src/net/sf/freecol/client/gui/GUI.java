@@ -2224,7 +2224,8 @@ public final class GUI {
      */
     private void displayFogOfWar(Graphics2D g, Map map, Tile tile, int x, int y) {  
         if (tile.isExplored()) {
-            final boolean displayFogOfWar = freeColClient.getGame().getGameOptions().getBoolean(GameOptions.FOG_OF_WAR);
+            final boolean displayFogOfWar = freeColClient.getGame().getGameOptions().getBoolean(GameOptions.FOG_OF_WAR)
+                    && freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_FOG_OF_WAR);
             if (displayFogOfWar
                     && freeColClient.getMyPlayer() != null
                     && !freeColClient.getMyPlayer().canSee(tile)) {
