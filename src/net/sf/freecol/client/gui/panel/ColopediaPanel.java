@@ -29,8 +29,11 @@ import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -51,7 +54,6 @@ import javax.swing.text.StyledDocument;
 import javax.swing.text.StyleConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -400,12 +402,37 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         Image buildingImage = ResourceManager.getImage("Colopedia.buildingSection.image");
         ImageIcon buildingIcon = new ImageIcon((buildingImage != null) ? buildingImage : null);
 
-        List<BuildingType> buildingTypes = Specification.getSpecification().getBuildingTypeList();
-        for (BuildingType buildingType : buildingTypes) {
-            DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
-                                                                                           buildingType.getName(),
-                                                                                           buildingIcon));
-            parent.add(item);
+        List<BuildingType> buildingTypes = new ArrayList<BuildingType>();
+        Map<BuildingType, DefaultMutableTreeNode> buildingHash =
+            new HashMap<BuildingType, DefaultMutableTreeNode>();
+        for (BuildingType buildingType : Specification.getSpecification().getBuildingTypeList()) {
+            if (buildingType.getUpgradesFrom() == null) {
+                DefaultMutableTreeNode item =
+                    new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
+                                                                     buildingType.getName(),
+                                                                     buildingIcon));
+                buildingHash.put(buildingType, item);
+                parent.add(item);
+            } else {
+                buildingTypes.add(buildingType);
+            }
+        }
+
+        while (!buildingTypes.isEmpty()) {
+            for (Iterator<BuildingType> iterator = buildingTypes.iterator(); iterator.hasNext();) {
+                BuildingType buildingType = iterator.next();
+                DefaultMutableTreeNode node = buildingHash.get(buildingType.getUpgradesFrom());
+                if (node != null) {
+                    DefaultMutableTreeNode item =
+                        new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
+                                                                         buildingType.getName(),
+                                                                         buildingIcon));
+                    node.add(item);
+                    buildingHash.put(buildingType, item);
+                    iterator.remove();
+                }
+            }
+
         }
     }
     
@@ -1313,18 +1340,19 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     public void valueChanged(TreeSelectionEvent event) {
         if (event.getSource() == tree) {
-            TreePath path = tree.getSelectionPath();
-            if (path == null) {
-                return;
-            }
-            
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
-            DefaultMutableTreeNode parent = (DefaultMutableTreeNode)path.getParentPath().getLastPathComponent();
-            ColopediaTreeItem parentItem = (ColopediaTreeItem)parent.getUserObject();
-            ColopediaTreeItem nodeItem = (ColopediaTreeItem)node.getUserObject();
 
-            if (parentItem.getPanelType() != null) {
-                selectDetail(parentItem.getPanelType(), nodeItem.getFreeColGameObjectType());
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+            DefaultMutableTreeNode parent = node;
+
+            while (parent != null) {
+                ColopediaTreeItem parentItem = (ColopediaTreeItem) parent.getUserObject();
+                if (parentItem.getPanelType() == null) {
+                    parent = (DefaultMutableTreeNode) parent.getParent();
+                } else {
+                    ColopediaTreeItem nodeItem = (ColopediaTreeItem) node.getUserObject();
+                    selectDetail(parentItem.getPanelType(), nodeItem.getFreeColGameObjectType());
+                    break;
+                }
             }
         }
     }
