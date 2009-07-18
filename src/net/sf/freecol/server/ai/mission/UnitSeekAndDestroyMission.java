@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
@@ -41,6 +40,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -196,7 +196,7 @@ public class UnitSeekAndDestroyMission extends Mission {
             }
         };
         return getGame().getMap().search(unit, start, gd, 
-                getGame().getMap().getDefaultCostDecider(), Integer.MAX_VALUE, carrier);    
+                Integer.MAX_VALUE, carrier);    
     }
     
     /**

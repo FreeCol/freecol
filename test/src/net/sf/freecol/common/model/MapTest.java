@@ -29,6 +29,8 @@ import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class MapTest extends FreeColTestCase {
@@ -312,6 +314,32 @@ public class MapTest extends FreeColTestCase {
         assertNull("No path should be available",path);
     }
     
+    public void testMoveThroughTileWithEnemyUnit() {
+        final UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
+        Game game = getStandardGame();
+        Map map = getTestMap(plainsType);
+        game.setMap(map);
+        
+        //Setup
+        Tile enemyUnitTile = map.getTile(2,1);
+        Player frenchPlayer = game.getPlayer("model.nation.french");
+        new Unit(game, enemyUnitTile, frenchPlayer, pioneerType, UnitState.ACTIVE);
+        
+        Tile unitTile = map.getTile(1, 1);
+        Player dutchPlayer = game.getPlayer("model.nation.dutch");
+        Unit unit = new Unit(game, unitTile, dutchPlayer, pioneerType, UnitState.ACTIVE);
+        // unit is going somewhere else
+        Tile unitDestination = map.getTile(3, 1);
+        unit.setDestination(unitDestination);
+        
+        // Execute
+        final CostDecider decider = CostDeciders.avoidSettlementsAndBlockingUnits();
+        final int cost = decider.getCost(unit, unitTile, enemyUnitTile, 4, 0);
+        assertTrue("Move should be invalid", cost == CostDecider.ILLEGAL_MOVE);
+        final int cost2 = decider.getCost(unit, unitTile, enemyUnitTile, 4, 1);
+        assertTrue("Move should be valid", cost2 != CostDecider.ILLEGAL_MOVE);
+    }
+
     /**
      * Tests path discoverability in a map with only one path available
      * That path is obstructed by a settlement, so is invalid
@@ -333,7 +361,7 @@ public class MapTest extends FreeColTestCase {
         Unit colonist = new Unit(game, unitTile, dutchPlayer, colonistType, UnitState.ACTIVE);
         colonist.setDestination(destinationTile);
         
-        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
+        PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile, CostDeciders.avoidSettlementsAndBlockingUnits());
         assertNull("No path should be available",path);
     }
     

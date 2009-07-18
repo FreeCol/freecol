@@ -57,7 +57,6 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.GoldTradeItem;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsTradeItem;
@@ -78,6 +77,7 @@ import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
@@ -1226,7 +1226,7 @@ public class ColonialAIPlayer extends AIPlayer {
         };
         final int MAXIMUM_DISTANCE_TO_SETTLEMENT = 10; // Given in number of
         // turns.
-        PathNode bestPath = map.search(unit, startTile, gd, map.getDefaultCostDecider(),
+        PathNode bestPath = map.search(unit, startTile, gd,
                 MAXIMUM_DISTANCE_TO_SETTLEMENT, carrier);
         if (bestPath != null) {
             PathNode ln = bestPath.getLastNode();
@@ -1293,7 +1293,7 @@ public class ColonialAIPlayer extends AIPlayer {
                 return false;
             }
         };
-        PathNode newTarget = map.search(unit, startTile, targetDecider, map.getDefaultCostDecider(), Integer.MAX_VALUE,
+        PathNode newTarget = map.search(unit, startTile, targetDecider, Integer.MAX_VALUE,
                 carrier);
         if (newTarget != null) {
             Tile targetTile = newTarget.getLastNode().getTile();

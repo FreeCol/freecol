@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2009  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -18,7 +18,12 @@
  */
 
 
-package net.sf.freecol.common.model;
+package net.sf.freecol.common.model.pathfinding;
+
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.PathNode;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**

@@ -20,8 +20,8 @@
 package net.sf.freecol.server.ai;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FoundingFather;
@@ -38,11 +37,13 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.server.networking.DummyConnection;
 

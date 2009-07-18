@@ -38,6 +38,8 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;

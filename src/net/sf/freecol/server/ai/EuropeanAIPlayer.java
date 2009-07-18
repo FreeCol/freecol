@@ -31,7 +31,6 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
-import net.sf.freecol.common.model.GoalDecider;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
@@ -45,6 +44,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.networking.Message;
@@ -591,7 +591,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
             };
         final int MAXIMUM_DISTANCE_TO_SETTLEMENT = 10; // Given in number of
         // turns.
-        PathNode bestPath = map.search(unit, startTile, gd, map.getDefaultCostDecider(),
+        PathNode bestPath = map.search(unit, startTile, gd,
                                        MAXIMUM_DISTANCE_TO_SETTLEMENT, carrier);
         if (bestPath != null) {
             PathNode ln = bestPath.getLastNode();
@@ -658,7 +658,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                     return false;
                 }
             };
-        PathNode newTarget = map.search(unit, startTile, targetDecider, map.getDefaultCostDecider(), Integer.MAX_VALUE,
+        PathNode newTarget = map.search(unit, startTile, targetDecider, Integer.MAX_VALUE,
                                         carrier);
         if (newTarget != null) {
             Tile targetTile = newTarget.getLastNode().getTile();

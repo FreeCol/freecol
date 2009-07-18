@@ -35,6 +35,11 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
+
+import org.w3c.dom.Element;
 
 /**
  * An isometric map. The map is represented as a collection of tiles.
@@ -121,8 +126,6 @@ public class Map extends FreeColGameObject {
     public static enum PathType { BOTH_LAND_AND_SEA, ONLY_LAND, ONLY_SEA }
 
     private Tile[][] tiles;
-
-    private final DefaultCostDecider defaultCostDecider = new DefaultCostDecider();
     
     private final java.util.Map<String, Region> regions = new HashMap<String, Region>();
 
@@ -279,7 +282,77 @@ public class Map extends FreeColGameObject {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         }
-        return findPath(unit, start, end, null, null);
+        return findPath(unit, start, end, null, null, CostDeciders.defaultFor(unit));
+    }
+    
+    /**
+     * Finds a shortest path between the given tiles. The <code>Tile</code> at
+     * the <code>end</code> will not be checked against the <code>unit</code>'s
+     * legal moves.
+     * 
+     * @param unit
+     *            The <code>Unit</code> that should be used to determine
+     *            whether or not a path is legal.
+     * @param start
+     *            The <code>Tile</code> in which the path starts from.
+     * @param end
+     *            The end of the path.
+     * @param costDecider
+     *            The object responsible for determining the cost.
+     * @return A <code>PathNode</code> for the first tile in the path. Calling
+     *         {@link PathNode#getTile} on this object, will return the
+     *         <code>Tile</code> right after the specified starting tile, and
+     *         {@link PathNode#getDirection} will return the direction you need
+     *         to take in order to reach that tile. This method returns
+     *         <code>null</code> if no path is found.
+     * @see #findPath(Tile, Tile, PathType)
+     * @see Unit#findPath(Tile)
+     * @exception IllegalArgumentException
+     *                if either <code>unit</code>, <code>start</code> or
+     *                <code>end</code> are <code>null</code>.
+     */
+    public PathNode findPath(Unit unit, Tile start, Tile end, CostDecider costDecider) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Unit must not be 'null'.");
+        }
+        return findPath(unit, start, end, null, null, costDecider);
+    }
+    
+    /**
+     * Finds a shortest path between the given tiles. The <code>Tile</code> at
+     * the <code>end</code> will not be checked against the <code>unit</code>'s
+     * legal moves.
+     * 
+     * @param unit
+     *            The <code>Unit</code> that should be used to determine
+     *            whether or not a path is legal.
+     * @param start
+     *            The <code>Tile</code> in which the path starts from.
+     * @param end
+     *            The end of the path.
+     * @param carrier
+     *            A carrier that currently holds the <code>unit</code>, or
+     *            <code>null</code> if the <code>unit</code> is not
+     *            presently on a carrier.
+     * @param costDecider
+     *            The object responsible for determining the cost.
+     * @return A <code>PathNode</code> for the first tile in the path. Calling
+     *         {@link PathNode#getTile} on this object, will return the
+     *         <code>Tile</code> right after the specified starting tile, and
+     *         {@link PathNode#getDirection} will return the direction you need
+     *         to take in order to reach that tile. This method returns
+     *         <code>null</code> if no path is found.
+     * @see #findPath(Tile, Tile, PathType)
+     * @see Unit#findPath(Tile)
+     * @exception IllegalArgumentException
+     *                if either <code>unit</code>, <code>start</code> or
+     *                <code>end</code> are <code>null</code>.
+     */
+    public PathNode findPath(Unit unit, Tile start, Tile end, Unit carrier, CostDecider costDecider) {
+        if (unit == null) {
+            throw new IllegalArgumentException("Unit must not be 'null'.");
+        }
+        return findPath(unit, start, end, null, carrier, costDecider);
     }
 
     /**
@@ -314,7 +387,7 @@ public class Map extends FreeColGameObject {
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         }
-        return findPath(unit, start, end, null, carrier);
+        return findPath(unit, start, end, null, carrier, CostDeciders.defaultFor(unit));
     }
 
     /**
@@ -348,7 +421,7 @@ public class Map extends FreeColGameObject {
      *                if <code>start == end</code>.
      */
     private PathNode findPath(Unit unit, Tile start, Tile end, PathType type) {
-        return findPath(unit, start, end, type, null);
+        return findPath(unit, start, end, type, null, CostDeciders.defaultFor(unit));
     }
 
     /**
@@ -373,6 +446,8 @@ public class Map extends FreeColGameObject {
      *            A carrier that currently holds the <code>unit</code>, or
      *            <code>null</code> if the <code>unit</code> is not
      *            presently on a carrier.
+     * @param costDecider
+     *            The object responsible for determining the cost.
      * @return A <code>PathNode</code> for the first tile in the path. Calling
      *         {@link PathNode#getTile} on this object, will return the
      *         <code>Tile</code> right after the specified starting tile, and
@@ -386,7 +461,7 @@ public class Map extends FreeColGameObject {
      *                if <code>start == end</code>.
      */
     private PathNode findPath(final Unit unit, final Tile start, final Tile end,
-            final PathType type, final Unit carrier) {
+            final PathType type, final Unit carrier, final CostDecider costDecider) {
         /*
          * Using A* with the Manhatten distance as the heuristics.
          * 
@@ -501,7 +576,7 @@ public class Map extends FreeColGameObject {
                 }
                 
                 if (currentUnit != null) {
-                    int extraCost = defaultCostDecider.getCost(currentUnit,
+                    int extraCost = costDecider.getCost(currentUnit,
                             currentNode.getTile(), newTile, movesLeft, turns);
                     if (extraCost == CostDecider.ILLEGAL_MOVE && !newTile.equals(end)) {
                         continue;
@@ -520,8 +595,8 @@ public class Map extends FreeColGameObject {
                             }
                         }
                         cost += extraCost;
-                        movesLeft = defaultCostDecider.getMovesLeft();
-                        if (defaultCostDecider.isNewTurn()) {
+                        movesLeft = costDecider.getMovesLeft();
+                        if (costDecider.isNewTurn()) {
                             turns++;
                         }
                     }
@@ -583,7 +658,7 @@ public class Map extends FreeColGameObject {
      *         <code>GoalDecider</code>.
      */
     public PathNode search(Unit unit, GoalDecider gd, int maxTurns) {
-        return search(unit, unit.getTile(), gd, defaultCostDecider, maxTurns);
+        return search(unit, unit.getTile(), gd, CostDeciders.defaultFor(unit), maxTurns);
     }
 
     /**
@@ -610,7 +685,7 @@ public class Map extends FreeColGameObject {
      */
     public PathNode search(Unit unit, Tile startTile, GoalDecider gd,
             int maxTurns) {
-        return search(unit, startTile, gd, defaultCostDecider, maxTurns);
+        return search(unit, startTile, gd, CostDeciders.defaultFor(unit), maxTurns);
     }
     
     /**
@@ -640,7 +715,7 @@ public class Map extends FreeColGameObject {
      */
     public PathNode search(Unit unit, GoalDecider gd,
             int maxTurns, Unit carrier) {
-        return search(unit, unit.getTile(), gd, defaultCostDecider, maxTurns, carrier);
+        return search(unit, unit.getTile(), gd, CostDeciders.defaultFor(unit), maxTurns, carrier);
     }
 
     /**
@@ -698,7 +773,40 @@ public class Map extends FreeColGameObject {
             CostDecider costDecider, int maxTurns) {
         return search(unit, startTile, gd, costDecider, maxTurns, null);
     }
-
+    
+    /**
+     * Finds a path to a goal determined by the given <code>GoalDecider</code>.
+     * 
+     * <br />
+     * <br />
+     * 
+     * A <code>GoalDecider</code> is typically defined inline to serve a
+     * specific need.
+     * 
+     * @param currentUnit
+     *            The <code>Unit</code> to find the path for.
+     * @param startTile
+     *            The <code>Tile</code> to start the search from.
+     * @param gd
+     *            The object responsible for determining whether a given
+     *            <code>PathNode</code> is a goal or not.
+     * @param maxTurns
+     *            The maximum number of turns the given <code>Unit</code> is
+     *            allowed to move. This is the maximum search range for a goal.
+     * @param carrier
+     *            The carrier the <code>unit</code> is currently onboard or
+     *            <code>null</code> if the <code>unit</code> is either not
+     *            onboard a carrier or should not use the carrier while finding
+     *            the path.
+     * @return The path to a goal determined by the given
+     *         <code>GoalDecider</code>.
+     */
+    public PathNode search(final Unit unit, final Tile startTile,
+            final GoalDecider gd, final int maxTurns,
+            final Unit carrier) {
+        return search(unit, startTile, gd, CostDeciders.defaultFor(unit), maxTurns, carrier);
+    }
+    
     /**
      * Finds a path to a goal determined by the given <code>GoalDecider</code>.
      * 
@@ -886,16 +994,6 @@ public class Map extends FreeColGameObject {
     }
 
     /**
-     * Gets the default <code>CostDecider</code>.
-     * 
-     * @return The default <code>CostDecider</code>. This is currently a
-     *         singleton instance of {@link DefaultCostDecider}.
-     */
-    public CostDecider getDefaultCostDecider() {
-        return defaultCostDecider;
-    }
-
-    /**
      * Checks if the given <code>Tile</code> is adjacent to the edge of the
      * map.
      * 
@@ -911,7 +1009,7 @@ public class Map extends FreeColGameObject {
         }
         return false;
     }
-
+    
     /**
      * Finds the best path to <code>Europe</code>.
      * 
@@ -925,6 +1023,22 @@ public class Map extends FreeColGameObject {
      * @see Europe
      */
     public PathNode findPathToEurope(Unit unit, Tile start) {
+        return findPathToEurope(unit, start, CostDeciders.defaultFor(unit));
+    }
+
+    /**
+     * Finds the best path to <code>Europe</code>.
+     * 
+     * @param unit
+     *            The <code>Unit</code> that should be used to determine
+     *            whether or not a path is legal.
+     * @param start
+     *            The starting <code>Tile</code>.
+     * @return The path to the target or <code>null</code> if no target can be
+     *         found.
+     * @see Europe
+     */
+    public PathNode findPathToEurope(Unit unit, Tile start, CostDecider costDecider) {
         GoalDecider gd = new GoalDecider() {
             private PathNode goal = null;
 
@@ -950,7 +1064,7 @@ public class Map extends FreeColGameObject {
                 return false;
             }
         };
-        return search(unit, start, gd, defaultCostDecider, Integer.MAX_VALUE);
+        return search(unit, start, gd, costDecider, Integer.MAX_VALUE);
     }
     
     /**

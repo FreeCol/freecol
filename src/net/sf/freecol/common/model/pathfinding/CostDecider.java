@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2002-2007  The FreeCol Team
+ *  Copyright (C) 2002-2009  The FreeCol Team
  *
  *  This file is part of FreeCol.
  *
@@ -18,7 +18,11 @@
  */
 
 
-package net.sf.freecol.common.model;
+package net.sf.freecol.common.model.pathfinding;
+
+import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 
 
 /**
@@ -26,7 +30,6 @@ package net.sf.freecol.common.model;
  * and {@link Map#search(Unit, Tile, GoalDecider, CostDecider, int, Unit) search}.
  */
 public interface CostDecider {
-    
 
     public static final int ILLEGAL_MOVE = -1;
     
@@ -38,20 +41,20 @@ public interface CostDecider {
      *      of unit as the one following the path.
      * @param oldTile The <code>Tile</code> we are moving from.
      * @param newTile The <code>Tile</code> we are moving to.
-     * @param movesLeft The remaining moves left. The
+     * @param movesLeftBefore The remaining moves left. The
      *      <code>CostDecider</code> can use this information
      *      if needed.
      * @param turns The number of turns spent so far.
      * @return The cost of moving the given unit from the
      *      <code>oldTile</code> to the <code>newTile</code>.
      */
-    public int getCost(Unit unit, Tile oldTile, Tile newTile, int movesLeft, int turns);   
+    public int getCost(Unit unit, Tile oldTile, Tile newTile, int movesLeftBefore, int turns);   
     
     /**
      * Gets the number of moves left. This method should be
      * called after invoking {@link #getCost}.
      * 
-     * @return The number og moves left.
+     * @return The number of moves left.
      */
     public int getMovesLeft();
 

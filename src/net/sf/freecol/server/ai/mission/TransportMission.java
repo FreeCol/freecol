@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -46,9 +47,12 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
@@ -408,7 +412,138 @@ public class TransportMission extends Mission {
         
         return path.getTotalTurns();
     }
+    
+    private boolean canAttackEnemyShips() {
+        final Unit carrier = getUnit();
+        return (carrier.getTile() != null)
+                && carrier.isNaval()
+                && carrier.isOffensiveUnit();
+        
+    }
+    
+    private boolean hasCargo() {
+        final Unit carrier = getUnit();
+        return (carrier.getGoodsCount() + carrier.getUnitCount()) > 0;
+    }
+    
+    private void attackIfEnemyShipIsBlocking(Connection connection, Direction direction) {
+        final Unit carrier = getUnit();
+        final Map map = carrier.getGame().getMap();
+        if (canAttackEnemyShips()
+                && carrier.getMoveType(direction) == MoveType.ATTACK) {
+            final Tile newTile = map.getNeighbourOrNull(direction, carrier.getTile());
+            final Unit defender = newTile.getDefendingUnit(carrier);
+            if (!canAttackPlayer(defender.getOwner())) {
+                return;
+            }
+            final Element element = Message.createNewRootElement("attack");
+            element.setAttribute("unit", carrier.getId());
+            element.setAttribute("direction", direction.toString());
 
+            try {
+                connection.ask(element);
+            } catch (IOException e) {
+                logger.warning("Could not send message!");
+            }
+            
+        }
+    }
+    
+    private void attackEnemyShips(Connection connection) {
+        if (!canAttackEnemyShips()) {
+            return;
+        }
+        if (hasCargo()) {
+            // Do not search for a target if we have cargo onboard.
+            return;
+        }
+        final Unit carrier = getUnit();
+        final PathNode pathToTarget = findNavalTarget(0);
+        if (pathToTarget != null) {
+            final Direction direction = moveTowards(connection, pathToTarget);
+            if (direction != null &&
+                    carrier.getMoveType(direction) == MoveType.ATTACK) {
+                final Element element = Message.createNewRootElement("attack");
+                element.setAttribute("unit", carrier.getId());
+                element.setAttribute("direction", direction.toString());
+
+                try {
+                    connection.ask(element);
+                } catch (IOException e) {
+                    logger.warning("Could not send message!");
+                }
+            }
+        }
+    }
+    
+    private boolean canAttackPlayer(Player target) {
+        final Unit unit = getUnit();
+        final Stance stance = unit.getOwner().getStance(target);
+        if (stance == Stance.ALLIANCE) {
+            return false;
+        }
+        if (stance != Stance.WAR
+                && !unit.hasAbility("model.ability.piracy")) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Finds the best target to attack within the given range.
+     *
+     * @param maxTurns The maximum number of turns the unit is allowed
+     *      to spend in order to reach the target.
+     * @return The path to the target or <code>null</code> if no target
+     *      can be found.
+     */
+    protected PathNode findNavalTarget(final int maxTurns) {
+        if (!getUnit().isOffensiveUnit()) {
+            throw new IllegalStateException("A target can only be found for offensive units. You tried with: " + getUnit().getName());
+        }
+        if (!getUnit().isNaval()) {
+            throw new IllegalStateException("A target can only be found for naval units. You tried with: " + getUnit().getName());
+        }
+        
+        final GoalDecider gd = new GoalDecider() {
+            private PathNode bestTarget = null;
+            private int bestValue = 0;
+            
+            public PathNode getGoal() {
+                return bestTarget;              
+            }
+            
+            public boolean hasSubGoals() {
+                return true;
+            }
+            
+            public boolean check(final Unit unit, final PathNode pathNode) {
+                final CombatModel combatModel = getGame().getCombatModel();
+                final Tile newTile = pathNode.getTile();
+                final Unit defender = newTile.getDefendingUnit(unit);
+                if (newTile.isLand()
+                        || defender == null
+                        || defender.getOwner() == unit.getOwner()) {
+                    return false;
+                }
+                if (!canAttackPlayer(defender.getOwner())) {
+                    return false;
+                }
+                final int value = 1 + defender.getUnitCount() + defender.getGoodsCount();
+                if (value > bestValue) {
+                    bestTarget = pathNode;
+                    bestValue = value;
+                }
+                return true;
+            }
+        };
+        return getGame().getMap().search(getUnit(),
+                getUnit().getTile(),
+                gd,
+                CostDeciders.avoidSettlements(),
+                maxTurns);
+    }
+    
     /**
      * Performs the mission.
      * 
@@ -431,7 +566,9 @@ public class TransportMission extends Mission {
             
         }
 
+        attackEnemyShips(connection);
         restockCargoAtDestination(connection);
+        attackEnemyShips(connection);
 
         boolean transportListChanged = false;
         boolean moreWork = true;
@@ -481,8 +618,11 @@ public class TransportMission extends Mission {
                         moreWork = true;
                     }
                 }
-
+                if (r != null) {
+                    attackIfEnemyShipIsBlocking(connection, r);
+                }
                 transportListChanged = restockCargoAtDestination(connection);
+                attackEnemyShips(connection);
             } else if (moveToEurope && carrier.canMoveToEurope()) {
                 moveUnitToEurope(connection, carrier);
             }
