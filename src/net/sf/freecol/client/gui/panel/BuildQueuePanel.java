@@ -29,6 +29,8 @@ import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
@@ -52,8 +54,10 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -74,6 +78,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
     private JButton buyBuilding;
     private Colony colony; 
 
+    private FeatureContainer featureContainer = new FeatureContainer();
+
     public BuildQueuePanel(Colony colony, Canvas parent) {
 
         super(parent, new MigLayout("wrap 3", "[260:][260:][260:]", "[][][300:400:][]"));
@@ -82,18 +88,24 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         DefaultListModel current = new DefaultListModel();
         for (BuildableType type : colony.getBuildQueue()) {
             current.addElement(type);
+            featureContainer.add(type.getFeatureContainer());
         }
 
         DefaultListModel units = new DefaultListModel();
         for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-            if (!unitType.getGoodsRequired().isEmpty()) {
+            if (!unitType.getGoodsRequired().isEmpty()
+                && (colony.getFeatureContainer().hasAbility("model.ability.build", unitType)
+                    || featureContainer.hasAbility("model.ability.build", unitType))) {
                 units.addElement(unitType);
             }
         }
 
         DefaultListModel buildings = new DefaultListModel();
         for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
-            if (!hasBuildingType(colony, buildingType)) {
+            Building oldBuilding = colony.getBuilding(buildingType);
+            BuildingType oldBuildingType = (oldBuilding == null) ? null : oldBuilding.getType();
+            if ((oldBuildingType == buildingType.getUpgradesFrom())
+                && !current.contains(buildingType)) {
                 buildings.addElement(buildingType);
             }
         }

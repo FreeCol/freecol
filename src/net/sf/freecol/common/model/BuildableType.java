@@ -55,6 +55,7 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * Stores the abilities required by this Type.
      */
     private final HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
+
     public String getGoodsRequiredAsString() {
         if (goodsRequired == null || goodsRequired.isEmpty()) {
             return "";
