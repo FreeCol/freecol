@@ -91,25 +91,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
             featureContainer.add(type.getFeatureContainer());
         }
 
-        DefaultListModel units = new DefaultListModel();
-        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
-            if (!unitType.getGoodsRequired().isEmpty()
-                && (colony.getFeatureContainer().hasAbility("model.ability.build", unitType)
-                    || featureContainer.hasAbility("model.ability.build", unitType))) {
-                units.addElement(unitType);
-            }
-        }
-
-        DefaultListModel buildings = new DefaultListModel();
-        for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
-            Building oldBuilding = colony.getBuilding(buildingType);
-            BuildingType oldBuildingType = (oldBuilding == null) ? null : oldBuilding.getType();
-            if ((oldBuildingType == buildingType.getUpgradesFrom())
-                && !current.contains(buildingType)) {
-                buildings.addElement(buildingType);
-            }
-        }
-
         BuildQueueCellRenderer cellRenderer = new BuildQueueCellRenderer();
         buildQueueList = new JList(current);
         buildQueueList.setTransferHandler(buildQueueHandler);
@@ -117,17 +98,21 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         buildQueueList.setDragEnabled(true);
         buildQueueList.setCellRenderer(cellRenderer);
 
+        DefaultListModel units = new DefaultListModel();
         unitList = new JList(units);
         unitList.setTransferHandler(buildQueueHandler);
         unitList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         unitList.setDragEnabled(true);
         unitList.setCellRenderer(cellRenderer);
+        updateUnitList();
 
+        DefaultListModel buildings = new DefaultListModel();
         buildingList = new JList(buildings);
         buildingList.setTransferHandler(buildQueueHandler);
         buildingList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         buildingList.setDragEnabled(true);
         buildingList.setCellRenderer(cellRenderer);
+        updateBuildingList();
 
         JLabel headLine = new JLabel(Messages.message("colonyPanel.buildQueue"));
         headLine.setFont(bigHeaderFont);
@@ -146,6 +131,43 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
         add(new JScrollPane(buildingList), "grow, wrap 20");
         add(buyBuilding, "span, split 2");
         add(okButton, "tag ok");
+    }
+
+    private void updateUnitList() {
+        DefaultListModel units = (DefaultListModel) unitList.getModel();
+        units.clear();
+        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+            if (!unitType.getGoodsRequired().isEmpty()
+                && (colony.getFeatureContainer().hasAbility("model.ability.build", unitType)
+                    || featureContainer.hasAbility("model.ability.build", unitType))) {
+                units.addElement(unitType);
+            }
+        }
+    }
+
+    private void updateBuildingList() {
+        DefaultListModel buildings = (DefaultListModel) buildingList.getModel();
+        DefaultListModel current = (DefaultListModel) buildQueueList.getModel();
+        buildings.clear();
+        for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
+            Building oldBuilding = colony.getBuilding(buildingType);
+            BuildingType oldBuildingType = (oldBuilding == null) ? null : oldBuilding.getType();
+            if ((oldBuildingType == buildingType.getUpgradesFrom()
+                 || current.contains(buildingType.getUpgradesFrom()))
+                && !current.contains(buildingType)) {
+                buildings.addElement(buildingType);
+            }
+        }
+    }
+
+    private void updateAllLists() {
+        DefaultListModel current = (DefaultListModel) buildQueueList.getModel();
+        featureContainer = new FeatureContainer();
+        for (Object type: current.toArray()) {
+            featureContainer.add(((BuildableType) type).getFeatureContainer());
+        }
+        updateUnitList();
+        updateBuildingList();
     }
 
     private void updateBuyBuildingButton(){
@@ -337,6 +359,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
                 }
                 targetModel.insertElementAt(buildQueue.get(index), minimumIndex);
             }
+
             return true;
         }
 
@@ -368,6 +391,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener {
             indices = null;
             targetIndex = -1;
             numberOfItems = 0;
+            updateAllLists();
         }
 
         /**
