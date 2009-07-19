@@ -73,6 +73,16 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         BUILD_QUEUE_CHANGE
     }
 
+    public static enum NoBuildReason {
+        NONE,
+        NOT_BUILDABLE,
+        POPULATION_TOO_SMALL,
+        MISSING_BUILD_ABILITY,
+        MISSING_ABILITY,
+        WRONG_UPGRADE
+    }
+
+
     /** A list of ColonyTiles. */
     private final List<ColonyTile> colonyTiles = new ArrayList<ColonyTile>();
 
@@ -1236,20 +1246,31 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return a <code>boolean</code> value
      */
     public boolean canBuild(BuildableType buildableType) {
+        return (getNoBuildReason(buildableType) == NoBuildReason.NONE);
+    }
+
+    /**
+     * Return the reason why the give <code>BuildableType</code> can
+     * not be built.
+     *
+     * @param buildableType a <code>BuildableType</code> value
+     * @return a <code>NoBuildReason</code> value
+     */
+    public NoBuildReason getNoBuildReason(BuildableType buildableType) {
         if (buildableType == null) {
-            return false;
+            return null;
         } else if (buildableType.getGoodsRequired().isEmpty()) {
-            return false;
+            return NoBuildReason.NOT_BUILDABLE;
         } else if (buildableType.getPopulationRequired() > getUnitCount()) {
-            return false;
+            return NoBuildReason.POPULATION_TOO_SMALL;
         } else if (!(buildableType instanceof BuildingType ||
                      featureContainer.hasAbility("model.ability.build", buildableType, getGame().getTurn()))) {
-            return false;
+            return NoBuildReason.MISSING_BUILD_ABILITY;
         } else {
             java.util.Map<String, Boolean> requiredAbilities = buildableType.getAbilitiesRequired();
             for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
                 if (hasAbility(entry.getKey()) != entry.getValue()) {
-                    return false;
+                    return NoBuildReason.MISSING_ABILITY;
                 }
             }
         }
@@ -1260,17 +1281,17 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 // the colony has no similar building yet
                 if (newBuildingType.getUpgradesFrom() != null) {
                     // we are trying to build an advanced factory, we should build lower level shop first
-                    return false;
+                    return NoBuildReason.WRONG_UPGRADE;
                 }
             } else {
                 // a building of the same family already exists
                 if (colonyBuilding.getType().getUpgradesTo() != newBuildingType) {
                     // the existing building's next upgrade is not the new one we want to build
-                    return false;
+                    return NoBuildReason.WRONG_UPGRADE;
                 }
             }
         }
-        return true;
+        return NoBuildReason.NONE;
     }
 
     /**
@@ -1396,10 +1417,22 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @see #payForBuilding
      */
     public int getPriceForBuilding() {
+        return getPriceForBuilding(getCurrentlyBuilding());
+    }
+
+    /**
+     * Returns the price for the remaining hammers and tools for the
+     * {@link Building} given.
+     * 
+     * @param buildableType a <code>BuildableType</code> value
+     * @return The price.
+     * @see #payForBuilding
+     */
+    public int getPriceForBuilding(BuildableType buildableType) {
         // Any changes in this method should also be reflected in
         // "payForBuilding()"
         int price = 0;
-        for (AbstractGoods goodsRequired : getCurrentlyBuilding().getGoodsRequired()) {
+        for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
             GoodsType requiredGoodsType = goodsRequired.getType();
             int remaining = goodsRequired.getAmount() - getGoodsCount(requiredGoodsType);
             if (remaining > 0) {
@@ -1450,11 +1483,25 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @see #getPriceForBuilding
      */
     public boolean canPayToFinishBuilding() {
-        if(getCurrentlyBuilding() == null){
+        return canPayToFinishBuilding(getCurrentlyBuilding());
+    }
+
+    /**
+     * Check if the owner can buy the remaining hammers and tools for 
+     * the {@link Building} given.
+     * 
+     * @param buildableType a <code>BuildableType</code> value
+     * @return a <code>boolean</code> value
+     * @exception IllegalStateException If the owner of this <code>Colony</code>
+     *                has an insufficient amount of gold.
+     * @see #getPriceForBuilding
+     */
+    public boolean canPayToFinishBuilding(BuildableType buildableType) {
+        if (buildableType == null){
             return false;
         }
         
-        if (getPriceForBuilding() > getOwner().getGold()) {
+        if (getPriceForBuilding(buildableType) > getOwner().getGold()) {
             return false;
         }
         return true;

@@ -190,11 +190,16 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
         updateUnitList();
         updateBuildingList();
+        updateBuyBuildingButton();
     }
 
-    private void updateBuyBuildingButton(){
-        buyBuilding.setEnabled(colony.canPayToFinishBuilding());
-        buyBuilding.repaint();
+    private void updateBuyBuildingButton() {
+        DefaultListModel current = (DefaultListModel) buildQueueList.getModel();
+        if (current.getSize() == 0) {
+            buyBuilding.setEnabled(false);
+        } else {
+            buyBuilding.setEnabled(colony.canPayToFinishBuilding((BuildableType) current.getElementAt(0)));
+        }
     }
 
     private boolean hasBuildingType(Colony colony, BuildingType buildingType) {
@@ -280,7 +285,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             getController().setBuildQueue(colony, getBuildableTypes(buildQueueList));
             getController().payForBuilding(colony);
             getCanvas().updateGoldLabel();
-            updateBuyBuildingButton();
+            ((DefaultListModel) buildQueueList.getModel()).remove(0);
+            updateAllLists();
         } else {
             logger.warning("Invalid ActionCommand: " + command);
         }
