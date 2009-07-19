@@ -42,14 +42,15 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.LostCityRumour;
-import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
+import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.server.ai.AIColony;
+import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
@@ -220,22 +221,34 @@ public final class TilePopup extends JPopupMenu {
                     }
                 }
             }
-            if (tile.getSettlement() != null) {
+            if (tile.getColony() != null) {
                 if (!notEmpty) {
                     takeOwnership.addSeparator();
                 }
                 JMenuItem toMenuItem = new JMenuItem(tile.getSettlement().toString());
                 toMenuItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            // Server:
-                            final Game serverGame = freeColClient.getFreeColServer().getGame();
-                            final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
-                            final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
-                            serverTile.getSettlement().setOwner(serverPlayer);
-                            freeColClient.getConnectController().reconnect();
-                        }
-                    });
+                    public void actionPerformed(ActionEvent event) {
+                        // Server:
+                        final Game serverGame = freeColClient.getFreeColServer().getGame();
+                        final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
+                        final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
+                        serverTile.getSettlement().setOwner(serverPlayer);
+                        freeColClient.getConnectController().reconnect();
+                    }
+                });
                 takeOwnership.add(toMenuItem);
+                JMenuItem displayColonyPlan = new JMenuItem("Display Colony Plan");
+                displayColonyPlan.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        // Server:
+                        final Game serverGame = freeColClient.getFreeColServer().getGame();
+                        final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
+                        final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
+                        final AIColony ac = (AIColony) freeColClient.getFreeColServer().getAIMain().getAIObject(serverTile.getSettlement());
+                        canvas.showInformationMessage(ac.getColonyPlan().toString());
+                    }
+                });
+                add(displayColonyPlan);
                 notEmpty = true;
             }
             if (notEmpty) {

@@ -807,4 +807,24 @@ public class ColonyPlan {
     public static String getXMLElementTagName() {
         return "colonyPlan";
     }
+    
+    /**
+     * Creates a <code>String</code> representation of this plan.
+     */
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("ColonyPlan for " + colony.getName() + " " + colony.getTile().getPosition());
+        sb.append("\n-----\n\nWORK LOCATIONS:\n");
+        for (WorkLocationPlan p : getSortedWorkLocationPlans()) {
+            sb.append(p.getGoodsType() + " (" + p.getWorkLocation() + ")\n");
+        }
+        sb.append("\n\nBUILD QUEUE:\n");
+        final Iterator<BuildableType> it = getBuildable();
+        while (it.hasNext()) {
+            final BuildableType b = it.next();
+            sb.append(b.getName());
+            sb.append('\n');
+        }
+        return sb.toString();
+    }
 }

@@ -1383,6 +1383,10 @@ public class AIColony extends AIObject {
             logger.warning("Expected end tag, received: " + in.getLocalName());
         }
     }
+    
+    public ColonyPlan getColonyPlan() {
+        return colonyPlan;
+    }
 
     /**
      * Returns the tag name of the root element representing this object.
