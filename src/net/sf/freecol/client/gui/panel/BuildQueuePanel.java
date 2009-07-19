@@ -27,24 +27,19 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.swing.DefaultListModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -187,19 +182,18 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         DefaultListModel current = (DefaultListModel) buildQueueList.getModel();
         featureContainer = new FeatureContainer();
         for (Object type: current.toArray()) {
-            featureContainer.add(((BuildableType) type).getFeatureContainer());
+            if (getMinimumIndex((BuildableType) type) >= 0) {
+                featureContainer.add(((BuildableType) type).getFeatureContainer());
+            } else {
+                current.removeElement(type);
+            }
         }
         updateUnitList();
         updateBuildingList();
     }
 
     private void updateBuyBuildingButton(){
-        boolean canBuy = true;
-        if(!colony.canPayToFinishBuilding() 
-                || colony.getPriceForBuilding() == 0){
-            canBuy = false;
-        }
-        buyBuilding.setEnabled(canBuy);
+        buyBuilding.setEnabled(colony.canPayToFinishBuilding());
         buyBuilding.repaint();
     }
 
@@ -241,31 +235,30 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         return result;
     }
 
-    private int getMinimumIndex(BuildableType buildableType, JList target, List<BuildableType> buildables) {
-        if (colony.canBuild(buildableType)) {
-            return 0;
-        } else if (buildableType instanceof UnitType) {
-            List<BuildableType> buildQueue = getBuildableTypes(target);
-            for (int index = 0; index < buildQueue.size(); index++) {
-                if (buildQueue.get(index).hasAbility("model.ability.build", buildableType)) {
-                    return index + 1;
+    private int getMinimumIndex(BuildableType buildableType) {
+        ListModel buildQueue = buildQueueList.getModel();
+        if (buildableType instanceof UnitType) {
+            if (colony.canBuild(buildableType)) {
+                return 0;
+            } else {
+                for (int index = 0; index < buildQueue.getSize(); index++) {
+                    if (((BuildableType) buildQueue.getElementAt(index))
+                        .hasAbility("model.ability.build", buildableType)) {
+                        return index + 1;
+                    }
                 }
             }
         } else if (buildableType instanceof BuildingType) {
             BuildingType upgradesFrom = ((BuildingType) buildableType).getUpgradesFrom();
-            if (upgradesFrom == null) {
+            Building building = colony.getBuilding((BuildingType) buildableType);
+            BuildingType buildingType = (building == null) ? null : building.getType();
+            if (buildingType == upgradesFrom) {
                 return 0;
             } else {
-                List<BuildableType> buildQueue = getBuildableTypes(target);
-                for (int index = 0; index < buildQueue.size(); index++) {
-                    if (upgradesFrom.equals(buildQueue.get(index))) {
+                for (int index = 0; index < buildQueue.getSize(); index++) {
+                    if (upgradesFrom.equals(buildQueue.getElementAt(index))) {
                         return index + 1;
                     }
-                }
-                if (buildables != null && buildables.contains(upgradesFrom)) {
-                    return buildQueue.size();
-                } else {
-                    return -1;
                 }
             }
         }
@@ -360,7 +353,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             }
 
             for (BuildableType type : buildQueue) {
-                if (getMinimumIndex(type, target, buildQueue) < 0) {
+                if (getMinimumIndex(type) < 0) {
                     return false;
                 }
             }
@@ -389,7 +382,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             targetIndex = preferredIndex;
 
             for (int index = 0; index < buildQueue.size(); index++) {
-                int minimumIndex = getMinimumIndex(buildQueue.get(index), target, null);
+                int minimumIndex = getMinimumIndex(buildQueue.get(index));
                 if (minimumIndex < targetIndex + index) {
                     minimumIndex = targetIndex + index;
                 }
