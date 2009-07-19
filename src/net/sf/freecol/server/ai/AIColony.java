@@ -1120,7 +1120,9 @@ public class AIColony extends AIObject {
         for (GoodsType goodsType : goodsList) {
             int production = colony.getProductionNetOf(goodsType);
             int in_stock = colony.getGoodsCount(goodsType);
-            if (Goods.FOOD != goodsType && production + in_stock > colony.getWarehouseCapacity()) {
+            if (Goods.FOOD != goodsType
+                    && goodsType.isStorable()
+                    && production + in_stock > colony.getWarehouseCapacity()) {
                 Iterator<Unit> unitIterator = colony.getUnitIterator();
                 int waste = production + in_stock - colony.getWarehouseCapacity();
                 while (unitIterator.hasNext() && waste > 0){
