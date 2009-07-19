@@ -723,5 +723,11 @@
             description="Rebuild from scratch and run all tests."
             depends="clean,package,validate,testall"/>
 
+    <!-- This is a shortcut for NetBeans, and possibly other IDEs. -->
+    <target name="run" depends="package" description="Runs the game">
+      <java jar="FreeCol.jar" fork="true">
+        <jvmarg value="-Xmx128m" />
+      </java>
+    </target>
 
 </project>
