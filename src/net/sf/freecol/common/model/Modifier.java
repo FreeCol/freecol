@@ -41,9 +41,6 @@ public final class Modifier extends Feature {
     public static final String CAPITAL_DEFENCE = "model.modifier.capitalDefence";
     public static final String SETTLEMENT_DEFENCE = "model.modifier.settlementDefence";
 
-    public static final FreeColGameObjectType COLONY_GOODS_PARTY =
-        new FreeColGameObjectType("model.monarch.colonyGoodsParty");
-
     public static final float UNKNOWN = Float.MIN_VALUE;
 
     public static enum Type { ADDITIVE, MULTIPLICATIVE, PERCENTAGE }
@@ -247,7 +244,7 @@ public final class Modifier extends Feature {
     // -- Factory methods --
 
     public static Modifier createTeaPartyModifier(Turn turn) {
-        Modifier bellsBonus = new Modifier("model.goods.bells", COLONY_GOODS_PARTY,
+        Modifier bellsBonus = new Modifier("model.goods.bells", Specification.COLONY_GOODS_PARTY,
                                            50, Type.PERCENTAGE);
         bellsBonus.setIncrement(-2, Type.ADDITIVE, turn, new Turn(turn.getNumber() + 25));
         return bellsBonus;

@@ -2038,7 +2038,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             // buildings in readFromXMLImpl().
             for (Modifier modifier : featureContainer.getModifierSet("model.goods.bells",
                                                                      null, getGame().getTurn())) {
-                if (Modifier.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
+                if (Specification.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
                     modifier.toXML(out);
                 }
             }
@@ -2133,10 +2133,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 exportData.put(data.getId(), data);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
                 Modifier modifier = new Modifier(in, Specification.getSpecification());
-                if (Modifier.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
+                if (Specification.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
                     Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
                     for (Modifier existingModifier : bellsBonus) {
-                        if (Modifier.COLONY_GOODS_PARTY.equals(existingModifier.getSource()) &&
+                        if (Specification.COLONY_GOODS_PARTY.equals(existingModifier.getSource()) &&
                             modifier.getType() == existingModifier.getType() ) {
                             // there is a already existing goods party modifier.. dont add again..
                             /* TODO: this is only a work-around; the

@@ -95,6 +95,11 @@ public final class Specification {
     public static final FreeColGameObjectType IN_CAPITAL = 
         new FreeColGameObjectType("model.source.inCapital");
 
+    // Workaround.  Not really in the specification.
+    public static final FreeColGameObjectType COLONY_GOODS_PARTY =
+        new FreeColGameObjectType("model.monarch.colonyGoodsParty");
+
+
     /**
      * Singleton
      */
@@ -224,7 +229,8 @@ public final class Specification {
                 CARGO_PENALTY_SOURCE,
                 AMBUSH_BONUS_SOURCE,
                 IN_SETTLEMENT,
-                IN_CAPITAL
+                IN_CAPITAL,
+                COLONY_GOODS_PARTY
             }) {
             allTypes.put(source.getId(), source);
         }
@@ -553,8 +559,7 @@ public final class Specification {
         } else if (allTypes.containsKey(Id)) {
             return type.cast(allTypes.get(Id));
         } else if (initialized) {
-            throw new IllegalArgumentException("Trying to retrieve FreeColGameObjectType" + " with ID '" + Id
-                                               + "' returned 'null'.");
+            throw new IllegalArgumentException("Retrieved FreeColGameObjectType" + " with ID '" + Id + " was already initialized.");
         } else {
             // forward declaration of new type
             try {
