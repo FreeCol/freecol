@@ -27,6 +27,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -113,12 +114,14 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buildQueueList.setCellRenderer(cellRenderer);
         buildQueueList.addMouseListener(new BuildQueueMouseAdapter());
 
+        BuildableListMouseAdapter adapter = new BuildableListMouseAdapter();
         DefaultListModel units = new DefaultListModel();
         unitList = new JList(units);
         unitList.setTransferHandler(buildQueueHandler);
         unitList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         unitList.setDragEnabled(true);
         unitList.setCellRenderer(cellRenderer);
+        unitList.addMouseListener(adapter);
         updateUnitList();
 
         DefaultListModel buildings = new DefaultListModel();
@@ -127,6 +130,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buildingList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         buildingList.setDragEnabled(true);
         buildingList.setCellRenderer(cellRenderer);
+        buildingList.addMouseListener(adapter);
         updateBuildingList();
 
         JLabel headLine = new JLabel(Messages.message("colonyPanel.buildQueue"));
@@ -177,16 +181,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 buildings.addElement(buildingType);
             }
         }
-    }
-
-    private void addToBuildQueue(BuildableType type) {
-        ((DefaultListModel) buildQueueList.getModel()).addElement(type);
-        updateAllLists();
-    }
-
-    private void removeFromBuildQueue(BuildableType type) {
-        ((DefaultListModel) buildQueueList.getModel()).removeElement(type);
-        updateAllLists();
     }
 
     private void updateAllLists() {
@@ -646,7 +640,20 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
                 JList source = (JList) e.getSource();
                 for (Object type : source.getSelectedValues()) {
-                    removeFromBuildQueue((BuildableType) type);
+                    ((DefaultListModel) buildQueueList.getModel()).removeElement(type);
+                }
+                updateAllLists();
+            }
+        }
+    }
+
+    class BuildableListMouseAdapter extends MouseAdapter {
+
+        public void mouseClicked(MouseEvent e) {
+            if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
+                JList source = (JList) e.getSource();
+                for (Object type : source.getSelectedValues()) {
+                    ((DefaultListModel) buildQueueList.getModel()).addElement(type);
                 }
                 updateAllLists();
             }
