@@ -28,6 +28,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,7 +83,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     private final BuildQueueTransferHandler buildQueueHandler = new BuildQueueTransferHandler();
 
-    private ListCellRenderer cellRenderer;
+    private static ListCellRenderer cellRenderer;
     private JList buildQueueList;
     private JList unitList;
     private JList buildingList;
@@ -108,6 +111,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buildQueueList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         buildQueueList.setDragEnabled(true);
         buildQueueList.setCellRenderer(cellRenderer);
+        buildQueueList.addMouseListener(new BuildQueueMouseAdapter());
 
         DefaultListModel units = new DefaultListModel();
         unitList = new JList(units);
@@ -173,6 +177,16 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 buildings.addElement(buildingType);
             }
         }
+    }
+
+    private void addToBuildQueue(BuildableType type) {
+        ((DefaultListModel) buildQueueList.getModel()).addElement(type);
+        updateAllLists();
+    }
+
+    private void removeFromBuildQueue(BuildableType type) {
+        ((DefaultListModel) buildQueueList.getModel()).removeElement(type);
+        updateAllLists();
     }
 
     private void updateAllLists() {
@@ -603,6 +617,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
         JLabel label = new JLabel();
         Border emptyBorder = BorderFactory.createEmptyBorder(2, 5, 2, 5);
+        Border lineBorder =
+            BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LINK_COLOR, 2),
+                                               BorderFactory.createEmptyBorder(2, 3, 3, 3));
 
         public SimpleBuildQueueCellRenderer() {
             label.setBorder(emptyBorder);
@@ -615,11 +632,24 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                                                       boolean cellHasFocus) {
             label.setText(((BuildableType) value).getName());
             if (isSelected) {
-                label.setBorder(BorderFactory.createLineBorder(LINK_COLOR, 2));
+                label.setBorder(lineBorder);
             } else {
                 label.setBorder(emptyBorder);
             }
             return label;
+        }
+    }
+
+    class BuildQueueMouseAdapter extends MouseAdapter {
+
+        public void mousePressed(MouseEvent e) {
+            if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
+                JList source = (JList) e.getSource();
+                for (Object type : source.getSelectedValues()) {
+                    removeFromBuildQueue((BuildableType) type);
+                }
+                updateAllLists();
+            }
         }
     }
 
