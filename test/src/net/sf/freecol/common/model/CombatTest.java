@@ -460,44 +460,6 @@ public class CombatTest extends FreeColTestCase {
 
     }
 
-    public void testDefendColonyWithScout() {
-    	Game game = getGame();
-    	Map map = getTestMap(plainsType,true);
-    	game.setMap(map);
-    	
-        Colony colony = getStandardColony();
-
-        SimpleCombatModel combatModel = new SimpleCombatModel(game.getModelController().getPseudoRandom());
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Player french = game.getPlayer("model.nation.frenchREF");
-
-        assertTrue(french.isREF());
-
-        Tile tile2 = map.getTile(4, 8);
-        tile2.setExploredBy(dutch, true);
-        tile2.setExploredBy(french, true);
-
-        Unit colonist = colony.getUnitIterator().next();
-        Unit defender = new Unit(getGame(), colony.getTile(), dutch, colonistType, UnitState.ACTIVE, horses);
-        Unit attacker = new Unit(getGame(), tile2, french, veteranType, UnitState.ACTIVE, horses, muskets);
-
-        assertTrue(defender.isDefensiveUnit());
-        assertEquals(defender, colony.getTile().getDefendingUnit(attacker));
-
-        // defender should lose horses
-        combatModel.attack(attacker, defender, victory, 0, null);
-        assertTrue(attacker.isMounted());
-        assertTrue(attacker.isArmed());
-        assertEquals(veteranType, attacker.getType());
-        assertFalse(defender.isMounted());
-        assertFalse(defender.isArmed());
-        assertEquals(colonistType, defender.getType());
-        // this should force DONE_SETTLEMENT
-        assertFalse(defender.isDefensiveUnit());
-
-    }
-
-
     public void testDefendColonyWithUnarmedColonist() {
     	Game game = getGame();
     	Map map = getTestMap(plainsType,true);
@@ -679,4 +641,30 @@ public class CombatTest extends FreeColTestCase {
         assertTrue("Pioneer should be dead", pioneer.isDisposed());
     }
 
+    public void testScoutDiesNotLosesEquipment() {
+        Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Tile tile1 = map.getTile(5, 8);       
+        tile1.setExploredBy(dutch, true);
+        tile1.setExploredBy(french, true);
+        Tile tile2 = map.getTile(4, 8);
+        tile2.setExploredBy(dutch, true);
+        tile2.setExploredBy(french, true);
+
+        Unit scout = new Unit(game, tile1, dutch, colonistType, UnitState.ACTIVE);
+        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
+
+        soldier.equipWith(muskets, true);
+        soldier.equipWith(horses, true);
+        scout.setMovesLeft(1);
+        scout.equipWith(horses, true);
+
+        combatModel.attack(soldier, scout, victory, 0, null);
+        assertTrue("Scout should be dead", scout.isDisposed());
+    }
 }

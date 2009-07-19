@@ -1131,22 +1131,50 @@ public class SimpleCombatModel implements CombatModel {
      * @param enemyUnit a <code>Unit</code> that has won a combat
      */
     private void loseCombat(Unit unit, Unit enemyUnit) {
-        EquipmentType typeToLose;
-        UnitType downgrade;
-
         if (unit.hasAbility("model.ability.disposeOnCombatLoss")) {
             slaughterUnit(unit, enemyUnit);
-        } else if ((typeToLose = findEquipmentTypeToLose(unit)) != null) {
-            disarmUnit(unit, typeToLose, enemyUnit);
-        } else if ((downgrade = unit.getType().getUnitTypeChange(ChangeType.DEMOTION, unit.getOwner()))
-                   != null) {
-            demoteUnit(unit, downgrade, enemyUnit);
-        } else if (unit.hasAbility("model.ability.canBeCaptured")
-                   && enemyUnit.hasAbility("model.ability.captureUnits")) {
-            captureUnit(unit, enemyUnit);
-        } else {
-            slaughterUnit(unit, enemyUnit);
+            return;
         }
+        
+        EquipmentType typeToLose = findEquipmentTypeToLose(unit);
+        boolean hasEquipToLose = typeToLose != null;
+        if(hasEquipToLose){
+            if(losingEquipDiscardsUnit(unit,typeToLose)){
+                slaughterUnit(unit, enemyUnit);
+            }
+            else{
+                disarmUnit(unit, typeToLose, enemyUnit);
+            }
+            return;
+        }
+        
+        UnitType downgrade = unit.getType().getUnitTypeChange(ChangeType.DEMOTION, unit.getOwner()); 
+        if (downgrade != null) {
+            demoteUnit(unit, downgrade, enemyUnit);
+            return;
+        }
+        
+        boolean unitCanBeCaptured = unit.hasAbility("model.ability.canBeCaptured")
+                                    && enemyUnit.hasAbility("model.ability.captureUnits");
+        if(unitCanBeCaptured){
+            captureUnit(unit, enemyUnit);
+        }
+        else{
+            slaughterUnit(unit, enemyUnit);
+        }        
+    }
+
+    private boolean losingEquipDiscardsUnit(Unit unit, EquipmentType typeToLose) {
+        if(!unit.hasAbility("model.ability.disposeOnAllEquipLost")){
+            return false;
+        }
+        // verifies if unit has other equipment
+        for(EquipmentType equip : unit.getEquipment().keySet()){
+            if(equip != typeToLose){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -1284,44 +1312,53 @@ public class SimpleCombatModel implements CombatModel {
                              "%enemyNation%", enemyNation,
                              "%enemyUnit%", enemyUnit.getName(),
                              "%location%", locationName);
+               
+        enemyCapturesEquipment(unit,enemyUnit,typeToLose);
+    }
+
+    private void enemyCapturesEquipment(Unit unit, Unit enemyUnit, EquipmentType typeToLose) {
+        if (!enemyUnit.hasAbility("model.ability.captureEquipment")){
+            return;
+        }
         
         // we may need to change the equipment type if:
         //    - the attacker is an indian and the defender is not, or vice-versa
         //  and
         //    - the equipment is muskets or horses
-        
         EquipmentType newEquipType = typeToLose;
-        if(!unit.getOwner().isIndian() && enemyUnit.getOwner().isIndian()){
-        	if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.horses")){
-        		newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
-        	}
-        	if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.muskets")){
-        		newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
-        	}
+        boolean defenderIsIndian = unit.getOwner().isIndian();
+        boolean attackerIsIndian = enemyUnit.getOwner().isIndian();
+        if(!defenderIsIndian && attackerIsIndian){
+            if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.horses")){
+                newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
+            }
+            if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.muskets")){
+                newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
+            }
         }
-        if(unit.getOwner().isIndian() && !enemyUnit.getOwner().isIndian()){
-        	if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses")){
-        		newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
-        	}
-        	if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets")){
-        		newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
-        	}
+        if(defenderIsIndian && !attackerIsIndian){
+            if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses")){
+                newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+            }
+            if(typeToLose == FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets")){
+                newEquipType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+            }
         }
         
-        if (enemyUnit.hasAbility("model.ability.captureEquipment")
-            && enemyUnit.canBeEquippedWith(newEquipType)) {
-            IndianSettlement settlement = enemyUnit.getIndianSettlement();
-
-            enemyUnit.equipWith(newEquipType, 1, true);
-            unit.addModelMessage(unit,
-                                 ModelMessage.MessageType.COMBAT_RESULT,
-                                 "model.unit.equipmentCaptured",
-                                 "%nation%", enemyNation,
-                                 "%equipment%", typeToLose.getName());
-            if (settlement != null) {
-                for (AbstractGoods goods : typeToLose.getGoodsRequired()) {
-                    settlement.addGoods(goods);
-                }
+        if(!enemyUnit.canBeEquippedWith(newEquipType)){
+            return;
+        }
+        
+        enemyUnit.equipWith(newEquipType, 1, true);
+        unit.addModelMessage(unit,
+                ModelMessage.MessageType.COMBAT_RESULT,
+                "model.unit.equipmentCaptured",
+                "%nation%", enemyUnit.getOwner().getNationAsString(),
+                "%equipment%", typeToLose.getName());
+        IndianSettlement settlement = enemyUnit.getIndianSettlement();
+        if (settlement != null) {
+            for (AbstractGoods goods : typeToLose.getGoodsRequired()) {
+                settlement.addGoods(goods);
             }
         }
     }
@@ -1356,6 +1393,11 @@ public class SimpleCombatModel implements CombatModel {
                              "%enemyNation%", enemyNation,
                              "%enemyUnit%", enemyUnit.getName(),
                              "%location%", locationName);
+        
+        for(EquipmentType equip : unit.getEquipment().keySet()){
+            enemyCapturesEquipment(unit, enemyUnit, equip);
+        }
+        
         loser.divertModelMessages(unit, unit.getTile());
         unit.dispose();
     }
