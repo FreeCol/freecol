@@ -46,9 +46,9 @@ public final class CostDeciders {
      */
     public static CostDecider defaultFor(final Unit unit) {
         if (!unit.getOwner().isAI()) {
-            return avoidSettlements();
+            return avoidSettlementsAndBlockingUnits();
         }
-        return unit.isOffensiveUnit() ? BASE_COST_DECIDER : AVOID_BLOCKING_UNITS_COST_DECIDER;
+        return unit.isOffensiveUnit() ? avoidSettlements() : avoidSettlementsAndBlockingUnits();
     }
 
     
