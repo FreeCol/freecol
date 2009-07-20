@@ -285,8 +285,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             getController().setBuildQueue(colony, getBuildableTypes(buildQueueList));
             getController().payForBuilding(colony);
             getCanvas().updateGoldLabel();
-            ((DefaultListModel) buildQueueList.getModel()).remove(0);
-            updateAllLists();
         } else {
             logger.warning("Invalid ActionCommand: " + command);
         }
