@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class MapTest extends FreeColTestCase {
     TileType oceanType = spec().getTileType("model.tile.ocean");
@@ -299,8 +300,9 @@ public class MapTest extends FreeColTestCase {
         // set obstructing french colony
         Player frenchPlayer = game.getPlayer("model.nation.french");
         Tile settlementTile = map.getTile(2,10);
-        Colony frenchColony = new Colony(game, frenchPlayer, "New Paris", settlementTile);
-        frenchColony.placeSettlement();
+        Colony frenchColony = FreeColTestUtils.getColonyBuilder().player(frenchPlayer)
+                                                                 .colonyTile(settlementTile)
+                                                                 .build();
         assertTrue("French colony was not set properly on the map",settlementTile.getSettlement() != null);
         // set unit
         Player dutchPlayer = game.getPlayer("model.nation.dutch");

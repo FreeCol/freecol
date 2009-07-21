@@ -254,32 +254,16 @@ public class FreeColTestCase extends TestCase {
      * @return
      */
     public Colony getStandardColony(int numberOfSettlers, int tileX, int tileY) {
-
-        if (numberOfSettlers < 1)
-            throw new IllegalArgumentException();
-
         Game game = getGame();
-        // TODO not sure if this is correct
-        Player dutch = game.getPlayer("model.nation.dutch");
 
         Map map = game.getMap();
 
         Tile tile = map.getTile(tileX, tileY);
-        Colony colony = new Colony(game, dutch, "New Amsterdam", tile);
 
-        UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-        Unit soldier = new Unit(game, tile, dutch, unitType, UnitState.ACTIVE, unitType.getDefaultEquipment());
-
-        soldier.buildColony(colony);
-
-        for (int i = 1; i < numberOfSettlers; i++) {
-            Unit settler = new Unit(game, tile, dutch, unitType, UnitState.ACTIVE, unitType.getDefaultEquipment());
-            settler.setLocation(colony);
-        }
-
-        assertEquals(numberOfSettlers, colony.getUnitCount());
-
-        return colony;
+        FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
+        builder.colonyTile(tile).initialColonists(numberOfSettlers);
+        
+        return builder.build();
     }
     
     public static class MapBuilder{

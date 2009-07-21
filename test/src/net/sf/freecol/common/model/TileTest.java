@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class TileTest extends FreeColTestCase {
 
@@ -350,20 +351,14 @@ public class TileTest extends FreeColTestCase {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
         game.setMap(map);
-        Tile tile1 = map.getTile(5, 8);
-        Player dutch = game.getPlayer("model.nation.dutch");
-
-        Colony colony = new Colony(game, dutch, "testColony", tile1);
-        Unit soldier = new Unit(game, tile1, dutch, spec().getUnitType("model.unit.veteranSoldier"),
-                                Unit.UnitState.ACTIVE);
-        soldier.buildColony(colony);
+        
+        Colony colony = FreeColTestUtils.getColonyBuilder().build();
 
         assertTrue(colony.getTile().hasRoad());
 
         colony.dispose();
 
         assertFalse(colony.getTile().hasRoad());
-
     }
 
 }

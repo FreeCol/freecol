@@ -5,6 +5,7 @@ import java.util.List;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class ColonyConsumptionTest extends FreeColTestCase {
 
@@ -26,7 +27,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         
         //////////////////////
         // Setting test colony and colonist
-        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(5, 8));
+        Colony colony = FreeColTestUtils.getColonyBuilder().colonyTile(map.getTile(5, 8)).build();
         UnitType colonistType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
         new Unit(game, colony.getBuildingForProducing(Goods.BELLS), dutch, colonistType, UnitState.ACTIVE,
                 colonistType.getDefaultEquipment());
@@ -40,8 +41,7 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         colony.updateFood();
         int foodRemaining = foodStored - colony.getFoodConsumption();
         
-        assertEquals("Unexpected value for remaining food, ", foodRemaining,colony.getFoodCount());
-        
+        assertEquals("Unexpected value for remaining food, ", foodRemaining,colony.getFoodCount());        
 	}
 	
 	public void testEqualFoodProductionConsumptionCase() {
@@ -68,10 +68,9 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         
         colonyTile.setExploredBy(dutch, true);
         
-        map.getTile(5, 8).setExploredBy(dutch, true);
         game.setMap(map);
            
-        Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(5, 8));
+        Colony colony = FreeColTestUtils.getColonyBuilder().colonyTile(colonyTile).build();
         
         // Set the food production of the center tile of the colony to 2
         // This will be the only food production of the colony

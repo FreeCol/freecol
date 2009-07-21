@@ -26,6 +26,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -119,13 +120,10 @@ public class GoodsTest extends FreeColTestCase {
         // Check in a colony
         //map.getTile(5, 8).setBonus(true);
         map.getTile(5, 8).setExploredBy(dutch, true);
-        map.getTile(6, 8).setExploredBy(dutch, true);
-
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteranSoldierType, UnitState.ACTIVE);
-
-        Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
-        soldier.setWorkType(Goods.FOOD);
-        soldier.buildColony(colony);
+        Tile colonyTile = map.getTile(6, 8);
+        colonyTile.setExploredBy(dutch, true);
+        
+        Colony colony = FreeColTestUtils.getColonyBuilder().colonyTile(colonyTile).build();
 
         // Create goods
         Goods cotton = new Goods(getGame(), null, cottonType, 75);

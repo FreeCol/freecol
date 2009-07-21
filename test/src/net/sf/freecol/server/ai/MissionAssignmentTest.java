@@ -44,6 +44,7 @@ import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class MissionAssignmentTest extends FreeColTestCase {
@@ -67,6 +68,7 @@ public class MissionAssignmentTest extends FreeColTestCase {
             ServerTestHelper.stopServer(server);
             server = null;
 		}
+		setGame(null);
 	}
 	
 	public void testImpossibleConditionsForTargetSelection() {
@@ -250,6 +252,8 @@ public class MissionAssignmentTest extends FreeColTestCase {
         }
         
         Game game = server.getGame();
+        setGame(game);
+        
         map = game.getMap();  // update reference        
         AIMain aiMain = server.getAIMain();
         
@@ -273,17 +277,12 @@ public class MissionAssignmentTest extends FreeColTestCase {
         Tile colonyTile = map.getTile(2, 3);
         assertTrue(colonyTile != null);
         colonyTile.setExploredBy(player1, true);
-        Colony colony = new Colony(game,player1,"TestColony",colonyTile);
-        Unit colonist = new Unit(game, colonyTile, player1, colonistType, UnitState.ACTIVE);
-
-        assertTrue(colonyTile.getMap() != null);
-
-        colonist.buildColony(colony);
+        Colony colony = FreeColTestUtils.getColonyBuilder().player(player1).colonyTile(colonyTile).build();
 
         assertTrue(colonyTile.getSettlement() == colony);
         assertTrue(colony.getOwner() == player1);
         assertTrue(colony.getUnitCount() == 1);
-
+        
         int turnsToColony = 1;
         // reassign mission and check
 
