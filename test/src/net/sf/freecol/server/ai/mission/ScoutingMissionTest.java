@@ -81,7 +81,6 @@ public class ScoutingMissionTest extends FreeColTestCase {
             Tile settlementTile = map.getTile(2, 1);
             FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
             Settlement settlement = builder.player(player1).settlementTile(settlementTile).build();
-            settlement.placeSettlement();
 
             Tile unitTile = map.getTile(2, 2);
             Unit scout = new Unit(game, unitTile, player2, scoutType, UnitState.ACTIVE);

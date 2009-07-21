@@ -275,7 +275,6 @@ public class MapTest extends FreeColTestCase {
         Tile settlementTile = map.getTile(2,10);
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         IndianSettlement settlement = builder.settlementTile(settlementTile).build();
-        settlement.placeSettlement();
 
         // set unit
         Player dutchPlayer = game.getPlayer("model.nation.dutch");
