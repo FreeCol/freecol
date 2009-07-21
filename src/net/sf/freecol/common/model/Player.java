@@ -704,6 +704,19 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Returns the sum of units currently working in the colonies of this player.
+     *
+     * @return Sum of units currently working in the colonies.
+     */
+    public int getColoniesPopulation() {
+        int i = 0;
+        for (Colony c : getColonies()) {
+            i += c.getUnitCount();
+        }
+        return i;
+    }
+
+    /**
      * Returns the <code>Colony</code> with the given name.
      *
      * @param name The name of the <code>Colony</code>.

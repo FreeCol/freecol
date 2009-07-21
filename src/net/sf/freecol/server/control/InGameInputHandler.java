@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Region;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
@@ -1312,8 +1313,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             result = unit.getGame().getCombatModel().generateAttackResult(unit, defender); 
         }
         if (result.type == CombatResultType.DONE_SETTLEMENT) {
-            // 10% of their gold
-            plunderGold = newTile.getSettlement().getOwner().getGold() / 10;
+            Settlement s = newTile.getSettlement();
+            if (s instanceof Colony) {
+                //colony: take amount proportional to colony-size/overall-colony-population
+                plunderGold = (s.getOwner().getGold()*s.getUnitCount())/s.getOwner().getColoniesPopulation();
+            } else {
+                //indian settlement: 10% of their gold
+                plunderGold = s.getOwner().getGold() / 10;
+            }
         }
         
         // Gets repair location if necessary
