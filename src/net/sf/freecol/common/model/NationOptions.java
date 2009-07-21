@@ -37,6 +37,11 @@ import javax.xml.stream.XMLStreamWriter;
 public class NationOptions extends FreeColObject{
 
     /**
+     * The default number of European nations.
+     */
+    public static final int DEFAULT_NO_OF_EUROPEANS = 4;
+
+    /**
      * National advantages for European players only. The natives will
      * always have national advantages.
      */
@@ -152,12 +157,18 @@ public class NationOptions extends FreeColObject{
         NationOptions result = new NationOptions();
         result.setSelectColors(true);
         result.setNationalAdvantages(Advantages.SELECTABLE);
+        int counter = 0;
         Map<Nation, NationState> defaultNations = new HashMap<Nation, NationState>();
         for (Nation nation : Specification.getSpecification().getNations()) {
             if (nation.getType().isREF()) {
                 continue;
             } else if (nation.getType().isEuropean() && nation.isSelectable()) {
-                defaultNations.put(nation, NationState.AVAILABLE);
+                if (counter < DEFAULT_NO_OF_EUROPEANS) {
+                    defaultNations.put(nation, NationState.AVAILABLE);
+                    counter++;
+                } else {
+                    defaultNations.put(nation, NationState.NOT_AVAILABLE);
+                }
             } else {
                 defaultNations.put(nation, NationState.AI_ONLY);
             }
