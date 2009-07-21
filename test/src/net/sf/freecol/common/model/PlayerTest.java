@@ -123,10 +123,10 @@ public class PlayerTest extends FreeColTestCase {
         testEuropeanPlayer(french);
         testEuropeanPlayer(english);
         testEuropeanPlayer(spanish);
-        testEuropeanPlayer(portuguese);
-        testEuropeanPlayer(swedish);
-        testEuropeanPlayer(danish);
-        testEuropeanPlayer(russian);
+        //testEuropeanPlayer(portuguese);
+        //testEuropeanPlayer(swedish);
+        //testEuropeanPlayer(danish);
+        //testEuropeanPlayer(russian);
         
         // indians
         Player inca = game.getPlayer("model.nation.inca");

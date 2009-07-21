@@ -20,6 +20,7 @@
 package net.sf.freecol.server.control;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -111,6 +112,7 @@ public final class PreGameController extends Controller {
                 freeColServer.addAIPlayer(entry.getKey());
             }
         }
+        Collections.sort(game.getPlayers(), Player.playerComparator);
         
         // Save the old GameOptions as possibly set by clients..
         // TODO: This might not be the best way to do it, the createMap should not really use the entire loadGame method

@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -251,6 +252,33 @@ public class Player extends FreeColGameObject implements Nameable {
      * Describe history here.
      */
     protected List<HistoryEvent> history = new ArrayList<HistoryEvent>();
+
+    public static final Comparator<Player> playerComparator = new Comparator<Player>() {
+        public int compare(Player player1, Player player2) {
+            int counter1 = 0;
+            int counter2 = 0;
+            if (player1.isAdmin()) {
+                counter1 += 8;
+            }
+            if (!player1.isAI()) {
+                counter1 += 4;
+            }
+            if (player1.isEuropean()) {
+                counter1 += 2;
+            }
+            if (player2.isAdmin()) {
+                counter2 += 8;
+            }
+            if (!player2.isAI()) {
+                counter2 += 4;
+            }
+            if (player2.isEuropean()) {
+                counter2 += 2;
+            }
+            
+            return counter2 - counter1;
+        }
+    };
 
 
     /**

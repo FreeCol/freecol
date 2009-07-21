@@ -19,7 +19,9 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
@@ -45,23 +47,31 @@ public class GameTest extends FreeColTestCase {
 
     public void testAddPlayer() {
         Game game = new ServerGame(new MockModelController());
-        game.setNationOptions(NationOptions.getDefaults());
+        NationOptions defaultOptions = NationOptions.getDefaults();
+        game.setNationOptions(defaultOptions);
 
-        Vector<Player> players = new Vector<Player>();
+        List<Player> players = new ArrayList<Player>();
 
+        int counter = 0;
         for (Nation n : FreeCol.getSpecification().getNations()) {
-            Player p;
-            if (n.getType().isEuropean() && !n.getType().isREF()) {
-                p = new Player(game, n.getType().getName(), false, n);
+            if (defaultOptions.getNationState(n) == NationOptions.NationState.NOT_AVAILABLE) {
+                counter++;
             } else {
-                p = new Player(game, n.getType().getName(), false, true, n);
+                Player p;
+                if (n.getType().isEuropean() && !n.getType().isREF()) {
+                    p = new Player(game, n.getType().getName(), false, n);
+                } else {
+                    p = new Player(game, n.getType().getName(), false, true, n);
+                }
+                game.addPlayer(p);
+                players.add(p);
             }
-            game.addPlayer(p);
-            players.add(p);
         }
 
-        assertEquals(FreeCol.getSpecification().getNations().size(), game
-                     .getPlayers().size());
+        Collections.sort(players, Player.playerComparator);
+        Collections.sort(game.getPlayers(), Player.playerComparator);
+        assertEquals(FreeCol.getSpecification().getNations().size() - counter,
+                     game.getPlayers().size());
         assertEquals(players, game.getPlayers());
     }
 
