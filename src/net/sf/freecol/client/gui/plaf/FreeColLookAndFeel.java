@@ -183,7 +183,7 @@ public class FreeColLookAndFeel extends MetalLookAndFeel {
             u.put("net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI", Class.forName("net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI"));
             u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");            
             u.put("CargoPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
-            u.put("BuildingsPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
+            u.put("BuildingsPanelUI", "net.sf.freecol.client.gui.plaf.FreeColPanelUI");
             u.put("OutsideColonyPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
             u.put("InPortPanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");
             u.put("WarehousePanelUI", "net.sf.freecol.client.gui.plaf.FreeColBrightPanelUI");

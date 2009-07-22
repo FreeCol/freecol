@@ -122,8 +122,6 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         Image bgImage = ResourceManager.getImage(building.getType().getId() + ".image");
         if (bgImage != null) {
             g.drawImage(bgImage, 0, 0, this);
-            g.setColor(new Color(255, 255, 255, 100));
-            g.fillRect(0, 0, width, height);
         } else {
             Image tempImage = ResourceManager.getImage("BackgroundImage");
 
