@@ -107,18 +107,17 @@ public final class TilePanel extends FreeColPanel {
         }
 
         if (tileType != null) {
-            List<AbstractGoods> production = tileType.getProduction();
-            if (!production.isEmpty()) {
-                GoodsType goodsType = production.get(0).getType();
-                add(new JLabel(String.valueOf(tile.potential(goodsType, null)),
-                               getLibrary().getGoodsImageIcon(goodsType),
-                               JLabel.CENTER),
-                    "split " + production.size());
-                for (int index = 1; index < production.size(); index++) {
-                    goodsType = production.get(index).getType();
-                    add(new JLabel(String.valueOf(tile.potential(goodsType, null)),
-                                   getLibrary().getGoodsImageIcon(goodsType),
-                                   JLabel.CENTER));
+            JLabel label;
+            List<AbstractGoods> production = tile.getSortedPotential();
+            for (int index = 0; index < production.size(); index++) {
+                AbstractGoods goods = production.get(index);
+                label = new JLabel(String.valueOf(goods.getAmount()),
+                                   getLibrary().getGoodsImageIcon(goods.getType()),
+                                   JLabel.CENTER);
+                if (index == 0 && production.size() > 1) {
+                    add(label, "split " + production.size());
+                } else {
+                    add(label);
                 }
 
             }

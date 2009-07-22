@@ -1279,7 +1279,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         }
         // Get tile potential + bonus if any
         int potential = tileType.getProductionOf(goodsType, unitType);
-        if (potential > 0 && tiContainer != null) {
+        if (tiContainer != null) {
             potential = tiContainer.getTotalBonusPotential(goodsType, unitType, potential);
         }
         return potential;
@@ -1294,9 +1294,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public List<AbstractGoods> getSortedPotential() {
         List<AbstractGoods> goodsTypeList = new ArrayList<AbstractGoods>();
         if (getType() != null) {
-            for (AbstractGoods production : getType().getProduction()) {
-                GoodsType goodsType = production.getType();
-                goodsTypeList.add(new AbstractGoods(goodsType, potential(goodsType, null)));
+            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                int potential = potential(goodsType, null);
+                if (potential > 0) {
+                    goodsTypeList.add(new AbstractGoods(goodsType, potential));
+                }
             }
             Collections.sort(goodsTypeList, new Comparator<AbstractGoods>() {
                     public int compare(AbstractGoods o, AbstractGoods p) {
