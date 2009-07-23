@@ -1298,7 +1298,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     public List<AbstractGoods> getSortedPotential() {
         List<AbstractGoods> goodsTypeList = new ArrayList<AbstractGoods>();
         if (getType() != null) {
-            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            for (GoodsType goodsType : FreeCol.getSpecification().getFarmedGoodsTypeList()) {
                 int potential = potential(goodsType, null);
                 if (potential > 0) {
                     goodsTypeList.add(new AbstractGoods(goodsType, potential));
