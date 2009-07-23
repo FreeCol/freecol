@@ -293,39 +293,6 @@ public class TileItemContainer extends FreeColGameObject {
     }
 
     /**
-     * Determine the total bonus from all Improvements
-     * @param g a <code>GoodsType</code> value
-     * @return The total bonus
-     */
-    // TODO: this is probably unnecessary
-    public int getImprovementBonusPotential(GoodsType g) {
-        int bonus = 0;
-        for (TileItem item : tileItems) {
-            if (item instanceof TileImprovement) {
-                bonus += ((TileImprovement) item).getBonus(g);
-            }
-        }
-        return bonus;
-    }
-
-    /**
-     * Determine the total bonus from Resource if any
-     * @param g a <code>GoodsType</code> value
-     * @param unitType an <code>UnitType</code> value
-     * @param potential an <code>int</code> value
-     * @return The total bonus
-     */
-    // TODO: this is probably unnecessary
-    public int getResourceBonusPotential(GoodsType g, UnitType unitType, int potential) {
-        for (TileItem item : tileItems) {
-            if (item instanceof Resource) {
-                return ((Resource) item).getBonus(g, unitType, potential);
-            }
-        }
-        return potential;
-    }
-
-    /**
      * Determine the total bonus for a GoodsType. Checks Resource and all Improvements.
      * @param g a <code>GoodsType</code> value
      * @param unitType an <code>UnitType</code> value

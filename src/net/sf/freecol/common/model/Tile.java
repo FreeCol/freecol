@@ -1192,7 +1192,11 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         for (TileType tileType : tileTypes) {
             float potential = tileType.getProductionOf(goodsType, unitType);
             if (tileType == getType() && hasResource()) {
-                potential = tileItemContainer.getResourceBonusPotential(goodsType, unitType, (int) potential);
+                for (TileItem item : tileItemContainer.getTileItems()) {
+                    if (item instanceof Resource) {
+                        potential = ((Resource) item).getBonus(goodsType, unitType, (int) potential);
+                    }
+                }
             }
             for (TileImprovementType impType : FreeCol.getSpecification().getTileImprovementTypeList()) {
                 if (impType.isNatural() || !impType.isTileTypeAllowed(tileType)) {
@@ -1354,8 +1358,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             Resource resource = tileItemContainer.getResource();
             // Potential of this Tile and Improvements
             // TODO: review
-            int potential = getTileTypePotential(getType(), goodsType, tileItemContainer, unitType)
-                + tileItemContainer.getImprovementBonusPotential(goodsType);
+            int potential = getTileTypePotential(getType(), goodsType, tileItemContainer, unitType);
+            for (TileItem item : tileItemContainer.getTileItems()) {
+                if (item instanceof TileImprovement) {
+                    potential += ((TileImprovement) item).getBonus(goodsType);
+                }
+            }
+
             if (resource.useQuantity(goodsType, unitType, potential) == 0) {
                 addModelMessage(settlement, ModelMessage.MessageType.WARNING,
                                 "model.tile.resourceExhausted", 
