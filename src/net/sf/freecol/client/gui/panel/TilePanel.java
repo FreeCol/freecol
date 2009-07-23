@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -47,6 +48,7 @@ import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.UnitType;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -107,24 +109,38 @@ public final class TilePanel extends FreeColPanel {
         }
 
         if (tileType != null) {
+            // TODO: make this more generic
+            UnitType colonist = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
+
             JLabel label;
-            List<AbstractGoods> production = tile.getSortedPotential();
-            for (int index = 0; index < production.size(); index++) {
-                AbstractGoods goods = production.get(index);
-                label = new JLabel(String.valueOf(goods.getAmount()),
-                                   getLibrary().getGoodsImageIcon(goods.getType()),
-                                   JLabel.CENTER);
-                if (index == 0 && production.size() > 1) {
-                    add(label, "split " + production.size());
-                } else {
+            boolean first = true;
+            for (GoodsType goodsType : FreeCol.getSpecification().getFarmedGoodsTypeList()) {
+                int potential = tile.potential(goodsType, colonist);
+                UnitType expert = FreeCol.getSpecification().getExpertForProducing(goodsType);
+                int expertPotential = tile.potential(goodsType, expert);
+                if (potential > 0) {
+                    label = new JLabel(String.valueOf(potential),
+                                       getLibrary().getGoodsImageIcon(goodsType),
+                                       JLabel.CENTER);
+                    if (first) {
+                        add(label, "split");
+                        first = false;
+                    } else {
+                        add(label);
+                    }
+                }
+                if (expertPotential > potential) {
+                    label = new JLabel(String.valueOf(expertPotential),
+                                       getLibrary().getGoodsImageIcon(goodsType),
+                                       JLabel.CENTER);
+                    label.setToolTipText(expert.getName());
                     add(label);
                 }
-
             }
         }
 
-        add(okButton, "newline 30, split 2, align center");
-        add(colopediaButton);
+        add(okButton, "newline 30, split 2, align center, tag ok");
+        add(colopediaButton, "tag help");
 
         setSize(getPreferredSize());
 
