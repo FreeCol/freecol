@@ -333,9 +333,17 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The total bonus
      */
     public int getTotalBonusPotential(GoodsType g, UnitType unitType, int tilePotential) {
-        int potential = getResourceBonusPotential(g, unitType, tilePotential);
-        if (tilePotential > 0) {
-            potential += getImprovementBonusPotential(g);
+        int potential = tilePotential;
+        int improvementBonus = 0;
+        for (TileItem item : tileItems) {
+            if (item instanceof TileImprovement) {
+                improvementBonus += ((TileImprovement) item).getBonus(g);
+            } else if (item instanceof Resource) {
+                potential = ((Resource) item).getBonus(g, unitType, potential);
+            }
+        }
+        if (potential > 0) {
+            potential += improvementBonus;
         }
         return potential;
     }
