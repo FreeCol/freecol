@@ -119,9 +119,9 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         add(tableScroll, "width 600:, span 2, grow");
         add(chatScroll, "width 250:, grow");
-        add(mapGeneratorOptions, "grow");
-        add(gameOptions, "grow");
-        add(chat, "grow");
+        add(mapGeneratorOptions, "growx, top");
+        add(gameOptions, "growx, top");
+        add(chat, "grow, top");
         add(readyBox, "span");
         add(start, "span, split 2, tag ok");
         add(cancel, "tag cancel");
