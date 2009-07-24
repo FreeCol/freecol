@@ -84,7 +84,7 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
 
         JButton cancel = new JButton(Messages.message("cancel"));
 
-        JScrollPane chatScroll, tableScroll;
+        JScrollPane chatScroll = null, tableScroll;
 
         setCancelComponent(cancel);
 
@@ -103,27 +103,30 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
             readyBox.setSelected(true);
         } else {
             readyBox.setSelected(getMyPlayer().isReady());
+            chat = new JTextField();
+            chatArea = new JTextArea();
+            chatScroll = new JScrollPane(chatArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                                         ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         }
-
-        chat = new JTextField();
-        chatArea = new JTextArea();
-        chatScroll = new JScrollPane(chatArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         refreshPlayersTable();
         tableScroll = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                                       ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         tableScroll.getViewport().setOpaque(false);
 
-        setLayout(new MigLayout("wrap 3, fill", "", ""));
+        setLayout(new MigLayout("fill", "", ""));
 
         add(tableScroll, "width 600:, span 2, grow");
-        add(chatScroll, "width 250:, grow");
-        add(mapGeneratorOptions, "growx, top");
+        if (!singlePlayerGame) {
+            add(chatScroll, "width 250:, grow");
+        }
+        add(mapGeneratorOptions, "newline, growx, top");
         add(gameOptions, "growx, top");
-        add(chat, "grow, top");
-        add(readyBox, "span");
-        add(start, "span, split 2, tag ok");
+        if (!singlePlayerGame) {
+            add(chat, "grow, top");
+        }
+        add(readyBox, "newline, span");
+        add(start, "newline, span, split 2, tag ok");
         add(cancel, "tag cancel");
 
         start.setActionCommand(String.valueOf(START));
@@ -131,7 +134,15 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         readyBox.setActionCommand(String.valueOf(READY));
         gameOptions.setActionCommand(String.valueOf(GAME_OPTIONS));
         mapGeneratorOptions.setActionCommand(String.valueOf(MAP_GENERATOR_OPTIONS));
-        chat.setActionCommand(String.valueOf(CHAT));
+
+        if (!singlePlayerGame) {
+            chat.setActionCommand(String.valueOf(CHAT));
+            chat.addActionListener(this);
+            chatArea.setEditable(false);
+            chatArea.setLineWrap(true);
+            chatArea.setWrapStyleWord(true);
+            chatArea.setText("");
+        }
 
         enterPressesWhenFocused(start);
         enterPressesWhenFocused(cancel);
@@ -139,17 +150,10 @@ public final class StartGamePanel extends FreeColPanel implements ActionListener
         start.addActionListener(this);
         cancel.addActionListener(this);
         readyBox.addActionListener(this);
-        chat.addActionListener(this);
         gameOptions.addActionListener(this);
         mapGeneratorOptions.addActionListener(this);
 
-        chatArea.setEditable(false);
-        chatArea.setLineWrap(true);
-        chatArea.setWrapStyleWord(true);
-
         setSize(getPreferredSize());
-
-        chatArea.setText("");
 
         setEnabled(true);
 
