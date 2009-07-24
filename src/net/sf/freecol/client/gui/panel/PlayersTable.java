@@ -48,6 +48,7 @@ import javax.swing.table.TableColumn;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.panel.ColopediaPanel.PanelType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
@@ -90,6 +91,8 @@ public final class PlayersTable extends JTable {
         NationState.NOT_AVAILABLE
     };
 
+    private final ImageLibrary library;
+
     /**
      * The constructor that will add the items to this panel.
      * 
@@ -98,8 +101,10 @@ public final class PlayersTable extends JTable {
     public PlayersTable(final Canvas canvas, NationOptions nationOptions, Player myPlayer) {
         super();
 
+        library = canvas.getGUI().getImageLibrary();
+
         setModel(new PlayersTableModel(canvas.getClient().getPreGameController(), nationOptions, myPlayer));
-        setRowHeight(22);
+        setRowHeight(47);
 
         JButton nationButton = new JButton(Messages.message("nation"));
         JLabel availabilityLabel = new JLabel(Messages.message("availability"));
@@ -128,7 +133,7 @@ public final class PlayersTable extends JTable {
         header.addMouseListener(new HeaderListener(header, renderer));
 
         TableColumn nationColumn = getColumnModel().getColumn(NATION_COLUMN);
-        nationColumn.setCellRenderer(dtcr);
+        nationColumn.setCellRenderer(new NationCellRenderer());
         nationColumn.setHeaderRenderer(renderer);
 
         TableColumn availableColumn = getColumnModel().getColumn(AVAILABILITY_COLUMN);
@@ -208,6 +213,33 @@ public final class PlayersTable extends JTable {
         }
     }
 
+
+    class NationCellRenderer implements TableCellRenderer {
+
+        JLabel label = new JLabel();
+
+        /**
+         * Returns the component used to render the cell's value.
+         * @param table The table whose cell needs to be rendered.
+         * @param value The value of the cell being rendered.
+         * @param hasFocus Indicates whether or not the cell in question has focus.
+         * @param row The row index of the cell that is being rendered.
+         * @param column The column index of the cell that is being rendered.
+         * @return The component used to render the cell's value.
+         */
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                                                       boolean hasFocus, int row, int column) {
+
+            Nation nation = (Nation) value;
+            label.setText(nation.getName());
+            if (nation.getType().isEuropean()) {
+                label.setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f));
+            } else {
+                label.setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.25f));
+            }
+            return label;
+        }
+    }
 
     class AvailableCellRenderer extends JLabel implements TableCellRenderer {
 
