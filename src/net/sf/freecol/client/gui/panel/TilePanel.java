@@ -112,7 +112,7 @@ public final class TilePanel extends FreeColPanel {
             // TODO: make this more generic
             UnitType colonist = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
 
-            JLabel label;
+            JLabel label = null;
             boolean first = true;
             for (GoodsType goodsType : FreeCol.getSpecification().getFarmedGoodsTypeList()) {
                 int potential = tile.potential(goodsType, colonist);
@@ -130,11 +130,26 @@ public final class TilePanel extends FreeColPanel {
                     }
                 }
                 if (expertPotential > potential) {
-                    label = new JLabel(String.valueOf(expertPotential),
-                                       getLibrary().getGoodsImageIcon(goodsType),
-                                       JLabel.CENTER);
-                    label.setToolTipText(expert.getName());
-                    add(label);
+                    if (label == null) {
+                        // this could happen if a resource were exploitable
+                        // only by experts, for example
+                        label = new JLabel(String.valueOf(expertPotential),
+                                           getLibrary().getGoodsImageIcon(goodsType),
+                                           JLabel.CENTER);
+                        label.setToolTipText(expert.getName());
+                        if (first) {
+                            add(label, "split");
+                            first = false;
+                        } else {
+                            add(new JLabel("/"));
+                            add(label);
+                        }
+                    } else {
+                        label.setText(String.valueOf(potential) + "/" +
+                                      String.valueOf(expertPotential));
+                        label.setToolTipText(colonist.getName() + "/" +
+                                             expert.getName());
+                    }
                 }
             }
         }
