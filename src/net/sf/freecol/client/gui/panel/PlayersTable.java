@@ -232,11 +232,7 @@ public final class PlayersTable extends JTable {
 
             Nation nation = (Nation) value;
             label.setText(nation.getName());
-            if (nation.getType().isEuropean()) {
-                label.setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f));
-            } else {
-                label.setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.25f));
-            }
+            label.setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f));
             return label;
         }
     }
