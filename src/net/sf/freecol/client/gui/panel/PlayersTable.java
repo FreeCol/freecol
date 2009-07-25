@@ -297,6 +297,11 @@ public final class PlayersTable extends JTable {
     class PlayerCellRenderer implements TableCellRenderer {
 
         JLabel label = new JLabel();
+        JButton button = new JButton(Messages.message("select"));
+
+        public PlayerCellRenderer() {
+            label.setHorizontalAlignment(JLabel.CENTER);
+        }
 
         /**
          * Returns the component used to render the cell's value.
@@ -314,7 +319,10 @@ public final class PlayersTable extends JTable {
             if (player == null) {
                 NationType nationType = (NationType) table.getValueAt(row, ADVANTAGE_COLUMN);
                 if (nationType instanceof EuropeanNationType) {
-                    label.setText("");
+                    NationState nationState = (NationState) table
+                        .getValueAt(row, AVAILABILITY_COLUMN);
+                    button.setEnabled(nationState == NationState.AVAILABLE);
+                    return button;
                 } else {
                     Nation nation = (Nation) table.getValueAt(row, NATION_COLUMN);
                     label.setText(nation.getRulerName());
@@ -328,11 +336,19 @@ public final class PlayersTable extends JTable {
 
     public final class PlayerCellEditor extends AbstractCellEditor implements TableCellEditor {
 
-        private JLabel label = new JLabel(Messages.message("select"));
+        private JButton button = new JButton(Messages.message("select"));
+
+        public PlayerCellEditor() {
+            button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        fireEditingStopped();
+                    }
+                });
+        }
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
                                                      int row, int column) {
-            return label;
+            return button;
         }
 
         public Object getCellEditorValue() {
