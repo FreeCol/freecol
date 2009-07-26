@@ -1299,6 +1299,24 @@ public final class Canvas extends JDesktopPane {
      */
     public String showInputDialog(String text, String defaultValue, String okText, String cancelText,
                                   String... data) {
+        return showInputDialog(text, defaultValue, okText, cancelText, true, data);
+    }
+
+    /**
+     * Displays a dialog with a text field and a ok/cancel option.
+     * 
+     * @param text The text that explains the action to the user.
+     * @param defaultValue The default value appearing in the text field.
+     * @param okText The text displayed on the "ok"-button.
+     * @param cancelText The text displayed on the "cancel"-button. Use <i>null</i>
+     *            to disable the cancel-option.
+     * @param rejectEmptyString a <code>boolean</code> value
+     * @return The text the user have entered or <i>null</i> if the user chose
+     *         to cancel the action.
+     * @see FreeColDialog
+     */
+    public String showInputDialog(String text, String defaultValue, String okText, String cancelText,
+                                  boolean rejectEmptyString, String... data) {
         try {
             text = Messages.message(text, data);
             okText = Messages.message(okText);
@@ -1317,7 +1335,7 @@ public final class Canvas extends JDesktopPane {
         String response = (String) inputDialog.getResponse();
 
         // checks if the user entered some text.
-        if ((response != null) && (response.length() == 0)) {
+        while (rejectEmptyString && (response != null) && (response.length() == 0)) {
             String okTxt = "ok";
             String txt = "enterSomeText";
             try {
@@ -1329,19 +1347,17 @@ public final class Canvas extends JDesktopPane {
 
             InformationDialog informationDialog = new InformationDialog(this, txt, null);
 
-            do {
-                remove(inputDialog);
-                addAsFrame(informationDialog);
-                informationDialog.requestFocus();
+            remove(inputDialog);
+            addAsFrame(informationDialog);
+            informationDialog.requestFocus();
 
-                informationDialog.getResponse();
-                remove(informationDialog);
+            informationDialog.getResponse();
+            remove(informationDialog);
 
-                addAsFrame(inputDialog);
-                inputDialog.requestFocus();
+            addAsFrame(inputDialog);
+            inputDialog.requestFocus();
 
-                response = (String) inputDialog.getResponse();
-            } while ((response != null) && (response.length() == 0));
+            response = (String) inputDialog.getResponse();
         }
 
         remove(inputDialog);

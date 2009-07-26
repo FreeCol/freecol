@@ -442,8 +442,9 @@ public final class InGameController implements NetworkConstants {
             name = freeColClient.getCanvas().showInputDialog("renameUnit.text",
                                                              object.getName(),
                                                              "renameUnit.yes",
-                                                             "renameUnit.no");
-            if (name == null || name.length() == 0) {
+                                                             "renameUnit.no",
+                                                             false);
+            if (name == null) {
                 return; // user cancelled
             }
         } else {

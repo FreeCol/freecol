@@ -2460,18 +2460,34 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return The given unit type as a String
      */
     public String getName() {
+        String completeName = "";
+        String customName = "";
         if (name != null) {
-            return name;
-        } else if (canCarryTreasure()) {
-            return Messages.message(getType().getId() + ".gold", "%gold%",
+            customName = " " + name + " ";
+        }
+
+        //Gets the type of the unit to be displayed with custom name
+        if (canCarryTreasure()) {
+            completeName = Messages.message(getType().getId() + ".gold", "%gold%",
                                     String.valueOf(getTreasureAmount()));
         } else if ((equipment == null || equipment.isEmpty()) &&
                    getType().getDefaultEquipmentType() != null) {
-            return getName(getType(), getRole()) + " (" +
+            completeName = getName(getType(), getRole()) + " (" +
                 Messages.message(getType().getDefaultEquipmentType().getId() + ".none") + ")";
         } else {
-            return getName(getType(), getRole());
+            completeName = getName(getType(), getRole());
         }
+
+        //Adds the custom name to the type of the unit
+        int index = completeName.lastIndexOf(" (");
+        if (index < 0) {
+            completeName = completeName + customName;
+        } else {
+            completeName = completeName.substring(0, index) + customName + 
+                completeName.substring(index + 1);
+        }
+
+        return completeName;
     }
 
     /**
@@ -2501,11 +2517,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param newName The new Name value.
      */
     public void setName(String newName) {
-        if (name != null && newName.equals("")) {
-            this.name = null;
-        } else {
-            this.name = newName;
-        }
+        this.name = newName;
     }
 
     /**
