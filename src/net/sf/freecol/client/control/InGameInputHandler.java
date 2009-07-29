@@ -551,7 +551,6 @@ public final class InGameInputHandler extends InputHandler {
     private Element setDead(Element element) {
         FreeColClient freeColClient = getFreeColClient();
         Player player = (Player) getGame().getFreeColGameObject(element.getAttribute("player"));
-        player.setDead(true);
 
         if (player == freeColClient.getMyPlayer()) {
             if (freeColClient.isSingleplayer()) {

@@ -68,6 +68,7 @@ import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -150,7 +151,49 @@ public final class InGameController extends Controller {
             return;
         }
     }
-    
+
+    /**
+     * Create an element to mark a player as dead, inform other players, and
+     * remove any leftover units.
+     *
+     * @param serverPlayer The player to kill.
+     * @return An element to kill the player.
+     */
+    private Element killPlayerElement(ServerPlayer serverPlayer) {
+        Element element = Message.createNewRootElement("multiple");
+        Document doc = element.getOwnerDocument();
+
+        Element update = doc.createElement("update");
+        element.appendChild(update);
+        Player player = (Player) serverPlayer;
+        player.setDead(true);
+        update.appendChild(player.toXMLElementPartial(doc, "dead"));
+
+        Element remove = doc.createElement("remove");
+        element.appendChild(remove);
+        List<Unit> unitList = new ArrayList<Unit>(serverPlayer.getUnits());
+        for (Unit unit : unitList) {
+            serverPlayer.removeUnit(unit);
+            remove.appendChild(unit.toXMLElement(serverPlayer, doc));
+            unit.dispose();
+        }
+
+        Element messages = doc.createElement("addMessages");
+        element.appendChild(messages);
+        ModelMessage m = new ModelMessage(serverPlayer,
+                                          ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                          serverPlayer, "model.diplomacy.dead",
+                                          "%nation%", serverPlayer.getNationAsString());
+        messages.appendChild(m.toXMLElement(doc));
+
+        Element setDeadElement = doc.createElement("setDead");
+        element.appendChild(setDeadElement);
+        setDeadElement.setAttribute("player", serverPlayer.getId());
+
+        return element;
+    }
+
+
     /**
      * Sets a new current player and notifies the clients.
      * @return The new current player.
@@ -184,10 +227,9 @@ public final class InGameController extends Controller {
         
         synchronized (newPlayer) {
             if (Player.checkForDeath(newPlayer)) {
-                newPlayer.setDead(true);
-                Element setDeadElement = Message.createNewRootElement("setDead");
-                setDeadElement.setAttribute("player", newPlayer.getId());
-                freeColServer.getServer().sendToAll(setDeadElement, null);
+                Element element = killPlayerElement(newPlayer);
+                freeColServer.getServer().sendToAll(element, null);
+                logger.info(newPlayer.getNationAsString() + " is dead.");
                 return nextPlayer();
             }
         }
