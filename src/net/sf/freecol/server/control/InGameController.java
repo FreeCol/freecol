@@ -169,13 +169,15 @@ public final class InGameController extends Controller {
         player.setDead(true);
         update.appendChild(player.toXMLElementPartial(doc, "dead"));
 
-        Element remove = doc.createElement("remove");
-        element.appendChild(remove);
-        List<Unit> unitList = new ArrayList<Unit>(serverPlayer.getUnits());
-        for (Unit unit : unitList) {
-            serverPlayer.removeUnit(unit);
-            remove.appendChild(unit.toXMLElement(serverPlayer, doc));
-            unit.dispose();
+        if (!serverPlayer.getUnits().isEmpty()) {
+            Element remove = doc.createElement("remove");
+            element.appendChild(remove);
+            List<Unit> unitList = new ArrayList<Unit>(serverPlayer.getUnits());
+            for (Unit unit : unitList) {
+                serverPlayer.removeUnit(unit);
+                remove.appendChild(unit.toXMLElement(serverPlayer, doc));
+                unit.dispose();
+            }
         }
 
         Element messages = doc.createElement("addMessages");
