@@ -154,7 +154,7 @@ public abstract class Mission extends AIObject {
             for (j = 0; j < randomDirections.length; j++) {
                 direction = randomDirections[j];
                 if (unit.getGame().getMap().getNeighbourOrNull(direction, thisTile) != null &&
-                    unit.getSimpleMoveType(direction) == MoveType.MOVE) {
+                    unit.getMoveType(direction) == MoveType.MOVE) {
                     break;
                 }
             }
