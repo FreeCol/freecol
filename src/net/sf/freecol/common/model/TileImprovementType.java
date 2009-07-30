@@ -285,7 +285,7 @@ public final class TileImprovementType extends FreeColGameObjectType
                                                         TileImprovementType.class, null);
 
         artOverlay = getAttribute(in, "overlay", null);
-        zIndex = getAttribute(in, "z-index", 0);
+        zIndex = getAttribute(in, "zIndex", 0);
 
         expendedEquipmentType = specification.getType(in, "expended-equipment-type", EquipmentType.class, null);
         expendedAmount = getAttribute(in, "expended-amount", 0);
