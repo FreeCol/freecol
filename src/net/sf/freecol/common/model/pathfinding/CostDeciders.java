@@ -45,7 +45,7 @@ public final class CostDeciders {
      *      unit (ai/human) and if the unit can attack other units.
      */
     public static CostDecider defaultFor(final Unit unit) {
-        if (!unit.getOwner().isAI()) {
+        if (unit==null || !unit.getOwner().isAI()) {
             return avoidSettlementsAndBlockingUnits();
         }
         return unit.isOffensiveUnit() ? avoidSettlements() : avoidSettlementsAndBlockingUnits();
