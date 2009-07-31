@@ -1157,7 +1157,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 } else {
                     for (int k = 0; k < dx; k++) {
                         newUnit = new Unit(getGame(), player.getEurope(), player,
-                                           player.generateRecruitable(),
+                                           player.generateRecruitable(player.getId() + "fountain." + Integer.toString(k)),
                                            UnitState.ACTIVE);
                         rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
                     }
@@ -1211,7 +1211,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(element.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable();
+        UnitType newRecruitable = player.generateRecruitable(player.getId() + "slot." + Integer.toString(slot));
         europe.setRecruitable(slot, newRecruitable);
         
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE);
@@ -1975,7 +1975,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable();
+        UnitType newRecruitable = player.generateRecruitable(player.getId() + "slot." + Integer.toString(slot));
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
         reply.setAttribute("newRecruitable", newRecruitable.getId());

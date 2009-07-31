@@ -1868,7 +1868,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
                     UnitType recruitable = getEurope().getRecruitable(index);
                     if (featureContainer.hasAbility("model.ability.canNotRecruitUnit", recruitable)) {
-                        getEurope().setRecruitable(index, generateRecruitable());
+                        getEurope().setRecruitable(index, generateRecruitable(getId() + "slot." + Integer.toString(index+1)));
                     }
                 }
             }
@@ -2304,6 +2304,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * Generates a random unit type. The unit type that is returned represents
      * the type of a unit that is recruitable in Europe.
      *
+     * @param taskId A taskId for getRandom().
      * @return A random unit type of a unit that is recruitable in Europe.
      *
      * @todo This is correctly called from server pre and in-game controllers,
@@ -2311,7 +2312,7 @@ public class Player extends FreeColGameObject implements Nameable {
      *       When fathers get moved server-side, revisit this routine.
      *
      */
-    public UnitType generateRecruitable() {
+    public UnitType generateRecruitable(String taskId) {
         ArrayList<RandomChoice<UnitType>> recruitables = new ArrayList<RandomChoice<UnitType>>();
         for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
             if (unitType.isRecruitable()
@@ -2321,8 +2322,9 @@ public class Player extends FreeColGameObject implements Nameable {
                 recruitables.add(new RandomChoice<UnitType>(unitType, prob));
             }
         }
-        PseudoRandom random = getGame().getModelController().getPseudoRandom();
-        return RandomChoice.getWeightedRandom(random, recruitables);
+        int total = RandomChoice.getTotalProbability(recruitables);
+        int random = getGame().getModelController().getRandom(taskId, total);
+        return RandomChoice.select(recruitables, random);
     }
 
     /**

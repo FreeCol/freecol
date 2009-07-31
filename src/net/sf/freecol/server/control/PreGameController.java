@@ -164,7 +164,7 @@ public final class PreGameController extends Controller {
                             .getStringOption(optionId).getValue();
                         europe.setRecruitable(index, Specification.getSpecification().getUnitType(unitTypeId));
                     } else {
-                        europe.setRecruitable(index, player.generateRecruitable());
+                        europe.setRecruitable(index, player.generateRecruitable(player.getId() + "slot." + Integer.toString(index+1)));
                     }
                 }
 

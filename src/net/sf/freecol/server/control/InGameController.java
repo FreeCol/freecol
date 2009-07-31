@@ -1062,7 +1062,7 @@ public final class InGameController extends Controller {
         }
 
         // Replace the recruit we used.
-        europe.setRecruitable(index, player.generateRecruitable());
+        europe.setRecruitable(index, player.generateRecruitable(player.getId() + "slot." + Integer.toString(slot)));
 
         // Return an informative message only if this was an ordinary migration
         // where we did not select the unit type.
