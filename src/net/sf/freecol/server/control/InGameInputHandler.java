@@ -1258,7 +1258,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (settlement.getLearnableSkill() != null) {
             reply.setAttribute("skill", settlement.getLearnableSkill().getId());
         }
-        settlement.setVisited(unit.getOwner());
         // Set the Tile.PlayerExploredTile attribute.
         settlement.getTile().updateIndianSettlementSkill(player);
         return reply;
@@ -1653,7 +1652,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         } else if (action.equals("speak")) {
             unit.contactAdjacent(settlement.getTile());
             if (!settlement.hasBeenVisited()) {
-                if (settlement.getLearnableSkill().hasAbility("model.ability.expertScout")) {
+                if (settlement.getLearnableSkill() != null
+                    && settlement.getLearnableSkill().hasAbility("model.ability.expertScout")) {
                     unit.setType(settlement.getLearnableSkill());
                     reply.setAttribute("result", "expert");
                     Element update = reply.getOwnerDocument().createElement("update");
@@ -1767,7 +1767,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
                 .getSettlement();
         unit.setMovesLeft(0);
-        settlement.setVisited(unit.getOwner());
         if (action.equals("cancel")) {
             return null;
         } else if (action.equals("establish")) {

@@ -3190,49 +3190,42 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
-        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
-            .getSettlement();
+        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
 
-        if (settlement != null && (settlement.getLearnableSkill() != null || !settlement.hasBeenVisited())) {
-            unit.setMovesLeft(0);
-            String skillName;
+        if (settlement != null) {
+            UnitType skill = settlement.getLearnableSkill();
 
-            Element askSkill = Message.createNewRootElement("askSkill");
-            askSkill.setAttribute("unit", unit.getId());
-            askSkill.setAttribute("direction", direction.toString());
-
-            Element reply = client.ask(askSkill);
-            UnitType skill = null;
-
-            if (reply.getTagName().equals("provideSkill")) {
-                if (reply.hasAttribute("skill")) {
-                    skill = FreeCol.getSpecification().getUnitType(reply.getAttribute("skill"));
-                    skillName = skill.getName();
+            if (skill == null) {
+                Element askSkill = Message.createNewRootElement("askSkill");
+                askSkill.setAttribute("unit", unit.getId());
+                askSkill.setAttribute("direction", direction.toString());
+                Element reply = client.ask(askSkill);
+                if (reply.getTagName().equals("provideSkill")) {
+                    if (reply.hasAttribute("skill")) {
+                        skill = FreeCol.getSpecification().getUnitType(reply.getAttribute("skill"));
+                        settlement.setLearnableSkill(skill);
+                    }
                 } else {
-                    skillName = null;
+                    logger.warning("Server gave an invalid reply to an askSkill message");
+                    return;
                 }
-            } else {
-                logger.warning("Server gave an invalid reply to an askSkill message");
-                return;
             }
 
-            settlement.setLearnableSkill(skill);
-            settlement.setVisited(unit.getOwner());
-
-            if (skillName == null) {
+            unit.setMovesLeft(0);
+            if (skill == null) {
                 canvas.errorMessage("indianSettlement.noMoreSkill");
             } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
                 canvas.showInformationMessage("indianSettlement.cantLearnSkill",
                                               settlement,
                                               "%unit%", unit.getName(),
-                                              "%skill%", skillName);
+                                              "%skill%", skill.getName());
             } else {
                 Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
                 learnSkill.setAttribute("unit", unit.getId());
                 learnSkill.setAttribute("direction", direction.toString());
-
-                if (!canvas.showConfirmDialog("learnSkill.text", "learnSkill.yes", "learnSkill.no",
-                                              "%replace%", skillName)) {
+                if (!canvas.showConfirmDialog("learnSkill.text",
+                                              "learnSkill.yes", "learnSkill.no",
+                                              "%replace%", skill.getName())) {
                     // the player declined to learn the skill
                     learnSkill.setAttribute("action", "cancel");
                 }
@@ -3246,8 +3239,9 @@ public final class InGameController implements NetworkConstants {
                     canvas.showInformationMessage("learnSkill.leave");
                 } else if (result.equals("success")) {
                     unit.setType(skill);
-                    if (!settlement.isCapital())
+                    if (!settlement.isCapital()) {
                         settlement.setLearnableSkill(null);
+                    }
                 } else if (result.equals("cancelled")) {
                     // do nothing
                 } else {
