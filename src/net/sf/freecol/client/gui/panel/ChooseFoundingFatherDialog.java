@@ -54,7 +54,6 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
 
     private final JTabbedPane tb;
 
-    private final ChooseFoundingFatherDialog chooseFoundingFatherDialog;
 
     private final List<FoundingFather> possibleFathers;
 
@@ -71,7 +70,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
     public ChooseFoundingFatherDialog(Canvas parent, List<FoundingFather> possibleFoundingFathers) {
         super(parent);
         possibleFathers = possibleFoundingFathers;
-        chooseFoundingFatherDialog = this;
+        setBorder(null);
+        setOpaque(false);
 
         setFocusCycleRoot(false);
 
@@ -80,13 +80,15 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
         boolean hasSelectedTab = false;
         for (int index = 0; index < possibleFoundingFathers.size(); index++) {
             FoundingFather father = possibleFoundingFathers.get(index);
-            FoundingFatherPanel panel = new FoundingFatherPanel(father.getType());
+            final FoundingFatherPanel panel = new FoundingFatherPanel(father.getType());
             panel.initialize(father);
             tb.addTab(father.getTypeAsString(), null, panel, null);
             if (!hasSelectedTab && panel.isEnabled()) {
                 tb.setSelectedIndex(index);
                 hasSelectedTab = true;
             }
+            panel.addMouseListener(FreeColPanel.createEventForwardingMouseListener(ChooseFoundingFatherDialog.this));
+            panel.addMouseMotionListener(FreeColPanel.createEventForwardingMouseMotionListener(ChooseFoundingFatherDialog.this));
         }
         add(tb);
         setSize(tb.getPreferredSize());
@@ -153,7 +155,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             p3.setOpaque(false);
             p3.setBorder(new EmptyBorder(0, 160, 20, 160));
             ok = new JButton(Messages.message("chooseThisFoundingFather"));
-            ok.addActionListener(chooseFoundingFatherDialog);
+            ok.addActionListener(ChooseFoundingFatherDialog.this);
             ok.setSize(ok.getPreferredSize());
             enterPressesWhenFocused(ok);
             p3.add(ok, BorderLayout.CENTER);

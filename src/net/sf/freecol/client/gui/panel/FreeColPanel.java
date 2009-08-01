@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
@@ -29,6 +30,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -55,6 +59,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
@@ -375,5 +380,58 @@ public class FreeColPanel extends JPanel implements ActionListener {
         if (OK.equals(command)) {
             getCanvas().remove(this);
         }
+    }
+
+    /**
+     * Creates a <code>MouseListener</code> which forwards events
+     * to the given <code>Component</code>.
+     *
+     * @param c The <code>Component</code> the events should be forwarded to.
+     */
+    public static MouseListener createEventForwardingMouseListener(final Component c) {
+        final MouseListener ml = new MouseListener() {
+            private void forward(MouseEvent e) {
+                c.dispatchEvent(javax.swing.SwingUtilities.convertMouseEvent(e.getComponent(), e, c));
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                forward(e);
+            }
+            public void mouseEntered(MouseEvent e) {
+                forward(e);
+            }
+            public void mouseExited(MouseEvent e) {
+                forward(e);
+            }
+            public void mousePressed(MouseEvent e) {
+                forward(e);
+            }
+            public void mouseReleased(MouseEvent e) {
+                forward(e);
+            }
+        };
+        return ml;
+    }
+
+    /**
+     * Creates a <code>MouseMotionListener</code> which forwards events
+     * to the given <code>Component</code>.
+     *
+     * @param c The <code>Component</code> the events should be forwarded to.
+     */
+    public static MouseMotionListener createEventForwardingMouseMotionListener(final Component c) {
+        final MouseMotionListener ml = new MouseMotionListener() {
+            private void forward(MouseEvent e) {
+                c.dispatchEvent(javax.swing.SwingUtilities.convertMouseEvent(e.getComponent(), e, c));
+            }
+
+            public void mouseDragged(MouseEvent e) {
+                forward(e);
+            }
+            public void mouseMoved(MouseEvent e) {
+                forward(e);
+            }
+        };
+        return ml;
     }
 }
