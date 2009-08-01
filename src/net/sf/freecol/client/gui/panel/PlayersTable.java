@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -214,9 +215,7 @@ public final class PlayersTable extends JTable {
     }
 
 
-    class NationCellRenderer implements TableCellRenderer {
-
-        JLabel label = new JLabel();
+    class NationCellRenderer extends JLabel implements TableCellRenderer {
 
         /**
          * Returns the component used to render the cell's value.
@@ -231,9 +230,9 @@ public final class PlayersTable extends JTable {
                                                        boolean hasFocus, int row, int column) {
 
             Nation nation = (Nation) value;
-            label.setText(nation.getName());
-            label.setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f));
-            return label;
+            setText(nation.getName());
+            setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f));
+            return this;
         }
     }
 
@@ -297,6 +296,10 @@ public final class PlayersTable extends JTable {
 
         public PlayerCellRenderer() {
             label.setHorizontalAlignment(JLabel.CENTER);
+            button.setBorder(BorderFactory
+                             .createCompoundBorder(BorderFactory
+                                                   .createEmptyBorder(5, 10, 5, 10),
+                                                   button.getBorder()));
         }
 
         /**
