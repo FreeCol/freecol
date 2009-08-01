@@ -1298,6 +1298,7 @@
     <founding-father id="model.foundingFather.janDeWitt" type="trade"
                      weight1="2" weight2="6" weight3="10">
       <ability id="model.ability.tradeWithForeignColonies" value="true"/>
+      <ability id="model.ability.customHouseTradesWithForeignCountries" value="true"/>
       <ability id="model.ability.betterForeignAffairsReport" value="true"/>
     </founding-father>
     <founding-father id="model.foundingFather.ferdinandMagellan" type="exploration"

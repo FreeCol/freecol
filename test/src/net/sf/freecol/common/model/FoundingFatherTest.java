@@ -331,4 +331,22 @@ public class FoundingFatherTest extends FreeColTestCase {
         errMsg = "Unit be able to automatically arm, has muskets and Paul Revere";
         assertFalse(errMsg, colonist.getAutomaticEquipment() == null);
     }
+
+    public void testDeWitt() {
+
+    	Game game = getGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        dutch.setArrears(musketsType);
+
+        assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
+
+        FoundingFather father = spec().getFoundingFather("model.foundingFather.janDeWitt");
+        dutch.addFather(father);
+
+        assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
+        assertTrue(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
+
+    }
+
 }

@@ -3191,11 +3191,13 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean canTrade(GoodsType type, int marketAccess) {
         MarketData data = getMarket().getMarketData(type);
-        if (data == null) {
+        if (data == null || data.getArrears() == 0) {
             return true;
+        } else if (marketAccess == Market.CUSTOM_HOUSE) {
+            return (getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
+                    || hasAbility("model.ability.customHouseTradesWithForeignCountries"));
         } else {
-            return (data.getArrears() == 0 || (marketAccess == Market.CUSTOM_HOUSE && getGameOptions().getBoolean(
-                                                                                                                  GameOptions.CUSTOM_IGNORE_BOYCOTT)));
+            return false;
         }
     }
 
