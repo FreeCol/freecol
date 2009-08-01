@@ -270,10 +270,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(rebelLabel, "split 3");
         add(bonusLabel, "gap left push, gap right push");
         add(royalistLabel);
-        add(inPortScroll, "grow, height 60:");
-        add(cargoScroll, "grow, height 60:");
-        add(outsideColonyScroll, "grow, height 60:");
-        add(warehouseScroll, "span, height 60!, growx");
+        add(inPortScroll, "grow, height 60:100");
+        add(cargoScroll, "grow, height 60:100");
+        add(outsideColonyScroll, "grow, height 60:100");
+        add(warehouseScroll, "span, height 40:60:80, growx");
         add(unloadButton, "span, split 5, align center");
         add(fillButton);
         add(warehouseButton);
@@ -752,7 +752,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     public final class ColonyCargoPanel extends CargoPanel {
 
         public ColonyCargoPanel(Canvas canvas) {
-            super(canvas, false);
+            super(canvas, true);
         }
 
         @Override
@@ -916,6 +916,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         private Colony colony;
 
+        public OutsideColonyPanel() {
+            super();
+            setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                       Messages.message("outsideColony")));
+        }
+
         public void setColony(Colony newColony) {
             if (colony != null) {
                 colony.getTile().removePropertyChangeListener(Tile.UNIT_CHANGE, this);
@@ -1015,6 +1021,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * waiting in the port of the colony.
      */
     public final class InPortPanel extends JPanel {
+
+        public InPortPanel() {
+            super();
+            setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(),
+                                                       Messages.message("inPort")));
+        }
 
         @Override
         public String getUIClassID() {
