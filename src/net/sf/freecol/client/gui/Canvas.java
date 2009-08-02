@@ -50,6 +50,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
@@ -83,9 +84,9 @@ import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.client.gui.panel.TrainDialog;
-import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.client.gui.video.Video;
 import net.sf.freecol.client.gui.video.VideoComponent;
+import net.sf.freecol.client.gui.video.VideoListener;
 import net.sf.freecol.common.ServerInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
@@ -1775,21 +1776,25 @@ public final class Canvas extends JDesktopPane {
         }
 
         if (comp.getBorder() != null) {
-            Image menuborderN = ResourceManager.getImage("menuborder.n.image");
-            Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
-            Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
-            Image menuborderW = ResourceManager.getImage("menuborder.w.image");
-            Image menuborderE = ResourceManager.getImage("menuborder.e.image");
-            Image menuborderS = ResourceManager.getImage("menuborder.s.image");
-            Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
-            Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
-            final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
-                    menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-            // comp.setBorder(BorderFactory.createCompoundBorder(imageBorder,
-            // BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+            if (comp.getBorder() instanceof EmptyBorder) {
+                f.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            } else {
+                Image menuborderN = ResourceManager.getImage("menuborder.n.image");
+                Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
+                Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
+                Image menuborderW = ResourceManager.getImage("menuborder.w.image");
+                Image menuborderE = ResourceManager.getImage("menuborder.e.image");
+                Image menuborderS = ResourceManager.getImage("menuborder.s.image");
+                Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
+                Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
+                final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
+                        menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
+                // comp.setBorder(BorderFactory.createCompoundBorder(imageBorder,
+                // BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
-            f.setBorder(imageBorder);
-            comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                f.setBorder(imageBorder);
+                comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            }
         } else {
             f.setBorder(null);
         }

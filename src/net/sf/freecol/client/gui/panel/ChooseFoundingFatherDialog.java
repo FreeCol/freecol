@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -70,7 +71,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
     public ChooseFoundingFatherDialog(Canvas parent, List<FoundingFather> possibleFoundingFathers) {
         super(parent);
         possibleFathers = possibleFoundingFathers;
-        setBorder(null);
+        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        setLayout(new BorderLayout());
         setOpaque(false);
 
         setFocusCycleRoot(false);
@@ -90,7 +92,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             panel.addMouseListener(FreeColPanel.createEventForwardingMouseListener(ChooseFoundingFatherDialog.this));
             panel.addMouseMotionListener(FreeColPanel.createEventForwardingMouseMotionListener(ChooseFoundingFatherDialog.this));
         }
-        add(tb);
+        add(tb, BorderLayout.CENTER);
         setSize(tb.getPreferredSize());
     }
 
