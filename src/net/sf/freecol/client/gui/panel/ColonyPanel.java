@@ -279,7 +279,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(warehouseButton);
         add(exitButton);
 
-        setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
+        setSize(parent.getWidth(), parent.getHeight());
 
     }
 

@@ -35,6 +35,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -46,6 +47,7 @@ import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.control.PreGameController;
 import net.sf.freecol.client.control.PreGameInputHandler;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.FullScreenFrame;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.ImageLibrary;
@@ -323,12 +325,33 @@ public final class FreeColClient {
     }
 
     /**
+     * Describe <code>getFrame</code> method here.
+     *
+     * @return a <code>JFrame</code> value
+     */
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    /**
+     * Describe <code>updateMenuBar</code> method here.
+     *
+     */
+    public void updateMenuBar() {
+        if (frame != null && frame.getJMenuBar() != null) {
+            ((FreeColMenuBar) frame.getJMenuBar()).update();
+        }
+    }
+
+    /**
      * Change the windowed mode.
      * @param windowed Use <code>true</code> for windowed mode
      *      and <code>false</code> for fullscreen mode.
      */
     public void changeWindowedMode(boolean windowed) {
+        JMenuBar menuBar = null;
         if (frame != null) {
+            menuBar = frame.getJMenuBar();
             if (frame instanceof WindowedFrame) {
                 windowBounds = frame.getBounds();
             }
@@ -341,6 +364,7 @@ public final class FreeColClient {
         } else {
             frame = new FullScreenFrame(gd);
         }
+        frame.setJMenuBar(menuBar);
         if (frame instanceof WindowedFrame) {
             ((WindowedFrame) frame).setCanvas(canvas);
             frame.getContentPane().add(canvas);
@@ -352,7 +376,6 @@ public final class FreeColClient {
         } else if (frame instanceof FullScreenFrame) {
             ((FullScreenFrame) frame).setCanvas(canvas);
             frame.getContentPane().add(canvas);
-            canvas.setSize(frame.getSize());
         }
         gui.forceReposition();
         canvas.updateSizes();
@@ -573,15 +596,6 @@ public final class FreeColClient {
         return getMyPlayer().isAdmin();
     }
 
-    /**
-     * Sets the type of main window to display.
-     * 
-     * @param windowed The main window is a full-screen window if set to
-     *            <i>false</i> and a normal window otherwise.
-     */
-    // private void setWindowed(boolean windowed) {
-    // this.windowed = windowed;
-    // }
     /**
      * Sets whether or not this game is a singleplayer game.
      * 

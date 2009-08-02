@@ -42,6 +42,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JMenuBar;
@@ -212,8 +213,6 @@ public final class Canvas extends JDesktopPane {
      */
     private final GUI colonyTileGUI;
 
-    private JMenuBar jMenuBar;
-
     private boolean clientOptionsDialogShowing = false;
 
     private MapControls mapControls;
@@ -300,39 +299,10 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Sets the menu bar. The menu bar will be resized to fit the width of the
-     * gui and made visible.
-     * 
-     * @param mb The menu bar.
-     * @see FreeColMenuBar
-     */
-    public void setJMenuBar(JMenuBar mb) {
-        if (jMenuBar != null) {
-            remove(jMenuBar);
-        }
-
-        mb.setLocation(0, 0);
-        mb.setSize(getWidth(), (int) mb.getPreferredSize().getHeight());
-        add(mb);
-
-        jMenuBar = mb;
-    }
-
-    /**
-     * Gets the menu bar.
-     * 
-     * @return The menu bar.
-     * @see FreeColMenuBar
-     */
-    public JMenuBar getJMenuBar() {
-        return jMenuBar;
-    }
-
-    /**
      * Updates the label displaying the current amount of gold.
      */
     public void updateGoldLabel() {
-        getJMenuBar().repaint();
+        getClient().getFrame().getJMenuBar().repaint();
     }
 
     /**
@@ -343,10 +313,8 @@ public final class Canvas extends JDesktopPane {
             oldSize = getSize();
         }
         if (oldSize.width != getWidth() || oldSize.height != getHeight()) {
-            if (jMenuBar != null) {
-                jMenuBar.setSize(getWidth(), (int) jMenuBar.getPreferredSize().getHeight());
-            }
-            MapControlsAction mca = (MapControlsAction) freeColClient.getActionManager().getFreeColAction(MapControlsAction.id);
+            MapControlsAction mca = (MapControlsAction) freeColClient
+                .getActionManager().getFreeColAction(MapControlsAction.id);
             MapControls mc = mca.getMapControls();
             if (mc != null && mc.isShowing()) {
                 mc.removeFromComponent(this);
@@ -356,8 +324,8 @@ public final class Canvas extends JDesktopPane {
             if (europePanel != null) {
                 JInternalFrame f = getInternalFrame(europePanel);
                 if (f != null) {
-                    f.setSize(getWidth(), getHeight() - getMenuBarHeight());
-                    f.setLocation(0, getMenuBarHeight());
+                    f.setSize(getWidth(), getHeight());
+                    f.setLocation(0, 0);
                 }
             }
             gui.setSize(getSize());
@@ -378,21 +346,6 @@ public final class Canvas extends JDesktopPane {
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
         gui.display(g2d);
-    }
-
-    /**
-     * Gets the height of the menu bar.
-     * 
-     * @return The menubar + any borders.
-     */
-    public int getMenuBarHeight() {
-        if (jMenuBar == null) {
-            return 0;
-        } else if (jMenuBar instanceof FreeColMenuBar) {
-            return ((FreeColMenuBar) jMenuBar).getOpaqueHeight();
-        } else {
-            return jMenuBar.getHeight();
-        }
     }
 
     /**
@@ -498,73 +451,6 @@ public final class Canvas extends JDesktopPane {
         addAsFrame(chatPanel);
         chatPanel.requestFocus();
     }
-
-    /**
-     * Displays a <code>ModelMessage</code> in a modal dialog. The message is
-     * displayed in this way:
-     * 
-     * <ol>
-     * <li>The <code>messageID</code> is used to get the message from
-     * {@link net.sf.freecol.client.gui.i18n.Messages#message(String)}.
-     * <li>Every occurrence of <code>data[x][0]</code> is replaced with
-     * <code>data[x][1]</code> for every <code>x</code>.
-     * <li>The message is displayed using a modal dialog.
-     * </ol>
-     * 
-     * A specialized panel may be used. In this case the <code>messageID</code>
-     * of the <code>ModelMessage</code> if used as a key for this panel.
-     * 
-     * @param m The <code>ModelMessage</code> to be displayed.
-     */
-    /*
-     * public void oldshowModelMessage(ModelMessage m) { String okText = "ok";
-     * String cancelText = "display"; String message = m.getMessageID();
-     * 
-     * if (message.equals("EventPanel.MEETING_EUROPEANS")) { // Skip for now:
-     * //showEventDialog(EventPanel.MEETING_EUROPEANS);
-     * freeColClient.getInGameController().nextModelMessage(); } else if
-     * (message.equals("EventPanel.MEETING_NATIVES")) { // Skip for now:
-     * //showEventDialog(EventPanel.MEETING_NATIVES);
-     * freeColClient.getInGameController().nextModelMessage(); } else if
-     * (message.equals("EventPanel.MEETING_AZTEC")) { // Skip for now:
-     * //showEventDialog(EventPanel.MEETING_AZTEC);
-     * freeColClient.getInGameController().nextModelMessage(); } else if
-     * (message.equals("EventPanel.MEETING_INCA")) { // Skip for now:
-     * //showEventDialog(EventPanel.MEETING_INCA);
-     * freeColClient.getInGameController().nextModelMessage(); } else { try {
-     * okText = Messages.message(okText); cancelText =
-     * Messages.message(cancelText); message = Messages.message(message,
-     * m.getData()); } catch (MissingResourceException e) {
-     * logger.warning("could not find message with id: " + okText + "."); }
-     * 
-     * FreeColGameObject source = m.getSource(); if (source instanceof Europe &&
-     * !europePanel.isShowing() || (source instanceof Colony || source
-     * instanceof WorkLocation) && !colonyPanel.isShowing()) {
-     * 
-     * FreeColDialog confirmDialog = FreeColDialog.createConfirmDialog(message,
-     * okText, cancelText); addCentered(confirmDialog, MODEL_MESSAGE_LAYER);
-     * confirmDialog.requestFocus();
-     * 
-     * if (!confirmDialog.getResponseBoolean()) { remove(confirmDialog); if
-     * (source instanceof Europe) { showEuropePanel(); } else if (source
-     * instanceof Colony) { showColonyPanel((Colony) source); } else if (source
-     * instanceof WorkLocation) { showColonyPanel(((WorkLocation)
-     * source).getColony()); } } else { remove(confirmDialog);
-     * freeColClient.getInGameController().nextModelMessage(); } } else {
-     * FreeColDialog informationDialog = null; if (m.getTypeOfGoods() < 0) {
-     * informationDialog = FreeColDialog.createInformationDialog(message,
-     * okText); } else { ImageIcon image =
-     * getImageProvider().getGoodsImageIcon(m.getTypeOfGoods());
-     * informationDialog = FreeColDialog.createInformationDialog(message,
-     * okText, image); }
-     * 
-     * addCentered(informationDialog, MODEL_MESSAGE_LAYER);
-     * informationDialog.requestFocus();
-     * 
-     * informationDialog.getResponse(); remove(informationDialog);
-     * 
-     * freeColClient.getInGameController().nextModelMessage(); } } }
-     */
 
     /**
      * Displays a number of ModelMessages.
@@ -1476,8 +1362,8 @@ public final class Canvas extends JDesktopPane {
             europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
             JInternalFrame f = addAsSimpleFrame(europePanel);
             f.setBorder(null);
-            f.setSize(getWidth(), getHeight() - getMenuBarHeight());
-            f.setLocation(0, getMenuBarHeight());
+            f.setSize(getWidth(), getHeight());
+            f.setLocation(0, 0);
             f.moveToBack();
         }
     }
@@ -1603,27 +1489,6 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Updates the menu bar.
-     */
-    public void updateJMenuBar() {
-        if (jMenuBar instanceof FreeColMenuBar) {
-            ((FreeColMenuBar) jMenuBar).update();
-        }
-    }
-
-    /**
-     * Resets <code>FreeColMenuBar</code> on this
-     * <code>Canvas</code>.
-     * 
-     * @see FreeColMenuBar
-     */
-    public void resetFreeColMenuBar() {
-        if (jMenuBar instanceof FreeColMenuBar) {
-            ((FreeColMenuBar) jMenuBar).reset();
-        }
-    }
-
-    /**
      * Removes the given component from this Container.
      * 
      * @param comp The component to remove from this Container.
@@ -1663,24 +1528,19 @@ public final class Canvas extends JDesktopPane {
             return;
         }
         final Rectangle updateBounds = comp.getBounds();
-        if (comp == jMenuBar) {
-            jMenuBar = null;
-            super.remove(comp);
+        final JInternalFrame frame = getInternalFrame(comp);
+        if (frame != null && frame != comp) {
+            // updateBounds = frame.getBounds();
+            frame.dispose();
         } else {
-            final JInternalFrame frame = getInternalFrame(comp);
-            if (frame != null && frame != comp) {
-                // updateBounds = frame.getBounds();
-                frame.dispose();
-            } else {
-                super.remove(comp);
-            }
+            super.remove(comp);
         }
 
         repaint(updateBounds.x, updateBounds.y, updateBounds.width, updateBounds.height);
 
         final boolean takeFocus = (comp != statusPanel);
         if (update) {
-            updateJMenuBar();
+            getClient().updateMenuBar();
             freeColClient.getActionManager().update();
             if (takeFocus && !isShowingSubPanel()) {
                 takeFocus();
@@ -1819,13 +1679,13 @@ public final class Canvas extends JDesktopPane {
             width = Math.min(width, getWidth());
         }
         if (height > getHeight() - FRAME_EMPTY_SPACE) {
-            height = Math.min(height, getHeight() - getMenuBarHeight());
+            height = Math.min(height, getHeight());
         }
         f.setSize(width, height);
         if (centered) {
             addCentered(f, MODAL_LAYER);
         } else {
-            f.setLocation(0, getMenuBarHeight());
+            f.setLocation(0, 0);
             add(f, MODAL_LAYER);
         }
         f.setName(comp.getClass().getSimpleName());
@@ -1902,8 +1762,8 @@ public final class Canvas extends JDesktopPane {
      * @param i The layer to add the component to (see JLayeredPane).
      */
     public void addCentered(Component comp, Integer i) {
-        comp.setLocation(getWidth() / 2 - comp.getWidth() / 2, (getHeight() + getMenuBarHeight()) / 2
-                - comp.getHeight() / 2);
+        comp.setLocation((getWidth() - comp.getWidth()) / 2,
+                         (getHeight() - comp.getHeight()) / 2);
 
         add(comp, i);
     }
@@ -1944,7 +1804,7 @@ public final class Canvas extends JDesktopPane {
         }
 
         if (update) {
-            updateJMenuBar();
+            getClient().updateMenuBar();
             freeColClient.getActionManager().update();
         }
     }
@@ -2344,10 +2204,6 @@ public final class Canvas extends JDesktopPane {
         // change to default view mode
         // Must be done before removing jMenuBar to prevent exception (crash)
         getGUI().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
-
-        if (jMenuBar != null) {
-            remove(jMenuBar);
-        }
 
         for (Component c : getComponents()) {
             remove(c, false);

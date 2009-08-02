@@ -283,7 +283,7 @@ public final class EuropePanel extends FreeColPanel {
         add(sailButton);
         add(marketScroll, "span 2, growx");
         add(exitButton);
-        add(logScroll, "span, height 40:");
+        add(logScroll, "span, height 40:120");
 
         setBorder(null);
 
@@ -294,7 +294,7 @@ public final class EuropePanel extends FreeColPanel {
         addMouseListener(new MouseAdapter() {
         });
 
-        setSize(parent.getWidth(), parent.getHeight() - parent.getMenuBarHeight());
+        setSize(parent.getWidth(), parent.getHeight());
 
     }
 

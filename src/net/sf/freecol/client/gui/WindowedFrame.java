@@ -17,8 +17,6 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
 package net.sf.freecol.client.gui;
 
 import java.awt.event.ComponentAdapter;
@@ -38,14 +36,10 @@ import net.sf.freecol.common.resources.ResourceManager;
 * instead.
 */
 public final class WindowedFrame extends JFrame {
+
     private static final Logger logger = Logger.getLogger(WindowedFrame.class.getName());
 
-
-
     private Canvas canvas;
-    
-    
-    
     
 
     /**

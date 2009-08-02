@@ -1637,7 +1637,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     class UpdateMenuBarSwingTask extends NoResultCanvasSwingTask {
         protected void doWork(Canvas canvas) {
-            canvas.updateJMenuBar();
+            getFreeColClient().updateMenuBar();
         }
     }
 

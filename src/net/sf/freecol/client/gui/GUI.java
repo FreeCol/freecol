@@ -581,7 +581,7 @@ public final class GUI {
         }
         
         freeColClient.getActionManager().update();
-        freeColClient.getCanvas().updateJMenuBar();
+        freeColClient.updateMenuBar();
 
         int x = 0, y = 0;
         MapControls mapControls = freeColClient.getCanvas().getMapControls();
@@ -748,7 +748,7 @@ public final class GUI {
             setSelectedTile(activeUnit.getTile().getPosition());
         } else {
             freeColClient.getActionManager().update();
-            freeColClient.getCanvas().updateJMenuBar();
+            freeColClient.updateMenuBar();
 
             int x = 0, y = 0;
             MapControls mapControls = freeColClient.getCanvas().getMapControls();
@@ -1435,6 +1435,15 @@ public final class GUI {
                 yy += si.getHeight();
             }
         }
+
+        Image decoration = ResourceManager.getImage("menuborder.shadow.s.image");
+        for (int index = 0; index < size.width; index++) {
+            g.drawImage(decoration, index, 0, null);
+        }
+        decoration = ResourceManager.getImage("menuborder.shadow.sw.image");
+        g.drawImage(decoration, 0, 0, null);
+        decoration = ResourceManager.getImage("menuborder.shadow.se.image");
+        g.drawImage(decoration, size.width - decoration.getWidth(null), 0, null);
         
     }
     

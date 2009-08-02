@@ -105,7 +105,7 @@ public final class DragListener extends MouseAdapter {
                             // work-around: JRE on Windows is unable
                             // to display popup menus that extend
                             // beyond the canvas
-                            menu.show(parentPanel.getCanvas(), 0, parentPanel.getCanvas().getMenuBarHeight());
+                            menu.show(parentPanel.getCanvas(), 0, 0);
                         } else {
                             menu.show(comp, e.getX(), e.getY());
                         }

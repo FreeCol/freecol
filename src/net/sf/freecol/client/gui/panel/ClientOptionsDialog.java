@@ -25,17 +25,18 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.FreeColMenuBar;
 import net.sf.freecol.client.gui.action.MapControlsAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.OptionMapUI;
@@ -132,13 +133,15 @@ public final class ClientOptionsDialog extends FreeColDialog<Boolean>  {
                     getCanvas().remove(this);
                     getClient().saveClientOptions();
                     getClient().getActionManager().update();
-                    if (getCanvas().getJMenuBar() != null) {
-                        getCanvas().resetFreeColMenuBar();
+                    JMenuBar menuBar = getClient().getFrame().getJMenuBar();
+                    if (menuBar != null) {
+                        ((FreeColMenuBar) menuBar).reset();
                     }
                     setResponse(Boolean.TRUE);
                     
                     // Immediately redraw the minimap if that was updated.
-                    MapControlsAction mca = (MapControlsAction) getClient().getActionManager().getFreeColAction(MapControlsAction.id);
+                    MapControlsAction mca = (MapControlsAction) getClient()
+                        .getActionManager().getFreeColAction(MapControlsAction.id);
                     if(mca.getMapControls() != null) {
                         mca.getMapControls().update();                        
                     }

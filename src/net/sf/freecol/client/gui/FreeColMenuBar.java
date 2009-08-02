@@ -70,7 +70,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
     protected final FreeColClient freeColClient;
 
-    protected final FreeColImageBorder outerBorder;
+    //protected final FreeColImageBorder outerBorder;
 
     JMenuItem reportsTradeMenuItem = null;
 
@@ -118,14 +118,18 @@ public abstract class FreeColMenuBar extends JMenuBar {
         Image menuborderS = ResourceManager.getImage("menuborder.s.image");
         Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
         Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
-        Image menuborderShadowSW = ResourceManager.getImage("menuborder.shadow.sw.image");
-        Image menuborderShadowS = ResourceManager.getImage("menuborder.shadow.s.image");
-        Image menuborderShadowSE = ResourceManager.getImage("menuborder.shadow.se.image");
         final FreeColImageBorder innerBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
                 menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-        outerBorder = new FreeColImageBorder(null, null, menuborderShadowS, null, null, null, menuborderShadowSW,
-                menuborderShadowSE);
-        setBorder(new CompoundBorder(outerBorder, innerBorder));
+        /* moved to GUI
+           Image menuborderShadowSW = ResourceManager.getImage("menuborder.shadow.sw.image");
+           Image menuborderShadowS = ResourceManager.getImage("menuborder.shadow.s.image");
+           Image menuborderShadowSE = ResourceManager.getImage("menuborder.shadow.se.image");
+           outerBorder = new FreeColImageBorder(null, null, menuborderShadowS,
+           null, null, null, menuborderShadowSW,
+           menuborderShadowSE);
+           setBorder(new CompoundBorder(outerBorder, innerBorder));
+        */
+        setBorder(innerBorder);
     }
 
     
@@ -246,9 +250,11 @@ public abstract class FreeColMenuBar extends JMenuBar {
      * @return The height of this menubar including all the borders except the
      *         ones being transparent.
      */
+    /*
     public int getOpaqueHeight() {
         return getHeight() - outerBorder.getBorderInsets(this).bottom;
     }
+    */
 
     /**
      * When a <code>FreeColMenuBar</code> is disabled, it does not show the

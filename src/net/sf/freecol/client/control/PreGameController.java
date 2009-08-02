@@ -33,7 +33,6 @@ import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.sound.SoundPlayer;
-import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
@@ -248,7 +247,7 @@ public final class PreGameController {
 
         if (!freeColClient.isHeadless()) {
             gui.setInGame(true);
-            freeColClient.getCanvas().setJMenuBar(new InGameMenuBar(freeColClient));
+            freeColClient.getFrame().setJMenuBar(new InGameMenuBar(freeColClient));
         }
 
         if (freeColClient.getGame().getTurn().getNumber() == 1) {

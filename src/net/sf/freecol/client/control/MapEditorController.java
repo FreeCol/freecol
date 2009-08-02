@@ -104,7 +104,7 @@ public final class MapEditorController {
             	gui.setImageLibrary(im);
             }
             
-            freeColClient.getCanvas().setJMenuBar(new MapEditorMenuBar(freeColClient));
+            freeColClient.getFrame().setJMenuBar(new MapEditorMenuBar(freeColClient));
             JInternalFrame f = freeColClient.getCanvas().addAsToolBox(new MapEditorTransformPanel(canvas));
             f.setLocation(f.getX(), 50);
             

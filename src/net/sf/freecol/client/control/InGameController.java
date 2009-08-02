@@ -249,8 +249,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void setInDebugMode(boolean debug) {
         FreeCol.setInDebugMode(debug);
-        freeColClient.getCanvas().setJMenuBar(new InGameMenuBar(freeColClient));
-        freeColClient.getCanvas().updateJMenuBar();
+        freeColClient.updateMenuBar();
     }
 
     /**
@@ -1334,7 +1333,7 @@ public final class InGameController implements NetworkConstants {
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     freeColClient.getActionManager().update();
-                    freeColClient.getCanvas().updateJMenuBar();
+                    freeColClient.updateMenuBar();
                 }
             });
     }
