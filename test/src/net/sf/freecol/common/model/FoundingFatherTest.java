@@ -336,6 +336,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     	Game game = getGame();
         Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
         dutch.setArrears(musketsType);
 
         assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
@@ -343,6 +344,16 @@ public class FoundingFatherTest extends FreeColTestCase {
 
         FoundingFather father = spec().getFoundingFather("model.foundingFather.janDeWitt");
         dutch.addFather(father);
+
+        assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
+
+        dutch.setStance(french, Player.Stance.WAR);
+
+        assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
+        assertFalse(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
+
+        dutch.setStance(french, Player.Stance.PEACE);
 
         assertFalse(dutch.canTrade(musketsType, Market.EUROPE));
         assertTrue(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));

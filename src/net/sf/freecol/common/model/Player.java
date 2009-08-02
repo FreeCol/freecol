@@ -3194,11 +3194,19 @@ public class Player extends FreeColGameObject implements Nameable {
         if (data == null || data.getArrears() == 0) {
             return true;
         } else if (marketAccess == Market.CUSTOM_HOUSE) {
-            return (getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
-                    || hasAbility("model.ability.customHouseTradesWithForeignCountries"));
-        } else {
-            return false;
+            if (getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)) {
+                return true;
+            } else if (hasAbility("model.ability.customHouseTradesWithForeignCountries")) {
+                for (Player otherPlayer : getGame().getPlayers()) {
+                    if (otherPlayer != this && otherPlayer.isEuropean()
+                        && (getStance(otherPlayer) == Stance.PEACE ||
+                            getStance(otherPlayer) == Stance.ALLIANCE)) {
+                        return true;
+                    }
+                }
+            }
         }
+        return false;
     }
 
     /**
