@@ -1437,7 +1437,8 @@ public final class GUI {
         }
 
         Image decoration = ResourceManager.getImage("menuborder.shadow.s.image");
-        for (int index = 0; index < size.width; index++) {
+        int width = decoration.getWidth(null);
+        for (int index = 0; index < size.width; index += width) {
             g.drawImage(decoration, index, 0, null);
         }
         decoration = ResourceManager.getImage("menuborder.shadow.sw.image");
