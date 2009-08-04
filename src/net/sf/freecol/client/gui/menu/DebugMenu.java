@@ -77,6 +77,22 @@ public class DebugMenu extends JMenu {
         buildDebugMenu();
     }
 
+    private void stepRNG() {
+        PseudoRandom clientRnd = freeColClient
+            .getGame().getModelController().getPseudoRandom();
+        PseudoRandom serverRnd = freeColClient.getFreeColServer()
+            .getGame().getModelController().getPseudoRandom();
+        boolean more = false;
+        do {
+            int cVal = clientRnd.nextInt(100);
+            int sVal = serverRnd.nextInt(100);
+            String value = Integer.toString(cVal) + ":" + Integer.toString(sVal);
+            more = canvas.showConfirmDialog("menuBar.debug.stepRandomNumberGenerator",
+                                            "more", "ok",
+                                            "%value%", value);
+        } while (more);
+    }
+
     private void buildDebugMenu() {
 
         this.setOpaque(false);
@@ -287,10 +303,7 @@ public class DebugMenu extends JMenu {
         this.add(rng);
         rng.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    PseudoRandom rnd = freeColClient.getGame().getModelController().getPseudoRandom();
-                    while(canvas.showConfirmDialog("menuBar.debug.stepRandomNumberGenerator",
-                                                   "more", "ok",
-                                                   "%value%", Integer.toString(rnd.nextInt(100))));
+                    stepRNG();
                 }
             });
 
