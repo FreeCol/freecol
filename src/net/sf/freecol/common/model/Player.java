@@ -864,16 +864,32 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public static boolean checkForDeath(Player player) {
         /*
-         * Die if: (No colonies or units on map)
-         *         && ((After year 1600) || (Cannot get a unit from Europe))
+         * Die if: (isREF && (no rebel nation to fight) && (units all in Europe))
+         *         || ((No colonies or units on map)
+         *             && ((After year 1600) || (Cannot get a unit from Europe)))
          */
         
         if (player.isREF()) {
-            /*
-             * The REF never dies. I can grant independence to
-             * dominions, see: AIPlayer.checkForREFDefeat
-             */
-            return false;
+            // Still alive if there are rebels to quell
+            Iterator<Player> players = player.getGame().getPlayerIterator();
+            while (players.hasNext()) {
+                Player enemy = players.next();
+                if (enemy.getREFPlayer() == player
+                    && enemy.getPlayerType() == PlayerType.REBEL) {
+                    return false;
+                }
+            }
+
+            // Still alive if there are units not in Europe
+            Iterator<Unit> units = player.getUnitIterator();
+            while (units.hasNext()) {
+                if (!units.next().isInEurope()) {
+                    return false;
+                }
+            }
+
+            // Otherwise, the REF has been defeated and gone home.
+            return true;
         }
 
         // Quick check to avoid long processing time:
