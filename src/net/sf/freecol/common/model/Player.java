@@ -2233,9 +2233,11 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             int distance;
             if (colony.hasAbility("model.ability.repairUnits")) {
-                //Tile.getDistanceTo(Tile) doesn't care about connectivity,
-                //so we need to check for an available path to target colony instead
-                PathNode pn = getGame().getMap().findPath(unit.getTile(),colony.getTile(),Map.PathType.ONLY_SEA);
+                // Tile.getDistanceTo(Tile) doesn't care about
+                // connectivity, so we need to check for an available
+                // path to target colony instead
+                PathNode pn = getGame().getMap().findPath(unit, unit.getTile(),
+                                                          colony.getTile());
                 if (pn != null && (distance = pn.getTotalTurns()) < shortestDistance) {
                     closestLocation = colony;
                     shortestDistance = distance;
