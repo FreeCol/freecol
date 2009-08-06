@@ -307,24 +307,27 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Declares independence for the home country.
+     *
+     * @todo Move magic 50% number to the spec.
      */
     public void declareIndependence() {
+        Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         if (game.getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
-        Canvas canvas = freeColClient.getCanvas();
+        // Check for adequate support.
         if (player.getSoL() < 50) {
             canvas.showInformationMessage("declareIndependence.notMajority",
-                                          FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                          "%percentage%",
-                                          Integer.toString(player.getSoL()));
+                FreeCol.getSpecification().getGoodsType("model.goods.bells"),
+                "%percentage%", Integer.toString(player.getSoL()));
             return;
         }
 
+        // Confirm intention, and collect nation+country names.
         List<String> names = canvas.showFreeColDialog(new ConfirmDeclarationDialog(canvas));
         if (names == null
             || names.get(0) == null || names.get(0).length() == 0
@@ -337,9 +340,11 @@ public final class InGameController implements NetworkConstants {
 
         Client client = freeColClient.getClient();
         DeclareIndependenceMessage message = new DeclareIndependenceMessage(nationName, countryName);
-        Element reply = askExpecting(client, message.toXMLElement(), "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
         if (reply != null) {
-            freeColClient.getInGameInputHandler().handle(freeColClient.getClient().getConnection(), reply);
+            Connection conn = freeColClient.getClient().getConnection();
+            freeColClient.getInGameInputHandler().handle(conn, reply);
             freeColClient.getActionManager().update();
             nextModelMessage();
         }
@@ -364,7 +369,8 @@ public final class InGameController implements NetworkConstants {
      * @param currentPlayer The player.
      */
     public void setCurrentPlayer(Player currentPlayer) {
-        logger.finest("Setting current player " + currentPlayer.getName());
+        logger.finest("Entering client setCurrentPlayer("
+                      + currentPlayer.getName() + ")");
         Game game = freeColClient.getGame();
         game.setCurrentPlayer(currentPlayer);
 
@@ -409,7 +415,8 @@ public final class InGameController implements NetworkConstants {
             displayModelMessages(true);
             nextActiveUnit();
         }
-        logger.finest("Exiting method setCurrentPlayer()");
+        logger.finest("Exiting client setCurrentPlayer("
+                      + currentPlayer.getName() + ")");
     }
 
     /**
@@ -418,33 +425,36 @@ public final class InGameController implements NetworkConstants {
      * @param object The object to rename.
      */
     public void rename(Nameable object) {
-        if (!(object instanceof Ownable) || ((Ownable) object).getOwner() != freeColClient.getMyPlayer()) {
+        Player player = freeColClient.getMyPlayer();
+        if (!(object instanceof Ownable)
+            || ((Ownable) object).getOwner() != player) {
             return;
         }
 
+        Canvas canvas = freeColClient.getCanvas();
         String name = null;
         if (object instanceof Colony) {
-            name = freeColClient.getCanvas().showInputDialog("renameColony.text",
-                                                             object.getName(),
-                                                             "renameColony.yes",
-                                                             "renameColony.no");
+            name = canvas.showInputDialog("renameColony.text",
+                                          object.getName(),
+                                          "renameColony.yes",
+                                          "renameColony.no");
             if (name == null || name.length() == 0) {
-                return; // user cancelled
+                return; // User cancelled
             }
-            if (freeColClient.getMyPlayer().getSettlement(name) != null) {
-                // colony name must be unique (per Player)
-                freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
-                                                                 "%name%", name);
+            if (player.getSettlement(name) != null) {
+                // Colony name must be unique.
+                canvas.showInformationMessage("nameColony.notUnique",
+                                              "%name%", name);
                 return;
             }
         } else if (object instanceof Unit) {
-            name = freeColClient.getCanvas().showInputDialog("renameUnit.text",
-                                                             object.getName(),
-                                                             "renameUnit.yes",
-                                                             "renameUnit.no",
-                                                             false);
+            name = canvas.showInputDialog("renameUnit.text",
+                                          object.getName(),
+                                          "renameUnit.yes",
+                                          "renameUnit.no",
+                                          false);
             if (name == null) {
-                return; // user cancelled
+                return; // User cancelled, zero-length return removes name.
             }
         } else {
             logger.warning("Tried to rename an unsupported Nameable: "
@@ -452,7 +462,8 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        RenameMessage message = new RenameMessage((FreeColGameObject) object, name);
+        RenameMessage message = new RenameMessage((FreeColGameObject) object,
+                                                  name);
         Element reply = askExpecting(freeColClient.getClient(),
                                      message.toXMLElement(), "update");
         if (reply != null) {
@@ -487,50 +498,44 @@ public final class InGameController implements NetworkConstants {
      * Uses the active unit to build a colony.
      */
     public void buildColony() {
+        Canvas canvas = freeColClient.getCanvas();
+        Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
-        if (freeColClient.getGame().getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        if (game.getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+
+        // Check unit can build, and is on the map.
+        GUI gui = freeColClient.getGUI();
+        Unit unit = gui.getActiveUnit();
+        if (unit == null || !unit.canBuildColony()) return;
+        Tile tile = unit.getTile();
+        if (tile == null) return;
+
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
+            && !showColonyWarnings(tile, unit)) {
+            return;
+        }
+
+        // Get and check the name.
+        String name = canvas.showInputDialog("nameColony.text",
+                                             player.getDefaultSettlementName(false),
+                                             "nameColony.yes", "nameColony.no");
+        if (name == null) return; // User cancelled.
+        if (player.getSettlement(name) != null) {
+            // Colony name must be unique.
+            canvas.showInformationMessage("nameColony.notUnique",
+                                          "%name%", name);
             return;
         }
 
         Client client = freeColClient.getClient();
-        Game game = freeColClient.getGame();
-        GUI gui = freeColClient.getGUI();
-        Unit unit = freeColClient.getGUI().getActiveUnit();
-
-        if (unit == null || !unit.canBuildColony()) {
-            return;
-        }
-
-        Tile tile = unit.getTile();
-
-        if (tile == null) {
-            return;
-        }
-
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS) &&
-            !showColonyWarnings(tile, unit)) {
-            return;
-        }
-
-        String name = freeColClient.getCanvas().showInputDialog("nameColony.text",
-                                                                freeColClient.getMyPlayer().getDefaultSettlementName(false), "nameColony.yes", "nameColony.no");
-
-        if (name == null) { // The user canceled the action.
-            return;
-        } else if (freeColClient.getMyPlayer().getSettlement(name) != null) {
-            // colony name must be unique (per Player)
-            freeColClient.getCanvas().showInformationMessage("nameColony.notUnique",
-                                                             "%name%", name);
-            return;
-        }
-
         BuildColonyMessage message = new BuildColonyMessage(name, unit);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "multiple");
         if (reply != null) {
             Connection conn = freeColClient.getClient().getConnection();
-
             player.invalidateCanSeeTiles();
             freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
             freeColClient.getInGameInputHandler().handle(conn, reply);
@@ -538,17 +543,22 @@ public final class InGameController implements NetworkConstants {
             // There should be a colony here now.  Check units present
             // for treasure cash-in.
             ArrayList<Unit> units = new ArrayList<Unit>(tile.getUnitList());
-            for(Unit unitInTile : units) {
-                if (unitInTile.canCarryTreasure()) {
-                    checkCashInTreasureTrain(unitInTile);
-                }
+            for (Unit unitInTile : units) {
+                checkCashInTreasureTrain(unitInTile);
             }
+
             gui.setActiveUnit(null);
             gui.setSelectedTile(tile.getPosition());
         }
     }
 
-
+    /**
+     * A colony is proposed to be built.  Show warnings if this has
+     * disadvantages.
+     *
+     * @param tile The <code>Tile</code> on which the colony is to be built.
+     * @param unit The <code>Unit</code> which is to build the colony.
+     */
     private boolean showColonyWarnings(Tile tile, Unit unit) {
         boolean landLocked = true;
         boolean ownedByEuropeans = false;
@@ -637,55 +647,56 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (ownedBySelf) {
-            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING, null, "buildColony.ownLand"));
+            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING,
+                                          null, "buildColony.ownLand"));
         }
         if (ownedByEuropeans) {
-            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING, null, "buildColony.EuropeanLand"));
+            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING,
+                                          null, "buildColony.EuropeanLand"));
         }
         if (ownedByIndians) {
-            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING, null, "buildColony.IndianLand"));
+            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING,
+                                          null, "buildColony.IndianLand"));
         }
 
-        if (messages.isEmpty()) {
-            return true;
-        } else {
-            ModelMessage[] modelMessages = messages.toArray(new ModelMessage[messages.size()]);
-            return freeColClient.getCanvas().showConfirmDialog(modelMessages, "buildColony.yes",
-                                                               "buildColony.no");
-        }
+        if (messages.isEmpty()) return true;
+        ModelMessage[] modelMessages = messages.toArray(new ModelMessage[messages.size()]);
+        return freeColClient.getCanvas().showConfirmDialog(modelMessages,
+                                                           "buildColony.yes",
+                                                           "buildColony.no");
     }
 
     /**
      * Moves the active unit in a specified direction. This may result in an
      * attack, move... action.
      * 
-     * @param direction The direction in which to move the Unit.
+     * @param direction The direction in which to move the active unit.
      */
     public void moveActiveUnit(Direction direction) {
-        Unit unit = freeColClient.getGUI().getActiveUnit();
-
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
 
+        Unit unit = freeColClient.getGUI().getActiveUnit();
         if (unit != null) {
             clearGotoOrders(unit);
             move(unit, direction);
 
-            // centers unit if option "always center" is active
-            // A few checks need to be remade, as the unit may no longer exist
-            //or no longer be on the map
+            // Centers unit if option "always center" is active.  A
+            // few checks need to be remade, as the unit may no longer
+            // exist or no longer be on the map.
             boolean alwaysCenter = freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER);
-            if(alwaysCenter && unit.getTile() != null){
+            if (alwaysCenter && unit.getTile() != null) {
                 centerOnUnit(unit);
             }
         } // else: nothing: There is no active unit that can be moved.
     }
 
     /**
-     * Selects a destination for this unit. Europe and the player's colonies are
-     * valid destinations.
+     * Selects a destination for this unit. Europe and the player's
+     * colonies are valid destinations.
      * 
      * @param unit The unit for which to select a destination.
      */
@@ -756,8 +767,8 @@ public final class InGameController implements NetworkConstants {
      * Sets the destination of the given unit and send the server
      * a message for this action.
      * 
-     * @param unit The <code>Unit</code>.
-     * @param destination The <code>Location</code>.
+     * @param unit The <code>Unit</code> to direct.
+     * @param destination The destination <code>Location</code>.
      * @see Unit#setDestination(Location)
      */
     public void setDestination(Unit unit, Location destination) {
@@ -773,7 +784,7 @@ public final class InGameController implements NetworkConstants {
      * Moves the given unit towards the destination given by
      * {@link Unit#getDestination()}.
      * 
-     * @param unit The unit to move.
+     * @param unit The <code>Unit</code> to move.
      */
     public void moveToDestination(Unit unit) {
         final Canvas canvas = freeColClient.getCanvas();
@@ -784,43 +795,44 @@ public final class InGameController implements NetworkConstants {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
+
         if (unit.getTradeRoute() != null) {
-        	Stop currStop = unit.getCurrentStop();
-        	
-        	if(!TradeRoute.isStopValid(unit, currStop)){
-        		String oldTradeRouteName = unit.getTradeRoute().getName();
-                logger.info("Trade unit " + unit.getId() + " in route " + 
-                		oldTradeRouteName + " cannot continue, stop invalid");
-                freeColClient.getCanvas().showInformationMessage("traderoute.broken",
-                        "%name%", oldTradeRouteName);
-        		clearOrders(unit);
-        		return;
-        	}
+            Stop currStop = unit.getCurrentStop();
+            if (!TradeRoute.isStopValid(unit, currStop)) {
+                String oldTradeRouteName = unit.getTradeRoute().getName();
+                logger.info("Trade unit " + unit.getId()
+                            + " in route " + oldTradeRouteName
+                            + " cannot continue: stop invalid.");
+                canvas.showInformationMessage("traderoute.broken",
+                                              "%name%", oldTradeRouteName);
+                clearOrders(unit);
+                return;
+            }
         	
             if (unit.getLocation().getTile() == currStop.getLocation().getTile()) {
                 // Trade unit is at current stop
-                logger.info("Trade unit " + unit.getId() + " in route " + 
-                            unit.getTradeRoute().getName() + " is at " + 
-                            unit.getCurrentStop().getLocation().getLocationName());
+                logger.info("Trade unit " + unit.getId()
+                            + " in route " + unit.getTradeRoute().getName()
+                            + " is at " + unit.getCurrentStop().getLocation().getLocationName());
                 followTradeRoute(unit);
                 return;
             } else {
-                logger.info("Unit " + unit.getId() + " is a trade unit in route " +
-                            unit.getTradeRoute().getName() + ", going to " +
-                            unit.getCurrentStop().getLocation().getLocationName());
+                logger.info("Unit " + unit.getId()
+                            + " is a trade unit in route " + unit.getTradeRoute().getName()
+                            + ", going to " + unit.getCurrentStop().getLocation().getLocationName());
             }
         } else {
-            logger.info("Moving unit " + unit.getId() + " to position "
-                        + unit.getDestination().getLocationName());
+            logger.info("Moving unit " + unit.getId()
+                        + " to position " + unit.getDestination().getLocationName());
         }
 
-        // Destination is either invalid (like an abandoned colony, for example
-    	//or is current tile
-        if(!(destination instanceof Europe) && 
-            (destination.getTile() == null || 
-             unit.getTile() == destination.getTile())) {
-                    clearGotoOrders(unit);
-                    return;
+        // Destination is either invalid (like an abandoned colony,
+        // for example) or is current tile.
+        if (!(destination instanceof Europe)
+            && (destination.getTile() == null
+                || unit.getTile() == destination.getTile())) {
+            clearGotoOrders(unit);
+            return;
         }
         
         PathNode path;
@@ -864,8 +876,8 @@ public final class InGameController implements NetworkConstants {
                 path = null;
                 break;
             case MOVE_NO_MOVES:
-                // the unit may have some moves left,
-                //but not enough to move to the destination
+                // The unit may have some moves left,
+                // but not enough to move to the destination.
                 unit.setMovesLeft(0);
                 return;
             default:
@@ -873,7 +885,7 @@ public final class InGameController implements NetworkConstants {
                     && (mt != MoveType.ATTACK || knownEnemyOnLastTile(path))) {
                     move(unit, path.getDirection());
                     // unit may have been destroyed while moving
-                    if(unit.isDisposed()){
+                    if (unit.isDisposed()) {
                         return;
                     }
                 } else {
@@ -886,13 +898,13 @@ public final class InGameController implements NetworkConstants {
             }
         }
 
-        if (unit.getTile() != null && destination instanceof Europe &&
-            map.isAdjacentToMapEdge(unit.getTile())) {
+        if (unit.getTile() != null && destination instanceof Europe
+            && map.isAdjacentToMapEdge(unit.getTile())) {
             moveToEurope(unit);
         }
 
-        // we have reached our destination
-        // if in a trade route, unload and update next stop
+        // We have reached our destination.
+        // If in a trade route, unload and update next stop.
         if (unit.getTradeRoute() == null) {
             setDestination(unit, null);
         } else {
@@ -1347,28 +1359,28 @@ public final class InGameController implements NetworkConstants {
      * method returns, since the next offer must come from the other
      * player.
      *
-     * @param unit an <code>Unit</code> value
-     * @param direction an <code>Direction</code> value
+     * @param unit The <code>Unit</code> negotiating.
+     * @param direction The direction of a settlement to negotiate with.
      */ 
     private void negotiate(Unit unit, Direction direction) {
+        Game game = freeColClient.getGame();
+        Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        if (tile == null) return;
+        Settlement settlement = tile.getSettlement();
+        if (settlement == null) return;
+
+        // Can not negotiate with the REF.
+        if (settlement.getOwner() == unit.getOwner().getREFPlayer()) {
+            throw new IllegalStateException("Unit tried to negotiate with REF");
+        }
+
         Player player = freeColClient.getMyPlayer();
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
-        Game game = freeColClient.getGame();
-        Settlement settlement = game.getMap().getNeighbourOrNull(direction, unit.getTile()).getSettlement();
         DiplomaticTrade oldAgreement = null;
         DiplomaticTrade newAgreement = null;
         DiplomacyMessage message;
         Element reply;
-
-        if (settlement == null) return;
-        
-        // Player cannot negotiate with REF
-        boolean isPlayersREF = settlement.getOwner() == unit.getOwner().getREFPlayer();
-        if(isPlayersREF){
-            throw new IllegalStateException("Unit tried to negociate with REF");
-        }
-        
         for (;;) {
             newAgreement = canvas.showNegotiationDialog(unit, settlement,
                                                         oldAgreement);
@@ -1410,20 +1422,19 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Enter in a foreign colony to spy it.
+     * Spy on a foreign colony.
      *
-     * @param unit an <code>Unit</code> value
-     * @param direction an <code>int</code> value
+     * @param unit The <code>Unit</code> that is spying.
+     * @param direction The direction of a colony to spy on.
      */
     private void spy(Unit unit, Direction direction) {
         Game game = freeColClient.getGame();
         Tile tile = game.getMap().getNeighbourOrNull(direction,
                                                      unit.getTile());
-        if (tile.getColony() == null) return;
+        if (tile == null || tile.getColony() == null) return;
 
         Client client = freeColClient.getClient();
-        SpySettlementMessage message = new SpySettlementMessage(unit,
-                                                                direction);
+        SpySettlementMessage message = new SpySettlementMessage(unit, direction);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "update");
         if (reply != null) {
@@ -1461,18 +1472,18 @@ public final class InGameController implements NetworkConstants {
     
 
     /**
-     * Ask for explore a lost city rumour, and move unit if player accepts
+     * Confirm exploration of a lost city rumour, moving if accepted.
      * 
-     * @param unit The unit to be moved.
-     * @param direction The direction in which to move the Unit.
+     * @param unit The <code>Unit</code> that is exploring.
+     * @param direction The direction of a rumour.
      */
     private void exploreLostCityRumour(Unit unit, Direction direction) {
-        
-        // center on the explorer
+        // Center on the explorer
         freeColClient.getGUI().setFocusImmediately(unit.getTile().getPosition());
-        
-        if (freeColClient.getCanvas().showConfirmDialog("exploreLostCityRumour.text", "exploreLostCityRumour.yes",
-                                                        "exploreLostCityRumour.no")) {
+        Canvas canvas = freeColClient.getCanvas();
+        if (canvas.showConfirmDialog("exploreLostCityRumour.text",
+                                     "exploreLostCityRumour.yes",
+                                     "exploreLostCityRumour.no")) {
             reallyMove(unit, direction);
         }
     }
@@ -1481,7 +1492,7 @@ public final class InGameController implements NetworkConstants {
      * Claim a piece of land.
      * 
      * @param tile The land to claim.
-     * @param colony An optional colony to own the land
+     * @param colony An optional <code>Colony</code> to own the land.
      * @param offer An offer to pay.
      * @return True if the claim succeeded.
      */
@@ -1501,21 +1512,23 @@ public final class InGameController implements NetworkConstants {
             if (offer >= price || offer < 0) {
                 price = offer;
             } else {
+                final int CLAIM_ACCEPT = 1;
+                final int CLAIM_STEAL = 2;
                 List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
                 if (price <= player.getGold()) {
                     choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
-                                                                         Integer.toString(price)), 1));
+                                                                         Integer.toString(price)), CLAIM_ACCEPT));
                 }
-                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), 2));
+                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), CLAIM_STEAL));
                 Integer ci = canvas.showChoiceDialog(Messages.message("indianLand.text",
                                                                       "%player%", owner.getNationAsString()),
                                                      Messages.message("indianLand.cancel"),
                                                      choices);
                 if (ci == null) { // cancelled
                     return false;
-                } else if (ci.intValue() == 1) { // accepted price
+                } else if (ci.intValue() == CLAIM_ACCEPT) { // accepted price
                     ;
-                } else if (ci.intValue() == 2) {
+                } else if (ci.intValue() == CLAIM_STEAL) {
                     price = -1; // steal
                 } else {
                     logger.warning("Impossible choice");
@@ -1600,11 +1613,11 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Trading with the natives, including buying, selling and delivering gifts.
-     * (Deliberate use of Settlement rather than IndianSettlement throughout
-     * these routines as some unification with colony trading is anticipated,
-     * and the native AI already uses the same DeliverGiftMessage to deliver
-     * gifts to Colonies)
+     * Trading with the natives, including buying, selling and
+     * delivering gifts.  (Deliberate use of Settlement rather than
+     * IndianSettlement throughout these routines as some unification
+     * with colony trading is anticipated, and the native AI already
+     * uses the same DeliverGiftMessage to deliver gifts to Colonies).
      * 
      * @param unit The <code>Unit</code> that is a carrier containing goods.
      * @param direction The direction the unit could move in order to enter a
@@ -1616,15 +1629,25 @@ public final class InGameController implements NetworkConstants {
      */
     private void tradeWithSettlement(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
+
+        // Sanity check
         if (!unit.canCarryGoods()) {
-            throw new IllegalArgumentException("The unit has to be able to carry goods in order to trade!");
+            throw new IllegalArgumentException("Unit " + unit.getId() + " can not carry goods.");
         }
         Map map = freeColClient.getGame().getMap();
-        Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+        Tile tile = unit.getTile();
+        if (tile == null) {
+            throw new IllegalArgumentException("Unit " + unit.getId() + " is not on the map!");
+        }
+        if ((tile = map.getNeighbourOrNull(direction, tile)) == null) {
+            throw new IllegalArgumentException("No tile in " + direction);
+        }
+        Settlement settlement = tile.getSettlement();
         if (settlement == null) {
             throw new IllegalArgumentException("No settlement in given direction!");
         }
@@ -1639,7 +1662,7 @@ public final class InGameController implements NetworkConstants {
             // The session tracks buy/sell/gift events and disables
             // canFoo when one happens.  So only offer such options if
             // the session allows it and the carrier is in good shape.
-            boolean buy = session.get("canBuy") && (unit.getSpaceLeft() > 0);
+            boolean buy = session.get("canBuy")  && (unit.getSpaceLeft() > 0);
             boolean sel = session.get("canSell") && (unit.getGoodsCount() > 0);
             boolean gif = session.get("canGift") && (unit.getGoodsCount() > 0);
 
@@ -1663,7 +1686,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         closeTransactionSession(unit, settlement);
-        if (unit.getMovesLeft() > 0) { // may have been restored if no trade
+        if (unit.getMovesLeft() > 0) { // May have been restored if no trade
             freeColClient.getGUI().setActiveUnit(unit);
         } else {
             nextActiveUnit();
@@ -1677,16 +1700,14 @@ public final class InGameController implements NetworkConstants {
      * @param settlement The <code>Settlement</code> that is trading.
      */
     private void attemptBuyFromSettlement(Unit unit, Settlement settlement) {
-        Canvas canvas = freeColClient.getCanvas();
-        Client client = freeColClient.getClient();
-        Goods goods = null;
-        
         // Get list of goods for sale
+        Goods goods = null;
         List<ChoiceItem<Goods>> goodsOffered = new ArrayList<ChoiceItem<Goods>>();
         for (Goods sell : getGoodsForSaleInSettlement(unit, settlement)) {
             goodsOffered.add(new ChoiceItem<Goods>(sell));
         }
 
+        Canvas canvas = freeColClient.getCanvas();
         for (;;) {
             // Choose goods to buy
             goods = canvas.showChoiceDialog(Messages.message("buyProposition.text"),
@@ -1705,23 +1726,25 @@ public final class InGameController implements NetworkConstants {
                 }
                 
                 // Show dialog for buy proposal
+                final int CHOOSE_BUY = 1;
+                final int CHOOSE_HAGGLE = 2;
                 String text = Messages.message("buy.text",
                         "%nation%", settlement.getOwner().getNationAsString(),
                         "%goods%", goods.getName(),
                         "%gold%", Integer.toString(gold));
                 List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), 1));
-                choices.add(new ChoiceItem<Integer>(Messages.message("buy.moreGold"), 2));
+                choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), CHOOSE_BUY));
+                choices.add(new ChoiceItem<Integer>(Messages.message("buy.moreGold"), CHOOSE_HAGGLE));
                 Integer offerReply = canvas.showChoiceDialog(text, Messages.message("buyProposition.cancel"), choices);
                 if (offerReply == null) {
                     // Cancelled, break out to choice-of-goods loop
                     break;
                 }
                 switch (offerReply.intValue()) {
-                case 1: // Accept price, make purchase
+                case CHOOSE_BUY: // Accept price, make purchase
                     buyFromSettlement(unit, settlement, goods, gold);
                     return;
-                case 2: // Try to negotiate a lower price
+                case CHOOSE_HAGGLE: // Try to negotiate a lower price
                     gold = gold * 9 / 10;
                     break;
                 default:
@@ -1751,7 +1774,8 @@ public final class InGameController implements NetworkConstants {
         if (reply == null) {
             gold = NO_TRADE - 1; // signal failure
         } else {
-            gold = new BuyPropositionMessage(freeColClient.getGame(), reply).getGold();
+            message = new BuyPropositionMessage(freeColClient.getGame(), reply);
+            gold = message.getGold();
         }
         return gold;
     }
@@ -1774,7 +1798,6 @@ public final class InGameController implements NetworkConstants {
             freeColClient.getCanvas().updateGoldLabel();
         }
     }
-
     
     /**
      * User interaction for selling to the natives.
@@ -1786,7 +1809,6 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Client client = freeColClient.getClient();
         Goods goods = null;
-
         for (;;) {
             // Choose goods to sell
             goods = canvas.showSimpleChoiceDialog(Messages.message("sellProposition.text"),
@@ -1809,28 +1831,31 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for sale proposal
+                final int CHOOSE_SELL = 1;
+                final int CHOOSE_HAGGLE = 2;
+                final int CHOOSE_GIFT = 3;
                 String text = Messages.message("sell.text",
                         "%nation%", settlement.getOwner().getNationAsString(),
                         "%goods%", goods.getName(),
                         "%gold%", Integer.toString(gold));
                 List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                choices.add(new ChoiceItem<Integer>(Messages.message("sell.takeOffer"), 1));
-                choices.add(new ChoiceItem<Integer>(Messages.message("sell.moreGold"), 2));
+                choices.add(new ChoiceItem<Integer>(Messages.message("sell.takeOffer"), CHOOSE_SELL));
+                choices.add(new ChoiceItem<Integer>(Messages.message("sell.moreGold"), CHOOSE_HAGGLE));
                 choices.add(new ChoiceItem<Integer>(Messages.message("sell.gift", "%goods%",
-                                                                     goods.getName()), 3));
+                                                                     goods.getName()), CHOOSE_GIFT));
                 Integer offerReply = canvas.showChoiceDialog(text, Messages.message("sellProposition.cancel"), choices);
                 if (offerReply == null) {
                     // Cancelled, break out to choice-of-goods loop
                     break;
                 }
                 switch (offerReply.intValue()) {
-                case 1: // Accepted price, make the sale
+                case CHOOSE_SELL: // Accepted price, make the sale
                     sellToSettlement(unit, settlement, goods, gold);
                     return;
-                case 2: // Ask for more money
+                case CHOOSE_HAGGLE: // Ask for more money
                     gold = (gold * 11) / 10;
                     break;
-                case 3: // Decide to make a gift of the goods
+                case CHOOSE_GIFT: // Decide to make a gift of the goods
                     deliverGiftToSettlement(unit, settlement, goods);
                     return;
                 default:
@@ -1839,7 +1864,7 @@ public final class InGameController implements NetworkConstants {
             }
         }
     }
-    
+
     /**
      * Ask the natives if a sale is acceptable.
      *
@@ -1860,7 +1885,8 @@ public final class InGameController implements NetworkConstants {
         if (reply == null) {
             gold = NO_TRADE - 1;
         } else {
-            gold = new SellPropositionMessage(freeColClient.getGame(), reply).getGold();
+            message = new SellPropositionMessage(freeColClient.getGame(), reply);
+            gold = message.getGold();
         }
         return gold;
     }
@@ -1893,7 +1919,6 @@ public final class InGameController implements NetworkConstants {
     private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
         Canvas canvas = freeColClient.getCanvas();
         Goods goods;
-
         goods = canvas.showSimpleChoiceDialog(Messages.message("gift.text"),
                                               Messages.message("cancel"),
                                               unit.getGoodsList());
@@ -1929,7 +1954,7 @@ public final class InGameController implements NetworkConstants {
      */
     public boolean checkCashInTreasureTrain(Unit unit) {
         if (!unit.canCarryTreasure() || !unit.canCashInTreasureTrain()) {
-            return false; // fail quickly if just not a candidate
+            return false; // Fail quickly if just not a candidate.
         }
 
         Canvas canvas = freeColClient.getCanvas();
@@ -1938,11 +1963,11 @@ public final class InGameController implements NetworkConstants {
             return false;
         }
 
-        Client client = freeColClient.getClient();
+        // Cash in or not?
         boolean cash;
         Europe europe = unit.getOwner().getEurope();
         if (europe == null || unit.getLocation() == europe) {
-            cash = true; // no need to check for transport
+            cash = true; // No need to check for transport
         } else {
             String confirm = (unit.getTransportFee() == 0)
                 ? "cashInTreasureTrain.free"
@@ -1951,14 +1976,16 @@ public final class InGameController implements NetworkConstants {
                                             "cashInTreasureTrain.yes",
                                             "cashInTreasureTrain.no");
         }
+
+        Client client = freeColClient.getClient();
         if (cash) {
-            Connection conn = freeColClient.getClient().getConnection();
+            Connection conn = client.getConnection();
             CashInTreasureTrainMessage message = new CashInTreasureTrainMessage(unit);
             Element reply = askExpecting(client, message.toXMLElement(),
                                          "multiple");
             if (reply != null) {
                 if (freeColClient.getGUI().getActiveUnit() == unit) {
-                    nextActiveUnit(); // it is about to disappear
+                    nextActiveUnit(); // Train is about to disappear
                 }
                 freeColClient.getInGameInputHandler().handle(conn, reply);
                 canvas.updateGoldLabel();
