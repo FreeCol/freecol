@@ -344,6 +344,8 @@ public final class GUI {
 
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
 
+        // TODO: these values depend on the size and geometry
+        // of the tiles used. They should be calculated on the fly.
         // borders
         int w = 128;
         int h = 64;
@@ -355,10 +357,16 @@ public final class GUI {
         borderPoints.put(Direction.S, new Dimension(w/2 + 6, h - 8));
         borderPoints.put(Direction.SW, new Dimension(w/2 - 6, h - 8));
         borderPoints.put(Direction.W, new Dimension(10, h/2 + 3));
-        controlPoints.put(Direction.N, new Dimension(w/2, 0));
-        controlPoints.put(Direction.E, new Dimension(w, h/2));
-        controlPoints.put(Direction.S, new Dimension(w/2, h));
-        controlPoints.put(Direction.W, new Dimension(0, h/2));
+        // small corners
+        controlPoints.put(Direction.N, new Dimension(w/2, 4));
+        controlPoints.put(Direction.E, new Dimension(w - 2, h/2));
+        controlPoints.put(Direction.S, new Dimension(w/2, h - 4));
+        controlPoints.put(Direction.W, new Dimension(2, h/2));
+        // big corners
+        controlPoints.put(Direction.SE, new Dimension(w/2, h));
+        controlPoints.put(Direction.NE, new Dimension(w, h/2));
+        controlPoints.put(Direction.SW, new Dimension(0, h/2));
+        controlPoints.put(Direction.NW, new Dimension(w/2, 0));
     }
     
     public void setImageLibrary(ImageLibrary lib) {
@@ -1208,6 +1216,7 @@ public final class GUI {
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
+        Stroke borderStroke = new BasicStroke(4);
 
         /*
         PART 1
@@ -1318,7 +1327,7 @@ public final class GUI {
             }
 
             Stroke oldStroke = g.getStroke();
-            g.setStroke(new BasicStroke(4));
+            g.setStroke(borderStroke);
 
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
@@ -1956,21 +1965,17 @@ public final class GUI {
     }    
 
 
-    public void paintBorders(Graphics2D g, Tile tile, int x, int y) {
+    private void paintBorders(Graphics2D g, Tile tile, int x, int y) {
         if (tile == null || !displayBorders) {
             return;
         }
         Player owner = tile.getOwner();
         if (owner != null) {
-            Map map = tile.getMap();
             Color oldColor = g.getColor();
-            g.setColor(new Color(owner.getColor().getRed(),
-                                 owner.getColor().getGreen(),
-                                 owner.getColor().getBlue()));
+            g.setColor(owner.getColor());
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
             path.moveTo(borderPoints.get(Direction.NW).width,
                         borderPoints.get(Direction.NW).height);
-            // TODO: use Arcs for corners
             for (Direction d : borderDirections) {
                 Tile otherTile = tile.getNeighbourOrNull(d);
                 Direction next = d.getNextDirection();
@@ -1982,7 +1987,9 @@ public final class GUI {
                         // small corner
                         path.lineTo(borderPoints.get(next).width,
                                     borderPoints.get(next).height);
-                        path.lineTo(borderPoints.get(next2).width,
+                        path.quadTo(controlPoints.get(next).width,
+                                    controlPoints.get(next).height,
+                                    borderPoints.get(next2).width,
                                     borderPoints.get(next2).height);
                     } else {
                         if (tile1 != null && tile1.getOwner() == owner) {
@@ -1998,7 +2005,9 @@ public final class GUI {
                             case SE: dy = 64; break;
                             case SW: dx = -128; break;
                             }
-                            path.lineTo(borderPoints.get(previous).width + dx,
+                            path.quadTo(controlPoints.get(d).width,
+                                        controlPoints.get(d).height,
+                                        borderPoints.get(previous).width + dx,
                                         borderPoints.get(previous).height + dy);
                         } else {
                             // straight line
