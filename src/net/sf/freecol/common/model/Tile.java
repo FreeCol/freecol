@@ -767,6 +767,16 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
+     * Describe <code>getNeighbourOrNull</code> method here.
+     *
+     * @param d a <code>Direction</code> value
+     * @return a <code>Tile</code> value
+     */
+    public Tile getNeighbourOrNull(Direction d) {
+        return getMap().getNeighbourOrNull(d, this);
+    }
+
+    /**
      * Determine whether this tile has adjacent tiles that are unexplored.
      * 
      * @return true if at least one neighbouring tiles is unexplored, otherwise false

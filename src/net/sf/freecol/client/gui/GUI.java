@@ -33,15 +33,18 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -305,6 +308,14 @@ public final class GUI {
     private java.util.Map<Unit, Integer> unitsOutForAnimation;
     private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
+    private static final Direction[] borderDirections =
+        new Direction[] { Direction.NW, Direction.NE, Direction.SE, Direction.SW };
+    private EnumMap<Direction, Dimension> borderPoints =
+        new EnumMap<Direction, Dimension>(Direction.class);
+    private EnumMap<Direction, Dimension> controlPoints =
+        new EnumMap<Direction, Dimension>(Direction.class);
+
+
     /**
     * The constructor to use.
     *
@@ -332,6 +343,22 @@ public final class GUI {
         blinkingMarqueeEnabled = true;
 
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
+
+        // borders
+        int w = 128;
+        int h = 64;
+        borderPoints.put(Direction.NW, new Dimension(10, h/2 - 3));
+        borderPoints.put(Direction.N, new Dimension(w/2 - 6, 8));
+        borderPoints.put(Direction.NE, new Dimension(w/2 + 6, 8));
+        borderPoints.put(Direction.E, new Dimension(w - 10, h/2 - 3));
+        borderPoints.put(Direction.SE, new Dimension(w - 10, h/2 + 3));
+        borderPoints.put(Direction.S, new Dimension(w/2 + 6, h - 8));
+        borderPoints.put(Direction.SW, new Dimension(w/2 - 6, h - 8));
+        borderPoints.put(Direction.W, new Dimension(10, h/2 + 3));
+        controlPoints.put(Direction.N, new Dimension(w/2, 0));
+        controlPoints.put(Direction.E, new Dimension(w, h/2));
+        controlPoints.put(Direction.S, new Dimension(w/2, h));
+        controlPoints.put(Direction.W, new Dimension(0, h/2));
     }
     
     public void setImageLibrary(ImageLibrary lib) {
@@ -1179,6 +1206,9 @@ public final class GUI {
         Rectangle clipBounds = g.getClipBounds();
         Map map = freeColClient.getGame().getMap();
 
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                           RenderingHints.VALUE_ANTIALIAS_ON);
+
         /*
         PART 1
         ======
@@ -1249,9 +1279,6 @@ public final class GUI {
         
         int yy = clipTopY;
 
-        Stroke oldStroke = g.getStroke();
-        g.setStroke(new BasicStroke(4));
-
         // Row per row; start with the top modified row
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
             xx = getXOffset(clipLeftX, tileY);
@@ -1260,13 +1287,11 @@ public final class GUI {
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile tile = map.getTile(tileX, tileY);
                 displayBaseTile(g, map, tile, xx, yy, true);
-                paintBorders(g, tile, xx, yy);
                 xx += tileWidth;
             }
 
             yy += tileHeight / 2;
         }
-        g.setStroke(oldStroke);
 
         /*
         PART 2b
@@ -1292,10 +1317,14 @@ public final class GUI {
                 g.translate(- xx, - (yy + (tileHeight / 2)));
             }
 
+            Stroke oldStroke = g.getStroke();
+            g.setStroke(new BasicStroke(4));
+
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile tile = map.getTile(tileX, tileY);
                     
+                paintBorders(g, tile, xx, yy);
                 // Display the Tile overlays:
                 displayTileOverlays(g, map, tile, xx, yy, true, true);
                     
@@ -1304,6 +1333,8 @@ public final class GUI {
                 }
                 xx += tileWidth;
             }
+
+            g.setStroke(oldStroke);
 
             xx = getXOffset(clipLeftX, tileY);
 
@@ -1926,40 +1957,69 @@ public final class GUI {
 
 
     public void paintBorders(Graphics2D g, Tile tile, int x, int y) {
-        if (tile == null) {
+        if (tile == null || !displayBorders) {
             return;
         }
         Player owner = tile.getOwner();
-        if (displayBorders && owner != null) {
+        if (owner != null) {
             Map map = tile.getMap();
-            int dx = lib.getTerrainImageWidth(tile.getType());
-            int dy = lib.getTerrainImageHeight(tile.getType());
             Color oldColor = g.getColor();
             g.setColor(new Color(owner.getColor().getRed(),
                                  owner.getColor().getGreen(),
                                  owner.getColor().getBlue()));
-            GeneralPath line = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-            Tile otherTile = map.getNeighbourOrNull(Map.Direction.NE, tile);
-            if (otherTile == null || otherTile.getOwner() != owner) {
-                line.moveTo(x + dx/2, y + 2);
-                line.lineTo(x + dx - 2, y + dy/2);
+            GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
+            path.moveTo(borderPoints.get(Direction.NW).width,
+                        borderPoints.get(Direction.NW).height);
+            // TODO: use Arcs for corners
+            for (Direction d : borderDirections) {
+                Tile otherTile = tile.getNeighbourOrNull(d);
+                Direction next = d.getNextDirection();
+                Direction next2 = next.getNextDirection();
+                if (otherTile == null || otherTile.getOwner() != owner) {
+                    Tile tile1 = tile.getNeighbourOrNull(next);
+                    Tile tile2 = tile.getNeighbourOrNull(next2);
+                    if (tile2 == null || tile2.getOwner() != owner) {
+                        // small corner
+                        path.lineTo(borderPoints.get(next).width,
+                                    borderPoints.get(next).height);
+                        path.lineTo(borderPoints.get(next2).width,
+                                    borderPoints.get(next2).height);
+                    } else {
+                        if (tile1 != null && tile1.getOwner() == owner) {
+                            path.lineTo(borderPoints.get(next).width,
+                                        borderPoints.get(next).height);
+                            // big corner
+                            Direction previous = d.getPreviousDirection()
+                                .getPreviousDirection();
+                            int dx = 0, dy = 0;
+                            switch(d) {
+                            case NW: dy = -64; break;
+                            case NE: dx = 128; break;
+                            case SE: dy = 64; break;
+                            case SW: dx = -128; break;
+                            }
+                            path.lineTo(borderPoints.get(previous).width + dx,
+                                        borderPoints.get(previous).height + dy);
+                        } else {
+                            // straight line
+                            int dx = 0, dy = 0;
+                            switch(d) {
+                            case NW: dx = 64; dy = -32; break;
+                            case NE: dx = 64; dy = 32; break;
+                            case SE: dx = -64; dy = 32; break;
+                            case SW: dx = -64; dy = -32; break;
+                            }
+                            path.lineTo(borderPoints.get(d).width + dx,
+                                        borderPoints.get(d).height + dy);
+                        }
+                    }
+                } else {
+                    path.moveTo(borderPoints.get(next2).width,
+                                borderPoints.get(next2).height);
+                }
             }
-            otherTile = map.getNeighbourOrNull(Map.Direction.SE, tile);
-            if (otherTile == null || otherTile.getOwner() != owner) {
-                line.moveTo(x + dx - 2, y + dy/2);
-                line.lineTo(x + dx/2, y + dy - 2);
-            }
-            otherTile = map.getNeighbourOrNull(Map.Direction.SW, tile);
-            if (otherTile == null || otherTile.getOwner() != owner) {
-                line.moveTo(x + dx/2, y + dy - 2);
-                line.lineTo(x + 2, y + dy/2);
-            }
-            otherTile = map.getNeighbourOrNull(Map.Direction.NW, tile);
-            if (otherTile == null || otherTile.getOwner() != owner) {
-                line.moveTo(x + 2, y + dy/2);
-                line.lineTo(x + dx/2, y + 2);
-            }
-            g.draw(line);
+            path.transform(AffineTransform.getTranslateInstance(x, y));
+            g.draw(path);
             g.setColor(oldColor);
         }
     }

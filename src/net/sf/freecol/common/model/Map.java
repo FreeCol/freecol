@@ -88,6 +88,14 @@ public class Map extends FreeColGameObject {
             return evenDY;
         }
 
+        public Direction getNextDirection() {
+            return values()[(ordinal() + 1) % 8];
+        }
+
+        public Direction getPreviousDirection() {
+            return values()[(ordinal() + 7) % 8];
+        }
+
         /**
          * Returns the reverse direction of the given direction.
          * 
@@ -115,6 +123,7 @@ public class Map extends FreeColGameObject {
                 return null;
             }
         }
+
     }
 
     public static final int NUMBER_OF_DIRECTIONS = Direction.values().length;
