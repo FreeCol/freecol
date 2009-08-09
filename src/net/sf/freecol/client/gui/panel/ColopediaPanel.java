@@ -161,7 +161,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(parent.getWidth(), parent.getHeight());
+        return new Dimension(850, parent.getHeight() - 100);
     }
 
 

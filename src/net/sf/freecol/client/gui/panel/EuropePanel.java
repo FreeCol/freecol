@@ -210,10 +210,10 @@ public final class EuropePanel extends FreeColPanel {
         marketPanel.addMouseListener(releaseListener);
         cargoPanel.addMouseListener(releaseListener);
 
-        toAmericaPanel.setLayout(new GridLayout(0, 2));
-        toEuropePanel.setLayout(new GridLayout(0, 2));
-        inPortPanel.setLayout(new GridLayout(0, 2));
-        docksPanel.setLayout(new GridLayout(0, 2));
+        toAmericaPanel.setLayout(new GridLayout(0, 4));
+        toEuropePanel.setLayout(new GridLayout(0, 4));
+        inPortPanel.setLayout(new GridLayout(0, 4));
+        docksPanel.setLayout(new GridLayout(0, 5));
         cargoPanel.setLayout(new GridLayout(1, 0));
 
         JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
