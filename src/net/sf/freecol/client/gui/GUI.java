@@ -1333,10 +1333,13 @@ public final class GUI {
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile tile = map.getTile(tileX, tileY);
                     
-                paintBorders(g, tile, xx, yy);
+                // paint full borders
+                paintBorders(g, tile, xx, yy, true);
                 // Display the Tile overlays:
                 displayTileOverlays(g, map, tile, xx, yy, true, true);
-                    
+                // paint transparent borders
+                paintBorders(g, tile, xx, yy, false);
+
                 if (viewMode.displayTileCursor(tile,xx,yy)) {
                     drawCursor(g, xx, yy);
                 }
@@ -1965,14 +1968,18 @@ public final class GUI {
     }    
 
 
-    private void paintBorders(Graphics2D g, Tile tile, int x, int y) {
+    private void paintBorders(Graphics2D g, Tile tile, int x, int y, boolean opaque) {
         if (tile == null || !displayBorders) {
             return;
         }
         Player owner = tile.getOwner();
         if (owner != null) {
             Color oldColor = g.getColor();
-            g.setColor(owner.getColor());
+            Color newColor = new Color(owner.getColor().getRed(),
+                                       owner.getColor().getGreen(),
+                                       owner.getColor().getBlue(),
+                                       opaque ? 255 : 100);
+            g.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
             path.moveTo(borderPoints.get(Direction.NW).width,
                         borderPoints.get(Direction.NW).height);
