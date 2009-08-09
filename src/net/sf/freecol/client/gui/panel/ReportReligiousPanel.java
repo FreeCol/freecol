@@ -53,7 +53,7 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
 
         reportPanel.add(new JLabel(Messages.message("crosses")));
         FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), Goods.CROSSES);
-        reportPanel.add(progressBar, "wrap");
+        reportPanel.add(progressBar, "span");
 
         List<Colony> colonies = player.getColonies();
         Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());

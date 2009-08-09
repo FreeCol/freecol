@@ -38,7 +38,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.miginfocom.swing.MigLayout;
 
 /**
- * This panel displays the Foreign Affairs Report.
+ * This panel displays the Native Affairs Advisor.
  */
 public final class ReportIndianPanel extends ReportPanel {
 
@@ -49,12 +49,14 @@ public final class ReportIndianPanel extends ReportPanel {
     public ReportIndianPanel(Canvas parent) {
         super(parent, Messages.message("menuBar.report.indian"));
         Player player = getMyPlayer();
-        reportPanel.setLayout(new GridLayout(0, 1));
+        reportPanel.setLayout(new MigLayout("wrap 1, fillx"));
         for (Player opponent : getGame().getPlayers()) {
             if (opponent.isIndian() && !opponent.isDead() && player.hasContacted(opponent)) {
                 reportPanel.add(buildIndianAdvisorPanel(player, opponent));
             }
         }
+        scrollPane.getViewport().setOpaque(false);
+        reportPanel.setOpaque(false);
         reportPanel.doLayout();
     }
 
@@ -66,23 +68,24 @@ public final class ReportIndianPanel extends ReportPanel {
      */
     private JPanel buildIndianAdvisorPanel(Player player, Player opponent) {
 
-        JPanel result = new JPanel(new MigLayout("wrap 4", "[]20px[]", ""));
+        JPanel result = new JPanel(new MigLayout("wrap 4, fillx", "[]20px[]", ""));
+        result.setOpaque(false);
 
         result.add(new JLabel(Messages.message("report.indian.nameOfTribe")));
-        result.add(new JLabel(opponent.getNationAsString()), "wrap");
+        result.add(new JLabel(opponent.getNationAsString()), "span");
         result.add(new JLabel(Messages.message("report.indian.chieftain")));
-        result.add(new JLabel(opponent.getName()), "wrap");
+        result.add(new JLabel(opponent.getName()), "span");
         result.add(new JLabel(Messages.message("report.indian.typeOfSettlements")));
-        result.add(new JLabel(((IndianNationType) opponent.getNationType()).getSettlementTypeAsString()), "wrap");
+        result.add(new JLabel(((IndianNationType) opponent.getNationType()).getSettlementTypeAsString()), "span");
         result.add(new JLabel(Messages.message("report.indian.numberOfSettlements")));
-        result.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "wrap");
+        result.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "span");
         result.add(new JLabel(Messages.message("report.indian.tension")+":"));
-        result.add(new JLabel(opponent.getTension(player).toString()), "wrap");
+        result.add(new JLabel(opponent.getTension(player).toString()), "span");
 
         result.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
         result.add(new JLabel(Messages.message("Settlement")), "newline 10");
-        result.add(new JLabel(Messages.message("report.indian.skillTaught")));
         result.add(new JLabel(Messages.message("report.indian.tension")));
+        result.add(new JLabel(Messages.message("report.indian.skillTaught")));
         result.add(new JLabel(Messages.message("report.indian.tradeInterests")));
 
         for (IndianSettlement settlement : opponent.getIndianSettlements()) {
@@ -96,7 +99,12 @@ public final class ReportIndianPanel extends ReportPanel {
                 + ((settlement.getMissionary() != null) ? "+" : "")
                 + " (" + settlement.getTile().getX()
                 + ", " + settlement.getTile().getY() + ")";
-            result.add(new JLabel(locationName));
+            result.add(new JLabel(locationName), "newline 15");
+
+            Tension tension = settlement.getAlarm(player);
+            result.add(new JLabel((tension == null)
+                                  ? Messages.message("indianSettlement.tensionUnknown")
+                                  : tension.toString()));
 
             JLabel skillLabel = new JLabel();
             UnitType skillType = settlement.getLearnableSkill();
@@ -112,11 +120,6 @@ public final class ReportIndianPanel extends ReportPanel {
             }
             skillLabel.setText(skill);
             result.add(skillLabel);
-
-            Tension tension = settlement.getAlarm(player);
-            result.add(new JLabel((tension == null)
-                                  ? Messages.message("indianSettlement.tensionUnknown")
-                                  : tension.toString()));
 
             GoodsType[] wantedGoods = settlement.getWantedGoods();
             if (wantedGoods[0] == null) {
@@ -135,7 +138,7 @@ public final class ReportIndianPanel extends ReportPanel {
                 }
             }
         }
-        result.add(new JSeparator(JSeparator.HORIZONTAL), "newline 20, span, growx");
+        result.add(new JSeparator(JSeparator.HORIZONTAL), "newline 10, span, growx");
         return result;
     }
 }
