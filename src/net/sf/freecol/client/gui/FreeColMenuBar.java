@@ -120,15 +120,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
         Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
         final FreeColImageBorder innerBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
                 menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-        /* moved to GUI
-           Image menuborderShadowSW = ResourceManager.getImage("menuborder.shadow.sw.image");
-           Image menuborderShadowS = ResourceManager.getImage("menuborder.shadow.s.image");
-           Image menuborderShadowSE = ResourceManager.getImage("menuborder.shadow.se.image");
-           outerBorder = new FreeColImageBorder(null, null, menuborderShadowS,
-           null, null, null, menuborderShadowSW,
-           menuborderShadowSE);
-           setBorder(new CompoundBorder(outerBorder, innerBorder));
-        */
         setBorder(innerBorder);
     }
 
@@ -245,18 +236,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
     }
 
     /**
-     * Returns the opaque height of this menubar.
-     * 
-     * @return The height of this menubar including all the borders except the
-     *         ones being transparent.
-     */
-    /*
-    public int getOpaqueHeight() {
-        return getHeight() - outerBorder.getBorderInsets(this).bottom;
-    }
-    */
-
-    /**
      * When a <code>FreeColMenuBar</code> is disabled, it does not show the
      * "in game options".
      */
@@ -279,8 +258,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
             Image tempImage = ResourceManager.getImage("BackgroundImage");
 
-            final Shape originalClip = g.getClip();
-            g.setClip(insets.left, insets.top, width, height);
             if (tempImage != null) {
                 for (int x = 0; x < width; x += tempImage.getWidth(null)) {
                     for (int y = 0; y < height; y += tempImage.getHeight(null)) {
@@ -291,7 +268,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
                 g.setColor(getBackground());
                 g.fillRect(insets.left, insets.top, width, height);
             }
-            g.setClip(originalClip);
         }
     }    
 }
