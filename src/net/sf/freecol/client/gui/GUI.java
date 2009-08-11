@@ -308,12 +308,14 @@ public final class GUI {
     private java.util.Map<Unit, Integer> unitsOutForAnimation;
     private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
+    // borders
     private static final Direction[] borderDirections =
         new Direction[] { Direction.NW, Direction.NE, Direction.SE, Direction.SW };
     private EnumMap<Direction, Dimension> borderPoints =
         new EnumMap<Direction, Dimension>(Direction.class);
     private EnumMap<Direction, Dimension> controlPoints =
         new EnumMap<Direction, Dimension>(Direction.class);
+    private Stroke borderStroke = new BasicStroke(4);
 
 
     /**
@@ -349,24 +351,29 @@ public final class GUI {
         // borders
         int w = 128;
         int h = 64;
-        borderPoints.put(Direction.NW, new Dimension(10, h/2 - 3));
-        borderPoints.put(Direction.N, new Dimension(w/2 - 6, 8));
-        borderPoints.put(Direction.NE, new Dimension(w/2 + 6, 8));
-        borderPoints.put(Direction.E, new Dimension(w - 10, h/2 - 3));
-        borderPoints.put(Direction.SE, new Dimension(w - 10, h/2 + 3));
-        borderPoints.put(Direction.S, new Dimension(w/2 + 6, h - 8));
-        borderPoints.put(Direction.SW, new Dimension(w/2 - 6, h - 8));
-        borderPoints.put(Direction.W, new Dimension(10, h/2 + 3));
+        int dx = 8;
+        int dy = 4;
         // small corners
-        controlPoints.put(Direction.N, new Dimension(w/2, 4));
-        controlPoints.put(Direction.E, new Dimension(w - 2, h/2));
-        controlPoints.put(Direction.S, new Dimension(w/2, h - 4));
-        controlPoints.put(Direction.W, new Dimension(2, h/2));
+        controlPoints.put(Direction.N, new Dimension(w/2, dy));
+        controlPoints.put(Direction.E, new Dimension(w - dx, h/2));
+        controlPoints.put(Direction.S, new Dimension(w/2, h - dy));
+        controlPoints.put(Direction.W, new Dimension(dx, h/2));
         // big corners
         controlPoints.put(Direction.SE, new Dimension(w/2, h));
         controlPoints.put(Direction.NE, new Dimension(w, h/2));
         controlPoints.put(Direction.SW, new Dimension(0, h/2));
         controlPoints.put(Direction.NW, new Dimension(w/2, 0));
+        // small corners
+        int ddx = 12;
+        int ddy = 6;
+        borderPoints.put(Direction.NW, new Dimension(dx + ddx, h/2 - ddy));
+        borderPoints.put(Direction.N, new Dimension(w/2 - ddx, dy + ddy));
+        borderPoints.put(Direction.NE, new Dimension(w/2 + ddx, dy + ddy));
+        borderPoints.put(Direction.E, new Dimension(w - dx - ddx, h/2 - ddy));
+        borderPoints.put(Direction.SE, new Dimension(w - dx - ddx, h/2 + ddy));
+        borderPoints.put(Direction.S, new Dimension(w/2 + ddx, h - dy - ddy));
+        borderPoints.put(Direction.SW, new Dimension(w/2 - ddx, h - dy - ddy));
+        borderPoints.put(Direction.W, new Dimension(dx + ddx, h/2 + ddy));
     }
     
     public void setImageLibrary(ImageLibrary lib) {
@@ -1216,7 +1223,6 @@ public final class GUI {
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);
-        Stroke borderStroke = new BasicStroke(4);
 
         /*
         PART 1
@@ -1326,9 +1332,6 @@ public final class GUI {
                 g.translate(- xx, - (yy + (tileHeight / 2)));
             }
 
-            Stroke oldStroke = g.getStroke();
-            g.setStroke(borderStroke);
-
             // Column per column; start at the left side to display the tiles.
             for (int tileX = clipLeftCol; tileX <= clipRightCol; tileX++) {
                 Tile tile = map.getTile(tileX, tileY);
@@ -1345,8 +1348,6 @@ public final class GUI {
                 }
                 xx += tileWidth;
             }
-
-            g.setStroke(oldStroke);
 
             xx = getXOffset(clipLeftX, tileY);
 
@@ -1974,6 +1975,8 @@ public final class GUI {
         }
         Player owner = tile.getOwner();
         if (owner != null) {
+            Stroke oldStroke = g.getStroke();
+            g.setStroke(borderStroke);
             Color oldColor = g.getColor();
             Color newColor = new Color(owner.getColor().getRed(),
                                        owner.getColor().getGreen(),
@@ -1999,32 +2002,33 @@ public final class GUI {
                                     borderPoints.get(next2).width,
                                     borderPoints.get(next2).height);
                     } else {
+                        int dx = 0, dy = 0;
+                        switch(d) {
+                        case NW: dx = 64; dy = -32; break;
+                        case NE: dx = 64; dy = 32; break;
+                        case SE: dx = -64; dy = 32; break;
+                        case SW: dx = -64; dy = -32; break;
+                        }
                         if (tile1 != null && tile1.getOwner() == owner) {
+                            // short straight line
                             path.lineTo(borderPoints.get(next).width,
                                         borderPoints.get(next).height);
                             // big corner
-                            Direction previous = d.getPreviousDirection()
-                                .getPreviousDirection();
-                            int dx = 0, dy = 0;
+                            Direction previous = d.getPreviousDirection();
+                            Direction previous2 = previous.getPreviousDirection();
+                            int ddx = 0, ddy = 0;
                             switch(d) {
-                            case NW: dy = -64; break;
-                            case NE: dx = 128; break;
-                            case SE: dy = 64; break;
-                            case SW: dx = -128; break;
+                            case NW: ddy = -64; break;
+                            case NE: ddx = 128; break;
+                            case SE: ddy = 64; break;
+                            case SW: ddx = -128; break;
                             }
-                            path.quadTo(controlPoints.get(d).width,
-                                        controlPoints.get(d).height,
-                                        borderPoints.get(previous).width + dx,
-                                        borderPoints.get(previous).height + dy);
+                            path.quadTo(controlPoints.get(previous).width + dx,
+                                        controlPoints.get(previous).height + dy,
+                                        borderPoints.get(previous2).width + ddx,
+                                        borderPoints.get(previous2).height + ddy);
                         } else {
                             // straight line
-                            int dx = 0, dy = 0;
-                            switch(d) {
-                            case NW: dx = 64; dy = -32; break;
-                            case NE: dx = 64; dy = 32; break;
-                            case SE: dx = -64; dy = 32; break;
-                            case SW: dx = -64; dy = -32; break;
-                            }
                             path.lineTo(borderPoints.get(d).width + dx,
                                         borderPoints.get(d).height + dy);
                         }
@@ -2037,6 +2041,7 @@ public final class GUI {
             path.transform(AffineTransform.getTranslateInstance(x, y));
             g.draw(path);
             g.setColor(oldColor);
+            g.setStroke(oldStroke);
         }
     }
 
