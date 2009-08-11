@@ -63,6 +63,7 @@ import javax.swing.border.BevelBorder;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -1111,12 +1112,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                 if (goodsType.isStorable()) {
                     Goods goods = colony.getGoodsContainer().getGoods(goodsType);
-                    GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
-                    if (colonyPanel.isEditable()) {
-                        goodsLabel.setTransferHandler(defaultTransferHandler);
-                        goodsLabel.addMouseListener(pressListener);
-                    }
-                    add(goodsLabel, false);
+					if (goods.getAmount() >= getClient().getClientOptions().getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS)) {
+						GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
+						if (colonyPanel.isEditable()) {
+							goodsLabel.setTransferHandler(defaultTransferHandler);
+							goodsLabel.addMouseListener(pressListener);
+						}
+						add(goodsLabel, false);
+					}
                 }
             }
         }

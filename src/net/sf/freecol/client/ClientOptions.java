@@ -89,6 +89,14 @@ public class ClientOptions extends OptionMap {
     public static final String ALWAYS_CENTER = "model.option.alwaysCenter";
 
     /**
+     * Used by GUI, this is the minimum number of goods a colony must possess for
+     * the goods to show up at the bottom of the colony panel.
+     * 
+     * @see net.sf.freecol.client.gui.GUI
+     */
+    public static final String MIN_NUMBER_FOR_DISPLAYING_GOODS = "model.option.guiMinNumberToDisplayGoods";
+
+    /**
      * Used by GUI, the number will be displayed when a group of goods are
      * higher than this number.
      * 
