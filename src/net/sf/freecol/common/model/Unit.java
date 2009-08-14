@@ -3584,6 +3584,132 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     }
 
+    private Location newLocation(Game game, String locationString) {
+        String XMLElementTag = locationString.substring(0, locationString.indexOf(':'));
+        if (XMLElementTag.equals(Tile.getXMLElementTagName())) {
+            return new Tile(game, locationString);
+        } else if (XMLElementTag.equals(ColonyTile.getXMLElementTagName())) {
+            return new ColonyTile(game, locationString);
+        } else if (XMLElementTag.equals(Colony.getXMLElementTagName())) {
+            return new Colony(game, locationString);
+        } else if (XMLElementTag.equals(IndianSettlement.getXMLElementTagName())) {
+            return new IndianSettlement(game, locationString);
+        } else if (XMLElementTag.equals(Europe.getXMLElementTagName())) {
+            return new Europe(game, locationString);
+        } else if (XMLElementTag.equals(Building.getXMLElementTagName())) {
+            return new Building(game, locationString);
+        } else if (XMLElementTag.equals(Unit.getXMLElementTagName())) {
+            return new Unit(game, locationString);
+        } else {
+            logger.warning("Unknown type of Location: " + locationString);
+            return new Tile(game, locationString);
+        }
+    }
+
+    /**
+     * Returns true if this unit has already been moved onto high seas but not
+     * to europe.
+     *
+     * @return true if the unit has already been moved onto high seas
+     */
+    public boolean isAlreadyOnHighSea() {
+        return alreadyOnHighSea;
+    }
+
+    /**
+     * Tells unit that it has just entered the high seas but instead of going to
+     * europe, it stays on the current side of the atlantic.
+     *
+     * @param alreadyOnHighSea
+     */
+    public void setAlreadyOnHighSea(boolean alreadyOnHighSea) {
+        this.alreadyOnHighSea = alreadyOnHighSea;
+    }
+
+    /**
+     * Return how many turns left to be repaired
+     *
+     * @return turns to be repaired
+     */
+    public int getTurnsForRepair() {
+        return unitType.getHitPoints() - getHitpoints();
+    }
+
+    /**
+     * Return the type of the image which will be used to draw the path
+     *
+     * @return a <code>String</code> to form the resource key
+     */
+    public String getPathTypeImage() {
+        if (isMounted()) {
+            return "horse";
+        } else {
+            return unitType.getPathImage();
+        }
+    }
+
+    /*
+     * Get the available equipment that can be equipped automatically in case of an attack
+     * Returns null if it cannot be automatically equipped.
+     */
+    public TypeCountMap<EquipmentType> getAutomaticEquipment(){
+        // Paul Revere makes an unarmed colonist in a settlement pick up
+        // a stock-piled musket if attacked, so the bonus should be applied
+        // for unarmed colonists inside colonies where there are muskets
+        // available. Indians can also pick up equipment.
+        if(isArmed()){
+            return null;
+        }
+
+        if(!getOwner().hasAbility("model.ability.automaticEquipment")){
+            return null;
+        }
+
+        Settlement settlement = null;
+        if (getLocation() instanceof WorkLocation) {
+            settlement = getColony();
+        }
+        if (getLocation() instanceof IndianSettlement) {
+            settlement = (Settlement) getLocation();
+        }
+        if(settlement == null){
+            return null;
+        }
+
+        TypeCountMap<EquipmentType> equipmentList = null;
+
+        // Check for necessary equipment in the settlement
+        Set<Ability> autoDefence = getOwner().getFeatureContainer().getAbilitySet("model.ability.automaticEquipment");
+
+        for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {
+                for (Ability ability : autoDefence) {
+                    if (!ability.appliesTo(equipment)){
+                        continue;
+                    }
+                    if (!canBeEquippedWith(equipment)) {
+                        continue;
+                    }
+
+                    boolean hasReqGoods = true;
+                    for(AbstractGoods goods : equipment.getGoodsRequired()){
+                        if(settlement.getGoodsCount(goods.getType()) < goods.getAmount()){
+                            hasReqGoods = false;
+                            break;
+                        }
+                    }
+                    if(hasReqGoods){
+                        // lazy initialization, required
+                        if(equipmentList == null){
+                            equipmentList = new TypeCountMap<EquipmentType>();
+                        }
+                        equipmentList.incrementCount(equipment, 1);
+                    }
+                }
+        }
+        return equipmentList;
+    }
+
+
     private void unitsToXML(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
             throws XMLStreamException {
         if (!units.isEmpty()) {
@@ -3854,136 +3980,37 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Partial writer for units, so that "remove" messages can be brief.
+     *
+     * @param out The target stream.
+     * @param fields The fields to write.
+     * @throws XMLStreamException If there are problems writing the stream.
+     */
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
+        throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
+
+    /**
+     * Partial reader for units, so that "remove" messages can be brief.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException If there are problems reading the stream.
+     */
+    @Override
+    protected void readFromXMLPartialImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
-     * 
-     * @return "unit.
+     *
+     * @return "unit"
      */
     public static String getXMLElementTagName() {
         return "unit";
     }
 
-    private Location newLocation(Game game, String locationString) {
-        String XMLElementTag = locationString.substring(0, locationString.indexOf(':'));
-        if (XMLElementTag.equals(Tile.getXMLElementTagName())) {
-            return new Tile(game, locationString);
-        } else if (XMLElementTag.equals(ColonyTile.getXMLElementTagName())) {
-            return new ColonyTile(game, locationString);
-        } else if (XMLElementTag.equals(Colony.getXMLElementTagName())) {
-            return new Colony(game, locationString);
-        } else if (XMLElementTag.equals(IndianSettlement.getXMLElementTagName())) {
-            return new IndianSettlement(game, locationString);
-        } else if (XMLElementTag.equals(Europe.getXMLElementTagName())) {
-            return new Europe(game, locationString);
-        } else if (XMLElementTag.equals(Building.getXMLElementTagName())) {
-            return new Building(game, locationString);
-        } else if (XMLElementTag.equals(Unit.getXMLElementTagName())) {
-            return new Unit(game, locationString);
-        } else {
-            logger.warning("Unknown type of Location: " + locationString);
-            return new Tile(game, locationString);
-        }
-    }
-
-    /**
-     * Returns true if this unit has already been moved onto high seas but not
-     * to europe.
-     * 
-     * @return true if the unit has already been moved onto high seas
-     */
-    public boolean isAlreadyOnHighSea() {
-        return alreadyOnHighSea;
-    }
-
-    /**
-     * Tells unit that it has just entered the high seas but instead of going to
-     * europe, it stays on the current side of the atlantic.
-     * 
-     * @param alreadyOnHighSea
-     */
-    public void setAlreadyOnHighSea(boolean alreadyOnHighSea) {
-        this.alreadyOnHighSea = alreadyOnHighSea;
-    }
-
-    /**
-     * Return how many turns left to be repaired
-     *
-     * @return turns to be repaired
-     */
-    public int getTurnsForRepair() {
-        return unitType.getHitPoints() - getHitpoints();
-    }
-    
-    /**
-     * Return the type of the image which will be used to draw the path
-     *
-     * @return a <code>String</code> to form the resource key
-     */
-    public String getPathTypeImage() {
-        if (isMounted()) {
-            return "horse";
-        } else {
-            return unitType.getPathImage();
-        }
-    }
-    
-    /*
-     * Get the available equipment that can be equipped automatically in case of an attack
-     * Returns null if it cannot be automatically equipped. 
-     */
-    public TypeCountMap<EquipmentType> getAutomaticEquipment(){
-        // Paul Revere makes an unarmed colonist in a settlement pick up
-        // a stock-piled musket if attacked, so the bonus should be applied
-        // for unarmed colonists inside colonies where there are muskets
-        // available. Indians can also pick up equipment.        
-        if(isArmed()){
-            return null;
-        }
-        
-        if(!getOwner().hasAbility("model.ability.automaticEquipment")){
-            return null;
-        }
-
-        Settlement settlement = null;
-        if (getLocation() instanceof WorkLocation) {
-            settlement = getColony();
-        }
-        if (getLocation() instanceof IndianSettlement) {
-            settlement = (Settlement) getLocation();
-        }       
-        if(settlement == null){
-            return null;
-        }
-    
-        TypeCountMap<EquipmentType> equipmentList = null;
-
-        // Check for necessary equipment in the settlement
-        Set<Ability> autoDefence = getOwner().getFeatureContainer().getAbilitySet("model.ability.automaticEquipment");
-
-        for (EquipmentType equipment : Specification.getSpecification().getEquipmentTypeList()) {          
-                for (Ability ability : autoDefence) {
-                    if (!ability.appliesTo(equipment)){
-                        continue;
-                    }
-                    if (!canBeEquippedWith(equipment)) {
-                        continue;
-                    }
-        
-                    boolean hasReqGoods = true;
-                    for(AbstractGoods goods : equipment.getGoodsRequired()){
-                        if(settlement.getGoodsCount(goods.getType()) < goods.getAmount()){
-                            hasReqGoods = false;
-                            break;
-                        }
-                    }
-                    if(hasReqGoods){
-                        // lazy initialization, required
-                        if(equipmentList == null){
-                            equipmentList = new TypeCountMap<EquipmentType>();
-                        }
-                        equipmentList.incrementCount(equipment, 1);
-                    }   
-                }
-        }
-        return equipmentList;
-    }
 }

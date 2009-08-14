@@ -23,13 +23,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.util.Utils;
 import net.sf.freecol.server.model.ServerGame;
+import net.sf.freecol.common.util.Introspector;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -289,17 +292,6 @@ abstract public class FreeColGameObject extends FreeColObject {
     }
 
     /**
-     * Gets the tag name of the root element representing this object.
-     * This method should be overwritten by any sub-class, preferably
-     * with the name of the class with the first letter in lower case.
-     *
-     * @return "unknown".
-     */
-    public static String getXMLElementTagName() {
-        return "unknown";
-    }
-
-    /**
      * Gets the ID's integer part of this object. The age of two
      * FreeColGameObjects can be compared by comparing their integer
      * IDs.
@@ -547,6 +539,112 @@ abstract public class FreeColGameObject extends FreeColObject {
                 return null;
             }
         }
+    }
+
+    /**
+     * Common routine for FreeColGameObject descendants to write an
+     * XML-representation of this object to the given stream,
+     * including only the mandatory and specified fields.
+     * All attributes are considered visible as this is
+     * server-to-owner-client functionality, but it depends ultimately
+     * on the presence of a getFieldName() method that returns a type
+     * compatible with String.valueOf.
+     *
+     * @param out The target stream.
+     * @param theClass The real class of this object, required by the
+     *                 <code>Introspector</code>.
+     * @param fields The fields to write.
+     * @throws XMLStreamException if there are problems writing the stream.
+     */
+    protected void toXMLPartialByClass(XMLStreamWriter out,
+                                       Class<?> theClass, String[] fields)
+        throws XMLStreamException {
+        // Start element
+        try {
+            Introspector tag = new Introspector(theClass, "XMLElementTagName");
+            out.writeStartElement(tag.getter(this));
+        } catch (IllegalArgumentException e) {
+            logger.warning("Could not get tag field: " + e.toString());
+        }
+
+        // Partial element
+        out.writeAttribute(ID_ATTRIBUTE, getId());
+        out.writeAttribute(PARTIAL_ATTRIBUTE, String.valueOf(true));
+
+        // All the fields
+        for (int i = 0; i < fields.length; i++) {
+            try {
+                Introspector intro = new Introspector(theClass, fields[i]);
+                out.writeAttribute(fields[i], intro.getter(this));
+            } catch (IllegalArgumentException e) {
+                logger.warning("Could not get field " + fields[i]
+                               + ": " + e.toString());
+            }
+        }
+
+        out.writeEndElement();
+    }
+
+    /**
+     * Common routine for FreeColGameObject descendants to update an
+     * object from a partial XML-representation which includes only
+     * mandatory and server-supplied fields.
+     * All attributes are considered visible as this is
+     * server-to-owner-client functionality.  It depends ultimately on
+     * the presence of a setFieldName() method that takes a parameter
+     * type T where T.valueOf(String) exists.
+     *
+     * @param in The input stream with the XML.
+     * @param theClass The real class of this object, required by the
+     *                 <code>Introspector</code>.
+     * @throws XMLStreamException If there are problems reading the stream.
+     */
+    protected void readFromXMLPartialByClass(XMLStreamReader in,
+                                             Class<?> theClass)
+        throws XMLStreamException {
+        int n = in.getAttributeCount();
+
+        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
+
+        for (int i = 0; i < n; i++) {
+            String name = in.getAttributeLocalName(i);
+
+            if (name.equals(ID_ATTRIBUTE)
+                || name.equals(PARTIAL_ATTRIBUTE)) continue;
+
+            try {
+                Introspector intro = new Introspector(theClass, name);
+                intro.setter(this, in.getAttributeValue(i));
+            } catch (IllegalArgumentException e) {
+                logger.warning("Could not set field " + name
+                               + ": " + e.toString());
+            }
+        }
+
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT);
+    }
+
+    /**
+     * Convenience function to add this object to an element intended to
+     * signal removal of the object.
+     *
+     * @param removeElement The remove element.
+     */
+    public void addToRemoveElement(Element removeElement) {
+        Document doc = removeElement.getOwnerDocument();
+        removeElement.appendChild(this.toXMLElementPartial(doc));
+    }
+
+
+    /**
+     * Gets the tag name of the root element representing this object.
+     * This method should be overwritten by any sub-class, preferably
+     * with the name of the class with the first letter in lower case.
+     *
+     * @return "unknown".
+     */
+    public static String getXMLElementTagName() {
+        return "unknown";
     }
 
 }

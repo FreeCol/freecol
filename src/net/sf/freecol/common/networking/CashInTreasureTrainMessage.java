@@ -75,7 +75,6 @@ public class CashInTreasureTrainMessage extends Message {
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Unit unit;
-
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
@@ -87,24 +86,25 @@ public class CashInTreasureTrainMessage extends Message {
             return Message.clientError("Can not cash in unit " + unitId + " because it is not in a suitable location.");
         }
 
+        // Cash in
         ModelMessage m = serverPlayer.cashInTreasureTrain(unit);
         Tile tile = unit.getTile();
         server.getInGameInputHandler().sendUpdatedTileToAll(tile, serverPlayer);
 
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        Element messages = doc.createElement("addMessages");
-        Element remove = doc.createElement("remove");
-        reply.appendChild(update);
-        reply.appendChild(messages);
-        reply.appendChild(remove);
         // Only need the partial player update, as the sole action on
         // the tile is to remove the treasure train, which will be
         // done by the remove anyway.
-        update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
+        Element reply = Message.createNewRootElement("multiple");
+        Document doc = reply.getOwnerDocument();
+        Element messages = doc.createElement("addMessages");
+        reply.appendChild(messages);
         messages.appendChild(m.toXMLElement(player, doc));
-        remove.appendChild(unit.toXMLElement(player, doc));
+        Element update = doc.createElement("update");
+        reply.appendChild(update);
+        update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
+        Element remove = doc.createElement("remove");
+        reply.appendChild(remove);
+        unit.addToRemoveElement(remove);
         return reply;
     }
 

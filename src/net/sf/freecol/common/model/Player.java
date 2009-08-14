@@ -48,7 +48,6 @@ import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.util.Introspector;
 import net.sf.freecol.common.util.RandomChoice;
 
 import org.w3c.dom.Element;
@@ -3820,81 +3819,31 @@ public class Player extends FreeColGameObject implements Nameable {
         invalidateCanSeeTiles();
     }
 
-
     /**
-     * This method writes an XML-representation of this object to the
-     * given stream, including only the mandatory and specified
-     * fields.  All attributes are considered visible as this is
-     * server-to-owner-client functionality, but it depends ultimately
-     * on the presence of a getFieldName() method that returns a type
-     * compatible with String.valueOf.
+     * Partial writer for players, so that simple updates to fields such
+     * as gold can be brief.
      *
      * @param out The target stream.
      * @param fields The fields to write.
-     * @throws XMLStreamException if there are any problems writing to the
-     *             stream.
+     * @throws XMLStreamException If there are problems writing the stream.
      */
     @Override
     protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
         throws XMLStreamException {
-        // Start element
-        out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute(ID_ATTRIBUTE, getId());
-        out.writeAttribute(PARTIAL_ATTRIBUTE, String.valueOf(true));
-
-        for (int i = 0; i < fields.length; i++) {
-            try {
-                Introspector intro = new Introspector(getClass(), fields[i]);
-                out.writeAttribute(fields[i], intro.getter(this));
-            } catch (IllegalArgumentException e) {
-                logger.warning("Could not get field " + fields[i]
-                               + ": " + e.toString());
-            }
-        }
-
-        out.writeEndElement();
+        toXMLPartialByClass(out, getClass(), fields);
     }
 
     /**
-     * Update an object from a partial XML-representation which includes
-     * only mandatory and server-supplied fields.  All attributes are considered
-     * visible as this is server-to-owner-client functionality.  It depends
-     * ultimately on the presence of a setFieldName() method that takes a
-     * parameter type T where T.valueOf(String) exists.
+     * Partial reader for players, so that simple updates to fields such
+     * as gold can be brief.
      *
      * @param in The input stream with the XML.
-     * @throws XMLStreamException if there are problems reading from the stream.
+     * @throws XMLStreamException If there are problems reading the stream.
      */
     @Override
     protected void readFromXMLPartialImpl(XMLStreamReader in)
         throws XMLStreamException {
-        int n = in.getAttributeCount();
-
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE));
-
-        for (int i = 0; i < n; i++) {
-            String name = in.getAttributeLocalName(i);
-
-            if (name.equals(ID_ATTRIBUTE)
-                || name.equals(PARTIAL_ATTRIBUTE)) continue;
-
-            try {
-                Introspector intro = new Introspector(getClass(), name);
-                intro.setter(this, in.getAttributeValue(i));
-            } catch (IllegalArgumentException e) {
-                logger.warning("Could not set field " + name
-                               + ": " + e.toString());
-            }
-            try {
-                Introspector intro = new Introspector(getClass(), name);
-            } catch (IllegalArgumentException e) {
-                logger.warning("ARGH " + name
-                               + ": " + e.toString());
-            }
-        }
-
-        while (in.nextTag() != XMLStreamConstants.END_ELEMENT);
+        readFromXMLPartialByClass(in, getClass());
     }
 
     /**
@@ -3905,6 +3854,5 @@ public class Player extends FreeColGameObject implements Nameable {
     public static String getXMLElementTagName() {
         return "player";
     }
-
 
 }

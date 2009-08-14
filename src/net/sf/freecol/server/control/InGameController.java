@@ -175,7 +175,7 @@ public final class InGameController extends Controller {
             List<Unit> unitList = new ArrayList<Unit>(serverPlayer.getUnits());
             for (Unit unit : unitList) {
                 serverPlayer.removeUnit(unit);
-                remove.appendChild(unit.toXMLElement(serverPlayer, doc));
+                unit.addToRemoveElement(remove);
                 unit.dispose();
             }
         }
