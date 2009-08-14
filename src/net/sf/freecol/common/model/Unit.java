@@ -3206,7 +3206,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             addModelMessage(this, ModelMessage.MessageType.WARNING, this,
                             Messages.getKey(getId() + ".noMoreTools", 
                                             "model.unit.noMoreTools"),
-                            "%unit%", getName());
+                            "%unit%", getName(),
+                            "%location%", getLocation().getLocationName());
         }
     }
 
