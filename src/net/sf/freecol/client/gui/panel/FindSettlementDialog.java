@@ -19,7 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,13 +29,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Settlement;
@@ -43,7 +46,7 @@ import net.miginfocom.swing.MigLayout;
 
 
 /**
- * Finds a colony on the map.
+ * Centers the map on a known settlement or colony.
  */
 public final class FindSettlementDialog extends FreeColDialog implements ListSelectionListener {
 
@@ -81,6 +84,8 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
         add(header);
 
         settlementList = new JList(knownSettlements.toArray(new Settlement[knownSettlements.size()]));
+        settlementList.setCellRenderer(new SettlementRenderer());
+        settlementList.setFixedCellHeight(48);
         JScrollPane listScroller = new JScrollPane(settlementList);
         listScroller.setPreferredSize(new Dimension(250, 250));
         settlementList.addListSelectionListener(this);
@@ -100,6 +105,18 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
     public void valueChanged(ListSelectionEvent e) {
         Settlement settlement = (Settlement) settlementList.getSelectedValue();
         getCanvas().getGUI().setFocus(settlement.getTile().getPosition());
+    }
+
+    private class SettlementRenderer extends JLabel implements ListCellRenderer {
+
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
+            Settlement settlement = (Settlement) value;
+            setText(settlement.getLongName());
+            setIcon(new ImageIcon(getLibrary().getSettlementImage(settlement)
+                                  .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
+            return this;
+        }
     }
 
 } 

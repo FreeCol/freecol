@@ -154,6 +154,20 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     }
 
     /**
+     * Gets the name of this <code>Settlement</code>.
+     *
+     * @return The name as a <code>String</code>.
+     */
+    public String getLongName() {
+        String result = name;
+        if (isCapital()) {
+            result += "*";
+        }
+        result += " (" + getOwner().getNationAsString() + ")";
+        return result;
+    }
+
+    /**
      * Sets the name of this <code>Settlement</code>.
      *
      * @param newName The new name.
