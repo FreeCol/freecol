@@ -54,6 +54,7 @@ import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.PreCombatDialog;
 import net.sf.freecol.client.gui.panel.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
 import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
@@ -740,9 +741,8 @@ public final class InGameController implements NetworkConstants {
             }, Integer.MAX_VALUE);
 
         Canvas canvas = freeColClient.getCanvas();
-        Location destination = canvas.showChoiceDialog(Messages.message("selectDestination.text"),
-                                                       Messages.message("selectDestination.cancel"),
-                                                       destinations);
+        Location destination = canvas.showFreeColDialog(new SelectDestinationDialog(canvas, destinations));
+
         if (destination == null) {
             // user aborted
             return;

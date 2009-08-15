@@ -114,6 +114,9 @@ public class FreeColPanel extends JPanel implements ActionListener {
     // The color to use for links
     protected static final Color LINK_COLOR = new Color(122, 109, 82);
 
+    // The color to use for selected items in lists
+    protected static final Color LIST_SELECT_COLOR = new Color(216, 194, 145);
+
     // The borders to use for table cells
     public static final Border TOPCELLBORDER =
         BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 1, 1, LINK_COLOR),

@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 /**
  * The super class of all settlements on the map (that is colonies and indian settlements).
  */
-abstract public class Settlement extends FreeColGameObject implements Location, Ownable {
+abstract public class Settlement extends FreeColGameObject implements Location, Named, Ownable {
 
     private static final Logger logger = Logger.getLogger(Settlement.class.getName()); 
     
@@ -151,20 +151,6 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      */
     public String getName() {
         return name;
-    }
-
-    /**
-     * Gets the name of this <code>Settlement</code>.
-     *
-     * @return The name as a <code>String</code>.
-     */
-    public String getLongName() {
-        String result = name;
-        if (isCapital()) {
-            result += "*";
-        }
-        result += " (" + getOwner().getNationAsString() + ")";
-        return result;
     }
 
     /**

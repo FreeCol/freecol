@@ -112,9 +112,17 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
         public Component getListCellRendererComponent(JList list, Object value, int index,
                                                       boolean isSelected, boolean cellHasFocus) {
             Settlement settlement = (Settlement) value;
-            setText(settlement.getLongName());
+            setText(settlement.getName()
+                    + (settlement.isCapital() ? "* (" : " (")
+                    + settlement.getOwner().getNationAsString() + ")");
             setIcon(new ImageIcon(getLibrary().getSettlementImage(settlement)
                                   .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
+            if (isSelected) {
+                setOpaque(true);
+                setBackground(LIST_SELECT_COLOR);
+            } else {
+                setOpaque(false);
+            }
             return this;
         }
     }
