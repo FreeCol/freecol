@@ -47,6 +47,8 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitType;
 
+import net.miginfocom.swing.MigLayout;
+
 /**
  * This panel displays a report.
  */
@@ -79,12 +81,12 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
      * @param title The title to display on the panel.
      */
     public ReportPanel(Canvas parent, String title) {
-        super(parent, new FlowLayout(FlowLayout.CENTER, 1000, 10));
+        super(parent);
 
-        setLayout(new BorderLayout());
+        setLayout(new MigLayout("wrap 1", "[fill]", "[]30[fill]30[]"));
 
         header = getDefaultHeader(title);
-        add(header, BorderLayout.NORTH);
+        add(header, "align center");
 
         reportPanel = new JPanel();
         reportPanel.setOpaque(true);
@@ -93,9 +95,9 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         scrollPane = new JScrollPane(reportPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                                      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement( 16 );
-        add(scrollPane, BorderLayout.CENTER);
+        add(scrollPane, "height 100%, width 100%");
 
-        add(okButton, BorderLayout.SOUTH);
+        add(okButton, "tag ok");
 
         setSize(850, 600);
     }
