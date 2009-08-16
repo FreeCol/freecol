@@ -1155,6 +1155,31 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Returns true if this unit can enter a settlement.
+     * 
+     * @param settlement The settlement to enter.
+     * @return <code>true</code> if this <code>Unit</code> can enter
+     *         the given <code>Settlement</code>.
+     */
+    public boolean canEnterSettlement(Settlement settlement) {
+        if (getOwner() == settlement.getOwner()) {
+            return true;
+        } else if (getOwner().getStance(settlement.getOwner()) == Stance.WAR) {
+            return false;
+        } else if (settlement instanceof IndianSettlement
+                   && (hasAbility("model.ability.scoutIndianSettlement")
+                       || hasAbility("model.ability.missionary"))) {
+            return true;
+        } else if (settlement instanceof Colony
+                   && hasAbility("model.ability.scoutForeignColony")) {
+            return true;
+        } else if (canTradeWith(settlement)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Gets the type of a move made in a specified direction.
      * 
      * @param direction The direction of the move.

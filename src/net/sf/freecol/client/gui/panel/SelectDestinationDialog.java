@@ -25,6 +25,8 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -37,7 +39,9 @@ import javax.swing.ListCellRenderer;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Settlement;
 
@@ -54,6 +58,50 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     private final JList destinationList;
 
+    private static Comparator<ChoiceItem<Location>> destinationComparator =
+        new Comparator<ChoiceItem<Location>>() {
+        public int compare(ChoiceItem<Location> choice1, ChoiceItem<Location> choice2) {
+            Location dest1 = choice1.getObject();
+            Location dest2 = choice2.getObject();
+
+            int score1 = 100;
+            if (dest1 instanceof Europe) {
+                score1 = 10;
+            } else if (dest1 instanceof Colony) {
+                score1 = 20;
+            } else if (dest1 instanceof IndianSettlement) {
+                score1 = 40;
+            }
+            int score2 = 100;
+            if (dest2 instanceof Europe) {
+                score2 = 10;
+            } else if (dest2 instanceof Colony) {
+                score2 = 20;
+            } else if (dest2 instanceof IndianSettlement) {
+                score2 = 40;
+            }
+
+            if (score1 == score2) {
+                String name1 = "";
+                if (dest1 instanceof Settlement) {
+                    name1 = ((Settlement) dest1).getName();
+                } else if (dest1 instanceof Europe) {
+                    name1 = ((Europe) dest1).getName();
+                }
+                String name2 = "";
+                if (dest2 instanceof Settlement) {
+                    name2 = ((Settlement) dest2).getName();
+                } else if (dest2 instanceof Europe) {
+                    name2 = ((Europe) dest2).getName();
+                }
+                return name1.compareTo(name2);
+            } else {
+                return score1 - score2;
+            }
+        }
+    };
+
+
     /**
      * The constructor to use.
      */
@@ -66,6 +114,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         JLabel header = new JLabel(Messages.message("selectDestination.text"));
         header.setFont(smallHeaderFont);
         add(header);
+
+        Collections.sort(destinations, destinationComparator);
 
         DefaultListModel model = new DefaultListModel();
         for (ChoiceItem<Location> location : destinations) {

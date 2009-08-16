@@ -75,7 +75,7 @@ class BaseCostDecider implements CostDecider {
             return ILLEGAL_MOVE;
         }
         if (newTile.getSettlement() != null
-                && newTile.getSettlement().getOwner() != unit.getOwner()) {
+            && !unit.canEnterSettlement(newTile.getSettlement())) {
             return ILLEGAL_MOVE;
         }
         
