@@ -58,24 +58,9 @@ class BaseCostDecider implements CostDecider {
             final int turns) {
         newTurn = false;
               
-        if (!newTile.isExplored()) {
-            // Not allowed to use an unexplored tile for a path:
-            return ILLEGAL_MOVE;
-        }
-
-        if (newTile.isLand() && unit.isNaval()
-                && (newTile.getSettlement() == null
-                    || (newTile.getSettlement().getOwner() != unit.getOwner()))) {
-            /*
-             * It should really not be allowed to move a naval unit on
-             * land, but the movetype returned below is not ILLEGAL_MOVE
-             * for this case since naval units should be able to move from
-             * a disbanded settlement:
-             */
-            return ILLEGAL_MOVE;
-        }
-        if (newTile.getSettlement() != null
-            && !unit.canEnterSettlement(newTile.getSettlement())) {
+        if (!newTile.isExplored()
+            || !unit.getSimpleMoveType(newTile).isLegal()) {
+            // Not allowed to use an unexplored tile for a path.
             return ILLEGAL_MOVE;
         }
         
