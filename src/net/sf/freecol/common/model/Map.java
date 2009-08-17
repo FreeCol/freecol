@@ -543,6 +543,13 @@ public class Map extends FreeColGameObject {
                 }
                 return currentNode.next;
             }
+
+            // Only check further if it is possible to transit *through* this node.
+            if (currentUnit != null
+                && !currentUnit.getSimpleMoveType(currentNode.getTile()).isProgress()) {
+                continue;
+            }
+
             
             // Try every direction:
             for (Direction direction : Direction.values()) {
@@ -911,6 +918,12 @@ public class Map extends FreeColGameObject {
                     logger.warning("The returned goal is null.");
                     return null;
                 }
+            }
+
+            // Only check further if it is possible to transit *through* this node.
+            if (currentUnit != null
+                && !currentUnit.getSimpleMoveType(currentNode.getTile()).isProgress()) {
+                continue;
             }
 
             // Try every direction:
