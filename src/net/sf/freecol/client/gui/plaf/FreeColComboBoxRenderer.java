@@ -61,16 +61,19 @@ public class FreeColComboBoxRenderer implements ListCellRenderer {
 
         c.setForeground(list.getForeground());
         c.setFont(list.getFont());
+        setLabelValues(c, value);
 
+        return c;
+    }
+
+
+    public void setLabelValues(JLabel c, Object value) {
         if (value instanceof Icon) {
             c.setIcon((Icon) value);
         } else {
             c.setText((value == null) ? "" : value.toString());
         }
-
-        return c;
     }
-
 
     private class SelectedComponent extends JLabel {
 

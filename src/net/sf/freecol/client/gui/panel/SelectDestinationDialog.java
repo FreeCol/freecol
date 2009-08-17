@@ -39,6 +39,7 @@ import javax.swing.ListCellRenderer;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -157,30 +158,22 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         getCanvas().remove(this);
     }
 
-    private class LocationRenderer extends JLabel implements ListCellRenderer {
+    private class LocationRenderer extends FreeColComboBoxRenderer {
 
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
 
             ChoiceItem choice = (ChoiceItem) value;
+            label.setText(choice.toString());
             if (choice.getObject() instanceof Europe) {
                 Europe europe = (Europe) choice.getObject();
-                setText(choice.toString());
-                setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(europe.getOwner().getNation())
-                                      .getScaledInstance(-1, 48, Image.SCALE_SMOOTH)));
+                label.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(europe.getOwner().getNation())
+                                            .getScaledInstance(-1, 48, Image.SCALE_SMOOTH)));
             } else if (choice.getObject() instanceof Settlement) {
                 Settlement settlement = (Settlement) choice.getObject();
-                setText(choice.toString());
-                setIcon(new ImageIcon(getLibrary().getSettlementImage(settlement)
-                                      .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
+                label.setIcon(new ImageIcon(getLibrary().getSettlementImage(settlement)
+                                            .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
             }
-            if (isSelected) {
-                setOpaque(true);
-                setBackground(LIST_SELECT_COLOR);
-            } else {
-                setOpaque(false);
-            }
-            return this;
         }
     }
 } 

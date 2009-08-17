@@ -39,6 +39,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Player;
 
@@ -107,23 +108,16 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
         getCanvas().getGUI().setFocus(settlement.getTile().getPosition());
     }
 
-    private class SettlementRenderer extends JLabel implements ListCellRenderer {
+    private class SettlementRenderer extends FreeColComboBoxRenderer {
 
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
+        @Override
+        public void setLabelValues(JLabel label, Object value) {
             Settlement settlement = (Settlement) value;
-            setText(settlement.getName()
-                    + (settlement.isCapital() ? "* (" : " (")
-                    + settlement.getOwner().getNationAsString() + ")");
-            setIcon(new ImageIcon(getLibrary().getSettlementImage(settlement)
-                                  .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
-            if (isSelected) {
-                setOpaque(true);
-                setBackground(LIST_SELECT_COLOR);
-            } else {
-                setOpaque(false);
-            }
-            return this;
+            label.setText(settlement.getName()
+                          + (settlement.isCapital() ? "* (" : " (")
+                          + settlement.getOwner().getNationAsString() + ")");
+            label.setIcon(new ImageIcon(getLibrary().getSettlementImage(settlement)
+                                        .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
         }
     }
 

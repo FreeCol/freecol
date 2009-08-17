@@ -729,7 +729,7 @@ public final class InGameController implements NetworkConstants {
                     Settlement settlement = p.getTile().getSettlement();
                     if (settlement != null && settlement != inSettlement) {
                         int turns = p.getTurns();
-                        destinations.add(new ChoiceItem<Location>(settlement.toString()
+                        destinations.add(new ChoiceItem<Location>(settlement.getName()
                                                                   + " (" + turns + ")",
                                                                   settlement));
                     }
