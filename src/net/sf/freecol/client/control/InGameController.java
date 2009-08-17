@@ -727,9 +727,7 @@ public final class InGameController implements NetworkConstants {
 
                 public boolean check(Unit u, PathNode p) {
                     Settlement settlement = p.getTile().getSettlement();
-                    if (settlement != null
-                        && settlement != inSettlement
-                        && u.canEnterSettlement(settlement)) {
+                    if (settlement != null && settlement != inSettlement) {
                         int turns = p.getTurns();
                         destinations.add(new ChoiceItem<Location>(settlement.toString()
                                                                   + " (" + turns + ")",
