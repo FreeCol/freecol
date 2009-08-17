@@ -58,9 +58,9 @@ class BaseCostDecider implements CostDecider {
             final int turns) {
         newTurn = false;
               
+        // Not allowed to use an unexplored or illegal tile for a path.
         if (!newTile.isExplored()
-            || !unit.getSimpleMoveType(newTile).isLegal()) {
-            // Not allowed to use an unexplored tile for a path.
+            || !unit.getSimpleMoveType(oldTile, newTile, true).isLegal()) {
             return ILLEGAL_MOVE;
         }
         
