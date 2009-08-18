@@ -19,7 +19,12 @@
 
 package net.sf.freecol.client.gui.panel;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Composite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -37,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -56,6 +59,7 @@ import javax.swing.TransferHandler;
 
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -293,9 +297,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     public void itemStateChanged(ItemEvent event) {
         if (compact.isSelected()) {
             if (cellRenderer instanceof DefaultBuildQueueCellRenderer) {
-                cellRenderer = new SimpleBuildQueueCellRenderer();
+                cellRenderer = new FreeColComboBoxRenderer();
             }
-        } else if (cellRenderer instanceof SimpleBuildQueueCellRenderer) {
+        } else if (cellRenderer instanceof FreeColComboBoxRenderer) {
             cellRenderer = new DefaultBuildQueueCellRenderer();
         }
         buildQueueList.setCellRenderer(cellRenderer);
@@ -540,9 +544,29 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
     }
 
+    /**
+     * See FreeColComboBoxRenderer.
+     */
+    class SelectedPanel extends JPanel {
+
+        public void paintComponent(Graphics g) {
+            Graphics2D g2d = (Graphics2D) g;
+            Composite oldComposite = g2d.getComposite();
+            Color oldColor = g2d.getColor();
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.1f));
+            g2d.setColor(Color.BLACK);
+            g2d.fillRect(0, 0, getWidth(), getHeight());
+            g2d.setComposite(oldComposite);
+            g2d.setColor(oldColor);
+            
+            super.paintComponent(g);
+        }
+    }
+
     class DefaultBuildQueueCellRenderer implements ListCellRenderer {
 
-        JPanel itemPanel = new JPanel(new MigLayout("", "", ""));
+        JPanel itemPanel = new JPanel();
+        JPanel selectedPanel = new SelectedPanel();
         JLabel imageLabel = new JLabel();
         JLabel nameLabel = new JLabel();
 
@@ -550,7 +574,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             = new HashMap<FreeColGameObjectType, ImageIcon>();
 
         public DefaultBuildQueueCellRenderer() {
-            // do nothing
+            itemPanel.setOpaque(false);
+            itemPanel.setLayout(new MigLayout("", "", ""));
+            selectedPanel.setOpaque(false);
+            selectedPanel.setLayout(new MigLayout("", "", ""));
         }
 
         public Component getListCellRendererComponent(JList list,
@@ -559,8 +586,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
             BuildableType item = (BuildableType) value;
-
-            itemPanel.removeAll();
+            JPanel panel = isSelected ? selectedPanel : itemPanel;
+            panel.removeAll();
 
             ImageIcon buildableIcon = imageCache.get(value);
             if (buildableIcon == null) {
@@ -574,8 +601,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             imageLabel.setIcon(buildableIcon);
 
             nameLabel.setText(item.getName());
-            itemPanel.add(imageLabel, "span 1 2");
-            itemPanel.add(nameLabel, "wrap");
+            panel.add(imageLabel, "span 1 2");
+            panel.add(nameLabel, "wrap");
 
             List<AbstractGoods> goodsRequired = item.getGoodsRequired();
             int size = goodsRequired.size();
@@ -590,44 +617,12 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                                                goodsIcon,
                                                SwingConstants.CENTER);
                 if (i == 0 && size > 1) {
-                    itemPanel.add(goodsLabel, "split " + size);
+                    panel.add(goodsLabel, "split " + size);
                 } else {
-                    itemPanel.add(goodsLabel);
+                    panel.add(goodsLabel);
                 }
             }
-            if (isSelected) {
-                itemPanel.setBorder(BorderFactory.createLineBorder(LINK_COLOR, 2));
-            } else {
-                itemPanel.setBorder(null);
-            }
-            return itemPanel;
-        }
-    }
-
-    class SimpleBuildQueueCellRenderer implements ListCellRenderer {
-
-        JLabel label = new JLabel();
-        Border emptyBorder = BorderFactory.createEmptyBorder(2, 5, 2, 5);
-        Border lineBorder =
-            BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LINK_COLOR, 2),
-                                               BorderFactory.createEmptyBorder(2, 3, 3, 3));
-
-        public SimpleBuildQueueCellRenderer() {
-            label.setBorder(emptyBorder);
-        }
-
-        public Component getListCellRendererComponent(JList list,
-                                                      Object value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
-            label.setText(((BuildableType) value).getName());
-            if (isSelected) {
-                label.setBorder(lineBorder);
-            } else {
-                label.setBorder(emptyBorder);
-            }
-            return label;
+            return panel;
         }
     }
 
