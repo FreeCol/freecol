@@ -1092,6 +1092,17 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Get the player death state.
+     * This is indeed identical to isDead(), but is needed for partial
+     * updates to complement the setDead() function.
+     *
+     * @return True if this <code>Player</code> is dead.
+     */
+    public boolean getDead() {
+        return dead;
+    }
+
+    /**
      * Sets this player to be dead or not.
      *
      * @param dead Should be set to <code>true</code> when this
