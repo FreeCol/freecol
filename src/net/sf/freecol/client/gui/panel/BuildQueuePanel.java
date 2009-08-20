@@ -297,9 +297,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     public void itemStateChanged(ItemEvent event) {
         if (compact.isSelected()) {
             if (cellRenderer instanceof DefaultBuildQueueCellRenderer) {
-                cellRenderer = new FreeColComboBoxRenderer();
+                cellRenderer = new SimpleBuildQueueCellRenderer();
             }
-        } else if (cellRenderer instanceof FreeColComboBoxRenderer) {
+        } else if (cellRenderer instanceof SimpleBuildQueueCellRenderer) {
             cellRenderer = new DefaultBuildQueueCellRenderer();
         }
         buildQueueList.setCellRenderer(cellRenderer);
@@ -561,6 +561,14 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             
             super.paintComponent(g);
         }
+    }
+
+    class SimpleBuildQueueCellRenderer extends FreeColComboBoxRenderer {
+
+        public void setLabelValues(JLabel c, Object value) {
+            c.setText(((BuildableType) value).getName());
+        }
+
     }
 
     class DefaultBuildQueueCellRenderer implements ListCellRenderer {

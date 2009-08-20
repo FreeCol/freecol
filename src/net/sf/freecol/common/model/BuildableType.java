@@ -118,10 +118,6 @@ public abstract class BuildableType extends FreeColGameObjectType {
         this.populationRequired = newPopulationRequired;
     }
 
-    public String toString() {
-        return getName();
-    }
-
     /**
      * Returns the abilities required by this Type.
      *
