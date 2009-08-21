@@ -1237,35 +1237,21 @@ public class AIColony extends AIObject {
      *            server.
      */
     private void decideBuildable(Connection connection) {
-        // TODO: Request tools if needed.
-        int hammersOld = getHammersRequired(colony.getCurrentlyBuilding());
-
-        boolean isOldValid = colony.canBuild();
-        
         Iterator<BuildableType> bi = colonyPlan.getBuildable();
-        while (bi.hasNext()) {
-            BuildableType buildable = bi.next();
-
-            if (buildable == colony.getCurrentlyBuilding()) {
-                // We are building the right item already:
-                break;
+        BuildableType buildable = (bi.hasNext()) ? bi.next() : null;
+        if (buildable != null && colony.canBuild(buildable)
+            && buildable != colony.getCurrentlyBuilding()) {
+            Element element = Message.createNewRootElement("setBuildQueue");
+            element.setAttribute("colony", colony.getId());
+            element.setAttribute("size", "1");
+            element.setAttribute("x0", buildable.getId());
+            try {
+                connection.sendAndWait(element);
+            } catch (IOException e) {
+                logger.warning("Could not send \"setBuildQueue\"-message.");
             }
-
-            int hammersNew = getHammersRequired(buildable);
-            if (hammersNew > colony.getGoodsCount(Goods.HAMMERS) || hammersNew > hammersOld || !isOldValid) {
-                Element setCurrentlyBuildingElement = Message.createNewRootElement("setCurrentlyBuilding");
-                setCurrentlyBuildingElement.setAttribute("colony", colony.getId());
-                setCurrentlyBuildingElement.setAttribute("type", buildable.getId());
-
-                try {
-                    connection.sendAndWait(setCurrentlyBuildingElement);
-                } catch (IOException e) {
-                    logger.warning("Could not send \"setCurrentlyBuilding\"-message.");
-                }
-
-                // We have found something to build:
-                break;
-            }
+            logger.fine("Colony " + colony.getId()
+                        + " will build " + buildable.getId());
         }
     }
 
