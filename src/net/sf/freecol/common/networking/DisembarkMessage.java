@@ -67,9 +67,9 @@ public class DisembarkMessage extends Message {
     /**
      * Handle a "disembark"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param connection The <code>Connection</code> message was received on.
      *
      * @return An update containing the disembarkd unit,
      *         or an error <code>Element</code> on failure.
@@ -77,10 +77,6 @@ public class DisembarkMessage extends Message {
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Unit unit;
-        Unit carrier;
-        Europe europe = null;
-        Tile tile = null;
-
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
@@ -89,17 +85,22 @@ public class DisembarkMessage extends Message {
         if (!(unit.getLocation() instanceof Unit)) {
             return Message.clientError("Not on a carrier: " + unitId);
         }
-        carrier = (Unit) unit.getLocation();
+
+        // Usually disembark onto a tile, but sometimes to Europe.
+        Unit carrier = (Unit) unit.getLocation();
+        Europe europe = null;
+        Tile tile = null;
         if (carrier.isInEurope()) {
             europe = (Europe) carrier.getLocation();
             unit.setLocation(europe);
         } else {
             tile = carrier.getLocation().getTile();
             unit.setLocation(tile);
-            server.getInGameInputHandler().sendUpdatedTileToAll(tile, player);
+            server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
         }
         unit.setState(UnitState.ACTIVE);
 
+        // Only have to update the new location, as it contains the carrier.
         Element reply = Message.createNewRootElement("update");
         Document doc = reply.getOwnerDocument();
         reply.appendChild(((europe != null) ? europe : tile).toXMLElement(player, doc));

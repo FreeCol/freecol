@@ -529,31 +529,63 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         });
     }
 
-    private List<ServerPlayer> getOtherPlayers(Player player) {
+
+    // TODO: Remove these when their local users migrate out.
+    // There are copies in InGameController.
+    /**
+     * Get a list of all server players, optionally excluding the supplied one.
+     *
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     * @return A list of all connected server players except one.
+     */
+    private List<ServerPlayer> getOtherPlayers(ServerPlayer serverPlayer) {
         List<ServerPlayer> result = new ArrayList<ServerPlayer>();
         for (Player otherPlayer : getGame().getPlayers()) {
             ServerPlayer enemyPlayer = (ServerPlayer) otherPlayer;
-            if (player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
+            if (!enemyPlayer.equals(serverPlayer)
+                && enemyPlayer.isConnected()) {
+                result.add(enemyPlayer);
             }
-            result.add(enemyPlayer);
         }
         return result;
     }
 
-
-    private void sendRemoveUnitToAll(Unit unit, Player player) {
-        Element removeElement = Message.createNewRootElement("remove");
-        Element removeUnit = removeElement.getOwnerDocument().createElement("removeObject");
-        removeUnit.setAttribute("ID", unit.getId());
-        removeElement.appendChild(removeUnit);
-        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
+    /**
+     * Tell all players to remove a unit, optionally excluding one.
+     *
+     * @param unit The <code>Unit</code> to remove.
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     */
+    private void sendRemoveUnitToAll(Unit unit, ServerPlayer serverPlayer) {
+        Element remove = Message.createNewRootElement("remove");
+        unit.addToRemoveElement(remove);
+        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
             if (unit.isVisibleTo(enemyPlayer)) {
                 try {
-                    enemyPlayer.getConnection().sendAndWait(removeElement);
+                    enemyPlayer.getConnection().sendAndWait(remove);
                 } catch (IOException e) {
-                    logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                                   + enemyPlayer.getConnection());
+                    logger.warning(e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Tell all players to update a tile, optionally excluding one.
+     *
+     * @param newTile The <code>Tile</code> to update.
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     */
+    private void sendUpdatedTileToAll(Tile newTile, ServerPlayer serverPlayer) {
+        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
+            if (enemyPlayer.canSee(newTile)) {
+                Element update = Message.createNewRootElement("update");
+                Document doc = update.getOwnerDocument();
+                update.appendChild(newTile.toXMLElement(enemyPlayer, doc));
+                try {
+                    enemyPlayer.getConnection().sendAndWait(update);
+                } catch (IOException e) {
+                    logger.warning(e.getMessage());
                 }
             }
         }
@@ -2647,26 +2679,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return null;
     }
 
-    public void sendUpdatedTileToAll(Tile newTile, Player player) {
-        // TODO: can Player be null?
-        Iterator<Player> enemyPlayerIterator = getGame().getPlayerIterator();
-        while (enemyPlayerIterator.hasNext()) {
-            ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-            if (player != null && player.equals(enemyPlayer) || enemyPlayer.getConnection() == null) {
-                continue;
-            }
-            try {
-                if (enemyPlayer.canSee(newTile)) {
-                    Element updateElement = Message.createNewRootElement("update");
-                    updateElement.appendChild(newTile.toXMLElement(enemyPlayer, updateElement.getOwnerDocument()));
-                    enemyPlayer.getConnection().sendAndWait(updateElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                        + enemyPlayer.getConnection());
-            }
-        }
-    }
     /*
      * Method not used, keep in comments. private void sendErrorToAll(String
      * message, Player player) { Game game = getFreeColServer().getGame();

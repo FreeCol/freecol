@@ -88,7 +88,6 @@ public class BuildColonyMessage extends Message {
         Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Unit unit;
-
         try {
             unit = server.getUnitSafely(builderId, serverPlayer);
         } catch (Exception e) {
@@ -105,6 +104,8 @@ public class BuildColonyMessage extends Message {
                                        "Unit " + builderId
                                        + " can not build colony " + colonyName);
         }
+
+        // Build can proceed.
         Tile tile = unit.getTile();
         Colony colony = new Colony(game, serverPlayer, colonyName, tile);
         unit.buildColony(colony);
@@ -112,24 +113,24 @@ public class BuildColonyMessage extends Message {
                                           HistoryEvent.Type.FOUND_COLONY,
                                           "%colony%", colony.getName());
         player.getHistory().add(h);
-        server.getInGameInputHandler().sendUpdatedTileToAll(tile, serverPlayer);
+        server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
 
-        Map map = game.getMap();
+        // Reply, updating the surrounding tiles now owned by the colony.
         Element reply = Message.createNewRootElement("multiple");
         Document doc = reply.getOwnerDocument();
         Element update = doc.createElement("update");
-        Element history = doc.createElement("addHistory");
         reply.appendChild(update);
-        reply.appendChild(history);
         update.appendChild(tile.toXMLElement(player, doc));
-        // Send the surrounding tiles that are now owned by the colony
+        Map map = game.getMap();
         for (Tile t : map.getSurroundingTiles(tile, colony.getRadius())) {
             if (t.getOwningSettlement() == colony) {
                 update.appendChild(t.toXMLElement(player, doc));
             }
         }
-        // Send any tiles that can now be seen because the colony can see
-        // further than the founding unit.
+        // Also send any tiles that can now be seen because the colony
+        // can see further than the founding unit.  TODO: do this a bit
+        // smarter--- collect the tiles before building so we can filter
+        // out the ones we could see anyway with canSee().
         for (int range = unit.getLineOfSight() + 1; 
              range <= colony.getLineOfSight(); range++) {
             CircleIterator circle = map.getCircleIterator(tile.getPosition(),
@@ -138,6 +139,8 @@ public class BuildColonyMessage extends Message {
                 update.appendChild(map.getTile(circle.next()).toXMLElement(player, doc));
             }
         }
+        Element history = doc.createElement("addHistory");
+        reply.appendChild(history);
         history.appendChild(h.toXMLElement(player, doc));
         return reply;
     }

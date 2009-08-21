@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -92,6 +93,89 @@ public final class InGameController extends Controller {
         
         transactionSessions = new HashMap<String,java.util.Map<String, java.util.Map<String,Object>>>();
     }
+
+
+    /**
+     * Get a list of all server players, optionally excluding the supplied one.
+     *
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     * @return A list of all connected server players except one.
+     */
+    public List<ServerPlayer> getOtherPlayers(ServerPlayer serverPlayer) {
+        List<ServerPlayer> result = new ArrayList<ServerPlayer>();
+        for (Player otherPlayer : getGame().getPlayers()) {
+            ServerPlayer enemyPlayer = (ServerPlayer) otherPlayer;
+            if (!enemyPlayer.equals(serverPlayer)
+                && enemyPlayer.isConnected()) {
+                result.add(enemyPlayer);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Tell all players to remove a unit, optionally excluding one player.
+     * Only send if the unit is visible to the player.
+     *
+     * @param unit The <code>Unit</code> to remove.
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     */
+    public void sendRemoveUnitToAll(Unit unit, ServerPlayer serverPlayer) {
+        Element remove = Message.createNewRootElement("remove");
+        unit.addToRemoveElement(remove);
+        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
+            if (unit.isVisibleTo(enemyPlayer)) {
+                try {
+                    enemyPlayer.getConnection().sendAndWait(remove);
+                } catch (IOException e) {
+                    logger.warning(e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Unconditionally tell all players to update an object,
+     * optionally excluding one player.
+     *
+     * @param obj The <code>FreeColGameObject</code> to update.
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     */
+    public void sendUpdateToAll(FreeColGameObject obj, ServerPlayer serverPlayer) {
+        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
+            Element update = Message.createNewRootElement("update");
+            Document doc = update.getOwnerDocument();
+            update.appendChild(obj.toXMLElement(enemyPlayer, doc));
+            try {
+                enemyPlayer.getConnection().sendAndWait(update);
+            } catch (IOException e) {
+                logger.warning(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Tell all players to update a tile, optionally excluding one player.
+     * Only send if the tile is visible.
+     *
+     * @param newTile The <code>Tile</code> to update.
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     */
+    public void sendUpdatedTileToAll(Tile newTile, ServerPlayer serverPlayer) {
+        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
+            if (enemyPlayer.canSee(newTile)) {
+                Element update = Message.createNewRootElement("update");
+                Document doc = update.getOwnerDocument();
+                update.appendChild(newTile.toXMLElement(enemyPlayer, doc));
+                try {
+                    enemyPlayer.getConnection().sendAndWait(update);
+                } catch (IOException e) {
+                    logger.warning(e.getMessage());
+                }
+            }
+        }
+    }
+
 
     /**
      * Ends the turn of the given player.

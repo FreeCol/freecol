@@ -81,19 +81,21 @@ public class CashInTreasureTrainMessage extends Message {
             return Message.clientError(e.getMessage());
         }
         if (!unit.canCarryTreasure()) {
-            return Message.clientError("Can not cash in unit " + unitId + " because it can not carry treasure.");
-        } else if (!unit.canCashInTreasureTrain()) {
-            return Message.clientError("Can not cash in unit " + unitId + " because it is not in a suitable location.");
+            return Message.clientError("Can not cash in unit " + unitId
+                                       + " as it can not carry treasure.");
+        }
+        if (!unit.canCashInTreasureTrain()) {
+            return Message.clientError("Can not cash in unit " + unitId
+                                       + " as it is not in a suitable location.");
         }
 
         // Cash in
         ModelMessage m = serverPlayer.cashInTreasureTrain(unit);
-        Tile tile = unit.getTile();
-        server.getInGameInputHandler().sendUpdatedTileToAll(tile, serverPlayer);
+        server.getInGameController().sendRemoveUnitToAll(unit, serverPlayer);
 
-        // Only need the partial player update, as the sole action on
-        // the tile is to remove the treasure train, which will be
-        // done by the remove anyway.
+        // Only need the partial player update for gold and score.
+        // The sole action on the tile is to remove the treasure
+        // train, which can be done concisely by a remove.
         Element reply = Message.createNewRootElement("multiple");
         Document doc = reply.getOwnerDocument();
         Element messages = doc.createElement("addMessages");

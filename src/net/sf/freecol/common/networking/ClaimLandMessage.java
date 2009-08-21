@@ -92,13 +92,12 @@ public class ClaimLandMessage extends Message {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Game game = server.getGame();
         Tile tile;
-        Settlement settlement;
-
         if (game.getFreeColGameObjectSafely(tileId) instanceof Tile) {
             tile = (Tile) game.getFreeColGameObjectSafely(tileId);
         } else {
             return Message.clientError("Invalid tileId");
         }
+        Settlement settlement;
         if (settlementId == null) {
             settlement = null;
         } else if (game.getFreeColGameObjectSafely(settlementId) instanceof Settlement) {
@@ -107,10 +106,10 @@ public class ClaimLandMessage extends Message {
             return Message.clientError("Invalid settlementId");
         }
 
+        // Request is well formed, but there are more possibilities...
         int value = player.getLandPrice(tile);
         Player owner = tile.getOwner();
         Settlement ownerSettlement = tile.getOwningSettlement();
-
         if (owner == null) { // unclaimed, always free
             price = 0;
         } else if (owner == player) { // capture vacant colony tiles only
@@ -136,9 +135,12 @@ public class ClaimLandMessage extends Message {
             }
         }
 
+        // All is well
         serverPlayer.claimLand(tile, settlement, price);
-        server.getInGameInputHandler().sendUpdatedTileToAll(tile, player);
+        server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
 
+        // Update the tile, and any now-angrier owners, and the player gold
+        // if a price was paid.
         Element reply = Message.createNewRootElement("update");
         Document doc = reply.getOwnerDocument();
         reply.appendChild(tile.toXMLElement(player, doc));
