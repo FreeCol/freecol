@@ -236,7 +236,9 @@ public class ScaleMapAction extends FreeColAction {
                  */
                 Tile importTile = oldMap.getTile(oldX, oldY);
                 Tile t = new Tile(game, importTile.getType(), x, y);
-                t.getTileItemContainer().copyFrom(importTile.getTileItemContainer());
+                if (t.getTileItemContainer() != null) {
+                    t.getTileItemContainer().copyFrom(importTile.getTileItemContainer());
+                }
                 tiles[x][y] = t;
             }
         }
