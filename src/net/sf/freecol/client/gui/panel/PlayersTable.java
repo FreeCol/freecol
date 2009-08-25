@@ -537,6 +537,7 @@ public final class PlayersTable extends JTable {
                     Nation nation = nations.get(row);
                     preGameController.setNation(nation);
                     preGameController.setColor(nation.getColor());
+                    preGameController.setNationType(nation.getType());
                     update();
                     break;
                 }
