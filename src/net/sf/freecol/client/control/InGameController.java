@@ -120,6 +120,7 @@ import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
+import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.RenameMessage;
@@ -508,35 +509,40 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Check unit can build, and is on the map.
-        GUI gui = freeColClient.getGUI();
-        Unit unit = gui.getActiveUnit();
-        if (unit == null || !unit.canBuildColony()) return;
+        Unit unit = canvas.getGUI().getActiveUnit();
+        if (unit == null) return;
         Tile tile = unit.getTile();
         if (tile == null) return;
 
-        if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
-            && !showColonyWarnings(tile, unit)) {
-            return;
-        }
+        Message message = null;
+        if (tile.getColony() == null) {
 
-        // Get and check the name.
-        String name = canvas.showInputDialog("nameColony.text",
-                                             player.getDefaultSettlementName(false),
-                                             "nameColony.yes", "nameColony.no");
-        if (name == null) return; // User cancelled.
-        if (player.getSettlement(name) != null) {
-            // Colony name must be unique.
-            canvas.showInformationMessage("nameColony.notUnique",
-                                          "%name%", name);
-            return;
+            if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_COLONY_WARNINGS)
+                && !showColonyWarnings(tile, unit)) {
+                return;
+            }
+
+            // Get and check the name.
+            String name = canvas.showInputDialog("nameColony.text",
+                                                 player.getDefaultSettlementName(false),
+                                                 "nameColony.yes", "nameColony.no");
+            if (name == null) return; // User cancelled.
+            if (player.getSettlement(name) != null) {
+                // Colony name must be unique.
+                canvas.showInformationMessage("nameColony.notUnique",
+                                              "%name%", name);
+                return;
+            }
+            message = new BuildColonyMessage(name, unit);
+        } else {
+            message = new JoinColonyMessage(tile.getColony(), unit);
         }
 
         Client client = freeColClient.getClient();
-        BuildColonyMessage message = new BuildColonyMessage(name, unit);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "multiple");
         if (reply != null) {
-            Connection conn = freeColClient.getClient().getConnection();
+            Connection conn = client.getConnection();
             player.invalidateCanSeeTiles();
             freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
             freeColClient.getInGameInputHandler().handle(conn, reply);
@@ -548,8 +554,8 @@ public final class InGameController implements NetworkConstants {
                 checkCashInTreasureTrain(unitInTile);
             }
 
-            gui.setActiveUnit(null);
-            gui.setSelectedTile(tile.getPosition());
+            canvas.getGUI().setActiveUnit(null);
+            canvas.getGUI().setSelectedTile(tile.getPosition());
         }
     }
 

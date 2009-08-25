@@ -69,7 +69,11 @@ public class BuildColonyAction extends MapboardAction {
             return false;
         }
         Unit selectedOne = getFreeColClient().getGUI().getActiveUnit();
-        return selectedOne != null && selectedOne.getTile() != null && selectedOne.canBuildColony();
+        return selectedOne != null && selectedOne.getTile() != null
+            && (selectedOne.canBuildColony()
+                || (selectedOne.getTile().getColony() != null
+                    // exclude artillery, ships, etc.
+                    && selectedOne.getType().hasSkill()));
     }
 
     /**

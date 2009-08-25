@@ -369,6 +369,12 @@ public class Message {
         return null;
     }
 
+
+    public Element toXMLElement() {
+        // do nothing
+        return null;
+    }
+
     /**
      * Returns the <code>String</code> representation of the message. This is
      * what actually gets transmitted to the other peer.

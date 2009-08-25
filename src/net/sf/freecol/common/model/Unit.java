@@ -2984,6 +2984,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
 
         colony.placeSettlement();
+        joinColony(colony);
+    }
+
+    /**
+     * Join existing colony.
+     *
+     * @param colony a <code>Colony</code> value
+     */
+    public void joinColony(Colony colony) {
         setState(UnitState.IN_COLONY);
         setLocation(colony);
         setMovesLeft(0);

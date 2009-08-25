@@ -87,6 +87,7 @@ import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
+import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NoRouteToServerException;
@@ -253,6 +254,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return new BuildColonyMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
+        register(JoinColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new JoinColonyMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("recruitUnitInEurope", new CurrentPlayerNetworkRequestHandler() {

@@ -32,9 +32,9 @@ import net.sf.freecol.client.FreeColClient;
 * Super class for all actions that should be disabled when the mapboard is not selected.
 */
 public abstract class MapboardAction extends FreeColAction {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(MapboardAction.class.getName());
-
 
 
     /**
@@ -74,9 +74,9 @@ public abstract class MapboardAction extends FreeColAction {
      */
     protected boolean shouldBeEnabled() { 
         return super.shouldBeEnabled()  
-                && getFreeColClient().getCanvas() != null
-                && getFreeColClient().getCanvas().isMapboardActionsEnabled()
-                && (getFreeColClient().getGame() == null
-                        || getFreeColClient().getGame().getCurrentPlayer() == getFreeColClient().getMyPlayer());
+            && getFreeColClient().getCanvas() != null
+            && getFreeColClient().getCanvas().isMapboardActionsEnabled()
+            && (getFreeColClient().getGame() == null
+                || getFreeColClient().getGame().getCurrentPlayer() == getFreeColClient().getMyPlayer());
     }
 }
