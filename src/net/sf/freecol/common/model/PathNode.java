@@ -291,4 +291,20 @@ public class PathNode implements Comparable<PathNode> {
     public int hashCode() {
         return tile.getX() * 10000 + tile.getY();
     }
+
+    /**
+     * Debug helper.
+     */
+    public String toString() {
+        return "PathNode"
+            + " tile=\"" + tile.getId() + "(" + Integer.toString(tile.getX())
+            + "," + Integer.toString(tile.getY()) + ")\""
+            + " cost=\"" + Integer.toString(cost) + "\""
+            + " f=\"" + Integer.toString(f) + "\""
+            + " direction=\"" + String.valueOf(direction) + "\""
+            + " movesLeft=\"" + Integer.toString(movesLeft) + "\""
+            + " turns=\"" + Integer.toString(turns) + "\""
+            + " onCarrier=\"" + Boolean.toString(onCarrier) + "\""
+            ;
+    }
 }

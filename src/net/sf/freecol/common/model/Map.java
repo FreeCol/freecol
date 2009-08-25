@@ -544,8 +544,11 @@ public class Map extends FreeColGameObject {
                 return currentNode.next;
             }
 
-            // Only check further if it is possible to transit *through* this node.
+            // Only check further along a path if it is possible to
+            // transit *through* it (isProgress()), but not if the
+            // unit is already there, as is the case for firstNode.
             if (currentUnit != null
+                && currentUnit.getTile() != currentNode.getTile()
                 && !currentUnit.getSimpleMoveType(currentNode.getTile()).isProgress()) {
                 continue;
             }
@@ -559,9 +562,12 @@ public class Map extends FreeColGameObject {
                     continue;
                 }
                 
-                // If the new tile is the tile we just visited, skip it. We can use == because PathNode.getTile() 
-                // and getNeighborOrNull both return references to the actual Tile in tiles[][].
-                if (currentNode.previous != null && currentNode.previous.getTile() == newTile) {
+                // If the new tile is the tile we just visited, skip
+                // it. We can use == because PathNode.getTile() and
+                // getNeighborOrNull both return references to the
+                // actual Tile in tiles[][].
+                if (currentNode.previous != null
+                    && currentNode.previous.getTile() == newTile) {
                     continue;
                 }
                 
@@ -573,38 +579,35 @@ public class Map extends FreeColGameObject {
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
                 boolean onCarrier = currentNode.isOnCarrier();
-                
+                Unit moveUnit;
+
                 // Check for disembark:
                 if (carrier != null
-                        && onCarrier
-                        && newTile.isLand()                        
-                        && (newTile.getSettlement() == null || newTile
-                                .getSettlement().getOwner() == currentUnit.getOwner())) {
+                    && onCarrier
+                    && newTile.isLand()
+                    && (newTile.getSettlement() == null
+                        || newTile.getSettlement().getOwner() == carrier.getOwner())) {
                     onCarrier = false;
-                    currentUnit = unit;
-                    movesLeft = currentUnit.getInitialMovesLeft();
+                    moveUnit = unit;
+                    movesLeft = moveUnit.getInitialMovesLeft();
                 } else {
-                    if (currentNode.isOnCarrier()) {
-                        currentUnit = carrier;
-                    } else {
-                        currentUnit = unit;
-                    }
+                    moveUnit = (currentNode.isOnCarrier()) ? carrier : unit;
                 }
                 
-                if (currentUnit != null) {
-                    int extraCost = costDecider.getCost(currentUnit,
-                            currentNode.getTile(), newTile, movesLeft, turns);
+                if (moveUnit != null) {
+                    int extraCost = costDecider.getCost(moveUnit,
+                        currentNode.getTile(), newTile, movesLeft, turns);
                     if (extraCost == CostDecider.ILLEGAL_MOVE && !newTile.equals(end)) {
                         continue;
                     }
                     if (extraCost == CostDecider.ILLEGAL_MOVE) {
                         if (newTile.equals(end)) {
-                            cost += currentUnit.getInitialMovesLeft();
+                            cost += moveUnit.getInitialMovesLeft();
                             movesLeft = 0;
                         }
                     } else {
                         if (carrier != null) {
-                            if (currentUnit.equals(carrier)) {
+                            if (moveUnit.equals(carrier)) {
                                 extraCost *= unit.getInitialMovesLeft();    
                             } else {
                                 extraCost *= carrier.getInitialMovesLeft();
@@ -920,8 +923,11 @@ public class Map extends FreeColGameObject {
                 }
             }
 
-            // Only check further if it is possible to transit *through* this node.
+            // Only check further along a path if it is possible to
+            // transit *through* it (isProgress()), but not if the
+            // unit is already there, as is the case for firstNode.
             if (currentUnit != null
+                && currentUnit.getTile() != currentNode.getTile()
                 && !currentUnit.getSimpleMoveType(currentNode.getTile()).isProgress()) {
                 continue;
             }
@@ -936,9 +942,12 @@ public class Map extends FreeColGameObject {
                     continue;
                 }
                 
-                // If the new tile is the tile we just visited, skip it. We can use == because PathNode.getTile() 
-                // and getNeighborOrNull both return references to the actual Tile in tiles[][].
-                if (currentNode.previous != null && currentNode.previous.getTile() == newTile) {
+                // If the new tile is the tile we just visited, skip
+                // it. We can use == because PathNode.getTile() and
+                // getNeighborOrNull both return references to the
+                // actual Tile in tiles[][].
+                if (currentNode.previous != null
+                    && currentNode.previous.getTile() == newTile) {
                     continue;
                 }
                 
@@ -950,33 +959,30 @@ public class Map extends FreeColGameObject {
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
                 boolean onCarrier = currentNode.isOnCarrier();
-                
+                Unit moveUnit;
+
                 // Check for disembark:
                 if (carrier != null
-                        && onCarrier
-                        && newTile.isLand()                        
-                        && (newTile.getSettlement() == null || newTile
-                                .getSettlement().getOwner() == currentUnit.getOwner())) {
+                    && onCarrier
+                    && newTile.isLand()
+                    && (newTile.getSettlement() == null
+                        || newTile.getSettlement().getOwner() == currentUnit.getOwner())) {
                     onCarrier = false;
-                    currentUnit = unit;
-                    movesLeft = currentUnit.getInitialMovesLeft();
+                    moveUnit = unit;
+                    movesLeft = moveUnit.getInitialMovesLeft();
                 } else {
-                    if (currentNode.isOnCarrier()) {
-                        currentUnit = carrier;
-                    } else {
-                        currentUnit = unit;
-                    }
+                    moveUnit = (currentNode.isOnCarrier()) ? carrier : unit;
                 }
 
-                int extraCost = costDecider.getCost(currentUnit,
+                int extraCost = costDecider.getCost(moveUnit,
                         currentNode.getTile(), newTile, movesLeft, turns);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     continue;
                 }
-                if (carrier != null && currentUnit.equals(unit)) {
+                if (carrier != null && moveUnit.equals(unit)) {
                     cost += extraCost
-                            * (1 + (carrier.getInitialMovesLeft() / ((double) unit
-                                    .getInitialMovesLeft())));
+                        * (1 + (carrier.getInitialMovesLeft()
+                                / ((double) unit.getInitialMovesLeft())));
                 } else {
                     cost += extraCost;
                 }
