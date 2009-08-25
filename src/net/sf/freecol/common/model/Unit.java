@@ -1359,14 +1359,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                             }
                         } else if (settlement instanceof IndianSettlement) {
                             switch (getRole()) {
-                            case DEFAULT:
+                            case DEFAULT: case PIONEER:
                                 IndianSettlement indians = (IndianSettlement) settlement;
                                 if (indians.getLearnableSkill() != null
                                     || !indians.hasBeenVisited()) {
                                     return MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
                                 }
-                                break;
-                            case PIONEER:
                                 break;
                             case MISSIONARY:
                                 return MoveType.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
