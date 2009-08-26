@@ -2018,6 +2018,23 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Client client = freeColClient.getClient();
 
+        // If we are in a colony, or Europe, load sentries
+        if (unit.getSpaceLeft() > 0
+            && (unit.getColony() != null || unit.isInEurope())) {
+            for (Unit sentry : new ArrayList<Unit>(unit.getLocation().getUnitList())) {
+                if (sentry.getState() == UnitState.SENTRY) {
+                    if (sentry.getSpaceTaken() <= unit.getSpaceLeft()) {
+                        boardShip(sentry, unit);
+                        logger.finest("Unit " + unit.getName() + " picked up sentry "
+                                      + sentry.getName() + ".");
+                    } else {
+                        logger.finest("Unit " + sentry.getName() + " is too large "
+                                      + "to board " + unit.getName() + ": skipped.");
+                    }
+                }
+            }            
+        }
+
         // Inform the server:
         Element moveElement = Message.createNewRootElement("move");
         moveElement.setAttribute("unit", unit.getId());
