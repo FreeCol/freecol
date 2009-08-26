@@ -232,7 +232,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
      * Updates this <code>FreeColMenuBar</code>.
      */
     public void update() {
-
+        repaint();
     }
 
     /**
