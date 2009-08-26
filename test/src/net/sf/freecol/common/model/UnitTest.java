@@ -631,8 +631,10 @@ public class UnitTest extends FreeColTestCase {
     }
     
     public void testEquipIndian() {
+        GoodsType toolsType = FreeCol.getSpecification().getGoodsType("model.goods.tools");
 		GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
         GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+        EquipmentType toolsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
         EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.horses");
         EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.indian.muskets");
         EquipmentType horsesWrongEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
@@ -647,23 +649,28 @@ public class UnitTest extends FreeColTestCase {
         
         int horsesReqPerUnit = horsesEqType.getAmountRequiredOf(horsesType);
         int musketsReqPerUnit = musketsEqType.getAmountRequiredOf(musketsType);        
+        int toolsReqPerUnit = toolsEqType.getAmountRequiredOf(toolsType);
         
         // Setup
         camp.addGoods(horsesType,horsesReqPerUnit);
         camp.addGoods(musketsType,musketsReqPerUnit);
+        camp.addGoods(toolsType,toolsReqPerUnit);
      
         assertEquals("Initial number of horses in Indian camp not as expected",horsesReqPerUnit,camp.getGoodsCount(horsesType));
         assertEquals("Initial number of muskets in Indian camp not as expected",musketsReqPerUnit,camp.getGoodsCount(musketsType));
+        assertEquals("Initial number of tools in Indian camp not as expected",toolsReqPerUnit,camp.getGoodsCount(toolsType));
 
         Unit brave = camp.getUnitList().get(0);
+        
+        assertFalse("Brave should not be equiped with tools",brave.canBeEquippedWith(toolsEqType));
         
         assertTrue("Brave should not be mounted",!brave.isMounted());
         assertTrue("Brave should not be armed",!brave.isArmed());
         assertTrue("Indian should be able to be armed",brave.canBeEquippedWith(musketsEqType));
         assertFalse("Indian should not be able to equip with " + musketsWrongEqType,brave.canBeEquippedWith(musketsWrongEqType));
         assertTrue("Indian should be able to be mounted",brave.canBeEquippedWith(horsesEqType));
-        assertFalse("Indian should not be able to equip with " + horsesWrongEqType,brave.canBeEquippedWith(horsesWrongEqType));        
-
+        assertFalse("Indian should not be able to equip with " + horsesWrongEqType,brave.canBeEquippedWith(horsesWrongEqType));
+        
         // Execute
         brave.equipWith(musketsEqType);
         brave.equipWith(horsesEqType);
