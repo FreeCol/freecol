@@ -2622,13 +2622,15 @@ public final class InGameController implements NetworkConstants {
         Element reply = askExpecting(client, message.toXMLElement(), "update");
         if (reply != null) {
             freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, null, unit);
             if (checkCashInTreasureTrain(unit)) {
                 nextActiveUnit();
-                return;
-            }
-            carrier.firePropertyChange(Unit.CARGO_CHANGE,null,unit);
-            if(carrier.getTile() != null){
-                carrier.getTile().firePropertyChange(Tile.UNIT_CHANGE,null,unit);
+            } else if (carrier.getTile() != null) {
+                carrier.getTile().firePropertyChange(Tile.UNIT_CHANGE, null, unit);
+            } else if (carrier.isInEurope()) {
+                Europe europe = (Europe) carrier.getLocation();
+                europe.firePropertyChange(Europe.UNIT_CHANGE, europe.getUnitCount(),
+                                          europe.getUnitCount() - 1);
             }
         }
     }

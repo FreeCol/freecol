@@ -436,15 +436,6 @@ public final class EuropePanel extends FreeColPanel {
             cargoPanel.setCarrier(unitLabel.getUnit());
             unitLabel.setSelected(true);
         }
-
-        updateCargoPanel();
-
-        cargoPanel.revalidate();
-        refresh();
-    }
-
-    private void updateCargoPanel() {
-        cargoPanel.initialize();
     }
 
     /**
@@ -477,20 +468,14 @@ public final class EuropePanel extends FreeColPanel {
                 Goods goods = goodsIterator.next();
                 if (getMyPlayer().canTrade(goods)) {
                     getController().sellGoods(goods);
-                    updateCargoPanel();
                 } else {
                     getController().payArrears(goods);
                 }
-                getCargoPanel().revalidate();
-                refresh();
             }
             Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
                 Unit newUnit = unitIterator.next();
                 getController().leaveShip(newUnit);
-                updateCargoPanel();
-                getCargoPanel().revalidate();
-                refresh();
             }
         }
     }
@@ -560,19 +545,11 @@ public final class EuropePanel extends FreeColPanel {
     }
 
     public final class EuropeCargoPanel extends CargoPanel {
+
         public EuropeCargoPanel(Canvas canvas) {
             super(canvas, true);
         }
         
-        @Override
-        public Component add(Component comp, boolean editState) {
-            Component result = super.add(comp, editState);
-            updateCargoPanel();
-            getCargoPanel().revalidate();
-            refresh();
-            return result;
-        }
-
         @Override
         public String getUIClassID() {
             return "EuropeCargoPanelUI";
