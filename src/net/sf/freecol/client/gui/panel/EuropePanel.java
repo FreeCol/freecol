@@ -28,6 +28,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -184,15 +186,6 @@ public final class EuropePanel extends FreeColPanel {
         StyleConstants.setBold(attributes, true);
         log.setParagraphAttributes(attributes, true);
 
-        /*
-        toAmericaPanel.setBackground(Color.WHITE);
-        toEuropePanel.setBackground(Color.WHITE);
-        inPortPanel.setBackground(Color.WHITE);
-        docksPanel.setBackground(Color.WHITE);
-        cargoPanel.setBackground(Color.WHITE);
-        exitButton.setForeground(Color.WHITE);
-        */
-
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
         toAmericaPanel.setTransferHandler(defaultTransferHandler);
         toEuropePanel.setTransferHandler(defaultTransferHandler);
@@ -260,13 +253,6 @@ public final class EuropePanel extends FreeColPanel {
         inPortPanel.setOpaque(false);
         logScroll.getViewport().setOpaque(false);
         log.setOpaque(false);
-        /*
-        recruitButton.setOpaque(false);
-        purchaseButton.setOpaque(false);
-        trainButton.setOpaque(false);
-        exitButton.setOpaque(false);
-        unloadButton.setOpaque(false);
-        */
 
         setLayout(new MigLayout("wrap 3, fill, align center, insets 30",
                                 "[fill][fill][fill, grow 0]", 
@@ -338,55 +324,6 @@ public final class EuropePanel extends FreeColPanel {
     }
 
     /**
-     * Refreshes the components on this panel that need to be refreshed after
-     * the user has recruited a new unit.
-     */
-    public void refreshDocks() {
-        docksPanel.removeAll();
-
-        Iterator<Unit> unitIterator = europe.getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit unit = unitIterator.next();
-
-            if (((unit.getState() == UnitState.ACTIVE) ||
-                 (unit.getState() == UnitState.SENTRY)) && (!unit.isNaval())) {
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
-                unitLabel.setTransferHandler(defaultTransferHandler);
-                unitLabel.addMouseListener(pressListener);
-
-                docksPanel.add(unitLabel, false);
-            }
-        }
-
-        // Only one component will be repainted!
-        docksPanel.repaint(0, 0, docksPanel.getWidth(), docksPanel.getHeight());
-    }
-
-    /**
-     * Refreshes the components on this panel that need to be refreshed after
-     * the user has purchased a new unit.
-      */
-    public void refreshInPort() {
-        inPortPanel.removeAll();
-
-        List<Unit> units = europe.getUnitList();
-        for (Unit unit : units) {
-            if ((unit.getState() == UnitState.ACTIVE) && (unit.isNaval())) {
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
-                unitLabel.setTransferHandler(defaultTransferHandler);
-                unitLabel.addMouseListener(pressListener);
-                inPortPanel.add(unitLabel);
-            }
-        }
-
-        // Only one component will be repainted!
-        inPortPanel.repaint(0, 0, inPortPanel.getWidth(), inPortPanel.getHeight());
-        if (!units.isEmpty()) {
-            setSelectedUnit(units.get(units.size() - 1));
-        }
-    }
-
-    /**
      * Initialize the data on the window.
      * 
      * @param europe The object of type <code>Europe</code> this panel should
@@ -405,10 +342,10 @@ public final class EuropePanel extends FreeColPanel {
 
         toAmericaPanel.removeAll();
         toEuropePanel.removeAll();
-        inPortPanel.removeAll();
+        inPortPanel.initialize();
         cargoPanel.removeAll();
         marketPanel.removeAll();
-        docksPanel.removeAll();
+        docksPanel.initialize();
         log.setText("");
 
         //
@@ -423,7 +360,7 @@ public final class EuropePanel extends FreeColPanel {
 
             if (!unit.isNaval()) {
                 // If it's not a naval unit, it belongs on the docks.
-                docksPanel.add(unitLabel, false);
+                // docksPanel.add(unitLabel, false);
             } else {
                 // Naval units can either be in the port, going to europe or
                 // going to america.
@@ -431,7 +368,7 @@ public final class EuropePanel extends FreeColPanel {
                 case ACTIVE:
                 default:
                     lastCarrier = unitLabel;
-                    inPortPanel.add(unitLabel);
+                    //inPortPanel.add(unitLabel);
                     break;
                 case TO_EUROPE:
                     toEuropePanel.add(unitLabel, false);
@@ -553,9 +490,6 @@ public final class EuropePanel extends FreeColPanel {
                 getController().leaveShip(newUnit);
                 updateCargoPanel();
                 getCargoPanel().revalidate();
-                // update docks panel
-                refreshDocks();
-                docksPanel.revalidate();
                 refresh();
             }
         }
@@ -578,15 +512,15 @@ public final class EuropePanel extends FreeColPanel {
             switch (europeAction) {
             case EXIT:
                 getMyPlayer().getMarket().removeTransactionListener(log);
+                europe.removePropertyChangeListener(docksPanel);
+                europe.removePropertyChangeListener(inPortPanel);
                 getCanvas().remove(this);
                 getController().nextModelMessage();
                 break;
             case RECRUIT:
             case PURCHASE:
             case TRAIN:
-                refreshDocks();
-                refreshInPort();
-                revalidate();
+                // handled by docks panel
                 break;
             case UNLOAD:
                 unload();
@@ -598,7 +532,6 @@ public final class EuropePanel extends FreeColPanel {
                     UnitLabel unitLabel = getSelectedUnitLabel();
                     inPortPanel.remove(unitLabel);
                     toAmericaPanel.add(unitLabel, false);
-                    refreshInPort();
                     revalidate();
                 }
                 break;
@@ -621,16 +554,6 @@ public final class EuropePanel extends FreeColPanel {
             getMarketPanel().revalidate();
             refresh();
         }
-    }
-
-    public void loadedGoods(Goods goods) {
-        marketPanel.revalidate();
-        revalidate();
-        refresh();
-    }
-
-    public void loadedUnit(Unit unit) {
-        refreshDocks();
     }
 
     public final class EuropeCargoPanel extends CargoPanel {
@@ -689,7 +612,7 @@ public final class EuropePanel extends FreeColPanel {
                     final ClientOptions co = getClient().getClientOptions();
                     boolean autoload = co.getBoolean(ClientOptions.AUTOLOAD_EMIGRANTS);
                     if (!autoload
-                            && docksPanel.getUnitCount() > 0
+                            && docksPanel.getComponentCount() > 0
                             && unit.getSpaceLeft() > 0) {
                         boolean leaveColonists = getCanvas().showConfirmDialog(
                                 "europe.leaveColonists",
@@ -788,16 +711,35 @@ public final class EuropePanel extends FreeColPanel {
      * A panel that holds UnitsLabels that represent naval Units that are
      * waiting in Europe.
      */
-    public final class InPortPanel extends JPanel {
+    public final class InPortPanel extends JPanel implements PropertyChangeListener {
 
-        /**
-         * Adds a component to this InPortPanel.
-         * 
-         * @param comp The component to add to this InPortPanel.
-         * @return The component argument.
-         */
-        public Component add(Component comp) {
-            return super.add(comp);
+        public void initialize() {
+            europe.addPropertyChangeListener(this);
+            update();
+        }
+
+        public void update() {
+            removeAll();
+
+            List<Unit> units = europe.getUnitList();
+            for (Unit unit : units) {
+                if ((unit.getState() == UnitState.ACTIVE) && (unit.isNaval())) {
+                    UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                    unitLabel.setTransferHandler(defaultTransferHandler);
+                    unitLabel.addMouseListener(pressListener);
+                    add(unitLabel);
+                }
+            }
+
+            if (!units.isEmpty()) {
+                setSelectedUnit(units.get(units.size() - 1));
+            }
+            revalidate();
+            repaint();
+        }
+
+        public void propertyChange(PropertyChangeEvent event) {
+            update();
         }
 
         public String getUIClassID() {
@@ -809,7 +751,8 @@ public final class EuropePanel extends FreeColPanel {
      * A panel that holds UnitsLabels that represent Units that are waiting on
      * the docks in Europe.
      */
-    public final class DocksPanel extends JPanel {
+    public final class DocksPanel extends JPanel implements PropertyChangeListener {
+
         private final EuropePanel europePanel;
 
 
@@ -821,49 +764,32 @@ public final class EuropePanel extends FreeColPanel {
         public DocksPanel(EuropePanel europePanel) {
             this.europePanel = europePanel;
         }
-
-        /**
-         * Adds a component to this DocksPanel and makes sure that the unit that
-         * the component represents gets modified so that it will wait on the
-         * docks in Europe.
-         * 
-         * @param comp The component to add to this DocksPanel.
-         * @param editState Must be set to 'true' if the state of the component
-         *            that is added (which should be a dropped component
-         *            representing a Unit) should be changed so that the
-         *            underlying unit will wait on the docks in Europe.
-         * @return The component argument.
-         */
-        public Component add(Component comp, boolean editState) {
-            if (editState) {
-                if (comp instanceof UnitLabel) {
-                    comp.getParent().remove(comp);
-                    /* Unnecessary, leaveShip() is called in CargoPanel.remove()
-                    Unit unit = ((UnitLabel) comp).getUnit();
-                    getController().leaveShip(unit);
-                    */
-                    europePanel.refreshDocks();
-                    return comp;
-                } else {
-                    logger.warning("An invalid component got dropped on this DocksPanel.");
-                    return null;
-                }
-            }
-
-            Component c = add(comp);
-            revalidate();
-            europePanel.refresh();
-            return c;
-        }
         
-        public int getUnitCount() {
-            int number = 0;
-            for (Unit u : europe.getUnitList()) {
-                if (!u.isNaval()) {
-                    number++;
+        public void initialize() {
+            europe.addPropertyChangeListener(this);
+            update();
+        }
+
+        public void update() {
+
+            removeAll();
+
+            List<Unit> units = europe.getUnitList();
+            for (Unit unit : units) {
+                if (!unit.isNaval()) {
+                    UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
+                    unitLabel.setTransferHandler(defaultTransferHandler);
+                    unitLabel.addMouseListener(pressListener);
+                    add(unitLabel);
                 }
             }
-            return number;
+
+            revalidate();
+            repaint();
+        }
+
+        public void propertyChange(PropertyChangeEvent event) {
+            update();
         }
 
         public String getUIClassID() {

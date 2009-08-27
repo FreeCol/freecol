@@ -53,6 +53,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
 
     public static final String UNITS_TAG_NAME = "units";
 
+    public static final String UNIT_CHANGE = "unitChange";
+
     /**
      * This array represents the types of the units that can be recruited in
      * Europe. They correspond to the slots that can be seen in the gui and that
@@ -215,6 +217,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         unit.getOwner().modifyGold(-getRecruitPrice());
         incrementRecruitPrice();
         unit.setLocation(this);
+        firePropertyChange(UNIT_CHANGE, getUnitCount() - 1, getUnitCount());
         unit.getOwner().updateImmigrationRequired();
         unit.getOwner().reduceImmigration();
 
@@ -252,6 +255,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
                 units = new ArrayList<Unit>();
             }        
             units.add((Unit) locatable);
+            firePropertyChange(UNIT_CHANGE, getUnitCount() - 1, getUnitCount());
         }
     }
 
@@ -264,6 +268,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     public void remove(Locatable locatable) {
         if (locatable instanceof Unit) {
             units.remove(locatable);
+            firePropertyChange(UNIT_CHANGE, getUnitCount() + 1, getUnitCount());
         } else {
             logger.warning("Tried to remove an unrecognized 'Locatable' from a europe.");
         }
@@ -409,6 +414,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         unit.getOwner().modifyGold(-price);
         increasePrice(unit, price);
         unit.setLocation(this);
+        firePropertyChange(UNIT_CHANGE, getUnitCount() - 1, getUnitCount());
     }
 
     /**

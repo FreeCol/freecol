@@ -154,10 +154,6 @@ public final class TrainDialog extends FreeColDialog<Integer> implements ActionL
         } else {
             UnitType unitType = FreeCol.getSpecification().getUnitType(command);
             getController().trainUnitInEurope(unitType);
-            getCanvas().getEuropePanel().refreshDocks();
-            getCanvas().getEuropePanel().refreshInPort();
-            getCanvas().getEuropePanel().revalidate();
-
             initialize();
         }
     }
