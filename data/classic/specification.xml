@@ -446,6 +446,7 @@
     <equipment-type id="model.equipment.tools" maximum-count="5" role="pioneer">
       <ability id="model.ability.improveTerrain" value="true"/>
       <required-ability id="model.ability.canBeEquipped" value="true"/>
+	  <required-ability id="model.ability.bornInIndianSettlement" value="false"/>
       <required-goods id="model.goods.tools" value="20"/>
     </equipment-type>
     <equipment-type id="model.equipment.missionary" role="missionary">
