@@ -521,9 +521,11 @@ public final class EuropePanel extends FreeColPanel {
             case PURCHASE:
             case TRAIN:
                 // handled by docks panel
+                requestFocus();
                 break;
             case UNLOAD:
                 unload();
+                requestFocus();
                 break;
             case SAIL:
                 Unit unit = getSelectedUnit();
@@ -534,6 +536,7 @@ public final class EuropePanel extends FreeColPanel {
                     toAmericaPanel.add(unitLabel, false);
                     revalidate();
                 }
+                requestFocus();
                 break;
             default:
                 logger.warning("Invalid action command");
