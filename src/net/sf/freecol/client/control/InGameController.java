@@ -40,7 +40,6 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.InGameMenuBar;
 import net.sf.freecol.client.gui.Canvas.MissionaryAction;
 import net.sf.freecol.client.gui.Canvas.ScoutAction;
 import net.sf.freecol.client.gui.Canvas.TradeAction;
@@ -103,7 +102,6 @@ import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
-import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
@@ -711,44 +709,8 @@ public final class InGameController implements NetworkConstants {
         final Player player = freeColClient.getMyPlayer();
         Map map = freeColClient.getGame().getMap();
 
-        final ArrayList<ChoiceItem<Location>> destinations = new ArrayList<ChoiceItem<Location>>();
-        if (unit.isNaval() && unit.getOwner().canMoveToEurope()) {
-            PathNode path = map.findPathToEurope(unit, unit.getTile());
-            if (path != null) {
-                int turns = path.getTotalTurns();
-                destinations.add(new ChoiceItem<Location>(player.getEurope().getName() + " (" + turns + ")", player.getEurope()));
-            } else if (unit.getTile() != null
-                       && (unit.getTile().canMoveToEurope() || map.isAdjacentToMapEdge(unit.getTile()))) {
-                destinations.add(new ChoiceItem<Location>(player.getEurope().getName() + " (0)", player.getEurope()));
-            }
-        }
-
-        final Settlement inSettlement = (unit.getTile() != null) ? unit.getTile().getSettlement() : null;
-
-        // Search for destinations we can reach:
-        map.search(unit, new GoalDecider() {
-                public PathNode getGoal() {
-                    return null;
-                }
-
-                public boolean check(Unit u, PathNode p) {
-                    Settlement settlement = p.getTile().getSettlement();
-                    if (settlement != null && settlement != inSettlement) {
-                        int turns = p.getTurns();
-                        destinations.add(new ChoiceItem<Location>(settlement.getName()
-                                                                  + " (" + turns + ")",
-                                                                  settlement));
-                    }
-                    return false;
-                }
-
-                public boolean hasSubGoals() {
-                    return false;
-                }
-            }, Integer.MAX_VALUE);
-
         Canvas canvas = freeColClient.getCanvas();
-        Location destination = canvas.showFreeColDialog(new SelectDestinationDialog(canvas, destinations));
+        Location destination = canvas.showFreeColDialog(new SelectDestinationDialog(canvas, unit));
 
         if (destination == null) {
             // user aborted
