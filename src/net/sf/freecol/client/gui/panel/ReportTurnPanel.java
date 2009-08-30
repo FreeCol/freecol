@@ -216,6 +216,12 @@ public final class ReportTurnPanel extends ReportPanel {
             button.addActionListener(this);
             button.setActionCommand(unit.getLocation().getId());
             headline = button;
+        } else if (source instanceof Tile) {
+            final Tile tile = (Tile) source;
+            JButton button = new JButton(tile.getLocationName());
+            button.addActionListener(this);
+            button.setActionCommand(tile.getId());
+            headline = button;
         } else if (source instanceof Nameable) {
             headline = new JLabel(((Nameable) source).getName());
         } else {
