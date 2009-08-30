@@ -181,9 +181,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            ChoiceItem item = (ChoiceItem) destinationList.getSelectedValue();
-            if (item != null) {
-                setResponse((Location) item.getObject());
+            Destination d = (Destination) destinationList.getSelectedValue();
+            if (d != null) {
+                setResponse((Location) d.location);
             }
         }
         getCanvas().remove(this);
