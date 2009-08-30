@@ -197,10 +197,12 @@ public final class FreeColClient {
         }
         
         // TODO: Move this to a more suitable place:
-        final List<ModInfo> mods = ((ListOption) getClientOptions().getObject(ClientOptions.USER_MODS)).getValue();
+        final List<ModInfo> mods = new ArrayList<ModInfo>();
         final List<ResourceMapping> modResources = new ArrayList<ResourceMapping>(mods.size());
-        for (ModInfo mi : mods) {
-            modResources.add(new FreeColModFile(mi).getResourceMapping());
+        for (Object object : ((ListOption) getClientOptions()
+                              .getObject(ClientOptions.USER_MODS)).getValue()) {
+            mods.add((ModInfo) object);
+            modResources.add(new FreeColModFile((ModInfo) object).getResourceMapping());
         }
         ResourceManager.setModMappings(modResources);
         ResourceManager.preload(innerWindowSize);
