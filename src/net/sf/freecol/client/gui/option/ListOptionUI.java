@@ -163,7 +163,7 @@ public final class ListOptionUI<T> extends JPanel implements OptionUpdater, Prop
     private void showAddElementDialog() {
         final Canvas canvas = FreeCol.getFreeColClient().getCanvas();
         final JButton addButton = new JButton(Messages.message("list.add"));
-        final FreeColDialog addElementDialog = new FreeColDialog(canvas) {
+        final FreeColDialog<Object> addElementDialog = new FreeColDialog<Object>(canvas) {
             public void requestFocus() {
                 addButton.requestFocus();
             }
