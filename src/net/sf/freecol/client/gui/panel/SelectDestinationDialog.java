@@ -124,7 +124,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             }
         }
 
-        MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
+        MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "");
         setLayout(layout);
 
         JLabel header = new JLabel(Messages.message("selectDestination.text"));
@@ -140,7 +140,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         JScrollPane listScroller = new JScrollPane(destinationList);
         listScroller.setPreferredSize(new Dimension(250, 250));
 
-        add(listScroller, "growx, growy");
+        add(listScroller, "newline 30, growx, growy");
 
         onlyMyColoniesBox = new JCheckBox(Messages.message("selectDestination.onlyMyColonies"),
                                           showOnlyMyColonies);
@@ -166,7 +166,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         cancelButton.addActionListener(this);
         okButton.addActionListener(this);
 
-        add(okButton, "split 2, tag ok");
+        add(okButton, "newline 30, split 2, tag ok");
         add(cancelButton, "tag cancel");
 
         setSize(getPreferredSize());
@@ -213,6 +213,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
     private void filterDestinations() {
         DefaultListModel model = (DefaultListModel) destinationList.getModel();
+        Object selected = destinationList.getSelectedValue();
         model.clear();
         for (Destination d : destinations) {
             if (showOnlyMyColonies) {
@@ -224,6 +225,10 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             } else {
                 model.addElement(d);
             }
+        }
+        destinationList.setSelectedValue(selected, true);
+        if (destinationList.getSelectedIndex() == -1) {
+            destinationList.setSelectedIndex(0);
         }
     }
 
