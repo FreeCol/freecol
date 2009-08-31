@@ -252,9 +252,10 @@ public final class UnitLabel extends JLabel implements ActionListener {
             g.translate(0, 10);
             pl.paintComponent(g);
             g.translate(0, -10);
-        } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel || 
-                   getParent() instanceof ColonyPanel.InPortPanel || 
-                   getParent() instanceof EuropePanel.InPortPanel || 
+        } else if (getParent() instanceof ColonyPanel.OutsideColonyPanel ||
+                   getParent() instanceof ColonyPanel.InPortPanel ||
+                   getParent() instanceof EuropePanel.InPortPanel ||
+                   getParent() instanceof EuropePanel.DocksPanel ||
                    getParent().getParent() instanceof ReportPanel) {
             int x = (getWidth() - getIcon().getIconWidth()) / 2;
             int y = (getHeight() - getIcon().getIconHeight()) / 2;
@@ -330,6 +331,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 	    inGameController.work(unit, building);
 	    break;
 	case ACTIVATE_UNIT:
+            inGameController.changeState(unit, UnitState.ACTIVE);
 	    parent.getGUI().setActiveUnit(unit);
 	    break;
 	case FORTIFY:

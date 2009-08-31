@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EquipmentType;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -190,6 +191,10 @@ public final class DragListener extends MouseAdapter {
                 if (addCommandItems(unitLabel, menu)) {
                     menu.addSeparator();
                 }
+            }
+        } else if (tempUnit.getLocation() instanceof Europe) {
+            if (addCommandItems(unitLabel, menu)) {
+                menu.addSeparator();
             }
         }
 
@@ -354,16 +359,18 @@ public final class DragListener extends MouseAdapter {
         JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
         menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
         menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(true);
+        menuItem.setEnabled(tempUnit.getState() != UnitState.ACTIVE);
         menu.add(menuItem);
 
-        menuItem = new JMenuItem(Messages.message("fortifyUnit"));
-        menuItem.setActionCommand(UnitAction.FORTIFY.toString());
-        menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
-                            && !(tempUnit.getState() == UnitState.FORTIFIED ||
-                                 tempUnit.getState() == UnitState.FORTIFYING));
-        menu.add(menuItem);
+        if (!(tempUnit.getLocation() instanceof Europe)) {
+            menuItem = new JMenuItem(Messages.message("fortifyUnit"));
+            menuItem.setActionCommand(UnitAction.FORTIFY.toString());
+            menuItem.addActionListener(unitLabel);
+            menuItem.setEnabled((tempUnit.getMovesLeft() > 0)
+                                && !(tempUnit.getState() == UnitState.FORTIFIED ||
+                                     tempUnit.getState() == UnitState.FORTIFYING));
+            menu.add(menuItem);
+        }
 
         menuItem = new JMenuItem(Messages.message("sentryUnit"));
         menuItem.setActionCommand(UnitAction.SENTRY.toString());
