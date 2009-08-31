@@ -558,7 +558,12 @@ public final class FreeColClient {
     public void quit() {
         getConnectController().quitGame(true);
         if (!windowed) {
-            gd.setFullScreenWindow(null);
+            try {
+                gd.setFullScreenWindow(null);
+            } catch(Exception e) {
+                // this can fail, but who cares?
+                // we are quitting anyway
+            }
         }
         System.exit(0);
     }
