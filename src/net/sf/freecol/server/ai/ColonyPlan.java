@@ -816,7 +816,7 @@ public class ColonyPlan {
         sb.append("ColonyPlan for " + colony.getName() + " " + colony.getTile().getPosition());
         sb.append("\n-----\n\nWORK LOCATIONS:\n");
         for (WorkLocationPlan p : getSortedWorkLocationPlans()) {
-            sb.append(p.getGoodsType() + " (" + p.getWorkLocation() + ")\n");
+            sb.append(p.getGoodsType().getName() + " (" + p.getWorkLocation() + ")\n");
         }
         sb.append("\n\nBUILD QUEUE:\n");
         final Iterator<BuildableType> it = getBuildable();

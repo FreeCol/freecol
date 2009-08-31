@@ -1084,8 +1084,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public static String getXMLElementTagName() {
         return "building";
     }
-    
+
     public String toString() {
-        return getType().getId();
+        return getName();
     }
+
 }

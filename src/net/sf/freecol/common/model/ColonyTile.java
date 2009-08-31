@@ -625,7 +625,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * @return A representation of a colony-tile that can be used for debugging.
      */
     public String toString() {
-        return getWorkTile().getPosition().toString() + " in '" + getColony().getName() + "'" + super.toString();
+        return "ColonyTile " + getWorkTile().getPosition().toString()
+            + " in '" + getColony().getName() + "'";
     }
 
     /**

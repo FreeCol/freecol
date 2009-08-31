@@ -444,7 +444,7 @@ public class AIColony extends AIObject {
         }
 
         // We might need more tools for a building or a pioneer:
-        AIUnit unequippedHardyPioneer = getUnequippedHardyPioneer();
+        AIUnit unequippedHardyPioneer = getUnequippedPioneer();
         final boolean needsPioneer = (TileImprovementPlans.size() > 0 || unequippedHardyPioneer != null
                                       && PioneeringMission.isValid(unequippedHardyPioneer));
         int toolsRequiredForBuilding = 0;
@@ -578,7 +578,7 @@ public class AIColony extends AIObject {
      * @return A suitable unit with no tools.
      *         Returns <code>null</code> if no such unit was found.
      */
-    private AIUnit getUnequippedHardyPioneer() {
+    private AIUnit getUnequippedPioneer() {
         AIUnit bestPioneer = null;
         for (Unit unit : colony.getTile().getUnitList()) {
             if (unit.canBeEquippedWith(toolsType)) {
@@ -586,13 +586,13 @@ public class AIColony extends AIObject {
                 if (aiUnit.getMission() == null
                     || (aiUnit.getMission() instanceof PioneeringMission
                         && !unit.getEquipment().containsKey(toolsType))) {
-                    if (bestPioneer == null) {
-                        bestPioneer = aiUnit;
-                    } else if (unit.hasAbility("model.ability.expertPioneer")) {
+                    if (unit.hasAbility("model.ability.expertPioneer")) {
                         bestPioneer = aiUnit;
                         // can't get better than that
                         break;
-                    } else if (unit.getType().getSkill() < bestPioneer.getUnit().getType().getSkill()) {
+                    } else if (bestPioneer == null
+                               || (unit.getType().getSkill()
+                                   < bestPioneer.getUnit().getType().getSkill())) {
                         bestPioneer = aiUnit;
                     }
                 }
@@ -864,7 +864,7 @@ public class AIColony extends AIObject {
                 }
             }
             if (canBuildTools) {
-                AIUnit unequippedPioneer = getUnequippedHardyPioneer();
+                AIUnit unequippedPioneer = getUnequippedPioneer();
                 if (unequippedPioneer != null
                     && (unequippedPioneer.getMission() == null ||
                         !(unequippedPioneer.getMission() instanceof PioneeringMission))
