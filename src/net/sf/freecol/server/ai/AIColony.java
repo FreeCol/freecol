@@ -575,30 +575,30 @@ public class AIColony extends AIObject {
      * Returns an unequipped pioneer that is either inside this colony or
      * standing on the same <code>Tile</code>.
      * 
-     * @return A unit with a {@link PioneeringMission} or a unit with ability
-     *         "model.ability.expertPioneer" - and with no tools.
+     * @return A suitable unit with no tools.
      *         Returns <code>null</code> if no such unit was found.
      */
     private AIUnit getUnequippedHardyPioneer() {
-        Iterator<Unit> ui = colony.getTile().getUnitIterator();
-        while (ui.hasNext()) {
-            Unit u = ui.next();
-            AIUnit au = (AIUnit) getAIMain().getAIObject(u);
-            if (au.getMission() != null && 
-                au.getMission() instanceof PioneeringMission &&
-                !u.getEquipment().containsKey(toolsType)) {
-                return au;
+        AIUnit bestPioneer = null;
+        for (Unit unit : colony.getTile().getUnitList()) {
+            if (unit.canBeEquippedWith(toolsType)) {
+                AIUnit aiUnit = (AIUnit) getAIMain().getAIObject(unit);
+                if (aiUnit.getMission() == null
+                    || (aiUnit.getMission() instanceof PioneeringMission
+                        && !unit.getEquipment().containsKey(toolsType))) {
+                    if (bestPioneer == null) {
+                        bestPioneer = aiUnit;
+                    } else if (unit.hasAbility("model.ability.expertPioneer")) {
+                        bestPioneer = aiUnit;
+                        // can't get better than that
+                        break;
+                    } else if (unit.getType().getSkill() < bestPioneer.getUnit().getType().getSkill()) {
+                        bestPioneer = aiUnit;
+                    }
+                }
             }
         }
-        ui = colony.getUnitIterator();
-        while (ui.hasNext()) {
-            Unit u = ui.next();
-            AIUnit au = (AIUnit) getAIMain().getAIObject(u);
-            if (u.hasAbility("model.ability.expertPioneer")) {
-                return au;
-            }
-        }
-        return null;
+        return bestPioneer;
     }
 
     public void removeWish(Wish w) {

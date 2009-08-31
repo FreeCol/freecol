@@ -259,7 +259,7 @@ public class PioneeringMission extends Mission {
      * Performs this mission.
      * @param connection The <code>Connection</code> to the server.
      */
-    public void doMission(Connection connection) {       
+    public void doMission(Connection connection) {
         if (!isValid()) {
             return;
         }
@@ -276,8 +276,9 @@ public class PioneeringMission extends Mission {
                     } else {
                         skipMission = true;
                     }
-                }
-                if (getUnit().getColony() != null) {
+                } else {
+                    logger.finest("about to equip " + getUnit() + " in "
+                                  + getUnit().getColony().getName());
                     AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getColony());
                     int amount = toolsType.getMaximumCount();
                     for (AbstractGoods materials : toolsType.getGoodsRequired()) {
@@ -420,8 +421,9 @@ public class PioneeringMission extends Mission {
      */
     public boolean isValid() {  
         updateTileImprovementPlan();
-        return !skipMission && tileImprovementPlan != null &&
-                (getUnit().getRole() == Role.PIONEER || getUnit().hasAbility("model.ability.expertPioneer"));
+        return !skipMission && tileImprovementPlan != null;
+        // &&
+        //      (getUnit().getRole() == Role.PIONEER || getUnit().hasAbility("model.ability.expertPioneer"));
     }
 
     /**

@@ -283,7 +283,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
                             null);
             }
         }
-	}
+    }
 
     /**
      * Analyzes an event and calls the right external methods to take care of
