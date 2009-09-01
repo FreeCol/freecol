@@ -58,6 +58,7 @@ public class TileTest extends FreeColTestCase {
     TileImprovementType fishBonusLand = spec().getTileImprovementType("model.improvement.fishBonusLand");
     TileImprovementType fishBonusRiver = spec().getTileImprovementType("model.improvement.fishBonusRiver");
 
+    GoodsType food = spec().getGoodsType("model.goods.food");
     GoodsType sugar = spec().getGoodsType("model.goods.sugar");
     GoodsType tobacco = spec().getGoodsType("model.goods.tobacco");
     GoodsType lumber = spec().getGoodsType("model.goods.lumber");
@@ -270,11 +271,11 @@ public class TileTest extends FreeColTestCase {
         assertTrue(tile2.hasRoad());
         assertTrue(tile2.hasRiver());
 
-        tile1.setType(spec().getTileType("model.tile.savannah"));
+        tile1.setType(savannah);
         assertTrue(tile1.hasRoad());
         assertTrue(tile1.hasRiver());
 
-        tile2.setType(spec().getTileType("model.tile.hills"));
+        tile2.setType(hills);
         assertTrue(tile2.hasRoad());
         assertFalse(tile2.hasRiver());
 
@@ -359,6 +360,43 @@ public class TileTest extends FreeColTestCase {
         colony.dispose();
 
         assertFalse(colony.getTile().hasRoad());
+    }
+
+    public void testBestImprovements() throws Exception {
+
+        Game game = getStandardGame();
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+
+        tile1.setType(savannah);
+        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, sugar));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
+
+        tile1.setType(savannahForest);
+        assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, sugar));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
+        assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, lumber));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
+
+        tile1.setType(hills);
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
+        assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, ore));
+
+        tile1.setType(arctic);
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
+
     }
 
 }

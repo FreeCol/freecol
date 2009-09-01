@@ -210,38 +210,27 @@ public final class TileImprovementType extends FreeColGameObjectType
      * @return Sum of all bonuses with a triple bonus for the preferred GoodsType
      */
     public int getValue(TileType tileType, GoodsType goodsType) {
-        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
-        // 2 main types TileImprovementTypes - Changing of TileType and Simple Bonus
-        TileType newTileType = getChange(tileType);
         int value = 0;
-        if (newTileType != null) {
-            // Calculate difference in output
-            for (GoodsType g : goodsList) {
-                if (!g.isFarmed())
-                    continue;
-                int change = newTileType.getProductionOf(g, null) - tileType.getProductionOf(g, null);
-                if (goodsType == g) {
-                    if (change < 0) {
-                        return 0;   // Reject if there is a drop in preferred GoodsType
-                    } else {
-                        change *= 3;
-                    }
+        if (goodsType.isFarmed()) {
+            TileType newTileType = getChange(tileType);
+            // 2 main types TileImprovementTypes - Changing of TileType and Simple Bonus
+            if (newTileType != null) {
+                int change = newTileType.getProductionOf(goodsType, null)
+                    - tileType.getProductionOf(goodsType, null);
+                if (change > 0) {
+                    value += change * 3;
                 }
-                value += change;
-            }
-        } else {
-            // Calculate bonuses from TileImprovementType
-            for (Modifier modifier : featureContainer.getModifiers()) {
-                float change = modifier.applyTo(1);
-                if (modifier.getId().equals(goodsType.getId())) {
-                    if (change < 1) {
-                        // Reject if there is a drop in preferred GoodsType
-                        return 0;
-                    } else {
-                        change *= 3;
+            } else if (tileType.getProductionOf(goodsType, null) > 0) {
+                // Calculate bonuses from TileImprovementType
+                for (Modifier modifier : featureContainer.getModifiers()) {
+                    float change = modifier.applyTo(1);
+                    if (modifier.getId().equals(goodsType.getId())) {
+                        if (change > 1) {
+                            value += change * 3;
+                        }
                     }
+
                 }
-                value += change;
             }
         }
         return value;
