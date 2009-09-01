@@ -230,11 +230,6 @@ public class AIColony extends AIObject {
      * @see TileImprovementPlan
      */
     public void createTileImprovementPlans() {
-        /*
-         * TODO: This method has to be implemented properly. For instance, tiles
-         * we are currently using should be improved before the ones which will
-         * only be used later.
-         */
 
         Map<Tile, TileImprovementPlan> plans =
             new HashMap<Tile, TileImprovementPlan>();
@@ -243,17 +238,23 @@ public class AIColony extends AIObject {
         }
         for (WorkLocationPlan wlp : colonyPlan.getSortedWorkLocationPlans()) {
             if (wlp.getWorkLocation() instanceof ColonyTile) {
-                Tile target = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
+                ColonyTile colonyTile = (ColonyTile) wlp.getWorkLocation();
+                Tile target = colonyTile.getWorkTile();
                 TileImprovementPlan plan = plans.get(target);
                 if (plan == null) {
                     plan = wlp.createTileImprovementPlan();
                     if (plan != null) {
+                        if (colonyTile.getUnit() != null) {
+                            plan.setValue(2 * plan.getValue());
+                        }
                         tileImprovementPlans.add(plan);
                         plans.put(target, plan);
                     }
                 } else if (wlp.updateTileImprovementPlan(plan) == null) {
                     tileImprovementPlans.remove(plan);
                     plan.dispose();
+                } else if (colonyTile.getUnit() != null) {
+                    plan.setValue(2 * plan.getValue());
                 }
             }
         }
