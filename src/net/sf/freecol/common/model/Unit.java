@@ -1843,15 +1843,40 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         
         if (!hasAbility("model.ability.improveTerrain")) {
             throw new IllegalStateException("Only 'Pioneers' can perform TileImprovement.");
-        }
-        
-        // TODO: Check whether and why improvement can be null here - possible bug in caller?
-        if (improvement == null){
+        } else if (improvement == null){
+            // TODO: Check whether and why improvement can be null here - possible bug in caller?
             throw new IllegalArgumentException("Improvement must not be 'null'.");
-        }
-        
-        if (!canPerformImprovement(improvement.getType())){
-            throw new IllegalArgumentException("Cannot perform this improvement for this tile");
+        } else {
+            TileImprovementType impType = improvement.getType();
+
+            // Is this a valid ImprovementType?
+            if (impType == null) {
+                throw new IllegalArgumentException("ImprovementType must not be 'null'.");
+            } else if (impType.isNatural()) {
+                throw new IllegalArgumentException("ImprovementType must not be natural.");
+            } else if (!impType.isTileTypeAllowed(getTile().getType())) {
+                // Check if improvement can be performed on this TileType
+                throw new IllegalArgumentException(impType.getName() + " not allowed on "
+                                                   + getTile().getType().getName());
+            } else {
+                // TODO: This does not check if the tile (not TileType accepts the improvement)
+
+                // Check if there is an existing Improvement of this type
+                TileImprovement oldImprovement = getTile().findTileImprovementType(impType);
+                if (oldImprovement == null) {
+                    // No improvement found, check if worker can do it
+                    if (!impType.isWorkerAllowed(this)) {
+                        throw new IllegalArgumentException(getName() + " not allowed to perform "
+                                                           + improvement.getName());
+                    }
+                } else {
+                    // Has improvement, check if worker can contribute to it
+                    if (!oldImprovement.isWorkerAllowed(this)) {
+                        throw new IllegalArgumentException(getName() + " not allowed to perform "
+                                                           + improvement.getName());
+                    }
+                }
+            }
         }
         
         setWorkImprovement(improvement);
@@ -2929,32 +2954,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         
         // Clear the alreadyOnHighSea flag:
         alreadyOnHighSea = false;
-    }
-
-    /**
-     * Checks whether this unit can create or contribute to a TileImprovement of this Type here
-     * @return The result.
-     */
-    public boolean canPerformImprovement(TileImprovementType impType) {
-        // Is this a valid ImprovementType?
-        if (impType == null || impType.isNatural()) {
-            return false;
-        }
-        // Check if improvement can be performed on this TileType
-        if (!impType.isTileTypeAllowed(getTile().getType())) {
-            return false;
-        }
-        // TODO: This does not check if the tile (not TileType accepts the improvement)
-        
-        // Check if there is an existing Improvement of this type
-        TileImprovement improvement = getTile().findTileImprovementType(impType);
-        if (improvement == null) {
-            // No improvement found, check if worker can do it
-            return impType.isWorkerAllowed(this);
-        } else {
-            // Has improvement, check if worker can contribute to it
-            return improvement.isWorkerAllowed(this);
-        }
     }
 
     /**
