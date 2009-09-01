@@ -207,6 +207,11 @@ public class TileImprovementPlan extends AIObject {
     public Tile getTarget() {
         return target;
     }
+
+    public String toString() {
+        return type.getName() + " on " + target + " (" + value + ")";
+    }
+
     
     /**
      * Writes this object to an XML stream.

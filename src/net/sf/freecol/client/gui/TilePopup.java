@@ -24,6 +24,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -50,8 +51,8 @@ import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.ai.AIColony;
-import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIUnit;
+import net.sf.freecol.server.ai.TileImprovementPlan;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
 
@@ -245,7 +246,14 @@ public final class TilePopup extends JPopupMenu {
                         final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
                         final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
                         final AIColony ac = (AIColony) freeColClient.getFreeColServer().getAIMain().getAIObject(serverTile.getSettlement());
-                        canvas.showInformationMessage(ac.getColonyPlan().toString());
+                        StringBuilder info = new StringBuilder(ac.getColonyPlan().toString());
+                        info.append("\n\nTILE IMPROVEMENTS:\n");
+                        Iterator<TileImprovementPlan> tipIt = ac.getTileImprovementPlanIterator();
+                        while (tipIt.hasNext()) {
+                            info.append(tipIt.next().toString());
+                            info.append("\n");
+                        }
+                        canvas.showInformationMessage(info.toString());
                     }
                 });
                 add(displayColonyPlan);
