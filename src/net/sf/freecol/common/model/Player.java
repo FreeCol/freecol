@@ -3063,11 +3063,6 @@ public class Player extends FreeColGameObject implements Nameable {
                 getEurope().newTurn();
             }
 
-            if (getMarket() != null) {
-                logger.finest("Calling newTurn for player " + getName() + "'s Market");
-                getMarket().newTurn();
-            }
-
             int numberOfColonies = settlements.size();
             if (numberOfColonies > 0) {
                 newSoL = newSoL / numberOfColonies;

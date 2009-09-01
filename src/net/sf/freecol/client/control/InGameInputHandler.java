@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
@@ -1056,13 +1057,12 @@ public final class InGameInputHandler extends InputHandler {
      *        holds all the information.
      */
     private Element marketElement(Element element) {
-        final Player player = getFreeColClient().getMyPlayer();
+        Player player = getFreeColClient().getMyPlayer();
         GoodsType type = FreeCol.getSpecification().getGoodsType(element.getAttribute("type"));
         int amount = Integer.parseInt(element.getAttribute("amount"));
-        if (amount > 0) {
-            player.getMarket().add(type, amount);
-        } else {
-            player.getMarket().remove(type, -amount);
+        Market market = player.getMarket();
+        if (market.addGoodsToMarket(type, amount)) {
+            player.addModelMessage(market.makePriceMessage(type));
         }
         return null;
     }

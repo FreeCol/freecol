@@ -50,41 +50,6 @@ public class MarketTest extends FreeColTestCase {
     }
 
     /**
-     * If we wait a number of turns, the market should recover and finally
-     * settle back to the initial levels.
-     */
-    public void testMarketRecovery() {
-                
-        Game g = getStandardGame();
-        g.setMap(getTestMap());
-
-        Player p = g.getPlayer("model.nation.dutch");
-
-        Market dm = p.getMarket();
-
-        Specification s = spec();
-
-        GoodsType silver = s.getGoodsType("model.goods.silver");
-
-        int previousGold = p.getGold();
-
-        int price = silver.getInitialSellPrice();
-
-        dm.sell(silver, 1000, p);
-
-        assertEquals(previousGold + price * 1000, p.getGold());
-
-        assertTrue(dm.getSalePrice(silver, 1) < price);
-                
-        // After 100 turns the prices should have recovered.
-        for (int i = 0; i < 100; i++){
-            dm.newTurn();
-        }
-                
-        assertTrue(dm.getSalePrice(silver, 1) >= price);
-    }
-
-    /**
      * Helper Method for finding out how much of a good to sell until the price drops.
      */
     public int sellUntilPriceDrop(Game game, Player player, GoodsType type){
@@ -183,56 +148,6 @@ public class MarketTest extends FreeColTestCase {
                 assertEquals(good.getName(), good.getInitialSellPrice(), dm.paidForSale(good));
             }
         }
-    }
-
-    /*
-     * Test that buying goods raise the price for all players, and that selling
-     * the good will make the prices fall for everybody.
-     */
-    public void testSharedMarket() {
-                
-        Game g = getStandardGame();
-        // Game needs a map, otherwise newTurn will crash
-        Map map = getTestMap();
-        g.setMap(map);
-
-        Player english = g.getPlayer("model.nation.english");
-        Player french = g.getPlayer("model.nation.french");
-
-        Market englishMarket = english.getMarket();
-        Market frenchMarket = french.getMarket();
-
-        Specification s = spec();
-
-        GoodsType silver = s.getGoodsType("model.goods.silver");
-
-        int previousGold = english.getGold();
-
-        int price = silver.getInitialSellPrice();
-
-        englishMarket.sell(silver, 1000, english);
-
-        assertEquals(previousGold + price * 1000, english.getGold());
-
-        // Both prices should drop
-        assertTrue(englishMarket.getSalePrice(silver, 1) < price);
-        // This does not work without real ModelControllers
-        // assertTrue(frenchMarket.getSalePrice(silver, 1) < price);
-
-        // The french market should drop no more than the english:
-        assertTrue(englishMarket.getSalePrice(silver, 1) <= frenchMarket.getSalePrice(silver, 1));
-
-        // After 100 turns the prices should have recovered.
-        for (int i = 0; i < 100; i++){
-            englishMarket.newTurn();
-            frenchMarket.newTurn();
-            
-            // The french market should also recover 
-            assertTrue(englishMarket.getSalePrice(silver, 1) <= frenchMarket.getSalePrice(silver, 1));
-        }
-                
-        assertTrue(englishMarket.getSalePrice(silver, 1) >= price);
-        assertTrue(frenchMarket.getSalePrice(silver, 1) >= price);
     }
 
     /**

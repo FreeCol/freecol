@@ -21,9 +21,13 @@ package net.sf.freecol.server.model;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -32,35 +36,102 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.Controller;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
+
 public class ServerPlayerTest extends FreeColTestCase {	
     TileType plains = spec().getTileType("model.tile.plains");
     
-	UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
+    UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
     UnitType treasureType = spec().getUnitType("model.unit.treasureTrain");
     
-	FreeColServer server = null;
+    FreeColServer server = null;
 	
-	public void tearDown() throws Exception {
-		if(server != null){
-			// must make sure that the server is stopped
+    public void tearDown() throws Exception {
+        if(server != null){
+            // must make sure that the server is stopped
             ServerTestHelper.stopServer(server);
+            FreeCol.setInDebugMode(false);
             FreeColTestCase.setGame(null);
             server = null;
-		}
-		super.tearDown();
-	}
+        }
+        super.tearDown();
+    }
 
-	/*
-	 * Tests worker allocation regarding building tasks
-	 */
+    /**
+     * If we wait a number of turns after selling, the market should
+     * recover and finally settle back to the initial levels.  Also
+     * test that selling reduces the price for other players.
+     */
+    public void testMarketRecovery() {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+
+        Player french = game.getPlayer("model.nation.french");
+        Player english = game.getPlayer("model.nation.english");
+        Market frenchMarket = french.getMarket();
+        Market englishMarket = english.getMarket();
+        int frenchGold = french.getGold();
+        int englishGold = english.getGold();
+        Specification s = spec();
+        GoodsType silver = s.getGoodsType("model.goods.silver");
+        int silverPrice = silver.getInitialSellPrice();
+
+        // Sell in the French market, price should drop
+        frenchMarket.sell(silver, 200, french);
+        assertEquals(frenchGold + silverPrice * 200, french.getGold());
+        assertTrue(frenchMarket.getSalePrice(silver, 1) < silverPrice);
+
+        // Price should have dropped in the English market too, but
+        // not as much as for the French.
+        // assertTrue(englishMarket.getSalePrice(silver, 1) < silverPrice);
+        // assertTrue(englishMarket.getSalePrice(silver, 1) >= frenchMarket.getSalePrice(silver, 1));
+        // This has never worked while the test was done client side,
+        // and had the comment: ``This does not work without real
+        // ModelControllers''.  TODO: Revisit when the client-server
+        // conversion of sales is complete.
+
+        // Pretend time is passing.
+        InGameController igc = server.getInGameController();
+        for (int i = 0; i < 100; i++) {
+            igc.yearlyGoodsRemoval((ServerPlayer) french);
+            igc.yearlyGoodsRemoval((ServerPlayer) english);
+        }
+
+        // Price should have recovered
+        int newPrice;
+        newPrice = frenchMarket.getSalePrice(silver, 1);
+        assertTrue("French silver price " + newPrice
+                   + " should have recovered to " + silverPrice,
+                   newPrice >= silverPrice);
+        newPrice = englishMarket.getSalePrice(silver, 1);
+        assertTrue("English silver price " + newPrice
+                   + " should have recovered to " + silverPrice,
+                   newPrice >= silverPrice);
+    }
+
+    /*
+     * Tests worker allocation regarding building tasks
+     */
     public void testCashInTreasure() {
-		// start a server
         server = ServerTestHelper.startServer(false, true);
-        
+
         Map map = getCoastTestMap(plains, true);
         server.setMapGenerator(new MockMapGenerator(map));
         
@@ -95,8 +166,9 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertTrue(treasure.canCashInTreasureTrain()); // from a ship in Europe
         int fee = treasure.getTransportFee();
         assertEquals(0, fee);
+        int oldGold = dutch.getGold();
         dutch.cashInTreasureTrain(treasure);
-        assertEquals(100, dutch.getGold());
+        assertEquals(100, dutch.getGold() - oldGold);
 
         // Succeed from a port with a connection to Europe
         Colony port = getStandardColony(1, 9, 4);
@@ -121,42 +193,41 @@ public class ServerPlayerTest extends FreeColTestCase {
         assertFalse(treasure.canCashInTreasureTrain());
     }
 	
-	    public void testHasExploredTile() {
-		// start a server
+    public void testHasExploredTile() {
         server = ServerTestHelper.startServer(false, true);
-                
+
         server.setMapGenerator(new MockMapGenerator(getTestMap()));
         
         PreGameController pgc = (PreGameController) server.getController();
-        
+
         try {
             pgc.startGame();
         } catch (FreeColException e) {
             fail("Failed to start game");
         }
-        
+
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
         Map map = game.getMap();
-        
+
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
-        
+
         Tile tile1 = map.getTile(6, 8);
         Tile tile2 = map.getTile(8, 6);
-                
+
         assertFalse("Setup error, tile1 should not be explored by dutch player",dutch.hasExplored(tile1));
         assertFalse("Setup error, tile1 should not be explored by french player",french.hasExplored(tile1));
-        
+
         assertFalse("Setup error, tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
         assertFalse("Setup error, tile2 should not be explored by french player",french.hasExplored(tile2));
-        
+
         new Unit(game, tile1, dutch, freeColonist, UnitState.SENTRY);
         new Unit(game, tile2, french, freeColonist, UnitState.SENTRY);
-        
+
         assertTrue("Tile1 should be explored by dutch player",dutch.hasExplored(tile1));
         assertFalse("Tile1 should not be explored by french player",french.hasExplored(tile1));
-        
+
         assertFalse("Tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
         assertTrue("Tile2 should be explored by french player",french.hasExplored(tile2));
     }

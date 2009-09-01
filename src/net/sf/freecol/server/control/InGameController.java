@@ -201,8 +201,9 @@ public final class InGameController extends Controller {
         ServerPlayer oldPlayer = (ServerPlayer) getGame().getCurrentPlayer();
         
         if (oldPlayer != player) {
-            logger.warning("It is not " + player.getName() + "'s turn!");
-            throw new IllegalArgumentException("It is not " + player.getName() + "'s turn!");
+            throw new IllegalArgumentException("It is not "
+                + player.getName() + "'s turn, it is "
+                + ((oldPlayer == null) ? "noone" : oldPlayer.getName()) + "'s!");
         }
         
         player.clearModelMessages();
@@ -233,6 +234,64 @@ public final class InGameController extends Controller {
             && (!newPlayer.isConnected() || debugOnlyAITurns > 0)) {
             endTurn(newPlayer);
             return;
+        }
+    }
+
+    /**
+     * Remove a standard yearly amount of storable goods, and
+     * a random extra amount of a random type.
+     * Send the market and change messages to the player.
+     * This method is public so it can be use in the Market test code.
+     *
+     * @param player The player whose market is to be updated.
+     */
+    public void yearlyGoodsRemoval(ServerPlayer player) {
+        List<ModelMessage> messages = new ArrayList<ModelMessage>();
+        List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
+        Market market = player.getMarket();
+
+        // Pick a random type of goods to remove an extra amount of.
+        GoodsType removeType;
+        do {
+            removeType = goodsTypes.get(getPseudoRandom().nextInt(goodsTypes.size()));
+        } while (!removeType.isStorable());
+
+        // Remove standard amount, and the extra amount.
+        for (GoodsType type : goodsTypes) {
+            if (type.isStorable()) {
+                int amount = 10;
+                if (type == removeType) {
+                    amount += getPseudoRandom().nextInt(21);
+                }
+                if (market.addGoodsToMarket(type, -amount)) {
+                    messages.add(market.makePriceMessage(type));
+                }
+            }
+        }
+
+        // Update the client
+        Element element;
+        if (messages.isEmpty()) {
+            element = Message.createNewRootElement("update");
+            Document doc = element.getOwnerDocument();
+            element.appendChild(market.toXMLElement(player, doc));
+        } else {
+            element = Message.createNewRootElement("multiple");
+            Document doc = element.getOwnerDocument();
+            Element update = doc.createElement("update");
+            element.appendChild(update);
+            update.appendChild(market.toXMLElement(player, doc));
+            Element mess = doc.createElement("addMessages");
+            element.appendChild(mess);
+            for (ModelMessage m : messages) {
+                mess.appendChild(m.toXMLElement(player, doc));
+            }
+        }
+        try {
+            player.getConnection().send(element);
+        } catch (Exception e) {
+            logger.warning("Error sending yearly market update to "
+                           + player.getName() + ": " + e.getMessage());
         }
     }
 
@@ -321,24 +380,7 @@ public final class InGameController extends Controller {
         }
         
         if (newPlayer.isEuropean()) {
-
-            try {        
-                Market market = newPlayer.getMarket();
-                // make random change to the market
-                List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
-                GoodsType typeToRemove = goodsTypes.get(getPseudoRandom().nextInt(goodsTypes.size()));
-                if (typeToRemove.isStorable()) {
-                    int amountToRemove = getPseudoRandom().nextInt(21);
-                    market.remove(typeToRemove, amountToRemove);
-                    Element updateElement = Message.createNewRootElement("marketElement");
-                    updateElement.setAttribute("type", typeToRemove.getId());
-                    updateElement.setAttribute("amount", String.valueOf(-amountToRemove));
-                    newPlayer.getConnection().send(updateElement);
-                }
-            } catch (Exception e) {
-                logger.warning("Could not send message to: " + newPlayer.getName() +
-                               " with connection " + newPlayer.getConnection());
-            }
+            yearlyGoodsRemoval(newPlayer);
 
             if (newPlayer.getCurrentFather() == null && newPlayer.getSettlements().size() > 0) {
                 chooseFoundingFather(newPlayer);

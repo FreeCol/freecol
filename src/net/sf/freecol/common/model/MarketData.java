@@ -73,6 +73,12 @@ public class MarketData extends FreeColObject {
     private int incomeAfterTaxes;
 
     /**
+     * Place to save to old price so as to be able to tell when a price change
+     * message should be generated.  Not necessary to serialize.
+     */
+    private int oldPrice;
+
+    /**
      * Has this good been traded?
      */
     private boolean traded;
@@ -243,12 +249,48 @@ public class MarketData extends FreeColObject {
     }
 
     /**
-     * Has this good been traded?
+     * Get the old price in this <code>MarketData</code>.
      *
-     * @return Whether this good has been traded
+     * @return The old price.
+     */
+    public final int getOldPrice() {
+        return oldPrice;
+    }
+
+    /**
+     * Set the old price in this <code>MarketData</code>.
+     *
+     * @param oldPrice A `new' old price.
+     */
+    public void setOldPrice(int oldPrice) {
+        this.oldPrice = oldPrice;
+    }
+
+    /**
+     * Has there been trading in this <code>MarketData</code>?
+     *
+     * @return Whether trading has occurred.
      **/
     public final boolean getTraded() {
         return traded;
+    }
+
+    /**
+     * Set the trade status of this <code>MarketData</code>.
+     *
+     * @param traded The trade status to set.
+     **/
+    public void setTraded(boolean traded) {
+        this.traded = traded;
+    }
+
+    /**
+     * Get the type of goods of this <code>MarketData</code>.
+     *
+     * @return The goods type for this data.
+     */
+    public final GoodsType getGoodsType() {
+        return Specification.getSpecification().getGoodsType(getId());
     }
 
     /**
@@ -290,8 +332,7 @@ public class MarketData extends FreeColObject {
         initialPrice = getAttribute(in, "initialPrice", -1);
         // support for older savegames
         if (initialPrice < 0) {
-            initialPrice = Specification.getSpecification().getGoodsType(getId())
-                .getInitialSellPrice();
+            initialPrice = getGoodsType().getInitialSellPrice();
         }
         arrears = Integer.parseInt(in.getAttributeValue(null, "arrears"));
         sales = Integer.parseInt(in.getAttributeValue(null, "sales"));
