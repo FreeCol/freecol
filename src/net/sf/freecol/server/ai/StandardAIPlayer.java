@@ -179,7 +179,8 @@ public class StandardAIPlayer extends AIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.fine("Entering AI code for: " + getPlayer().getNationAsString());
+        logger.fine("Entering AI code for: " + getPlayer().getNationAsString() + ", year " + getGame().getTurn().getYear());
+        
         /** TODO: find some intelligent solution
         switch (player.getNation()) {
         case Player.DUTCH:
