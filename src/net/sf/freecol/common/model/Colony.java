@@ -1130,8 +1130,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         ColonyTile bestPick = null;
         int highestProduction = 0;
         for (ColonyTile colonyTile : colonyTiles) {
-            if (colonyTile.canAdd(unit)) {
-                Tile workTile = colonyTile.getWorkTile();
+            Tile workTile = colonyTile.getWorkTile();
+            if (workTile.getOwningSettlement() == this && colonyTile.canAdd(unit)) {
                 /*
                  * canAdd ensures workTile it's empty or unit it's working in it
                  * so unit can work in it if it's owned by none, by europeans or
