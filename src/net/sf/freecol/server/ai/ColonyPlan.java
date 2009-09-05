@@ -64,7 +64,8 @@ public class ColonyPlan {
     // What is this supposed to be? Is it the maximum number of units
     // per building?
     private static final int MAX_LEVEL = 3;
-
+    private static final int MIN_RAW_GOODS_THRESHOLD = 20;
+    
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
      */
@@ -440,7 +441,11 @@ public class ColonyPlan {
 
         // Try to ensure that we produce the raw material necessary for
         //what we are building
-        if(buildingRawMat != null && getProductionOf(buildingRawMat) <= 0) {
+        boolean buildingRawMatReq = buildingRawMat != null 
+                                    && colony.getGoodsCount(buildingRawMat) < MIN_RAW_GOODS_THRESHOLD
+                                    && getProductionOf(buildingRawMat) <= 0; 
+        
+        if(buildingRawMatReq) {
             WorkLocationPlan bestChoice = null;
             int highestPotential = 0;
 
@@ -458,7 +463,7 @@ public class ColonyPlan {
                 // this must be true because it is the only way to
                 // increase highestPotential
                 assert bestChoice != null;
-                bestChoice.setGoodsType(Goods.LUMBER);
+                bestChoice.setGoodsType(buildingRawMat);
             }
         }
 
