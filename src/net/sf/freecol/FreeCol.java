@@ -388,10 +388,7 @@ public final class FreeCol {
                 + "FreeCol.log";
         }
         try {
-            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile));
-            if (inDebugMode) {
-                logLevel = Level.FINEST;
-            } 
+            baseLogger.addHandler(new DefaultHandler(consoleLogging, logFile)); 
             Logger freecolLogger = Logger.getLogger("net.sf.freecol");
             freecolLogger.setLevel(logLevel);
         } catch (FreeColException e) {
@@ -867,6 +864,10 @@ public final class FreeCol {
             }
             if (line.hasOption("debug")) {
                 inDebugMode = true;
+                // user set log level has precedence
+                if(!line.hasOption("log-level")){
+                    logLevel = Level.FINEST;
+                }
             }
             if (line.hasOption("server")) {
                 standAloneServer = true;
