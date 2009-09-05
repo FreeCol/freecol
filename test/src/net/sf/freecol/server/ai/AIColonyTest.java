@@ -29,17 +29,21 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class AIColonyTest extends FreeColTestCase {	
     final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    final UnitType lumberJackType = spec().getUnitType("model.unit.expertLumberJack");
     final TileType forestType = spec().getTileType("model.tile.coniferForest");
 	final TileType mountainType = spec().getTileType("model.tile.mountains");
 	final TileType savannahType = spec().getTileType("model.tile.savannah");
@@ -202,5 +206,53 @@ public class AIColonyTest extends FreeColTestCase {
         
         assertFalse("Colony couldnt have been assigned a ore miner, no ore",colony.getProductionOf(oreType) > 0);
         assertTrue("Colony should have been assigned a blacksmith, has ore in stock",blacksmithHouse.getUnitCount() > 0);
+    }
+    
+    /*
+     * Tests expert allocation regarding raw materials where there are plenty already in stock
+     */
+    public void testExpertAllocColonyHasEnoughRawMat() {
+        // start a server
+        server = ServerTestHelper.startServer(false, true);
+        
+        Map map = getTestMap(forestType);
+        
+        server.setMapGenerator(new MockMapGenerator(map));
+        
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+        
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        
+        Game game = server.getGame();
+        
+        FreeColTestCase.setGame(game);
+        
+        AIMain aiMain = server.getAIMain();
+
+        
+        FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
+        Colony colony = builder.addColonist(lumberJackType).build();
+        
+        ServerPlayer player = (ServerPlayer) colony.getOwner();
+        assertEquals("Wrong number of units in colony",1,colony.getUnitCount());
+        Unit lumberjack = colony.getUnitList().get(0);
+                       
+        AIColony aiColony = (AIColony) aiMain.getAIObject(colony); 
+
+        aiColony.rearrangeWorkers(player.getConnection());
+                
+        assertTrue("Lumberjack should have been assigned to collect lumber",lumberjack.getWorkType() == lumberType);
+                
+        // Add lumber to stock, re-arrange and re-check
+        colony.addGoods(lumberType, fullStock);
+        aiColony.rearrangeWorkers(player.getConnection());
+        
+        String errMsg = "Lumberjack should not have been assigned to collect lumber, enough lumber in the colony";
+        assertFalse(errMsg, lumberType == lumberjack.getWorkType());
     }
 }
