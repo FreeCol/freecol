@@ -1,5 +1,8 @@
 package net.sf.freecol.util.test;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
@@ -34,6 +37,7 @@ public class FreeColTestUtils {
         static final UnitType colonistType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
         private Game game;
         
+        private HashMap<UnitType,Integer> colonists = new HashMap<UnitType,Integer>();
         private Player player;
         private String name;
         private int initialColonists;
@@ -94,6 +98,15 @@ public class FreeColTestUtils {
             return this;
         }
         
+        public ColonyBuilder addColonist(UnitType type){
+            if(!colonists.containsKey(type)){
+                colonists.put(type, 0);
+            }
+            Integer nCol = colonists.get(type);
+            colonists.put(type, nCol + 1);
+            return this;
+        }
+        
         public Colony build(){
                         
             // player not set, get default
@@ -124,9 +137,23 @@ public class FreeColTestUtils {
             
             Colony colony = new Colony(game, player, name, colonyTile);
             colony.placeSettlement();
+
             
-            // Add braves
-            for(int i=0; i < initialColonists; i++){
+            // Add colonists
+            int nCol = 0;
+            Iterator<UnitType> iter = colonists.keySet().iterator();
+            while(iter.hasNext()){
+                UnitType type = iter.next();
+                Integer n = colonists.get(type);
+                for(int i=0; i < n; i++){
+                    Unit colonist = new Unit(game, colony, player, type, UnitState.IN_COLONY,
+                            colonistType.getDefaultEquipment());
+                    colonist.setLocation(colony);
+                    nCol++;
+                }
+            }
+            // add rest of colonists as simple free colonists
+            for(int i=nCol; i < initialColonists; i++){
                 Unit colonist = new Unit(game, colony, player, colonistType, UnitState.IN_COLONY,
                         colonistType.getDefaultEquipment());
                 colonist.setLocation(colony);
