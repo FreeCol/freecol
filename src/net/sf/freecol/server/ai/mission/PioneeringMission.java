@@ -143,18 +143,18 @@ public class PioneeringMission extends Mission {
         Tile improvementTarget = (tileImprovementPlan != null)? tileImprovementPlan.getTarget():null;
         // invalid tileImprovementPlan, remove and get a new valid one
         if (tileImprovementPlan != null && improvementTarget == null) {
-        	logger.warning("Found invalid TileImprovementPlan, removing it and assigning a new one");
-        	aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
-        	tileImprovementPlan.dispose();
+            logger.warning("Found invalid TileImprovementPlan, removing it and assigning a new one");
+            aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
+            tileImprovementPlan.dispose();
         }
         
         // Verify if the improvement has been applied already
         // If it has, remove this improvement
-        if( tileImprovementPlan != null &&
+        if (tileImprovementPlan != null &&
             improvementTarget != null &&
             improvementTarget.hasImprovement(tileImprovementPlan.getType())){
-                aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
-                tileImprovementPlan.dispose();
+            aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
+            tileImprovementPlan.dispose();
         }
         
         // mission still valid, no update needed
@@ -179,14 +179,14 @@ public class PioneeringMission extends Mission {
         while (tiIterator.hasNext()) {
             TileImprovementPlan ti = tiIterator.next();
             if (ti.getPioneer() == null) {
-            	// invalid tileImprovementPlan, remove and get a new valid one
+                // invalid tileImprovementPlan, remove and get a new valid one
                 if (ti.getTarget() == null) {
-                	logger.warning("Found invalid TileImprovementPlan, removing it and finding a new one");
-                	aiPlayer.removeTileImprovementPlan(ti);
-                	ti.dispose();
-                	continue;
+                    logger.warning("Found invalid TileImprovementPlan, removing it and finding a new one");
+                    aiPlayer.removeTileImprovementPlan(ti);
+                    ti.dispose();
+                    continue;
                 }
-            	
+                
                 PathNode path = null;
                 int value;
                 if (startTile != ti.getTarget()) {
@@ -201,7 +201,7 @@ public class PioneeringMission extends Mission {
                         PathNode pn = path;
                         while (pn != null) {
                             if (pn.getTile().getFirstUnit() != null
-                                    && pn.getTile().getFirstUnit().getOwner() != getUnit().getOwner()) {
+                                && pn.getTile().getFirstUnit().getOwner() != getUnit().getOwner()) {
                                 value -= 1000;
                             }
                             pn = pn.next;
@@ -227,31 +227,31 @@ public class PioneeringMission extends Mission {
     
     private PathNode findColonyWithTools() {
         GoalDecider destinationDecider = new GoalDecider() {
-            private PathNode best = null;
+                private PathNode best = null;
 
-            public PathNode getGoal() {
-                return best;
-            }
-
-            public boolean hasSubGoals() {
-                return false;
-            }
-
-            public boolean check(Unit u, PathNode pathNode) {
-                Tile t = pathNode.getTile();
-                boolean target = false;
-                if (t.getColony() != null && 
-                    t.getColony().getOwner() == u.getOwner() &&
-                    t.getColony().canBuildEquipment(toolsType)) {
-                    AIColony ac = (AIColony) getAIMain().getAIObject(t.getColony());
-                    target = ac.canBuildEquipment(toolsType);
+                public PathNode getGoal() {
+                    return best;
                 }
-                if (target) {
-                    best = pathNode;
+
+                public boolean hasSubGoals() {
+                    return false;
                 }
-                return target;
-            }
-        };
+
+                public boolean check(Unit u, PathNode pathNode) {
+                    Tile t = pathNode.getTile();
+                    boolean target = false;
+                    if (t.getColony() != null && 
+                        t.getColony().getOwner() == u.getOwner() &&
+                        t.getColony().canBuildEquipment(toolsType)) {
+                        AIColony ac = (AIColony) getAIMain().getAIObject(t.getColony());
+                        target = ac.canBuildEquipment(toolsType);
+                    }
+                    if (target) {
+                        best = pathNode;
+                    }
+                    return target;
+                }
+            };
         return getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE);     
     }
     

@@ -202,6 +202,10 @@ public final class TileImprovementType extends FreeColGameObjectType
         return tileTypeChange.get(tileType);
     }
 
+    public boolean changeContainsTarget(TileType tileType) {
+        return tileTypeChange.containsValue(tileType);
+    }
+
     /**
      * Returns a value for use in AI decision making.
      * @param tileType The <code>TileType</code> to be considered. A <code>null</code> entry

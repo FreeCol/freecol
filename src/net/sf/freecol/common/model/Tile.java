@@ -1269,7 +1269,12 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      *         completed.
      */
     public boolean hasImprovement(TileImprovementType type) {
-        return tileItemContainer != null && tileItemContainer.hasImprovement(type);
+        if (type.changeContainsTarget(getType())) {
+            return true;
+        } else if (tileItemContainer != null) {
+            return tileItemContainer.hasImprovement(type);
+        }
+        return false;
     }
     
     /**
