@@ -854,7 +854,7 @@ public class TransportMission extends Mission {
         }
 
         // Try training the unit:
-        if (player.getGold() >= price) {
+        if (price > 0 && player.getGold() >= price) {
             return aiPlayer.trainAIUnitInEurope(unitType);
         }
 
