@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
  *
  * @see Tile
  */
-public class TileImprovementPlan extends AIObject {
+public class TileImprovementPlan extends ValuedAIObject {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TileImprovementPlan.class.getName());
@@ -49,11 +49,6 @@ public class TileImprovementPlan extends AIObject {
      * The type of improvement, from TileImprovementTypes.
      */
     private TileImprovementType type;
-    
-    /**
-     * The value of this improvement.
-     */
-    private int value;
     
     /**
      * The pioneer which should make the improvement (if a <code>Unit</code> has
@@ -81,7 +76,7 @@ public class TileImprovementPlan extends AIObject {
         
         this.target = target;
         this.type = type;
-        this.value = value;
+        setValue(value);
     }
     
     /**
@@ -135,25 +130,6 @@ public class TileImprovementPlan extends AIObject {
         super.dispose();
     }    
 
-    /**
-    * Returns the value for this <code>TileImprovementPlan</code>.
-    * @return The value identifying the importance of
-    *         this <code>TileImprovementPlan</code> - a higher value 
-    *         signals a higher importance.
-    */
-    public int getValue() {
-        return value;
-    }
-
-    /**
-     * Sets the value of this <code>TileImprovementPlan</code>.
-     * @param value The value.
-     * @see #getValue
-     */
-    public void setValue(int value) {
-        this.value = value;
-    }
-    
     /**
      * Gets the pioneer who have been assigned to making the
      * improvement described by this object.
@@ -209,7 +185,7 @@ public class TileImprovementPlan extends AIObject {
     }
 
     public String toString() {
-        return type.getName() + " on " + target + " (" + value + ")";
+        return type.getName() + " on " + target + " (" + getValue() + ")";
     }
 
     
@@ -225,7 +201,7 @@ public class TileImprovementPlan extends AIObject {
 
         out.writeAttribute("ID", getId());        
         out.writeAttribute("type", type.getId());
-        out.writeAttribute("value", Integer.toString(value));
+        out.writeAttribute("value", Integer.toString(getValue()));
         if (pioneer != null) {
             out.writeAttribute("pioneer", pioneer.getId());
         }
@@ -243,7 +219,7 @@ public class TileImprovementPlan extends AIObject {
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         setId(in.getAttributeValue(null, "ID"));
         type = FreeCol.getSpecification().getTileImprovementType(in.getAttributeValue(null, "type"));
-        value = Integer.parseInt(in.getAttributeValue(null, "value"));
+        setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
         
         final String pioneerStr = in.getAttributeValue(null, "pioneer");
         if (pioneerStr != null) {

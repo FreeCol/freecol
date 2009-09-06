@@ -376,6 +376,13 @@ public class TileTest extends FreeColTestCase {
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
 
+        tile1.setType(marsh);
+        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, food));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, sugar));
+        assertEquals(plow, TileImprovement.findBestTileImprovementType(tile1, tobacco));
+        assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
+        assertEquals(road, TileImprovement.findBestTileImprovementType(tile1, ore));
+
         tile1.setType(savannahForest);
         assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, food));
         assertEquals(clearForest, TileImprovement.findBestTileImprovementType(tile1, sugar));

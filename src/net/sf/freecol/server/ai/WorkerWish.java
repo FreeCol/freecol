@@ -68,7 +68,7 @@ public class WorkerWish extends Wish {
         }
         
         this.destination = destination;
-        this.value = value;
+        setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
     }
@@ -124,7 +124,7 @@ public class WorkerWish extends Wish {
      *       required or not.
      */
     public void update(int value, UnitType unitType, boolean expertNeeded) {
-        this.value = value;
+        setValue(value);
         this.unitType = unitType;
         this.expertNeeded = expertNeeded;
     }
@@ -152,7 +152,7 @@ public class WorkerWish extends Wish {
         if (transportable != null) {
             out.writeAttribute("transportable", transportable.getId());
         }
-        out.writeAttribute("value", Integer.toString(value));
+        out.writeAttribute("value", Integer.toString(getValue()));
 
         out.writeAttribute("unitType", unitType.getId());
         out.writeAttribute("expertNeeded", Boolean.toString(expertNeeded));
@@ -179,7 +179,7 @@ public class WorkerWish extends Wish {
         } else {
             transportable = null;
         }
-        value = Integer.parseInt(in.getAttributeValue(null, "value"));
+        setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
 
         unitType = FreeCol.getSpecification().getUnitType(in.getAttributeValue(null, "unitType"));
         expertNeeded = Boolean.valueOf(in.getAttributeValue(null, "expertNeeded")).booleanValue();

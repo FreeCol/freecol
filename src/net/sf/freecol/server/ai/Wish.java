@@ -36,13 +36,11 @@ import org.w3c.dom.Element;
 /**
 * Represents a need for something at a given <code>Location</code>.
 */
-public abstract class Wish extends AIObject {
+public abstract class Wish extends ValuedAIObject {
+
     private static final Logger logger = Logger.getLogger(Wish.class.getName());
 
-
     protected Location destination = null;
-    protected int value;
-
     
     /**
     * The <code>Transportable</code> which will realize the wish,
@@ -97,16 +95,6 @@ public abstract class Wish extends AIObject {
         return (transportable != null);
     }
     
-    /**
-    * Returns the value for this <code>Wish</code>.
-    * @return The value identifying the importance of
-    *         this <code>Wish</code>.
-    */
-    public int getValue() {
-        return value;
-    }
-
-
     /**
     * Assigns a <code>Transportable</code> to this <code>Wish</code>.
     * @param transportable The <code>Transportable</code> which should

@@ -41,12 +41,10 @@ import org.w3c.dom.Element;
 /**
 * Objects of this class contains AI-information for a single {@link WorkLocation}.
 */
-public class WorkLocationPlan {
+public class WorkLocationPlan extends ValuedAIObject {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkLocationPlan.class.getName());
-
-    private AIMain aiMain;
 
     /**
     * The FreeColGameObject this AIObject contains AI-information for.
@@ -66,9 +64,10 @@ public class WorkLocationPlan {
      *      <code>workLocation</code> using this plan.
      */
     public WorkLocationPlan(AIMain aiMain, WorkLocation workLocation, GoodsType goodsType) {
-        this.aiMain = aiMain;
+        super(aiMain);
         this.workLocation = workLocation;
         this.goodsType = goodsType;
+        setValue(getProductionOf(goodsType));
     }
 
 
@@ -80,28 +79,12 @@ public class WorkLocationPlan {
      *      XML-representation of this object.
      */
     public WorkLocationPlan(AIMain aiMain, Element element) {
-        this.aiMain = aiMain;
+        super(aiMain);
         readFromXMLElement(element);
+        setValue(getProductionOf(goodsType));
     }
 
 
-    /**
-     * Gets the main AI-object.
-     * @return The main AI-object.
-     */
-    public AIMain getAIMain() {
-        return aiMain;
-    }
-
-    
-    /**
-     * Get the <code>Game</code> this object is associated to.
-     * @return The <code>Game</code>.
-     */    
-    public Game getGame() {
-        return aiMain.getGame();
-    }
-    
     /**
      * Gets a <code>TileImprovementPlan</code> which will improve
      * the production of the goods type specified by this
@@ -173,7 +156,7 @@ public class WorkLocationPlan {
      * @return The production.
      */
     public int getProductionOf(GoodsType goodsType) {
-        if (goodsType != this.goodsType) {
+        if (goodsType == null || goodsType != this.goodsType) {
             return 0;
         }
         
@@ -241,6 +224,7 @@ public class WorkLocationPlan {
     */
     public void setGoodsType(GoodsType goodsType) {
         this.goodsType = goodsType;
+        setValue(getProductionOf(goodsType));
     }
 
     

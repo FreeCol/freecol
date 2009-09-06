@@ -22,7 +22,6 @@ package net.sf.freecol.server.ai;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -236,7 +235,7 @@ public class AIColony extends AIObject {
         for (TileImprovementPlan plan : tileImprovementPlans) {
             plans.put(plan.getTarget(), plan);
         }
-        for (WorkLocationPlan wlp : colonyPlan.getSortedWorkLocationPlans()) {
+        for (WorkLocationPlan wlp : colonyPlan.getWorkLocationPlans()) {
             if (wlp.getWorkLocation() instanceof ColonyTile) {
                 ColonyTile colonyTile = (ColonyTile) wlp.getWorkLocation();
                 Tile target = colonyTile.getWorkTile();
@@ -277,14 +276,7 @@ public class AIColony extends AIObject {
             }
         }
 
-        Collections.sort(tileImprovementPlans, new Comparator<TileImprovementPlan>() {
-                public int compare(TileImprovementPlan o, TileImprovementPlan p) {
-                    Integer i = o.getValue();
-                    Integer j = p.getValue();
-
-                    return j.compareTo(i);
-                }
-            });
+        Collections.sort(tileImprovementPlans);
     }
 
     /**
@@ -457,7 +449,7 @@ public class AIColony extends AIObject {
                     GoodsWish gw = (GoodsWish) w;
                     // TODO: check for a certain required amount?
                     if (gw.getGoodsType() == Goods.TOOLS) {
-                        gw.value = goodsWishValue;
+                        gw.setValue(goodsWishValue);
                         goodsOrdered = true;
                         break;
                     }
@@ -473,13 +465,7 @@ public class AIColony extends AIObject {
 
         disposeUnwantedWishes(newWishes);        
 
-        Collections.sort(wishes, new Comparator<Wish>() {
-                public int compare(Wish o, Wish p) {
-                    Integer i = o.getValue();
-                    Integer j = p.getValue();
-                    return j.compareTo(i);
-                }
-            });
+        Collections.sort(wishes);
 
     }
 
@@ -869,14 +855,7 @@ public class AIColony extends AIObject {
 
         List<Unit> units = new ArrayList<Unit>();
         List<WorkLocationPlan> workLocationPlans = colonyPlan.getWorkLocationPlans();
-        Collections.sort(workLocationPlans, new Comparator<WorkLocationPlan>() {
-                public int compare(WorkLocationPlan o, WorkLocationPlan p) {
-                    Integer i = o.getProductionOf(o.getGoodsType());
-                    Integer j = p.getProductionOf(p.getGoodsType());
-
-                    return j.compareTo(i);
-                }
-            });
+        Collections.sort(workLocationPlans);
 
         // Remove all colonists from the colony:
         Iterator<Unit> ui = colony.getUnitIterator();

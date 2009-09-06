@@ -35,8 +35,8 @@ import net.sf.freecol.common.model.Game;
 * player, can have a single <code>AIObject</code> attached to it.
 */
 public abstract class AIObject extends FreeColObject {
+
     private static final Logger logger = Logger.getLogger(FreeColObject.class.getName());
-    
     
     private final AIMain aiMain;
     protected boolean uninitialized = false;
@@ -130,6 +130,6 @@ public abstract class AIObject extends FreeColObject {
     * @return The <code>String</code> "unknown".
     */
     public static String getXMLElementTagName() {
-        return "unknown";
+        return "AIObject";
     }
 }

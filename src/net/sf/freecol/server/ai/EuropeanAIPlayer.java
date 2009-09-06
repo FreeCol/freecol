@@ -936,13 +936,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                 wishList.add(w);
             }
         }
-        Collections.sort(wishList, new Comparator<Wish>() {
-                public int compare(Wish o1, Wish o2) {
-                    Integer a = o1.getValue();
-                    Integer b = o2.getValue();
-                    return b.compareTo(a);
-                }
-            });
+        Collections.sort(wishList);
         return wishList.iterator();
     }
 

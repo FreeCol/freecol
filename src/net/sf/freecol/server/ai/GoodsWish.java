@@ -66,7 +66,7 @@ public class GoodsWish extends Wish {
         }       
 
         this.destination = destination;
-        this.value = value;
+        setValue(value);
         this.goodsType = goodsType;
         this.amountRequested = amountRequested;
     }
@@ -151,7 +151,7 @@ public class GoodsWish extends Wish {
         if (transportable != null) {
             out.writeAttribute("transportable", transportable.getId());
         }
-        out.writeAttribute("value", Integer.toString(value));
+        out.writeAttribute("value", Integer.toString(getValue()));
         out.writeAttribute("goodsType", goodsType.getId());
         out.writeAttribute("amountRequested", Integer.toString(amountRequested));
 
@@ -177,7 +177,7 @@ public class GoodsWish extends Wish {
          } else {
              transportable = null;
          }
-         value = Integer.parseInt(in.getAttributeValue(null, "value"));
+         setValue(Integer.parseInt(in.getAttributeValue(null, "value")));
          
          goodsType = FreeCol.getSpecification().getGoodsType(in.getAttributeValue(null, "goodsType"));
 

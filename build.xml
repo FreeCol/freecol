@@ -575,7 +575,7 @@
             if you have a version of Ant prior to 1.6 on UNIX:
             export CLASSPATH=${CLASSPATH}:test/lib/junit.jar; ant testall
             -->
-        <junit printsummary="on" errorproperty="error.junit" fork="yes" maxmemory="32m">
+        <junit printsummary="on" errorproperty="error.junit" fork="yes" maxmemory="48m">
             <classpath refid="test.run.classpath"/>
             <formatter type="xml" />
             

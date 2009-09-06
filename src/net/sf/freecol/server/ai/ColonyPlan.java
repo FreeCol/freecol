@@ -21,7 +21,6 @@ package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -120,11 +119,7 @@ public class ColonyPlan {
      */
     public List<WorkLocationPlan> getSortedWorkLocationPlans() {
         List<WorkLocationPlan> workLocationPlans = getWorkLocationPlans();
-        Collections.sort(workLocationPlans, new Comparator<WorkLocationPlan>() {
-            public int compare(WorkLocationPlan o, WorkLocationPlan p) {
-                return p.getProductionOf(p.getGoodsType()) - o.getProductionOf(o.getGoodsType());
-            }
-        });
+        Collections.sort(workLocationPlans);
 
         return workLocationPlans;
     }

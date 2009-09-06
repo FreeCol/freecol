@@ -45,46 +45,46 @@ public class AIColonyTest extends FreeColTestCase {
     final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     final UnitType lumberJackType = spec().getUnitType("model.unit.expertLumberJack");
     final TileType forestType = spec().getTileType("model.tile.coniferForest");
-	final TileType mountainType = spec().getTileType("model.tile.mountains");
-	final TileType savannahType = spec().getTileType("model.tile.savannah");
-	final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
+    final TileType mountainType = spec().getTileType("model.tile.mountains");
+    final TileType savannahType = spec().getTileType("model.tile.savannah");
+    final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
     final GoodsType oreType = spec().getGoodsType("model.goods.ore");
     final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
     final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
     final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
     final int fullStock = 100;
     
-	FreeColServer server = null;
+    FreeColServer server = null;
 	
-	public void tearDown() throws Exception {
-		if(server != null){
-			// must make sure that the server is stopped
+    public void tearDown() throws Exception {
+        if(server != null){
+            // must make sure that the server is stopped
             ServerTestHelper.stopServer(server);
             server = null;
-		}
-		super.tearDown();
-	}
-	
-	// creates the special map for the tests
-	// map will have: 
+        }
+        super.tearDown();
+    }
+        
+    // creates the special map for the tests
+    // map will have: 
     //    - a colony in (5,8) (built after)
-	//    - a forest in (4,8) for lumber
-	//    - a mountain in (6,8) for ore
-	private Map buildMap(boolean withBuildRawMat){
-	    MapBuilder builder = new MapBuilder(getGame());
-	    builder.setBaseTileType(savannahType);
-	    if(withBuildRawMat){
-	        builder.setTile(4, 8, forestType);
-	        builder.setTile(6, 8, mountainType);
-	    }
-	    return builder.build();
-	}
-	
-	/*
-	 * Tests worker allocation regarding building tasks
-	 */
-	public void testBuildersAllocation() {
-		// start a server
+    //    - a forest in (4,8) for lumber
+    //    - a mountain in (6,8) for ore
+    private Map buildMap(boolean withBuildRawMat){
+        MapBuilder builder = new MapBuilder(getGame());
+        builder.setBaseTileType(savannahType);
+        if(withBuildRawMat){
+            builder.setTile(4, 8, forestType);
+            builder.setTile(6, 8, mountainType);
+        }
+        return builder.build();
+    }
+        
+    /*
+     * Tests worker allocation regarding building tasks
+     */
+    public void testBuildersAllocation() {
+        // start a server
         server = ServerTestHelper.startServer(false, true);
         
         Map map = buildMap(true);
@@ -129,9 +129,9 @@ public class AIColonyTest extends FreeColTestCase {
         assertFalse("Colony does not need a carpenter",carpenterHouse.getUnitCount() > 0);
         assertTrue("Colony should have been assigned a ore miner",colony.getProductionOf(oreType) > 0);
         assertTrue("Colony should have been assigned a blacksmith",blacksmithHouse.getUnitCount() > 0);
-	}
-	
-	/*
+    }
+        
+    /*
      * Tests worker allocation regarding building tasks when the colony
      *does not have tiles that provide the raw materials for the build
      */
