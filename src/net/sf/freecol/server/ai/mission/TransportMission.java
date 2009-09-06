@@ -74,10 +74,8 @@ import org.w3c.dom.Element;
  * @see net.sf.freecol.common.model.Unit Unit
  */
 public class TransportMission extends Mission {
+
     private static final Logger logger = Logger.getLogger(TransportMission.class.getName());
-
-
-
 
     private static final String ELEMENT_TRANSPORTABLE = "transportable";
 
@@ -477,16 +475,8 @@ public class TransportMission extends Mission {
     }
     
     private boolean canAttackPlayer(Player target) {
-        final Unit unit = getUnit();
-        final Stance stance = unit.getOwner().getStance(target);
-        if (stance == Stance.ALLIANCE) {
-            return false;
-        }
-        if (stance != Stance.WAR
-                && !unit.hasAbility("model.ability.piracy")) {
-            return false;
-        }
-        return true;
+        return (getUnit().getOwner().getStance(target) == Stance.WAR
+                || getUnit().hasAbility("model.ability.piracy"));
     }
     
     /**
@@ -847,9 +837,14 @@ public class TransportMission extends Mission {
             }
         }
 
-        // Try recruiting the unit:
-        // TODO: Check if it will be cheaper to train the unit instead.
-        if (player.getGold() >= player.getRecruitPrice()) {
+        int price = -1;
+        if (unitType.hasPrice() && europe.getUnitPrice(unitType) >= 0) {
+            price = europe.getUnitPrice(unitType);
+        }
+        // Try recruiting the unit, unless it would be cheaper to
+        // train
+        if (player.getGold() >= player.getRecruitPrice()
+            && price > player.getRecruitPrice()) {
             for (int i = 0; i < 3; i++) {
                 // Note, used to be 1-3 but the method expects 0-2
                 if (europe.getRecruitable(i) == unitType) {
@@ -859,8 +854,7 @@ public class TransportMission extends Mission {
         }
 
         // Try training the unit:
-        if (unitType.hasPrice() && europe.getUnitPrice(unitType) >= 0 &&
-                player.getGold() >= europe.getUnitPrice(unitType)) {
+        if (player.getGold() >= price) {
             return aiPlayer.trainAIUnitInEurope(unitType);
         }
 
@@ -1436,7 +1430,7 @@ public class TransportMission extends Mission {
      * for debugging purposes.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer("Transport list:\n");
+        StringBuilder sb = new StringBuilder("Transport list:\n");
         List<Transportable> ts = new LinkedList<Transportable>();
         for(Transportable t : transportList) {
             Locatable l = t.getTransportLocatable();
