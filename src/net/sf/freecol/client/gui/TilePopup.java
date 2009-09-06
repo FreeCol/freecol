@@ -191,6 +191,8 @@ public final class TilePopup extends JPopupMenu {
             addSeparator();
             JMenu takeOwnership = new JMenu("Take ownership");
             takeOwnership.setOpaque(false);
+            JMenu transportLists = new JMenu("Transport lists");
+            transportLists.setOpaque(false);
             boolean notEmpty = false;
             for (final Unit currentUnit : tile.getUnitList()) {
                 JMenuItem toMenuItem = new JMenuItem(currentUnit.toString());
@@ -212,15 +214,18 @@ public final class TilePopup extends JPopupMenu {
                 if (currentUnit.isCarrier()) {
                     final AIUnit au = (AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(currentUnit);
                     if (au.getMission() != null && au.getMission() instanceof TransportMission) {
-                        JMenuItem menuItem = new JMenuItem("Transport list for: " + currentUnit.toString() +
-                                                           " (" + currentUnit.hashCode() + ")");
+                        JMenuItem menuItem = new JMenuItem(currentUnit.toString());
                         menuItem.addActionListener(new ActionListener() {
                                 public void actionPerformed(ActionEvent event) {
                                     canvas.showInformationMessage(au.getMission().toString());
                                 }
                             });
+                        transportLists.add(menuItem);
                     }
                 }
+            }
+            if (transportLists.getItemCount() > 0) {
+                add(transportLists);
             }
             if (tile.getColony() != null) {
                 if (!notEmpty) {
