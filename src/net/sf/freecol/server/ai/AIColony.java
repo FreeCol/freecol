@@ -49,7 +49,6 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
@@ -829,8 +828,6 @@ public class AIColony extends AIObject {
     public void rearrangeWorkers(Connection connection) {
         colonyPlan.create();
         
-        boolean canProduceInWater = colony.hasAbility("model.ability.produceInWater");
-        
         // TODO: Detect a siege and move the workers temporarily around.
 
         // Move a pioneer outside the colony if we have a sufficient amount of
@@ -869,69 +866,8 @@ public class AIColony extends AIObject {
             unit.putOutsideColony();
         }
 
-        // Place all the experts:
-        
-        // Since we will change the original list, we need to make a copy to iterate from
-        Iterator<Unit> uit = new ArrayList<Unit>(units).iterator();
-        while (uit.hasNext()) {
-            Unit unit = uit.next();
-            
-            GoodsType expertProd = unit.getType().getExpertProduction();
-            
-            // not an expert
-            if(expertProd == null){
-                continue;
-            }
-            
-            WorkLocationPlan bestWorkPlan = null;
-            int bestProduction = 0;
-                        
-            Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
-            while (wlpIterator.hasNext()) {
-                WorkLocationPlan wlp = wlpIterator.next();
-                WorkLocation wl = wlp.getWorkLocation();
-                
-                GoodsType locGoods = wlp.getGoodsType();
-                
-                boolean isColonyTile = wl instanceof ColonyTile;
-                boolean isLand = true;
-                if(isColonyTile){
-                    isLand = ((ColonyTile) wl).getWorkTile().isLand();
-                }
-                
-                //Colony cannot get fish yet
-                if(isColonyTile && !isLand && !canProduceInWater){
-                    continue;
-                }
-                
-                // not a fit
-                if(expertProd != locGoods){
-                    continue;
-                }
-                
-                // no need to look any further, only one place to work in
-                if(!isColonyTile){
-                    bestWorkPlan = wlp;
-                    break;
-                }
-                
-                int planProd = wlp.getProductionOf(expertProd);
-                if(bestWorkPlan == null || bestProduction < planProd){
-                    bestWorkPlan = wlp;
-                    bestProduction = planProd;
-                    
-                }
-            }
-
-            if(bestWorkPlan != null){
-                //use work() instead of setLocation()
-                //to make sure that unitState is properly updated!
-                unit.work(bestWorkPlan.getWorkLocation());
-                unit.setWorkType(bestWorkPlan.getGoodsType());
-                workLocationPlans.remove(bestWorkPlan);
-                units.remove(unit);
-            }
-        }
+        // Place the experts:
+        placeExpertsInWorkPlaces(units, workLocationPlans);
 
         boolean workerAdded = true;
         while (workerAdded) {
@@ -1236,6 +1172,72 @@ public class AIColony extends AIObject {
         if (this.colony.getUnitCount()<=0) {
             // something bad happened, there is no remaining unit working in the colony
             throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
+        }
+    }
+
+    private void placeExpertsInWorkPlaces(List<Unit> units, List<WorkLocationPlan> workLocationPlans) {
+        boolean canProduceInWater = colony.hasAbility("model.ability.produceInWater");
+        
+        // Since we will change the original list, we need to make a copy to iterate from
+        Iterator<Unit> uit = new ArrayList<Unit>(units).iterator();
+        while (uit.hasNext()) {
+            Unit unit = uit.next();
+            
+            GoodsType expertProd = unit.getType().getExpertProduction();
+            
+            // not an expert
+            if(expertProd == null){
+                continue;
+            }
+            
+            WorkLocationPlan bestWorkPlan = null;
+            int bestProduction = 0;
+                        
+            Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
+            while (wlpIterator.hasNext()) {
+                WorkLocationPlan wlp = wlpIterator.next();
+                WorkLocation wl = wlp.getWorkLocation();
+                
+                GoodsType locGoods = wlp.getGoodsType();
+                
+                boolean isColonyTile = wl instanceof ColonyTile;
+                boolean isLand = true;
+                if(isColonyTile){
+                    isLand = ((ColonyTile) wl).getWorkTile().isLand();
+                }
+                
+                //Colony cannot get fish yet
+                if(isColonyTile && !isLand && !canProduceInWater){
+                    continue;
+                }
+                
+                // not a fit
+                if(expertProd != locGoods){
+                    continue;
+                }
+                
+                // no need to look any further, only one place to work in
+                if(!isColonyTile){
+                    bestWorkPlan = wlp;
+                    break;
+                }
+                
+                int planProd = wlp.getProductionOf(expertProd);
+                if(bestWorkPlan == null || bestProduction < planProd){
+                    bestWorkPlan = wlp;
+                    bestProduction = planProd;
+                    
+                }
+            }
+
+            if(bestWorkPlan != null){
+                //use work() instead of setLocation()
+                //to make sure that unitState is properly updated!
+                unit.work(bestWorkPlan.getWorkLocation());
+                unit.setWorkType(bestWorkPlan.getGoodsType());
+                workLocationPlans.remove(bestWorkPlan);
+                units.remove(unit);
+            }
         }
     }
 
