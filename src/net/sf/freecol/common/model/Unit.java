@@ -1323,6 +1323,27 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Can we perhaps learn a skill in this settlement?
+     *
+     * @param settlement The <code>IndianSettlement<code> to test.
+     * @return True/false if there is possibly a skill to learn.
+     */
+    private boolean perhapsLearnFromSettlement(IndianSettlement settlement) {
+        // If we know the skill is gone, fail.
+        if (settlement.getLearnableSkill() == null
+            && settlement.hasBeenVisited()) {
+            return false;
+        }
+        // Generic way of saying: is this unit upgradable with one of the
+        // standard native skills?  We can not use the settlement's true
+        // skill because another nation might have consumed it without our
+        // knowing.
+        return getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES);
+    }
+    private static UnitType scoutSkill
+        = FreeCol.getSpecification().getUnitType("model.unit.seasonedScout");
+
+    /**
      * Gets the type of a move that is made when moving a land unit to
      * from one tile to another.
      * 
@@ -1360,9 +1381,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                         } else if (settlement instanceof IndianSettlement) {
                             switch (getRole()) {
                             case DEFAULT: case PIONEER:
-                                IndianSettlement indians = (IndianSettlement) settlement;
-                                if (indians.getLearnableSkill() != null
-                                    || !indians.hasBeenVisited()) {
+                                if (perhapsLearnFromSettlement((IndianSettlement) settlement)) {
                                     return MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
                                 }
                                 break;
