@@ -852,6 +852,7 @@ public class ColonyPlan {
             
             u.work(factory);
             u.setWorkType(producedGoods);
+            producers.remove(u);
         }
     }
     
