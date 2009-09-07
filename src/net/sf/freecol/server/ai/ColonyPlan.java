@@ -834,6 +834,13 @@ public class ColonyPlan {
             if(stockRawMat < 50 && producers.size() < 2){
                 return;
             }
+            
+            int rawProd = colony.getProductionNextTurn(rawMat);
+            int mfnProd = colony.getProductionOf(producedGoods);
+            if(stockRawMat < 50 && mfnProd > rawProd + 2){
+                return;
+            }
+            
             if(factory.getUnitCount() == factory.getMaxUnits()){
                 return;
             }
