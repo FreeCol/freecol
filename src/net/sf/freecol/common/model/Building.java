@@ -334,6 +334,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             final Unit unit = (Unit) locatable;
 
             unit.removeAllEquipment(false);
+            unit.setState(Unit.UnitState.IN_COLONY);
 
             Unit student = unit.getStudent();
             if (buildingType.hasAbility("model.ability.teach")) {

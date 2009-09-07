@@ -83,7 +83,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * A state a Unit can have.
      */
     public static enum UnitState { ACTIVE, FORTIFIED, SENTRY, IN_COLONY, IMPROVING,
-            TO_EUROPE, IN_EUROPE, TO_AMERICA, FORTIFYING, SKIPPED }
+            TO_EUROPE, TO_AMERICA, FORTIFYING, SKIPPED }
 
     /** The roles a Unit can have. */
     public static enum Role {
@@ -1585,8 +1585,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void add(Locatable locatable) {
         if (locatable instanceof Unit && canCarryUnits()) {
-            if (getSpaceLeft() < locatable.getSpaceTaken()) {
-                throw new IllegalStateException();
+            Unit unit = (Unit) locatable;
+            if (getSpaceLeft() < unit.getSpaceTaken()) {
+                throw new IllegalStateException("Not enough space for " + unit.getName()
+                                                + " left on " + getName());
             }
             if (units.contains(locatable)) {
             	logger.warning("Tried to add a 'Locatable' already in the carrier.");
@@ -1596,19 +1598,21 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (units.equals(Collections.emptyList())) {
             	units = new ArrayList<Unit>();
             } 
-            units.add((Unit) locatable);
+            units.add(unit);
+            unit.setState(UnitState.SENTRY);
             firePropertyChange(CARGO_CHANGE, null, locatable);
-			spendAllMoves();
+            spendAllMoves();
         } else if (locatable instanceof Goods && canCarryGoods()) {
-        	Goods goods = (Goods) locatable;
-        	if(getLoadableAmount(goods.getType()) < goods.getAmount()){
-                throw new IllegalStateException("Not enough space for the given locatable!");
+            Goods goods = (Goods) locatable;
+            if (getLoadableAmount(goods.getType()) < goods.getAmount()){
+                throw new IllegalStateException("Not enough space for " + goods.toString()
+                                                + " left on " + getName());
             }
-        	goodsContainer.addGoods(goods);
-			firePropertyChange(CARGO_CHANGE, null, locatable);
+            goodsContainer.addGoods(goods);
+            firePropertyChange(CARGO_CHANGE, null, locatable);
             spendAllMoves();
         } else {
-        	throw new IllegalStateException("Tried to add a 'Locatable' to a non-carrier unit.");
+            throw new IllegalStateException("Tried to add a 'Locatable' to a non-carrier unit.");
         }
     }
 
@@ -1918,12 +1922,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     // this should always be the case, except possibly for unit tests
                     int newPopulation = oldColony.getUnitCount();
                     oldColony.updatePopulation(-1);
-                    if (getState() != UnitState.ACTIVE) {
-                        logger.warning("Removing unit " + getId() + " with state==" + getState() 
-                                       + " (should not be IN_COLONY) from WorkLocation in "
-                                       + oldLocation.getColony().getName() + ". Fixing: ");
-                        setState(UnitState.ACTIVE);
-                    }
+                    setState(UnitState.ACTIVE);
                 }
             }
         } else if (newLocation instanceof WorkLocation) {
@@ -2684,7 +2683,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         case SENTRY:
         case IN_COLONY:
         case TO_EUROPE:
-        case IN_EUROPE:
         case TO_AMERICA:
         case FORTIFYING:
         case SKIPPED:

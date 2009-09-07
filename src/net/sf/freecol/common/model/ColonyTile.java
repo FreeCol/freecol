@@ -338,6 +338,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
 
         Unit u = (Unit) locatable;
         u.removeAllEquipment(false);
+        u.setState(Unit.UnitState.IN_COLONY);
         setUnit(u);
     }
     

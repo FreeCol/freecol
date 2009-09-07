@@ -566,20 +566,22 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     @Override
     public void add(Locatable locatable) {
         if (locatable instanceof Unit) {
-            if (((Unit) locatable).isColonist()) {
-                WorkLocation w = getVacantWorkLocationFor((Unit) locatable);
+            Unit newUnit = (Unit) locatable;
+            if (newUnit.isColonist()) {
+                WorkLocation w = getVacantWorkLocationFor(newUnit);
                 if (w == null) {
-                    logger.warning("Could not find a 'WorkLocation' for " + locatable + " in " + this);
-                    ((Unit) locatable).putOutsideColony();
+                    logger.warning("Could not find a 'WorkLocation' for " + newUnit.getName()
+                                   + " in " + getName());
+                    newUnit.putOutsideColony();
                 } else {
                     int oldPopulation = getUnitCount();
-                    ((Unit) locatable).work(w);
+                    newUnit.work(w);
                     firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
                                        oldPopulation, oldPopulation + 1);
                     updatePopulation(1);
                 }
             } else {
-                ((Unit) locatable).putOutsideColony();
+                newUnit.putOutsideColony();
             }
         } else if (locatable instanceof Goods) {
             addGoods((Goods) locatable);

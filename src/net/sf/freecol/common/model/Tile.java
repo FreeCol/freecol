@@ -1052,6 +1052,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                     units = new ArrayList<Unit>();
                 } 
                 units.add((Unit) locatable);
+                ((Unit) locatable).setState(Unit.UnitState.ACTIVE);
                 firePropertyChange(UNIT_CHANGE, null, locatable);
             }
         } else if (locatable instanceof TileItem) {

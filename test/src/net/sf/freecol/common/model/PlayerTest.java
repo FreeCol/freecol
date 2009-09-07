@@ -289,8 +289,8 @@ public class PlayerTest extends FreeColTestCase {
         
         UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
         UnitType galleon = spec().getUnitType("model.unit.galleon");
-        new Unit(game, dutch.getEurope(), dutch, freeColonist, UnitState.IN_EUROPE);
-        new Unit(game, dutch.getEurope(), dutch, galleon, UnitState.IN_EUROPE);
+        new Unit(game, dutch.getEurope(), dutch, freeColonist, UnitState.SENTRY);
+        new Unit(game, dutch.getEurope(), dutch, galleon, UnitState.SENTRY);
         assertFalse("Should not be game over, not 1600 yet",Player.checkForDeath(dutch));
         
         game.setTurn(new Turn(1600));

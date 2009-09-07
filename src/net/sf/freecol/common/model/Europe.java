@@ -253,8 +253,13 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         } else if (!units.contains(locatable)) {
             if (units.equals(Collections.emptyList())) {
                 units = new ArrayList<Unit>();
-            }        
-            units.add((Unit) locatable);
+            }
+            Unit newUnit = (Unit) locatable;
+            units.add(newUnit);
+            if (!(newUnit.getState() == Unit.UnitState.TO_EUROPE
+                  || newUnit.getState() == Unit.UnitState.TO_AMERICA)) {
+                newUnit.setState(Unit.UnitState.SENTRY);
+            }
             firePropertyChange(UNIT_CHANGE, getUnitCount() - 1, getUnitCount());
         }
     }
