@@ -1164,10 +1164,11 @@ public class AIColony extends AIObject {
           colony.setExports(Goods.CLOTH, true);
           colony.setExports(Goods.COATS, true);
           }*/
-
+        
         decideBuildable(connection);
         createTileImprovementPlans();
         createWishes();
+        colonyPlan.adjustProductionAndManufacture();
         
         if (this.colony.getUnitCount()<=0) {
             // something bad happened, there is no remaining unit working in the colony

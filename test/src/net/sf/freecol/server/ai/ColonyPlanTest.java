@@ -21,13 +21,18 @@ package net.sf.freecol.server.ai;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.Controller;
@@ -37,10 +42,14 @@ import net.sf.freecol.util.test.MockMapGenerator;
 
 public class ColonyPlanTest extends FreeColTestCase {	
 	final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+	final TileType prairieType = spec().getTileType("model.tile.prairie");
 	final TileType forestType = spec().getTileType("model.tile.coniferForest");
 	final TileType mountainType = spec().getTileType("model.tile.mountains");
 	final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
     final GoodsType oreType = spec().getGoodsType("model.goods.ore");
+    final GoodsType foodType = spec().getGoodsType("model.goods.food");
+    final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+    final GoodsType clothType = spec().getGoodsType("model.goods.cloth");
     final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
     final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
     final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
@@ -281,4 +290,59 @@ public class ColonyPlanTest extends FreeColTestCase {
         assertFalse("The colony cannot produce ore, none available", ore > 0);
         assertTrue("The colony should produce tools, has ore in stock", tools > 0);
 	}
+	
+	/*
+     * This test verifies adjustments to manufactured goods production
+     */
+    public void testAdjustProductionAndManufacture(){
+        final int fullStock = 100;
+        // start a server
+        server = ServerTestHelper.startServer(false, true);
+        
+        Map map = getTestMap(prairieType);
+        
+        server.setMapGenerator(new MockMapGenerator(map));
+        
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+        
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        
+        Game game = server.getGame();
+        
+        FreeColTestCase.setGame(game);
+        
+        AIMain aiMain = server.getAIMain();
+            
+        Colony colony = getStandardColony(1);
+        Tile t = map.getAdjacentTile(colony.getTile().getPosition(), Direction.N);
+        Unit u = colony.getUnitList().get(0);
+        ColonyTile colTile = colony.getColonyTile(t);
+        u.work(colTile);
+        u.setWorkType(cottonType);
+        
+        ColonyPlan plan = new ColonyPlan(aiMain,colony);        
+        plan.create();
+        
+        assertEquals("Wrong primary raw material",foodType, plan.getPrimaryRawMaterial());
+        assertEquals("Wrong secondary raw material",cottonType, plan.getSecondaryRawMaterial());
+
+        assertEquals("Wrong number of units in colony tile", 1, colTile.getUnitCount());
+        assertEquals("Unit should be picking cotton", cottonType, u.getWorkType());
+        plan.adjustProductionAndManufacture();
+        assertEquals("Unit should not have been shifted", cottonType, u.getWorkType());
+        
+        // Simulate that enough cotton have been gathered, re-adjust and re-check
+        colony.addGoods(cottonType, fullStock);
+        Building weaverHouse = colony.getBuildingsForConsuming(cottonType).get(0);
+        assertEquals("Wrong number of units in waever house", 0, weaverHouse.getUnitCount());
+        plan.adjustProductionAndManufacture();
+        assertEquals("Wrong number of units in colony tile", 0, colTile.getUnitCount());
+        assertEquals("Unit should have been shifted", clothType, u.getWorkType());
+        assertEquals("Wrong number of units in waever house", 1, weaverHouse.getUnitCount());
+    }
 }

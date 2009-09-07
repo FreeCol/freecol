@@ -65,6 +65,11 @@ public class ColonyPlan {
     private static final int MAX_LEVEL = 3;
     private static final int MIN_RAW_GOODS_THRESHOLD = 20;
     
+    private static final GoodsType hammersType = Specification.getSpecification().getGoodsType("model.goods.hammers");
+    private static final GoodsType toolsType = Specification.getSpecification().getGoodsType("model.goods.tools");
+    private static final GoodsType lumberType = Specification.getSpecification().getGoodsType("model.goods.lumber");
+    private static final GoodsType oreType = Specification.getSpecification().getGoodsType("model.goods.ore");
+
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
      */
@@ -74,7 +79,11 @@ public class ColonyPlan {
 
     private ArrayList<WorkLocationPlan> workLocationPlans = new ArrayList<WorkLocationPlan>();
 
-
+    private GoodsType primaryRawMaterial = null;
+    
+    private GoodsType secondaryRawMaterial = null;
+    
+    
     /**
      * Creates a new <code>ColonyPlan</code>.
      * 
@@ -395,12 +404,7 @@ public class ColonyPlan {
         // TODO: Erik - adapt plan to colony profile
         // Colonies should be able to specialize, determine role by colony
         // resources, buildings and specialists
-        
-        final GoodsType hammersType = Specification.getSpecification().getGoodsType("model.goods.hammers");
-        final GoodsType toolsType = Specification.getSpecification().getGoodsType("model.goods.tools");
-        final GoodsType lumberType = Specification.getSpecification().getGoodsType("model.goods.lumber");
-        final GoodsType oreType = Specification.getSpecification().getGoodsType("model.goods.ore");
-        
+                
         workLocationPlans.clear();
         Building townHall = colony.getBuildingForProducing(Goods.BELLS);
         
@@ -421,14 +425,14 @@ public class ColonyPlan {
         GoodsType buildingReq = null;
         GoodsType buildingRawMat = null;
         Building buildingReqProducer = null;
-        BuildableType currBuild = colony.getCurrentlyBuilding();
-        if(currBuild != null){
-            if(colony.getGoodsCount(hammersType) < currBuild.getAmountRequiredOf(hammersType)){
-                buildingReq = hammersType;
+        
+        buildingReq = getBuildingReqGoods();
+        
+        if(buildingReq != null){
+            if(buildingReq == hammersType){
                 buildingRawMat = lumberType;
             }
             else{
-                buildingReq = toolsType;
                 buildingRawMat = oreType;
             }
             buildingReqProducer = colony.getBuildingForProducing(buildingReq);
@@ -463,9 +467,9 @@ public class ColonyPlan {
         }
 
         // Determine the primary and secondary types of goods:
-        GoodsType primaryRawMaterial = null;
+        primaryRawMaterial = null;
+        secondaryRawMaterial = null;
         int primaryRawMaterialProduction = 0;
-        GoodsType secondaryRawMaterial = null;
         int secondaryRawMaterialProduction = 0;
         List<GoodsType> goodsTypeList = Specification.getSpecification().getGoodsTypeList();
         for (GoodsType goodsType : goodsTypeList) {
@@ -764,7 +768,107 @@ public class ColonyPlan {
             }
         }
     }
+    
+    public void adjustProductionAndManufacture(){
+        List<GoodsType> rawMatList = new ArrayList<GoodsType>(); 
+    
+        if(getBuildingReqGoods() == hammersType){
+            rawMatList.add(lumberType);
+        }
+        rawMatList.add(oreType);
+        
+        if (primaryRawMaterial != null
+                && primaryRawMaterial != lumberType
+                && primaryRawMaterial != oreType
+                && !primaryRawMaterial.isFoodType()) {
+            rawMatList.add(primaryRawMaterial);
+        }
+        
+        if (secondaryRawMaterial != null
+                && secondaryRawMaterial != lumberType
+                && secondaryRawMaterial != oreType
+                && !secondaryRawMaterial.isFoodType()) {
+            rawMatList.add(secondaryRawMaterial);
+        }
+        
+        for(GoodsType rawMat : rawMatList){
+            GoodsType producedGoods = rawMat.getProducedMaterial();
+            if(producedGoods == null){
+                continue;
+            }
+            adjustProductionAndManufactureFor(rawMat,producedGoods);
+        }
+    }
+    
+    public void adjustProductionAndManufactureFor(GoodsType rawMat, GoodsType producedGoods){
+        Building factory = colony.getBuildingForProducing(producedGoods);
+        if(factory == null){
+            return;
+        }
+        
+        List<Unit> producers = new ArrayList<Unit>();
+        int stockRawMat = colony.getGoodsCount(rawMat);
+       
+        for(ColonyTile t : colony.getColonyTiles()){
+            if(t.isColonyCenterTile()){
+                continue;
+            }
+            Unit u = t.getUnit();
+            if(u == null){
+                continue;
+            }
+            if(u.getWorkType() != rawMat){
+                continue;
+            }
+            producers.add(u); 
+        }
+        
+        if(producers.size() == 0){
+            return;
+        }
+        
+        // shift units gathering raw materials to production of manufactured goods
+        Iterator<Unit> iter = new ArrayList<Unit>(producers).iterator();
+        while(iter.hasNext()){
+            // not enough stock of raw material and workers
+            if(stockRawMat < 50 && producers.size() < 2){
+                return;
+            }
+            if(factory.getUnitCount() == factory.getMaxUnits()){
+                return;
+            }
+            Unit u = iter.next();
+            // this particular unit cannot be added to this building
+            if(!factory.canAdd(u.getType())){
+                continue;
+            }
+            u.work(factory);
+            u.setWorkType(producedGoods);
+        }
+    }
+    
+    public GoodsType getBuildingReqGoods(){
+        BuildableType currBuild = colony.getCurrentlyBuilding();
+        if(currBuild == null){
+            return null;
+        }
+        
+        if(colony.getGoodsCount(hammersType) < currBuild.getAmountRequiredOf(hammersType)){
+            return hammersType;
+        }
+        else{
+            return toolsType;
+        }
+    }
+    
+    public GoodsType getPrimaryRawMaterial(){
+        return primaryRawMaterial;
+    }
 
+    public GoodsType getSecondaryRawMaterial(){
+        return secondaryRawMaterial;
+    }
+    
     /**
      * Gets the <code>Colony</code> this <code>ColonyPlan</code> controls.
      * 
