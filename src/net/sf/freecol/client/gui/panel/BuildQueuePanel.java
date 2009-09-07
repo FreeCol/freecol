@@ -283,7 +283,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            getController().setBuildQueue(colony, getBuildableTypes(buildQueueList));
+            if(!FreeCol.isInDebugMode() || colony.getOwner() == getMyPlayer()){
+                getController().setBuildQueue(colony, getBuildableTypes(buildQueueList));
+            }
             getCanvas().remove(this);
         } else if (BUY.equals(command)) {
             getController().setBuildQueue(colony, getBuildableTypes(buildQueueList));
