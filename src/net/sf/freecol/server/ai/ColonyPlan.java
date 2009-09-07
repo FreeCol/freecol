@@ -21,6 +21,7 @@ package net.sf.freecol.server.ai;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -826,6 +827,24 @@ public class ColonyPlan {
         if(producers.size() == 0){
             return;
         }
+
+        // Creates comparator to order the list of producers by their production (ascending)
+        Comparator<Unit> comp = new Comparator<Unit>(){
+                public int compare(Unit u1, Unit u2){
+                    GoodsType goodsType = u1.getWorkType();
+                    int prodU1 = ((ColonyTile) u1.getLocation()).getProductionOf(u1, goodsType);
+                    int prodU2 = ((ColonyTile) u2.getLocation()).getProductionOf(u2, goodsType);
+                    
+                    if(prodU1 > prodU2){
+                        return 1;
+                    }
+                    if(prodU1 < prodU2){
+                        return -1;
+                    }
+                    return 0;
+                }
+        };
+        Collections.sort(producers, comp);
         
         // shift units gathering raw materials to production of manufactured goods
         Iterator<Unit> iter = new ArrayList<Unit>(producers).iterator();
@@ -843,10 +862,11 @@ public class ColonyPlan {
             if(!factory.canAdd(u.getType())){
                 continue;
             }
-            
-            int rawProd = colony.getProductionNextTurn(rawMat);
-            int mfnProd = colony.getProductionOf(producedGoods);
-            if(stockRawMat < 50 && rawProd < mfnProd + 2){
+
+            // get  the production values if the unit is shifted 
+            int rawProd = colony.getProductionNextTurn(rawMat) - ((ColonyTile)u.getWorkTile()).getProductionOf(u, rawMat);
+            int mfnProd = colony.getProductionNextTurn(producedGoods) + factory.getAdditionalProductionNextTurn(u);
+            if(stockRawMat < 50 && rawProd < mfnProd){
                 return;
             }
             
