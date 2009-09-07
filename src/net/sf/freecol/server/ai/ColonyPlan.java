@@ -835,12 +835,6 @@ public class ColonyPlan {
                 return;
             }
             
-            int rawProd = colony.getProductionNextTurn(rawMat);
-            int mfnProd = colony.getProductionOf(producedGoods);
-            if(stockRawMat < 50 && mfnProd > rawProd + 2){
-                return;
-            }
-            
             if(factory.getUnitCount() == factory.getMaxUnits()){
                 return;
             }
@@ -849,6 +843,13 @@ public class ColonyPlan {
             if(!factory.canAdd(u.getType())){
                 continue;
             }
+            
+            int rawProd = colony.getProductionNextTurn(rawMat);
+            int mfnProd = colony.getProductionOf(producedGoods);
+            if(stockRawMat < 50 && mfnProd > rawProd + 2){
+                return;
+            }
+            
             u.work(factory);
             u.setWorkType(producedGoods);
         }
