@@ -846,7 +846,7 @@ public class ColonyPlan {
             
             int rawProd = colony.getProductionNextTurn(rawMat);
             int mfnProd = colony.getProductionOf(producedGoods);
-            if(stockRawMat < 50 && mfnProd > rawProd + 2){
+            if(stockRawMat < 50 && rawProd < mfnProd + 2){
                 return;
             }
             
