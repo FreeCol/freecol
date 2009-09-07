@@ -1692,7 +1692,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             unit.contactAdjacent(settlement.getTile());
             if (!settlement.hasBeenVisited()) {
                 if (settlement.getLearnableSkill() != null
-                    && settlement.getLearnableSkill().hasAbility("model.ability.expertScout")) {
+                    && settlement.getLearnableSkill().hasAbility("model.ability.expertScout")
+                    && !unit.hasAbility("model.ability.expertScout")) {
                     unit.setType(settlement.getLearnableSkill());
                     reply.setAttribute("result", "expert");
                     Element update = reply.getOwnerDocument().createElement("update");
