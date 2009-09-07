@@ -2075,10 +2075,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param workElement The element containing the request.
      */
     private Element work(Connection connection, Element workElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(workElement.getAttribute("unit"));
         WorkLocation workLocation = (WorkLocation) getGame().getFreeColGameObject(workElement.getAttribute("workLocation"));
-        if (unit.getOwner() != player) {
+        if (unit.getOwner() != serverPlayer) {
             throw new IllegalStateException("Not your unit!");
         }
         if (workLocation == null) {
@@ -2089,17 +2089,26 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                                             + ") to " + workLocation.toString() + "(" 
                                             + workLocation.getId() + ")");
         }
+        if (workLocation instanceof ColonyTile) {
+            Tile tile = ((ColonyTile) workLocation).getWorkTile();
+            Colony colony = workLocation.getColony();
+            if (tile.getOwningSettlement() != colony) {
+                // Claim known free land (because canAdd() succeeded).
+                serverPlayer.claimLand(tile, colony, 0);
+            }
+        }
+
         Location oldLocation = unit.getLocation();
         unit.work(workLocation);
         // For updating the number of colonist:
-        sendUpdatedTileToAll(unit.getTile(), player);
+        sendUpdatedTileToAll(unit.getTile(), serverPlayer);
         // oldLocation is empty now
         if (oldLocation instanceof ColonyTile) {
-            sendUpdatedTileToAll(((ColonyTile) oldLocation).getWorkTile(), player);
+            sendUpdatedTileToAll(((ColonyTile) oldLocation).getWorkTile(), serverPlayer);
         }
         // workLocation is occupied now
         if (workLocation instanceof ColonyTile) {
-            sendUpdatedTileToAll(((ColonyTile) workLocation).getWorkTile(), player);
+            sendUpdatedTileToAll(((ColonyTile) workLocation).getWorkTile(), serverPlayer);
         }
         return null;
     }

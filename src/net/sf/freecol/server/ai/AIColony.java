@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
@@ -818,6 +819,42 @@ public class AIColony extends AIObject {
 
 
     /**
+     * Find a colony's best tile to put a unit to produce a type of
+     * goods.  Steals land from other settlements only when it is
+     * free.
+     *
+     * @param connection The <code>Connection</code> to be used when
+     *            communicating with the server.
+     * @param unit The <code>Unit</code> to work the tile.
+     * @param goodsType The type of goods to produce.
+     * @return The best choice of available vacant colony tiles, or
+     *         null if nothing suitable.
+     */
+    private ColonyTile getBestVacantTile(Connection connection,
+                                         Unit unit, GoodsType goodsType) {
+        ColonyTile colonyTile = colony.getVacantColonyTileFor(unit, goodsType);
+        if (colonyTile == null) return null;
+
+        // Check if the tile needs to be claimed from another settlement.
+        Tile tile = colonyTile.getWorkTile();
+        if (tile.getOwningSettlement() != colony) {
+            ClaimLandMessage message = new ClaimLandMessage(tile, colony, 0);
+            try {
+                connection.sendAndWait(message.toXMLElement());
+            } catch (IOException e) {
+                logger.warning("Could not send \""
+                               + message.getXMLElementTagName()
+                               + "\"-message:" + e.getMessage());
+            }
+            if (tile.getOwningSettlement() != colony) {
+                return null; // Claim failed.
+            }
+        }
+
+        return colonyTile;
+    }
+
+    /**
      * Rearranges the workers within this colony. This is done according to the
      * {@link ColonyPlan}, although minor adjustments can be done to increase
      * production.
@@ -1033,7 +1070,8 @@ public class AIColony extends AIObject {
                     }
                 }
                 GoodsType rawMaterial = bestPick.getWorkType().getRawMaterial();
-                ColonyTile ct = (rawMaterial != null) ? colony.getVacantColonyTileFor(bestPick, rawMaterial) : null;
+                ColonyTile ct = (rawMaterial == null) ? null
+                    : getBestVacantTile(connection, bestPick, rawMaterial);
                 if (ct != null) {
                     bestPick.work(ct);
                     bestPick.setWorkType(rawMaterial);
@@ -1042,7 +1080,7 @@ public class AIColony extends AIObject {
                     if (th.canAdd(bestPick)) {
                         bestPick.work(th);
                     } else {
-                        ct = colony.getVacantColonyTileFor(bestPick, Goods.FOOD);
+                        ct = getBestVacantTile(connection, bestPick, Goods.FOOD);
                         if (ct != null) {
                             bestPick.work(ct);
                             bestPick.setWorkType(Goods.FOOD);
@@ -1082,7 +1120,7 @@ public class AIColony extends AIObject {
                         for (GoodsType goodsType2 : goodsList) {
                             if (!goodsType2.isFarmed())
                                 continue;
-                            ColonyTile bestTile = colony.getVacantColonyTileFor(unit, goodsType2);
+                            ColonyTile bestTile = getBestVacantTile(connection, unit, goodsType2);
                             int production2 = (bestTile == null ? 0 :
                                                bestTile.getProductionOf(unit, goodsType2));
                             if (production2 > best && production2 + colony.getGoodsCount(goodsType2)

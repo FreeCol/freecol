@@ -1132,14 +1132,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         ColonyTile bestPick = null;
         int highestProduction = 0;
         for (ColonyTile colonyTile : colonyTiles) {
-            Tile workTile = colonyTile.getWorkTile();
-            if (workTile.getOwningSettlement() == this && colonyTile.canAdd(unit)) {
+            if (colonyTile.canAdd(unit)) {
+                Tile workTile = colonyTile.getWorkTile();
                 /*
                  * canAdd ensures workTile it's empty or unit it's working in it
                  * so unit can work in it if it's owned by none, by europeans or
                  * unit's owner has the founding father Peter Minuit
                  */
-
                 if (owner.getLandPrice(workTile) == 0) {
                     int potential = colonyTile.getProductionOf(unit, goodsType);
                     if (potential > highestProduction) {
