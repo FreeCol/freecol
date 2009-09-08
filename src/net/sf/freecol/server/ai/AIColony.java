@@ -48,6 +48,7 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -301,31 +302,30 @@ public class AIColony extends AIObject {
     /**
      * Creates the wishes for the <code>Colony</code>.
      */
-    private void createWishes() {
+    private void createWishesOld() {
         logger.finest("Entering method createWishes");
         List<WorkLocationPlan> workLocationPlans = colonyPlan.getSortedWorkLocationPlans();
         Iterator<WorkLocationPlan> rit = workLocationPlans.iterator();
         while (rit.hasNext()) {
             WorkLocationPlan wlp = rit.next();
-            // Do not use tiles taken by other colonies:
-            if (wlp.getWorkLocation() instanceof ColonyTile
-                && ((ColonyTile) wlp.getWorkLocation()).getWorkTile().getSettlement() != null) {
-                rit.remove();
-            }
-            // Do not request fishermen unless Docks have been completed:
-            if (wlp.getWorkLocation() instanceof ColonyTile
-                && !((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()
-                && !colony.hasAbility("model.ability.produceInWater")) {
-                // TODO: Check if docks are currently being built (and a carpenter with lumber is available)
-                rit.remove();
+            if (wlp.getWorkLocation() instanceof ColonyTile) {
+                Tile tile = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
+                if (tile.getSettlement() != null) {
+                    // Do not use tiles taken by other colonies:
+                    rit.remove();
+                } else if (tile.isLand()
+                           && !colony.hasAbility("model.ability.produceInWater")) {
+                    // Do not request fishermen unless Docks have been completed:
+                    // TODO: Check if docks are currently being built
+                    // (and a carpenter with lumber is available)
+                    rit.remove();
+                }
             }
         }
 
         int[] production = new int[FreeCol.getSpecification().numberOfGoodsTypes()];
         ArrayList<Unit> nonExpertUnits = new ArrayList<Unit>();
-        Iterator<Unit> unitIterator = colony.getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit u = unitIterator.next();
+        for (Unit u : colony.getUnitList()) {
             GoodsType workType = u.getType().getExpertProduction();
             if (workType != null) {
                 Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
@@ -335,7 +335,7 @@ public class AIColony extends AIObject {
                         if (workType.getIndex() < production.length) {
                             production[workType.getIndex()] += wlp.getProductionOf(workType);
                         }
-                        production[(Goods.FOOD).getIndex()] -= 2;
+                        production[(Goods.FOOD).getIndex()] -= u.getType().getFoodConsumed();
                         wlpIterator.remove();
                         break;
                     }
@@ -467,6 +467,138 @@ public class AIColony extends AIObject {
 
         Collections.sort(wishes);
 
+    }
+
+    private void createWishes() {
+        wishes.clear();
+        int expertValue = 100;
+        int goodsWishValue = 50;
+
+        // for every non-expert, request expert replacement
+        for (Unit unit : colony.getUnitList()) {
+            if (unit.getWorkType() != null
+                && unit.getWorkType() != unit.getType().getExpertProduction()) {
+                UnitType expert = FreeCol.getSpecification().getExpertForProducing(unit.getWorkType());
+                wishes.add(new WorkerWish(getAIMain(), colony, expertValue, expert, true));
+            }
+        }
+
+        // request population increase
+        int newPopulation = colony.getUnitCount() + 1;
+        if (colony.governmentChange(newPopulation) >= 0) {
+            // population increase incurs no penalty
+            if (colony.getFoodProduction() > newPopulation * Colony.FOOD_CONSUMPTION) {
+                // TODO: better choice
+                UnitType expert = FreeCol.getSpecification().getUnitType("model.unit.elderStatesman");
+                wishes.add(new WorkerWish(getAIMain(), colony, expertValue / 5, expert, false));
+            } else {
+                // TODO: check whether tiles are available for cultivation
+                UnitType expert = FreeCol.getSpecification().getUnitType("model.unit.expertFarmer");
+                wishes.add(new WorkerWish(getAIMain(), colony, expertValue / 5, expert, false));
+            }
+        }
+
+        // TODO: check for students
+
+        // increase defense value
+        int defence = 0;
+        for (Unit unit : colony.getTile().getUnitList()) {
+            // TODO: better algorithm to determine defence
+            // should be located in combat model?
+            defence += unit.getType().getDefence();
+            if (unit.isArmed()) {
+                defence += 1;
+            }
+            if (unit.isMounted()) {
+                defence += 1;
+            }
+        }
+
+        // TODO: is this heuristic suitable?
+        boolean badlyDefended = defence < 3 * colony.getUnitCount();
+        if (badlyDefended) {
+            UnitType bestDefender = null;
+            for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+                if ((bestDefender == null
+                     || bestDefender.getDefence() < unitType.getDefence())
+                    && !unitType.hasAbility("model.ability.navalUnit")
+                    && unitType.isAvailableTo(colony.getOwner())) {
+                    bestDefender = unitType;
+                }
+            }
+            if (bestDefender != null) {
+                wishes.add(new WorkerWish(getAIMain(), colony, expertValue, bestDefender, true));
+            }
+        }
+
+        // request goods
+        // TODO: improve heuristics
+        TypeCountMap<GoodsType> requiredGoods = new TypeCountMap<GoodsType>();
+
+        // add building materials
+        if (colony.getCurrentlyBuilding() != null) {
+            for (AbstractGoods goods : colony.getCurrentlyBuilding().getGoodsRequired()) {
+                if (colony.getProductionNetOf(goods.getType()) == 0) {
+                    requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+                }
+            }
+        }
+
+        // add materials required to improve tiles
+        for (TileImprovementPlan plan : tileImprovementPlans) {
+            for (AbstractGoods goods : plan.getType().getExpendedEquipmentType()
+                     .getGoodsRequired()) {
+                requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+            }
+        }
+
+        // add raw materials for buildings
+        for (WorkLocation workLocation : colony.getWorkLocations()) {
+            if (workLocation instanceof Building) {
+                Building building = (Building) workLocation;
+                GoodsType inputType = building.getGoodsInputType();
+                if (inputType != null
+                    && colony.getProductionNetOf(inputType) < building.getMaximumGoodsInput()) {
+                    requiredGoods.incrementCount(inputType, 100);
+                }
+            }
+        }
+
+        // add breedable goods
+        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+            if (goodsType.isBreedable()) {
+                requiredGoods.incrementCount(goodsType, goodsType.getBreedingNumber());
+            }
+        }
+
+        // add materials required to build military equipment
+        if (badlyDefended) {
+            // TODO: do not consider unavailable equipment types,
+            // such as indian horses
+            for (EquipmentType type : FreeCol.getSpecification().getEquipmentTypeList()) {
+                if (type.isMilitaryEquipment()) {
+                    for (AbstractGoods goods : type.getGoodsRequired()) {
+                        requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+                    }
+                }
+            }
+        }
+
+        for (GoodsType type : requiredGoods.keySet()) {
+            GoodsType requiredType = type;
+            while (!requiredType.isStorable()) {
+                requiredType = requiredType.getRawMaterial();
+            }
+            if (requiredType != null) {
+                int amount = Math.min((requiredGoods.getCount(requiredType)
+                                       - colony.getGoodsCount(requiredType)),
+                                      colony.getWarehouseCapacity());
+                if (amount > 0) {
+                    wishes.add(new GoodsWish(getAIMain(), colony, goodsWishValue, amount, requiredType));
+                }
+            }
+        }
+        Collections.sort(wishes);
     }
 
     private int getToolsRequired(BuildableType buildableType) {
