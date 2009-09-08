@@ -35,12 +35,12 @@ import org.w3c.dom.Element;
 
 
 /**
-* Represents the need for a worker within a <code>Colony</code>.
-*/
+ * Represents the need for a worker within a <code>Colony</code>.
+ */
 public class WorkerWish extends Wish {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(WorkerWish.class.getName());
-
 
     private UnitType unitType;
     private boolean expertNeeded;

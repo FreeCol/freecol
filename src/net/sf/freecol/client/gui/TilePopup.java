@@ -53,6 +53,7 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.TileImprovementPlan;
+import net.sf.freecol.server.ai.Wish;
 import net.sf.freecol.server.ai.mission.TransportMission;
 
 
@@ -256,6 +257,12 @@ public final class TilePopup extends JPopupMenu {
                         Iterator<TileImprovementPlan> tipIt = ac.getTileImprovementPlanIterator();
                         while (tipIt.hasNext()) {
                             info.append(tipIt.next().toString());
+                            info.append("\n");
+                        }
+                        info.append("\n\nWISHES:\n");
+                        Iterator<Wish> wishIterator = ac.getWishIterator();
+                        while (wishIterator.hasNext()) {
+                            info.append(wishIterator.next().toString());
                             info.append("\n");
                         }
                         canvas.showInformationMessage(info.toString());

@@ -38,9 +38,9 @@ import org.w3c.dom.Element;
 * Represents the need for goods within a <code>Colony</code>.
 */
 public class GoodsWish extends Wish {
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(GoodsWish.class.getName());
-
     
     private GoodsType goodsType;
     private int amountRequested;
@@ -201,4 +201,9 @@ public class GoodsWish extends Wish {
     public static String getXMLElementTagName() {
         return "GoodsWish";
     }
+
+    public String toString() {
+        return "GoodsWish: " + amountRequested + " " + goodsType.getName();
+    }
+
 }
