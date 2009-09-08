@@ -2746,7 +2746,9 @@ public final class GUI {
         }
         
         // FOR DEBUGGING:
-        if (debugShowMission && freeColClient.getFreeColServer() != null) {
+        if (debugShowMission 
+                && freeColClient.getFreeColServer() != null
+                && unit.getOwner().isAI()) {
             net.sf.freecol.server.ai.AIUnit au = (net.sf.freecol.server.ai.AIUnit) freeColClient.getFreeColServer().getAIMain().getAIObject(unit);
             if (au != null) {
                 g.setColor(Color.WHITE);
