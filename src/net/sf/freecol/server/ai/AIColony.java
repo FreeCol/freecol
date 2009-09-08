@@ -1207,10 +1207,41 @@ public class AIColony extends AIObject {
         createTileImprovementPlans();
         createWishes();
         colonyPlan.adjustProductionAndManufacture();
+        checkConditionsForHorseBreed();
         
         if (this.colony.getUnitCount()<=0) {
             // something bad happened, there is no remaining unit working in the colony
             throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
+        }
+    }
+
+    /**
+     * Verifies if the <code>Colony</code> has conditions for breeding horses,
+     *and un-mounts a mounted <code>Unit</code> if available, to have horses to breed.
+     */
+    void checkConditionsForHorseBreed() {
+        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+        GoodsType reqGoodsType = horsesType.getRawMaterial();
+        
+        // Colony already is breeding horses
+        if(colony.getGoodsCount(horsesType) >= horsesType.getBreedingNumber()){
+            return;
+        }
+        
+        int foodProdAvail = colony.getProductionOf(reqGoodsType) - colony.getFoodConsumptionByType(reqGoodsType);
+        // no food production available for breeding anyway
+        if(foodProdAvail <= 0){
+            return;
+        }
+        
+        // we will now look for any mounted unit that can be temporarily dismounted  
+        for(Unit u : colony.getTile().getUnitList()){
+            if(!u.isMounted()){
+                continue;
+            }
+            u.removeEquipment(horsesEqType);
+            return;
         }
     }
 

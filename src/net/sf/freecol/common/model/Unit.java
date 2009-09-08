@@ -2250,6 +2250,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         setRole();
     }
+    
+    public void removeEquipment(EquipmentType equipmentType) {
+        int amount = getEquipmentCount(equipmentType);
+        
+        removeEquipment(equipmentType, amount, false);
+    }
 
     /**
      * Describe <code>removeEquipment</code> method here.

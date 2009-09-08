@@ -19,11 +19,13 @@
 
 package net.sf.freecol.server.ai;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
+import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
@@ -51,7 +53,9 @@ public class AIColonyTest extends FreeColTestCase {
     final GoodsType oreType = spec().getGoodsType("model.goods.ore");
     final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
     final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
+    final GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
     final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
+    final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
     final int fullStock = 100;
     
     FreeColServer server = null;
@@ -254,5 +258,46 @@ public class AIColonyTest extends FreeColTestCase {
         
         String errMsg = "Lumberjack should not have been assigned to collect lumber, enough lumber in the colony";
         assertFalse(errMsg, lumberType == lumberjack.getWorkType());
+    }
+    
+    public void testCheckConditionsForHorseBreed(){
+        // start a server
+        server = ServerTestHelper.startServer(false, true);
+        
+        Map map = getTestMap();
+        
+        server.setMapGenerator(new MockMapGenerator(map));
+        
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+        
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        
+        Game game = server.getGame();
+        
+        FreeColTestCase.setGame(game);
+        
+        AIMain aiMain = server.getAIMain();
+
+        Colony colony = getStandardColony(1);
+        AIColony aiColony = (AIColony) aiMain.getAIObject(colony);
+        
+        GoodsType reqGoodsType = horsesType.getRawMaterial();
+        int foodSuplus = colony.getProductionOf(reqGoodsType) - colony.getFoodConsumptionByType(reqGoodsType);
+        assertTrue("Setup error, colony does not have food surplus", foodSuplus > 0);
+                
+        Unit scout = new Unit(getGame(), colony.getTile(), colony.getOwner(), colonistType, UnitState.ACTIVE, horsesEqType);
+        assertTrue("Scout should be mounted",scout.isMounted());
+        
+        assertTrue("Setup error, colony should not have horses in stock",colony.getGoodsCount(horsesType) == 0);
+        
+        aiColony.checkConditionsForHorseBreed();
+        
+        assertTrue("Colony should now have horses in stock",colony.getGoodsCount(horsesType) > 0);
+        assertFalse("Scout should not be mounted",scout.isMounted());
     }
 }
