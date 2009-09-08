@@ -37,6 +37,7 @@ public final class UnitType extends BuildableType {
 
     public static final int DEFAULT_OFFENCE = 0;
     public static final int DEFAULT_DEFENCE = 1;
+    public static final int FOOD_CONSUMPTION = 2;
 
     /**
      * Describe offence here.
@@ -117,6 +118,11 @@ public final class UnitType extends BuildableType {
      * Describe defaultEquipment here.
      */
     private EquipmentType defaultEquipment;
+
+    /**
+     * Describe foodConsumed here.
+     */
+    private int foodConsumed = FOOD_CONSUMPTION;
 
     /**
      * The possible type changes for this unit type.
@@ -471,6 +477,25 @@ public final class UnitType extends BuildableType {
      */
     public void setSkillTaught(final String newSkillTaught) {
         this.skillTaught = newSkillTaught;
+    }
+
+    /**
+     * Returns the amount of food this unit type consumes per turn. At
+     * the moment, this is 2 for all unit types.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getFoodConsumed() {
+        return foodConsumed;
+    }
+
+    /**
+     * Set the <code>FoodConsumed</code> value.
+     *
+     * @param newFoodConsumed The new FoodConsumed value.
+     */
+    public void setFoodConsumed(final int newFoodConsumed) {
+        this.foodConsumed = newFoodConsumed;
     }
 
     /**
