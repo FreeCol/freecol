@@ -1187,14 +1187,14 @@ public class IndianSettlement extends Settlement {
     private void breedHorses() {
     	GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
     	GoodsType reqGoodsType = horsesType.getRawMaterial();
-    	
+  
     	// Not enough horses to breed
     	if(getGoodsCount(horsesType) < horsesType.getBreedingNumber()){
     		return;
     	}
     	
     	int foodProdAvail = getProductionOf(reqGoodsType) - getFoodConsumptionByType(reqGoodsType);
-    	
+
     	// no food production available for breeding
     	if(foodProdAvail <= 0){
     		return;
@@ -1516,5 +1516,28 @@ public class IndianSettlement extends Settlement {
         StringBuilder s = new StringBuilder(getLocationName());
         s.append(" at (").append(tile.getX()).append(",").append(tile.getY()).append(")"); 
         return s.toString();
+    }
+
+    /**
+     * Allows spread of horses and arms between settlements
+     * @param settlement
+     */
+    public void tradeGoodsWithSetlement(IndianSettlement settlement) {
+        GoodsType armsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        
+        List<GoodsType> goodsToTrade = new ArrayList<GoodsType>();
+        goodsToTrade.add(armsType);
+        goodsToTrade.add(horsesType);
+        
+        for(GoodsType goods : goodsToTrade){
+            int goodsInStock = getGoodsCount(goods);
+            if(goodsInStock <= 50){
+                continue;
+            }
+            int goodsTraded = goodsInStock / 2;  
+            settlement.addGoods(goods, goodsTraded);
+            removeGoods(goods, goodsTraded);
+        }
     }
 }

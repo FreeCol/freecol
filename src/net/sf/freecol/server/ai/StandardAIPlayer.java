@@ -956,9 +956,17 @@ public class StandardAIPlayer extends AIPlayer {
             }
             */
         } else {
-            for (IndianSettlement is : getPlayer().getIndianSettlements()) {
-                secureIndianSettlement(is);
+            List<IndianSettlement> settlements = getPlayer().getIndianSettlements();
+            for (IndianSettlement is : settlements) {
+                // Spread arms and horses between camps
+                //TODO: maybe make this dependent on difficulty level?
+                int n = getRandom().nextInt(settlements.size());
+                IndianSettlement settlement = settlements.get(n);
+                if(settlement != is){
+                    is.tradeGoodsWithSetlement(settlement);
+                }
                 is.equipBraves();
+                secureIndianSettlement(is);
             }
         }
     }

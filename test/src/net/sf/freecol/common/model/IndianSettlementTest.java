@@ -8,6 +8,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class IndianSettlementTest extends FreeColTestCase {
 	private static GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+	private static GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
     
 	/**
 	 * Changes the ownership of a number of tiles from and around camp1 to camp2.
@@ -381,4 +382,42 @@ public class IndianSettlementTest extends FreeColTestCase {
         assertTrue("Indian player should own land tile", landTile.getOwner() == indianPlayer);
         assertFalse("Indian player should not own water tile", waterTile.getOwner() == indianPlayer);
 	}
+	
+	/*
+     * Test settlement trade
+     */
+    public void testTradeGoodsWithSetlement(){
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Tile camp2Tile = map.getTile(3, 3);
+                
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        
+        IndianSettlement camp1 = builder.build();
+        IndianSettlement camp2 = builder.reset().settlementTile(camp2Tile).build();
+        
+        final int notEnoughToShare = 50;
+        final int enoughToShare = 100;
+        final int none = 0;
+        
+        camp1.addGoods(horsesType, notEnoughToShare);
+        camp1.addGoods(musketsType, enoughToShare);
+        
+        String wrongQtyMusketsMsg = "Wrong quantity of muskets";
+        String wrongQtyHorsesMsg = "Wrong quantity of horses";
+        
+        assertEquals(wrongQtyMusketsMsg,enoughToShare,camp1.getGoodsCount(musketsType));
+        assertEquals(wrongQtyHorsesMsg,notEnoughToShare,camp1.getGoodsCount(horsesType));
+        assertEquals(wrongQtyMusketsMsg,none,camp2.getGoodsCount(musketsType));
+        assertEquals(wrongQtyHorsesMsg,none,camp2.getGoodsCount(horsesType));
+        
+        camp1.tradeGoodsWithSetlement(camp2);
+        
+        assertEquals(wrongQtyMusketsMsg,enoughToShare / 2,camp1.getGoodsCount(musketsType));
+        assertEquals(wrongQtyHorsesMsg,notEnoughToShare,camp1.getGoodsCount(horsesType));
+        assertEquals(wrongQtyMusketsMsg,enoughToShare / 2,camp2.getGoodsCount(musketsType));
+        assertEquals(wrongQtyHorsesMsg,none,camp2.getGoodsCount(horsesType));
+    }
 }
