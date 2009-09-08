@@ -238,8 +238,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return a <code>boolean</code> value
      */
     private boolean isFree(BuildingType buildingType) {
-        float value = owner.getFeatureContainer().applyModifier(100f, 
-                "model.modifier.buildingPriceBonus", buildingType, getGame().getTurn());
+        float value = owner.getFeatureContainer()
+            .applyModifier(100f, "model.modifier.buildingPriceBonus",
+                           buildingType, getGame().getTurn());
         return (value == 0f && canBuild(buildingType));
     }
 
@@ -740,7 +741,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * 
      * @param unit The unit to add as a teacher.
      * @return <code>true</code> if this unit type could be added.
-    */
+     */
     public boolean canTrain(Unit unit) {
         return canTrain(unit.getType());
     }
@@ -754,7 +755,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * 
      * @param unitType The unit type to add as a teacher.
      * @return <code>true</code> if this unit type could be added.
-    */
+     */
     public boolean canTrain(UnitType unitType) {
         if (!hasAbility("model.ability.teach")) {
             return false;
@@ -988,13 +989,27 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Calculates the current SoL membership of the colony based on the number
-     * of liberty and colonists.
+     * Calculates the current SoL membership of the colony based on
+     * the liberty value and colonists.
      */
     public void updateSoL() {
         int units = getUnitCount();
+        oldSonsOfLiberty = sonsOfLiberty;
+        oldTories = tories;
+        sonsOfLiberty = calculateMembership(units);
+        tories = units - getMembers();
+    }
+
+    /**
+     * Returns the SoL membership of the colony based on the liberty
+     * value and the number of colonists given.
+     *
+     * @param units an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public int calculateMembership(int units) {
         if (units <= 0) {
-            return;
+            return 0;
         }
         // Update "addSol(int)" and "getMembers()" if this formula gets changed:
         int membership = (liberty * 100) / (LIBERTY_PER_REBEL * units);
@@ -1003,11 +1018,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         } else if (membership > 100) {
             membership = 100;
         }
-        
-        oldSonsOfLiberty = sonsOfLiberty;
-        oldTories = tories;
-        sonsOfLiberty = membership;
-        tories = (units - getMembers());
+        return membership;
     }
 
     /**
@@ -1342,12 +1353,12 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     return;
                 }
                 messages.add(new ModelMessage(this, ModelMessage.MessageType.MISSING_GOODS,
-                        requiredGoodsType,
-                        "model.colony.buildableNeedsGoods",
-                        "%colony%", getName(),
-                        "%buildable%", buildable.getName(),
-                        "%amount%", String.valueOf(required - available),
-                        "%goodsType%", requiredGoodsType.getName()));
+                                              requiredGoodsType,
+                                              "model.colony.buildableNeedsGoods",
+                                              "%colony%", getName(),
+                                              "%buildable%", buildable.getName(),
+                                              "%amount%", String.valueOf(required - available),
+                                              "%goodsType%", requiredGoodsType.getName()));
             }
         }
        
@@ -1367,7 +1378,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         // consume the goods
         for (AbstractGoods goodsRequired : buildable.getGoodsRequired()) {
             if (getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ||
-                    goodsRequired.getType().isStorable()) {
+                goodsRequired.getType().isStorable()) {
                 removeGoods(goodsRequired);
             } else {
                 // waste excess goods
@@ -1377,12 +1388,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         
         if (buildable instanceof UnitType) {
             // artillery/ship/wagon completed
-            Unit unit = getGame().getModelController().createUnit(getId() + "buildUnit", getTile(), getOwner(),
-                    (UnitType) buildable);
+            Unit unit = getGame().getModelController()
+                .createUnit(getId() + "buildUnit", getTile(), getOwner(),
+                            (UnitType) buildable);
             addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit,
-                    "model.colony.unitReady",
-                    "%colony%", getName(),
-                    "%unit%", unit.getName());
+                            "model.colony.unitReady",
+                            "%colony%", getName(),
+                            "%unit%", unit.getName());
             if (buildQueue.size() > 1) {
                 // Remove the unit-to-build unless it is the last entry.
                 buildQueue.remove(0);
@@ -1396,9 +1408,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 getBuilding(upgradesFrom).upgrade();
             }
             addModelMessage(this, ModelMessage.MessageType.BUILDING_COMPLETED, this,
-                    "model.colony.buildingReady", 
-                    "%colony%", getName(),
-                    "%building%", buildable.getName());
+                            "model.colony.buildingReady", 
+                            "%colony%", getName(),
+                            "%building%", buildable.getName());
             buildQueue.remove(0);
         }
             
@@ -1522,17 +1534,17 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (goodsType.isFoodType() && goodsType.isStorable()) {
             if (amount + production < 0) {
                 result.add(Messages.message("model.colony.famineFeared",
-                        "%colony%", getName(),
-                        "%number%", "0"));
+                                            "%colony%", getName(),
+                                            "%number%", "0"));
             }
         } else {
             //food is never wasted -> new settler is produced
             int waste = (amount + production - getWarehouseCapacity());
             if (waste > 0 && !getExportData(goodsType).isExported() && !goodsType.limitIgnored()) {
                 result.add(Messages.message("model.building.warehouseSoonFull",
-                        "%goods%", goodsType.getName(),
-                        "%colony%", getName(),
-                        "%amount%", String.valueOf(waste)));
+                                            "%goods%", goodsType.getName(),
+                                            "%colony%", getName(),
+                                            "%amount%", String.valueOf(waste)));
 
             }
         }
@@ -1571,11 +1583,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (building != null) {
             int delta = building.getMaximumProduction() - building.getProductionNextTurn();
             if (delta > 0) {
-                warnings.add(createInsufficientProductionMessage(
-                        building.getGoodsOutputType(),
-                        delta,
-                        building.getGoodsInputType(),
-                        building.getMaximumGoodsInput() - building.getGoodsInputNextTurn()));
+                warnings.add(createInsufficientProductionMessage(building.getGoodsOutputType(),
+                                                                 delta,
+                                                                 building.getGoodsInputType(),
+                                                                 building.getMaximumGoodsInput()
+                                                                 - building.getGoodsInputNextTurn()));
             }
         }
     }
@@ -1592,11 +1604,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     private String createInsufficientProductionMessage(GoodsType outputType, int missingOutput,
                                                        GoodsType inputType, int missingInput) {
         return Messages.message("model.colony.insufficientProduction",
-                "%outputAmount%", String.valueOf(missingOutput),
-                "%outputType%", outputType.getName(),
-                "%colony%", getName(),
-                "%inputAmount%", String.valueOf(missingInput),
-                "%inputType%", inputType.getName());
+                                "%outputAmount%", String.valueOf(missingOutput),
+                                "%outputType%", outputType.getName(),
+                                "%colony%", getName(),
+                                "%inputAmount%", String.valueOf(missingInput),
+                                "%inputType%", inputType.getName());
     }
 
     /**
@@ -1657,9 +1669,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             if (required > production){
             	int turnsToLive = (available - required) / (required - production);
             	if(turnsToLive <= 3) {
-            		addModelMessage(this, ModelMessage.MessageType.WARNING,
-                                "model.colony.famineFeared", "%colony%", getName(),
-                                "%number%", String.valueOf(turnsToLive));
+                    addModelMessage(this, ModelMessage.MessageType.WARNING,
+                                    "model.colony.famineFeared", "%colony%", getName(),
+                                    "%number%", String.valueOf(turnsToLive));
             	}
             }
         }
@@ -1668,11 +1680,14 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     // Create a new colonist if there is enough food:
     private void checkForNewColonist() {
         if (getFoodCount() >= FOOD_PER_COLONIST) {
-            List<UnitType> unitTypes = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.bornInColony");
+            List<UnitType> unitTypes = FreeCol.getSpecification()
+                .getUnitTypesWithAbility("model.ability.bornInColony");
             if (!unitTypes.isEmpty()) {
-                int random = getGame().getModelController().getRandom(getId() + "bornInColony", unitTypes.size());
-                Unit u = getGame().getModelController().createUnit(getId() + "newTurn200food",
-                                                getTile(), getOwner(), unitTypes.get(random));
+                int random = getGame().getModelController()
+                    .getRandom(getId() + "bornInColony", unitTypes.size());
+                Unit u = getGame().getModelController()
+                    .createUnit(getId() + "newTurn200food",
+                                getTile(), getOwner(), unitTypes.get(random));
                 removeFood(FOOD_PER_COLONIST);
                 addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, u,
                                 "model.colony.newColonist", "%colony%", getName());
@@ -1709,7 +1724,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 // no need to do anything about bells or crosses
                 continue;
             } else if (getExportData(goodsType).isExported() &&
-                owner.canTrade(goods, Market.CUSTOM_HOUSE)) {
+                       owner.canTrade(goods, Market.CUSTOM_HOUSE)) {
                 // capacity will never be exceeded
                 continue;
             } else if (goods.getAmount() < getWarehouseCapacity()) {
@@ -1749,15 +1764,69 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
 
         ModelMessage govMgtMessage = checkForGovMgtChangeMessage();
-        if(govMgtMessage != null){
-        	addModelMessage(govMgtMessage);
+        if (govMgtMessage != null){
+            addModelMessage(govMgtMessage);
         }
 
     }
     
-    public ModelMessage checkForGovMgtChangeMessage(){
-        final int veryBadGovernment = Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
-        final int badGovernment = Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue();
+    /**
+     * Returns 1, 0, or -1 to indicate that government would improve,
+     * remain the same, or deteriorate if the colony had the given
+     * population.
+     *
+     * @param units an <code>int</code> value
+     * @return an <code>int</code> value
+     */
+    public int governmentChange(int units) {
+        final int veryBadGovernment = Specification.getSpecification()
+            .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
+        final int badGovernment = Specification.getSpecification()
+            .getIntegerOption("model.option.badGovernmentLimit").getValue();
+
+        int rebels = calculateMembership(units);
+        int loyalists = Math.round((rebels * units) / 100f);
+        int result = 0;
+
+        if (rebels == 100) {
+            // there are no tories left
+            if (sonsOfLiberty < 100) {
+                result = 1;
+            }
+        } else if (rebels >= 50) {
+            if (sonsOfLiberty == 100) {
+                result = -1;
+            } else if (sonsOfLiberty < 50) {
+                result = 1;
+            }
+        } else {
+            if (sonsOfLiberty >= 50) {
+                result = -1;
+            }
+        	
+            // Now that no bonus is applied, penalties may.
+            if (loyalists > veryBadGovernment) {
+                if (tories <= veryBadGovernment) {
+                    result = -1;
+                }
+            } else if (loyalists > badGovernment) {
+                if (tories <= badGovernment) {
+                    result = -1;
+                } else if (tories > veryBadGovernment) {
+                    result = 1;
+                }
+            } else if (tories > badGovernment) {
+                result = 1;
+            }
+        }
+        return result;
+    }
+
+    public ModelMessage checkForGovMgtChangeMessage() {
+        final int veryBadGovernment = Specification.getSpecification()
+            .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
+        final int badGovernment = Specification.getSpecification()
+            .getIntegerOption("model.option.badGovernmentLimit").getValue();
         
         String msgId = null;
         ModelMessage.MessageType msgType = ModelMessage.MessageType.GOVERNMENT_EFFICIENCY;
@@ -1769,48 +1838,48 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
             }
         } else if (sonsOfLiberty >= 50) {
-        	if (oldSonsOfLiberty == 100) {
-        		msgId = "model.colony.lostSoL100";
-        		msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
-        	}
-        	if (oldSonsOfLiberty < 50) {
-        		msgId = "model.colony.SoL50";
-        		msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
-        	}
+            if (oldSonsOfLiberty == 100) {
+                msgId = "model.colony.lostSoL100";
+                msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+            } else if (oldSonsOfLiberty < 50) {
+                msgId = "model.colony.SoL50";
+                msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+            }
         } else {
-        	if(oldSonsOfLiberty >= 50){
-        		msgId = "model.colony.lostSoL50";
-        		msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
-        	}
+            if (oldSonsOfLiberty >= 50) {
+                msgId = "model.colony.lostSoL50";
+                msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
+            }
         	
-        	// Now that no bonus is applied, penalties may.
-        	if (tories > veryBadGovernment) {
-        		if (oldTories <= veryBadGovernment) {
-        			// government has become very bad
-        			msgId = "model.colony.veryBadGovernment";
-        		}
-        	} else if (tories > badGovernment) {
-        		if (oldTories <= badGovernment) {
-        			// government has become bad
-        			msgId = "model.colony.badGovernment";
-        		} else if (oldTories > veryBadGovernment) {
-        			// government has improved, but is still bad
-        			msgId = "model.colony.governmentImproved1";
-        		}
-        	} else if (oldTories > badGovernment) {
-        		// government was bad, but has improved
-        		msgId = "model.colony.governmentImproved2";
-        	}
+            // Now that no bonus is applied, penalties may.
+            if (tories > veryBadGovernment) {
+                if (oldTories <= veryBadGovernment) {
+                    // government has become very bad
+                    msgId = "model.colony.veryBadGovernment";
+                }
+            } else if (tories > badGovernment) {
+                if (oldTories <= badGovernment) {
+                    // government has become bad
+                    msgId = "model.colony.badGovernment";
+                } else if (oldTories > veryBadGovernment) {
+                    // government has improved, but is still bad
+                    msgId = "model.colony.governmentImproved1";
+                }
+            } else if (oldTories > badGovernment) {
+                // government was bad, but has improved
+                msgId = "model.colony.governmentImproved2";
+            }
         }
         
         // no change happened
-        if(msgId == null){
-        	return null;
+        if (msgId == null){
+            return null;
         }
         
-        ModelMessage msg = new ModelMessage(this,msgType,
-        		FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-        		msgId,"%colony%", getName());
+        ModelMessage msg = 
+            new ModelMessage(this, msgType,
+                             FreeCol.getSpecification().getGoodsType("model.goods.bells"),
+                             msgId, "%colony%", getName());
      
         return msg;
     }
@@ -1885,9 +1954,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             } else if (currentlyBuilding.getPopulationRequired() > getUnitCount()) {
                 // not enough units
                 addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
-                        "model.colony.buildNeedPop", 
-                        "%colony%", getName(), 
-                        "%building%", currentlyBuilding.getName());
+                                "model.colony.buildNeedPop", 
+                                "%colony%", getName(), 
+                                "%building%", currentlyBuilding.getName());
             }
         }
         
@@ -1987,7 +2056,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public int getWarehouseCapacity() {
         /* This will return 0 unless additive modifiers are present.
            This is intentional.
-         */
+        */
         return (int) featureContainer.applyModifier(0, "model.modifier.warehouseStorage",
                                                     null, getGame().getTurn());
     }
@@ -2005,18 +2074,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     public void propertyChange(PropertyChangeEvent event) {
         firePropertyChange(event.getPropertyName(),
                            event.getOldValue(), event.getNewValue());
-        /*
-        Object source = event.getSource();
-        if (source.equals(goodsContainer)) {
-            // stored amount of some goods has changed
-            firePropertyChange(event.getPropertyName(),
-                               event.getOldValue(), event.getNewValue());
-        } else if (source instanceof WorkLocation) {
-            // production of some goods has changed
-            firePropertyChange(event.getPropertyName(), event.getOldValue(),
-                               event.getNewValue());
-        }
-        */
     }
 
 
@@ -2059,7 +2116,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     @Override
     protected void toXMLImpl(XMLStreamWriter out, Player player, boolean showAll, boolean toSavedGame)
-            throws XMLStreamException {
+        throws XMLStreamException {
         boolean full = getGame().isClientTrusted() || showAll || player == getOwner();
         PlayerExploredTile pet;
 
@@ -2193,7 +2250,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                                Feature and subclasses.  I *think* this
                                is the only place where this is a
                                problem, but I may be mistaken.
-                             */
+                            */
                             continue loop;
                         }
                     }
