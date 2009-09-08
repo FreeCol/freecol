@@ -586,7 +586,7 @@ public class AIColony extends AIObject {
 
         for (GoodsType type : requiredGoods.keySet()) {
             GoodsType requiredType = type;
-            while (!requiredType.isStorable()) {
+            while (requiredType != null && !requiredType.isStorable()) {
                 requiredType = requiredType.getRawMaterial();
             }
             if (requiredType != null) {
