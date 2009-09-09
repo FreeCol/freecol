@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.ai.AIColony;
+import net.sf.freecol.server.ai.AIGoods;
 import net.sf.freecol.server.ai.AIUnit;
 import net.sf.freecol.server.ai.TileImprovementPlan;
 import net.sf.freecol.server.ai.Wish;
@@ -263,6 +264,12 @@ public final class TilePopup extends JPopupMenu {
                         Iterator<Wish> wishIterator = ac.getWishIterator();
                         while (wishIterator.hasNext()) {
                             info.append(wishIterator.next().toString());
+                            info.append("\n");
+                        }
+                        info.append("\n\nEXPORT GOODS:\n");
+                        Iterator<AIGoods> goodsIterator = ac.getAIGoodsIterator();
+                        while (goodsIterator.hasNext()) {
+                            info.append(goodsIterator.next().toString());
                             info.append("\n");
                         }
                         canvas.showInformationMessage(info.toString());

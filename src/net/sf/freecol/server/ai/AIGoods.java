@@ -376,7 +376,7 @@ public class AIGoods extends AIObject implements Transportable {
      * @return A <code>String</code> representing this objecy for debugging purposes.
      */
     public String toString() {
-        return "AIGoods@" + hashCode() + " type: " + getGoods().getName() + " amount: " + getGoods().getAmount();
+        return "AIGoods@" + hashCode() + ": " + goods;
     }
     
 
