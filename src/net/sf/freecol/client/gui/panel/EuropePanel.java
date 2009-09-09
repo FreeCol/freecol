@@ -703,7 +703,8 @@ public final class EuropePanel extends FreeColPanel {
 
             List<Unit> units = europe.getUnitList();
             for (Unit unit : units) {
-                if ((unit.getState() == UnitState.ACTIVE) && (unit.isNaval())) {
+                if ((unit.getState() == UnitState.ACTIVE || unit.getState() == UnitState.SENTRY)
+                        && (unit.isNaval())) {
                     UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
