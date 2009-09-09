@@ -60,6 +60,7 @@ public class TileTest extends FreeColTestCase {
 
     GoodsType food = spec().getGoodsType("model.goods.food");
     GoodsType sugar = spec().getGoodsType("model.goods.sugar");
+    GoodsType cotton = spec().getGoodsType("model.goods.cotton");
     GoodsType tobacco = spec().getGoodsType("model.goods.tobacco");
     GoodsType lumber = spec().getGoodsType("model.goods.lumber");
     GoodsType ore = spec().getGoodsType("model.goods.ore");
@@ -403,6 +404,51 @@ public class TileTest extends FreeColTestCase {
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, tobacco));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, lumber));
         assertEquals(null, TileImprovement.findBestTileImprovementType(tile1, ore));
+
+    }
+
+    public void testSortedPotential() {
+        Game game = getStandardGame();
+        Map map = getTestMap(plains);
+        game.setMap(map);
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Market market = dutch.getMarket();
+        UnitType sugarPlanter = spec().getUnitType("model.unit.masterSugarPlanter");
+        UnitType cottonPlanter = spec().getUnitType("model.unit.masterCottonPlanter");
+        UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
+        Tile tile1 = map.getTile(5, 8);
+
+        tile1.setType(savannah);
+        assertEquals(3, savannah.getProductionOf(sugar, null));
+        assertEquals(6, savannah.getProductionOf(sugar, sugarPlanter));
+
+        // savannah produces more food than sugar
+        List<AbstractGoods> sortedPotential = tile1.getSortedPotential();
+        assertEquals(food, sortedPotential.get(0).getType());
+        assertEquals(4, sortedPotential.get(0).getAmount());
+        assertEquals(sugar, sortedPotential.get(1).getType());
+        assertEquals(3, sortedPotential.get(1).getAmount());
+
+        // 3 sugar is more expensive than 4 food
+        assertNotNull(sugarPlanter);
+        assertTrue(tile1.potential(sugar, sugarPlanter) > tile1.potential(sugar, null));
+        sortedPotential = tile1.getSortedPotential(sugarPlanter, dutch);
+        assertEquals(sugar, sortedPotential.get(0).getType());
+        assertEquals(6, sortedPotential.get(0).getAmount());
+
+        sortedPotential = tile1.getSortedPotential(farmer, dutch);
+        assertEquals(food, sortedPotential.get(0).getType());
+        assertEquals(7, sortedPotential.get(0).getAmount());
+        assertTrue(market.getSalePrice(food, 7) > market.getSalePrice(sugar, 3));
+
+        tile1.setType(plains);
+        // make sure 2 cotton is more expensive than 5 food
+        market.getMarketData(cotton).setPaidForSale(3);
+
+        // plains produces more food than sugar
+        assertEquals(food, tile1.getSortedPotential().get(0).getType());
+        assertEquals(food, tile1.getSortedPotential(farmer, dutch).get(0).getType());
+        assertEquals(cotton, tile1.getSortedPotential(cottonPlanter, dutch).get(0).getType());
 
     }
 

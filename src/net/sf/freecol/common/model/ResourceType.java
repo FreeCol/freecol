@@ -85,7 +85,7 @@ public final class ResourceType extends FreeColGameObjectType
         }
         return s;
         */
-        return "";
+        return getName();
     }
 
     // ------------------------------------------------------------ API methods

@@ -1312,19 +1312,58 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * @return The sorted GoodsTypes.
      */
     public List<AbstractGoods> getSortedPotential() {
+        return getSortedPotential(null, null);
+    }
+
+    /**
+     * Sorts GoodsTypes according to potential based on TileType,
+     * TileItemContainer if any.
+     *
+     * @param unit the <code>Unit</code> to work on this Tile
+     *
+     * @return The sorted GoodsTypes.
+     */
+    public List<AbstractGoods> getSortedPotential(Unit unit) {
+        return getSortedPotential(unit.getType(), unit.getOwner());
+    }
+
+    /**
+     * Sorts GoodsTypes according to potential based on TileType,
+     * TileItemContainer if any.
+     *
+     * @param unitType the <code>UnitType</code> to work on this Tile
+     * @param owner the <code>Player</code> owning the unit
+     *
+     * @return The sorted GoodsTypes.
+     */
+    public List<AbstractGoods> getSortedPotential(UnitType unitType, Player owner) {
+
         List<AbstractGoods> goodsTypeList = new ArrayList<AbstractGoods>();
         if (getType() != null) {
+            // It is necessary to consider all farmed goods, since the
+            // tile might have a resource that produces goods not
+            // produced by the tile type.
             for (GoodsType goodsType : FreeCol.getSpecification().getFarmedGoodsTypeList()) {
-                int potential = potential(goodsType, null);
+                int potential = potential(goodsType, unitType);
                 if (potential > 0) {
                     goodsTypeList.add(new AbstractGoods(goodsType, potential));
                 }
             }
-            Collections.sort(goodsTypeList, new Comparator<AbstractGoods>() {
-                    public int compare(AbstractGoods o, AbstractGoods p) {
-                        return p.getAmount() - o.getAmount();
-                    }
-                });
+            if (owner == null || owner.getMarket() == null) {
+                Collections.sort(goodsTypeList, new Comparator<AbstractGoods>() {
+                        public int compare(AbstractGoods o, AbstractGoods p) {
+                            return p.getAmount() - o.getAmount();
+                        }
+                    });
+            } else {
+                final Market market = owner.getMarket();
+                Collections.sort(goodsTypeList, new Comparator<AbstractGoods>() {
+                        public int compare(AbstractGoods o, AbstractGoods p) {
+                            return market.getSalePrice(p.getType(), p.getAmount())
+                                - market.getSalePrice(o.getType(), o.getAmount());
+                        }
+                    });
+            }
         }
         return goodsTypeList;
     }
