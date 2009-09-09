@@ -336,14 +336,14 @@ public class ColonyPlan {
         if (defenders < 5) {
             for (UnitType unitType : buildableDefenders) {
                 if (colony.canBuild(unitType)) {
-                    highPriority.add(unitType);
+                    normalPriority.add(unitType);
                     break;
                 }
             }
         } else if (defenders < 10) {
             for (UnitType unitType : buildableDefenders) {
                 if (colony.canBuild(unitType)) {
-                    normalPriority.add(unitType);
+                    lowPriority.add(unitType);
                     break;
                 }
             }
