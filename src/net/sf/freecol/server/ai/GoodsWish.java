@@ -203,7 +203,8 @@ public class GoodsWish extends Wish {
     }
 
     public String toString() {
-        return "GoodsWish: " + amountRequested + " " + goodsType.getName();
+        return "GoodsWish: " + amountRequested + " " + goodsType.getName()
+            + " (" + getValue() + ")";
     }
 
 }

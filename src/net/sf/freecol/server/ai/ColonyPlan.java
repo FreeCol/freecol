@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -401,12 +402,26 @@ public class ColonyPlan {
      * manufactured.
      */
     public void create() {
+        create(false);
+    }
+
+    public void create(boolean outpost, GoodsType... production) {
         
-        // TODO: Erik - adapt plan to colony profile
-        // Colonies should be able to specialize, determine role by colony
-        // resources, buildings and specialists
-                
         workLocationPlans.clear();
+        if (outpost) {
+            if (production == null) {
+                Production bestProduction = getBestProduction(colony.getUnitList().get(0).getType());
+                workLocationPlans.add(new WorkLocationPlan(getAIMain(), bestProduction.colonyTile,
+                                                           bestProduction.goodsType));
+            } else {
+                GoodsType goodsType = production[0];
+                workLocationPlans.add(new WorkLocationPlan(getAIMain(),
+                                                           getBestTileToProduce(goodsType),
+                                                           goodsType));
+            }
+            return;
+        }
+                
         Building townHall = colony.getBuildingForProducing(Goods.BELLS);
         
         // Choose the best production for each tile:
@@ -728,7 +743,6 @@ public class ColonyPlan {
         // Add values for the center tile:
         if (goodsType == colony.getTile().primaryGoods() ||
             goodsType == colony.getTile().secondaryGoods()) {
-            // TODO: find out about unit working here, if any (?)
             amount += colony.getTile().getMaximumPotential(goodsType, null);
         }
 
@@ -769,6 +783,60 @@ public class ColonyPlan {
             }
         }
     }
+
+    private ColonyTile getBestTileToProduce(GoodsType goodsType) {
+        int bestProduction = -1;
+        ColonyTile bestTile = null;
+        for (ColonyTile ct : colony.getColonyTiles()) {
+            Tile tile = ct.getWorkTile();
+            if ((tile.getOwningSettlement() == null
+                 || tile.getOwningSettlement() == colony)
+                && !ct.isColonyCenterTile()) {
+                int production = tile.potential(goodsType, null);
+                if (bestTile == null || bestProduction < production) {
+                    bestTile = ct;
+                    bestProduction = production;
+                }
+            }
+        }
+        if (bestProduction > 0) {
+            return bestTile;
+        } else {
+            return null;
+        }
+    }
+
+    public class Production {
+        ColonyTile colonyTile;
+        GoodsType goodsType;
+
+        public Production(ColonyTile ct, GoodsType gt) {
+            colonyTile = ct;
+            goodsType = gt;
+        }
+    }
+
+    public Production getBestProduction(UnitType unitType) {
+        Market market = colony.getOwner().getMarket();
+        Production bestProduction = null;
+        int value = -1;
+        for (ColonyTile ct : colony.getColonyTiles()) {
+            Tile tile = ct.getWorkTile();
+            if ((tile.getOwningSettlement() == null
+                 || tile.getOwningSettlement() == colony)
+                && !ct.isColonyCenterTile()) {
+                for (GoodsType goodsType : Specification.getSpecification().getFarmedGoodsTypeList()) {
+                    int production = market.getSalePrice(goodsType, tile.potential(goodsType, unitType));
+                    if (bestProduction == null || value < production) {
+                        value = production;
+                        bestProduction = new Production(ct, goodsType);
+                    }
+                }
+            }
+        }
+        return bestProduction;
+    }
+
     
     public void adjustProductionAndManufacture(){
         List<GoodsType> rawMatList = new ArrayList<GoodsType>(); 

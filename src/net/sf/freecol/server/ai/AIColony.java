@@ -302,173 +302,6 @@ public class AIColony extends AIObject {
     /**
      * Creates the wishes for the <code>Colony</code>.
      */
-    private void createWishesOld() {
-        logger.finest("Entering method createWishes");
-        List<WorkLocationPlan> workLocationPlans = colonyPlan.getSortedWorkLocationPlans();
-        Iterator<WorkLocationPlan> rit = workLocationPlans.iterator();
-        while (rit.hasNext()) {
-            WorkLocationPlan wlp = rit.next();
-            if (wlp.getWorkLocation() instanceof ColonyTile) {
-                Tile tile = ((ColonyTile) wlp.getWorkLocation()).getWorkTile();
-                if (tile.getSettlement() != null) {
-                    // Do not use tiles taken by other colonies:
-                    rit.remove();
-                } else if (tile.isLand()
-                           && !colony.hasAbility("model.ability.produceInWater")) {
-                    // Do not request fishermen unless Docks have been completed:
-                    // TODO: Check if docks are currently being built
-                    // (and a carpenter with lumber is available)
-                    rit.remove();
-                }
-            }
-        }
-
-        int[] production = new int[FreeCol.getSpecification().numberOfGoodsTypes()];
-        ArrayList<Unit> nonExpertUnits = new ArrayList<Unit>();
-        for (Unit u : colony.getUnitList()) {
-            GoodsType workType = u.getType().getExpertProduction();
-            if (workType != null) {
-                Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
-                while (wlpIterator.hasNext()) {
-                    WorkLocationPlan wlp = wlpIterator.next();
-                    if (wlp.getGoodsType() == workType) {
-                        if (workType.getIndex() < production.length) {
-                            production[workType.getIndex()] += wlp.getProductionOf(workType);
-                        }
-                        production[(Goods.FOOD).getIndex()] -= u.getType().getFoodConsumed();
-                        wlpIterator.remove();
-                        break;
-                    }
-                }
-            } else {
-                nonExpertUnits.add(u);
-            }
-        }
-
-        List<Wish> newWishes = new ArrayList<Wish>();
-        int value = 120; // TODO: Better method for determining the value of
-        // the wish.
-        while (workLocationPlans.size() > 0) {
-            UnitType unitType = null;
-
-            // Farmer/fisherman wishes:
-            if (production[(Goods.FOOD).getIndex()] < 2) {
-                Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
-                while (wlpIterator.hasNext()) {
-                    WorkLocationPlan wlp = wlpIterator.next();
-                    if (wlp.getGoodsType() == Goods.FOOD) {
-                        production[(Goods.FOOD).getIndex()] += wlp.getProductionOf(Goods.FOOD);
-                        production[(Goods.FOOD).getIndex()] -= 2;
-                        wlpIterator.remove();
-
-                        if (((ColonyTile) wlp.getWorkLocation()).getWorkTile().isLand()) {
-                            unitType = FreeCol.getSpecification().getExpertForProducing(Goods.FOOD);
-                        } else {
-                            unitType = FreeCol.getSpecification().getExpertForProducing(Goods.FISH);
-                        }
-                        break;
-                    }
-                }
-            }
-            if (unitType == null) {
-                if (production[(Goods.FOOD).getIndex()] < 2) {
-                    // Not enough food.
-                    break;
-                }
-                Iterator<WorkLocationPlan> wlpIterator = workLocationPlans.iterator();
-                while (wlpIterator.hasNext()) {
-                    WorkLocationPlan wlp = wlpIterator.next();
-                    // TODO: Check if the production of the raw material is
-                    // sufficient.
-                    if (wlp.getGoodsType().getIndex() < production.length) {
-                        production[wlp.getGoodsType().getIndex()] += wlp.getProductionOf(wlp.getGoodsType());
-                    }
-                    production[(Goods.FOOD).getIndex()] -= 2;
-                    wlpIterator.remove();
-
-                    if (wlp.getWorkLocation() instanceof ColonyTile) {
-                        unitType = FreeCol.getSpecification().getExpertForProducing(wlp.getGoodsType());
-                    } else {
-                        unitType = ((Building) wlp.getWorkLocation()).getExpertUnitType();
-                    }
-                    break;
-                }
-            }
-            if (unitType != null) {
-                boolean expert = (nonExpertUnits.size() <= 0);
-
-                boolean wishFound = false;
-                Iterator<Wish> wishIterator = wishes.iterator();
-                while (wishIterator.hasNext()) {
-                    Wish w = wishIterator.next();
-                    if (w instanceof WorkerWish) {
-                        WorkerWish ww = (WorkerWish) w;
-                        if (ww.getUnitType() == unitType && !newWishes.contains(ww)) {
-                            ww.update(value, unitType, expert);
-                            newWishes.add(ww);
-                            wishFound = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!wishFound) {
-                    WorkerWish ww = new WorkerWish(getAIMain(), colony, value, unitType, expert);
-                    wishes.add(ww);
-                    newWishes.add(ww);
-                }
-                if (!expert) {
-                    nonExpertUnits.remove(0);
-                }
-                value -= 5;
-                if (value < 50) {
-                    value = 50;
-                }
-            }
-        }
-
-        // We might need more tools for a building or a pioneer:
-        AIUnit unequippedHardyPioneer = getUnequippedPioneer();
-        final boolean needsPioneer = (tileImprovementPlans.size() > 0 || unequippedHardyPioneer != null
-                                      && PioneeringMission.isValid(unequippedHardyPioneer));
-        int toolsRequiredForBuilding = 0;
-        if (colony.getCurrentlyBuilding() != null) {
-            toolsRequiredForBuilding = getToolsRequired(colony.getCurrentlyBuilding());
-        }
-        if (colony.getProductionNetOf(Goods.TOOLS) == 0 && (colony.getGoodsCount(Goods.TOOLS) < 20 && needsPioneer)
-            || toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) {
-            int goodsWishValue = AIGoods.TOOLS_FOR_COLONY_PRIORITY
-                + AIGoods.TOOLS_FOR_IMPROVEMENT
-                * tileImprovementPlans.size()
-                + ((unequippedHardyPioneer != null) ? AIGoods.TOOLS_FOR_PIONEER : 0)
-                + ((toolsRequiredForBuilding > colony.getGoodsCount(Goods.TOOLS)) ? AIGoods.TOOLS_FOR_BUILDING
-                   + (toolsRequiredForBuilding - colony.getGoodsCount(Goods.TOOLS)) : 0);
-            boolean goodsOrdered = false;
-            for (Wish w : wishes) {
-                if (w instanceof GoodsWish) {
-                    GoodsWish gw = (GoodsWish) w;
-                    // TODO: check for a certain required amount?
-                    if (gw.getGoodsType() == Goods.TOOLS) {
-                        gw.setValue(goodsWishValue);
-                        goodsOrdered = true;
-                        break;
-                    }
-                }
-            }
-            if (!goodsOrdered) {
-                GoodsWish gw = new GoodsWish(getAIMain(), colony, goodsWishValue, Goods.TOOLS);
-                wishes.add(gw);
-            }
-        } else {
-            disposeAllToolsGoodsWishes();
-        }
-
-        disposeUnwantedWishes(newWishes);        
-
-        Collections.sort(wishes);
-
-    }
-
     private void createWishes() {
         wishes.clear();
         int expertValue = 100;
@@ -484,16 +317,14 @@ public class AIColony extends AIObject {
         }
 
         // request population increase
-        int newPopulation = colony.getUnitCount() + 1;
-        if (colony.governmentChange(newPopulation) >= 0) {
-            // population increase incurs no penalty
-            if (colony.getFoodProduction() > newPopulation * Colony.FOOD_CONSUMPTION) {
-                // TODO: better choice
-                UnitType expert = FreeCol.getSpecification().getUnitType("model.unit.elderStatesman");
-                wishes.add(new WorkerWish(getAIMain(), colony, expertValue / 5, expert, false));
-            } else {
-                // TODO: check whether tiles are available for cultivation
-                UnitType expert = FreeCol.getSpecification().getUnitType("model.unit.expertFarmer");
+        if (wishes.isEmpty()) {
+            int newPopulation = colony.getUnitCount() + 1;
+            if (colony.governmentChange(newPopulation) >= 0) {
+                // population increase incurs no penalty
+                boolean needFood = colony.getFoodProduction()
+                    <= newPopulation * Colony.FOOD_CONSUMPTION;
+                // choose expert for best work location plan
+                UnitType expert = getNextExpert(needFood);
                 wishes.add(new WorkerWish(getAIMain(), colony, expertValue / 5, expert, false));
             }
         }
@@ -573,12 +404,15 @@ public class AIColony extends AIObject {
 
         // add materials required to build military equipment
         if (badlyDefended) {
-            // TODO: do not consider unavailable equipment types,
-            // such as indian horses
             for (EquipmentType type : FreeCol.getSpecification().getEquipmentTypeList()) {
                 if (type.isMilitaryEquipment()) {
-                    for (AbstractGoods goods : type.getGoodsRequired()) {
-                        requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+                    for (Unit unit : colony.getUnitList()) {
+                        if (unit.canBeEquippedWith(type)) {
+                            for (AbstractGoods goods : type.getGoodsRequired()) {
+                                requiredGoods.incrementCount(goods.getType(), goods.getAmount());
+                            }
+                            break;
+                        }
                     }
                 }
             }
@@ -594,11 +428,61 @@ public class AIColony extends AIObject {
                                        - colony.getGoodsCount(requiredType)),
                                       colony.getWarehouseCapacity());
                 if (amount > 0) {
-                    wishes.add(new GoodsWish(getAIMain(), colony, goodsWishValue, amount, requiredType));
+                    int value = colonyCouldProduce(requiredType) ?
+                        goodsWishValue / 10 : goodsWishValue;
+                    wishes.add(new GoodsWish(getAIMain(), colony, value, amount, requiredType));
                 }
             }
         }
         Collections.sort(wishes);
+    }
+
+    private boolean colonyCouldProduce(GoodsType goodsType) {
+        if (goodsType.isBreedable()) {
+            return colony.getGoodsCount(goodsType) >= goodsType.getBreedingNumber();
+        } else if (goodsType.isFarmed()) {
+            for (ColonyTile colonyTile : colony.getColonyTiles()) {
+                if (colonyTile.getWorkTile().potential(goodsType, null) > 0) {
+                    return true;
+                }
+            }
+        } else {
+            if (!colony.getBuildingsForProducing(goodsType).isEmpty()) {
+                if (goodsType.getRawMaterial() == null) {
+                    return true;
+                } else {
+                    return colonyCouldProduce(goodsType.getRawMaterial());
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private UnitType getNextExpert(boolean onlyFood) {
+        UnitType bestType = null;
+        for (WorkLocationPlan plan : colonyPlan.getSortedWorkLocationPlans()) {
+            if (plan.getGoodsType().isFoodType() || !onlyFood) {
+                WorkLocation location = plan.getWorkLocation();
+                if (location instanceof ColonyTile) {
+                    ColonyTile colonyTile = (ColonyTile) location;
+                    if (colonyTile.getUnit() == null
+                        && (colonyTile.getWorkTile().isLand()
+                            || colony.hasAbility("model.ability.produceInWater"))) {
+                        bestType = FreeCol.getSpecification()
+                            .getExpertForProducing(plan.getGoodsType());
+                        break;
+                    }
+                } else if (location instanceof Building) {
+                    Building building = (Building) location;
+                    if (building.getUnitCount() < building.getMaxUnits()) {
+                        bestType = building.getExpertUnitType();
+                        break;
+                    }
+                }
+            }
+        }
+        return bestType;
     }
 
     private int getToolsRequired(BuildableType buildableType) {
@@ -628,58 +512,6 @@ public class AIColony extends AIObject {
         return hammersRequiredForBuilding;
     }
 
-    /**
-     * Dispose all goods wishes for tools. Note the two-pass approach
-     * in order to avoid concurrent modification exceptions!
-     */
-    private void disposeAllToolsGoodsWishes() {
-        List<GoodsWish> toolsWishes = new ArrayList<GoodsWish>();
-        for (Wish w : wishes) {
-            if (w instanceof GoodsWish) {
-                GoodsWish gw = (GoodsWish) w;
-                // TODO: check for a certain required amount?
-                if (gw.getGoodsType() == Goods.TOOLS) {
-                    toolsWishes.add(gw);
-                }
-            }
-        }
-        for(GoodsWish gw : toolsWishes) {
-            gw.dispose();
-        }
-    }
-
-    /**
-     * Dispose wishes no longer relevant. For worker wishes this is all
-     * wishes not present among the new ones. For goods wishes the current
-     * criteria (TO BE CHANGED) is at least 20 of the given goods. Other
-     * types of wishes are not supported.
-     * <p>
-     * Note that the wishes are disposed in a separate pass. This is necessary
-     * or there will be a {@link ConcurrentModificationException}.
-     * 
-     * @param newWishes The new wishes.
-     */
-    private void disposeUnwantedWishes(List<Wish> newWishes) {
-        List<Wish> wishesToDispose = new ArrayList<Wish>();
-        for (Wish w : wishes) {
-            if (w instanceof WorkerWish) {
-                if (!newWishes.contains(w)) {
-                    wishesToDispose.add(w);
-                }
-            } else if (w instanceof GoodsWish) {
-                GoodsWish gw = (GoodsWish) w;
-                // TODO: check for a certain required amount?
-                if (getColony().getGoodsCount(gw.getGoodsType()) >= 20) {
-                    wishesToDispose.add(gw);
-                }
-            } else {
-                logger.warning("Unknown type of Wish: " + w + " for " + this);
-            }
-        }
-        for (Wish w : wishesToDispose) {
-            w.dispose();
-        }
-    }
 
     /**
      * Returns an unequipped pioneer that is either inside this colony or
@@ -721,7 +553,6 @@ public class AIColony extends AIObject {
      */
     public void createAIGoods() {
         createExportAIGoodsList();
-        // TODO: createGoodsWishes()
     }
 
     /**
@@ -1236,8 +1067,8 @@ public class AIColony extends AIObject {
             int production = colony.getProductionNetOf(goodsType);
             int in_stock = colony.getGoodsCount(goodsType);
             if (Goods.FOOD != goodsType
-                    && goodsType.isStorable()
-                    && production + in_stock > colony.getWarehouseCapacity()) {
+                && goodsType.isStorable()
+                && production + in_stock > colony.getWarehouseCapacity()) {
                 Iterator<Unit> unitIterator = colony.getUnitIterator();
                 int waste = production + in_stock - colony.getWarehouseCapacity();
                 while (unitIterator.hasNext() && waste > 0){
