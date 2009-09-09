@@ -231,7 +231,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         Unit unit = new Unit(getGame(), colony.getTile(), player, pioneerType, UnitState.ACTIVE, pioneerType.getDefaultEquipment());
         // set the unit as a farmer in the colony
         unit.setWorkType(Goods.FOOD);
-        ColonyTile farmLand = colony.getVacantColonyTileFor(unit, Goods.FOOD);
+        ColonyTile farmLand = colony.getVacantColonyTileFor(unit, Goods.FOOD, true);
         unit.setLocation(farmLand);
         b = colony.getBuilding(stockadeType);
         assertNotNull(b);

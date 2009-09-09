@@ -1113,7 +1113,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public WorkLocation getVacantWorkLocationFor(Unit unit) {
         for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
-            WorkLocation colonyTile = getVacantColonyTileFor(unit, foodType);
+            WorkLocation colonyTile = getVacantColonyTileFor(unit, foodType, false);
             if (colonyTile != null) {
                 return colonyTile;
             }
@@ -1134,17 +1134,22 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param unit The <code>Unit</code> to find a vacant
      *            <code>ColonyTile</code> for.
      * @param goodsType The type of goods that should be produced.
+     * @param allowClaim Allow claiming free tiles from other settlements.
      * @return The <code>ColonyTile</code> giving the highest production of
      *         the given goods for the given unit or <code>null</code> if
      *         there is no available <code>ColonyTile</code> for producing
      *         that goods.
      */
-    public ColonyTile getVacantColonyTileFor(Unit unit, GoodsType goodsType) {
+    public ColonyTile getVacantColonyTileFor(Unit unit, GoodsType goodsType,
+                                             boolean allowClaim) {
         ColonyTile bestPick = null;
         int highestProduction = 0;
         for (ColonyTile colonyTile : colonyTiles) {
             if (colonyTile.canAdd(unit)) {
                 Tile workTile = colonyTile.getWorkTile();
+                if (workTile.getOwningSettlement() != this && !allowClaim) {
+                    continue;
+                }
                 /*
                  * canAdd ensures workTile it's empty or unit it's working in it
                  * so unit can work in it if it's owned by none, by europeans or

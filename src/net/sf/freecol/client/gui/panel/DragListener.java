@@ -240,7 +240,7 @@ public final class DragListener extends MouseAdapter {
         List<GoodsType> farmedGoods = Specification.getSpecification().getFarmedGoodsTypeList();
         // Work in Field - automatically find the best location
         for (GoodsType goodsType : farmedGoods) {
-            ColonyTile bestTile = colony.getVacantColonyTileFor(tempUnit, goodsType);
+            ColonyTile bestTile = colony.getVacantColonyTileFor(tempUnit, goodsType, true);
             if (bestTile != null) {
                 int maxpotential = bestTile.getProductionOf(tempUnit, goodsType);
                 UnitType expert = Specification.getSpecification().getExpertForProducing(goodsType);
