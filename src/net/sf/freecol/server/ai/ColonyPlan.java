@@ -22,8 +22,8 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -61,6 +61,15 @@ public class ColonyPlan {
 
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(ColonyPlan.class.getName());
+
+    // gets multiplied by the number of fish produced
+    public static final int DOCKS_PRIORITY = 10;
+    public static final int ARTILLERY_PRIORITY = 10;
+    public static final int WAGON_TRAIN_PRIORITY = 20;
+    public static final int SCHOOL_PRIORITY = 50;
+    public static final int UPGRADE_PRIORITY = 50;
+    public static final int WAREHOUSE_PRIORITY = 90;
+    public static final int BUILDING_PRIORITY = 120;
 
     // What is this supposed to be? Is it the maximum number of units
     // per building?
@@ -136,6 +145,20 @@ public class ColonyPlan {
     }
 
 
+    public class Buildable implements Comparable<Buildable> {
+        BuildableType type;
+        int priority;
+
+        public Buildable(BuildableType type, int priority) {
+            this.type = type;
+            this.priority = priority;
+        }
+
+        public int compareTo(Buildable other) {
+            return other.priority - priority;
+        }
+    }
+
     /**
      * Gets an <code>Iterator</code> for everything to be built in the
      * <code>Colony</code>.
@@ -145,10 +168,8 @@ public class ColonyPlan {
      */
     public Iterator<BuildableType> getBuildable() {
 
-        Set<BuildableType> lowPriority = new LinkedHashSet<BuildableType>();
-        Set<BuildableType> highPriority = new LinkedHashSet<BuildableType>();
-        Set<BuildableType> normalPriority = new LinkedHashSet<BuildableType>();
-
+        List<Buildable> buildables = new ArrayList<Buildable>();
+        
         List<BuildingType> docks = new ArrayList<BuildingType>();
         List<BuildingType> customs = new ArrayList<BuildingType>();
         List<BuildingType> builders = new ArrayList<BuildingType>();
@@ -210,33 +231,27 @@ public class ColonyPlan {
                     landLockedColonies++;
                 }
             }
-            if (bestWagon != null) {
-                if (landLockedColonies > 2 * wagonTrains) {
-                    highPriority.add(bestWagon);
-                } else if (landLockedColonies > wagonTrains) {
-                    normalPriority.add(bestWagon);
-                }
+            if (bestWagon != null && landLockedColonies > wagonTrains) {
+                buildables.add(new Buildable(bestWagon, WAGON_TRAIN_PRIORITY
+                                             * (landLockedColonies - wagonTrains)));
             }
         } else if (!colony.hasAbility("model.ability.produceInWater")) {
             // coastal colonies need docks
             int potential = 0;
             for (ColonyTile colonyTile : colony.getColonyTiles()) {
-                if (!colonyTile.getTile().isLand()) {
-                    List<AbstractGoods> production = colonyTile.getTile().getSortedPotential();
-                    if (!production.isEmpty()) {
-                        potential += production.get(0).getAmount();
+                Tile tile = colonyTile.getWorkTile();
+                if (!tile.isLand()) {
+                    for (AbstractGoods goods : tile.getSortedPotential()) {
+                        if (goods.getType().isFoodType()) {
+                            potential += goods.getAmount();
+                            break;
+                        }
                     }
                 }
             }
             for (BuildingType buildingType : docks) {
                 if (colony.canBuild(buildingType)) {
-                    if (potential > 15) {
-                        highPriority.add(buildingType);
-                    } else if (potential > 10) {
-                        normalPriority.add(buildingType);
-                    } else {
-                        lowPriority.add(buildingType);
-                    }
+                    buildables.add(new Buildable(buildingType, potential * DOCKS_PRIORITY));
                     break;
                 }
             }
@@ -250,7 +265,7 @@ public class ColonyPlan {
             if (wlp.getWorkLocation() instanceof Building) {
                 Building b = (Building) wlp.getWorkLocation();
                 if (b.canBuildNext()) {
-                    normalPriority.add(b.getType().getUpgradesTo());
+                    buildables.add(new Buildable(b.getType().getUpgradesTo(), UPGRADE_PRIORITY));
                 }
 
                 GoodsType outputType = b.getGoodsOutputType();
@@ -258,7 +273,8 @@ public class ColonyPlan {
                     for (Building building : colony.getBuildings()) {
                         if (!building.getType().getModifierSet(outputType.getId()).isEmpty()
                             && building.canBuildNext()) {
-                            normalPriority.add(building.getType().getUpgradesTo());
+                            buildables.add(new Buildable(building.getType().getUpgradesTo(),
+                                                         UPGRADE_PRIORITY));
                         }
                     }
                 }
@@ -271,7 +287,7 @@ public class ColonyPlan {
         if (!colony.hasAbility("model.ability.export")) {
             for (BuildingType buildingType : customs) {
                 if (colony.canBuild(buildingType)) {
-                    highPriority.add(buildingType);
+                    buildables.add(new Buildable(buildingType, UPGRADE_PRIORITY));
                     break;
                 }
             }
@@ -280,34 +296,33 @@ public class ColonyPlan {
         // improve production of building materials
         for (BuildingType buildingType : builders) {
             if (colony.canBuild(buildingType)) {
-                if (colony.getBuilding(buildingType) == null) {
-                    highPriority.add(buildingType);
-                } else {
-                    normalPriority.add(buildingType);
+                int priority = BUILDING_PRIORITY;
+                // reduce priority for armory and stables
+                if (buildingType.getProducedGoodsType() != null
+                    && buildingType.getProducedGoodsType().isMilitaryGoods()) {
+                    priority /= 2;
                 }
+                buildables.add(new Buildable(buildingType, priority));
             }
         }
 
         // Check if we should improve the warehouse:
         Building building = colony.getWarehouse();
         if (building.canBuildNext()) {
-            if (colony.getGoodsContainer().hasReachedCapacity(colony.getWarehouseCapacity())) {
-                highPriority.add(building.getType().getUpgradesTo());
-            } else {
-                normalPriority.add(building.getType());
-            }
+            int priority = colony.getGoodsContainer()
+                .hasReachedCapacity(colony.getWarehouseCapacity()) ?
+                2 * WAREHOUSE_PRIORITY : WAREHOUSE_PRIORITY;
+            buildables.add(new Buildable(building.getType().getUpgradesTo(), priority));
         } else if (bestWagon != null && wagonTrains < 4 * colony.getOwner().getColonies().size()) {
-            lowPriority.add(bestWagon);
+            buildables.add(new Buildable(bestWagon, WAGON_TRAIN_PRIORITY));
         }
 
         // improve defences
         for (BuildingType buildingType : defence) {
             if (colony.canBuild(buildingType)) {
-                if (colony.getBuilding(buildingType) == null) {
-                    highPriority.add(buildingType);
-                } else {
-                    normalPriority.add(buildingType);
-                }
+                int priority = (colony.getBuilding(buildingType) == null) ?
+                    2 * UPGRADE_PRIORITY : UPGRADE_PRIORITY;
+                buildables.add(new Buildable(buildingType, priority));
             }
         }
 
@@ -317,33 +332,19 @@ public class ColonyPlan {
                 if (colony.getBuilding(buildingType) == null
                     && (buildingType.getConsumedGoodsType() == null 
                         || buildingType.getConsumedGoodsType().isFarmed())) {
-                    normalPriority.add(buildingType);
+                    buildables.add(new Buildable(buildingType, UPGRADE_PRIORITY));
                 } else {
-                    lowPriority.add(buildingType);
+                    buildables.add(new Buildable(buildingType, UPGRADE_PRIORITY / 2));
                 }
             }
         }
 
         // add artillery if necessary
         // TODO: at some point, we will have to add ships
-        int defenders = 0;
-        for (Unit unit : colony.getTile().getUnitList()) {
-            if (unit.isDefensiveUnit()) {
-                defenders++;
-            }
-        }
-
-        if (defenders < 5) {
+        if (((AIColony) aiMain.getAIObject(colony)).isBadlyDefended()) {
             for (UnitType unitType : buildableDefenders) {
                 if (colony.canBuild(unitType)) {
-                    normalPriority.add(unitType);
-                    break;
-                }
-            }
-        } else if (defenders < 10) {
-            for (UnitType unitType : buildableDefenders) {
-                if (colony.canBuild(unitType)) {
-                    lowPriority.add(unitType);
+                    buildables.add(new Buildable(unitType, ARTILLERY_PRIORITY));
                     break;
                 }
             }
@@ -352,30 +353,23 @@ public class ColonyPlan {
         // improve education
         for (BuildingType buildingType : schools) {
             if (colony.canBuild(buildingType)) {
-                if (colony.getBuilding(buildingType) == null) {
-                    normalPriority.add(buildingType);
-                } else {
-                    lowPriority.add(buildingType);
-                }
+                int priority = (colony.getBuilding(buildingType) == null
+                                && colony.getUnitCount() > 5) ?
+                    2 * SCHOOL_PRIORITY : SCHOOL_PRIORITY;
+                buildables.add(new Buildable(buildingType, priority));
             }
         }
 
-        highPriority.addAll(normalPriority);
-        highPriority.addAll(lowPriority);
-
-        // catch all
-        for (BuildingType buildingType : Specification.getSpecification().getBuildingTypeList()) {
-            if (colony.canBuild(buildingType) && !highPriority.contains(buildingType)) {
-                highPriority.add(buildingType);
+        Collections.sort(buildables);
+        List<BuildableType> result = new ArrayList<BuildableType>();
+        Set<BuildableType> found = new HashSet<BuildableType>();
+        for (Buildable buildable : buildables) {
+            if (!found.contains(buildable.type)) {
+                result.add(buildable.type);
+                found.add(buildable.type);
             }
         }
-        for (UnitType unitType : buildableDefenders) {
-            if (colony.canBuild(unitType) && !highPriority.contains(unitType)) {
-                highPriority.add(unitType);
-            }
-        }
-
-        return highPriority.iterator();
+        return result.iterator();
     }
 
     /**

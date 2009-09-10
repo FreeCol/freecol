@@ -304,21 +304,7 @@ public class AIColony extends AIObject {
         // TODO: check for students
 
         // increase defense value
-        int defence = 0;
-        for (Unit unit : colony.getTile().getUnitList()) {
-            // TODO: better algorithm to determine defence
-            // should be located in combat model?
-            defence += unit.getType().getDefence();
-            if (unit.isArmed()) {
-                defence += 1;
-            }
-            if (unit.isMounted()) {
-                defence += 1;
-            }
-        }
-
-        // TODO: is this heuristic suitable?
-        boolean badlyDefended = defence < 3 * colony.getUnitCount();
+        boolean badlyDefended = isBadlyDefended();
         if (badlyDefended) {
             UnitType bestDefender = null;
             for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
@@ -484,6 +470,23 @@ public class AIColony extends AIObject {
         return hammersRequiredForBuilding;
     }
 
+    public boolean isBadlyDefended() {
+        int defence = 0;
+        for (Unit unit : colony.getTile().getUnitList()) {
+            // TODO: better algorithm to determine defence
+            // should be located in combat model?
+            defence += unit.getType().getDefence();
+            if (unit.isArmed()) {
+                defence += 1;
+            }
+            if (unit.isMounted()) {
+                defence += 1;
+            }
+        }
+
+        // TODO: is this heuristic suitable?
+        return defence < 3 * colony.getUnitCount();
+    }
 
     /**
      * Returns an unequipped pioneer that is either inside this colony or
