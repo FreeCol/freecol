@@ -327,6 +327,14 @@ public class StandardAIPlayer extends AIPlayer {
         int bestWeight = -1;
         for (FoundingFather father : foundingFathers) {
             if (father == null) continue;
+                    
+            //For the moment, arbitrarily: always choose the one offering custom houses.
+            //Allowing the AI to build CH early alleviates the complexity
+            //problem of handling all TransportMissions correctly somewhat.
+            if (father.hasAbility("model.ability.buildCustomHouse")) {
+                return father;
+            }
+
             int weight = father.getWeight(age);
             if (weight > bestWeight) {
                 bestWeight = weight;
