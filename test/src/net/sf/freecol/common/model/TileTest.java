@@ -419,12 +419,11 @@ public class TileTest extends FreeColTestCase {
         UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
         Tile tile1 = map.getTile(5, 8);
 
-        List<AbstractGoods> sortedPotential = tile1.getSortedPotential();
-        /*
         tile1.setType(savannah);
         assertEquals(3, savannah.getProductionOf(sugar, null));
         assertEquals(6, savannah.getProductionOf(sugar, sugarPlanter));
 
+        List<AbstractGoods> sortedPotential = tile1.getSortedPotential();
         // savannah produces more food than sugar
         assertEquals(food, sortedPotential.get(0).getType());
         assertEquals(4, sortedPotential.get(0).getAmount());
@@ -452,7 +451,6 @@ public class TileTest extends FreeColTestCase {
         assertEquals(food, tile1.getSortedPotential(farmer, dutch).get(0).getType());
         assertEquals(cotton, tile1.getSortedPotential(cottonPlanter, dutch).get(0).getType());
 
-*/
         tile1.setType(ocean);
         sortedPotential = tile1.getSortedPotential();
         assertEquals(1, sortedPotential.size());
