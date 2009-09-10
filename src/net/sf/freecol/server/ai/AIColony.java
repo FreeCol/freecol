@@ -163,34 +163,6 @@ public class AIColony extends AIObject {
     }
     
     /**
-     * Updates custom house export settings.
-     */
-    private void updateCustomHouse() {
-        int capacity = colony.getWarehouseCapacity();
-        for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
-            if (goodsType.isTradeGoods()) {
-                // can only be produced in Europe
-                colony.setExportData(new ExportData(goodsType, false, 0));
-            } else if (!goodsType.isStorable()) {
-                // abstract goods such as hammers
-                colony.setExportData(new ExportData(goodsType, false, 0));
-            } else if (goodsType.isBreedable()) {
-                colony.setExportData(new ExportData(goodsType, true, capacity - 20));
-            } else if (goodsType.isMilitaryGoods()) {
-                colony.setExportData(new ExportData(goodsType, true, capacity - 50));
-            } else if (goodsType.isBuildingMaterial()) {
-                colony.setExportData(new ExportData(goodsType, true, Math.min(capacity, 250)));
-            } else if (goodsType.isFoodType()) {
-                colony.setExportData(new ExportData(goodsType, false, 0));
-            } else if (goodsType.isNewWorldGoodsType() || goodsType.isRefined()) {
-                colony.setExportData(new ExportData(goodsType, true, 0));
-            } else {
-                colony.setExportData(new ExportData(goodsType, false, 0));
-            }
-        }
-    }
-
-    /**
      * Returns an <code>Iterator</code> of the goods to be shipped from this
      * colony. The item with the highest
      * {@link Transportable#getTransportPriority transport priority} gets
@@ -548,14 +520,6 @@ public class AIColony extends AIObject {
     }
 
     /**
-     * Creates a list of the goods which should be shipped to and from this
-     * colony.
-     */
-    public void createAIGoods() {
-        createExportAIGoodsList();
-    }
-
-    /**
      * Add a <code>GoodsWish</code> to the wish list.
      * 
      * @param gw The <code>GoodsWish</code> to be added.
@@ -583,154 +547,182 @@ public class AIColony extends AIObject {
      * This is the list {@link #getAIGoodsIterator} returns the
      * <code>Iterator</code> for.
      */
-    private void createExportAIGoodsList() {
-        ArrayList<AIGoods> newAIGoods = new ArrayList<AIGoods>();
-
-        // TODO: Do not sell raw material we are lacking.
-        
-        updateCustomHouse();
+    public void createAIGoods() {
+        int capacity = colony.getWarehouseCapacity();
         if (colony.hasAbility("model.ability.export")) {
-            // No need to export.
-            aiGoods.clear();
-            return;
-        }
-
-        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
-        for (GoodsType goodsType : goodsList) {
-            // Never export food and lumber
-            if (goodsType == Goods.FOOD || goodsType == Goods.LUMBER) {
-                continue;
-            }
-            // Never export unstorable goods
-            if (!goodsType.isStorable()) {
-                continue;
-            }
-            // Only export muskets if we do not have room for them:
-            if (goodsType == Goods.MUSKETS
-                && (colony.getProductionOf(Goods.MUSKETS) == 0 || colony.getGoodsCount(Goods.MUSKETS) < colony
-                    .getWarehouseCapacity()
-                    - colony.getProductionOf(Goods.MUSKETS))) {
-                continue;
-            }
-            // Only export horses if we do not have room for them:
-            if (goodsType == Goods.HORSES
-                && (colony.getProductionOf(Goods.HORSES) == 0 || colony.getGoodsCount(Goods.HORSES) < colony
-                    .getWarehouseCapacity()
-                    - colony.getProductionOf(Goods.HORSES))) {
-                continue;
-            }
-
-            /*
-             * Only export tools if we are producing it in this colony and have
-             * sufficient amounts in warehouse:
-             */
-            if (goodsType == Goods.TOOLS && colony.getGoodsCount(Goods.TOOLS) > 0) {
-                if (colony.getProductionNetOf(Goods.TOOLS) > 0) {
-                    final BuildableType currentlyBuilding = colony.getCurrentlyBuilding();
-                    int requiredTools = getToolsRequired(currentlyBuilding);
-                    int requiredHammers = getHammersRequired(currentlyBuilding);
-                    int buildTurns = (requiredHammers - colony.getGoodsCount(Goods.HAMMERS)) /
-                        (colony.getProductionOf(Goods.HAMMERS) + 1);
-                    if (requiredTools > 0) {
-                        if (colony.getWarehouseCapacity() > 100) {
-                            requiredTools += 100;
-                        }
-                        int toolsProductionTurns = requiredTools / colony.getProductionNetOf(Goods.TOOLS);
-                        if (buildTurns <= toolsProductionTurns + 1) {
-                            continue;
-                        }
-                    } else if (colony.getWarehouseCapacity() > 100 && colony.getGoodsCount(Goods.TOOLS) <= 100) {
-                        continue;
-                    }
+            for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
+                if (goodsType.isTradeGoods()) {
+                    // can only be produced in Europe
+                    colony.setExportData(new ExportData(goodsType, false, 0));
+                } else if (!goodsType.isStorable()) {
+                    // abstract goods such as hammers
+                    colony.setExportData(new ExportData(goodsType, false, 0));
+                } else if (goodsType.isBreedable()) {
+                    colony.setExportData(new ExportData(goodsType, true, capacity - 20));
+                } else if (goodsType.isMilitaryGoods()) {
+                    colony.setExportData(new ExportData(goodsType, true, capacity - 50));
+                } else if (goodsType.isBuildingMaterial()) {
+                    colony.setExportData(new ExportData(goodsType, true, Math.min(capacity, 250)));
+                } else if (goodsType.isFoodType()) {
+                    colony.setExportData(new ExportData(goodsType, false, 0));
+                } else if (goodsType.isNewWorldGoodsType() || goodsType.isRefined()) {
+                    colony.setExportData(new ExportData(goodsType, true, 0));
                 } else {
+                    colony.setExportData(new ExportData(goodsType, false, 0));
+                }
+            }
+            aiGoods.clear();
+
+        } else {
+
+            ArrayList<AIGoods> newAIGoods = new ArrayList<AIGoods>();
+
+            List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+            loop: for (GoodsType goodsType : goodsList) {
+                // Never export food and lumber
+                if (goodsType.isFoodType() || goodsType == Goods.LUMBER) {
                     continue;
                 }
-            }
-
-            if (colony.getGoodsCount(goodsType) > 0) {
-                List<AIGoods> alreadyAdded = new ArrayList<AIGoods>();
-                for (int j = 0; j < aiGoods.size(); j++) {
-                    AIGoods ag = aiGoods.get(j);
-                    if (ag == null) {
-                        logger.warning("aiGoods == null");
-                    } else if (ag.getGoods() == null) {
-                        logger.warning("aiGoods.getGoods() == null");
-                        if (ag.isUninitialized()) {
-                            logger.warning("AIGoods uninitialized: " + ag.getId());
-                        }
-                    }
-                    if (ag != null && ag.getGoods() != null && ag.getGoods().getType() == goodsType
-                        && ag.getGoods().getLocation() == colony) {
-                        alreadyAdded.add(ag);
-                    }
+                // Never export unstorable goods
+                if (!goodsType.isStorable()) {
+                    continue;
+                }
+                // Only export military goods if we do not have room for them:
+                if (goodsType.isMilitaryGoods()
+                    && (colony.getProductionOf(goodsType) == 0
+                        || (colony.getGoodsCount(goodsType)
+                            < capacity - colony.getProductionOf(goodsType)))) {
+                    continue;
                 }
 
-                int amountRemaining = colony.getGoodsCount(goodsType);
-                for (int i = 0; i < alreadyAdded.size(); i++) {
-                    AIGoods oldGoods = alreadyAdded.get(i);
-                    if (oldGoods.getGoods().getLocation() != colony) {
+                // don't export stuff we need
+                for (Wish wish : wishes) {
+                    if (wish instanceof GoodsWish
+                        && ((GoodsWish) wish).getGoodsType() == goodsType) {
+                        continue loop;
+                    }
+                }
+                Building consumer = colony.getBuildingForConsuming(goodsType);
+                if (consumer != null
+                    && colony.getProductionOf(goodsType) < consumer.getGoodsInput()) {
+                    continue;
+                }
+
+                /*
+                 * Only export tools if we are producing it in this colony and have
+                 * sufficient amounts in warehouse:
+                 */
+                // TODO: make this more generic
+                if (goodsType == Goods.TOOLS && colony.getGoodsCount(Goods.TOOLS) > 0) {
+                    if (colony.getProductionNetOf(Goods.TOOLS) > 0) {
+                        final BuildableType currentlyBuilding = colony.getCurrentlyBuilding();
+                        int requiredTools = getToolsRequired(currentlyBuilding);
+                        int requiredHammers = getHammersRequired(currentlyBuilding);
+                        int buildTurns = (requiredHammers - colony.getGoodsCount(Goods.HAMMERS)) /
+                            (colony.getProductionOf(Goods.HAMMERS) + 1);
+                        if (requiredTools > 0) {
+                            if (colony.getWarehouseCapacity() > 100) {
+                                requiredTools += 100;
+                            }
+                            int toolsProductionTurns = requiredTools / colony.getProductionNetOf(Goods.TOOLS);
+                            if (buildTurns <= toolsProductionTurns + 1) {
+                                continue;
+                            }
+                        } else if (colony.getWarehouseCapacity() > 100
+                                   && colony.getGoodsCount(Goods.TOOLS) <= 100) {
+                            continue;
+                        }
+                    } else {
                         continue;
                     }
-                    if (oldGoods.getGoods().getAmount() < 100 && oldGoods.getGoods().getAmount() < amountRemaining) {
-                        int goodsAmount = Math.min(100, amountRemaining);
-                        oldGoods.getGoods().setAmount(goodsAmount);
-                        if (amountRemaining >= colony.getWarehouseCapacity()
-                            && oldGoods.getTransportPriority() < AIGoods.IMPORTANT_DELIVERY) {
-                            oldGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
-                        } else if (goodsAmount == 100 && oldGoods.getTransportPriority() < AIGoods.FULL_DELIVERY) {
-                            oldGoods.setTransportPriority(AIGoods.FULL_DELIVERY);
-                        }
-                        amountRemaining -= goodsAmount;
-                        newAIGoods.add(oldGoods);
-                    } else if (oldGoods.getGoods().getAmount() > amountRemaining) {
-                        if (amountRemaining == 0) {
-                            if (oldGoods.getTransport() != null
-                                && oldGoods.getTransport().getMission() instanceof TransportMission) {
-                                ((TransportMission) oldGoods.getTransport().getMission())
-                                .removeFromTransportList(oldGoods);
+                }
+
+                if (colony.getGoodsCount(goodsType) > 0) {
+                    List<AIGoods> alreadyAdded = new ArrayList<AIGoods>();
+                    for (int j = 0; j < aiGoods.size(); j++) {
+                        AIGoods ag = aiGoods.get(j);
+                        if (ag == null) {
+                            logger.warning("aiGoods == null");
+                        } else if (ag.getGoods() == null) {
+                            logger.warning("aiGoods.getGoods() == null");
+                            if (ag.isUninitialized()) {
+                                logger.warning("AIGoods uninitialized: " + ag.getId());
                             }
-                            oldGoods.dispose();
-                        } else {
-                            oldGoods.getGoods().setAmount(amountRemaining);
+                        }
+                        if (ag != null && ag.getGoods() != null && ag.getGoods().getType() == goodsType
+                            && ag.getGoods().getLocation() == colony) {
+                            alreadyAdded.add(ag);
+                        }
+                    }
+
+                    int amountRemaining = colony.getGoodsCount(goodsType);
+                    for (int i = 0; i < alreadyAdded.size(); i++) {
+                        AIGoods oldGoods = alreadyAdded.get(i);
+                        if (oldGoods.getGoods().getLocation() != colony) {
+                            continue;
+                        }
+                        if (oldGoods.getGoods().getAmount() < 100 && oldGoods.getGoods().getAmount() < amountRemaining) {
+                            int goodsAmount = Math.min(100, amountRemaining);
+                            oldGoods.getGoods().setAmount(goodsAmount);
+                            if (amountRemaining >= colony.getWarehouseCapacity()
+                                && oldGoods.getTransportPriority() < AIGoods.IMPORTANT_DELIVERY) {
+                                oldGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
+                            } else if (goodsAmount == 100 && oldGoods.getTransportPriority() < AIGoods.FULL_DELIVERY) {
+                                oldGoods.setTransportPriority(AIGoods.FULL_DELIVERY);
+                            }
+                            amountRemaining -= goodsAmount;
                             newAIGoods.add(oldGoods);
+                        } else if (oldGoods.getGoods().getAmount() > amountRemaining) {
+                            if (amountRemaining == 0) {
+                                if (oldGoods.getTransport() != null
+                                    && oldGoods.getTransport().getMission() instanceof TransportMission) {
+                                    ((TransportMission) oldGoods.getTransport().getMission())
+                                    .removeFromTransportList(oldGoods);
+                                }
+                                oldGoods.dispose();
+                            } else {
+                                oldGoods.getGoods().setAmount(amountRemaining);
+                                newAIGoods.add(oldGoods);
+                                amountRemaining = 0;
+                            }
+                        } else {
+                            newAIGoods.add(oldGoods);
+                            amountRemaining -= oldGoods.getGoods().getAmount();
+                        }
+                    }
+                    while (amountRemaining > 0) {
+                        if (amountRemaining >= 100) {
+                            AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, 100, getColony().getOwner()
+                                                           .getEurope());
+                            if (amountRemaining >= colony.getWarehouseCapacity()) {
+                                newGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
+                            } else {
+                                newGoods.setTransportPriority(AIGoods.FULL_DELIVERY);
+                            }
+                            newAIGoods.add(newGoods);
+                            amountRemaining -= 100;
+                        } else {
+                            AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, amountRemaining, getColony()
+                                                           .getOwner().getEurope());
+                            newAIGoods.add(newGoods);
                             amountRemaining = 0;
                         }
-                    } else {
-                        newAIGoods.add(oldGoods);
-                        amountRemaining -= oldGoods.getGoods().getAmount();
-                    }
-                }
-                while (amountRemaining > 0) {
-                    if (amountRemaining >= 100) {
-                        AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, 100, getColony().getOwner()
-                                                       .getEurope());
-                        if (amountRemaining >= colony.getWarehouseCapacity()) {
-                            newGoods.setTransportPriority(AIGoods.IMPORTANT_DELIVERY);
-                        } else {
-                            newGoods.setTransportPriority(AIGoods.FULL_DELIVERY);
-                        }
-                        newAIGoods.add(newGoods);
-                        amountRemaining -= 100;
-                    } else {
-                        AIGoods newGoods = new AIGoods(getAIMain(), colony, goodsType, amountRemaining, getColony()
-                                                       .getOwner().getEurope());
-                        newAIGoods.add(newGoods);
-                        amountRemaining = 0;
                     }
                 }
             }
-        }
 
-        aiGoods.clear();
-        Iterator<AIGoods> nai = newAIGoods.iterator();
-        while (nai.hasNext()) {
-            AIGoods ag = nai.next();
-            int i;
-            for (i = 0; i < aiGoods.size() && aiGoods.get(i).getTransportPriority() > ag.getTransportPriority(); i++)
-                ;
-            aiGoods.add(i, ag);
+            aiGoods.clear();
+            Iterator<AIGoods> nai = newAIGoods.iterator();
+            while (nai.hasNext()) {
+                AIGoods ag = nai.next();
+                int i;
+                for (i = 0; i < aiGoods.size() && aiGoods.get(i).getTransportPriority() > ag.getTransportPriority(); i++)
+                    ;
+                aiGoods.add(i, ag);
+            }
         }
     }
+
 
     /**
      * Returns the available amount of the GoodsType given.
