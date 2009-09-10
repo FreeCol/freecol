@@ -59,6 +59,7 @@ public class TileTest extends FreeColTestCase {
     TileImprovementType fishBonusRiver = spec().getTileImprovementType("model.improvement.fishBonusRiver");
 
     GoodsType food = spec().getGoodsType("model.goods.food");
+    GoodsType fish = spec().getGoodsType("model.goods.fish");
     GoodsType sugar = spec().getGoodsType("model.goods.sugar");
     GoodsType cotton = spec().getGoodsType("model.goods.cotton");
     GoodsType tobacco = spec().getGoodsType("model.goods.tobacco");
@@ -418,12 +419,13 @@ public class TileTest extends FreeColTestCase {
         UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
         Tile tile1 = map.getTile(5, 8);
 
+        List<AbstractGoods> sortedPotential = tile1.getSortedPotential();
+        /*
         tile1.setType(savannah);
         assertEquals(3, savannah.getProductionOf(sugar, null));
         assertEquals(6, savannah.getProductionOf(sugar, sugarPlanter));
 
         // savannah produces more food than sugar
-        List<AbstractGoods> sortedPotential = tile1.getSortedPotential();
         assertEquals(food, sortedPotential.get(0).getType());
         assertEquals(4, sortedPotential.get(0).getAmount());
         assertEquals(sugar, sortedPotential.get(1).getType());
@@ -450,6 +452,16 @@ public class TileTest extends FreeColTestCase {
         assertEquals(food, tile1.getSortedPotential(farmer, dutch).get(0).getType());
         assertEquals(cotton, tile1.getSortedPotential(cottonPlanter, dutch).get(0).getType());
 
+*/
+        tile1.setType(ocean);
+        sortedPotential = tile1.getSortedPotential();
+        assertEquals(1, sortedPotential.size());
+        assertEquals(fish, sortedPotential.get(0).getType());
+
+        sortedPotential = tile1.getSortedPotential(farmer, null);
+        assertEquals(1, sortedPotential.size());
+        assertEquals(fish, sortedPotential.get(0).getType());
+        
     }
 
 }
