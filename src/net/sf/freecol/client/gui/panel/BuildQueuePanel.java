@@ -175,8 +175,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             Building oldBuilding = colony.getBuilding(buildingType);
             BuildingType oldBuildingType = (oldBuilding == null) ? null : oldBuilding.getType();
             if ((oldBuildingType == buildingType.getUpgradesFrom()
-                 || current.contains(buildingType.getUpgradesFrom()))
-                && !current.contains(buildingType)) {
+                ||  current.contains(buildingType.getUpgradesFrom()))
+                && !current.contains(buildingType)
+                && (buildingType.getPopulationRequired() > colony.getUnitCount())) {
                 buildings.addElement(buildingType);
             }
         }
