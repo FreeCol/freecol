@@ -78,11 +78,6 @@ public class AIColony extends AIObject {
 
     private ColonyPlan colonyPlan;
 
-    /**
-     * Describe profile here.
-     */
-    private ColonyProfile profile = new ColonyProfile();
-
     private ArrayList<AIGoods> aiGoods = new ArrayList<AIGoods>();
 
     private ArrayList<Wish> wishes = new ArrayList<Wish>();
@@ -144,24 +139,6 @@ public class AIColony extends AIObject {
      */
     public Colony getColony() {
         return colony;
-    }
-
-    /**
-     * Get the <code>Profile</code> value.
-     *
-     * @return a <code>ColonyProfile</code> value
-     */
-    public final ColonyProfile getProfile() {
-        return profile;
-    }
-
-    /**
-     * Set the <code>Profile</code> value.
-     *
-     * @param newProfile The new Profile value.
-     */
-    public final void setProfile(final ColonyProfile newProfile) {
-        this.profile = newProfile;
     }
 
     /**

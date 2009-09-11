@@ -43,6 +43,8 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
+import net.sf.freecol.server.ai.ColonyProfile.ProfileType;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -96,6 +98,12 @@ public class ColonyPlan {
     private GoodsType primaryRawMaterial = null;
     
     private GoodsType secondaryRawMaterial = null;
+
+    /**
+     * Describe profile here.
+     */
+    private ColonyProfile profile = new ColonyProfile();
+
     
     
     /**
@@ -110,6 +118,7 @@ public class ColonyPlan {
         }
         this.aiMain = aiMain;
         this.colony = colony;
+        selectProfile();
     }
 
     /**
@@ -148,6 +157,24 @@ public class ColonyPlan {
     }
 
 
+    /**
+     * Get the <code>Profile</code> value.
+     *
+     * @return a <code>ColonyProfile</code> value
+     */
+    public final ColonyProfile getProfile() {
+        return profile;
+    }
+
+    /**
+     * Set the <code>Profile</code> value.
+     *
+     * @param newProfile The new Profile value.
+     */
+    public final void setProfile(final ColonyProfile newProfile) {
+        this.profile = newProfile;
+    }
+
     public class Buildable implements Comparable<Buildable> {
         BuildableType type;
         int priority;
@@ -170,6 +197,12 @@ public class ColonyPlan {
      *         priority (highest priority first).
      */
     public Iterator<BuildableType> getBuildable() {
+
+        // don't build anything in colonies likely to be abandoned
+        if (profile.getType() == ProfileType.OUTPOST) {
+            List<BuildableType> result = Collections.emptyList();
+            return result.iterator();
+        }
 
         List<Buildable> buildables = new ArrayList<Buildable>();
         
@@ -336,7 +369,9 @@ public class ColonyPlan {
         // improve defences
         for (BuildingType buildingType : defence) {
             if (colony.canBuild(buildingType)) {
-                int priority = (colony.getBuilding(buildingType) == null) ?
+                int priority = (colony.getBuilding(buildingType) == null
+                                || profile.getType() == ProfileType.LARGE
+                                || profile.getType() == ProfileType.CAPITAL) ?
                     2 * UPGRADE_PRIORITY : UPGRADE_PRIORITY;
                 buildables.add(new Buildable(buildingType, priority));
             }
@@ -360,19 +395,32 @@ public class ColonyPlan {
         if (((AIColony) aiMain.getAIObject(colony)).isBadlyDefended()) {
             for (UnitType unitType : buildableDefenders) {
                 if (colony.canBuild(unitType)) {
-                    buildables.add(new Buildable(unitType, ARTILLERY_PRIORITY));
+                    int priority = (profile.getType() == ProfileType.LARGE
+                                    || profile.getType() == ProfileType.CAPITAL) ?
+                        2 * ARTILLERY_PRIORITY : ARTILLERY_PRIORITY;
+                    buildables.add(new Buildable(unitType, priority));
                     break;
                 }
             }
         }        
 
         // improve education
-        for (BuildingType buildingType : schools) {
-            if (colony.canBuild(buildingType)) {
-                int priority = (colony.getBuilding(buildingType) == null
-                                && colony.getUnitCount() > 5) ?
-                    2 * SCHOOL_PRIORITY : SCHOOL_PRIORITY;
-                buildables.add(new Buildable(buildingType, priority));
+        if (profile.getType() != ProfileType.SMALL) {
+            for (BuildingType buildingType : schools) {
+                if (colony.canBuild(buildingType)) {
+                    int priority = SCHOOL_PRIORITY;
+                    if (colony.getBuilding(buildingType) != null) {
+                        if (profile.getType() == ProfileType.MEDIUM) {
+                            priority /= 2;
+                        }
+                        if (buildingType.getUpgradesTo() == null) {
+                            if (profile.getType() != ProfileType.CAPITAL) {
+                                continue;
+                            }
+                        }
+                    }
+                    buildables.add(new Buildable(buildingType, priority));
+                }
             }
         }
 
@@ -432,23 +480,13 @@ public class ColonyPlan {
      * manufactured.
      */
     public void create() {
-        create(false);
-    }
-
-    public void create(boolean outpost, GoodsType... production) {
         
         workLocationPlans.clear();
-        if (outpost) {
-            if (production == null) {
-                Production bestProduction = getBestProduction(colony.getUnitList().get(0).getType());
-                workLocationPlans.add(new WorkLocationPlan(getAIMain(), bestProduction.colonyTile,
-                                                           bestProduction.goodsType));
-            } else {
-                GoodsType goodsType = production[0];
-                workLocationPlans.add(new WorkLocationPlan(getAIMain(),
-                                                           getBestTileToProduce(goodsType),
-                                                           goodsType));
-            }
+        if (profile.getType() == ProfileType.OUTPOST) {
+            GoodsType goodsType = profile.getPreferredProduction().get(0);
+            workLocationPlans.add(new WorkLocationPlan(getAIMain(),
+                                                       getBestTileToProduce(goodsType),
+                                                       goodsType));
             return;
         }
                 
@@ -1005,6 +1043,17 @@ public class ColonyPlan {
         return colony;
     }
 
+    private void selectProfile() {
+        int size = colony.getUnitCount();
+        if (size < 4) {
+            profile.setType(ProfileType.SMALL);
+        } else if (size > 8) {
+            profile.setType(ProfileType.LARGE);
+        } else if (size > 12) {
+            profile.setType(ProfileType.CAPITAL);
+        }
+    }
+
     /**
      * Creates an XML-representation of this object.
      * 
@@ -1028,6 +1077,8 @@ public class ColonyPlan {
      */
     public void readFromXMLElement(Element element) {
         colony = (Colony) getAIMain().getFreeColGameObject(element.getAttribute("ID"));
+        // TODO: serialize profile
+        selectProfile();
     }
 
     /**
@@ -1045,7 +1096,14 @@ public class ColonyPlan {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("ColonyPlan for " + colony.getName() + " " + colony.getTile().getPosition());
-        sb.append("\n-----\n\nWORK LOCATIONS:\n");
+        sb.append("\n\nPROFILE:\n");
+        sb.append(profile.getType().toString());
+        sb.append("\n");
+        for (GoodsType goodsType : profile.getPreferredProduction()) {
+            sb.append(goodsType.getName());
+            sb.append("\n");
+        }
+        sb.append("\n\nWORK LOCATIONS:\n");
         for (WorkLocationPlan p : getSortedWorkLocationPlans()) {
             sb.append(p.getGoodsType().getName() + " (" + p.getWorkLocation() + ")\n");
         }
