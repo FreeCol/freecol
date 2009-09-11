@@ -68,7 +68,8 @@ public class AIColony extends AIObject {
 
     private static final Logger logger = Logger.getLogger(AIColony.class.getName());
 
-    private static final EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
+    private static final EquipmentType toolsType = FreeCol.getSpecification()
+        .getEquipmentType("model.equipment.tools");
 
     /**
      * The FreeColGameObject this AIObject contains AI-information for.
@@ -76,6 +77,11 @@ public class AIColony extends AIObject {
     private Colony colony;
 
     private ColonyPlan colonyPlan;
+
+    /**
+     * Describe profile here.
+     */
+    private ColonyProfile profile = new ColonyProfile();
 
     private ArrayList<AIGoods> aiGoods = new ArrayList<AIGoods>();
 
@@ -138,6 +144,24 @@ public class AIColony extends AIObject {
      */
     public Colony getColony() {
         return colony;
+    }
+
+    /**
+     * Get the <code>Profile</code> value.
+     *
+     * @return a <code>ColonyProfile</code> value
+     */
+    public final ColonyProfile getProfile() {
+        return profile;
+    }
+
+    /**
+     * Set the <code>Profile</code> value.
+     *
+     * @param newProfile The new Profile value.
+     */
+    public final void setProfile(final ColonyProfile newProfile) {
+        this.profile = newProfile;
     }
 
     /**
