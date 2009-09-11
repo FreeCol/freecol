@@ -78,6 +78,7 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     private int price = NO_PRICE;
 
+
     // ----------------------------------------------------------- constructors
 
     public GoodsType(int index) {
@@ -124,6 +125,24 @@ public final class GoodsType extends FreeColGameObjectType {
 
     public boolean isNewWorldLuxuryType() {
         return (madeFrom != null && madeFrom.isNewWorldGoodsType());
+    }
+
+    /**
+     * Get the <code>ImmigrationType</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isImmigrationType() {
+        return !getModifierSet("model.modifier.immigration").isEmpty();
+    }
+
+    /**
+     * Get the <code>LibertyType</code> value.
+     *
+     * @return a <code>boolean</code> value
+     */
+    public boolean isLibertyType() {
+        return !getModifierSet("model.modifier.liberty").isEmpty();
     }
 
     public boolean isStorable() {

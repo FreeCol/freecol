@@ -65,9 +65,12 @@ public class ColonyPlan {
     // gets multiplied by the number of fish produced
     public static final int DOCKS_PRIORITY = 10;
     public static final int ARTILLERY_PRIORITY = 10;
+    public static final int CHURCH_PRIORITY = 15;
     public static final int WAGON_TRAIN_PRIORITY = 20;
-    public static final int SCHOOL_PRIORITY = 50;
+    public static final int SCHOOL_PRIORITY = 30;
     public static final int UPGRADE_PRIORITY = 50;
+    public static final int CUSTOMS_HOUSE_PRIORITY = 60;
+    public static final int TOWN_HALL_PRIORITY = 75;
     public static final int WAREHOUSE_PRIORITY = 90;
     public static final int BUILDING_PRIORITY = 120;
 
@@ -176,6 +179,8 @@ public class ColonyPlan {
         List<BuildingType> defence = new ArrayList<BuildingType>();
         List<BuildingType> military = new ArrayList<BuildingType>();
         List<BuildingType> schools = new ArrayList<BuildingType>();
+        List<BuildingType> churches = new ArrayList<BuildingType>();
+        List<BuildingType> townHalls = new ArrayList<BuildingType>();
 
         for (BuildingType type : Specification.getSpecification().getBuildingTypeList()) {
             if (type.hasAbility("model.ability.produceInWater")) {
@@ -191,11 +196,18 @@ public class ColonyPlan {
                 defence.add(type);
             }
             if (type.getProducedGoodsType() != null) {
-                if (type.getProducedGoodsType().isBuildingMaterial()) {
+                GoodsType output = type.getProducedGoodsType();
+                if (output.isBuildingMaterial()) {
                     builders.add(type);
                 }
-                if (type.getProducedGoodsType().isMilitaryGoods()) {
+                if (output.isMilitaryGoods()) {
                     military.add(type);
+                }
+                if (output.isLibertyType()) {
+                    townHalls.add(type);
+                }
+                if (output.isImmigrationType()) {
+                    churches.add(type);
                 }
             }
         }
@@ -268,13 +280,17 @@ public class ColonyPlan {
                     buildables.add(new Buildable(b.getType().getUpgradesTo(), UPGRADE_PRIORITY));
                 }
 
+                // this handles buildings that increase the production
+                // of other buildings (printing press, newspaper)
                 GoodsType outputType = b.getGoodsOutputType();
                 if (outputType != null) {
-                    for (Building building : colony.getBuildings()) {
-                        if (!building.getType().getModifierSet(outputType.getId()).isEmpty()
-                            && building.canBuildNext()) {
-                            buildables.add(new Buildable(building.getType().getUpgradesTo(),
-                                                         UPGRADE_PRIORITY));
+                    for (BuildingType otherType : Specification.getSpecification()
+                             .getBuildingTypeList()) {
+                        if (!otherType.getModifierSet(outputType.getId()).isEmpty()
+                            && colony.canBuild(otherType)) {
+                            int priority = (colony.getBuilding(otherType) == null) ?
+                                2 * UPGRADE_PRIORITY : UPGRADE_PRIORITY;
+                            buildables.add(new Buildable(otherType, priority));
                         }
                     }
                 }
@@ -287,7 +303,7 @@ public class ColonyPlan {
         if (!colony.hasAbility("model.ability.export")) {
             for (BuildingType buildingType : customs) {
                 if (colony.canBuild(buildingType)) {
-                    buildables.add(new Buildable(buildingType, UPGRADE_PRIORITY));
+                    buildables.add(new Buildable(buildingType, CUSTOMS_HOUSE_PRIORITY));
                     break;
                 }
             }
@@ -359,6 +375,26 @@ public class ColonyPlan {
                 buildables.add(new Buildable(buildingType, priority));
             }
         }
+
+        // improve town hall (not required for standard rule set,
+        // since town hall can not be upgraded)
+        for (BuildingType buildingType : townHalls) {
+            if (colony.canBuild(buildingType)) {
+                int priority = (colony.getBuilding(buildingType) == null) ?
+                    2 * TOWN_HALL_PRIORITY : TOWN_HALL_PRIORITY;
+                buildables.add(new Buildable(buildingType, priority));
+            }
+        }
+
+        // improve churches
+        for (BuildingType buildingType : churches) {
+            if (colony.canBuild(buildingType)) {
+                int priority = (colony.getBuilding(buildingType) == null) ?
+                    2 * CHURCH_PRIORITY : CHURCH_PRIORITY;
+                buildables.add(new Buildable(buildingType, priority));
+            }
+        }
+
 
         Collections.sort(buildables);
         List<BuildableType> result = new ArrayList<BuildableType>();
