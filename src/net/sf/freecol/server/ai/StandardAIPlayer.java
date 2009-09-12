@@ -71,13 +71,13 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
@@ -956,13 +956,18 @@ public class StandardAIPlayer extends AIPlayer {
     private void secureSettlements() {
         logger.finest("Entering method secureSettlements");
         if (getPlayer().isEuropean()) {
-            // Temporarily deactive this feature:
+
+            
             // Ok, we are a European player. Things are about to get fun.
-            /*
-            for (Colony colony : player.getColonies()) {
-                secureColony(colony);
+            
+            for (Colony colony : getPlayer().getColonies()) {
+                equipSoldiersOutsideColony(colony);
+                reOrganizeSoldiersOfColony(colony);
+                
+                // Temporarily deactive this feature:
+                //secureColony(colony);
             }
-            */
+            
         } else {
             List<IndianSettlement> settlements = getPlayer().getIndianSettlements();
             for (IndianSettlement is : settlements) {
@@ -978,6 +983,152 @@ public class StandardAIPlayer extends AIPlayer {
             }
         }
     }
+
+    void equipSoldiersOutsideColony(Colony colony) {
+        boolean colonyHasArmedUnits = false;
+        boolean canArmUnit = false;
+        EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+        
+        // Create comparator to sort units by skill level
+        // Prefer unit with less qualifications
+        Comparator<Unit> comp = Unit.getSkillLevelComparator();
+        
+        List<Unit>unarmedExpertSoldiers = new ArrayList<Unit>();
+        List<Unit>unarmedColonists = new ArrayList<Unit>();
+        
+        
+        // First process all units
+        for(Unit unit : colony.getTile().getUnitList()){
+            boolean isArmed = unit.isArmed();
+            boolean isExpertSoldier = unit.hasAbility("model.ability.expertSoldier"); 
+            if(isExpertSoldier){
+                if(isArmed){
+                    colonyHasArmedUnits = true;
+                }
+                else{
+                    unarmedExpertSoldiers.add(unit);
+                }
+                continue;
+            }
+            if(unit.isArmed()){
+                colonyHasArmedUnits = true;   
+            }
+            else{
+                unarmedColonists.add(unit);
+            }
+        }
+        
+        //Try to equip all unarmed expert soldiers first
+        for(Unit unit : unarmedExpertSoldiers){
+            canArmUnit = colony.canBuildEquipment(musketsEqType);
+            
+            // arming unit with equipment from colony stock
+            if(canArmUnit){
+                unit.equipWith(musketsEqType);
+                colonyHasArmedUnits = true;
+                continue;
+            }
+        }
+        
+        // colony has armed units defending it, nothing else to do
+        if(colonyHasArmedUnits){
+            return;
+        }
+        
+        // Colony still does not have a soldier to protect it
+        // Try to arm a non expert unit
+        canArmUnit = colony.canBuildEquipment(musketsEqType);
+        // colony cannot arm other units, nothing else to do
+        if(!canArmUnit || unarmedColonists.size() == 0){
+            return;
+        }
+                
+        Collections.sort(unarmedColonists, comp);
+        Unit unit = unarmedColonists.get(0);
+        unit.equipWith(musketsEqType);
+    }
+    
+    void reOrganizeSoldiersOfColony(Colony colony){
+        List<Unit>unarmedExpertSoldiers = new ArrayList<Unit>();
+        List<Unit>armedNonExpertSoldiers = new ArrayList<Unit>();
+        List<Unit>colonistsInside = new ArrayList<Unit>();
+        
+        
+        // Create comparator to sort units by skill level
+        // Prefer unit with less qualifications
+        Comparator<Unit> comp = Unit.getSkillLevelComparator();
+        
+        Comparator<Unit> reverseComp = Collections.reverseOrder(comp);
+        
+        // First process all units
+        for(Unit unit : colony.getTile().getUnitList()){
+            boolean isArmed = unit.isArmed();
+            boolean isExpertSoldier = unit.hasAbility("model.ability.expertSoldier"); 
+            if(isExpertSoldier){
+                if(!isArmed){
+                    unarmedExpertSoldiers.add(unit);
+                }
+                // ignore armed expert soldiers
+                continue;
+            }
+            if(isArmed){
+                armedNonExpertSoldiers.add(unit);
+                continue;
+            }
+        }
+
+        // we want to remove the ones with the biggest skill possible from soldier duty
+        Collections.sort(armedNonExpertSoldiers, reverseComp);
+        
+        //Try to equip all unarmed expert soldiers first
+        for(Unit unit : unarmedExpertSoldiers){
+            // there is no non-expert armed unit, no other way to arm this unit and the rest
+            if(armedNonExpertSoldiers.size() == 0){
+                return;
+            }
+        
+            // found other non expert soldier, take equipment from it
+            Unit otherSoldier = armedNonExpertSoldiers.remove(0);
+            unit.switchEquipmentWith(otherSoldier);
+            unit.setState(UnitState.ACTIVE);
+            otherSoldier.setState(UnitState.ACTIVE);
+            ((AIUnit)getAIMain().getAIObject(unit)).setMission(null);
+            ((AIUnit)getAIMain().getAIObject(otherSoldier)).setMission(null);   
+        }
+        
+        if(armedNonExpertSoldiers.size() == 0){
+            return;
+        }
+        
+        // Try to swap soldier roles with less skilled units from inside the colony
+        colonistsInside.addAll(colony.getUnitList());
+        Collections.sort(colonistsInside, comp);
+        
+        for(Unit unit : armedNonExpertSoldiers){
+            // there is no other unit to trade with
+            if(colonistsInside.size() == 0){
+                return;
+            }
+            
+            Unit unitInside = colonistsInside.remove(0);
+            
+            // no more units inside with lesser skill levels
+            if(unit.getSkillLevel() <= unitInside.getSkillLevel()){
+                return;
+            }
+        
+            Location loc = unitInside.getLocation();
+            
+            unitInside.putOutsideColony();
+            unit.switchEquipmentWith(unitInside);
+            unit.setLocation(loc);
+            unit.setState(UnitState.IN_COLONY);
+            unitInside.setState(UnitState.ACTIVE);
+            ((AIUnit)getAIMain().getAIObject(unit)).setMission(null);
+            ((AIUnit)getAIMain().getAIObject(unitInside)).setMission(null);   
+        }
+    }
+    
 
     /**
      * Takes the necessary actions to secure an indian settlement

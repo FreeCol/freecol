@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +60,8 @@ import org.w3c.dom.Element;
  * {@link Location}.
  */
 public class Unit extends FreeColGameObject implements Locatable, Location, Ownable, Nameable {
-
+    private static Comparator<Unit> skillLevelComp  = null;
+    
     private static final Logger logger = Logger.getLogger(Unit.class.getName());
 
     /**
@@ -686,6 +688,28 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
 
         return 0;
+    }
+    
+    public static Comparator<Unit> getSkillLevelComparator(){
+        if(skillLevelComp != null){
+            return skillLevelComp;
+        }
+        
+        // Create comparator to sort units by skill level
+        // Prefer unit with less qualifications
+        skillLevelComp = new Comparator<Unit>(){
+            public int compare(Unit u1,Unit u2){
+                if(u1.getSkillLevel() < u2.getSkillLevel()){
+                    return -1;
+                }
+                if(u1.getSkillLevel() > u2.getSkillLevel()){
+                    return 1;
+                }
+                return 0;
+            }
+        };
+        
+        return skillLevelComp;
     }
 
     /**
@@ -2321,6 +2345,34 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return equipment.getCount(equipmentType);
     }
 
+    /**
+     * Switches equipment between colonists
+     */
+    public void switchEquipmentWith(Unit unit){
+        if(!isColonist() || !unit.isColonist()){
+            throw new IllegalArgumentException("Both units need to be colonists to switch equipment");
+        }
+        
+        if(getTile() != unit.getTile()){
+            throw new IllegalStateException("Units can only switch equipment in the same location");
+        }
+        
+        if(getTile().getSettlement() == null){
+            throw new IllegalStateException("Units can only switch equipment in a settlement");
+        }
+        
+        List<EquipmentType> equipList = new ArrayList<EquipmentType>(getEquipment().keySet());
+        List<EquipmentType> otherEquipList = new ArrayList<EquipmentType>(unit.getEquipment().keySet());
+        removeAllEquipment(false);
+        unit.removeAllEquipment(false);
+        for(EquipmentType equip : otherEquipList){
+            equipWith(equip);
+        }
+        for(EquipmentType equip : equipList){
+            unit.equipWith(equip);
+        }
+    }
+    
     /**
      * Checks if this <code>Unit</code> is located in Europe. That is; either
      * directly or onboard a carrier which is in Europe.

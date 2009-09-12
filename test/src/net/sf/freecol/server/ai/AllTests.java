@@ -30,6 +30,7 @@ public class AllTests {
 	    suite.addTestSuite(ColonyPlanTest.class);
 		suite.addTestSuite(MissionAssignmentTest.class);
 		suite.addTestSuite(REFTest.class);
+		suite.addTestSuite(StandardAIPlayerTest.class);
 		suite.addTestSuite(TensionTest.class);
 		//$JUnit-END$
 		suite.addTest(net.sf.freecol.server.ai.mission.AllTests.suite());

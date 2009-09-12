@@ -22,7 +22,6 @@ package net.sf.freecol.server.ai;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,9 +51,9 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
+import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.server.ai.mission.PioneeringMission;
 import net.sf.freecol.server.ai.mission.TransportMission;
 import net.sf.freecol.server.ai.mission.WorkInsideColonyMission;
@@ -847,6 +846,8 @@ public class AIColony extends AIObject {
                 }
             }
         }
+        
+        checkForUnarmedExpertSoldier();
 
         List<Unit> units = new ArrayList<Unit>();
         List<WorkLocationPlan> workLocationPlans = colonyPlan.getWorkLocationPlans();
@@ -1171,6 +1172,39 @@ public class AIColony extends AIObject {
         if (this.colony.getUnitCount()<=0) {
             // something bad happened, there is no remaining unit working in the colony
             throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
+        }
+    }
+
+    /**
+     * Checks if the colony has an unarmed expert soldier inside
+     * If there are conditions to arm it, put it outside for later equip
+     */
+    private void checkForUnarmedExpertSoldier() {
+        EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+        
+        for(Unit unit : colony.getUnitList()){
+            if(colony.getUnitCount() == 1){
+                return;
+            }
+            
+            if(!unit.hasAbility("model.ability.expertSoldier")){
+                continue;
+            }
+            
+            // check if colony has goods to equip unit
+            if(colony.canBuildEquipment(musketsEqType)){
+                unit.putOutsideColony();
+                continue;
+            }
+            
+            // check for armed non-expert unit
+            for(Unit outsideUnit : colony.getTile().getUnitList()){
+                if(outsideUnit.isArmed() 
+                        && !outsideUnit.hasAbility("model.ability.expertSoldier")){
+                    unit.putOutsideColony();
+                    break;
+                }
+            }
         }
     }
 
