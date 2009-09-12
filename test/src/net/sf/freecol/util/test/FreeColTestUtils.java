@@ -25,7 +25,7 @@ public class FreeColTestUtils {
             colonyBuilder = new ColonyBuilder(game);
         }
         else{
-            colonyBuilder = colonyBuilder.setGame(game);
+            colonyBuilder = colonyBuilder.reset().setGame(game);
         }
         
         return colonyBuilder;
@@ -61,6 +61,7 @@ public class FreeColTestUtils {
             colonyTile = null;
             name = defaultName; 
             initialColonists = initialDefaultColonists;
+            colonists.clear();
         }
         
         public ColonyBuilder player(Player player){
