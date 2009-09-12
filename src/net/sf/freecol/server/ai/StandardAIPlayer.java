@@ -987,7 +987,9 @@ public class StandardAIPlayer extends AIPlayer {
     void equipSoldiersOutsideColony(Colony colony) {
         boolean colonyHasArmedUnits = false;
         boolean canArmUnit = false;
+        
         EquipmentType musketsEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
+        EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
         
         // Create comparator to sort units by skill level
         // Prefer unit with less qualifications
@@ -995,15 +997,19 @@ public class StandardAIPlayer extends AIPlayer {
         
         List<Unit>unarmedExpertSoldiers = new ArrayList<Unit>();
         List<Unit>unarmedColonists = new ArrayList<Unit>();
-        
+        List<Unit>unmountedSoldiers = new ArrayList<Unit>();
         
         // First process all units
         for(Unit unit : colony.getTile().getUnitList()){
             boolean isArmed = unit.isArmed();
-            boolean isExpertSoldier = unit.hasAbility("model.ability.expertSoldier"); 
+            boolean isMounted = unit.isMounted();
+            boolean isExpertSoldier = unit.hasAbility("model.ability.expertSoldier");
             if(isExpertSoldier){
                 if(isArmed){
                     colonyHasArmedUnits = true;
+                    if(!isMounted){
+                        unmountedSoldiers.add(unit);
+                    }
                 }
                 else{
                     unarmedExpertSoldiers.add(unit);
@@ -1011,7 +1017,10 @@ public class StandardAIPlayer extends AIPlayer {
                 continue;
             }
             if(unit.isArmed()){
-                colonyHasArmedUnits = true;   
+                colonyHasArmedUnits = true;
+                if(!isMounted){
+                    unmountedSoldiers.add(unit);
+                }
             }
             else{
                 unarmedColonists.add(unit);
@@ -1021,31 +1030,56 @@ public class StandardAIPlayer extends AIPlayer {
         //Try to equip all unarmed expert soldiers first
         for(Unit unit : unarmedExpertSoldiers){
             canArmUnit = colony.canBuildEquipment(musketsEqType);
-            
+            boolean isMounted = unit.isMounted();
             // arming unit with equipment from colony stock
             if(canArmUnit){
                 unit.equipWith(musketsEqType);
                 colonyHasArmedUnits = true;
+                if(!isMounted){
+                    unmountedSoldiers.add(unit);
+                }
                 continue;
             }
         }
         
-        // colony has armed units defending it, nothing else to do
-        if(colonyHasArmedUnits){
-            return;
-        }
-        
         // Colony still does not have a soldier to protect it
         // Try to arm a non expert unit
-        canArmUnit = colony.canBuildEquipment(musketsEqType);
-        // colony cannot arm other units, nothing else to do
-        if(!canArmUnit || unarmedColonists.size() == 0){
-            return;
+        if(!colonyHasArmedUnits){
+            canArmUnit = colony.canBuildEquipment(musketsEqType);
+            // colony cannot arm other units, nothing else to do
+            if(!canArmUnit || unarmedColonists.size() == 0){
+                return;
+            }
+        
+            Collections.sort(unarmedColonists, comp);
+            Unit unit = unarmedColonists.get(0);
+            unit.equipWith(musketsEqType);
+            if(!unit.isMounted()){
+                unmountedSoldiers.add(unit);
+            }
         }
-                
-        Collections.sort(unarmedColonists, comp);
-        Unit unit = unarmedColonists.get(0);
-        unit.equipWith(musketsEqType);
+        
+        comp = new Comparator<Unit>(){
+            public int compare(Unit unit1, Unit unit2){
+                boolean isUnit1Expert = unit1.hasAbility("model.ability.expertSoldier");
+                boolean isUnit2Expert = unit2.hasAbility("model.ability.expertSoldier");
+
+                if(isUnit1Expert && !isUnit2Expert){
+                    return -1;
+                }
+                if(!isUnit1Expert && isUnit2Expert){
+                    return 1;
+                }
+                return 0;
+            }
+        };
+        Collections.sort(unmountedSoldiers,comp);
+        
+        while(unmountedSoldiers.size() > 0 
+                && colony.canBuildEquipment(horsesEqType)){
+            Unit soldier = unmountedSoldiers.remove(0);
+            soldier.equipWith(horsesEqType);
+        }
     }
     
     void reOrganizeSoldiersOfColony(Colony colony){

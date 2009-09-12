@@ -93,6 +93,8 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         
         player.reOrganizeSoldiersOfColony(colony);
         
+        assertEquals("Wrong number of units in colony",1,colony.getUnitCount());
+        
         assertTrue("Indentured servant should now have horses", indenturedServant.getEquipmentCount(horsesEqType) == 1);
         assertTrue("Indentured servant should now have muskets",indenturedServant.getEquipmentCount(musketsEqType) == 1);
         
@@ -174,7 +176,9 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
 
         colony.addGoods(musketsType, 100);
-
+        colony.addGoods(horsesType, 100);
+        assertTrue("Colony should be hable to equip units with horses",colony.canBuildEquipment(horsesEqType));
+        
         Unit expertSoldier = new Unit(game, colony.getTile(), colony.getOwner(), expertSoldierType, UnitState.ACTIVE, new EquipmentType[0]);
 
         StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
@@ -184,5 +188,6 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         player.equipSoldiersOutsideColony(colony);
 
         assertTrue("Expert soldier should now have muskets",expertSoldier.getEquipmentCount(musketsEqType) == 1);
+        assertEquals("Expert soldier should now have horses",1,expertSoldier.getEquipmentCount(horsesEqType));
     }
 }
