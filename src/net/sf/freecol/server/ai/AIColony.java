@@ -21,6 +21,7 @@ package net.sf.freecol.server.ai;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,6 +51,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -1172,6 +1174,69 @@ public class AIColony extends AIObject {
         if (this.colony.getUnitCount()<=0) {
             // something bad happened, there is no remaining unit working in the colony
             throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
+        }
+    }
+
+    public static Unit bestUnitForTileProduction(Collection<Unit> units, GoodsType goodsType, Tile tile) {
+        if (goodsType == null || tile == null
+            || units == null || units.isEmpty()) {
+            return null;
+        } else {
+            UnitType expert = FreeCol.getSpecification().getExpertForProducing(goodsType);
+            Unit bestUnit = null;
+            int bestProduction = 0;
+            int experience = 0;
+            int wastedExperience = 0;
+            boolean canBeUpgraded = false;
+            for (Unit unit : units) {
+                if (unit.getType() == expert) {
+                    // can't get any better than this
+                    return unit;
+                } else {
+                    int production = unit.getProductionOf(goodsType, tile.potential(goodsType, unit.getType()));
+                    if (production > bestProduction) {
+                        // production is better
+                        bestUnit = unit;
+                        bestProduction = production;
+                        canBeUpgraded = unit.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE);
+                        if (canBeUpgraded) {                            
+                            if (unit.getWorkType() == goodsType) {
+                                experience = unit.getExperience();
+                                wastedExperience = 0;
+                            } else {
+                                experience = 0;
+                                wastedExperience = unit.getExperience();
+                            }
+                        } else {
+                            experience = 0;
+                            wastedExperience = 0;
+                        }
+                    } else if (production == bestProduction
+                               && unit.getType().canBeUpgraded(expert, ChangeType.EXPERIENCE)
+                               && (!canBeUpgraded
+                                   || (unit.getWorkType() == goodsType
+                                       && unit.getExperience() > experience)
+                                   || (unit.getWorkType() != goodsType
+                                       && unit.getExperience() < wastedExperience))) {
+                        // production is equal, but unit is better
+                        // from an education perspective
+                        bestUnit = unit;
+                        canBeUpgraded = true;
+                        if (unit.getWorkType() == goodsType) {
+                            experience = unit.getExperience();
+                            wastedExperience = 0;
+                        } else {
+                            experience = 0;
+                            wastedExperience = unit.getExperience();
+                        }
+                    }
+                }
+            }
+            if (bestProduction == 0) {
+                return null;
+            } else {
+                return bestUnit;
+            }
         }
     }
 

@@ -19,6 +19,9 @@
 
 package net.sf.freecol.server.ai;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Building;
@@ -29,6 +32,7 @@ import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -44,18 +48,30 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class AIColonyTest extends FreeColTestCase {	
+
     final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    final UnitType servantType = spec().getUnitType("model.unit.indenturedServant");
+    final UnitType criminalType = spec().getUnitType("model.unit.pettyCriminal");
     final UnitType lumberJackType = spec().getUnitType("model.unit.expertLumberJack");
+    final UnitType sugarPlanterType = spec().getUnitType("model.unit.masterSugarPlanter");
+    final UnitType farmerType = spec().getUnitType("model.unit.expertFarmer");
+    final UnitType convertType = spec().getUnitType("model.unit.indianConvert");
+
     final TileType forestType = spec().getTileType("model.tile.coniferForest");
     final TileType mountainType = spec().getTileType("model.tile.mountains");
     final TileType savannahType = spec().getTileType("model.tile.savannah");
+
     final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
+    final GoodsType foodType = spec().getGoodsType("model.goods.food");
     final GoodsType oreType = spec().getGoodsType("model.goods.ore");
+    final GoodsType sugarType = spec().getGoodsType("model.goods.sugar");
     final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
     final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
     final GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+
     final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
     final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+
     final int fullStock = 100;
     
     FreeColServer server = null;
@@ -300,4 +316,73 @@ public class AIColonyTest extends FreeColTestCase {
         assertTrue("Colony should now have horses in stock",colony.getGoodsCount(horsesType) > 0);
         assertFalse("Scout should not be mounted",scout.isMounted());
     }
+
+    public void testBestUnitForTileProduction() {
+
+        Player dutch = getGame().getPlayer("model.nation.dutch");
+        Tile tile = new Tile(getGame(), savannahType, 0, 0);
+
+        assertNull(AIColony.bestUnitForTileProduction(null, sugarType, tile));
+
+        List<Unit> units = new ArrayList<Unit>();
+        assertNull(AIColony.bestUnitForTileProduction(units, sugarType, tile));
+
+        Unit servant = new Unit(getGame(), dutch, servantType);
+        units.add(servant);
+        assertEquals(servant, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(servant, AIColony.bestUnitForTileProduction(units, foodType, tile));
+
+        Unit criminal = new Unit(getGame(), dutch, criminalType);
+        units.add(criminal);
+        assertEquals(servant, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(servant, AIColony.bestUnitForTileProduction(units, foodType, tile));
+
+        Unit colonist1 = new Unit(getGame(), dutch, colonistType);
+        units.add(colonist1);
+        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, foodType, tile));
+
+        Unit colonist2 = new Unit(getGame(), dutch, colonistType);
+        units.add(colonist2);
+        colonist2.setWorkType(sugarType);
+        colonist2.modifyExperience(100);
+        // colonist2 has more sugar experience
+        assertEquals(colonist2, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, foodType, tile));
+
+        colonist2.setWorkType(lumberType);
+        colonist2.modifyExperience(100);
+        // colonist1 has *less* experience to waste
+        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        // colonist2 has lumber experience, but production is zero
+        assertEquals(null, AIColony.bestUnitForTileProduction(units, lumberType, tile));
+
+        Unit convert = new Unit(getGame(), dutch, convertType);
+        units.add(convert);
+        assertEquals(convert, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(convert, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        units.remove(convert);
+
+        Unit sugarPlanter = new Unit(getGame(), dutch, sugarPlanterType);
+        units.add(sugarPlanter);
+        assertEquals(sugarPlanter, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        // prefer colonist over wrong type of expert
+        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        units.remove(sugarPlanter);
+
+        Unit farmer = new Unit(getGame(), dutch, farmerType);
+        units.add(farmer);
+        // prefer colonist over wrong type of expert
+        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(farmer, AIColony.bestUnitForTileProduction(units, foodType, tile));
+
+        units.add(convert);
+        units.add(sugarPlanter);
+
+        assertEquals(sugarPlanter, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(farmer, AIColony.bestUnitForTileProduction(units, foodType, tile));
+
+    }
+
 }
