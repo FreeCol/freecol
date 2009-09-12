@@ -317,16 +317,7 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                 }
             }
             // ATTENTION: skill may be Integer.MIN_VALUE!
-            Collections.sort(others, new Comparator<Unit>() {
-                    public int compare(Unit unit1, Unit unit2) {
-                        if (unit1.getSkillLevel() < unit2.getSkillLevel()) {
-                            return -1;
-                        } else if (unit1.getSkillLevel() > unit2.getSkillLevel()) {
-                            return 1;
-                        } else {
-                            return 0;
-                        }
-                    }});
+            Collections.sort(others, Unit.getSkillLevelComparator());
             recruits.addAll(others);
             // Don't overdo it - leave at least one person behind.
             int recruitCount = threat - defenders;
