@@ -439,7 +439,7 @@ public final class UnitType extends BuildableType {
         }
     }
 
-    List<UnitTypeChange> getTypeChanges() {
+    public List<UnitTypeChange> getTypeChanges() {
         return typeChanges;
     }
 
@@ -537,8 +537,10 @@ public final class UnitType extends BuildableType {
     
 
     /**
-     * Whether this UnitType can be upgraded to the given UnitType by
-     * the given means of education.
+     * Return true if this UnitType can be upgraded to the given
+     * UnitType by the given means of education. If the given UnitType
+     * is null, return true if the UnitType can be upgraded to any
+     * other UnitType by the given means of education.
      *
      * @param newType the UnitType to learn
      * @param changeType an <code>ChangeType</code> value
@@ -547,7 +549,8 @@ public final class UnitType extends BuildableType {
     public boolean canBeUpgraded(UnitType newType, ChangeType changeType) {
         for (UnitTypeChange change : typeChanges) {
             if (change.asResultOf(changeType)) {
-                if (newType == change.getNewUnitType()) {
+                if (newType == null
+                    || newType == change.getNewUnitType()) {
                     return true;
                 }
             }

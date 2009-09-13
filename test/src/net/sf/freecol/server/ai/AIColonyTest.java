@@ -317,71 +317,97 @@ public class AIColonyTest extends FreeColTestCase {
         assertFalse("Scout should not be mounted",scout.isMounted());
     }
 
-    public void testBestUnitForTileProduction() {
+    public void testBestUnitForWorkLocation() {
 
+        Game game = getGame();
+        Map map = getTestMap(savannahType);
+        game.setMap(map);
+        Colony colony = getStandardColony();
         Player dutch = getGame().getPlayer("model.nation.dutch");
-        Tile tile = new Tile(getGame(), savannahType, 0, 0);
+        ColonyTile colonyTile = colony.getColonyTiles().get(0);
 
-        assertNull(AIColony.bestUnitForTileProduction(null, sugarType, tile));
+        assertNull(AIColony.bestUnitForWorkLocation(null, colonyTile, sugarType));
 
         List<Unit> units = new ArrayList<Unit>();
-        assertNull(AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertNull(AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
 
         Unit servant = new Unit(getGame(), dutch, servantType);
         units.add(servant);
-        assertEquals(servant, AIColony.bestUnitForTileProduction(units, sugarType, tile));
-        assertEquals(servant, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
 
         Unit criminal = new Unit(getGame(), dutch, criminalType);
         units.add(criminal);
-        assertEquals(servant, AIColony.bestUnitForTileProduction(units, sugarType, tile));
-        assertEquals(servant, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
 
         Unit colonist1 = new Unit(getGame(), dutch, colonistType);
         units.add(colonist1);
-        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, sugarType, tile));
-        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
 
         Unit colonist2 = new Unit(getGame(), dutch, colonistType);
         units.add(colonist2);
         colonist2.setWorkType(sugarType);
         colonist2.modifyExperience(100);
         // colonist2 has more sugar experience
-        assertEquals(colonist2, AIColony.bestUnitForTileProduction(units, sugarType, tile));
-        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(colonist2, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
 
         colonist2.setWorkType(lumberType);
         colonist2.modifyExperience(100);
         // colonist1 has *less* experience to waste
-        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, sugarType, tile));
-        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
         // colonist2 has lumber experience, but production is zero
-        assertEquals(null, AIColony.bestUnitForTileProduction(units, lumberType, tile));
+        assertEquals(null, AIColony.bestUnitForWorkLocation(units, colonyTile, lumberType));
 
         Unit convert = new Unit(getGame(), dutch, convertType);
         units.add(convert);
-        assertEquals(convert, AIColony.bestUnitForTileProduction(units, sugarType, tile));
-        assertEquals(convert, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(convert, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
+        assertEquals(convert, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
         units.remove(convert);
 
         Unit sugarPlanter = new Unit(getGame(), dutch, sugarPlanterType);
         units.add(sugarPlanter);
-        assertEquals(sugarPlanter, AIColony.bestUnitForTileProduction(units, sugarType, tile));
+        assertEquals(sugarPlanter, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
         // prefer colonist over wrong type of expert
-        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
         units.remove(sugarPlanter);
 
         Unit farmer = new Unit(getGame(), dutch, farmerType);
         units.add(farmer);
         // prefer colonist over wrong type of expert
-        assertEquals(colonist1, AIColony.bestUnitForTileProduction(units, sugarType, tile));
-        assertEquals(farmer, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
+        assertEquals(farmer, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
 
         units.add(convert);
         units.add(sugarPlanter);
 
-        assertEquals(sugarPlanter, AIColony.bestUnitForTileProduction(units, sugarType, tile));
-        assertEquals(farmer, AIColony.bestUnitForTileProduction(units, foodType, tile));
+        assertEquals(sugarPlanter, AIColony.bestUnitForWorkLocation(units, colonyTile, sugarType));
+        assertEquals(farmer, AIColony.bestUnitForWorkLocation(units, colonyTile, foodType));
+
+        Building townHall = new Building(game, colony, spec().getBuildingType("model.building.TownHall"));
+        units.clear();
+        units.add(servant);
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, townHall, null));
+
+        units.add(criminal);
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, townHall, null));
+
+        units.add(convert);
+        assertEquals(servant, AIColony.bestUnitForWorkLocation(units, townHall, null));
+
+        units.add(colonist1);
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, townHall, null));
+
+        units.add(colonist2);
+        // colonist1 has *less* experience to waste
+        assertEquals(colonist1, AIColony.bestUnitForWorkLocation(units, townHall, null));
+
+        units.add(sugarPlanter);
+        // sugar planter can not be upgraded at all, but colonist could be
+        assertEquals(sugarPlanter, AIColony.bestUnitForWorkLocation(units, townHall, null));
 
     }
 
