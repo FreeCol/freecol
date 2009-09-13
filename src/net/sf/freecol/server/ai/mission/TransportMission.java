@@ -434,16 +434,7 @@ public class TransportMission extends Mission {
             if (!canAttackPlayer(defender.getOwner())) {
                 return;
             }
-            final Element element = Message.createNewRootElement("attack");
-            element.setAttribute("unit", carrier.getId());
-            element.setAttribute("direction", direction.toString());
-
-            try {
-                connection.ask(element);
-            } catch (IOException e) {
-                logger.warning("Could not send message!");
-            }
-            
+            attack(connection, carrier, direction);
         }
     }
     
@@ -461,15 +452,7 @@ public class TransportMission extends Mission {
             final Direction direction = moveTowards(connection, pathToTarget);
             if (direction != null &&
                     carrier.getMoveType(direction) == MoveType.ATTACK) {
-                final Element element = Message.createNewRootElement("attack");
-                element.setAttribute("unit", carrier.getId());
-                element.setAttribute("direction", direction.toString());
-
-                try {
-                    connection.ask(element);
-                } catch (IOException e) {
-                    logger.warning("Could not send message!");
-                }
+                attack(connection, carrier, direction);
             }
         }
     }
