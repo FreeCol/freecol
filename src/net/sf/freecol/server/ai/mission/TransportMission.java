@@ -761,14 +761,8 @@ public class TransportMission extends Mission {
         Market market = player.getMarket();
 
         if (player.getGold() >= market.getBidPrice(type, amount)) {
-            Element buyGoodsElement = Message.createNewRootElement("buyGoods");
-            buyGoodsElement.setAttribute("carrier", getUnit().getId());
-            buyGoodsElement.setAttribute("type", type.getId());
-            buyGoodsElement.setAttribute("amount", Integer.toString(amount));
-            try {
-                connection.sendAndWait(buyGoodsElement);
-            } catch (IOException e) {
-                logger.warning("Could not send \"buyGoods\"-message to the server.");
+            boolean success = buyGoods(connection, getUnit(), type, amount);
+            if(!success){
                 return null;
             }
             AIGoods ag = new AIGoods(getAIMain(), getUnit(), type, amount, destination);
@@ -1166,18 +1160,14 @@ public class TransportMission extends Mission {
                 if (ag.getGoods().getTile() == carrier.getTile() && carrier.getState() != UnitState.TO_EUROPE
                         && carrier.getState() != UnitState.TO_AMERICA) {
                     if (carrier.getLocation() instanceof Europe) {
-                        Element buyGoodsElement = Message.createNewRootElement("buyGoods");
-                        buyGoodsElement.setAttribute("carrier", carrier.getId());
-                        buyGoodsElement.setAttribute("type", Integer.toString(ag.getGoods().getType().getIndex()));
-                        buyGoodsElement.setAttribute("amount", Integer.toString(ag.getGoods().getAmount()));
-                        try {
-                            connection.sendAndWait(buyGoodsElement);
+                        GoodsType goodsType = ag.getGoods().getType();
+                        int goodsAmount = ag.getGoods().getAmount();
+                        boolean success = buyGoods(connection, carrier, goodsType, goodsAmount);
+                        if(success){
                             tli.remove();
                             transportListChanged = true;
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"buyGoodsElement\"-message!");
+                            ag.setGoods(new Goods(getGame(), carrier, goodsType, goodsAmount));
                         }
-                        ag.setGoods(new Goods(getGame(), carrier, ag.getGoods().getType(), ag.getGoods().getAmount()));
                     } else {
                         Element loadCargoElement = Message.createNewRootElement("loadCargo");
                         loadCargoElement.setAttribute("carrier", carrier.getId());

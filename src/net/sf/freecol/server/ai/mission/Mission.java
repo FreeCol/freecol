@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
@@ -519,5 +520,21 @@ public abstract class Mission extends AIObject {
         } catch (IOException e) {
             logger.warning("Could not send \"disembark\"-message!");
         }
+    }
+    
+    public boolean buyGoods(Connection connection, Unit carrier, GoodsType goodsType, int amount){
+        boolean success = true;
+        Element buyGoodsElement = Message.createNewRootElement("buyGoods");
+        buyGoodsElement.setAttribute("carrier", carrier.getId());
+        buyGoodsElement.setAttribute("type", goodsType.getId());
+        buyGoodsElement.setAttribute("amount", Integer.toString(amount));
+        try {
+            connection.sendAndWait(buyGoodsElement);
+        } catch (IOException e) {
+            logger.warning("Could not send \"buyGoods\"-message to the server.");
+            success = false;
+        }
+        
+        return success;
     }
 }
