@@ -42,13 +42,23 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class TransportMissionTest extends FreeColTestCase {
+    FreeColServer server = null;
+    
+    public void tearDown(){
+        if(server != null){
+            // must make sure that the server is stopped
+            ServerTestHelper.stopServer(server);
+            server = null;   
+        }
+        setGame(null);
+    }
     
     public void testTransportMission() {
         // Reset import file option value (set by previous tests)
         ((FileOption) Specification.getSpecification().getOption(MapGeneratorOptions.IMPORT_FILE)).setValue(null);
         
         // start a server
-        FreeColServer server = ServerTestHelper.startServer(false, true);
+        server = ServerTestHelper.startServer(false, true);
         
         // generate a random map
         Controller c = server.getController();
@@ -72,9 +82,7 @@ public class TransportMissionTest extends FreeColTestCase {
         
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
         AIPlayer aiPlayer = (AIPlayer)aiMain.getAIObject(player1.getId());
-
-        
-        
+    
         // create a ship carrying a colonist
         Tile tile1 = map.getTile(6, 9);
         
@@ -105,13 +113,9 @@ public class TransportMissionTest extends FreeColTestCase {
         // and also invalidation of the transport mission as side effect
         assertTrue(galleon.isUnderRepair());
         assertFalse(aiUnit.getMission().isValid());
-        
-        try {
-            // this will call AIPlayer.abortInvalidMissions() and change the carrier mission
-            aiPlayer.startWorking();
-            assertFalse(aiUnit.getMission() instanceof TransportMission);
-        } finally {
-            ServerTestHelper.stopServer(server);
-        }
+                
+        // this will call AIPlayer.abortInvalidMissions() and change the carrier mission
+        aiPlayer.startWorking();
+        assertFalse(aiUnit.getMission() instanceof TransportMission);
     }
 }
