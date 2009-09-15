@@ -110,19 +110,7 @@ public class IdleAtColonyMission extends Mission {
             }
 
             //still here, so we're somewhere on the map; find some colony
-            PathNode pathToTarget = null;
-            final int MAX_COLONY_DISTANCE = 10;
-            Iterator<Position> i = gameMap.getCircleIterator(thisTile.getPosition(), true, MAX_COLONY_DISTANCE);
-            while (i.hasNext()) {
-                Position pos = i.next();
-                Settlement s = gameMap.getTile(pos).getSettlement();
-                if (s instanceof Colony &&
-                    (((Colony)s).getOwner()==getUnit().getOwner())) {
-                    logger.info("Unit "+unit.getId()+" moving towards settlement: "+s.getId());
-                    pathToTarget = getUnit().findPath(s.getTile());
-                    break;
-                }
-            }
+            PathNode pathToTarget = findNearestColony(unit);
         
             if (pathToTarget != null) {
                 Direction dir = moveTowards(connection, pathToTarget);
