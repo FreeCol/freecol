@@ -423,7 +423,8 @@ public class AIColony extends AIObject {
 
 
     private UnitType getNextExpert(boolean onlyFood) {
-        UnitType bestType = null;
+        // some type should be returned, not null
+        UnitType bestType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
         for (WorkLocationPlan plan : colonyPlan.getSortedWorkLocationPlans()) {
             if (plan.getGoodsType().isFoodType() || !onlyFood) {
                 WorkLocation location = plan.getWorkLocation();
