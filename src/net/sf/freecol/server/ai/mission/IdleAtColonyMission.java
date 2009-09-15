@@ -21,20 +21,15 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.util.logging.Logger;
-import java.util.Iterator;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.PathNode;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
@@ -98,7 +93,6 @@ public class IdleAtColonyMission extends Mission {
     public void doMission(Connection connection) {
         Tile thisTile = getUnit().getTile();
         Unit unit = getUnit();
-        Map gameMap = getGame().getMap();
 
         //Only deal with units on the map
         if (thisTile != null) {
