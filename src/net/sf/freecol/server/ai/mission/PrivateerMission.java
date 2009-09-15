@@ -279,43 +279,20 @@ public class PrivateerMission extends Mission {
         return unit.findPath(nearestColony.getTile());
     }    
     
-    private void findNearestPort(){
+    private void findNearestPort(){        
+        nearestPort = null;
         Unit unit = getUnit();
-        Player player = unit.getOwner();
-        Location nearestColony = null;
-        int distToColony = Integer.MAX_VALUE;
         
-        // First try colonies
-        for(Colony colony : player.getColonies()){
-            PathNode path = unit.findPath(colony.getTile());
-            if(path == null){
-                continue;
-            }
-            int dist = path.getTotalTurns();
-            
-            if(dist <= 1){
-                nearestPort = colony;
-                return;
-            }
-            
-            if(dist < distToColony){
-                nearestColony = colony;
-                distToColony = dist; 
+        PathNode path = findNearestColony(unit);
+        if(path != null){
+            nearestPort = path.getLastNode().getTile().getColony();
+        }
+        else{
+            Europe europe = unit.getOwner().getEurope();
+            if(europe != null){
+                nearestPort = europe;
             }
         }
-        
-        if(nearestColony != null){
-            nearestPort = nearestColony;
-            return;
-        }
-        
-        Europe europe = unit.getOwner().getEurope();
-        if(europe != null){
-            nearestPort = europe;
-            return;
-        }
-        
-        nearestPort =  null;
     }
     
     private boolean isUnitInPort(){

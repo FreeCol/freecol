@@ -25,8 +25,11 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
@@ -536,5 +539,32 @@ public abstract class Mission extends AIObject {
         }
         
         return success;
+    }
+    
+    public PathNode findNearestColony(Unit unit){
+        Player player = unit.getOwner();
+        PathNode nearestColony = null;
+        int distToColony = Integer.MAX_VALUE;
+        
+        // First try colonies
+        for(Colony colony : player.getColonies()){
+            PathNode path = unit.findPath(colony.getTile());
+            if(path == null){
+                continue;
+            }
+            int dist = path.getTotalTurns();
+            
+            if(dist <= 1){
+                nearestColony = path;
+                break;
+            }
+            
+            if(dist < distToColony){
+                nearestColony = path;
+                distToColony = dist; 
+            }
+        }       
+        
+        return nearestColony;
     }
 }
