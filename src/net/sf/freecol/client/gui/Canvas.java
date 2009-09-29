@@ -1300,8 +1300,7 @@ public final class Canvas extends JDesktopPane {
      * Shows a status message that cannot be dismissed. The panel will be
      * removed when another component is added to this <code>Canvas</code>.
      * This includes all the <code>showXXX</code>-methods. In addition,
-     * {@link #closeStatusPanel()} and {@link #closeMenus()} also removes this
-     * panel.
+     * {@link #closeStatusPanel()} also removes this panel.
      * 
      * @param message The text message to display on the status panel.
      * @see StatusPanel

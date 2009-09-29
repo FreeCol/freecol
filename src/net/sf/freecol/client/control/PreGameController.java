@@ -235,7 +235,8 @@ public final class PreGameController {
         if (!freeColClient.isHeadless()) {
             canvas.closeMainPanel();
             canvas.closeMenus();
-        
+            canvas.closeStatusPanel();
+            
             // TODO: Nation specific intro-music:
             freeColClient.playMusicOnce("england", SoundPlayer.STANDARD_DELAY);
         }
