@@ -767,9 +767,19 @@ public class StandardAIPlayer extends AIPlayer {
         Iterator<AIUnit> it = getAIUnitIterator();
         while (it.hasNext()) {
             AIUnit au = it.next();
-            if (!au.hasMission()
-                    && (au.getUnit().getLocation() instanceof ColonyTile || au.getUnit().getLocation() instanceof Building)) {
-                AIColony ac = (AIColony) getAIMain().getAIObject(au.getUnit().getColony());
+            
+            if(au.hasMission()){
+                continue;
+            }
+            
+            //XXX: Why should this happen??
+            Unit u = au.getUnit();
+            if (u.getLocation() instanceof ColonyTile || u.getLocation() instanceof Building) {
+                AIColony ac = (AIColony) getAIMain().getAIObject(u.getColony());
+                if(ac == null){
+                    logger.warning("Could not get AIColony object for unit=" + u.getId() + " at=" + u.getLocation());
+                    continue;
+                }
                 au.setMission(new WorkInsideColonyMission(getAIMain(), au, ac));
             }
         }
