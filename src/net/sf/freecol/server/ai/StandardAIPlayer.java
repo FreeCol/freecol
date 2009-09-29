@@ -1927,7 +1927,9 @@ public class StandardAIPlayer extends AIPlayer {
 
         value += combatModel.getOffencePower(defender, unit) -
               combatModel.getDefencePower(defender, unit);
-        value -= turns * 10;
+        
+        // Take distance to target into account
+        value -= turns * 100;
 
         if (!defender.isNaval()) {
         	if (defender.hasAbility("model.ability.expertSoldier")
