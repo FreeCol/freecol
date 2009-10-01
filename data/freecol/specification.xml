@@ -1186,6 +1186,7 @@
       <modifier id="model.modifier.defence" type="percentage" value="100"/>
       <!-- modifier needs to be added to prevent missing keys. -->
       <modifier id="model.modifier.minimumColonySize" type="additive" value="0"/>
+      <!-- TODO: abilties to prevent the effects of Indian raids. -->
     </building-type>
     <building-type id="model.building.Fort"     workplaces="0" upgradesFrom="model.building.Stockade"
                    required-population="3" sequence="11">
