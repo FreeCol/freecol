@@ -654,12 +654,7 @@ public final class FreeColServer {
             final String version = xsr.getAttributeValue(null, "version");
             int savegameVersion = 0;
             try {
-                // TODO: remove this compatibility code BEFORE releasing 0.9
-                if (version.equals("0.1.4")) {
-                    savegameVersion = 1;
-                } else {
-                    savegameVersion = Integer.parseInt(version);
-                }
+                savegameVersion = Integer.parseInt(version);
             } catch(Exception e) {
                 throw new FreeColException("incompatibleVersions");
             }
@@ -714,6 +709,7 @@ public final class FreeColServer {
                     throw new XMLStreamException("Unknown tag: " + xsr.getLocalName());
                 }
             }
+            Collections.sort(game.getPlayers(), Player.playerComparator);
             if (aiMain == null) {
                 aiMain = new AIMain(this);
                 game.setFreeColGameObjectListener(aiMain);
