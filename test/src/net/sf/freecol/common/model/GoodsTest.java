@@ -19,6 +19,7 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.List;
 import java.util.Locale;
 
 import net.sf.freecol.FreeCol;
@@ -524,6 +525,24 @@ public class GoodsTest extends FreeColTestCase {
         assertEquals(goods1.getType(), goods2.getType());
         assertEquals(goods1.getAmount(), goods2.getAmount());
 
+    }
+
+    public void testProductionChain() {
+        GoodsType hammers = spec().getGoodsType("model.goods.hammers");
+        GoodsType lumber = spec().getGoodsType("model.goods.lumber");
+        GoodsType muskets = spec().getGoodsType("model.goods.muskets");
+        GoodsType tools = spec().getGoodsType("model.goods.tools");
+        GoodsType ore = spec().getGoodsType("model.goods.ore");
+
+        List<GoodsType> chain = hammers.getProductionChain();
+        assertEquals(lumber, chain.get(0));
+        assertEquals(hammers, chain.get(1));
+
+        chain = muskets.getProductionChain();
+        assertEquals(ore, chain.get(0));
+        assertEquals(tools, chain.get(1));
+        assertEquals(muskets, chain.get(2));
+        
     }
 
 }
