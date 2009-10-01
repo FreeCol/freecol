@@ -19,6 +19,9 @@
 
 package net.sf.freecol.common.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -209,6 +212,23 @@ public final class GoodsType extends FreeColGameObjectType {
      */
     public void setBuildingMaterial(final boolean newBuildingMaterial) {
         this.buildingMaterial = newBuildingMaterial;
+    }
+
+    /**
+     * Returns the production chain of the goods type, beginning with
+     * a raw material that can not be produced from any other. The
+     * last element of the production chain is the goods type itself.
+     *
+     * @return  the production chain of the goods type
+     */
+    public List<GoodsType> getProductionChain() {
+        List<GoodsType> result = new ArrayList<GoodsType>();
+        GoodsType currentGoods = this;
+        while (currentGoods != null) {
+            result.add(0, currentGoods);
+            currentGoods = currentGoods.madeFrom;
+        }
+        return result;
     }
 
     /**
