@@ -251,12 +251,6 @@ public final class PreGameController {
             freeColClient.getFrame().setJMenuBar(new InGameMenuBar(freeColClient));
         }
 
-        if (freeColClient.getGame().getTurn().getNumber() == 1) {
-            Player player = freeColClient.getMyPlayer();
-            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, 
-                                                    player, "tutorial.startGame"));
-        }
-
         Unit activeUnit = freeColClient.getMyPlayer().getNextActiveUnit();
         //freeColClient.getMyPlayer().updateCrossesRequired();
         gui.setActiveUnit(activeUnit);
@@ -269,5 +263,13 @@ public final class PreGameController {
         canvas.addKeyListener(new CanvasKeyListener(canvas, inGameController));
         canvas.addMouseListener(new CanvasMouseListener(canvas, gui));
         canvas.addMouseMotionListener(new CanvasMouseMotionListener(canvas, gui, freeColClient.getGame().getMap()));
+        
+        if (freeColClient.getGame().getTurn().getNumber() == 1) {
+            Player player = freeColClient.getMyPlayer();
+            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, 
+                                                    player, "tutorial.startGame"));
+            // force view of tutorial message
+            inGameController.nextModelMessage();
+        }
     }
 }
