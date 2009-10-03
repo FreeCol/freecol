@@ -456,28 +456,35 @@ public class FreeColDialog<T> extends FreeColPanel {
             new FreeColDialog<File>(FreeCol.getFreeColClient().getCanvas());
         final JFileChooser fileChooser = new JFileChooser(directory);
 
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        loadDialog.cancelButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    loadDialog.setResponse(null);
+                }
+            });
+        loadDialog.okButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    if (selectedFile != null) {
+                        loadDialog.setResponse(selectedFile);
+                    }
+                }
+            });
+
         if (fileFilters.length > 0) {
-            for (int i=0; i<fileFilters.length; i++) {
-                fileChooser.addChoosableFileFilter(fileFilters[i]);
+            for (FileFilter fileFilter : fileFilters) {
+                fileChooser.addChoosableFileFilter(fileFilter);
             }
             fileChooser.setFileFilter(fileFilters[0]);
             fileChooser.setAcceptAllFileFilterUsed(false);
         }
+        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                String actionCommand = event.getActionCommand();
-                if (actionCommand.equals(JFileChooser.APPROVE_SELECTION)) {
-                    loadDialog.setResponse(fileChooser.getSelectedFile());
-                } else if (actionCommand.equals(JFileChooser.CANCEL_SELECTION)) {
-                    loadDialog.setResponse(null);
-                }
-            }
-        });
         fileChooser.setFileHidingEnabled(false);
-        loadDialog.setLayout(new BorderLayout());
-        loadDialog.add(fileChooser);
+        fileChooser.setControlButtonsAreShown(false);
+        loadDialog.setLayout(new MigLayout("fill", "", ""));
+        loadDialog.add(fileChooser, "grow");
+        loadDialog.add(loadDialog.okButton, "newline 20, split 2, tag ok");
+        loadDialog.add(loadDialog.cancelButton, "tag cancel");
         loadDialog.setSize(480, 320);
 
         return loadDialog;
