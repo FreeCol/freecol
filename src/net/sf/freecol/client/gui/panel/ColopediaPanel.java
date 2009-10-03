@@ -1167,7 +1167,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (nation == null) {
             return;
         }
-        NationType currentNationType = null;
+        NationType currentNationType = nation.getType();;
         for (Player player : getGame().getPlayers()) {
             if (player.getNation() == nation) {
                 currentNationType = player.getNationType();
