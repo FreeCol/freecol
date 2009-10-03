@@ -167,17 +167,18 @@ which a Java Virtual Machine compatible with Sun Java 5 or higher is
 available. In practice, however, things are less clear cut.
 
 FreeCol is known to work with \href{http://java.sun.com/}{Sun's Java 5
-and 6}. FreeCol also works with OpenJDK, although some problems and
+  and 6}. FreeCol also works with OpenJDK, although some problems and
 graphics glitches remain. FreeCol is known to run on recent versions
-of Windows and Linux, and on Mac OS X to some extent.
-If you are using Linux, using Java 6 is recommended, as its font
-rendering is much better. If you are using FreeCol on a different
-platform, we would like to hear about it.
+of Windows, Linux, and Mac OS X. If you are using Linux, using Java 6
+is recommended, as its font rendering is much better. If you are using
+FreeCol on a different platform, we would like to hear about it.
 
 FreeCol requires at least 128 MB memory and works best with a screen
-resolution of at least 1024x768 pixels. You can still use the game
-with a smaller screen, but some dialogs will not be completely
-displayed.
+resolution of at least 1024x768 pixels. It should also be possible to
+play the game with a screen resolution of 1024x600 pixels, although
+some panels will look a bit cramped. You can play the game with an
+even smaller screen, but we do not support that, and some things might
+not work.
 
 \hypertarget{FreeCol on Intel Macs}{\subsection{FreeCol on Intel Macs}}
 
@@ -296,13 +297,31 @@ list of servers from \verb$meta.freecol.org$\index{meta.freecol.org},
 to join a \Concept{multi-player game}, or to start a new multi-player
 game.
 
-If you start a single-player game, you must decide on the number of
-European players (1--8) and whether to allow additional nations (which
-were not available in the original game) and whether to allow national
-advantages to be selectable (in the original game, national advantages
-were fixed). Of course, if you wish to have more than four European
-players, you must also enable additional nations, since the original
-game only made four European nations available.
+If you start a new game, you must also decide whether to use fixed or
+selectable national advantages, or no national advantages at all. In
+the original game, national advantages were always fixed. The Dutch,
+for example, always had a trading advantage.
+
+The next screen allows you to select which European and native nations
+will be present in the game, which colour will be used to represent
+them, and whether they will be played by humans or computer
+players. At the moment, human players can only select a European
+nation. In future, that might change. If you chose selectable national
+advantages, then you can also change the national advantage of the
+nation you are playing.
+
+The original game only included four European nations, namely the
+Dutch, English, French and Spanish. FreeCol includes eight, mainly in
+order to support large multi-player games, but also in order to
+include the Portuguese, who were sadly absent from the original
+game. By default, however, only the original four European nations are
+selected.
+
+The table headers for the {\bf Nation} and {\bf Advantage} columns are
+buttons that will take you to the relevant sections of the
+\hyperlink{Colopedia}{Colopedia}. Also see the chapter on
+\hyperlink{Home Country}{your Home Country} for further information on
+the national advantages of various European nations.
 
 If you choose to retrieve a list of running games from the metaserver,
 your computer will attempt to establish a connection to
@@ -314,7 +333,9 @@ not that many public multi-player games are being run.
 If you wish to join a multi-player game, you must enter the
 \Concept{IP address} of a server that is running a FreeCol game as
 well as the port it is running on. The default port is
-$3541$\index{Port 3541}.
+$3541$\index{Port 3541}. If you join a multi-player game, you can also
+choose a nation and colour, but another players might already have
+selected your preferred nation.
 
 If you wish to start a multi-player game, then the IP address of the
 server will be that of your computer, but you must still select a port
@@ -347,13 +368,6 @@ permit the clients to connect to the port of the game server.
 
 
 \hypertarget{Game options}{\subsection{Game options}}
-
-If you decide to start a single-player game or a game server, you will
-be able to choose which nation to play and which colour to use. If you
-join a multi-player game, you can also choose a nation and colour, but
-another players might already have selected your preferred nation. See
-the chapter on \hyperlink{Home Country}{your Home Country} for further
-information on the national advantages of various European nations.
 
 The \hypertarget{map generator options}{map generator options} allow
 you to import a map, and to set several parameters that influence the
@@ -1075,9 +1089,11 @@ or wait outside of the colony.
 The colony panel consists of several panels and control elements with
 different functions. At the top of the panel, you can see a select box
 displaying the name of the colony, which can be used to select a
-different colony.
+different colony. Next to the colony's name, you can see the
+production panel, which shows how much food, horses, bells and crosses
+your colony is producing.
 
-Below this select box, you can see the area surrounding the colony to
+Below colony name, you can see the area surrounding the colony to
 the left and a scroll pane displaying the buildings of the colony to
 the right. You can drag and drop a unit on a tile or a building. The
 tiles surrounding the colony can produce several kinds of goods,
@@ -1087,37 +1103,32 @@ has a red border, then it is being used by another colony or
 settlement. Please note that you can not use water tiles until you
 have built \hyperlink{Dock}{docks}.
 
-As buildings can produce only one type of goods, the unit will
-automatically do the right kind of work. Nonetheless, you can also
-right click a unit in a building in order to assign it to a different
-building.
+Below the surrounding area, you can see a status panel that tells you
+how many colonists support independence and how many support the
+crown. Below the status panel, the port panel shows you any ships or
+wagon trains in the colony. If there is at least one unit present, the
+cargo panel below the port panel shows you the cargo of the selected
+carrier (if any).
 
-Below the surrounding area, you can see the production panel, which
-shows how much food, horses, bells and crosses your colony is
-producing. It also tells you how many colonists support the Sons of
-Liberty and how many support the crown.
+On the right hand side of the panel, you can see the buildings panel,
+which displays an image for every building in the colony, as well as
+the building or unit currenlty being built. You can see the units
+working in a building, as well as its production. If you let the mouse
+hover over a building, you can see a slightly larger and more detailed
+view. You can click on any building in order to open the build queue
+dialog, which enables you to create a list of units and buildings to
+build.
 
-Below the list of buildings, you can see four elements related to
-the production of buildings and units. At the top left, a select box
-allows you to select the building or unit you wish to build. The
-button at the bottom left allows you to buy the selected building or
-unit instead of building it. The two progress bars to the right show
-you how many hammers and tools are required to finish the selected
-building or unit, how many hammers and tools you have already
-produced, how many will be produced in the next turn, and how long it
-will take until all necessary goods have been produced.
+Below the buildings panel, the outside colony panel shows you which
+colonists are present on the same tile, but are not working inside the
+colony. Any units shown here are able to defend the colony against
+attacks. 
 
-Yet further below, two panels show you the ships or wagon trains in
-your colony's port. If there is at least one unit present, the cargo
-panel to the right will show you the cargo of the selected
-carrier. Below these two panels, you can see the colony's warehouse
-area. You can drag and drop goods from the warehouse to the cargo
-panel and vice versa in order to load and unload your ships or wagon
-trains. Press the shift key while selecting goods if you do not wish
-to select all the goods present, or less than one hundred units.
-
-You can also drag and drop units from one of the other areas
-to the cargo panel of a ship.
+Below this panels, you can see the colony's warehouse area. You can
+drag and drop goods from the warehouse to the cargo panel and vice
+versa in order to load and unload your ships or wagon trains. Press
+the shift key while selecting goods if you do not wish to select all
+the goods present, or less than one hundred units.
 
 The \hyperlink{Warehouse}{Warehouse} can only hold a certain amount of
 goods of each type. Its initial capacity is limited to 100 units of
@@ -1132,12 +1143,6 @@ the colony, you can export goods to Europe automatically. Goods marked
 to be exported are printed in green. Open the warehouse dialog (see
 below) in order to change export settings.
 
-To the right of these panels you can see the units outside of your
-colony. These can be fortified units defending your colony, or units
-just passing through, or waiting for passage elsewhere. Right clicking
-on one of these units once again allows you to give them orders. You
-can also drag and drop units from and to this area.
-
 At the bottom of the Colony Screen, you will see a row of buttons, not
 all of which are always active. From left to right, these buttons will
 allow you to
@@ -1148,9 +1153,15 @@ allow you to
 wagon train
 \item Open the warehouse dialog in order to change the export and
 warning levels for all types of goods (see below)
-\item Rename the colony
 \item Close the dialog
 \end{itemize}
+
+You can drag and drop colonists to and from buildings, tiles
+surrounding the colony, ships and the area outside of the colony. You
+can also use the right click menu of any unit to assign it to a work
+place, equip it, or place it outside of the colony (unless it already
+is outside of the colony).
+
 
 
 \hypertarget{The Warehouse Dialog}{\subsection{The Warehouse Dialog}}
