@@ -34,6 +34,9 @@ import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
@@ -228,6 +231,25 @@ public class ClientModelController implements ModelController {
      */
     public void update(Tile tile) {
         // Nothing to do on the client side.
+    }
+    
+    /**
+     * Tells the <code>ModelController</code> that a tile improvement was finished
+     * @param tile The <code>Tile</code> where the improvement was done
+     * @param type the <code>TileImprovementType</code> finished
+     */
+    public void tileImprovementFinished(Unit unit, TileImprovement improvement){
+        // Perform TileType change if any
+        Tile tile = unit.getTile();
+        TileType changeType = improvement.getChange(tile.getType());
+        if (changeType != null) {
+            // "model.improvement.ClearForest"
+            tile.setType(changeType);
+        } else {
+            // "model.improvement.Road", "model.improvement.Plow"
+            tile.add(improvement);
+            // FIXME: how should we compute the style better?
+        }
     }
 
     /**

@@ -100,6 +100,12 @@ public interface ModelController {
     */
     public void exploreTiles(Player player, ArrayList<Tile> tiles);
     
+    /**
+     * Tells the <code>ModelController</code> that a tile improvement was finished
+     * @param tile The <code>Tile</code> where the improvement was done
+     * @param type the <code>TileImprovementType</code> finished
+     */
+    public void tileImprovementFinished(Unit unit, TileImprovement improvement);
     
     /**
      * Updates stances.

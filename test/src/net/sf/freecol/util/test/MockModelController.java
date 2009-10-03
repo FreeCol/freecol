@@ -30,6 +30,8 @@ import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
@@ -105,6 +107,10 @@ public class MockModelController implements ModelController {
     public Building createBuilding(String taskID, Colony colony, BuildingType type) {
         // TODO Auto-generated method stub
         return new Building(colony.getGame(), colony, type);
+    }
+
+    public void tileImprovementFinished(Unit unit, TileImprovement improvement) {
+        // TODO Auto-generated method stub
     }
 
 }

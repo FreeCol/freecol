@@ -3249,20 +3249,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                             }
                         }
                     }
-                    // Perform TileType change if any
-                    TileType changeType = getWorkImprovement().getChange(getTile().getType());
-                    if (changeType != null) {
-                        // "model.improvement.ClearForest"
-                        getTile().setType(changeType);
-                    } else {
-                        // "model.improvement.Road", "model.improvement.Plow"
-                        getTile().add(workImprovement);
-                        // FIXME: how should we compute the style better?
-                    }
                     // Finish up
+                    TileImprovement improvement = getWorkImprovement();
                     setWorkImprovement(null);
                     setState(UnitState.ACTIVE);
                     setMovesLeft(0);
+                    // This should be run at the end, so that the info sent to the other players
+                    //is up to date.
+                    getGame().getModelController().tileImprovementFinished(this, improvement);
+                    
                     break;
                 default:
                     logger.warning("Unknown work completed. State: " + state);
