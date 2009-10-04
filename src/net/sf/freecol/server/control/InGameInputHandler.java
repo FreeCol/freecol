@@ -992,7 +992,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (newTile.hasLostCityRumour() && player.isEuropean()) {
             exploreLostCityRumour(unit, player);
-            newTile.removeLostCityRumour();
         }
         Document doc = reply.getOwnerDocument();
         reply.appendChild(newTile.toXMLElement(player, doc, false, false));
@@ -1213,6 +1212,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             logger.warning("Could not send rumour message to: " + player.getName() + " with connection "
                     + player.getConnection());
         }
+        tile.removeLostCityRumour();
         // tell everyone the rumour has been explored
         for (ServerPlayer updatePlayer : getOtherPlayers(player)) {
             if (updatePlayer.canSee(tile)) {
