@@ -20,17 +20,18 @@
 
 package net.sf.freecol.tools;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 
 public class MergeTranslations {
@@ -64,15 +65,13 @@ public class MergeTranslations {
             System.out.println("Processing source file: " + name);
 
             File sourceFile = new File(sourceDirectory, name);
-            Properties sourceProperties = new Properties();
-            sourceProperties.load(new FileInputStream(sourceFile));
+            Map<String, String> sourceProperties = readFile(sourceFile);
 
             File targetFile = new File(targetDirectory, name);
 
             if (targetFile.exists()) {
 
-                Properties targetProperties = new Properties();
-                targetProperties.load(new FileInputStream(targetFile));
+                Map<String, String> targetProperties = readFile(targetFile);
 
                 List<Entry> missingProperties = new ArrayList<Entry>();
                 for (Entry entry : sourceProperties.entrySet()) {
@@ -111,5 +110,25 @@ public class MergeTranslations {
             }
         }
     }
+
+    private static Map<String, String> readFile(File file) {
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader); 
+            String line = bufferedReader.readLine();
+            while (line != null) {
+                int index = line.indexOf('=');
+                if (index >= 0) {
+                    result.put(line.substring(0, index), line.substring(index + 1));
+                }
+                line = bufferedReader.readLine();
+            }
+        } catch(Exception e) {
+            // forget it
+        }
+        return result;
+    }
+
 }
 
