@@ -353,7 +353,8 @@ public final class InGameController extends Controller {
         
         if (getGame().isNextPlayerInNewTurn()) {
             getGame().newTurn();
-            if (!getGame().getSpanishSuccession()) {
+            if (getGame().getTurn().getNumber() > 1600
+                && !getGame().getSpanishSuccession()) {
                 checkSpanishSuccession();
             }
             if (debugOnlyAITurns > 0) {
