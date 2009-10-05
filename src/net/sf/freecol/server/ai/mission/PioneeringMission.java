@@ -21,7 +21,9 @@
 package net.sf.freecol.server.ai.mission;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -30,17 +32,15 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.MoveType;
-import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
@@ -68,13 +68,15 @@ public class PioneeringMission extends Mission {
 
     private static final EquipmentType toolsType = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
 
+    private static enum PioneeringMissionState {GET_TOOLS,IMPROVING};
+    
+    private PioneeringMissionState state = PioneeringMissionState.GET_TOOLS;
+    
     private TileImprovementPlan tileImprovementPlan = null;
     
-    /**
-     * Temporary variable for skipping the mission.
-     */
-    private boolean skipMission = false;
+    private Colony colonyWithTools = null;
 
+    private boolean invalidateMission = false;
 
     /**
      * Creates a mission for the given <code>AIUnit</code>.
@@ -85,6 +87,14 @@ public class PioneeringMission extends Mission {
      */
     public PioneeringMission(AIMain aiMain, AIUnit aiUnit) {
         super(aiMain, aiUnit);
+        
+        boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
+        if(hasTools){
+            state = PioneeringMissionState.IMPROVING;
+        }
+        else{
+            state = PioneeringMissionState.GET_TOOLS;
+        }
     }
 
 
@@ -146,6 +156,7 @@ public class PioneeringMission extends Mission {
             logger.warning("Found invalid TileImprovementPlan, removing it and assigning a new one");
             aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
             tileImprovementPlan.dispose();
+            tileImprovementPlan = null;
         }
         
         // Verify if the improvement has been applied already
@@ -155,6 +166,7 @@ public class PioneeringMission extends Mission {
             improvementTarget.hasImprovement(tileImprovementPlan.getType())){
             aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
             tileImprovementPlan.dispose();
+            tileImprovementPlan = null;
         }
         
         // mission still valid, no update needed
@@ -222,155 +234,237 @@ public class PioneeringMission extends Mission {
         if (bestChoice != null) {
             tileImprovementPlan = bestChoice;
             bestChoice.setPioneer(getAIUnit());
-        }    
+        }
+        
+        if(tileImprovementPlan == null){
+            invalidateMission = true;
+        }
     }
     
-    private PathNode findColonyWithTools() {
-        GoalDecider destinationDecider = new GoalDecider() {
-                private PathNode best = null;
-
-                public PathNode getGoal() {
-                    return best;
-                }
-
-                public boolean hasSubGoals() {
-                    return false;
-                }
-
-                public boolean check(Unit u, PathNode pathNode) {
-                    Tile t = pathNode.getTile();
-                    boolean target = false;
-                    if (t.getColony() != null && 
-                        t.getColony().getOwner() == u.getOwner() &&
-                        t.getColony().canBuildEquipment(toolsType)) {
-                        AIColony ac = (AIColony) getAIMain().getAIObject(t.getColony());
-                        target = ac.canBuildEquipment(toolsType);
-                    }
-                    if (target) {
-                        best = pathNode;
-                    }
-                    return target;
-                }
-            };
-        return getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE);     
-    }
     
     /**
      * Performs this mission.
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-        if (!isValid()) {
-            return;
+        logger.warning("Entering PioneeringMission.doMission()");
+        
+        Unit unit = getUnit();
+        logger.warning("Unit moves=" + unit.getMovesLeft());
+        
+        boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
+        if(unit.getState() == UnitState.IMPROVING || hasTools){
+            state = PioneeringMissionState.IMPROVING;
+        }
+        else{
+            state = PioneeringMissionState.GET_TOOLS;
         }
         
-        if (getUnit().getTile() != null) {
-            if (!getUnit().hasAbility("model.ability.improveTerrain")) {
-                // Get tools from a Colony.
-                if (getUnit().getColony() == null) {
-                    PathNode bestPath = findColonyWithTools();        
+        while(isValid() && unit.getMovesLeft() > 0){
+            switch(state){
+                case GET_TOOLS:
+                    logger.warning("Unit at=" + getUnit().getTile() + " requires tools");
+                    getTools(connection);
+                    break;
+                case IMPROVING:
+                    processImprovementPlan(connection);
+                    break;
+                default:
+                    logger.warning("Unknown state");
+                    invalidateMission = true;
+            }        
+        }
+    }
 
-                    if (bestPath != null) {
-                        Direction direction = moveTowards(connection, bestPath);
-                        moveButDontAttack(connection, direction);
-                    } else {
-                        skipMission = true;
-                    }
-                } else {
-                    logger.finest("about to equip " + getUnit() + " in "
-                                  + getUnit().getColony().getName());
-                    AIColony ac = (AIColony) getAIMain().getAIObject(getUnit().getColony());
-                    int amount = toolsType.getMaximumCount();
-                    for (AbstractGoods materials : toolsType.getGoodsRequired()) {
-                        int availableAmount = ac.getAvailableGoods(materials.getType());
-                        int requiredAmount = materials.getAmount();
-                        if (availableAmount < requiredAmount) {
-                            skipMission = true;
-                            break;
-                        } else {
-                            amount = Math.min(amount, availableAmount / requiredAmount);
-                        }
-                    }
-                    if (!skipMission) {
-                        Element equipUnitElement = Message.createNewRootElement("equipUnit");
-                        equipUnitElement.setAttribute("unit", getUnit().getId());
-                        equipUnitElement.setAttribute("type", toolsType.getId());
-                        equipUnitElement.setAttribute("amount", Integer.toString(amount));
-                        try {
-                            connection.sendAndWait(equipUnitElement);
-                        } catch (Exception e) {
-                            logger.warning("Could not send equip message.");
-                        }
-                    }
-                }
+    private void processImprovementPlan(Connection connection) {
+        if (tileImprovementPlan == null) {
+            updateTileImprovementPlan();
+            if (tileImprovementPlan == null) {
+                invalidateMission = true;
                 return;
             }
         }
-        
-        if (tileImprovementPlan == null) {
-            updateTileImprovementPlan();
+
+        Unit unit = getUnit();
+        // Sanitation
+        if (unit.getTile() == null) {
+            logger.warning("Unit is in unknown location, cannot proceed with mission");
+            invalidateMission = true;
+            return;
+        }
+                
+        // move toward the target tile
+        if (getUnit().getTile() != tileImprovementPlan.getTarget()) {
+            PathNode pathToTarget = getUnit().findPath(tileImprovementPlan.getTarget());
+            if (pathToTarget == null) {
+                invalidateMission = true;
+                return; 
+            }
+
+            Direction direction = moveTowards(connection, pathToTarget);
+            if (direction != null
+                    && unit.getMoveType(direction).isProgress()) {
+                move(connection, direction);
+            }
+            
+            if(unit.getTile() != tileImprovementPlan.getTarget()){
+                unit.setMovesLeft(0);
+            }
+            if(unit.getMovesLeft() == 0){
+                return;
+            }
+        }
+
+        // Sanitation
+        if (unit.getTile() != tileImprovementPlan.getTarget()){
+            String errMsg = "Something is wrong, pioneer should be on the tile to improve, but isnt";
+            logger.warning(errMsg);
+            invalidateMission = true;
+            return;
+        }            
+        makeImprovement(connection);
+    }
+
+    private void makeImprovement(Connection connection) {
+        if(getUnit().getState() == UnitState.IMPROVING){
+            getUnit().setMovesLeft(0);
+            return;
         }
         
-        if (tileImprovementPlan != null) {
-            if (getUnit().getTile() != null) {
-                // move toward the target tile
-                if (getUnit().getTile() != tileImprovementPlan.getTarget()) {
-                    PathNode pathToTarget = getUnit().findPath(tileImprovementPlan.getTarget());
-                    if (pathToTarget != null) {
-                        Direction direction = moveTowards(connection, pathToTarget);
-                        if (direction != null
-                            && getUnit().getMoveType(direction).isProgress()) {
-                            move(connection, direction);
-                        }
-                    }
-                }
-                // are we there yet ?
-                if (getUnit().getTile() == tileImprovementPlan.getTarget()
-                    && getUnit().getState() != UnitState.IMPROVING
-                    && getUnit().checkSetState(UnitState.IMPROVING)) {
-                    // start improving now
-                    int price = getUnit().getOwner().getLandPrice(getUnit().getTile());
-                    // Buy the land from the Indians first?
-                    if (price > 0) {
-                        // TODO: the AI should buy the land, to avoid indian wars
-                    }
-                    // ask to create the TileImprovement
-                    Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");
-                    changeWorkTypeElement.setAttribute("unit", getUnit().getId());
-                    changeWorkTypeElement.setAttribute("improvementType", tileImprovementPlan.getType().getId());
-                    Element reply = null;
-                    try {
-                        reply = connection.ask(changeWorkTypeElement);
-                    } catch (IOException e) {
-                        logger.warning("Could not send message!");
-                    }
-                    if (reply!=null && reply.getTagName().equals("workImprovementConfirmed")) {
-                        // get the TileItemContainer
-                        Element containerElement = (Element)reply.getElementsByTagName(TileItemContainer.getXMLElementTagName()).item(0);
-                        if (containerElement != null) {
-                            TileItemContainer container = (TileItemContainer) getGame().getFreeColGameObject(containerElement.getAttribute("ID"));
-                            if (container == null) {
-                                container = new TileItemContainer(getGame(), getUnit().getTile(), containerElement);
-                                getUnit().getTile().setTileItemContainer(container);
-                            } else {
-                                container.readFromXMLElement(containerElement);
-                            }
-                        }
-                        // get the TileImprovement
-                        Element improvementElement = (Element)reply.getElementsByTagName(TileImprovement.getXMLElementTagName()).item(0);
-                        if (improvementElement!=null) {
-                            TileImprovement improvement = (TileImprovement) getGame().getFreeColGameObject(improvementElement.getAttribute("ID"));
-                            if (improvement == null) {
-                                improvement = new TileImprovement(getGame(), improvementElement);
-                                getUnit().getTile().add(improvement);
-                            } else {
-                                improvement.readFromXMLElement(improvementElement);
-                            }
-                        }
-                    }
+        if (getUnit().checkSetState(UnitState.IMPROVING)) {
+            // start improving now
+            int price = getUnit().getOwner().getLandPrice(getUnit().getTile());
+            // Buy the land from the Indians first?
+            if (price > 0) {
+                // TODO: the AI should buy the land, to avoid indian wars
+            }
+            // ask to create the TileImprovement
+            Element changeWorkTypeElement = Message.createNewRootElement("workImprovement");
+            changeWorkTypeElement.setAttribute("unit", getUnit().getId());
+            changeWorkTypeElement.setAttribute("improvementType", tileImprovementPlan.getType().getId());
+            Element reply = null;
+            try {
+                reply = connection.ask(changeWorkTypeElement);
+            } catch (IOException e) {
+                logger.warning("Could not send message!");
+            }
+            if (reply==null || !reply.getTagName().equals("workImprovementConfirmed")) {
+                throw new IllegalStateException("Failed to make improvement");
+            }
+            
+            // get the TileItemContainer
+            Element containerElement = (Element)reply.getElementsByTagName(TileItemContainer.getXMLElementTagName()).item(0);
+            if (containerElement != null) {
+                TileItemContainer container = (TileItemContainer) getGame().getFreeColGameObject(containerElement.getAttribute("ID"));
+                if (container == null) {
+                    container = new TileItemContainer(getGame(), getUnit().getTile(), containerElement);
+                    getUnit().getTile().setTileItemContainer(container);
+                } else {
+                    container.readFromXMLElement(containerElement);
                 }
             }
-        }        
+            
+            // get the TileImprovement
+            Element improvementElement = (Element)reply.getElementsByTagName(TileImprovement.getXMLElementTagName()).item(0);
+            if (improvementElement==null) {
+                throw new IllegalStateException("Failed to make improvement");
+            }
+ 
+            TileImprovement improvement = (TileImprovement) getGame().getFreeColGameObject(improvementElement.getAttribute("ID"));
+            if (improvement == null) {
+                improvement = new TileImprovement(getGame(), improvementElement);
+                getUnit().getTile().add(improvement);
+            } else {
+                improvement.readFromXMLElement(improvementElement);
+            }
+            getUnit().work(improvement);
+        }
+    }
+
+    private void getTools(Connection connection) {
+        validateColonyWithTools();
+        if(invalidateMission){
+            return;
+        }
+          
+        Unit unit = getUnit();
+        
+        // Not there yet
+        if(unit.getTile() != colonyWithTools.getTile()){
+            PathNode path = getGame().getMap().findPath(unit, unit.getTile(), colonyWithTools.getTile());         
+
+            if(path == null){
+                invalidateMission = true;
+                colonyWithTools = null;
+                return;
+            }
+
+            Direction direction = moveTowards(connection, path);
+            moveButDontAttack(connection, direction);
+
+            // not there yet, remove any moves left 
+            if(unit.getTile() != colonyWithTools.getTile()){
+                unit.setMovesLeft(0);
+                return;
+            }
+        }
+        // reached colony with tools, equip unit
+        equipUnitWithTools(connection);
+    }
+
+
+    private void equipUnitWithTools(Connection connection) {
+        Unit unit = getUnit();
+        logger.warning("About to equip " + unit + " in " + colonyWithTools.getName());
+        AIColony ac = (AIColony) getAIMain().getAIObject(colonyWithTools);
+        int amount = toolsType.getMaximumCount();
+        for (AbstractGoods materials : toolsType.getGoodsRequired()) {
+            int availableAmount = ac.getAvailableGoods(materials.getType());
+            int requiredAmount = materials.getAmount();
+            if (availableAmount < requiredAmount) {
+                invalidateMission = true;
+                return;
+            } 
+            amount = Math.min(amount, availableAmount / requiredAmount);
+        }
+
+        logger.warning("Equipping " + unit + " at=" + colonyWithTools.getName() + " amount=" + amount);
+        Element equipUnitElement = Message.createNewRootElement("equipUnit");
+        equipUnitElement.setAttribute("unit", unit.getId());
+        equipUnitElement.setAttribute("type", toolsType.getId());
+        equipUnitElement.setAttribute("amount", Integer.toString(amount));
+        try {
+            connection.sendAndWait(equipUnitElement);
+        } catch (Exception e) {
+            logger.warning("Could not send equip message.");
+        }
+        
+        // Unit is now equipped, get to work
+        if(unit.getEquipmentCount(toolsType) > 0){
+            state = PioneeringMissionState.IMPROVING;
+        }
+    }
+
+
+    private boolean validateColonyWithTools() {
+        if(colonyWithTools != null){
+            if(colonyWithTools.isDisposed() 
+                    || colonyWithTools.getOwner() != getUnit().getOwner()
+                    || !colonyWithTools.canBuildEquipment(toolsType)){
+                colonyWithTools = null;
+            }
+        }
+        if(colonyWithTools == null){
+            // find a new colony with tools
+            colonyWithTools = findColonyWithTools(getAIUnit());
+            if(colonyWithTools == null){
+                logger.warning("No tools found");
+                invalidateMission = true;
+                return false;
+            }
+            logger.warning("Colony found=" + colonyWithTools.getName());            
+        }
+        return true;
     }
 
 
@@ -419,11 +513,20 @@ public class PioneeringMission extends Mission {
      * @return <code>true</code> if this mission is still valid to perform
      *         and <code>false</code> otherwise.
      */
-    public boolean isValid() {  
-        updateTileImprovementPlan();
-        return !skipMission && tileImprovementPlan != null;
-        // &&
-        //      (getUnit().getRole() == Role.PIONEER || getUnit().hasAbility("model.ability.expertPioneer"));
+    public boolean isValid() {
+        if(getUnit().getTile() == null){
+            return false;
+        }
+        
+        switch(state){
+            case GET_TOOLS:
+                validateColonyWithTools();
+                break;
+            case IMPROVING:
+                updateTileImprovementPlan();
+                break;
+        }        
+        return !invalidateMission;
     }
 
     /**
@@ -434,15 +537,112 @@ public class PioneeringMission extends Mission {
      *         and <code>false</code> otherwise.
      */    
     public static boolean isValid(AIUnit aiUnit) {
+        if(!aiUnit.getUnit().isColonist()){
+            return false;
+        }
+        
         AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getId());
         Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();            
+        
+        
+        boolean foundImprovementPlan = false;
         while (tiIterator.hasNext()) {
             TileImprovementPlan ti = tiIterator.next();
             if (ti.getPioneer() == null) {
-                return true;
+                foundImprovementPlan = true;
             }
         }
+        if(!foundImprovementPlan){
+            logger.warning("No Improvement plan found, PioneeringMission not valid");
+            return false;
+        }
+        
+        boolean unitHasToolsAvail = aiUnit.getUnit().getEquipmentCount(toolsType) > 0;
+        if(unitHasToolsAvail){
+            logger.warning("Tools equipped, PioneeringMission valid");
+           return true; 
+        }
+        
+        // Search colony with tools to equip the unit with
+        Colony colonyWithTools = findColonyWithTools(aiUnit);
+        if(colonyWithTools != null){
+            logger.warning("Tools found, PioneeringMission valid");
+            return true;
+        }
+        
+        logger.warning("Tools not found, PioneeringMission not valid");
         return false;
+    }
+    
+    public static Colony findColonyWithTools(AIUnit aiu) {
+        Colony best = null;
+        int bestValue = Integer.MIN_VALUE;
+        
+        Unit unit = aiu.getUnit();
+        // Sanitation
+        if(unit == null){
+            return null;
+        }
+        
+        for(Colony colony : unit.getOwner().getColonies()){
+            if(!colony.canBuildEquipment(toolsType)) {
+                continue;
+            }
+
+            AIColony ac = (AIColony) aiu.getAIMain().getAIObject(colony);
+            // Sanitation
+            if(ac == null){
+                continue;
+            }
+            
+            // check if it possible for the unit to reach the colony
+            PathNode pathNode = null;
+            if(unit.getTile() != colony.getTile()){
+                pathNode = aiu.getGame().getMap().findPath(unit, unit.getTile(), colony.getTile());
+                // no path found
+                if(pathNode == null){
+                    continue;
+                }
+            }
+            
+            int value = 100;
+            for(AbstractGoods goods : toolsType.getGoodsRequired()){
+                if(colony.getGoodsCount(goods.getType()) == 0){
+                    value = Integer.MIN_VALUE;
+                    break;
+                }
+                value += colony.getGoodsCount(goods.getType());
+            }
+            if(value == Integer.MIN_VALUE){
+                continue;
+            }
+            
+            if(pathNode != null){
+                value -= pathNode.getTotalTurns() * 10;
+            }
+                
+            if(best == null || value > bestValue){
+                best = colony;
+                bestValue = value;
+            }
+        }        
+        return best;
+    }
+    
+    public static List<AIUnit>getPlayerPioneers(AIPlayer aiPlayer){
+        List<AIUnit> list = new ArrayList<AIUnit>();
+        
+        AIMain aiMain = aiPlayer.getAIMain();
+        for(Unit u : aiPlayer.getPlayer().getUnits()){
+            AIUnit aiu =  (AIUnit) aiMain.getAIObject(u);
+            if(aiu == null){
+                continue;
+            }
+            if(aiu.getMission() instanceof PioneeringMission){
+                list.add(aiu);
+            }
+        }
+        return list;
     }
 
     /**
@@ -506,16 +706,21 @@ public class PioneeringMission extends Mission {
      *      </ul>
      */
     public String getDebuggingInfo() {
-        if (tileImprovementPlan != null) {
-            final String action = tileImprovementPlan.getType().getName();
-            return tileImprovementPlan.getTarget().getPosition().toString() + " " + action;
-        } else {
-            PathNode bestPath = findColonyWithTools();
-            if (bestPath != null) {
-                return "Getting tools: " + bestPath.getLastNode().getTile().getPosition().toString();
-            } else {
-                return "No target";
-            }
+        switch(state){
+            case IMPROVING:
+                if(tileImprovementPlan == null){
+                    return "No target";
+                }
+                final String action = tileImprovementPlan.getType().getName();
+                return tileImprovementPlan.getTarget().getPosition().toString() + " " + action;
+            case GET_TOOLS:
+                if (colonyWithTools == null) {
+                    return "No target";
+                }
+                return "Getting tools from " + colonyWithTools.getName();
+            default:
+                logger.warning("Unknown state");
+                return "";
         }
     }
 }

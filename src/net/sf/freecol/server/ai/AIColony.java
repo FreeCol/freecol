@@ -52,6 +52,7 @@ import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
+import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.WorkLocation;
 import net.sf.freecol.common.networking.ClaimLandMessage;
@@ -494,35 +495,6 @@ public class AIColony extends AIObject {
         return defence < 3 * colony.getUnitCount();
     }
 
-    /**
-     * Returns an unequipped pioneer that is either inside this colony or
-     * standing on the same <code>Tile</code>.
-     * 
-     * @return A suitable unit with no tools.
-     *         Returns <code>null</code> if no such unit was found.
-     */
-    private AIUnit getUnequippedPioneer() {
-        AIUnit bestPioneer = null;
-        for (Unit unit : colony.getTile().getUnitList()) {
-            if (unit.canBeEquippedWith(toolsType)) {
-                AIUnit aiUnit = (AIUnit) getAIMain().getAIObject(unit);
-                if (aiUnit.getMission() == null
-                    || (aiUnit.getMission() instanceof PioneeringMission
-                        && !unit.getEquipment().containsKey(toolsType))) {
-                    if (unit.hasAbility("model.ability.expertPioneer")) {
-                        bestPioneer = aiUnit;
-                        // can't get better than that
-                        break;
-                    } else if (bestPioneer == null
-                               || (unit.getType().getSkill()
-                                   < bestPioneer.getUnit().getType().getSkill())) {
-                        bestPioneer = aiUnit;
-                    }
-                }
-            }
-        }
-        return bestPioneer;
-    }
 
     public void removeWish(Wish w) {
         wishes.remove(w);
@@ -831,27 +803,7 @@ public class AIColony extends AIObject {
         
         // TODO: Detect a siege and move the workers temporarily around.
 
-        // Move a pioneer outside the colony if we have a sufficient amount of
-        // tools:
-        if (colony.getUnitCount() > 1) {
-            boolean canBuildTools = true;
-            for (AbstractGoods materials : toolsType.getGoodsRequired()) {
-                if (getAvailableGoods(materials.getType()) < materials.getAmount()) {
-                    canBuildTools = false;
-                    break;
-                }
-            }
-            if (canBuildTools) {
-                AIUnit unequippedPioneer = getUnequippedPioneer();
-                if (unequippedPioneer != null
-                    && (unequippedPioneer.getMission() == null ||
-                        !(unequippedPioneer.getMission() instanceof PioneeringMission))
-                    && PioneeringMission.isValid(unequippedPioneer)) {
-                    unequippedPioneer.getUnit().putOutsideColony();
-                    unequippedPioneer.setMission(new PioneeringMission(getAIMain(), unequippedPioneer));
-                }
-            }
-        }
+        checkForUnequippedExpertPioneer();
         
         checkForUnarmedExpertSoldier();
 
@@ -1178,6 +1130,29 @@ public class AIColony extends AIObject {
         if (this.colony.getUnitCount()<=0) {
             // something bad happened, there is no remaining unit working in the colony
             throw new IllegalStateException("Colony " + colony.getName() + " contains no units!");
+        }
+    }
+
+    private void checkForUnequippedExpertPioneer() {
+        if (colony.getUnitCount() < 2) {
+            return;
+        }
+        
+        for(Unit unit : colony.getUnitList()){
+            if(!unit.hasAbility("model.ability.expertPioneer")){
+                continue;
+            }
+            AIUnit aiu = (AIUnit) (AIUnit) this.getAIMain().getAIObject(unit);
+            if( aiu == null){
+                continue;
+            }
+            //if its not valid for this unit, is not valid for any other, no need to continue
+            if(!PioneeringMission.isValid(aiu)){
+                return;
+            }
+            unit.putOutsideColony();
+            aiu.setMission(new PioneeringMission(getAIMain(), aiu));
+            return;
         }
     }
 

@@ -31,15 +31,13 @@ package net.sf.freecol.server.ai;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -53,7 +51,6 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.ColonyTradeItem;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.DiplomaticTrade;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -66,8 +63,6 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StanceTradeItem;
 import net.sf.freecol.common.model.Tension;
@@ -75,13 +70,12 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.Role;
-import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.UnitTradeItem;
 import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.model.Player.PlayerType;
+import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit.Role;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.goal.ManageMissionariesGoal;
@@ -850,6 +844,7 @@ public class ColonialAIPlayer extends AIPlayer {
 
         
         final boolean fewColonies = hasFewColonies();
+        boolean isPioneerReq = PioneeringMission.getPlayerPioneers(this).size() == 0;
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
@@ -865,6 +860,19 @@ public class ColonialAIPlayer extends AIPlayer {
                 continue;
             }
             
+            // Setup as a pioneer if unit is:
+            //      - already with tools, or
+            //      - an expert pioneer, or
+            //      - a non-expert unit and there are no other units assigned as pioneers
+            boolean isPioneer = unit.hasAbility("model.ability.improveTerrain")
+                                || unit.hasAbility("model.ability.expertPioneer");
+            boolean isExpert = unit.getSkillLevel() > 0;
+            if ((isPioneer || (isPioneerReq && !isExpert)) && PioneeringMission.isValid(aiUnit)) {
+                aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
+                isPioneerReq = false;
+                continue;
+            }
+            
             if (unit.canCarryTreasure()) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
             } else if (unit.hasAbility("model.ability.scoutIndianSettlement") &&
@@ -874,9 +882,6 @@ public class ColonialAIPlayer extends AIPlayer {
                        && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") || 
                         getGame().getTurn().getNumber() > 5)) {
                 giveMilitaryMission(aiUnit);
-            } else if (unit.hasAbility("model.ability.improveTerrain")
-                       && PioneeringMission.isValid(aiUnit)) {
-                aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
             } else if (unit.isColonist()) {                
                 /*
                  * Motivated by (speed) performance: This map stores the

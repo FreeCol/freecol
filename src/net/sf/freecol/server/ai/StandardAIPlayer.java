@@ -1519,6 +1519,7 @@ public class StandardAIPlayer extends AIPlayer {
         }
 
         final boolean fewColonies = hasFewColonies();
+        boolean isPioneerReq = PioneeringMission.getPlayerPioneers(this).size() == 0;
         Iterator<AIUnit> aiUnitsIterator = getAIUnitIterator();
         while (aiUnitsIterator.hasNext()) {
             AIUnit aiUnit = aiUnitsIterator.next();
@@ -1552,9 +1553,16 @@ public class StandardAIPlayer extends AIPlayer {
                 continue;
             }
 
-            if (unit.hasAbility("model.ability.improveTerrain")
-                       && PioneeringMission.isValid(aiUnit)) {
+            // Setup as a pioneer if unit is:
+            //      - already with tools, or
+            //      - an expert pioneer, or
+            //      - a non-expert unit and there are no other units assigned as pioneers
+            boolean isPioneer = unit.hasAbility("model.ability.improveTerrain")
+                                || unit.hasAbility("model.ability.expertPioneer");
+            boolean isExpert = unit.getSkillLevel() > 0;
+            if ((isPioneer || (isPioneerReq && !isExpert)) && PioneeringMission.isValid(aiUnit)) {
                 aiUnit.setMission(new PioneeringMission(getAIMain(), aiUnit));
+                isPioneerReq = false;
                 continue;
             }
 
