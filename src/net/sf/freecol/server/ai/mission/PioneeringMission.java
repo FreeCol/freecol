@@ -573,6 +573,7 @@ public class PioneeringMission extends Mission {
     }
     
     public static Colony findColonyWithTools(AIUnit aiu) {
+        final int MAX_TURN_DISTANCE = 10;
         Colony best = null;
         int bestValue = Integer.MIN_VALUE;
         
@@ -603,16 +604,14 @@ public class PioneeringMission extends Mission {
                 }
             }
             
-            int value = 100;
-            for(AbstractGoods goods : toolsType.getGoodsRequired()){
-                if(colony.getGoodsCount(goods.getType()) == 0){
-                    value = Integer.MIN_VALUE;
-                    break;
-                }
-                value += colony.getGoodsCount(goods.getType());
-            }
-            if(value == Integer.MIN_VALUE){
+            if(pathNode.getTotalTurns() > MAX_TURN_DISTANCE){
                 continue;
+            }
+            
+            int value = 100;
+            // Prefer units with plenty of tools
+            for(AbstractGoods goods : toolsType.getGoodsRequired()){
+                value += colony.getGoodsCount(goods.getType());
             }
             
             if(pathNode != null){
