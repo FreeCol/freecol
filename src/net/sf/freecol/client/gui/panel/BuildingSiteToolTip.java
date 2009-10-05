@@ -71,6 +71,9 @@ public class BuildingSiteToolTip extends JToolTip {
             if (turnsToComplete >= 0) {
                 turns = Integer.toString(turnsToComplete);
             }
+            else if(turnsToComplete != Integer.MIN_VALUE){
+                turns = ">" + Integer.toString(turnsToComplete*-1);
+            }
             add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
                                             "%buildable%", buildable.getName())),
                 "span, align center");

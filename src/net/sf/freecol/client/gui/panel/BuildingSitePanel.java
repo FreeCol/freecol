@@ -92,13 +92,19 @@ public class BuildingSitePanel extends JPanel implements PropertyChangeListener 
         buildable = colony.getCurrentlyBuilding();
 
         if (buildable != null) {
-            JLabel turnsLabel = new JLabel(Messages.message("notApplicable.short"));
+            JLabel turnsLabel = new JLabel();
             turnsLabel.setBackground(Color.WHITE);
             turnsLabel.setOpaque(true);
+            String turnsStr = Messages.message("notApplicable.short");
             int turnsLeft = colony.getTurnsToComplete(buildable);
-            if (turnsLeft > 0) {
-                turnsLabel.setText(Integer.toString(turnsLeft));
+            if (turnsLeft >= 0) {
+                turnsStr = Integer.toString(turnsLeft);
             }
+            else if(turnsLeft != Integer.MIN_VALUE){
+                turnsStr = ">" + Integer.toString(turnsLeft*-1);
+            }
+            turnsLabel.setText(turnsStr);
+          
             add(turnsLabel, "align center, wrap");
         }
 

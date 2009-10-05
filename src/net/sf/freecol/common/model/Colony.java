@@ -873,31 +873,49 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns how many turns it would take to build the given
-     * <code>BuildableType</code>. Returns -1 if no result can be
-     * calculated.
+     * <code>BuildableType</code>. Returns a negative number if any of the production goods is
+     * being built, Integer.MIN_VAL if none is, and there are no goods available
      *
      * @param buildable a <code>BuildableType</code> value
      * @return an <code>int</code> value
      */
     public int getTurnsToComplete(BuildableType buildable) {
         int result = 0;
+        boolean goodsMissing = false;
+        boolean goodsBeingProduced = false;
+        boolean productionMissing = false;
+        
         for (AbstractGoods requiredGoods : buildable.getGoodsRequired()) {
             int amountNeeded = requiredGoods.getAmount();
             int amountAvailable = getGoodsCount(requiredGoods.getType());
-            if (amountAvailable < amountNeeded) {
-                int amountProduced = getProductionNextTurn(requiredGoods.getType());
-                if (amountProduced <= 0) {
-                    return -1;
-                } else {
-                    int amountRemaining = amountNeeded - amountAvailable;
-                    int eta = amountRemaining / amountProduced;
-                    if (amountRemaining % amountProduced != 0) {
-                        eta++;
-                    }
-                    result = Math.max(result, eta);
-                }
+            if (amountAvailable >= amountNeeded) {
+                continue;
             }
+            goodsMissing = true;
+            int amountProduced = getProductionNextTurn(requiredGoods.getType());
+            if (amountProduced <= 0) {
+                productionMissing = true;
+                continue;
+            }
+            goodsBeingProduced = true;
+            
+            int amountRemaining = amountNeeded - amountAvailable;
+            int eta = amountRemaining / amountProduced;
+            if (amountRemaining % amountProduced != 0) {
+                eta++;
+            }
+            result += eta;
         }
+        if(!goodsMissing){
+            return 0;
+        }
+        if(goodsMissing && !goodsBeingProduced){
+            return Integer.MIN_VALUE;
+        }
+        if(productionMissing){
+            result = result * -1;
+        }
+        
         return result;
     }
 
