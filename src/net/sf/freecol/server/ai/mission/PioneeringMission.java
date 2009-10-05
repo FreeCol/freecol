@@ -153,7 +153,7 @@ public class PioneeringMission extends Mission {
         Tile improvementTarget = (tileImprovementPlan != null)? tileImprovementPlan.getTarget():null;
         // invalid tileImprovementPlan, remove and get a new valid one
         if (tileImprovementPlan != null && improvementTarget == null) {
-            logger.warning("Found invalid TileImprovementPlan, removing it and assigning a new one");
+            logger.finest("Found invalid TileImprovementPlan, removing it and assigning a new one");
             aiPlayer.removeTileImprovementPlan(tileImprovementPlan);
             tileImprovementPlan.dispose();
             tileImprovementPlan = null;
@@ -193,7 +193,7 @@ public class PioneeringMission extends Mission {
             if (ti.getPioneer() == null) {
                 // invalid tileImprovementPlan, remove and get a new valid one
                 if (ti.getTarget() == null) {
-                    logger.warning("Found invalid TileImprovementPlan, removing it and finding a new one");
+                    logger.finest("Found invalid TileImprovementPlan, removing it and finding a new one");
                     aiPlayer.removeTileImprovementPlan(ti);
                     ti.dispose();
                     continue;
@@ -247,10 +247,9 @@ public class PioneeringMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {
-        logger.warning("Entering PioneeringMission.doMission()");
+        logger.finest("Entering PioneeringMission.doMission()");
         
         Unit unit = getUnit();
-        logger.warning("Unit moves=" + unit.getMovesLeft());
         
         boolean hasTools = getUnit().hasAbility("model.ability.improveTerrain");
         if(unit.getState() == UnitState.IMPROVING || hasTools){
@@ -263,7 +262,6 @@ public class PioneeringMission extends Mission {
         while(isValid() && unit.getMovesLeft() > 0){
             switch(state){
                 case GET_TOOLS:
-                    logger.warning("Unit at=" + getUnit().getTile() + " requires tools");
                     getTools(connection);
                     break;
                 case IMPROVING:
@@ -415,7 +413,7 @@ public class PioneeringMission extends Mission {
 
     private void equipUnitWithTools(Connection connection) {
         Unit unit = getUnit();
-        logger.warning("About to equip " + unit + " in " + colonyWithTools.getName());
+        logger.finest("About to equip " + unit + " in " + colonyWithTools.getName());
         AIColony ac = (AIColony) getAIMain().getAIObject(colonyWithTools);
         int amount = toolsType.getMaximumCount();
         for (AbstractGoods materials : toolsType.getGoodsRequired()) {
@@ -428,7 +426,7 @@ public class PioneeringMission extends Mission {
             amount = Math.min(amount, availableAmount / requiredAmount);
         }
 
-        logger.warning("Equipping " + unit + " at=" + colonyWithTools.getName() + " amount=" + amount);
+        logger.finest("Equipping " + unit + " at=" + colonyWithTools.getName() + " amount=" + amount);
         Element equipUnitElement = Message.createNewRootElement("equipUnit");
         equipUnitElement.setAttribute("unit", unit.getId());
         equipUnitElement.setAttribute("type", toolsType.getId());
@@ -458,11 +456,11 @@ public class PioneeringMission extends Mission {
             // find a new colony with tools
             colonyWithTools = findColonyWithTools(getAIUnit());
             if(colonyWithTools == null){
-                logger.warning("No tools found");
+                logger.finest("No tools found");
                 invalidateMission = true;
                 return false;
             }
-            logger.warning("Colony found=" + colonyWithTools.getName());            
+            logger.finest("Colony found=" + colonyWithTools.getName());            
         }
         return true;
     }
@@ -553,24 +551,24 @@ public class PioneeringMission extends Mission {
             }
         }
         if(!foundImprovementPlan){
-            logger.warning("No Improvement plan found, PioneeringMission not valid");
+            logger.finest("No Improvement plan found, PioneeringMission not valid");
             return false;
         }
         
         boolean unitHasToolsAvail = aiUnit.getUnit().getEquipmentCount(toolsType) > 0;
         if(unitHasToolsAvail){
-            logger.warning("Tools equipped, PioneeringMission valid");
+            logger.finest("Tools equipped, PioneeringMission valid");
            return true; 
         }
         
         // Search colony with tools to equip the unit with
         Colony colonyWithTools = findColonyWithTools(aiUnit);
         if(colonyWithTools != null){
-            logger.warning("Tools found, PioneeringMission valid");
+            logger.finest("Tools found, PioneeringMission valid");
             return true;
         }
         
-        logger.warning("Tools not found, PioneeringMission not valid");
+        logger.finest("Tools not found, PioneeringMission not valid");
         return false;
     }
     
