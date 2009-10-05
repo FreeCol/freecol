@@ -139,6 +139,10 @@ public class TransportMission extends Mission {
         while (ui.hasNext()) {
             Unit u = ui.next();
             AIUnit aiUnit = (AIUnit) getAIMain().getAIObject(u);
+            if(aiUnit == null){
+                logger.warning("Could not find ai unit");
+                continue;
+            }
             addToTransportList(aiUnit);
         }
         
