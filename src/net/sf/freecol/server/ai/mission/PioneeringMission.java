@@ -602,10 +602,10 @@ public class PioneeringMission extends Mission {
                 if(pathNode == null){
                     continue;
                 }
-            }
-            
-            if(pathNode.getTotalTurns() > MAX_TURN_DISTANCE){
-                continue;
+                // colony too far
+                if(pathNode.getTotalTurns() > MAX_TURN_DISTANCE){
+                    continue;
+                }
             }
             
             int value = 100;
