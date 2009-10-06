@@ -325,6 +325,19 @@ public final class FreeColClient {
     public void setHeadless(final boolean newHeadless) {
         this.headless = newHeadless;
     }
+    
+    /**
+     *  Verifies if this client can save the current game
+     *  Clients that do not have the server running, or that have not the required permissions
+     *cannot save and should have the menu entry disabled
+     * @return true if this client can save the game in progress, false otherwise
+     */
+    public boolean canSaveCurrentGame(){
+        if(getFreeColServer() == null || !getMyPlayer().isAdmin()){
+            return false;
+        }
+        return true;
+    }
 
     /**
      * Describe <code>getFrame</code> method here.

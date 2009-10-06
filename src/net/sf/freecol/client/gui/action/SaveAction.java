@@ -56,9 +56,13 @@ public class SaveAction extends MapboardAction {
     protected boolean shouldBeEnabled() {
         if (freeColClient.isMapEditor()) {
             return true;
-        } else {
-            return !freeColClient.getCanvas().isShowingSubPanel();
         }
+        
+        //In game
+        if (!freeColClient.canSaveCurrentGame()) {
+            return false;
+        }
+        return !freeColClient.getCanvas().isShowingSubPanel();
     }
 
     /**
