@@ -166,7 +166,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
         add(getDefaultHeader(Messages.message("traderouteDialog.name")),
             "span, align center");
   
-        add(tradeRouteView, "height 400:");
+        add(tradeRouteView, "height 360:400");
         add(newRouteButton, "split 3, flowy, growx");
         add(editRouteButton, "growx");
         add(removeRouteButton, "growx");
