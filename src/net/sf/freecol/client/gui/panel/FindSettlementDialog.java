@@ -80,7 +80,7 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
         MigLayout layout = new MigLayout("wrap 1, fill", "[align center]", "[]30[]30[]");
         setLayout(layout);
 
-        JLabel header = new JLabel(Messages.message("menuBar.view.findSettlement"));
+        JLabel header = new JLabel(Messages.message("findSettlementDialog.name"));
         header.setFont(smallHeaderFont);
         add(header);
 
