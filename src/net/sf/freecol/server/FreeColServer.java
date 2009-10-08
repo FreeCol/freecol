@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -37,7 +38,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -64,10 +64,8 @@ import net.sf.freecol.common.model.HighScore;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
-import net.sf.freecol.common.model.NationOptions.NationState;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Player.PlayerType;
@@ -115,7 +113,7 @@ public final class FreeColServer {
     /**
      * The save game format used for saving games.
      */
-    public static final int SAVEGAME_VERSION = 6;
+    public static final int SAVEGAME_VERSION = 7;
 
     /**
      * The oldest save game format that can still be loaded.
@@ -564,7 +562,18 @@ public final class FreeColServer {
         try {
             XMLStreamWriter xsw;
             fos = new JarOutputStream(new FileOutputStream(file));
-            fos.putNextEntry(new JarEntry(file.getName().substring(0, file.getName().lastIndexOf('.')) + "/" + FreeColSavegameFile.SAVEGAME_FILE));
+            fos.putNextEntry(new JarEntry("specification.xml"));
+            InputStream in = FreeCol.getSpecificationInputStream();
+            int len;
+            byte[] buf = new byte[1024];
+            while ((len = in.read(buf)) > 0) {
+                fos.write(buf, 0, len);
+            }
+            fos.closeEntry();
+            in.close();
+
+
+            fos.putNextEntry(new JarEntry(FreeColSavegameFile.SAVEGAME_FILE));
             xsw = xof.createXMLStreamWriter(fos, "UTF-8");
 
             xsw.writeStartDocument("UTF-8", "1.0");

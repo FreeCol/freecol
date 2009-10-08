@@ -604,18 +604,21 @@ public final class FreeCol {
     public static File getAutosaveDirectory() {
         return saveDirectory;
     }
+
+    public static InputStream getSpecificationInputStream() throws IOException {
+        final FreeColTcFile tcData = new FreeColTcFile(tc);
+        ResourceManager.setTcMapping(tcData.getResourceMapping());
+        return tcData.getSpecificationInputStream();
+    }
     
     public static boolean initializeResourceFolders() {
         FreeColDataFile baseData = new FreeColDataFile(new File(dataFolder, "base"));
         ResourceManager.setBaseMapping(baseData.getResourceMapping());
         
-        final FreeColTcFile tcData = new FreeColTcFile(tc);
-        ResourceManager.setTcMapping(tcData.getResourceMapping());
-        
         // This needs to be initialized before ImageLibrary
         InputStream si = null;
         try {
-            si = tcData.getSpecificationInputStream();
+            si = getSpecificationInputStream();
             Specification.createSpecification(si);
         } catch (IOException e) {
             System.err.println("Could not load specification.xml for: " + tc);
