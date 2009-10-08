@@ -96,10 +96,10 @@ public class FreeColDataFile {
             jf = new JarFile(file);
             final JarEntry entry = jf.entries().nextElement();
             final String en = entry.getName();
-            final int index = (en.lastIndexOf('/') > 0) ? en.lastIndexOf('/') : en.length() - 1;
-            final String name = en.substring(0, index);
-            if (!name.equals(expectedName)) {
-                logger.warning("Expected directory '" + expectedName + "', but found '" + name + "' in data file.");
+            final int index = en.lastIndexOf('/');
+            String name = "";
+            if (index > 0) {
+                name = en.substring(0, index + 1);
             }
             return name;
         } catch (Exception e) {
@@ -132,7 +132,7 @@ public class FreeColDataFile {
             if (file.isDirectory()) {
                 return new URL("file", null, (new File(file, filename)).getAbsolutePath());
             } else {
-                return new URL("jar:file:" + file.getAbsoluteFile() + "!/" + jarDirectory + "/" + filename);
+                return new URL("jar:file:" + file.getAbsoluteFile() + "!/" + jarDirectory + filename);
             }
         } catch (IOException e) {
             logger.log(Level.WARNING, "Exception while reading ResourceMapping from: " + file, e);
