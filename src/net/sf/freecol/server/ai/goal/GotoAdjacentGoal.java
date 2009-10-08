@@ -71,9 +71,12 @@ public class GotoAdjacentGoal extends Goal {
                         && pathNode.getTurns() == 0
                         && pathNode.getTile() != target
                         && (u.getUnit().getMoveType(pathNode.getDirection()) == MoveType.MOVE
-                        //|| getUnit().getMoveType(pathNode.getDirection()) == MoveType.MOVE_HIGH_SEAS
-                        || u.getUnit().getMoveType(pathNode.getDirection()) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
-
+                          ||u.getUnit().getMoveType(pathNode.getDirection()) == MoveType.EXPLORE_LOST_CITY_RUMOUR)) {
+                        
+                            if(u.getUnit().getMoveType(pathNode.getDirection()) == MoveType.EXPLORE_LOST_CITY_RUMOUR) {
+                                logger.warning("Accidental rumour exploration!");
+                            }
+                        
                             Element moveElement = Message.createNewRootElement("move");
                             moveElement.setAttribute("unit", u.getUnit().getId());
                             moveElement.setAttribute("direction", pathNode.getDirection().toString());
@@ -99,6 +102,16 @@ public class GotoAdjacentGoal extends Goal {
             //signal that we may safely be cancelled now
             isFinished = true;
         }
+    }
+
+    public String getGoalDescription() {
+        String descr = super.getGoalDescription();
+        if (target!=null) {
+            descr += ":"+target.getX()+","+target.getY();
+        } else {
+            descr += ":null";
+        }
+        return descr;
     }
     
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {

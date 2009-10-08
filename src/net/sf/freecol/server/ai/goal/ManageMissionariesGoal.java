@@ -123,6 +123,7 @@ public class ManageMissionariesGoal extends Goal {
                 if (i != null) {
                     PathNode pathNode = u.getUnit().findPath(i.getTile());
                     if (pathNode != null) {
+                        logger.info("Creating subgoal CreateMissionAtSettlementGoal.");
                         CreateMissionAtSettlementGoal g = new CreateMissionAtSettlementGoal(player,this,1,u,i);
                         subGoalList.add(g);
                     }
@@ -149,6 +150,12 @@ public class ManageMissionariesGoal extends Goal {
         }
     }
     
+    public String getGoalDescription() {
+        String descr = super.getGoalDescription();
+        descr += ":"+availableUnitsList.size();
+        return descr;
+    }
+    
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         //TODO
     }
@@ -169,8 +176,7 @@ public class ManageMissionariesGoal extends Goal {
             //Possible TODO: Slightly randomize findings?
             //Otherwise, missionaries starting from the same position will find
             //the same settlement.
-            final int MAX_SETTLEMENT_DISTANCE = 10;
-            Iterator<Position> i = player.getGame().getMap().getCircleIterator(t.getPosition(), true, MAX_SETTLEMENT_DISTANCE);
+            Iterator<Position> i = player.getGame().getMap().getCircleIterator(t.getPosition(), true, MAX_SEARCH_RADIUS);
             while (i.hasNext()) {
                 Position pos = i.next();
                 Settlement s = player.getGame().getMap().getTile(pos).getSettlement();
@@ -181,8 +187,8 @@ public class ManageMissionariesGoal extends Goal {
                         return (IndianSettlement)s;
                 }
             }
-        //TODO: We didn't find a settlement in range - what now?
         }
+        //TODO: We didn't find a settlement in range - what now?
         return null;
     }
 }

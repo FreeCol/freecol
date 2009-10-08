@@ -2757,6 +2757,13 @@ public final class GUI {
                 if (au.getMission() != null) {
                     String missionName = au.getMission().getClass().toString();
                     missionName = missionName.substring(missionName.lastIndexOf('.') + 1);
+                    
+                    if (FreeCol.usesExperimentalAI() && au.getGoal()!=null) {
+                        missionName = "";
+                        String goalName = au.getGoal().getDebugDescription();
+                        text += goalName;
+                    }
+                    
                     text += missionName;
                     if (debugShowMissionInfo) {
                         debuggingInfo = au.getMission().getDebuggingInfo();

@@ -49,7 +49,7 @@ import org.w3c.dom.Element;
  * On construction, an {@link AIUnit} and an {@link IndianSettlement}
  * are given to this.
  * The Goal will try to create a mission at that settlement,
- * eventually by bringing the missionary unit there first using {@link GoToAdjacentGoal}.
+ * eventually by bringing the missionary unit there first using a {@link GotoAdjacentGoal}.
  * Should the target become invalid, the missionary will be given back
  * to the parent of this goal ({@link ManageMissionariesGoal}, in most cases).
  * Excess units will be given back to the parent, or the {@link AIPlayer} directly. 
@@ -172,6 +172,7 @@ public class CreateMissionAtSettlementGoal extends Goal {
                         } else {
                             //Missionary is not adjacent to target,
                             //use it to create a GoToAdjacentGoal
+                            logger.info("Creating subgoal GotoAdjacentGoal.");
                             gotoSubGoal = new GotoAdjacentGoal(player,this,1,u,target.getTile());
                         }
                     } else {
@@ -185,6 +186,16 @@ public class CreateMissionAtSettlementGoal extends Goal {
                 }
             }
         }
+    }
+
+    public String getGoalDescription() {
+        String descr = super.getGoalDescription();
+        if (target!=null) {
+            descr += ":"+target.getName();
+        } else {
+            descr += ":null";
+        }
+        return descr;
     }
     
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {

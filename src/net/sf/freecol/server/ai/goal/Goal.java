@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.UnitType;
 
 import net.sf.freecol.server.ai.AIMain;
@@ -41,6 +42,7 @@ import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIPlayer;
 import net.sf.freecol.server.ai.AIUnit;
 
+import net.sf.freecol.server.ai.goal.GoalConstants;
 
 /**
  * A Goal is used to encapsulate a specific part of the decision-making process
@@ -57,7 +59,7 @@ import net.sf.freecol.server.ai.AIUnit;
  * Specific AI goals are created by extending this class; some of these could
  * also be used to assist the human player (i.e. GoTo, Scouting, Trade, Piracy).
  */
-public abstract class Goal extends AIObject {
+public abstract class Goal extends AIObject implements GoalConstants {
     private static final Logger logger = Logger.getLogger(Goal.class.getName());
 
     private float relativeWeight;
@@ -124,7 +126,7 @@ public abstract class Goal extends AIObject {
      * @return A list of all {@link AIUnit} being freed up by this action          
      */
     public List<AIUnit> cancelGoal() {
-        logger.finest("Entering method cancelGoal()");
+        logger.finest("Entering method cancelGoal() for "+getDebugDescription());
         List<AIUnit> cancelledUnitsList = new ArrayList<AIUnit>();
         
         //get units from subgoals
@@ -141,6 +143,7 @@ public abstract class Goal extends AIObject {
             AIUnit u = uit.next();
             cancelledUnitsList.add(u);
         }
+        logger.info("Got "+cancelledUnitsList.size()+" units from cancelled subgoals");
         return cancelledUnitsList;
     }
 
@@ -149,7 +152,7 @@ public abstract class Goal extends AIObject {
      * then calls its own planning method.
      */              
     public void doPlanning() {
-        logger.finest("Entering method doPlanning()");
+        logger.finest("Entering method doPlanning() for "+getDebugDescription());
         boolean subgoalsPlanned = false;
         
         normalizeSubGoalWeights();
@@ -176,7 +179,7 @@ public abstract class Goal extends AIObject {
      * @return true if this Goal or at least one subgoal needs planning, false otherwise
      */
     public boolean needsPlanning() {
-        logger.finest("Entering method needsPlanning()");
+        logger.finest("Entering method needsPlanning() for "+getDebugDescription());
         if (needsPlanning) {
             return true;
         } else {
@@ -200,7 +203,7 @@ public abstract class Goal extends AIObject {
      * @param p Boolean determining whether to set needsPlanning =true or =false
      */
     public void setNeedsPlanningRecursive(boolean p) {
-        logger.finest("Entering method setNeedsPlanningRecursive()");
+        logger.finest("Entering method setNeedsPlanningRecursive() for "+getDebugDescription());
         needsPlanning = p;
         
         Iterator<Goal> git = getSubGoalIterator();
@@ -285,8 +288,34 @@ public abstract class Goal extends AIObject {
         }
     }
 
+//     /**
+//      * Wrapper method for a unit request sent to the {@link AIPlayer}.
+//      * </p><p>
+//      * Each Goal can request necessary units from the AIPlayer.
+//      * Here, such a request is wrapped in a private method for convenience.
+//      * Each request contains a weight, which is {@link #getAbsoluteWeight()}
+//      * of this goal, and the number of turns since a unit request has last been granted.
+//      * The latter should be taken into account as a "bonus weight" by the AIPlayer.
+//      * </p><p>
+//      * TODO:Should that be role, instead or alternatively?
+//      * </p><p>
+//      * TODO: {@link AIPlayer#addUnitWish(Goal,UnitType,float,int)}; should add
+//      * requests to a set-like structure, so that there's only one active request
+//      * per Goal at any time. Since fulfilling a request using {@link #addUnit(AIUnit)}
+//      * means that {@link #plan()} will be called again during the turn,
+//      * the Goal will be able to request again.
+//      * 
+//      * @param ut The {@link UnitType} we'd like to request           
+//      */
+//     protected void requestUnit(UnitType ut) {
+//         int turnsWithoutUnit = getGame().getTurn().getNumber() - turnLastUnitAdded;
+//         
+//         //TODO: Uncomment after AIPlayer.addUnitWish() has been written.
+//         //player.addUnitWish(this, ut, getAbsoluteWeight(), turnsWithoutUnit);
+//     }
+
     /**
-     * Wrapper method for a unit request sent to the {@link AIPlayer}.
+     * Wrapper method for a worker request sent to the {@link AIPlayer}.
      * </p><p>
      * Each Goal can request necessary units from the AIPlayer.
      * Here, such a request is wrapped in a private method for convenience.
@@ -294,21 +323,23 @@ public abstract class Goal extends AIObject {
      * of this goal, and the number of turns since a unit request has last been granted.
      * The latter should be taken into account as a "bonus weight" by the AIPlayer.
      * </p><p>
-     * TODO:Should that be role, instead or alternatively?
-     * </p><p>
-     * TODO: {@link AIPlayer#addUnitWish(Goal,UnitType,float,int)}; should add
+     * TODO: {@link AIPlayer#addUnitWish(Goal,GoodsType,int,float,int)}; should add
      * requests to a set-like structure, so that there's only one active request
      * per Goal at any time. Since fulfilling a request using {@link #addUnit(AIUnit)}
      * means that {@link #plan()} will be called again during the turn,
      * the Goal will be able to request again.
      * 
-     * @param ut The {@link UnitType} we'd like to request           
+     * @param gt The {@link GoodsType} we're requesting a worker for.
+     * @param minProduction The minimum a unit needs to produce to be considered.
+     * Should be 0 if any worker will do, or the value of
+     * {@link UnitType#getProductionFor(GoodsType,int)} if an existing worker
+     * unit is supposed to be replaced.     
      */
-    protected void requestUnit(UnitType ut) {
+    protected void requestWorker(GoodsType gt, int minProduction) {
         int turnsWithoutUnit = getGame().getTurn().getNumber() - turnLastUnitAdded;
         
-        //TODO: Uncomment after AIPlayer.addUnitWish() has been written.
-        //player.addUnitWish(this, ut, getAbsoluteWeight(), turnsWithoutUnit);
+        //TODO: Uncomment after AIPlayer.addWorkerWish() has been written.
+        //player.addWorkerWish(this, gt, minProduction, getAbsoluteWeight(), turnsWithoutUnit);
     }
 
     /**
@@ -324,7 +355,7 @@ public abstract class Goal extends AIObject {
      * @param u The {@link AIUnit} being added to this goal
      */
     public void addUnit(AIUnit u) {
-        logger.finest("Entering method addUnit() with unit: "+u.getId());
+        logger.finest("Entering method addUnit() for "+getDebugDescription()+" with unit: "+u.getId());
         turnLastUnitAdded = getGame().getTurn().getNumber();
         availableUnitsList.add(u);
         u.setGoal(this);
@@ -340,7 +371,7 @@ public abstract class Goal extends AIObject {
      * @param u The {@link AIUnit} to be added to the parent     
      */                   
     protected void addUnitToParent(AIUnit u) {
-        logger.finest("Entering method addUnitToParent() with unit: "+u.getId());
+        logger.finest("Entering method addUnitToParent() for "+getDebugDescription()+" with unit: "+u.getId());
         if (parentGoal != null) {
             parentGoal.addUnit(u);
         } else {
@@ -473,20 +504,55 @@ public abstract class Goal extends AIObject {
      * An AIUnit is supposed to be invalid if it no longer contains a valid Unit.
      * This may be the case if the Unit has been removed from the game between turns.
      * </p><p>
-     * NOTE: The assumption here is that {@link AIUnit.isValid()} will return true
-     * as long as the {@link Unit} wrapped in it exists.
+     * NOTE: The assumption here is that {@link AIUnit#isValid()} will return true
+     * as long as the {@link net.sf.freecol.common.model.Unit} wrapped in it exists.
      */          
     protected void validateOwnedUnits() {
         Iterator<AIUnit> uit = getOwnedAIUnitsIterator();
         while (uit.hasNext()) {
             AIUnit u = uit.next();
+            if (!(u.getGoal()==this)) {
+                logger.warning("Goal "+getGoalDescription()+" owns unit with another goal: "+u.getGoal().getGoalDescription());
+                removeUnit(u);
+            }
             //TODO: Uncomment after AIUnit.isValid() has been written.
             //if (!u.isValid()) {
             //    removeUnit(u);
             //}
         }    
     }
-    
+
+    /**
+     * Returns a string describing just this goal.
+     * An implementing class may override this method to add specialized information.          
+     * Used by {@link getDebugDescription}.
+     * 
+     * @return a string describing this goal
+     */ 
+    public String getGoalDescription() {
+        String goalName = getClass().toString();
+        goalName = goalName.substring(goalName.lastIndexOf('.') + 1,goalName.length()-4);
+        return goalName;
+    }
+
+    /**
+     * Build and return a string describing this goal including its parent goal.
+     * Used by "Display AI-missions" in debug mode.
+     * 
+     * @return a string describing this goal
+     */    
+    public String getDebugDescription() {
+        String descr = "";
+        
+        //if goal has parent goal, add that as well
+        //no recursive call, to avoid lengthy descriptions        
+        if (parentGoal!=null) {
+            descr = parentGoal.getGoalDescription() + ">>";
+        }
+        descr += getGoalDescription();
+        return descr;
+    }
+
     /**
      * Returns the tag name of the root element representing this object.
      * 
@@ -539,7 +605,7 @@ public abstract class Goal extends AIObject {
      *   <ul><li>eventually by adding it to one of the subgoals, or</li>
      *   <li>by adding it back to the {@link AIPlayer}, or</li>
      *   <li>last but not least, by spending their movement points for some internal mission</li></ul></li>
-     * <li>requesting new units (via {@link #requestUnit(UnitType)})</li>
+     * <li>requesting new units (via a method like {@link #requestWorker(GoodsType,int)})</li>
      * <li>managing direct subgoals, including:
      *   <ul><li>creating new ones, if necessary</li>
      *   <li>cancelling those with isFinished()==true</li>
