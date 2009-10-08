@@ -375,25 +375,7 @@ public final class InGameController implements NetworkConstants {
         game.setCurrentPlayer(currentPlayer);
 
         if (freeColClient.getMyPlayer().equals(currentPlayer)) {
-            // Autosave the game:
-            if (freeColClient.getFreeColServer() != null) {
-                final int turnNumber = freeColClient.getGame().getTurn().getNumber();
-                final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);
-                if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-                    final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-'
-                        + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
-                    File saveGameFile = new File(FreeCol.getAutosaveDirectory(), filename);
-                    saveGame(saveGameFile);
-                    int generations = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_GENERATIONS);
-                    if (generations > 0) {
-                        allSaveGames.add(saveGameFile);
-                        if (allSaveGames.size() > generations) {
-                            File fileToDelete = allSaveGames.remove(0);
-                            fileToDelete.delete();
-                        }
-                    }
-                }
-            }
+            autosaveGame();
 
             removeUnitsOutsideLOS();
             if (currentPlayer.checkEmigrate()) {
@@ -417,6 +399,28 @@ public final class InGameController implements NetworkConstants {
         }
         logger.finest("Exiting client setCurrentPlayer("
                       + currentPlayer.getName() + ")");
+    }
+
+    public void autosaveGame() {
+        // Autosave the game:
+        if (freeColClient.getFreeColServer() != null) {
+            final int turnNumber = freeColClient.getGame().getTurn().getNumber();
+            final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);
+            if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
+                final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-'
+                    + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
+                File saveGameFile = new File(FreeCol.getAutosaveDirectory(), filename);
+                saveGame(saveGameFile);
+                int generations = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_GENERATIONS);
+                if (generations > 0) {
+                    allSaveGames.add(saveGameFile);
+                    if (allSaveGames.size() > generations) {
+                        File fileToDelete = allSaveGames.remove(0);
+                        fileToDelete.delete();
+                    }
+                }
+            }
+        }
     }
 
     /**
