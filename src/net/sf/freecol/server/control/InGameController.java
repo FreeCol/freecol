@@ -353,7 +353,7 @@ public final class InGameController extends Controller {
         
         if (getGame().isNextPlayerInNewTurn()) {
             getGame().newTurn();
-            if (getGame().getTurn().getNumber() > 1600
+            if (getGame().getTurn().getAge() > 1
                 && !getGame().getSpanishSuccession()) {
                 checkSpanishSuccession();
             }
