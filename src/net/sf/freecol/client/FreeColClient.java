@@ -74,6 +74,7 @@ import net.sf.freecol.common.option.LanguageOption.Language;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.resources.ResourceMapping;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.FreeColServer.GameState;
 
 import org.w3c.dom.Element;
 
@@ -333,7 +334,12 @@ public final class FreeColClient {
      * @return true if this client can save the game in progress, false otherwise
      */
     public boolean canSaveCurrentGame(){
-        if(getFreeColServer() == null || !getMyPlayer().isAdmin()){
+        if(getFreeColServer() == null){
+            return false;
+        }
+        
+        if(getFreeColServer().getGameState() == GameState.IN_GAME
+                && !getMyPlayer().isAdmin()){
             return false;
         }
         return true;
