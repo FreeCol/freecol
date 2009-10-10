@@ -19,9 +19,7 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -46,7 +44,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.text.BadLocationException;
@@ -108,8 +105,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     // layout of production modifier panel
     private static final int MODIFIERS_PER_ROW = 5;
 
-    private final Canvas parent;
-
     private JLabel header;
 
     private JPanel listPanel;
@@ -124,31 +119,34 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent The parent of this panel.
      */
     public ColopediaPanel(Canvas parent) {
-        super(parent, new FlowLayout(FlowLayout.CENTER, 1000, 10));
-        this.parent = parent;
+        super(parent);
 
         none = Messages.message("none");
 
-        setLayout(new BorderLayout());
+        setLayout(new MigLayout("", "[]unrelated[grow, fill]", "[][grow, fill][]"));
 
         header = getDefaultHeader(Messages.message("menuBar.colopedia"));
-        add(header, BorderLayout.NORTH);
+        add(header, "span, align center");
 
         listPanel = new JPanel();
         listPanel.setOpaque(false);
         JScrollPane sl = new JScrollPane(listPanel, 
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                                         JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sl.getVerticalScrollBar().setUnitIncrement(16);
         sl.getViewport().setOpaque(false);
-        add(sl, BorderLayout.WEST);
+        add(sl);
 
         detailPanel = new JPanel();
         detailPanel.setOpaque(false);
-        detailPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        add(detailPanel, BorderLayout.CENTER);
+        JScrollPane detail = new JScrollPane(detailPanel, 
+                                             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        detail.getVerticalScrollBar().setUnitIncrement(16);
+        detail.getViewport().setOpaque(false);
+        add(detail);
 
-        add(okButton, BorderLayout.SOUTH);
+        add(okButton, "newline 20, span, tag ok");
 
         setSize(getPreferredSize());
 
@@ -161,7 +159,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(850, parent.getHeight() - 100);
+        return new Dimension(850, getCanvas().getHeight() - 100);
     }
 
 
@@ -1437,7 +1435,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (OK.equals(command)) {
-            parent.remove(this);
+            getCanvas().remove(this);
         } else {
             FreeColGameObjectType type = Specification.getSpecification().getType(command);
             initialize(type);
