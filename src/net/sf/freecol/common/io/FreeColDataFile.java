@@ -121,12 +121,24 @@ public class FreeColDataFile {
      *      archive. 
      * @return
      */
-    protected InputStream getInputStream(String filename) throws IOException {
+    public InputStream getInputStream(String filename) throws IOException {
         final URLConnection connection = getURL(filename).openConnection();
         connection.setDefaultUseCaches(false);
         return new BufferedInputStream(connection.getInputStream());
     }
-    
+
+    public boolean containsEntry(String entryName) {
+        if (file.isDirectory()) {
+            return new File(file, entryName).exists();
+        } else {
+            try {
+                return new JarFile(file).getEntry(entryName) != null;
+            } catch(Exception e) {
+                return false;
+            }
+        }
+    }    
+
     private URL getURL(String filename) {
         try {
             if (file.isDirectory()) {

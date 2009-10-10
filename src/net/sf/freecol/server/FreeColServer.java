@@ -56,6 +56,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.io.FreeColModFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
@@ -657,6 +658,13 @@ public final class FreeColServer {
         boolean doNotLoadAI = false;
         XMLStream xs = null;
         try {
+
+            if (fis.containsEntry(FreeColModFile.SPECIFICATION_FILE)) {
+                Specification.createSpecification(fis.getInputStream(FreeColModFile.SPECIFICATION_FILE));
+            } else {
+                logger.warning("Did not find specification in saved game.");
+            }
+
             xs = createXMLStreamReader(fis);
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
