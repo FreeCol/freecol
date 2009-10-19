@@ -629,8 +629,9 @@ public class ColonyPlan {
         }
 
         // Remove the secondary goods if we need food:
-        if (getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION &&
-            secondaryRawMaterial.isNewWorldGoodsType()) {
+        if (secondaryRawMaterial != null 
+                && getFoodProduction() < workLocationPlans.size() * Colony.FOOD_CONSUMPTION 
+                && secondaryRawMaterial.isNewWorldGoodsType()) {
             Iterator<WorkLocationPlan> wlpIterator2 = workLocationPlans.iterator();
             while (wlpIterator2.hasNext()) {
                 WorkLocationPlan wlp = wlpIterator2.next();
