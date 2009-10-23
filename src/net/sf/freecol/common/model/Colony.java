@@ -873,7 +873,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns how many turns it would take to build the given
-     * <code>BuildableType</code>. Returns a negative number if any of the production goods is
+     * <code>BuildableType</code>. Returns a negative number if any of the production goods isnt
      * being built, Integer.MIN_VAL if none is, and there are no goods available
      *
      * @param buildable a <code>BuildableType</code> value
@@ -904,7 +904,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             if (amountRemaining % amountProduced != 0) {
                 eta++;
             }
-            result += eta;
+            result = Math.max(result, eta);
         }
         if(!goodsMissing){
             return 0;
