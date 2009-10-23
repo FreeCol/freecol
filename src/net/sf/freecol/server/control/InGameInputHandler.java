@@ -1626,9 +1626,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 reply.setAttribute("result", "leave");
                 break;
             default:
-                unit.setType(settlement.getLearnableSkill());
-                if (!settlement.isCapital())
-                    settlement.setLearnableSkill(null);
+                unit.learnFromIndianSettlement(settlement);
                 // Set the Tile.PlayerExploredTile attribute.
                 settlement.getTile().updateIndianSettlementSkill(player);
                 reply.setAttribute("result", "success");

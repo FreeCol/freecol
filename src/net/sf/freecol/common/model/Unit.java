@@ -4090,4 +4090,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return "unit";
     }
 
+    public void learnFromIndianSettlement(IndianSettlement settlement) {
+        UnitType skill = settlement.getLearnableSkill();
+        if(skill == null){
+            throw new IllegalStateException("Trying to learn from settlement which cannot teach");
+        }
+        
+        setType(skill);
+        setMovesLeft(0);
+        if (!settlement.isCapital()) {
+            settlement.setLearnableSkill(null);
+        }
+    }
+
 }
