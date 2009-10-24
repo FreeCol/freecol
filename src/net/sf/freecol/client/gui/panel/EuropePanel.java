@@ -396,7 +396,7 @@ public final class EuropePanel extends FreeColPanel {
             }
         }
 
-        String newLandName = getMyPlayer().getNewLandName();
+        String newLandName = getMyPlayer().getSafeNewLandName();
         ((TitledBorder) toAmericaPanel.getBorder()).setTitle(Messages.message("sailingTo", 
                 "%location%", newLandName));
     }
@@ -598,7 +598,7 @@ public final class EuropePanel extends FreeColPanel {
                                 "europe.leaveColonists",
                                 "yes",
                                 "no",
-                                "%newWorld%", unit.getOwner().getNewLandName());
+                                "%newWorld%", unit.getOwner().getSafeNewLandName());
                         if (!leaveColonists) {
                             // Remain in Europe.
                             return null;

@@ -143,8 +143,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = monarchAction(element);
             } else if (type.equals("removeGoods")) {
                 reply = removeGoods(element);
-            } else if (type.equals("lostCityRumour")) {
-                reply = lostCityRumour(element);
             } else if (type.equals("setStance")) {
                 reply = setStance(element);
             } else if (type.equals("newConvert")) {
@@ -256,136 +254,46 @@ public final class InGameInputHandler extends InputHandler {
     /**
      * Handles an "opponentMove"-message.
      * 
-     * @param opponentMoveElement The element (root element in a DOM-parsed XML
-     *            tree) that holds all the information.
+     * @param element An element (root element in a DOM-parsed XML tree)
+     *                that holds attributes for the old and new tiles and
+     *                an element for the unit that is moving (which are
+     *                used solely to operate the animation), and a "multiple"
+     *                element containing the real changes from the server.
      */
-    private Element opponentMove(Element opponentMoveElement) {
-        Map map = getGame().getMap();
+    private Element opponentMove(Element element) {
+        FreeColClient freeColClient = getFreeColClient();
 
-        Direction direction = Enum.valueOf(Direction.class, opponentMoveElement.getAttribute("direction"));
-
-        if (opponentMoveElement.hasAttribute("fromTile")) {
-            // The unit moving should be already visible
-            final Unit unit = (Unit) getGame().getFreeColGameObjectSafely(opponentMoveElement.getAttribute("unit"));
+        // The messy bit is the animation, which needs to be done first
+        // before applying the update to the client state, as that may
+        // show the unit at its new location.
+        String key = ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        if (freeColClient.getClientOptions().getInteger(key) > 0) {
+            Game game = getGame();
+            String unitId = element.getAttribute("unit");
+            Tile newTile = (Tile) game.getFreeColGameObjectSafely(element.getAttribute("newTile"));
+            Tile oldTile = (Tile) game.getFreeColGameObjectSafely(element.getAttribute("oldTile"));
+            Unit unit = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("unit"));
             if (unit == null) {
-                /*
-                logger.warning("Could not find the 'unit' in 'opponentMove'. Unit ID: "
-                        + opponentMoveElement.getAttribute("unit"));
-                return null;
-                */
-                throw new IllegalStateException("Could not find the 'unit' in 'opponentMove'. Unit ID: "
-                                                + opponentMoveElement.getAttribute("unit"));
+                unit = new Unit(game, (Element) element.getFirstChild());
             }
-            
-            final Tile fromTile = (Tile) getGame().getFreeColGameObjectSafely(opponentMoveElement.getAttribute("fromTile"));
-            if (fromTile == null) {
-                /*
-                logger.warning("Ignoring opponentMove, unit " + unit.getId() + " has no tile!");
-                return null;
-                */
-                throw new IllegalStateException("Ignoring opponentMove, unit " + unit.getId()
-                                                + " has no tile!");
+            if (newTile == null || oldTile == null || unit == null) {
+                throw new IllegalStateException("opponentMove"
+                                                + ((newTile == null) ? ": null newTile" : "")
+                                                + ((oldTile == null) ? ": null oldTile" : "")
+                                                + ((unit == null) ? ": null unit" : ""));
             }
-
-            final Tile toTile = map.getNeighbourOrNull(direction, fromTile);
-            if (toTile==null) {
-                // logger.warning("Destination tile is null!");
-                // TODO: find out why this can happen
-                throw new IllegalStateException("Destination tile is null!");
-            } else {
-                final String key = (getFreeColClient().getMyPlayer() == unit.getOwner()) ?
-                        ClientOptions.MOVE_ANIMATION_SPEED
-                        : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-                if (getFreeColClient().getClientOptions().getInteger(key) > 0) {
-                    //Playing the animation before actually moving the unit
-                    try {
-                        new UnitMoveAnimationCanvasSwingTask(unit, fromTile, toTile).invokeAndWait();
-                    } catch (InvocationTargetException exception) {
-                        logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
-                    }
-                } else {
-                    // Just refresh both Tiles
-                    new RefreshTilesSwingTask(unit.getTile(), toTile).invokeLater();
-                }
+            try {
+                new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile).invokeAndWait();
+            } catch (InvocationTargetException exception) {
+                logger.warning("UnitMoveAnimationCanvasSwingTask raised "
+                               + exception.toString());
             }
-            if (getFreeColClient().getMyPlayer().canSee(toTile)) {
-                unit.setLocation(toTile);
-            } else {
-                unit.dispose();
-            }
-        } else {
-            // the unit reveals itself, after leaving a settlement or carrier
-            String tileID = opponentMoveElement.getAttribute("toTile");
-
-            Element unitElement = Message.getChildElement(opponentMoveElement, Unit.getXMLElementTagName());
-            if (unitElement == null) {
-                throw new NullPointerException("unitElement == null");
-            }
-            Unit u = (Unit) getGame().getFreeColGameObjectSafely(unitElement.getAttribute("ID"));
-            if (u == null) {
-                u = new Unit(getGame(), unitElement);
-            } else {
-                u.readFromXMLElement(unitElement);
-            }
-            final Unit unit = u;
-
-            if (opponentMoveElement.hasAttribute("inUnit")) {
-                String inUnitID = opponentMoveElement.getAttribute("inUnit");
-                Unit inUnit = (Unit) getGame().getFreeColGameObjectSafely(inUnitID);
-
-                NodeList units = opponentMoveElement.getElementsByTagName(Unit.getXMLElementTagName());
-                Element locationElement = null;
-                for (int i = 0; i < units.getLength() && locationElement == null; i++) {
-                    Element element = (Element) units.item(i);
-                    if (element.getAttribute("ID").equals(inUnitID))
-                        locationElement = element;
-                }
-                if (locationElement != null) {
-                    if (inUnit == null) {
-                        inUnit = new Unit(getGame(), locationElement);
-                    } else {
-                        inUnit.readFromXMLElement(locationElement);
-                    }
-                }
-            }
-
-            if (getGame().getFreeColGameObject(tileID) == null) {
-                /*
-                logger.warning("Could not find tile with id: " + tileID);
-                unit.setLocation(null);
-                // Can't go on without the tile
-                return null;
-                */
-                throw new IllegalStateException("Could not find tile with id: " + tileID);
-            }
-            
-            final Tile newTile = (Tile) getGame().getFreeColGameObject(tileID);
-            
-            final Tile oldTile = map.getNeighbourOrNull(direction.getReverseDirection(), newTile);
-            if (unit.getLocation() == null) {
-                // Getting the previous tile so we can animate the movement properly
-                unit.setLocationNoUpdate(oldTile); 
-            }
-            
-            final String key = (getFreeColClient().getMyPlayer() == unit.getOwner()) ?
-                    ClientOptions.MOVE_ANIMATION_SPEED
-                    : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-            if (getFreeColClient().getClientOptions().getInteger(key) > 0) {
-                //Playing the animation before actually moving the unit
-                try {
-                    new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile).invokeAndWait();
-                } catch (InvocationTargetException exception) {
-                    logger.warning("UnitMoveAnimationCanvasSwingTask raised " + exception.toString());
-                }
-            } else {
-                // Just refresh both Tiles
-                new RefreshTilesSwingTask(unit.getTile(), newTile).invokeLater();
-            }
-
-            unit.setLocation(newTile);
-
         }
 
+        // Now that the unit looks like it is in the right place,
+        // process the real server response, which might even remove the unit.
+        handle(freeColClient.getClient().getConnection(),
+               Message.getChildElement(element, "multiple"));
         return null;
     }
 
@@ -996,38 +904,103 @@ public final class InGameInputHandler extends InputHandler {
     private Element setStance(Element element) {
         final FreeColClient freeColClient = getFreeColClient();
         Player player = freeColClient.getMyPlayer();
+        Game game = getGame();
         Stance stance = Enum.valueOf(Stance.class, element.getAttribute("stance"));
-        Player first = (Player) getGame().getFreeColGameObject(element.getAttribute("first"));
-        Player second = (Player) getGame().getFreeColGameObject(element.getAttribute("second"));
+        Player first = (Player) game.getFreeColGameObject(element.getAttribute("first"));
+        Player second = (Player) game.getFreeColGameObject(element.getAttribute("second"));
 
+        Stance oldStance = first.getStance(second);
         /*
          * Diplomacy messages were sometimes not shown because opponentAttack
          * messages arrive before setStance messages, so when the setStance
          * message arrived the player already had the new stance.
          * So, do not filter like this:
          *   if (first.getStance(second) == stance) { return null; }
+         * TODO: fix opponentAttack.
          */
         first.setStance(second, stance);
         if (second.getStance(first) != stance) second.setStance(first, stance);
-        if (player.equals(second)) {
-            player.addModelMessage(new ModelMessage(first,
-                    "model.diplomacy." + stance.toString().toLowerCase() + ".declared",
-                    new String[][] {
-                        {"%nation%", first.getNationAsString()}},
-                    ModelMessage.MessageType.FOREIGN_DIPLOMACY));
-        } else if (stance == Stance.WAR
+
+        // Message processing follows.  The AI is not interested.
+        if (player.isAI()) return null;
+
+        // Does this message involve this player and an other?
+        Player other = (player.equals(first)) ? second
+            : (player.equals(second)) ? first
+            : null;
+
+        if (other == null) {
+            // If not, always inform about wars, always inform
+            // post-deWitt, generally inform if have met one of the
+            // nations involved.
+            if (stance == Stance.WAR
                    || player.hasAbility("model.ability.betterForeignAffairsReport")
                    || player.hasContacted(first)
                    || player.hasContacted(second)) {
-            // Always inform about wars, always inform post-deWitt,
-            // generally inform if have met one of the nations involved
-            player.addModelMessage(new ModelMessage(first,
-                    "model.diplomacy." + stance.toString().toLowerCase() + ".others",
-                    new String[][] {
-                        {"%attacker%", first.getNationAsString()},
-                        {"%defender%", second.getNationAsString()}},
-                    ModelMessage.MessageType.FOREIGN_DIPLOMACY));
+                player.addModelMessage(new ModelMessage(first,
+                        "model.diplomacy." + stance.toString().toLowerCase() + ".others",
+                        new String[][] {
+                            {"%attacker%", first.getNationAsString()},
+                            {"%defender%", second.getNationAsString()}},
+                        ModelMessage.MessageType.FOREIGN_DIPLOMACY));
+            }
+
+        } else {
+            // If so, normally provide the standard diplomacy
+            // messages, unless this is a new peaceful contact in
+            // which case we do not have to inform of the
+            // UNCONTACTED->PEACE transition but there are special
+            // first contact messages to consider.
+            if (oldStance == Stance.UNCONTACTED && stance == Stance.PEACE) {
+                boolean contactedIndians = false;
+                boolean contactedEuro = false;
+                for (Player p : game.getPlayers()) {
+                    if (player.hasContacted(p) && p != other) {
+                        if (p.isEuropean()) {
+                            contactedEuro = true;
+                            if (contactedIndians) break;
+                        } else {
+                            contactedIndians = true;
+                            if (contactedEuro) break;
+                        }
+                    }
+                }
+                if (other.isEuropean() && !contactedEuro) {
+                    player.addModelMessage(new ModelMessage(player,
+                            ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            other,
+                            "EventPanel.MEETING_EUROPEANS"));
+                } else if (!other.isIndian() && !contactedIndians) {
+                    player.addModelMessage(new ModelMessage(player,
+                            ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            other,
+                            "EventPanel.MEETING_NATIVES"));
+                }
+                // Special cases for Aztec and Inca.  TODO: cleanup.
+                Specification spec = FreeCol.getSpecification();
+                if (other.getNationType()
+                    == spec.getNationType("model.nationType.aztec")) {
+                    player.addModelMessage(new ModelMessage(player,
+                            ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            other,
+                            "EventPanel.MEETING_AZTEC"));
+                } else if (other.getNationType()
+                           == spec.getNationType("model.nationType.inca")) {
+                    player.addModelMessage(new ModelMessage(player,
+                            ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                            other,
+                            "EventPanel.MEETING_INCA"));
+                }
+
+            } else { // Standard diplomacy message.
+                player.addModelMessage(new ModelMessage(first,
+                        "model.diplomacy." + stance.toString().toLowerCase() + ".declared",
+                        new String[][] {
+                            {"%nation%", other.getNationAsString()}},
+                        ModelMessage.MessageType.FOREIGN_DIPLOMACY));
+            }
         }
+
         return null;
     }
 
@@ -1108,145 +1081,6 @@ public final class InGameInputHandler extends InputHandler {
                                                            "%goods%", goods.getName())).invokeLater();
         }
 
-        return null;
-    }
-
-    /**
-     * Handles a "lostCityRumour"-request.
-     * 
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *            holds all the information.
-     */
-    private Element lostCityRumour(Element element) {
-        final FreeColClient freeColClient = getFreeColClient();
-        final Player player = freeColClient.getMyPlayer();
-        RumourType type = Enum.valueOf(RumourType.class, element.getAttribute("type"));
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-
-        if (unit == null) {
-            throw new IllegalArgumentException("Unit is null.");
-        }
-        Tile tile = unit.getTile();
-        tile.removeLostCityRumour();
-        
-        // center on the explorer
-        freeColClient.getGUI().setFocusImmediately(tile.getPosition());
-
-        Unit newUnit = null;
-        NodeList unitList;
-        ModelMessage m;
-        switch (type) {
-        case BURIAL_GROUND:
-            Player indianPlayer = tile.getOwner();
-            indianPlayer.modifyTension(player, Tension.Level.HATEFUL.getLimit());
-            m = new ModelMessage(unit, "lostCityRumour.BurialGround", new String[][] { { "%nation%",
-                    indianPlayer.getNationAsString() } }, ModelMessage.MessageType.LOST_CITY_RUMOUR);
-            break;
-        case EXPEDITION_VANISHES:
-            m = new ModelMessage(unit, "lostCityRumour.ExpeditionVanishes", null, ModelMessage.MessageType.LOST_CITY_RUMOUR);
-            unit.dispose();
-            break;
-        case NOTHING:
-            m = new ModelMessage(unit, "lostCityRumour.Nothing", null, ModelMessage.MessageType.LOST_CITY_RUMOUR);
-            break;
-        case LEARN:
-            m = new ModelMessage(unit, "lostCityRumour.SeasonedScout", new String[][] { { "%unit%", unit.getName() } },
-                    ModelMessage.MessageType.LOST_CITY_RUMOUR);
-            unit.setType(FreeCol.getSpecification().getUnitType(element.getAttribute("unitType")));
-            break;
-        case TRIBAL_CHIEF:
-            String amount = element.getAttribute("amount");
-            m = new ModelMessage(unit, "lostCityRumour.TribalChief", new String[][] { { "%money%", amount } },
-                    ModelMessage.MessageType.LOST_CITY_RUMOUR);
-            player.modifyGold(Integer.parseInt(amount));
-            break;
-        case COLONIST:
-            m = new ModelMessage(unit, ModelMessage.MessageType.LOST_CITY_RUMOUR, null, "lostCityRumour.Colonist");
-            unitList = element.getChildNodes();
-            for (int i = 0; i < unitList.getLength(); i++) {
-                Element unitElement = (Element) unitList.item(i);
-                newUnit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-                if (newUnit == null) {
-                    newUnit = new Unit(getGame(), unitElement);
-                } else {
-                    newUnit.readFromXMLElement(unitElement);
-                }
-                tile.add(newUnit);
-            }
-            break;
-        case TREASURE:
-            String treasure = element.getAttribute("amount");
-            unitList = element.getChildNodes();
-            for (int i = 0; i < unitList.getLength(); i++) {
-                Element unitElement = (Element) unitList.item(i);
-                newUnit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-                if (newUnit == null) {
-                    newUnit = new Unit(getGame(), unitElement);
-                } else {
-                    newUnit.readFromXMLElement(unitElement);
-                }
-                tile.add(newUnit);
-            }
-            m = new ModelMessage(unit, ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                 newUnit, "lostCityRumour.TreasureTrain",
-                                 "%money%", treasure);
-            player.getHistory().add(new HistoryEvent(player.getGame().getTurn().getNumber(),
-                                                     HistoryEvent.Type.CITY_OF_GOLD,
-                                                     "%treasure%", String.valueOf(treasure)));
-            break;
-        case FOUNTAIN_OF_YOUTH:
-            if (player.getEurope() == null) {
-                m = new ModelMessage(player, "lostCityRumour.FountainOfYouthWithoutEurope", null,
-                                     ModelMessage.MessageType.LOST_CITY_RUMOUR);
-            } else {
-                freeColClient.playMusicOnce("fountain");
-                m = new ModelMessage(player.getEurope(), "lostCityRumour.FountainOfYouth", null,
-                                     ModelMessage.MessageType.LOST_CITY_RUMOUR);
-                if (player.hasAbility("model.ability.selectRecruit")) {
-                    final int emigrants = Integer.parseInt(element.getAttribute("emigrants"));
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            for (int i = 0; i < emigrants; i++) {
-                                int slot = getFreeColClient().getCanvas().showEmigrationPanel(true);
-                                Element selectElement = Message.createNewRootElement("selectFromFountainYouth");
-                                selectElement.setAttribute("slot", Integer.toString(slot));
-                                Element reply = freeColClient.getClient().ask(selectElement);
-
-                                Element unitElement = (Element) reply.getChildNodes().item(0);
-                                Unit unit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-                                if (unit == null) {
-                                    unit = new Unit(getGame(), unitElement);
-                                } else {
-                                    unit.readFromXMLElement(unitElement);
-                                }
-                                player.getEurope().add(unit);
-                                
-                                String newRecruitableStr = reply.getAttribute("newRecruitable");
-                                UnitType newRecruitable = FreeCol.getSpecification().getUnitType(newRecruitableStr);
-                                player.getEurope().setRecruitable(slot, newRecruitable);
-                            }
-                        }
-                    });
-               } else {
-                    unitList = element.getChildNodes();
-                    for (int i = 0; i < unitList.getLength(); i++) {
-                        Element unitElement = (Element) unitList.item(i);
-                        newUnit = (Unit) getGame().getFreeColGameObject(unitElement.getAttribute("ID"));
-                        if (newUnit == null) {
-                            newUnit = new Unit(getGame(), unitElement);
-                        } else {
-                            newUnit.readFromXMLElement(unitElement);
-                        }
-                        player.getEurope().add(newUnit);
-                    }
-               }
-            }
-            break;
-        default:
-            throw new IllegalStateException("No such rumour.");
-        }
-        
-        player.addModelMessage(m);
         return null;
     }
 

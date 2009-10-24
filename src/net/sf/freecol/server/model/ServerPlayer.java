@@ -22,6 +22,7 @@ package net.sf.freecol.server.model;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +44,7 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
@@ -50,6 +52,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.model.Map.Position;
@@ -342,6 +345,15 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
+     * Add a HistoryEvent to this player.
+     *
+     * @param event The <code>HistoryEvent</code> to add.
+     */
+    public void addHistory(HistoryEvent event) {
+        history.add(event);
+    }
+
+    /**
     * Resets this player's explored tiles. This is done by setting
     * all the tiles within a {@link Unit}s line of sight visible.
     * The other tiles are made unvisible.
@@ -374,13 +386,14 @@ public class ServerPlayer extends Player implements ServerModelObject {
 
     }
 
-
     /**
-    * Checks if this <code>Player</code> has explored the given <code>Tile</code>.
-    * @param tile The <code>Tile</code>.
-    * @return <i>true</i> if the <code>Tile</code> has been explored and
-    *         <i>false</i> otherwise.
-    */
+     * Checks if this <code>Player</code> has explored the given
+     * <code>Tile</code>.
+     *
+     * @param tile The <code>Tile</code>.
+     * @return <i>true</i> if the <code>Tile</code> has been explored and
+     *         <i>false</i> otherwise.
+     */
     public boolean hasExplored(Tile tile) {
         return tile.isExploredBy(this);
     }

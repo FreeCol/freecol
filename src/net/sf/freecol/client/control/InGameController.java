@@ -120,7 +120,10 @@ import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.networking.NewLandNameMessage;
+import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
@@ -1226,32 +1229,22 @@ public final class InGameController implements NetworkConstants {
     }
     
     /**
-     * Moves the specified unit in a specified direction. This may result in an
-     * attack, move... action.
+     * Moves the specified unit in a specified direction. This may
+     * result in many different types of action.
      * 
-     * @param unit The unit to be moved.
-     * @param direction The direction in which to move the Unit.
+     * @param unit The <code>Unit</code> to be moved.
+     * @param direction The direction in which to move the unit.
+     * @todo Unify trade and negotiation.
      */
     public void move(Unit unit, Direction direction) {
-
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
-        // Be certain the tile we are about to move into has been updated by the
-        // server:
-        // Can be removed if we use 'client.ask' when moving:
-        /*
-         * try { while (game.getMap().getNeighbourOrNull(direction,
-         * unit.getTile()) != null &&
-         * game.getMap().getNeighbourOrNull(direction, unit.getTile()).getType() ==
-         * Tile.UNEXPLORED) { Thread.sleep(5); } } catch (InterruptedException
-         * ie) {}
-         */
-
         MoveType move = unit.getMoveType(direction);
-
         switch (move) {
         case MOVE:
             reallyMove(unit, direction);
@@ -1281,18 +1274,15 @@ public final class InGameController implements NetworkConstants {
             scoutForeignColony(unit, direction);
             break;
         case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            //TODO: unify trade and negotiations
             Map map = freeColClient.getGame().getMap();
-            Settlement settlement = map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+            Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+            Settlement settlement = tile.getSettlement();
             if (settlement instanceof Colony) {
                 negotiate(unit, direction);
+            } else if (player.hasContacted(settlement.getOwner())) {
+                tradeWithSettlement(unit, direction);
             } else {
-                if (freeColClient.getGame().getCurrentPlayer().hasContacted(settlement.getOwner())) {
-                    tradeWithSettlement(unit, direction);
-                }
-                else {
-                    freeColClient.getCanvas().showInformationMessage("noContactWithIndians");
-                }
+                canvas.showInformationMessage("noContactWithIndians");
             }
             break;
         case EXPLORE_LOST_CITY_RUMOUR:
@@ -1302,19 +1292,18 @@ public final class InGameController implements NetworkConstants {
             if (!move.isLegal()) {
                 freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
             } else {
-                throw new RuntimeException("unrecognised move: " + move);
+                throw new RuntimeException("Unrecognized move: " + move);
             }
             break;
         }
 
-        // Display a "cash in"-dialog if a treasure train have been moved into a
-        // colony:
+        // Display a "cash in"-dialog if a treasure train have been
+        // moved into a colony.
         if (checkCashInTreasureTrain(unit)) {
             nextActiveUnit();
         }
 
         nextModelMessage();
-
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     freeColClient.getActionManager().update();
@@ -1968,6 +1957,12 @@ public final class InGameController implements NetworkConstants {
         return false;
     }
 
+    private String getBuildColonyActionKeyString() {
+        BuildColonyAction bca = (BuildColonyAction) freeColClient.getActionManager().getFreeColAction(BuildColonyAction.id);
+        KeyStroke keyStroke = bca.getAccelerator();
+        return FreeColActionUI.getHumanKeyStrokeText(keyStroke);
+    }
+
     /**
      * Actually moves a unit in a specified direction.
      * 
@@ -1975,14 +1970,27 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the Unit.
      */
     private void reallyMove(Unit unit, Direction direction) {
+        final Canvas canvas = freeColClient.getCanvas();
+        Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         if (game.getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
-        Canvas canvas = freeColClient.getCanvas();
-        Client client = freeColClient.getClient();
+        Player player = unit.getOwner();
+        if (!freeColClient.isHeadless()) {
+            // Play an animation showing the unit movement
+            Map map = game.getMap();
+            String key = (freeColClient.getMyPlayer() == player)
+                ? ClientOptions.MOVE_ANIMATION_SPEED
+                : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+            if (freeColClient.getClientOptions().getInteger(key) > 0) {
+                Tile src = unit.getTile();
+                Tile dst = map.getNeighbourOrNull(direction, src);
+                Animations.unitMove(canvas, unit, src, dst);
+            }
+        }
 
         // If we are in a colony, or Europe, load sentries
         if (unit.getSpaceLeft() > 0
@@ -2001,104 +2009,93 @@ public final class InGameController implements NetworkConstants {
             }            
         }
 
-        // Inform the server:
-        Element moveElement = Message.createNewRootElement("move");
-        moveElement.setAttribute("unit", unit.getId());
-        moveElement.setAttribute("direction", direction.toString());
+        // Do the move
+        Connection conn = client.getConnection();
+        InputHandler inputHandler = freeColClient.getInGameInputHandler();
+        MoveMessage message = new MoveMessage(unit, direction);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
+        if (reply == null) return;
+        inputHandler.handle(conn, reply);
 
-        // TODO: server can actually fail (illegal move)!
-        
-        // Play an animation showing the unit movement
-        if (!freeColClient.isHeadless()) {
-            String key = (freeColClient.getMyPlayer() == unit.getOwner()) ?
-                ClientOptions.MOVE_ANIMATION_SPEED :
-                ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-            if (freeColClient.getClientOptions().getInteger(key) > 0) {
-                Animations.unitMove(canvas, unit, unit.getTile(),
-                                    game.getMap().getNeighbourOrNull(direction, unit.getTile()));
-            }
-        }
-        
-        // move before ask to server, to be in new tile in case there is a
-        // rumours
-        unit.move(direction);
-
-        if (unit.getTile().isLand() && !unit.getOwner().isNewLandNamed()) {
-            String newLandName = canvas.showInputDialog("newLand.text", unit.getOwner().getNewLandName(),
-                                                        "newLand.yes", null);
-            unit.getOwner().setNewLandName(newLandName);
-            Element setNewLandNameElement = Message.createNewRootElement("setNewLandName");
-            setNewLandNameElement.setAttribute("newLandName", newLandName);
-            client.sendAndWait(setNewLandNameElement);
-            canvas.showFreeColDialog(new EventPanel(canvas, EventPanel.EventType.FIRST_LANDING));
-            unit.getOwner().getHistory()
-                .add(new HistoryEvent(unit.getGame().getTurn().getNumber(),
-                                      HistoryEvent.Type.DISCOVER_NEW_WORLD,
-                                      "%name%", newLandName));
-            
-            final Player player = freeColClient.getMyPlayer();
-            final BuildColonyAction bca = (BuildColonyAction) freeColClient.getActionManager()
-                .getFreeColAction(BuildColonyAction.id);
-            final KeyStroke keyStroke = bca.getAccelerator();
-            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, player,
-                                                    "tutorial.buildColony", 
-                                                    "%build_colony_key%",
-                                                    FreeColActionUI.getHumanKeyStrokeText(keyStroke),
-                                                    "%build_colony_menu_item%",
-                                                    Messages.message("unit.state.7"),
-                                                    "%orders_menu_item%",
-                                                    Messages.message("menuBar.orders")));
-            nextModelMessage();
-        }
-
-        Region region = unit.getTile().getDiscoverableRegion();
-        if (region != null) {
-            String name = null;
-            if (region.isPacific()) {
-                name = Messages.message("model.region.pacific");
-                canvas.showFreeColDialog(new EventPanel(canvas, EventPanel.EventType.DISCOVER_PACIFIC));
-            } else if (unit.getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS)) {
-                String defaultName = unit.getOwner().getDefaultRegionName(region.getType());
-                name = freeColClient.getCanvas().showInputDialog("nameRegion.text", defaultName,
-                                                                 "ok", "cancel", 
-                                                                 "%name%", region.getDisplayName());
-                moveElement.setAttribute("regionName", name);
-            }
-            if (name != null) {
-                freeColClient.getMyPlayer().getHistory()
-                    .add(new HistoryEvent(freeColClient.getGame().getTurn().getNumber(),
-                                      HistoryEvent.Type.DISCOVER_REGION,
-                                      "%region%", name));
-            }
-        }
-
-        // reply is an "update" Element
-        Element reply = client.ask(moveElement);
-        freeColClient.getInGameInputHandler().handle(client.getConnection(), reply);
-
-        if (reply.hasAttribute("movesSlowed")) {
-            // ship slowed
-            unit.setMovesLeft(unit.getMovesLeft() - Integer.parseInt(reply.getAttribute("movesSlowed")));
-            Unit slowedBy = (Unit) freeColClient.getGame().getFreeColGameObject(reply.getAttribute("slowedBy"));
+        // Handle special cases
+        if (reply.hasAttribute("slowedBy")) { // ship slowed
+            Unit slowedBy = (Unit) game.getFreeColGameObject(reply.getAttribute("slowedBy"));
+            String enemy = slowedBy.getOwner().getNationAsString();
             canvas.showInformationMessage("model.unit.slowed", slowedBy,
-                                          "%unit%", unit.getName(), 
+                                          "%unit%", unit.getName(),
                                           "%enemyUnit%", slowedBy.getName(),
-                                          "%enemyNation%", slowedBy.getOwner().getNationAsString());
+                                          "%enemyNation%", enemy);
         }
 
-        // set location again in order to meet with people player don't see
-        // before move
-        if (!unit.isDisposed()) {
-            unit.setLocation(unit.getTile());
+        if (reply.hasAttribute("nameNewLand")) {
+            String newLandName = reply.getAttribute("nameNewLand");
+            newLandName = canvas.showInputDialog("newLand.text",
+                                                 newLandName,
+                                                 "newLand.yes", null);
+            NewLandNameMessage landMessage = new NewLandNameMessage(newLandName);
+            Element nameReply = askExpecting(client, landMessage.toXMLElement(),
+                                             "multiple");
+            if (nameReply != null) {
+                inputHandler.handle(conn, nameReply);
+                canvas.showFreeColDialog(new EventPanel(canvas, EventPanel.EventType.FIRST_LANDING));
+                String key = getBuildColonyActionKeyString();
+                ModelMessage m = new ModelMessage(player, ModelMessage.MessageType.TUTORIAL,
+                                                  player,
+                                                  "tutorial.buildColony",
+                                                  "%build_colony_key%", key,
+                                                  "%build_colony_menu_item%", Messages.message("unit.state.7"),
+                                                  "%orders_menu_item%", Messages.message("menuBar.orders"));
+                player.addModelMessage(m);
+            }
         }
 
-        if (unit.getTile().getSettlement() != null && unit.isCarrier() && unit.getTradeRoute() == null
-            && (unit.getDestination() == null || unit.getDestination().getTile() == unit.getTile())) {
+        if (reply.hasAttribute("discoverPacific")) {
+            canvas.showFreeColDialog(new EventPanel(canvas, EventPanel.EventType.DISCOVER_PACIFIC));
+        }
+
+        if (reply.hasAttribute("discoverRegion")
+            && reply.hasAttribute("regionType")) {
+            String newRegionName = reply.getAttribute("discoverRegion");
+            String newRegionType = reply.getAttribute("regionType");
+            newRegionName = canvas.showInputDialog("nameRegion.text",
+                                                   newRegionName,
+                                                   "ok", "cancel",
+                                                   "%name%", newRegionType);
+            NewRegionNameMessage regionMessage = new NewRegionNameMessage(newRegionName, unit);
+            Element regionReply = askExpecting(client,
+                                               regionMessage.toXMLElement(),
+                                               "multiple");
+            if (regionReply != null) {
+                inputHandler.handle(conn, regionReply);
+            }
+        }
+
+        if (reply.hasAttribute("fountainOfYouth")) {
+            // Without Brewster, the emigrants have already been selected
+            // and were updated to the European docks above.
+            final int emigrants = Integer.parseInt(reply.getAttribute("fountainOfYouth"));
+
+            freeColClient.playMusicOnce("fountain");
+            SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        for (int i = 0; i < emigrants; i++) {
+                            emigrateUnitInEurope(canvas.showEmigrationPanel(true) + 1);
+                        }
+                    }
+                });
+        }
+
+        if (unit.isDisposed()) {
+            nextActiveUnit(unit.getTile());
+        } else if (unit.getTile().getSettlement() != null
+                   && unit.isCarrier() && unit.getTradeRoute() == null
+                   && (unit.getDestination() == null
+                       || unit.getDestination().getTile() == unit.getTile())) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
-        } else if (unit.getMovesLeft() <= 0 || unit.isDisposed()) {
+        } else if (unit.getMovesLeft() <= 0) {
             nextActiveUnit(unit.getTile()); 
-        } 
-
+        }
         nextModelMessage();
     }
 
@@ -3287,11 +3284,6 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         Colony colony = tile.getColony();
-
-        if (colony != null && !player.hasContacted(colony.getOwner())) {
-            player.setContacted(colony.getOwner(), true);
-        }
-
         ScoutAction userAction = canvas.showScoutForeignColonyDialog(colony, unit);
         switch (userAction) {
         case CANCEL:
@@ -3386,12 +3378,10 @@ public final class InGameController implements NetworkConstants {
             client.sendAndWait(scoutMessage);
             return;
         case INDIAN_SETTLEMENT_SPEAK:
-            unit.contactAdjacent(unit.getTile());
             scoutMessage.setAttribute("action", "speak");
             reply = client.ask(scoutMessage);
             break;
         case INDIAN_SETTLEMENT_TRIBUTE:
-            unit.contactAdjacent(unit.getTile());
             scoutMessage.setAttribute("action", "tribute");
             reply = client.ask(scoutMessage);
             break;
@@ -3406,44 +3396,35 @@ public final class InGameController implements NetworkConstants {
                 // unit killed
                 unit.dispose();
                 canvas.showInformationMessage("scoutSettlement.speakDie", settlement);
-            } else if (action.equals("speak")) {
-                if (result.equals("tales")) {
-                    // receive an update of the surrounding tiles.
-                    Element updateElement = getChildElement(reply, "update");
-                    if (updateElement != null) {
-                        freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
-                    }
-                    canvas.showInformationMessage("scoutSettlement.speakTales", settlement);
-                } else if (result.equals("beads")) {
-                    // receive a small gift of gold
-                    String amount = reply.getAttribute("amount");
-                    unit.getOwner().modifyGold(Integer.parseInt(amount));
-                    freeColClient.getCanvas().updateGoldLabel();
-                    canvas.showInformationMessage("scoutSettlement.speakBeads", settlement,
-                                                  "%replace%", amount);
-                } else if (result.equals("nothing")) {
-                    // nothing special
-                    canvas.showInformationMessage("scoutSettlement.speakNothing", settlement);
-                } else if (result.equals("expert")) {
-                    Element updateElement = getChildElement(reply, "update");
-                    if (updateElement != null) {
-                        freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
-                    }
-                    canvas.showInformationMessage("scoutSettlement.expertScout", settlement,
-                                                  "%unit%", unit.getType().getName());
-                }                    
-            } else if (action.equals("tribute")) {
-                if (result.equals("agree")) {
-                    // receive a tribute
-                    String amount = reply.getAttribute("amount");
-                    unit.getOwner().modifyGold(Integer.parseInt(amount));
-                    freeColClient.getCanvas().updateGoldLabel();
-                    canvas.showInformationMessage("scoutSettlement.tributeAgree", settlement,
-                                                  "%replace%", amount);
-                } else if (result.equals("disagree")) {
-                    // no tribute
-                    canvas.showInformationMessage("scoutSettlement.tributeDisagree", settlement);
+            } else if (action.equals("speak") && result.equals("tales")) {
+                // receive an update of the surrounding tiles.
+                Element updateElement = getChildElement(reply, "update");
+                if (updateElement != null) {
+                    freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
                 }
+                canvas.showInformationMessage("scoutSettlement.speakTales", settlement);
+            } else if (action.equals("speak") && result.equals("beads")) {
+                // receive a small gift of gold
+                String amount = reply.getAttribute("amount");
+                unit.getOwner().modifyGold(Integer.parseInt(amount));
+                freeColClient.getCanvas().updateGoldLabel();
+                canvas.showInformationMessage("scoutSettlement.speakBeads",
+                                              settlement,
+                                              "%replace%", amount);
+            } else if (action.equals("speak") && result.equals("nothing")) {
+                // nothing special
+                canvas.showInformationMessage("scoutSettlement.speakNothing", settlement);
+            } else if (action.equals("tribute") && result.equals("agree")) {
+                // receive a tribute
+                String amount = reply.getAttribute("amount");
+                unit.getOwner().modifyGold(Integer.parseInt(amount));
+                freeColClient.getCanvas().updateGoldLabel();
+                canvas.showInformationMessage("scoutSettlement.tributeAgree",
+                                              settlement,
+                                              "%replace%", amount);
+            } else if (action.equals("tribute") && result.equals("disagree")) {
+                // no tribute
+                canvas.showInformationMessage("scoutSettlement.tributeDisagree", settlement);
             }
         } else {
             logger.warning("Server gave an invalid reply to an scoutIndianSettlement message");

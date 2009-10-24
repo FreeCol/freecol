@@ -73,7 +73,7 @@ public final class EventPanel extends FreeColDialog<Boolean> {
         switch(type) {
         case FIRST_LANDING:
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.firstLanding")));
-            header.setText(Messages.message("event.firstLanding", "%name%", getMyPlayer().getNewLandName()));
+            header.setText(Messages.message("event.firstLanding", "%name%", getMyPlayer().getSafeNewLandName()));
             break;
         case MEETING_NATIVES:
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingNatives")));

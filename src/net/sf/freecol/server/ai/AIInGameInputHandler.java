@@ -123,7 +123,6 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("attackResult")) {
                 } else if (type.equals("setCurrentPlayer")) {
                     reply = setCurrentPlayer((DummyConnection) connection, element);
-                } else if (type.equals("emigrateUnitInEuropeConfirmed")) {
                 } else if (type.equals("newTurn")) {
                 } else if (type.equals("setDead")) {
                 } else if (type.equals("gameEnded")) {
@@ -141,11 +140,13 @@ public final class AIInGameInputHandler implements MessageHandler, StreamedMessa
                 } else if (type.equals("removeGoods")) {
                 } else if (type.equals("indianDemand")) {
                     reply = indianDemand((DummyConnection) connection, element);
-                } else if (type.equals("lostCityRumour")) {
                 } else if (type.equals("updateMarket")) {
                 } else if (type.equals("marketElement")) {
                 } else if (type.equals("diplomacy")) {
                     reply = diplomaticTrade((DummyConnection) connection, element);
+                } else if (type.equals("addMessages")) {
+                } else if (type.equals("addHistory")) {
+                } else if (type.equals("multiple")) {
                 } else {
                     logger.warning("Message is of unsupported type \"" + type + "\".");
                 }

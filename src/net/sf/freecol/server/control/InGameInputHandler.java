@@ -89,7 +89,10 @@ import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
+import net.sf.freecol.common.networking.NewLandNameMessage;
+import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.SellMessage;
@@ -148,10 +151,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new SetDestinationMessage(getGame(), element).handle(freeColServer, connection);
             }
         });
-        register("move", new CurrentPlayerNetworkRequestHandler() {
+        register(MoveMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return move(connection, element);
+                return new MoveMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("askSkill", new CurrentPlayerNetworkRequestHandler() {
@@ -328,10 +331,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return clearSpeciality(connection, element);
             }
         });
-        register("setNewLandName", new CurrentPlayerNetworkRequestHandler() {
+        register(NewLandNameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return setNewLandName(connection, element);
+                return new NewLandNameMessage(getGame(), element).handle(freeColServer, player, connection);
+            }
+        });
+        register(NewRegionNameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            @Override
+            public Element handle(Player player, Connection connection, Element element) {
+                return new NewRegionNameMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("endTurn", new CurrentPlayerNetworkRequestHandler() {
@@ -494,11 +503,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new DiplomacyMessage(getGame(), element).handle(freeColServer, connection);
             }
         });
-        register("selectFromFountainYouth", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return selectFromFountainYouth(connection, element);
-            }
-        });
         register(SpySettlementMessage.getXMLElementTagName(), new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return new SpySettlementMessage(getGame(), element).handle(freeColServer, connection);
@@ -598,21 +602,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
     }
 
-    /**
-     * Handles a "setNewLandName"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element setNewLandName(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        player.setNewLandName(element.getAttribute("newLandName"));
-        player.getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                                 HistoryEvent.Type.DISCOVER_NEW_WORLD,
-                                                 "%name%", player.getNewLandName()));
-        // TODO: Send name to all other players.
-        return null;
-    }
 
     /**
      * Handles a "createUnit"-message from a client.
@@ -844,420 +833,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         colony.dispose();
         sendUpdatedTileToAll(tile, player);
         return null;
-    }
-
-    /**
-     * Handles a "move"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param moveElement The element containing the request.
-     * @exception IllegalArgumentException If the data format of the message is
-     *                invalid.
-     * @exception IllegalStateException If the request is not accepted by the
-     *                model.
-     */
-    private Element move(Connection connection, Element moveElement) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        String unitID = moveElement.getAttribute("unit");
-        Unit unit = (Unit) getGame().getFreeColGameObject(unitID);
-        Direction direction = Enum.valueOf(Direction.class, moveElement.getAttribute("direction"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: " + unitID);
-        }
-        if (unit.getTile() == null) {
-            throw new IllegalArgumentException("'Unit' not on map: ID: " + unitID + " ("
-                    + unit.getName() + ")");
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-
-        for (ServerPlayer enemyPlayer : getOtherPlayers(player)) {
-            try {
-                if (unit.isVisibleTo(enemyPlayer)) { // && !disembark
-                    // the unit is already visible
-                    Element opponentMoveElement = Message.createNewRootElement("opponentMove");
-                    opponentMoveElement.setAttribute("fromTile", unit.getTile().getId());
-                    opponentMoveElement.setAttribute("direction", direction.toString());
-                    opponentMoveElement.setAttribute("unit", unit.getId());
-                    enemyPlayer.getConnection().sendAndWait(opponentMoveElement);
-                } else if (enemyPlayer.canSee(newTile)
-                           && newTile.getSettlement() == null) {
-                    // the unit reveals itself, after leaving a settlement or carrier
-                    Element opponentMoveElement = Message.createNewRootElement("opponentMove");
-                    opponentMoveElement.setAttribute("direction", direction.toString());
-                    opponentMoveElement.setAttribute("toTile", newTile.getId());
-                    opponentMoveElement.appendChild(unit.toXMLElement(enemyPlayer, opponentMoveElement
-                            .getOwnerDocument(), false, false));
-                    if (unit.isOnCarrier() && !((Unit) unit.getLocation()).isVisibleTo(enemyPlayer)) {
-                        Unit location = (Unit) unit.getLocation();
-                        opponentMoveElement.setAttribute("inUnit", location.getId());
-                        opponentMoveElement.appendChild(location.toXMLElement(enemyPlayer, opponentMoveElement
-                                .getOwnerDocument(), false, false));
-                    }
-                    enemyPlayer.getConnection().sendAndWait(opponentMoveElement);
-                }
-            } catch (IOException e) {
-                logger.warning("Could not send message to: " + enemyPlayer.getName() + " with connection "
-                        + enemyPlayer.getConnection());
-            }
-        }
-        
-        unit.move(direction);
-
-        Element reply = Message.createNewRootElement("update");
-        CombatModel combatModel = unit.getGame().getCombatModel();        
-        // Check if ship is slowed
-        if (unit.isNaval() && unit.getMovesLeft() > 0) {
-            Iterator<Position> tileIterator = getGame().getMap().getAdjacentIterator(unit.getTile().getPosition());
-            float attackPower = 0;
-            Unit attacker = null;
-            
-            while (tileIterator.hasNext()) {
-                Tile tile = getGame().getMap().getTile(tileIterator.next());
-                Colony colony = tile.getColony();
-                // ships in settlements don't slow enemy ships
-                if (colony != null) {
-                    /* TODO: this doesn't actually do anything.
-                     * Should a fortress slow enemy ships?
-                    Player enemy = colony.getOwner();
-                    if (player != enemy && (player.getStance(enemy) == Stance.WAR
-                            || unit.hasAbility("model.ability.piracy"))
-                            && colony.hasAbility("model.ability.bombardShips")) {
-                        float bombardingPower = combatModel.getOffencePower(colony, unit);
-                    }
-                    */
-                } else if (!tile.isLand() && tile.getFirstUnit() != null) {
-                    Player enemy = tile.getFirstUnit().getOwner();
-                    if (player == enemy) { // own units, check another tile
-                        continue;
-                    }
-                    
-                    for (Unit enemyUnit : tile.getUnitList()) {
-                        if (enemyUnit.isOffensiveUnit() && (player.getStance(enemy) == Stance.WAR
-                                || enemyUnit.hasAbility("model.ability.piracy")
-                                || unit.hasAbility("model.ability.piracy"))) {
-                            attackPower += combatModel.getOffencePower(enemyUnit, unit);
-                            if (attacker == null) {
-                                attacker = enemyUnit;
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if (attackPower > 0) {
-                // this must be the case, because it is the only way
-                // to increase attackPower
-                assert attacker != null;
-                float defencePower = combatModel.getDefencePower(attacker, unit);
-                float totalProbability = attackPower + defencePower;
-                int r = getPseudoRandom().nextInt(Math.round(totalProbability) + 1);
-                if (r < attackPower) {
-                    int diff = Math.max(0, Math.round(attackPower - defencePower));
-                    int moves = Math.min(9, 3 + diff / 3);
-                    unit.setMovesLeft(unit.getMovesLeft() - moves);
-                    reply.setAttribute("movesSlowed", Integer.toString(moves));
-                    reply.setAttribute("slowedBy", attacker.getId());
-                }
-            }
-        }
-        
-
-        if (player.isEuropean()) {
-            Region region = newTile.getDiscoverableRegion();
-            if (region != null &&
-                (region.isPacific() ||
-                 getGame().getGameOptions().getBoolean(GameOptions.EXPLORATION_POINTS))) {
-                String name;
-                if (region.isPacific()) {
-                    name = region.getDisplayName();
-                } else {
-                    name = moveElement.getAttribute("regionName");
-                    if (name == null || "".equals(name)) {
-                        name = player.getDefaultRegionName(region.getType());
-                    }
-                }
-                region.discover(player, getGame().getTurn(), name);
-                reply.appendChild(region.toXMLElement(player, reply.getOwnerDocument()));
-
-                Element updateElement = Message.createNewRootElement("update");
-                updateElement.appendChild(region.toXMLElement(player, updateElement.getOwnerDocument()));
-                freeColServer.getServer().sendToAll(updateElement, player.getConnection());
-            }
-        }
-
-
-        if (newTile.hasLostCityRumour() && player.isEuropean()) {
-            exploreLostCityRumour(unit, player);
-        }
-        Document doc = reply.getOwnerDocument();
-        reply.appendChild(newTile.toXMLElement(player, doc, false, false));
-        for (Tile t : getGame().getMap().getSurroundingTiles(unit.getTile(), unit.getLineOfSight())) {
-            reply.appendChild(t.toXMLElement(player, doc, false, false));
-        }
-        return reply;
-    }
-
-    /**
-     * Returns a type of Lost City Rumour. The type of rumour depends on the
-     * exploring unit, as well as player settings.
-     * 
-     * @param unit The <code>Unit</code> exploring the lost city rumour.
-     * @param player The <code>ServerPlayer</code> to send a message to.
-     */
-    private void exploreLostCityRumour(Unit unit, ServerPlayer player) {
-
-        Tile tile = unit.getTile();        
-
-        Specification specification = FreeCol.getSpecification();
-        List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
-        List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
-        List<UnitType> treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
-
-        int level = Specification.getSpecification().getRangeOption("model.option.difficulty").getValue();
-
-        RumourType rumour = tile.getLostCityRumour().getType();
-
-        if (rumour == null) {
-
-            //TODO: Move this magic values to the specification file
-        
-            //The following arrays contain percentage values for "good"
-            //and "bad" events when scouting with a non-expert at the various
-            //difficulty levels [0..4]
-            //exact values TODO, but generally "bad" should increase, "good" decrease
-            final int BAD_EVENT_PERCENTAGE[]  = { 11, 17, 23, 30, 37};
-            final int GOOD_EVENT_PERCENTAGE[] = { 75, 62, 48, 33, 17};
-            //remaining to 100, event "NOTHING":  14, 21, 29, 37, 46
-        
-            //The following arrays contain the modifiers applied when expert scout is at work
-            //exact values TODO; modifiers may look slightly "better" on harder levels
-            //since we're starting from a "worse" percentage
-            final int BAD_EVENT_MOD[]  = {-6, -7, -7, -8, -9};
-            final int GOOD_EVENT_MOD[] = {14, 15, 16, 18, 20};
-
-            //the scouting outcome is based on three factors: level, expert scout or not, DeSoto or not
-            boolean isExpertScout = unit.hasAbility("model.ability.expertScout") && 
-                unit.hasAbility("model.ability.scoutIndianSettlement");
-            boolean hasDeSoto = player.hasAbility("model.ability.rumoursAlwaysPositive");
-
-            //based on that, we're going to calculate probabilites for neutral, bad and good events
-            int percentNeutral = 0;
-            int percentBad;
-            int percentGood;
-        
-            if (hasDeSoto) {
-                percentBad     = 0;
-                percentGood    = 100;
-            } else {
-                //First, get "basic" percentages
-                percentBad  = BAD_EVENT_PERCENTAGE[level];
-                percentGood = GOOD_EVENT_PERCENTAGE[level];
-        
-                //Second, apply ExpertScout bonus if necessary
-                if (isExpertScout) {
-                    percentBad += BAD_EVENT_MOD[level];
-                    percentGood += GOOD_EVENT_MOD[level];
-                }
-
-                //Third, get a value for the "neutral" percentage,
-                //unless the other values exceed 100 already
-                if (percentBad+percentGood<100) {
-                    percentNeutral = 100-percentBad-percentGood;
-                }
-            }
-
-            //Now, the individual events; each section should add up to 100
-            //The NEUTRAL
-            int eventNothing = 100;
-
-            //The BAD
-            int eventVanish = 100;
-            int eventBurialGround = 0;
-            //if the tile is native-owned, allow burial grounds rumour
-            if (tile.getOwner() != null && !tile.getOwner().isEuropean()) {
-                eventVanish = 75;
-                eventBurialGround = 25;
-            }
-
-            //The GOOD
-            int eventLearn    = 30;
-            int eventTrinkets = 30;
-            int eventColonist = 20;
-            //or, if the unit can't learn
-            if (learntUnitTypes.isEmpty()) {
-                eventLearn    =  0;
-                eventTrinkets = 50;
-                eventColonist = 30;
-            }
-
-            //The SPECIAL
-            //TODO: Right now, these are considered "good" events that happen randomly
-            //Change this to have them appear a fixed (per specifications) amount of times throughout the game
-            int eventDorado   = 13;
-            int eventFountain =  7;
-
-            //Finally, apply the Good/Bad/Neutral modifiers from above,
-            //so that we end up with a ton of values, some of them zero,
-            //the sum of which should be 10000.
-            eventNothing      *= percentNeutral;
-            eventVanish       *= percentBad;
-            eventBurialGround *= percentBad;
-            eventLearn        *= percentGood;
-            eventTrinkets     *= percentGood;
-            eventColonist     *= percentGood;
-            eventDorado       *= percentGood;
-            eventFountain     *= percentGood;
-
-            //Add all possible events to a RandomChoice List
-            List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
-            if (eventNothing>0) {
-                choices.add(new RandomChoice<RumourType>(RumourType.NOTHING, eventNothing));
-            }
-            if (eventVanish>0) {
-                choices.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, eventVanish));
-            }
-            if (eventBurialGround>0) {
-                choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, eventBurialGround));
-            }
-            if (eventLearn>0) {
-                choices.add(new RandomChoice<RumourType>(RumourType.LEARN, eventLearn));
-            }
-            if (eventTrinkets>0) {
-                choices.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF, eventTrinkets));
-            }
-            if (eventColonist>0) {
-                choices.add(new RandomChoice<RumourType>(RumourType.COLONIST, eventColonist));
-            }
-            if (eventFountain>0) {
-                choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
-            }
-            if (eventDorado>0) {
-                choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, eventDorado));
-            }
-            rumour = RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
-        } else {
-            if (rumour == RumourType.LEARN && learntUnitTypes.isEmpty()) {
-                rumour = RumourType.NOTHING;
-            }
-        }
-
-        Element rumourElement = Message.createNewRootElement("lostCityRumour");
-        rumourElement.setAttribute("type", rumour.toString());
-        rumourElement.setAttribute("unit", unit.getId());
-        Unit newUnit;
-        int random;
-        int dx = 10 - level;
-        switch (rumour) {
-        case BURIAL_GROUND:
-            Player indianPlayer = tile.getOwner();
-            indianPlayer.modifyTension(player, Tension.Level.HATEFUL.getLimit());
-            break;
-        case EXPEDITION_VANISHES:
-            unit.dispose();
-            break;
-        case NOTHING:
-            break;
-        case LEARN:
-            random = getPseudoRandom().nextInt(learntUnitTypes.size());
-            unit.setType(learntUnitTypes.get(random));
-            rumourElement.setAttribute("unitType", learntUnitTypes.get(random).getId());
-            break;
-        case TRIBAL_CHIEF:
-            int amount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
-            player.modifyGold(amount);
-            rumourElement.setAttribute("amount", Integer.toString(amount));
-            break;
-        case COLONIST:
-            random = getPseudoRandom().nextInt(newUnitTypes.size());
-            newUnit = new Unit(getGame(), tile, player, newUnitTypes.get(random), UnitState.ACTIVE);
-            rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
-            break;
-        case TREASURE:
-            int treasure = getPseudoRandom().nextInt(dx * 600) + dx * 300;
-            random = getPseudoRandom().nextInt(treasureUnitTypes.size());
-            newUnit = new Unit(getGame(), tile, player, treasureUnitTypes.get(random), UnitState.ACTIVE);
-            newUnit.setTreasureAmount(treasure);
-            rumourElement.setAttribute("amount", Integer.toString(treasure));
-            rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
-            player.getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                                     HistoryEvent.Type.CITY_OF_GOLD,
-                                                     "%treasure%", String.valueOf(treasure)));
-            break;
-        case FOUNTAIN_OF_YOUTH:
-            if (player.getEurope() != null) {
-                if (player.hasAbility("model.ability.selectRecruit")) {
-                    player.setRemainingEmigrants(dx);
-                    rumourElement.setAttribute("emigrants", Integer.toString(dx));
-                } else {
-                    for (int k = 0; k < dx; k++) {
-                        newUnit = new Unit(getGame(), player.getEurope(), player,
-                                           player.generateRecruitable(player.getId() + "fountain." + Integer.toString(k)),
-                                           UnitState.ACTIVE);
-                        rumourElement.appendChild(newUnit.toXMLElement(player, rumourElement.getOwnerDocument()));
-                    }
-                }
-            }
-            break;
-        default:
-            throw new IllegalStateException("No such rumour.");
-        }
-        // tell the player about the result, sendAndWait to avoid a block
-        try {
-            player.getConnection().sendAndWait(rumourElement);
-        } catch (IOException e) {
-            logger.warning("Could not send rumour message to: " + player.getName() + " with connection "
-                    + player.getConnection());
-        }
-        tile.removeLostCityRumour();
-        // tell everyone the rumour has been explored
-        for (ServerPlayer updatePlayer : getOtherPlayers(player)) {
-            if (updatePlayer.canSee(tile)) {
-                try {
-                    Element rumourUpdate = Message.createNewRootElement("update");
-                    rumourUpdate.appendChild(tile.toXMLElement(updatePlayer, rumourUpdate.getOwnerDocument()));
-                    updatePlayer.getConnection().sendAndWait(rumourUpdate);
-                } catch (IOException e) {
-                    logger.warning("Could not send update message to: " + updatePlayer.getName() + " with connection "
-                                   + updatePlayer.getConnection());
-                }
-            }
-        }
-    }
-    
-    /**
-     * Handles an "selectFromFountainYouth"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @exception IllegalArgumentException If the data format of the message is
-     *                invalid.
-     * @exception IllegalStateException If the request is not accepted by the
-     *                model.
-     */
-    private Element selectFromFountainYouth(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        int remaining = player.getRemainingEmigrants();
-        if (remaining == 0) {
-            throw new IllegalStateException("There is no remaining emigrants for this player.");
-        }
-        player.setRemainingEmigrants(remaining-1);
-        
-        Europe europe = player.getEurope();
-        int slot = Integer.parseInt(element.getAttribute("slot"));
-        UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable(player.getId() + "slot." + Integer.toString(slot));
-        europe.setRecruitable(slot, newRecruitable);
-        
-        Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE);
-        Element reply = Message.createNewRootElement("selectFromFountainYouthConfirmed");
-        reply.setAttribute("newRecruitable", newRecruitable.getId());
-        reply.appendChild(unit.toXMLElement(player, reply.getOwnerDocument()));
-        return reply;
     }
 
     /**
@@ -1656,7 +1231,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
         Element reply = Message.createNewRootElement("scoutIndianSettlementResult");
         if (action.equals("basic")) {
-            unit.contactAdjacent(settlement.getTile());
             unit.setMovesLeft(0);
             // Just return the skill and wanted goods.
             UnitType skill = settlement.getLearnableSkill();
@@ -1687,7 +1261,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.setAttribute("result", "die");
             unit.dispose();
         } else if (action.equals("speak")) {
-            unit.contactAdjacent(settlement.getTile());
             if (!settlement.hasBeenVisited()) {
                 if (settlement.getLearnableSkill() != null
                     && settlement.getLearnableSkill().hasAbility("model.ability.expertScout")
@@ -1726,7 +1299,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 reply.setAttribute("result", "nothing");
             }
         } else if (action.equals("tribute")) {
-            unit.contactAdjacent(settlement.getTile());
             demandTribute(settlement, player, reply);
         }
         return reply;

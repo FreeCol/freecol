@@ -41,11 +41,16 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
+import net.sf.freecol.common.model.LostCityRumour;
+import net.sf.freecol.common.model.LostCityRumour.RumourType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -58,6 +63,7 @@ import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
@@ -66,6 +72,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
@@ -1199,6 +1206,439 @@ public final class InGameController extends Controller {
                                unit, "model.europe.emigrate",
                                "%europe%", europe.getName(),
                                "%unit%", unit.getName());
+    }
+
+
+    /**
+     * If a unit moves, check if an opposing naval unit slows it down.
+     * Note that the unit moves are reduced here.
+     *
+     * @param unit The <code>Unit</code> that is moving.
+     * @param tile The <code>Tile</code> the unit is moving to.
+     * @return Either an enemy unit that causes a slowdown, or null if none.
+     */
+    public Unit getSlowedBy(Unit unit, Tile newTile) {
+        Player player = unit.getOwner();
+        Game game = unit.getGame();
+        CombatModel combatModel = game.getCombatModel();
+        Unit attacker = null;
+        boolean pirate = unit.hasAbility("model.ability.piracy");
+        float attackPower = 0;
+
+        if (!unit.isNaval() || unit.getMovesLeft() <= 0) return null;
+        for (Tile tile : game.getMap().getSurroundingTiles(newTile, 1)) {
+            // Ships in settlements do not slow enemy ships, but:
+            // TODO should a fortress slow a ship?
+            Player enemy;
+            if (tile.isLand()
+                || tile.getColony() != null
+                || tile.getFirstUnit() == null
+                || (enemy = tile.getFirstUnit().getOwner()) == player) continue;
+            for (Unit enemyUnit : tile.getUnitList()) {
+                if (pirate || enemyUnit.hasAbility("model.ability.piracy")
+                    || (enemyUnit.isOffensiveUnit()
+                        && player.getStance(enemy) == Stance.WAR)) {
+                    attackPower += combatModel.getOffencePower(enemyUnit, unit);
+                    if (attacker == null) {
+                        attacker = enemyUnit;
+                    }
+                }
+            }
+        }
+        if (attackPower > 0) {
+            float defencePower = combatModel.getDefencePower(attacker, unit);
+            float totalProbability = attackPower + defencePower;
+            if (getPseudoRandom().nextInt(Math.round(totalProbability) + 1)
+                < attackPower) {
+                int diff = Math.max(0, Math.round(attackPower - defencePower));
+                int moves = Math.min(9, 3 + diff / 3);
+                unit.setMovesLeft(unit.getMovesLeft() - moves);
+                logger.info(unit.getId()
+                            + " slowed by " + attacker.getId()
+                            + " by " + Integer.toString(moves) + " moves.");
+            } else {
+                attacker = null;
+            }
+        }
+        return attacker;
+    }
+
+
+    /**
+     * Returns a type of Lost City Rumour. The type of rumour depends on the
+     * exploring unit, as well as player settings.
+     *
+     * @param lostCity The <code>LostCityRumour</code> to investigate.
+     * @param unit The <code>Unit</code> exploring the lost city rumour.
+     * @param difficulty The difficulty level.
+     * @return The type of rumour.
+     * @todo Move all the magic numbers in here to the specification.
+     *       Also change the logic so that the special events appear a fixed number
+     *       of times throughout the game, according to the specification.
+     *       Names for the cities of gold is also on the wishlist.
+     */
+    private RumourType getLostCityRumourType(LostCityRumour lostCity,
+                                             Unit unit, int difficulty) {
+        Tile tile = unit.getTile();
+        Player player = unit.getOwner();
+        RumourType rumour = lostCity.getType();
+
+        if (rumour != null) {
+            // Filter out failing cases that could only occur if the
+            // type was explicitly set in debug mode.
+            switch (rumour) {
+            case BURIAL_GROUND:
+                if (tile.getOwner() == null || !tile.getOwner().isIndian()) {
+                    rumour = RumourType.NOTHING;
+                }
+                break;
+            case LEARN:
+                if (unit.getType().getUnitTypesLearntInLostCity().isEmpty()) {
+                    rumour = RumourType.NOTHING;
+                }
+                break;
+            default:
+                break;
+            }
+            return rumour;
+        }
+
+        // The following arrays contain percentage values for
+        // "good" and "bad" events when scouting with a non-expert
+        // at the various difficulty levels [0..4] exact values
+        // but generally "bad" should increase, "good" decrease
+        final int BAD_EVENT_PERCENTAGE[]  = { 11, 17, 23, 30, 37 };
+        final int GOOD_EVENT_PERCENTAGE[] = { 75, 62, 48, 33, 17 };
+        // remaining to 100, event NOTHING:   14, 21, 29, 37, 46
+
+        // The following arrays contain the modifiers applied when
+        // expert scout is at work exact values; modifiers may
+        // look slightly "better" on harder levels since we're
+        // starting from a "worse" percentage.
+        final int BAD_EVENT_MOD[]  = { -6, -7, -7, -8, -9 };
+        final int GOOD_EVENT_MOD[] = { 14, 15, 16, 18, 20 };
+
+        // The scouting outcome is based on three factors: level,
+        // expert scout or not, DeSoto or not.  Based on this, we
+        // are going to calculate probabilites for neutral, bad
+        // and good events.
+        boolean isExpertScout = unit.hasAbility("model.ability.expertScout")
+            && unit.hasAbility("model.ability.scoutIndianSettlement");
+        boolean hasDeSoto = player.hasAbility("model.ability.rumoursAlwaysPositive");
+        int percentNeutral;
+        int percentBad;
+        int percentGood;
+
+        if (hasDeSoto) {
+            percentBad  = 0;
+            percentGood = 100;
+            percentNeutral = 0;
+        } else { // First, get "basic" percentages
+            percentBad  = BAD_EVENT_PERCENTAGE[difficulty];
+            percentGood = GOOD_EVENT_PERCENTAGE[difficulty];
+
+            // Second, apply ExpertScout bonus if necessary
+            if (isExpertScout) {
+                percentBad  += BAD_EVENT_MOD[difficulty];
+                percentGood += GOOD_EVENT_MOD[difficulty];
+            }
+
+            // Third, get a value for the "neutral" percentage,
+            // unless the other values exceed 100 already
+            if (percentBad + percentGood < 100) {
+                percentNeutral = 100 - percentBad - percentGood;
+            } else {
+                percentNeutral = 0;
+            }
+        }
+
+        // Now, the individual events; each section should add up to 100
+        // The NEUTRAL
+        int eventNothing = 100;
+
+        // The BAD
+        int eventVanish = 100;
+        int eventBurialGround = 0;
+        // If the tile not is European-owned, allow burial grounds rumour.
+        if (tile.getOwner() != null && tile.getOwner().isIndian()) {
+            eventVanish = 75;
+            eventBurialGround = 25;
+        }
+
+        // The GOOD
+        int eventLearn    = 30;
+        int eventTrinkets = 30;
+        int eventColonist = 20;
+        // or, if the unit can't learn
+        if (unit.getType().getUnitTypesLearntInLostCity().isEmpty()) {
+            eventLearn    =  0;
+            eventTrinkets = 50;
+            eventColonist = 30;
+        }
+
+        // The SPECIAL
+        // Right now, these are considered "good" events that happen randomly.
+        int eventDorado   = 13;
+        int eventFountain = 7;
+
+        // Finally, apply the Good/Bad/Neutral modifiers from
+        // above, so that we end up with a ton of values, some of
+        // them zero, the sum of which should be 10000.
+        eventNothing      *= percentNeutral;
+        eventVanish       *= percentBad;
+        eventBurialGround *= percentBad;
+        eventLearn        *= percentGood;
+        eventTrinkets     *= percentGood;
+        eventColonist     *= percentGood;
+        eventDorado       *= percentGood;
+        eventFountain     *= percentGood;
+
+        // Add all possible events to a RandomChoice List
+        List<RandomChoice<RumourType>> choices = new ArrayList<RandomChoice<RumourType>>();
+        if (eventNothing > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.NOTHING, eventNothing));
+        }
+        if (eventVanish > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.EXPEDITION_VANISHES, eventVanish));
+        }
+        if (eventBurialGround > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.BURIAL_GROUND, eventBurialGround));
+        }
+        if (eventLearn > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.LEARN, eventLearn));
+        }
+        if (eventTrinkets > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.TRIBAL_CHIEF, eventTrinkets));
+        }
+        if (eventColonist > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.COLONIST, eventColonist));
+        }
+        if (eventFountain > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
+        }
+        if (eventDorado > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, eventDorado));
+        }
+        return RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
+    }
+
+    /**
+     * Explore a lost city.
+     *
+     * @param unit The <code>Unit</code> that is exploring.
+     * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
+     * @return A list of FreeColObjects to send to the client as a result.
+     */
+    public List<FreeColObject> exploreLostCityRumour(ServerPlayer serverPlayer, Unit unit) {
+        List<FreeColObject> result = new ArrayList<FreeColObject>();
+        Specification specification = FreeCol.getSpecification();
+        int difficulty = specification.getRangeOption("model.option.difficulty").getValue();
+        int dx = 10 - difficulty;
+        Game game = unit.getGame();
+        Tile tile = unit.getTile();
+        LostCityRumour lostCity = tile.getLostCityRumour();
+
+        if (lostCity == null) return result;
+        switch (getLostCityRumourType(lostCity, unit, difficulty)) {
+        case BURIAL_GROUND:
+            Player indianPlayer = tile.getOwner();
+            indianPlayer.modifyTension(serverPlayer, Tension.Level.HATEFUL.getLimit());
+            result.add(indianPlayer);
+            result.add(new ModelMessage(serverPlayer,
+                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        unit,
+                                        "lostCityRumour.BurialGround",
+                                        "%nation%", indianPlayer.getNationAsString()));
+            break;
+        case EXPEDITION_VANISHES:
+            unit.dispose();
+            result.add(new ModelMessage(serverPlayer,
+                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        null,
+                                        "lostCityRumour.ExpeditionVanishes"));
+            break;
+        case NOTHING:
+            result.add(new ModelMessage(serverPlayer,
+                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        unit,
+                                        "lostCityRumour.Nothing"));
+            break;
+        case LEARN:
+            List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
+            String oldName = unit.getName();
+            unit.setType(learntUnitTypes.get(getPseudoRandom().nextInt(learntUnitTypes.size())));
+            result.add(new ModelMessage(serverPlayer,
+                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        unit,
+                                        "lostCityRumour.Learn",
+                                        "%unit%", oldName,
+                                        "%type%", unit.getType().getName()));
+            break;
+        case TRIBAL_CHIEF:
+            int chiefAmount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
+            serverPlayer.modifyGold(chiefAmount);
+            result.add(serverPlayer);
+            result.add(new ModelMessage(serverPlayer,
+                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        unit,
+                                        "lostCityRumour.TribalChief",
+                                        "%money%", Integer.toString(chiefAmount)));
+            break;
+        case COLONIST:
+            List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
+            Unit newUnit = new Unit(game, tile, serverPlayer,
+                                    newUnitTypes.get(getPseudoRandom().nextInt(newUnitTypes.size())),
+                                    UnitState.ACTIVE);
+            result.add(new ModelMessage(serverPlayer,
+                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        newUnit,
+                                        "lostCityRumour.Colonist"));
+            break;
+        case TREASURE:
+            List<UnitType> treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
+            int treasureAmount = getPseudoRandom().nextInt(dx * 600) + dx * 300;
+            String treasureString = String.valueOf(treasureAmount);
+            UnitType unitType = treasureUnitTypes.get(getPseudoRandom().nextInt(treasureUnitTypes.size()));
+            newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
+            newUnit.setTreasureAmount(treasureAmount);
+            result.add(new ModelMessage(serverPlayer,
+                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        newUnit,
+                                        "lostCityRumour.TreasureTrain",
+                                        "%money%", treasureString));
+            result.add(new HistoryEvent(game.getTurn().getNumber(),
+                                        HistoryEvent.Type.CITY_OF_GOLD,
+                                        "%treasure%", treasureString));
+            break;
+        case FOUNTAIN_OF_YOUTH:
+            Europe europe = serverPlayer.getEurope();
+            if (europe == null) {
+                result.add(new ModelMessage(serverPlayer,
+                                            ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                            unit,
+                                            "lostCityRumour.FountainOfYouthWithoutEurope"));
+            } else {
+                if (serverPlayer.hasAbility("model.ability.selectRecruit")
+                    && !serverPlayer.isAI() // TODO: let the AI select
+                    ) {
+                    // Remember, and ask player to select
+                    serverPlayer.setRemainingEmigrants(dx);
+                } else {
+                    for (int k = 0; k < dx; k++) {
+                        new Unit(game, europe, serverPlayer, serverPlayer.generateRecruitable(serverPlayer.getId() + "fountain." + Integer.toString(k)),
+                                 UnitState.ACTIVE);
+                    }
+                    result.add(europe);
+                }
+                result.add(new ModelMessage(serverPlayer,
+                                            ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                            unit,
+                                            "lostCityRumour.FountainOfYouth"));
+            }
+            break;
+        case NO_SUCH_RUMOUR:
+        default:
+            throw new IllegalStateException("No such rumour.");
+        }
+        tile.removeLostCityRumour();
+        result.add(tile);
+        return result;
+    }
+
+    /**
+     * Find uncontacted players with units or settlements on
+     * surrounding tiles.
+     * Removed the restriction that the unit must not be naval which
+     * avoids the special case where a scout, student, missionary, or
+     * military unit can arrive by ship at an uncontacted settlement.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is moving.
+     * @param tile The <code>Tile</code> to check.
+     * @return A list of <code>ServerPlayer</code>s newly contacted.
+     */
+    public List<ServerPlayer> findAdjacentUncontacted(ServerPlayer serverPlayer,
+                                                      Tile tile) {
+        List<ServerPlayer> players = new ArrayList<ServerPlayer>();
+        for (Tile t : getGame().getMap().getSurroundingTiles(tile, 1)) {
+            if (t == null || !t.isLand()) {
+                continue; // Invalid tile for contact
+            }
+
+            ServerPlayer otherPlayer = null;
+            if (t.getSettlement() != null) {
+                otherPlayer = (ServerPlayer) t.getSettlement().getOwner();
+            } else if (t.getFirstUnit() != null) {
+                otherPlayer = (ServerPlayer) t.getFirstUnit().getOwner();
+            }
+
+            // Ignore ourself and previously contacted nations.
+            if (otherPlayer != null && otherPlayer != serverPlayer
+                && !serverPlayer.hasContacted(otherPlayer)) {
+                players.add(otherPlayer);
+            }
+        }
+        return players;
+    }
+
+    /**
+     * Move a unit.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is moving.
+     * @param unit The <code>Unit</code> to move.
+     * @param newTile The <code>Tile</code> to move to.
+     * @return A list of newly contacted <code>ServerPlayer</code>s as
+     *         a result of this move.
+     */
+    public List<FreeColObject> move(ServerPlayer serverPlayer, Unit unit,
+                                    Tile newTile) {
+        unit.setState(UnitState.ACTIVE);
+        unit.setStateToAllChildren(UnitState.SENTRY);
+        unit.setMovesLeft(unit.getMovesLeft() - unit.getMoveCost(newTile));
+        unit.setLocation(newTile);
+        unit.activeAdjacentSentryUnits(newTile);
+
+        // Clear the alreadyOnHighSea flag if we move onto a non-highsea tile.
+        unit.setAlreadyOnHighSea(newTile.canMoveToEurope());
+
+        // Explore a rumour if present.
+        List<FreeColObject> objects
+            = (newTile.hasLostCityRumour() && serverPlayer.isEuropean())
+            ? exploreLostCityRumour(serverPlayer, unit)
+            : new ArrayList<FreeColObject>();
+
+        // If the unit died we do not get to see the formerly unseen
+        // objects or make new contacts.  However we do not ignore the
+        // rumour objects as the only way the unit can die is the
+        // burial ground rumour, for which the rumour object is the
+        // now aggravated Indian player which we do want to update.
+        if (!unit.isDisposed()) {
+            List<ServerPlayer> contacts = findAdjacentUncontacted(serverPlayer, newTile);
+            for (ServerPlayer other : contacts) {
+                serverPlayer.setContacted(other);
+                other.setContacted(serverPlayer);
+                objects.add(other);
+            }
+
+            // Also check for arriving next to an IndianSettlement
+            // without alarm set, in which case it should be initialized.
+            if (serverPlayer.isEuropean()) {
+                for (Tile t : getGame().getMap().getSurroundingTiles(newTile, 1)) {
+                    Settlement settlement = t.getSettlement();
+                    if (settlement != null
+                        && settlement instanceof IndianSettlement) {
+                        IndianSettlement indians = (IndianSettlement) settlement;
+                        if (indians.getAlarm(serverPlayer) == null) {
+                            Player indianPlayer = indians.getOwner();
+                            indians.setAlarm(serverPlayer,
+                                             indianPlayer.getTension(serverPlayer));
+                            objects.add(indians);
+                        }
+                    }
+                }
+            }
+        }
+
+        return objects;
     }
 
 }

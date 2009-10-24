@@ -104,7 +104,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * hostility.
      */
     // TODO: move this to AIPlayer
-    private java.util.Map<Player, Tension> tension = new HashMap<Player, Tension>();
+    protected java.util.Map<Player, Tension> tension = new HashMap<Player, Tension>();
 
     /**
      * Stores the stance towards the other players. One of: WAR, CEASE_FIRE,
@@ -1234,18 +1234,34 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
+     * Gets the default new land name for this <code>Player</code>.
+     *
+     * @return A suitable default name.
+     */
+    public String getDefaultNewLandName() {
+        return Messages.message(nationID + ".newLandName");
+    }
+
+    /**
      * Gets the name this player has chosen for the new land.
      *
-     * @return The name of the new world as chosen by the <code>Player</code>.
-     *         If no land name was chosen, the default name is returned.
+     * @return The name of the new world as chosen by the <code>Player</code>,
+     *         or null if none chosen yet.
      */
     public String getNewLandName() {
-        if (newLandName == null) {
-            return Messages.message(nationID + ".newLandName");
-        } else {
-            return newLandName;
-        }
+        return newLandName;
     }
+
+    /**
+     * Gets a name for the new land, either the player choice or a default.
+     *
+     * @return A name for the new world.
+     */
+    public String getSafeNewLandName() {
+        return (newLandName != null) ? newLandName
+            : getDefaultNewLandName();
+    }
+
 
     /**
      * Returns true if the player already selected a new name for the discovered
@@ -1410,68 +1426,14 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Sets whether this player has contacted the given player.
+     * Set this player as having made initial contact with another player.
+     * Always start with PEACE, which can go downhill fast.
      *
-     * @param player The <code>Player</code>.
-     * @param contacted <code>true</code> if this <code>Player</code> has
-     *            contacted the given <code>Player</code>.
+     * @param player The <code>Player</code> to set contact with.
      */
-    public void setContacted(Player player, boolean contacted) {
-
-        if (player == null || player == this || player == getGame().getUnknownEnemy()) {
-            return;
-        }
-
-        if (contacted && !hasContacted(player)) {
-            history.add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                         HistoryEvent.Type.MEET_NATION,
-                                         "%nation%", player.getNationAsString()));
-
-            if (isEuropean() && !isAI()) {
-                boolean contactedIndians = false;
-                boolean contactedEuro = false;
-                for (Player player1 : getGame().getPlayers()) {
-                    if (hasContacted(player1)) {
-                        if (player1.isEuropean()) {
-                            contactedEuro = true;
-                            if (contactedIndians) {
-                                break;
-                            }
-                        } else {
-                            contactedIndians = true;
-                            if (contactedEuro) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                // these dialogs should only appear on the first event
-                if (player.isEuropean()) {
-                    if (!contactedEuro) {
-                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
-                                        "EventPanel.MEETING_EUROPEANS");
-                    }
-                } else {
-                    if (!contactedIndians) {
-                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
-                                        "EventPanel.MEETING_NATIVES");
-                    }
-                    // special cases for Aztec/Inca
-                    if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.aztec")) {
-                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
-                                        "EventPanel.MEETING_AZTEC");
-                    } else if (player.getNationType() == FreeCol.getSpecification().getNationType("model.nationType.inca")) {
-                        addModelMessage(this, ModelMessage.MessageType.FOREIGN_DIPLOMACY, player,
-                                        "EventPanel.MEETING_INCA");
-                    }
-                }
-            } else if (!isEuropean()) {
-                tension.put(player, new Tension(0));
-            }
-            changeRelationWithPlayer(player, Stance.PEACE);
-        }
-        if (!contacted) {
-            stance.remove(player.getId());
+    public void setContacted(Player player) {
+        if (player != null && player != this) {
+            stance.put(player.getId(), Stance.PEACE);
         }
     }
 
@@ -2541,7 +2503,12 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == null) {
             return new Tension();
         } else {
-            return tension.get(player);
+            Tension newTension = tension.get(player);
+            if (newTension == null) {
+                newTension = new Tension(0);
+            }
+            tension.put(player, newTension);
+            return newTension;
         }
     }
 

@@ -48,14 +48,15 @@ public class LostCityRumour extends TileItem {
     /** Constants describing types of Lost City Rumours. */
     public static enum RumourType {
         NO_SUCH_RUMOUR,
-            BURIAL_GROUND,
-            EXPEDITION_VANISHES, 
-            NOTHING,
-            LEARN,
-            TRIBAL_CHIEF,
-            COLONIST,
-            TREASURE,
-            FOUNTAIN_OF_YOUTH }
+        BURIAL_GROUND,
+        EXPEDITION_VANISHES,
+        NOTHING,
+        LEARN,
+        TRIBAL_CHIEF,
+        COLONIST,
+        TREASURE,
+        FOUNTAIN_OF_YOUTH
+    }
 
     /**
      * Creates a new <code>LostCityRumour</code> instance.

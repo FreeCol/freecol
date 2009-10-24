@@ -484,11 +484,6 @@ public class DiplomacyMessage extends Message {
         }
 
         // New trade proposal
-        // TODO revisit contacted-status for updates
-        if (!serverPlayer.hasContacted(settlementPlayer)) {
-            serverPlayer.setContacted(settlementPlayer, true);
-            settlementPlayer.setContacted(serverPlayer, true);
-        }
         unit.setMovesLeft(0);
         TradeStatus state = TradeStatus.PROPOSE_TRADE;
         try {

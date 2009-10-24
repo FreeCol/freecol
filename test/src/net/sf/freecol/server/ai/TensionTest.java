@@ -48,101 +48,103 @@ public class TensionTest extends FreeColTestCase {
     public void testTension()
     {
         // start a server
-        FreeColServer server = ServerTestHelper.startServer(false, true);
+        FreeColServer server = null;
         
-        // generate a test map
-        TileType plainsType = spec().getTileType("model.tile.plains");
-        Map map = getTestMap(plainsType);
-        assertNotNull(map);
-        server.setMapGenerator(new MockMapGenerator(map));
+        try {
+            server = ServerTestHelper.startServer(false, true);
 
-        Controller c = server.getController();
-        assertNotNull(c);
-        assertTrue(c instanceof PreGameController);
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail();
-        }
-        assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
-        Game game = server.getGame();
-        assertNotNull(game);
-        AIMain aiMain = server.getAIMain();
-        assertNotNull(aiMain);
-        
-        ServerPlayer european = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        ServerPlayer indian = (ServerPlayer) game.getPlayer("model.nation.tupi");
-        StandardAIPlayer europeanAI = (StandardAIPlayer)aiMain.getAIObject(european.getId());
-        StandardAIPlayer indianAI = (StandardAIPlayer)aiMain.getAIObject(indian.getId());
-        
-        // initially, the players are unknown to each other
-        Tension tension = indian.getTension(european);
-        Stance stance = indian.getStance(european);
-        assertNull(tension);
-        assertEquals(Stance.UNCONTACTED, stance);
-        assertFalse(indian.hasContacted(european));
-        
-        // create an Indian settlement
-        Tile tile = map.getTile(6, 9);
-        
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement settlement = builder.player(indian).settlementTile(tile).skillToTeach(null).capital(true).build();
-        
-        tile.setOwningSettlement(settlement);
-        Iterator<Position> circleIterator = map.getCircleIterator(tile.getPosition(), true, settlement.getRadius());
-        while (circleIterator.hasNext()) {
-            Tile newTile = map.getTile(circleIterator.next());
-            newTile.setOwningSettlement(settlement);
-            newTile.setOwner(indian);
-        }
-        int unitCount = settlement.getGeneratedUnitCount();
-        for (int i = 0; i < unitCount; i++) {
-            UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
-            Unit unit = new Unit(game, settlement, indian, unitType, UnitState.ACTIVE,
-                                 unitType.getDefaultEquipment());
-            unit.setIndianSettlement(settlement);
-            if (i == 0) {
-                unit.setLocation(tile);
-            } else {
-                unit.setLocation(settlement);
+            // generate a test map
+            TileType plainsType = spec().getTileType("model.tile.plains");
+            Map map = getTestMap(plainsType);
+            assertNotNull(map);
+            server.setMapGenerator(new MockMapGenerator(map));
+
+            Controller c = server.getController();
+            assertNotNull(c);
+            assertTrue(c instanceof PreGameController);
+            PreGameController pgc = (PreGameController)c;
+            try {
+                pgc.startGame();
+            } catch (FreeColException e) {
+                fail();
             }
-        }
-        indian.setContacted(european, true);
-        tension = indian.getTension(european);
-        stance = indian.getStance(european);
-        assertNotNull(tension);
-        assertEquals(Stance.PEACE, stance);
-        
-        // create 2 unarmed european units next to the indianSettlement
-        UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
-        @SuppressWarnings("unused") Unit unit1 = new Unit(game, map.getTile(7, 9), european, unitType, UnitState.ACTIVE);
-        @SuppressWarnings("unused") Unit unit2 = new Unit(game, map.getTile(5, 9), european, unitType, UnitState.ACTIVE);
-        
-        // the european player steals 1 tile from the indians
-        Tile tile2 = map.getTile(6,8);
-        assertEquals(indian, tile2.getOwner());
-        european.claimLand(tile2, null, -1);
-        assertEquals(european, tile2.getOwner());
-        
-        // check the tension and stance have expected values
-        tension = indian.getTension(european);
-        stance = indian.getStance(european);
-        assertNotNull(tension);
-        assertEquals(Tension.TENSION_ADD_LAND_TAKEN, tension.getValue());
-        assertEquals(Stance.PEACE, stance);
-        
-        try {
+            assertEquals(FreeColServer.GameState.IN_GAME, server.getGameState());
+            Game game = server.getGame();
+            assertNotNull(game);
+            AIMain aiMain = server.getAIMain();
+            assertNotNull(aiMain);
+
+            ServerPlayer european = (ServerPlayer) game.getPlayer("model.nation.dutch");
+            ServerPlayer indian = (ServerPlayer) game.getPlayer("model.nation.tupi");
+            StandardAIPlayer europeanAI = (StandardAIPlayer)aiMain.getAIObject(european.getId());
+            StandardAIPlayer indianAI = (StandardAIPlayer)aiMain.getAIObject(indian.getId());
+
+            // initially, the players are unknown to each other
+            Tension tension = indian.getTension(european);
+            Stance stance = indian.getStance(european);
+            assertTrue(tension != null && tension.getValue() == 0);
+            assertEquals(Stance.UNCONTACTED, stance);
+            assertFalse(indian.hasContacted(european));
+
+            // create an Indian settlement
+            Tile tile = map.getTile(6, 9);
+
+            FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+            IndianSettlement settlement = builder.player(indian).settlementTile(tile).skillToTeach(null).capital(true).build();
+
+            tile.setOwningSettlement(settlement);
+            Iterator<Position> circleIterator = map.getCircleIterator(tile.getPosition(), true, settlement.getRadius());
+            while (circleIterator.hasNext()) {
+                Tile newTile = map.getTile(circleIterator.next());
+                newTile.setOwningSettlement(settlement);
+                newTile.setOwner(indian);
+            }
+            int unitCount = settlement.getGeneratedUnitCount();
+            for (int i = 0; i < unitCount; i++) {
+                UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+                Unit unit = new Unit(game, settlement, indian, unitType, UnitState.ACTIVE,
+                                     unitType.getDefaultEquipment());
+                unit.setIndianSettlement(settlement);
+                if (i == 0) {
+                    unit.setLocation(tile);
+                } else {
+                    unit.setLocation(settlement);
+                }
+            }
+            indian.setContacted(european);
+            tension = indian.getTension(european);
+            stance = indian.getStance(european);
+            assertNotNull(tension);
+            assertEquals(Stance.PEACE, stance);
+
+            // create 2 unarmed european units next to the indianSettlement
+            UnitType unitType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
+            @SuppressWarnings("unused") Unit unit1 = new Unit(game, map.getTile(7, 9), european, unitType, UnitState.ACTIVE);
+            @SuppressWarnings("unused") Unit unit2 = new Unit(game, map.getTile(5, 9), european, unitType, UnitState.ACTIVE);
+
+            // the european player steals 1 tile from the indians
+            Tile tile2 = map.getTile(6,8);
+            assertEquals(indian, tile2.getOwner());
+            european.claimLand(tile2, null, -1);
+            assertEquals(european, tile2.getOwner());
+
+            // check the tension and stance have expected values
+            tension = indian.getTension(european);
+            stance = indian.getStance(european);
+            assertNotNull(tension);
+            assertEquals(Tension.TENSION_ADD_LAND_TAKEN, tension.getValue());
+            assertEquals(Stance.PEACE, stance);
+
             // ask the AI to secure the settlement
             indianAI.secureIndianSettlement(settlement);
-            
+
             // the tension and stance have not changed
             tension = indian.getTension(european);
             stance = indian.getStance(european);
             assertNotNull(tension);
             assertEquals(Tension.TENSION_ADD_LAND_TAKEN, tension.getValue());
             assertEquals(Stance.PEACE, stance);
-            
+
             // but one brave will go on a rampage and declare war.
             Iterator<Unit> iter = settlement.getOwnedUnitsIterator();
             while (iter.hasNext()) {

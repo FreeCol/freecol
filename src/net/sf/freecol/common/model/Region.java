@@ -411,7 +411,7 @@ public class Region extends FreeColGameObject implements Nameable {
      * @param turn a <code>Turn</code> value
      * @param newName a <code>String</code> value
      */
-    public void discover(Player player, Turn turn, String newName) {
+    public HistoryEvent discover(Player player, Turn turn, String newName) {
         discoveredBy = player;
         discoveredIn = turn;
         name = newName;
@@ -420,9 +420,11 @@ public class Region extends FreeColGameObject implements Nameable {
             isPacific()) {
             player.modifyScore(getScoreValue());
         }
-        player.getHistory().add(new HistoryEvent(turn.getNumber(),
-                                                 HistoryEvent.Type.DISCOVER_REGION,
-                                                 "%region%", Messages.message(newName)));
+        HistoryEvent h = new HistoryEvent(turn.getNumber(),
+                                          HistoryEvent.Type.DISCOVER_REGION,
+                                          "%region%", Messages.message(newName));
+        player.getHistory().add(h);
+        return h;
     }
 
     /**
