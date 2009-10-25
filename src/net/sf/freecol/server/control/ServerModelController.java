@@ -19,6 +19,8 @@
 
 package net.sf.freecol.server.control;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,20 +32,20 @@ import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelController;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.TileImprovement;
-import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
-import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.FreeColServer;
@@ -54,7 +56,7 @@ import org.w3c.dom.Element;
 /**
  * A server-side implementation of the <code>ModelController</code> interface.
  */
-public class ServerModelController implements ModelController {
+public class ServerModelController implements ModelController,PropertyChangeListener {
 
     private static final Logger logger = Logger.getLogger(ServerModelController.class.getName());
 
@@ -545,5 +547,24 @@ public class ServerModelController implements ModelController {
 
         /** The number of turns before a <code>TaskEntry</code> has expired. */
         private static final int TASK_ENTRY_TIME_OUT = 5;
+    }
+    
+    public void updateModelListening(){
+        for(Player player : freeColServer.getGame().getPlayers()){
+            if(!player.isIndian()){
+                continue;
+            }
+            for(Settlement settlement : player.getIndianSettlements()){
+                settlement.addPropertyChangeListener("alarmLevel", this);
+            }
+        }
+    }
+
+    
+    public void propertyChange(PropertyChangeEvent e) {
+        if(e.getPropertyName() == "alarmLevel"){
+            IndianSettlement settlement = (IndianSettlement) e.getSource();
+            update(settlement.getTile());
+        }
     }
 }

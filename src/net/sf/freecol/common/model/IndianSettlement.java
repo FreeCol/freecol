@@ -19,17 +19,17 @@
 
 package net.sf.freecol.common.model;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -38,8 +38,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Tension.Level;
 import net.sf.freecol.common.model.Unit.Role;
 
 import org.w3c.dom.Element;
@@ -259,7 +259,10 @@ public class IndianSettlement extends Settlement {
      */
     public void modifyAlarm(Player player, int addToAlarm) {
         Tension tension = alarm.get(player);
+        Level oldLevel = null;
+        Level newLevel = null;
         if(tension != null) {
+            oldLevel = tension.getLevel();
             tension.modify(addToAlarm);            
         }
         // propagate alarm upwards
@@ -269,6 +272,17 @@ public class IndianSettlement extends Settlement {
                 owner.modifyTension(player, addToAlarm, this);
             } else {
                 owner.modifyTension(player, addToAlarm/2, this);
+            }
+        }
+        
+        if(alarm.get(player) != null){
+            newLevel = alarm.get(player).getLevel();
+        }
+        if(newLevel != null && !newLevel.equals(oldLevel)){
+            String propertyEvtName = "alarmLevel"; 
+            PropertyChangeEvent e = new PropertyChangeEvent(this,propertyEvtName,oldLevel,newLevel);
+            for(PropertyChangeListener listener : this.getPropertyChangeListeners(propertyEvtName)){
+                listener.propertyChange(e);
             }
         }
     }
@@ -282,8 +296,7 @@ public class IndianSettlement extends Settlement {
      */
     public void propagatedAlarm(Player player, int addToAlarm) {
         Tension tension = alarm.get(player);
-        // only applies tension if settlement has met europeans
-        if (tension != null && hasBeenVisited(player)) {
+        if (tension != null) {
             tension.modify(addToAlarm);            
         }
     }

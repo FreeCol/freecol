@@ -3351,10 +3351,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     // TODO: move to AI code
     public void adjustTension(Unit enemyUnit) {
         Player myPlayer = getOwner();
-        Player enemy = enemyUnit.getOwner();
-        myPlayer.modifyTension(enemy, -Tension.TENSION_ADD_MINOR);
-        if (getIndianSettlement() != null) {
-            getIndianSettlement().modifyAlarm(enemy, -Tension.TENSION_ADD_UNIT_DESTROYED / 2);
+        Player enemy = enemyUnit.getOwner();     
+        if(myPlayer.isAI()){
+            myPlayer.modifyTension(enemy, -Tension.TENSION_ADD_MINOR);
+            if (getIndianSettlement() != null) {
+                getIndianSettlement().modifyAlarm(enemy, -Tension.TENSION_ADD_UNIT_DESTROYED / 2);
+            }
         }
 
         // Increases the enemy's tension levels:
