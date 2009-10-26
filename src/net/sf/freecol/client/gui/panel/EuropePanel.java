@@ -25,6 +25,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
@@ -112,64 +113,18 @@ public final class EuropePanel extends FreeColPanel {
         setFocusCycleRoot(true);
 
         // Use ESCAPE for closing the ColonyPanel:
-        exitButton = new JButton(Messages.message("close"));
-        exitButton.setActionCommand(EuropeAction.EXIT.toString());
-        exitButton.addActionListener(this);
-        InputMap closeInputMap = new ComponentInputMap(exitButton);
-        closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), "pressed");
-        closeInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(exitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
-        enterPressesWhenFocused(exitButton);
-
-        // train button
-        JButton trainButton = new JButton(Messages.message("train"));
-        trainButton.setActionCommand(EuropeAction.TRAIN.toString());
-        trainButton.addActionListener(this);
-        InputMap trainInputMap = new ComponentInputMap(trainButton);
-        trainInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0, false), "pressed");
-        trainInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(trainButton, JComponent.WHEN_IN_FOCUSED_WINDOW, trainInputMap);
-        enterPressesWhenFocused(trainButton);
-
-        // purchase button
-        JButton purchaseButton = new JButton(Messages.message("purchase"));
-        purchaseButton.setActionCommand(EuropeAction.PURCHASE.toString());
-        purchaseButton.addActionListener(this);
-        InputMap purchaseInputMap = new ComponentInputMap(purchaseButton);
-        purchaseInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0, false), "pressed");
-        purchaseInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(purchaseButton, JComponent.WHEN_IN_FOCUSED_WINDOW, purchaseInputMap);
-        enterPressesWhenFocused(purchaseButton);
-
-        // recruit button
-        JButton recruitButton = new JButton(Messages.message("recruit"));
-        recruitButton.setActionCommand(EuropeAction.RECRUIT.toString());
-        recruitButton.addActionListener(this);
-        InputMap recruitInputMap = new ComponentInputMap(recruitButton);
-        recruitInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, false), "pressed");
-        recruitInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(recruitButton, JComponent.WHEN_IN_FOCUSED_WINDOW, recruitInputMap);
-        enterPressesWhenFocused(recruitButton);
-
-        // unload button
-        JButton unloadButton = new JButton(Messages.message("unload"));
-        unloadButton.setActionCommand(EuropeAction.UNLOAD.toString());
-        unloadButton.addActionListener(this);
-        InputMap unloadInputMap = new ComponentInputMap(unloadButton);
-        unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, false), "pressed");
-        unloadInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(unloadButton, JComponent.WHEN_IN_FOCUSED_WINDOW, unloadInputMap);
-        enterPressesWhenFocused(unloadButton);
-
-        // sail button
-        JButton sailButton = new JButton(Messages.message("sail"));
-        sailButton.setActionCommand(EuropeAction.SAIL.toString());
-        sailButton.addActionListener(this);
-        InputMap sailInputMap = new ComponentInputMap(sailButton);
-        sailInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false), "pressed");
-        sailInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, true), "released");
-        SwingUtilities.replaceUIInputMap(sailButton, JComponent.WHEN_IN_FOCUSED_WINDOW, sailInputMap);
-        enterPressesWhenFocused(sailButton);
+        exitButton = new EuropeButton(Messages.message("close"), KeyEvent.VK_ESCAPE,
+                                      EuropeAction.EXIT.toString(), this);
+        EuropeButton trainButton = new EuropeButton(Messages.message("train"), KeyEvent.VK_T,
+                                                    EuropeAction.TRAIN.toString(), this);
+        EuropeButton purchaseButton = new EuropeButton(Messages.message("purchase"), KeyEvent.VK_P,
+                                                       EuropeAction.PURCHASE.toString(), this);
+        EuropeButton recruitButton = new EuropeButton(Messages.message("recruit"), KeyEvent.VK_R,
+                                                      EuropeAction.RECRUIT.toString(), this);
+        EuropeButton unloadButton = new EuropeButton(Messages.message("unload"), KeyEvent.VK_U,
+                                                     EuropeAction.UNLOAD.toString(), this);
+        EuropeButton sailButton = new EuropeButton(Messages.message("sail"), KeyEvent.VK_S,
+                                                   EuropeAction.SAIL.toString(), this);
 
         toAmericaPanel = new ToAmericaPanel(this);
         toEuropePanel = new ToEuropePanel(this);
@@ -182,7 +137,7 @@ public final class EuropePanel extends FreeColPanel {
         log = new TransactionLog();
         SimpleAttributeSet attributes = new SimpleAttributeSet();
         StyleConstants.setAlignment(attributes, StyleConstants.ALIGN_RIGHT);
-        StyleConstants.setForeground(attributes, Color.WHITE);
+        //StyleConstants.setForeground(attributes, Color.WHITE);
         StyleConstants.setBold(attributes, true);
         log.setParagraphAttributes(attributes, true);
 
@@ -203,11 +158,11 @@ public final class EuropePanel extends FreeColPanel {
         marketPanel.addMouseListener(releaseListener);
         cargoPanel.addMouseListener(releaseListener);
 
-        toAmericaPanel.setLayout(new GridLayout(0, 4));
-        toEuropePanel.setLayout(new GridLayout(0, 4));
-        inPortPanel.setLayout(new GridLayout(0, 4));
+        toAmericaPanel.setLayout(new GridLayout(0, 3));
+        toEuropePanel.setLayout(new GridLayout(0, 3));
+        inPortPanel.setLayout(new GridLayout(0, 3));
         docksPanel.setLayout(new GridLayout(0, 5));
-        cargoPanel.setLayout(new GridLayout(1, 0));
+        cargoPanel.setLayout(new GridLayout(0, 4));
 
         JScrollPane toAmericaScroll = new JScrollPane(toAmericaPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -239,6 +194,16 @@ public final class EuropePanel extends FreeColPanel {
                 .message("inPort")));
         logScroll.setBorder(BorderFactory.createEmptyBorder());
 
+        // ugly hack to get white background
+        JPanel whitePanel = new JPanel(new MigLayout("fill", "", "")) {
+                public String getUIClassID() {
+                    return "MarketPanelUI";
+                }
+            };
+        whitePanel.setOpaque(false);
+        whitePanel.setBorder(BorderFactory.createEtchedBorder(Color.WHITE, Color.BLACK));
+        whitePanel.add(logScroll, "grow");
+
         marketScroll.getViewport().setOpaque(false);
         marketPanel.setOpaque(false);
         cargoScroll.getViewport().setOpaque(false);
@@ -255,21 +220,23 @@ public final class EuropePanel extends FreeColPanel {
         log.setOpaque(false);
 
         setLayout(new MigLayout("wrap 3, fill, align center, insets 30",
-                                "[fill][fill][fill, grow 0]", 
-                                "[align top][align top][align top]"));
-        add(toAmericaScroll, "width 315:, height 150:, grow");
-        add(toEuropeScroll, "width 315:, height 150:, grow");
-        add(recruitButton, "split 4, flowy");
+                                "[fill, 280:][fill, 280:][fill, 200:]", 
+                                "[90:, align top][90:, align top][90:, align top][][]"));
+        add(toAmericaScroll, "grow");
+        add(toEuropeScroll, "grow");
+        //add(logScroll, "span 1 4");
+        add(whitePanel, "span 1 4, grow");
+        add(inPortScroll, "grow");
+        add(docksScroll, "span 1 2, grow");
+        add(cargoScroll, "grow");
+        add(marketScroll, "span 2, grow");
+
+        add(recruitButton, "span, split 6");
         add(purchaseButton);
         add(trainButton);
         add(unloadButton);
-        add(inPortScroll, "split 2, flowy, grow, width 315:");
-        add(cargoScroll, "grow, width 315:");
-        add(docksScroll, "grow, width 315:, height 150:");
         add(sailButton);
-        add(marketScroll, "span 2, growx");
-        add(exitButton);
-        add(logScroll, "span, height 40:120");
+        add(exitButton, "tag ok");
 
         setBorder(null);
 
@@ -923,4 +890,25 @@ public final class EuropePanel extends FreeColPanel {
     public final MarketPanel getMarketPanel() {
         return marketPanel;
     }
+
+    public class EuropeButton extends JButton {
+
+        public EuropeButton(String text, int keyEvent, String command, ActionListener listener) {
+            setOpaque(true);
+            setText(text);
+            setActionCommand(command);
+            addActionListener(listener);
+            InputMap closeInputMap = new ComponentInputMap(this);
+            closeInputMap.put(KeyStroke.getKeyStroke(keyEvent, 0, false), "pressed");
+            closeInputMap.put(KeyStroke.getKeyStroke(keyEvent, 0, true), "released");
+            SwingUtilities.replaceUIInputMap(this, JComponent.WHEN_IN_FOCUSED_WINDOW, closeInputMap);
+            enterPressesWhenFocused(this);
+        }
+        /*
+        public String getUIClassID() {
+            return "EuropeButtonUI";
+        }
+        */
+    }
+
 }

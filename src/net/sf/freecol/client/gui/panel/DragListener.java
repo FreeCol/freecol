@@ -61,6 +61,7 @@ import net.sf.freecol.common.model.WorkLocation;
 public final class DragListener extends MouseAdapter {
 
     private final FreeColPanel parentPanel;
+    private final Canvas canvas;
 
     /**
      * The constructor to use.
@@ -70,6 +71,7 @@ public final class DragListener extends MouseAdapter {
      */
     public DragListener(FreeColPanel parentPanel) {
         this.parentPanel = parentPanel;
+        this.canvas = parentPanel.getCanvas();
     }
 
     /**
@@ -106,7 +108,7 @@ public final class DragListener extends MouseAdapter {
                             // work-around: JRE on Windows is unable
                             // to display popup menus that extend
                             // beyond the canvas
-                            menu.show(parentPanel.getCanvas(), 0, 0);
+                            menu.show(canvas, 0, 0);
                         } else {
                             menu.show(comp, e.getX(), e.getY());
                         }
@@ -290,8 +292,7 @@ public final class DragListener extends MouseAdapter {
             JMenuItem menuItem = new JMenuItem(Messages.message("showProduction"));
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        Canvas canvas = unitLabel.getCanvas();
-                        canvas.showSubPanel(new ColonyTileProductionPanel(canvas, tempUnit.getWorkTile(), tempUnit.getWorkType()));
+                        canvas.showSubPanel(new WorkProductionPanel(canvas, tempUnit));
                     }
                 });
             menu.add(menuItem);
@@ -300,8 +301,7 @@ public final class DragListener extends MouseAdapter {
             JMenuItem menuItem = new JMenuItem(Messages.message("showProductivity"));
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
-                        Canvas canvas = unitLabel.getCanvas();
-                        canvas.showSubPanel(new BuildingProductionPanel(canvas, tempUnit));
+                        canvas.showSubPanel(new WorkProductionPanel(canvas, tempUnit));
                     }
                 });
             menu.add(menuItem);
@@ -382,7 +382,7 @@ public final class DragListener extends MouseAdapter {
             menuItem = new JMenuItem(Messages.message("cashInTreasureTrain.order"));
             menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        unitLabel.getCanvas().getClient().getInGameController()
+                        canvas.getClient().getInGameController()
                             .checkCashInTreasureTrain(tempUnit);
                     }
                 });
@@ -457,7 +457,7 @@ public final class DragListener extends MouseAdapter {
                     final EquipmentType type = equipmentType; 
                     newItem.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
-                                unitLabel.getCanvas().getClient().getInGameController()
+                                canvas.getClient().getInGameController()
                                     .equipUnit(tempUnit, type, items);
                                 unitLabel.updateIcon();
                             }
@@ -502,7 +502,7 @@ public final class DragListener extends MouseAdapter {
     public JPopupMenu getGoodsMenu(final GoodsLabel goodsLabel) {
 
         final Goods goods = goodsLabel.getGoods();
-        final InGameController inGameController = goodsLabel.getCanvas().getClient().getInGameController();
+        final InGameController inGameController = canvas.getClient().getInGameController();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         JPopupMenu menu = new JPopupMenu("Cargo");
         JMenuItem name = new JMenuItem(goods.getName() + " (" +
@@ -510,7 +510,7 @@ public final class DragListener extends MouseAdapter {
                                        imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
         name.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    goodsLabel.getCanvas().showColopediaPanel(ColopediaPanel.PanelType.GOODS,
+                    canvas.showColopediaPanel(ColopediaPanel.PanelType.GOODS,
                                                               goods.getType());
                 }
             });

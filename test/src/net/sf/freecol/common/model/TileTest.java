@@ -461,5 +461,4 @@ public class TileTest extends FreeColTestCase {
         assertEquals(fish, sortedPotential.get(0).getType());
         
     }
-
 }

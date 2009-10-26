@@ -1192,8 +1192,7 @@ public class AIColony extends AIObject {
                     return unit;
                 } else {
                     if (tile != null) {
-                        production = unit.getProductionOf(goodsType,
-                                                          tile.potential(goodsType, unit.getType()));
+                        production = tile.potential(goodsType, unit.getType());
                     } else if (building != null) {
                         production = building.getUnitProductivity(unit);
                     }

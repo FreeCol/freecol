@@ -285,9 +285,6 @@ public final class GUI {
     public static final int OVERLAY_INDEX = 100;
     public static final int FOREST_INDEX = 200;
 
-
-    private boolean displayBorders = false;
-    private boolean displayGrid = false;
     private int displayTileText = 0;
     private GeneralPath gridPath = null;
 
@@ -339,8 +336,6 @@ public final class GUI {
         messages = new Vector<GUIMessage>(MESSAGE_COUNT);
         viewMode = new ViewMode(this);
         logger.info("Starting in Move Units View Mode");
-        displayBorders = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS);
-        displayGrid = freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID);
         displayTileText = freeColClient.getClientOptions().getDisplayTileText();
         blinkingMarqueeEnabled = true;
 
@@ -1258,7 +1253,7 @@ public final class GUI {
         =======
         Create a GeneralPath to draw the grid with, if needed.
         */
-        if (displayGrid) {
+        if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID)) {
             gridPath = new GeneralPath();
             gridPath.moveTo(0, 0);
             int nextX = tileWidth / 2;
@@ -1324,7 +1319,7 @@ public final class GUI {
         for (int tileY = clipTopRow; tileY <= clipBottomRow; tileY++) {
             xx = getXOffset(clipLeftX, tileY);
 
-            if (displayGrid) {
+            if (freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_GRID)) {
                 // Display the grid.
                 g.translate(xx, yy + (tileHeight / 2));
                 g.setColor(Color.BLACK);
@@ -1970,7 +1965,7 @@ public final class GUI {
 
 
     private void paintBorders(Graphics2D g, Tile tile, int x, int y, boolean opaque) {
-        if (tile == null || !displayBorders) {
+        if (tile == null || !freeColClient.getClientOptions().getBoolean(ClientOptions.DISPLAY_BORDERS)) {
             return;
         }
         Player owner = tile.getOwner();
@@ -2545,27 +2540,6 @@ public final class GUI {
     public PathNode getGotoPath() {
         return gotoPath;
     }
-
-
-    /**
-    * If set to <i>true</i> then a grid is drawn on the map.
-    * @param displayGrid <code>true</code> if the grid should be drawn
-    *       on the map and <code>false</code> otherwise.
-    */
-    public void setDisplayGrid(boolean displayGrid) {
-        this.displayGrid = displayGrid;
-    }
-
-
-    /**
-     * If set to <i>true</i> then a borders is drawn on the map.
-     * @param displayBorders <code>true</code> if the borders should be drawn
-     *       on the map and <code>false</code> otherwise.
-     */
-    public void setDisplayBorders(boolean displayBorders) {
-        this.displayBorders = displayBorders;
-    }
-
 
     /**
      * Set the type of text drawn in the tiles.

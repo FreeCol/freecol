@@ -28,6 +28,7 @@ import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.common.option.BooleanOption;
 
 /**
  * 
@@ -77,7 +78,8 @@ public class DisplayGridAction extends SelectableAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getGUI().setDisplayGrid(((JCheckBoxMenuItem) e.getSource()).isSelected());
+        boolean b = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+        ((BooleanOption) freeColClient.getClientOptions().getObject(ClientOptions.DISPLAY_GRID)).setValue(b);
         freeColClient.getCanvas().refresh();
     }
 }

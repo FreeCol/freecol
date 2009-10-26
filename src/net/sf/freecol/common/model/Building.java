@@ -23,9 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -902,33 +900,15 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
 
         int base = buildingType.getBasicProduction();
-        int productivity = prodUnit.getProductionOf(getGoodsOutputType(), base);
+        int productivity = Math.round(FeatureContainer
+                                      .applyModifierSet(base, getGame().getTurn(),
+                                                        prodUnit.getModifierSet(getGoodsOutputType().getId())));
         if (productivity > 0) {
             productivity += colony.getProductionBonus();
             if (productivity < 1)
                 productivity = 1;
         }
         return productivity;
-    }
-
-    /**
-     * Returns the maximum productivity of a unit working in this building.
-     *
-     * @return The maximum returns from this unit if in this <code>Building</code>,
-     *         assuming enough "input goods".
-     */
-    public Set<Modifier> getProductivityModifiers(Unit prodUnit) {
-        if (getGoodsOutputType() == null) {
-            return Collections.emptySet();
-        } else {
-            String outputId = getGoodsOutputType().getId();
-            Set<Modifier> result = new LinkedHashSet<Modifier>();
-            if (buildingType.getProductionModifier() != null) {
-                result.add(buildingType.getProductionModifier());
-            }
-            result.addAll(prodUnit.getModifierSet(outputId));
-            return result;
-        }
     }
 
     /**

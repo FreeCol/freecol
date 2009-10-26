@@ -24,6 +24,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -32,6 +33,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.FeatureContainer;
@@ -40,39 +42,70 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Scope;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
 
-public class ColonyTileProductionPanel extends FreeColPanel {
+public class WorkProductionPanel extends FreeColPanel {
 
-    public ColonyTileProductionPanel(Canvas canvas, ColonyTile colonyTile, GoodsType goodsType) {
+    public WorkProductionPanel(Canvas canvas, Unit unit) {
         super(canvas);
 
-        Colony colony = colonyTile.getColony();
-        UnitType unitType = null;
-        if (colonyTile.getUnit() != null) {
-            unitType = colonyTile.getUnit().getType();
+        setLayout(new MigLayout("wrap 3, insets 10 10 10 10", "[]30:push[right][]", ""));
+
+        Colony colony = unit.getColony();
+        UnitType unitType = unit.getType();
+
+        JLabel headline = new JLabel();
+        Set<Modifier> modifiers;
+        Set<Modifier> basicModifiers;
+        Set<Modifier> colonyModifiers = new LinkedHashSet<Modifier>();
+        if (unit.getLocation() instanceof ColonyTile) {
+            ColonyTile colonyTile = (ColonyTile) unit.getLocation();
+            GoodsType goodsType = unit.getWorkType();
+            basicModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
+            modifiers = sortModifiers(basicModifiers);
+            basicModifiers.addAll(colony.getModifierSet(goodsType.getId()));
+            if (colony.getProductionBonus() != 0) {
+                colonyModifiers.add(colony.getProductionModifier(goodsType));
+                modifiers.add(colony.getProductionModifier(goodsType));
+            }
+
+            add(new JLabel(colonyTile.getLabel()), "span, align center, wrap 30");
+
+            TileType tileType = colonyTile.getWorkTile().getType();
+            int width = canvas.getClient().getImageLibrary().getTerrainImageWidth(tileType);
+            int height = canvas.getClient().getImageLibrary().getTerrainImageHeight(tileType);
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            canvas.getGUI().displayColonyTile((Graphics2D) image.getGraphics(), colonyTile.getWorkTile().getMap(),
+                                              colonyTile.getWorkTile(), 0, 0, colony);
+            add(new JLabel(new ImageIcon(image)));
+
+        } else {
+            Building building = (Building) unit.getLocation();
+            GoodsType goodsType = building.getGoodsOutputType();
+            basicModifiers = new LinkedHashSet<Modifier>();
+            if (building.getType().getProductionModifier() != null) {
+                basicModifiers.add(building.getType().getProductionModifier());
+            }
+            if (goodsType != null) {
+                basicModifiers.addAll(unit.getModifierSet(goodsType.getId()));
+            }
+            modifiers = sortModifiers(basicModifiers);
+            colonyModifiers = unit.getColony().getModifierSet(goodsType.getId());
+            modifiers.addAll(unit.getColony().getModifierSet(goodsType.getId()));
+            if (colony.getProductionBonus() != 0) {
+                colonyModifiers.add(colony.getProductionModifier(goodsType));
+                modifiers.add(colony.getProductionModifier(goodsType));
+            }
+            add(new JLabel(building.getName()), "span, align center, wrap 30");
+
+            add(new JLabel(ResourceManager.getImageIcon(building.getType().getId() + ".image")));
         }
-        Set<Modifier> basicModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
-        basicModifiers.addAll(colony.getModifierSet(goodsType.getId()));
-        Set<Modifier> modifiers = sortModifiers(basicModifiers);
-        if (colony.getProductionBonus() != 0) {
-            modifiers.add(colony.getProductionModifier(goodsType));
-        }
 
-        setLayout(new MigLayout("wrap 3, insets 30 30 10 30", "[]30:push[right][]", ""));
-
-        add(new JLabel(colonyTile.getLabel()), "span, align center, wrap 30");
-
-        TileType tileType = colonyTile.getWorkTile().getType();
-        int width = canvas.getClient().getImageLibrary().getTerrainImageWidth(tileType);
-        int height = canvas.getClient().getImageLibrary().getTerrainImageHeight(tileType);
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        canvas.getGUI().displayColonyTile((Graphics2D) image.getGraphics(), colonyTile.getWorkTile().getMap(),
-                                          colonyTile.getWorkTile(), 0, 0, colony);
-        add(new JLabel(new ImageIcon(image)));
-        add(new UnitLabel(colonyTile.getUnit(), getCanvas(), false, false), "wrap");
+        add(new UnitLabel(unit, canvas, false, false), "wrap");
 
         for (Modifier modifier : modifiers) {
             FreeColGameObjectType source = modifier.getSource();
@@ -117,9 +150,9 @@ public class ColonyTileProductionPanel extends FreeColPanel {
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 16);
 
-        int result = (int) FeatureContainer.applyModifierSet(0, colonyTile.getGame().getTurn(), basicModifiers)
-            + colony.getProductionBonus();
-        JLabel finalLabel = new JLabel(Messages.message("modifiers.finalResult.name"));
+        int result = (int) (FeatureContainer.applyModifierSet(0, getGame().getTurn(), basicModifiers)
+                            + FeatureContainer.applyModifierSet(0, getGame().getTurn(), colonyModifiers));
+        JLabel finalLabel = new JLabel(Messages.message("model.source.finalResult.name"));
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");
 
@@ -130,7 +163,7 @@ public class ColonyTileProductionPanel extends FreeColPanel {
                                                     BorderFactory.createEmptyBorder(2, 2, 2, 2)));
         add(finalResult, "wrap 30");
 
-        add(okButton, "span, align center");
+        add(okButton, "span, tag ok");
 
         setSize(getPreferredSize());
 
