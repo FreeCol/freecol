@@ -54,7 +54,6 @@ public class IndianSettlement extends Settlement {
 
     public static final int MISSIONARY_TENSION = -3;
     public static final int MAX_CONVERT_DISTANCE = 10;
-    public static final int TURNS_PER_TRIBUTE = 5;
     public static final int ALARM_RADIUS = 2;
     public static final int ALARM_TILE_IN_USE = 2;
     public static final int ALARM_NEW_MISSIONARY = -100;
@@ -219,36 +218,21 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Returns the amount of gold this settlement pays as a tribute.
+     * Get the year of the last tribute.
      *
-     * @param player a <code>Player</code> value
-     * @return an <code>int</code> value
+     * @return The year of the last tribute.
      */
-    public int getTribute(Player player) {
-        // increase tension whether we pay or not
-        // apply tension directly to this settlement and let propagation works
-        modifyAlarm(player, Tension.TENSION_ADD_NORMAL);
+    public int getLastTribute() {
+        return lastTribute;
+    }
 
-        int gold = 0;
-        if (getGame().getTurn().getNumber() > lastTribute + TURNS_PER_TRIBUTE) {
-            switch(getOwner().getTension(player).getLevel()) {
-            case HAPPY:
-            case CONTENT:
-                gold = Math.min(getOwner().getGold() / 10, 100);
-                break;
-            case DISPLEASED:
-                gold = Math.min(getOwner().getGold() / 20, 100);
-                break;
-            case ANGRY:
-            case HATEFUL:
-            default:
-                // do nothing
-            }
-
-        }
-        getOwner().modifyGold(-gold);
-        lastTribute = getGame().getTurn().getNumber();
-        return gold;
+    /**
+     * Set the year of the last tribute.
+     *
+     * @param lastTribute The new last tribute year.
+     */
+    public void setLastTribute(int lastTribute) {
+        this.lastTribute = lastTribute;
     }
 
     /**

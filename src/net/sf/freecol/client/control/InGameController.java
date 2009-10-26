@@ -113,6 +113,7 @@ import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
+import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
@@ -2100,6 +2101,26 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Demand a tribute from an indian settlement.
+     *
+     * @param unit The <code>Unit</code> that demands.
+     * @param direction The direction to demand in.
+     */
+    private void demandTribute(Unit unit, Direction direction) {
+        Client client = freeColClient.getClient();
+        DemandTributeMessage message = new DemandTributeMessage(unit, direction);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
+        if (reply == null) return;
+        Connection conn = client.getConnection();
+        InputHandler inputHandler = freeColClient.getInGameInputHandler();
+        inputHandler.handle(conn, reply);
+        freeColClient.getCanvas().updateGoldLabel();
+        nextModelMessage();
+        nextActiveUnit(unit.getTile());
+    }
+
+    /**
      * Ask for attack or demand a tribute when attacking an indian settlement,
      * attack in other cases
      * 
@@ -2107,56 +2128,44 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to attack.
      */
     private void attack(Unit unit, Direction direction) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        Canvas canvas = freeColClient.getCanvas();
+        Game game = freeColClient.getGame();
+        if (game.getCurrentPlayer() != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
-        Tile target = freeColClient.getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
+        // Sanity check
+        if (unit == null) return;
+        Tile tile = unit.getTile();
+        if (tile == null) return;
+        Tile target = game.getMap().getNeighbourOrNull(direction, tile);
+        if (target == null) return;
 
-        if (target.getSettlement() != null && target.getSettlement() instanceof IndianSettlement && unit.isArmed()) {
-            IndianSettlement settlement = (IndianSettlement) target.getSettlement();
-            switch (freeColClient.getCanvas().showArmedUnitIndianSettlementDialog(settlement)) {
-            case INDIAN_SETTLEMENT_ATTACK:
-                if (confirmHostileAction(unit, target) && confirmPreCombat(unit, target)) {
-                    reallyAttack(unit, direction);
-                }
-                return;
+        // Extra option with native settlement
+        Settlement settlement;
+        if ((settlement = target.getSettlement()) != null
+            && settlement instanceof IndianSettlement
+            && unit.isArmed()) {
+            IndianSettlement natives = (IndianSettlement) settlement;
+            switch (canvas.showArmedUnitIndianSettlementDialog(natives)) {
             case CANCEL:
                 return;
+            case INDIAN_SETTLEMENT_ATTACK:
+                break; // go on to usual attack confirmation
             case INDIAN_SETTLEMENT_TRIBUTE:
-                Element demandMessage = Message.createNewRootElement("armedUnitDemandTribute");
-                demandMessage.setAttribute("unit", unit.getId());
-                demandMessage.setAttribute("direction", direction.toString());
-                Element reply = freeColClient.getClient().ask(demandMessage);
-                if (reply != null && reply.getTagName().equals("armedUnitDemandTributeResult")) {
-                    String result = reply.getAttribute("result");
-                    if (result.equals("agree")) {
-                        String amount = reply.getAttribute("amount");
-                        unit.getOwner().modifyGold(Integer.parseInt(amount));
-                        freeColClient.getCanvas().updateGoldLabel();
-                        freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeAgree",
-                                                                         settlement,
-                                                                         "%replace%", amount);
-                    } else if (result.equals("disagree")) {
-                        freeColClient.getCanvas().showInformationMessage("scoutSettlement.tributeDisagree", settlement);
-                    }
-                    unit.setMovesLeft(0);
-                } else {
-                    logger.warning("Server gave an invalid reply to an armedUnitDemandTribute message");
-                    return;
-                }
-                nextActiveUnit(unit.getTile());
-                break;
+                demandTribute(unit, direction);
+                return;
             default:
-                logger.warning("Incorrect response returned from Canvas.showArmedUnitIndianSettlementDialog()");
+                logger.warning("showArmedUnitIndianSettlementDialog failed");
                 return;
             }
-        } else {
-            if (confirmHostileAction(unit, target) && confirmPreCombat(unit, target)) {
-                reallyAttack(unit, direction);
-            }
-            return;
+        }
+
+        // Normal attack confirmation
+        if (confirmHostileAction(unit, target)
+            && confirmPreCombat(unit, target)) {
+            reallyAttack(unit, direction);
         }
     }
 
@@ -2164,15 +2173,16 @@ public final class InGameController implements NetworkConstants {
      * Check if an attack results in a transition from peace or cease fire to
      * war and, if so, warn the player.
      * 
-     * @param attacker The potential attacker.
-     * @param target The target tile.
-     * @return true to attack, false to abort.
+     * @param attacker The potential attacking <code>Unit</code>.
+     * @param target The target <code>Tile</code>.
+     * @return True to attack, false to abort.
      */
     private boolean confirmHostileAction(Unit attacker, Tile target) {
         if (attacker.hasAbility("model.ability.piracy")) {
             // Privateers can attack and remain at peace
             return true;
         }
+
         Player enemy;
         if (target.getSettlement() != null) {
             enemy = target.getSettlement().getOwner();
@@ -2188,45 +2198,53 @@ public final class InGameController implements NetworkConstants {
             }
             enemy = defender.getOwner();
         }
+
+        // Confirm attack given current stance
+        Canvas canvas = freeColClient.getCanvas();
+        String enemyNation = enemy.getNationAsString();
         switch (attacker.getOwner().getStance(enemy)) {
         case UNCONTACTED: case PEACE:
-            return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.peace",
-                                                               "model.diplomacy.attack.confirm",
-                                                               "cancel",
-                                                               "%replace%", enemy.getNationAsString());
+            return canvas.showConfirmDialog("model.diplomacy.attack.peace",
+                                            "model.diplomacy.attack.confirm",
+                                            "cancel",
+                                            "%nation%", enemyNation);
         case WAR:
             logger.finest("Player at war, no confirmation needed");
             break;
         case CEASE_FIRE:
-            return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.ceaseFire",
-                                                               "model.diplomacy.attack.confirm",
-                                                               "cancel",
-                                                               "%replace%", enemy.getNationAsString());
+            return canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
+                                            "model.diplomacy.attack.confirm",
+                                            "cancel",
+                                            "%nation%", enemyNation);
         case ALLIANCE:
-            return freeColClient.getCanvas().showConfirmDialog("model.diplomacy.attack.alliance",
-                                                               "model.diplomacy.attack.confirm",
-                                                               "cancel",
-                                                               "%replace%", enemy.getNationAsString());
+            return canvas.showConfirmDialog("model.diplomacy.attack.alliance",
+                                            "model.diplomacy.attack.confirm",
+                                            "cancel",
+                                            "%nation%", enemyNation);
         }
         return true;
     }
 
     /**
-     * If the client options include a pre-combat dialog, allow the user to view
-     * the odds and possibly cancel the attack.
+     * If the client options include a pre-combat dialog, allow the
+     * user to view the odds and possibly cancel the attack.
      * 
-     * @param attacker The attacker.
-     * @param target The target tile.
-     * @return true to attack, false to abort.
+     * @param attacker The attacking <code>Unit</code>.
+     * @param target The target <code>Tile</code>.
+     * @return True to attack, false to abort.
      */
     private boolean confirmPreCombat(Unit attacker, Tile target) {
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
             Settlement settlementOrNull = target.getSettlement();
             // Don't tell the player how a settlement is defended!
-            Unit defenderOrNull = settlementOrNull != null ? null : target.getDefendingUnit(attacker);
+            Unit defenderOrNull = (settlementOrNull != null) ? null
+                : target.getDefendingUnit(attacker);
             Canvas canvas = freeColClient.getCanvas();
-            return canvas.showFreeColDialog(new PreCombatDialog(attacker, defenderOrNull,
-                                                                settlementOrNull, canvas));
+            PreCombatDialog dialog = new PreCombatDialog(attacker,
+                                                         defenderOrNull,
+                                                         settlementOrNull,
+                                                         canvas);
+            return canvas.showFreeColDialog(dialog);
         }
         return true;
     }
@@ -3382,9 +3400,8 @@ public final class InGameController implements NetworkConstants {
             reply = client.ask(scoutMessage);
             break;
         case INDIAN_SETTLEMENT_TRIBUTE:
-            scoutMessage.setAttribute("action", "tribute");
-            reply = client.ask(scoutMessage);
-            break;
+            demandTribute(unit, direction);
+            return;
         default:
             logger.warning("Incorrect response returned from Canvas.showScoutIndianSettlementDialog()");
             return;
@@ -3414,17 +3431,6 @@ public final class InGameController implements NetworkConstants {
             } else if (action.equals("speak") && result.equals("nothing")) {
                 // nothing special
                 canvas.showInformationMessage("scoutSettlement.speakNothing", settlement);
-            } else if (action.equals("tribute") && result.equals("agree")) {
-                // receive a tribute
-                String amount = reply.getAttribute("amount");
-                unit.getOwner().modifyGold(Integer.parseInt(amount));
-                freeColClient.getCanvas().updateGoldLabel();
-                canvas.showInformationMessage("scoutSettlement.tributeAgree",
-                                              settlement,
-                                              "%replace%", amount);
-            } else if (action.equals("tribute") && result.equals("disagree")) {
-                // no tribute
-                canvas.showInformationMessage("scoutSettlement.tributeDisagree", settlement);
             }
         } else {
             logger.warning("Server gave an invalid reply to an scoutIndianSettlement message");

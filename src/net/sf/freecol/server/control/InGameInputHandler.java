@@ -81,6 +81,7 @@ import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
+import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
@@ -205,10 +206,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return inciteAtSettlement(connection, element);
             }
         });
-        register("armedUnitDemandTribute", new CurrentPlayerNetworkRequestHandler() {
+        register(DemandTributeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return armedUnitDemandTribute(connection, element);
+                return new DemandTributeMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(DisembarkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -1298,67 +1299,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             } else {
                 reply.setAttribute("result", "nothing");
             }
-        } else if (action.equals("tribute")) {
-            demandTribute(settlement, player, reply);
         }
         return reply;
     }
-
-    /**
-     * Handles a "armedUnitDemandTribute"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element armedUnitDemandTribute(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        // Get parameters:
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
-        // Test the parameters:
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (unit.getTile() == null) {
-            throw new IllegalArgumentException("'Unit' is not on the map: " + unit.toString());
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile newTile = getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
-        if (newTile == null) {
-            throw new IllegalArgumentException("Could not find tile in direction " + direction + " from unit with ID "
-                    + element.getAttribute("unit"));
-        }
-        unit.setMovesLeft(0);
-        IndianSettlement settlement = (IndianSettlement) newTile.getSettlement();
-        Element reply = Message.createNewRootElement("armedUnitDemandTributeResult");
-        demandTribute(settlement, player, reply);
-        return reply;
-    }
-
-
-    /**
-     * Demands a tribute to an <code>IndianSettlement</code>
-     * 
-     * @param settlement The <code>IndianSettlement</code> whom demand the
-     *            tribute to
-     * @param player The <code>Player</code> which demands the tribute
-     * @param reply The element to add the result
-     */
-    private void demandTribute(IndianSettlement settlement, Player player, Element reply) {
-        int gold = settlement.getTribute(player);
-        if (gold > 0) {
-            reply.setAttribute("result", "agree");
-            reply.setAttribute("amount", String.valueOf(gold));
-            player.modifyGold(gold);
-        } else {
-            reply.setAttribute("result", "disagree");
-        }
-    }
-
 
     /**
      * Handles a "missionaryAtSettlement"-message from a client.

@@ -1641,4 +1641,41 @@ public final class InGameController extends Controller {
         return objects;
     }
 
+    /**
+     * Demand a tribute from a native settlement.
+     *
+     * @param player The <code>Player</code> demanding the tribute.
+     * @param settlement The <code>IndianSettlement</code> demanded of.
+     * @return The amount of gold offered as tribute.
+     * @todo Move TURNS_PER_TRIBUTE magic number to the spec.
+     */
+    public int demandTribute(Player player, IndianSettlement settlement) {
+        final int TURNS_PER_TRIBUTE = 5;
+        Player indianPlayer = settlement.getOwner();
+        int gold = 0;
+        int year = getGame().getTurn().getNumber();
+        if (settlement.getLastTribute() + TURNS_PER_TRIBUTE < year) {
+            switch (indianPlayer.getTension(player).getLevel()) {
+            case HAPPY:
+            case CONTENT:
+                gold = Math.min(indianPlayer.getGold() / 10, 100);
+                break;
+            case DISPLEASED:
+                gold = Math.min(indianPlayer.getGold() / 20, 100);
+                break;
+            case ANGRY:
+            case HATEFUL:
+            default:
+                break; // do nothing
+            }
+        }
+
+        // Increase tension whether we paid or not.
+        // Apply tension directly to the settlement and let propagation work.
+        settlement.modifyAlarm(player, Tension.TENSION_ADD_NORMAL);
+        settlement.setLastTribute(year);
+        indianPlayer.modifyGold(-gold);
+        player.modifyGold(gold);
+        return gold;
+    }
 }
