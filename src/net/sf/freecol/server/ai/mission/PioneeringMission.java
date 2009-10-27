@@ -539,6 +539,10 @@ public class PioneeringMission extends Mission {
             return false;
         }
         
+        if(aiUnit.getUnit().getTile() == null){
+            return false;
+        }
+        
         AIPlayer aiPlayer = (AIPlayer) aiUnit.getAIMain().getAIObject(aiUnit.getUnit().getOwner().getId());
         Iterator<TileImprovementPlan> tiIterator = aiPlayer.getTileImprovementPlanIterator();            
         
