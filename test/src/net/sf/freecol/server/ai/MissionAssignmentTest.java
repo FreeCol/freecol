@@ -41,6 +41,7 @@ import net.sf.freecol.server.ai.mission.DefendSettlementMission;
 import net.sf.freecol.server.ai.mission.UnitSeekAndDestroyMission;
 import net.sf.freecol.server.ai.mission.UnitWanderHostileMission;
 import net.sf.freecol.server.control.Controller;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -424,9 +425,10 @@ public class MissionAssignmentTest extends FreeColTestCase {
 	    Unit galleon = new Unit(game, seaTile, player2, galleonType, UnitState.ACTIVE);
 
 	    int unitsInGalleon = 6;
+      InGameController igc = (InGameController) server.getController();
 	    for(int i=0; i < unitsInGalleon; i ++){
 	        Unit artillery = new Unit(game, seaTile, player2, artilleryType, UnitState.SENTRY);
-	        artillery.embark(galleon);
+	        igc.embarkUnit(player2, artillery, galleon);
 	    }
 	    assertEquals("Wrong number of units onboard galleon",unitsInGalleon,galleon.getUnitCount());
 	    assertEquals("Galleon should be full",0,galleon.getSpaceLeft());

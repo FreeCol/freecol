@@ -1678,4 +1678,31 @@ public final class InGameController extends Controller {
         player.modifyGold(gold);
         return gold;
     }
+
+
+    /**
+     * Embark a unit onto a carrier.
+     * Checking that the locations are appropriate is not done here.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> whose unit is embarking.
+     * @param unit The <code>Unit</code> that is embarking.
+     * @param carrier The <code>Unit</code> to embark onto.
+     * @return True if the the embarkation succeeds.
+     */
+    public boolean embarkUnit(ServerPlayer serverPlayer, Unit unit, Unit carrier) {
+        if (unit.isNaval() || carrier.getSpaceLeft() < unit.getSpaceTaken()) {
+            return false;
+        }
+
+        Location sourceLocation = unit.getLocation();
+        unit.setLocation(carrier);
+        unit.setMovesLeft(0); // unit.getMovesLeft() -  3
+        unit.setState(UnitState.SENTRY);
+
+        // Update others
+        if (sourceLocation instanceof Tile) {
+            sendRemoveUnitToAll(unit, serverPlayer);
+        }
+        return true;
+    }
 }

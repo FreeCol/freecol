@@ -1554,43 +1554,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Embarks this unit onto the specified unit.
-     * 
-     * @param unit The unit to embark onto.
-     * @exception IllegalStateException If the embark is illegal.
-     */
-    public void embark(Unit unit) {
-        if (unit == null) {
-            throw new IllegalArgumentException("Target of embarkation must not be 'null'.");
-        } else if (getMoveType(unit.getTile()) != MoveType.EMBARK) {
-            throw new IllegalStateException("Illegal disembark requested!");
-        } else {
-            setLocation(unit);
-            setMovesLeft(getMovesLeft() - 3);
-        }
-    }
-
-    /**
-     * Boards a carrier that is on the same tile.
-     * 
-     * @param carrier The carrier this unit shall embark.
-     * @exception IllegalStateException If the carrier is on another tile than
-     *                this unit.
-     */
-    public void boardShip(Unit carrier) {
-        if (isNaval()) {
-            throw new IllegalStateException("A ship cannot board another carrier!");
-        }
-
-        if (getTile() == carrier.getTile() && isInEurope() == carrier.isInEurope()) {
-            setLocation(carrier);
-            setState(UnitState.SENTRY);
-        } else {
-            throw new IllegalStateException("It is not allowed to board a ship on another tile.");
-        }
-    }
-
-    /**
      * Verifies if the unit is aboard a carrier
      */
     public boolean isOnCarrier(){

@@ -45,9 +45,13 @@ import net.sf.freecol.util.test.MockMapGenerator;
 public class ServerPlayerTest extends FreeColTestCase {	
     TileType plains = spec().getTileType("model.tile.plains");
     
-    UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
-    UnitType treasureType = spec().getUnitType("model.unit.treasureTrain");
-    
+    UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    UnitType treasureTrainType = spec().getUnitType("model.unit.treasureTrain");
+    UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
+    UnitType caravelType = spec().getUnitType("model.unit.caravel");
+    UnitType galleonType = spec().getUnitType("model.unit.galleon");
+
+
     FreeColServer server = null;
 	
     public void tearDown() throws Exception {
@@ -130,32 +134,25 @@ public class ServerPlayerTest extends FreeColTestCase {
      * Tests worker allocation regarding building tasks
      */
     public void testCashInTreasure() {
-        server = ServerTestHelper.startServer(false, true);
-
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
         Map map = getCoastTestMap(plains, true);
         server.setMapGenerator(new MockMapGenerator(map));
-        
         Controller c = server.getController();
         PreGameController pgc = (PreGameController)c;
-        
         try {
             pgc.startGame();
         } catch (FreeColException e) {
             fail("Failed to start game");
         }
-        
         Game game = server.getGame();
-        
         FreeColTestCase.setGame(game);
      
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        
         Tile tile = map.getTile(10, 4);
-        
-        UnitType shipType = FreeCol.getSpecification().getUnitType("model.unit.galleon");
-        Unit ship = new Unit(game, tile, dutch, shipType, UnitState.ACTIVE, shipType.getDefaultEquipment());
-        
-        Unit treasure = new Unit(game, tile, dutch, treasureType, UnitState.ACTIVE, treasureType.getDefaultEquipment());
+        Unit ship = new Unit(game, tile, dutch, galleonType, UnitState.ACTIVE, galleonType.getDefaultEquipment());
+        Unit treasure = new Unit(game, tile, dutch, treasureTrainType, UnitState.ACTIVE, treasureTrainType.getDefaultEquipment());
         assertTrue(treasure.canCarryTreasure());
         treasure.setTreasureAmount(100);
         
@@ -194,41 +191,82 @@ public class ServerPlayerTest extends FreeColTestCase {
     }
 	
     public void testHasExploredTile() {
-        server = ServerTestHelper.startServer(false, true);
-
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        Map map = getTestMap(plains);
         server.setMapGenerator(new MockMapGenerator(getTestMap()));
-        
         PreGameController pgc = (PreGameController) server.getController();
-
         try {
             pgc.startGame();
         } catch (FreeColException e) {
             fail("Failed to start game");
         }
-
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
-        Map map = game.getMap();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
-
         Tile tile1 = map.getTile(6, 8);
         Tile tile2 = map.getTile(8, 6);
-
         assertFalse("Setup error, tile1 should not be explored by dutch player",dutch.hasExplored(tile1));
         assertFalse("Setup error, tile1 should not be explored by french player",french.hasExplored(tile1));
-
         assertFalse("Setup error, tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
         assertFalse("Setup error, tile2 should not be explored by french player",french.hasExplored(tile2));
 
-        new Unit(game, tile1, dutch, freeColonist, UnitState.SENTRY);
-        new Unit(game, tile2, french, freeColonist, UnitState.SENTRY);
-
+        new Unit(game, tile1, dutch, colonistType, UnitState.SENTRY);
+        new Unit(game, tile2, french, colonistType, UnitState.SENTRY);
         assertTrue("Tile1 should be explored by dutch player",dutch.hasExplored(tile1));
         assertFalse("Tile1 should not be explored by french player",french.hasExplored(tile1));
-
         assertFalse("Tile2 should not be explored by dutch player",dutch.hasExplored(tile2));
         assertTrue("Tile2 should be explored by french player",french.hasExplored(tile2));
     }
+
+    public void testEmbark() {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        Map map = getCoastTestMap(plains);
+        server.setMapGenerator(new MockMapGenerator(getTestMap()));
+        PreGameController pgc = (PreGameController) server.getController();
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+
+        //Game game = getStandardGame();
+        //Map map = getTestMap();
+        //Tile tile = map.getTile(6, 8);
+        //game.setMap(map);
+
+        InGameController igc = (InGameController) server.getController();
+        Tile landTile = map.getTile(9, 9);
+        Tile seaTile = map.getTile(10, 9);
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Unit colonist = new Unit(game, landTile, dutch, colonistType, UnitState.ACTIVE);
+        Unit galleon = new Unit(game, seaTile, dutch, galleonType, UnitState.ACTIVE);
+        Unit caravel = new Unit(game, seaTile, dutch, caravelType, UnitState.ACTIVE);
+        caravel.getType().setSpaceTaken(2);
+        Unit wagon = new Unit(game, landTile, dutch, wagonTrainType, UnitState.ACTIVE);
+
+        // can not put ship on carrier
+        assertFalse(igc.embarkUnit(dutch, caravel, galleon));
+
+        // can not put wagon on galleon at its normal size
+        wagon.getType().setSpaceTaken(12);
+        assertFalse(igc.embarkUnit(dutch, wagon, galleon));
+
+        // but we can if it is made smaller
+        wagon.getType().setSpaceTaken(2);
+        assertTrue(igc.embarkUnit(dutch, wagon, galleon));
+        assertEquals(UnitState.SENTRY, wagon.getState());
+
+        // can put colonist on carrier
+        assertTrue(igc.embarkUnit(dutch, colonist, caravel));
+        assertEquals(UnitState.SENTRY, colonist.getState());
+    }
+
 }

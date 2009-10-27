@@ -117,6 +117,7 @@ import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
@@ -1945,69 +1946,40 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to embark.
      */
     private void moveEmbark(Unit unit, Direction direction) {
-        embark(unit, direction); // about to go away
-    }
-
-    /**
-     * Embarks the specified unit in a specified direction.
-     *
-     * @param unit The unit to be embarked.
-     * @param direction The direction in which to embark the Unit.
-     */
-    private void embark(Unit unit, Direction direction) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-
-        Game game = freeColClient.getGame();
-        Client client = freeColClient.getClient();
-        GUI gui = freeColClient.getGUI();
+        // Choose which carrier to embark upon.
         Canvas canvas = freeColClient.getCanvas();
-        Tile destinationTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
-        Unit destinationUnit = null;
-
-        // Animate the units movement
-        Animations.unitMove(canvas, unit, unit.getTile(), destinationTile);
-
-        if (destinationTile.getUnitCount() == 1) {
-            destinationUnit = destinationTile.getFirstUnit();
-        } else {
-            ArrayList<Unit> choices = new ArrayList<Unit>();
-            for (Unit nextUnit : destinationTile.getUnitList()) {
-                if (nextUnit.getSpaceLeft() >= unit.getType().getSpaceTaken()) {
-                    choices.add(nextUnit);
-                }
+        Tile sourceTile = unit.getTile();
+        Map map = freeColClient.getGame().getMap();
+        Tile destinationTile = map.getNeighbourOrNull(direction, sourceTile);
+        Unit carrier = null;
+        ArrayList<Unit> choices = new ArrayList<Unit>();
+        for (Unit nextUnit : destinationTile.getUnitList()) {
+            if (nextUnit.getSpaceLeft() >= unit.getType().getSpaceTaken()) {
+                choices.add(nextUnit);
             }
+        }
+        if (choices.size() == 0) {
+            throw new RuntimeException("Unit " + unit.getId()
+                                       + " found no carrier to embark upon.");
+        } else if (choices.size() == 1) {
+            carrier = choices.get(0);
+        } else {
+            carrier = canvas.showSimpleChoiceDialog(Messages.message("embark.text"),
+                                                    Messages.message("embark.cancel"),
+                                                    choices);
+            if (carrier == null) return; // User cancelled
+        }
 
-            if (choices.size() == 1) {
-                destinationUnit = choices.get(0);
-            } else if (choices.size() == 0) {
-                throw new IllegalStateException();
+        // Proceed to embark
+        if (askEmbark(unit, carrier, direction)
+            && unit.getLocation() == carrier) {
+            Animations.unitMove(canvas, unit, sourceTile, destinationTile);
+            if (carrier.getMovesLeft() > 0) {
+                freeColClient.getGUI().setActiveUnit(carrier);
             } else {
-                destinationUnit = canvas.showSimpleChoiceDialog(Messages.message("embark.text"),
-                                                                Messages.message("embark.cancel"),
-                                                                choices);
-                if (destinationUnit == null) { // == user cancelled
-                    return;
-                }
+                nextActiveUnit(destinationTile);
             }
         }
-
-        unit.embark(destinationUnit);
-
-        if (destinationUnit.getMovesLeft() > 0) {
-            gui.setActiveUnit(destinationUnit);
-        } else {
-            nextActiveUnit(destinationUnit.getTile());
-        }
-
-        Element embarkElement = Message.createNewRootElement("embark");
-        embarkElement.setAttribute("unit", unit.getId());
-        embarkElement.setAttribute("direction", direction.toString());
-        embarkElement.setAttribute("embarkOnto", destinationUnit.getId());
-
-        client.sendAndWait(embarkElement);
     }
 
     /**
@@ -3094,49 +3066,69 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-     * Boards a specified unit onto a carrier. The carrier should be
-     * at the same tile as the boarding unit.
-     * 
-     * @param unit The unit who is going to board the carrier.
-     * @param carrier The carrier.
-     * @return <i>true</i> if the <code>unit</code> actually gets on the
-     *         <code>carrier</code>.
+     * Boards a specified unit onto a carrier.
+     * The carrier must be at the same location as the boarding unit.
+     *
+     * @param unit The <code>Unit</code> which is to board the carrier.
+     * @param carrier The carrier to board.
+     * @return True if the unit boards the carrier.
      */
     public boolean boardShip(Unit unit, Unit carrier) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            throw new IllegalStateException("Not your turn.");
+            return false;
         }
 
+        // Sanity checks.
         if (unit == null) {
             logger.warning("unit == null");
             return false;
         }
-
         if (carrier == null) {
             logger.warning("Trying to load onto a non-existent carrier.");
             return false;
         }
-
-        Client client = freeColClient.getClient();
-
         if (unit.isNaval()) {
             logger.warning("Trying to load a ship onto another carrier.");
             return false;
         }
+        if (unit.isInEurope() != carrier.isInEurope()
+            || unit.getTile() != carrier.getTile()) {
+            logger.warning("Unit and carrier are not co-located.");
+            return false;
+        }
 
-        freeColClient.playSound(SoundEffect.LOAD_CARGO);
+        // Proceed to board
+        if (askEmbark(unit, carrier, null) && unit.getLocation() == carrier) {
+            freeColClient.playSound(SoundEffect.LOAD_CARGO);
+            //TODO: firePropertyChange?
+            return true;
+        }
+        return false;
+    }
 
-        Element boardShipElement = Message.createNewRootElement("boardShip");
-        boardShipElement.setAttribute("unit", unit.getId());
-        boardShipElement.setAttribute("carrier", carrier.getId());
+    /**
+     * Server query-response for boarding a carrier.
+     *
+     * @param unit The <code>Unit</code> that is boarding.
+     * @param carrier The carrier <code>Unit</code>.
+     * @param direction An optional direction if the unit is boarding from
+     *        an adjacent tile, or null if from the same tile.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askEmbark(Unit unit, Unit carrier, Direction direction) {
+        Client client = freeColClient.getClient();
+        EmbarkMessage message = new EmbarkMessage(unit, carrier, direction);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "update");
+        if (reply == null) return false;
 
-        unit.boardShip(carrier);
-
-        client.sendAndWait(boardShipElement);
-
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
         return true;
     }
+
 
     /**
      * Leave a ship.  The ship must be in harbour.

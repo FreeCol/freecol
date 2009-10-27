@@ -84,6 +84,7 @@ import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DemandTributeMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
@@ -170,16 +171,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return attack(connection, element);
             }
         });
-        register("embark", new CurrentPlayerNetworkRequestHandler() {
+        register(EmbarkMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return embark(connection, element);
-            }
-        });
-        register("boardShip", new CurrentPlayerNetworkRequestHandler() {
-            @Override
-            public Element handle(Player player, Connection connection, Element element) {
-                return boardShip(connection, element);
+                return new EmbarkMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("learnSkillAtSettlement", new CurrentPlayerNetworkRequestHandler() {
@@ -1095,65 +1090,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(update);
         }
         return reply;
-    }
-
-    /**
-     * Handles an "embark"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param embarkElement The element containing the request.
-     * @exception IllegalArgumentException If the data format of the message is
-     *                invalid.
-     */
-    private Element embark(Connection connection, Element embarkElement) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(embarkElement.getAttribute("unit"));
-        Direction direction = Enum.valueOf(Direction.class, embarkElement.getAttribute("direction"));
-        Unit destinationUnit = (Unit) getGame().getFreeColGameObject(embarkElement.getAttribute("embarkOnto"));
-        if (unit == null || destinationUnit == null
-                || getGame().getMap().getNeighbourOrNull(direction, unit.getTile()) != destinationUnit.getTile()) {
-            throw new IllegalArgumentException("Invalid data format in client message.");
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile oldTile = unit.getTile();
-        unit.embark(destinationUnit);
-        sendRemoveUnitToAll(unit, player);
-        return null;
-    }
-
-    /**
-     * Handles an "boardShip"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param boardShipElement The element containing the request.
-     */
-    private Element boardShip(Connection connection, Element boardShipElement) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(boardShipElement.getAttribute("unit"));
-        Unit carrier = (Unit) getGame().getFreeColGameObject(boardShipElement.getAttribute("carrier"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile oldTile = unit.getTile();
-        boolean tellEnemyPlayers = true;
-        if (oldTile == null || oldTile.getSettlement() != null) {
-            tellEnemyPlayers = false;
-        }
-        if (unit.isNaval()) {
-            logger.warning("Tried to load a ship onto another carrier.");
-            return null;
-        }
-        unit.boardShip(carrier);
-        if (tellEnemyPlayers) {
-            sendRemoveUnitToAll(unit, player);
-        }
-        // For updating the number of colonist:
-        sendUpdatedTileToAll(unit.getTile(), player);
-        return null;
     }
 
     /**

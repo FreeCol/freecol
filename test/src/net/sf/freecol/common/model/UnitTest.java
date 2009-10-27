@@ -906,39 +906,6 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Colonist should not have lost experience, compatible role",colonist.getExperience() > 0);
     }
 
-    public void boardShipTest() {
-        Game game = getStandardGame();
-        Map map = getTestMap();
-        Tile tile = map.getTile(6, 8);
-        game.setMap(map);
-
-        Player dutch = game.getPlayer("model.nation.dutch");
-        Unit colonist = new Unit(game, tile, dutch, colonistType, UnitState.ACTIVE);
-        Unit galleon = new Unit(game, tile, dutch, galleonType, UnitState.ACTIVE);
-        Unit caravel = new Unit(game, tile, dutch, caravelType, UnitState.ACTIVE);
-        Unit wagon = new Unit(game, tile, dutch, wagonType, UnitState.ACTIVE);
-
-        caravel.getType().setSpaceTaken(2);
-        wagon.getType().setSpaceTaken(2);
-
-        // can't put ship on carrier
-        caravel.boardShip(galleon);
-        assertEquals(tile, caravel.getLocation());
-        assertEquals(UnitState.ACTIVE, caravel.getState());
-
-        // can put wagon on carrier
-        wagon.boardShip(galleon);
-        assertEquals(galleon, wagon.getLocation());
-        assertEquals(UnitState.SENTRY, wagon.getState());
-        assertEquals("Wrong number of units aboard the carrier",1,galleon.getUnitCount());
-
-        colonist.boardShip(galleon);
-        assertEquals(galleon, colonist.getLocation());
-        assertEquals(UnitState.SENTRY, colonist.getState());
-        assertEquals("Wrong number of units aboard the carrier",2,galleon.getUnitCount());
-
-    }
-    
     public void testClearSpecialty(){
         Game game = getStandardGame();
         Map map = getTestMap(plains);
