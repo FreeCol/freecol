@@ -432,6 +432,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         inPortPanel.initialize(null);
     }
 
+    public void updateTilePanel() {
+        tilePanel.initialize();
+    }
+
     public void updateNameBox() {
         // Remove all action listeners, so the update has no effect (except
         // updating the list).
@@ -1515,6 +1519,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 getCanvas().showInformationMessage(msg.getId(), msg.getDisplay(), msg.getData());
             }
             updateSoLLabel();
+        } else if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
+            updateTilePanel();
         } else if (property.startsWith("model.goods.")) {
             updateProductionPanel();
         } else {

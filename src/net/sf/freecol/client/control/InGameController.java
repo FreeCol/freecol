@@ -3100,9 +3100,20 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Proceed to board
+        Location oldLocation = unit.getLocation();
         if (askEmbark(unit, carrier, null) && unit.getLocation() == carrier) {
             freeColClient.playSound(SoundEffect.LOAD_CARGO);
-            //TODO: firePropertyChange?
+            // Update GUI
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, null, unit);
+            if (oldLocation instanceof Europe) {
+                Europe europe = (Europe) oldLocation;
+                europe.firePropertyChange(Europe.UNIT_CHANGE,
+                                          europe.getUnitCount() + 1,
+                                          europe.getUnitCount());
+            } else if (oldLocation instanceof Tile) {
+                Tile tile = (Tile) oldLocation;
+                tile.firePropertyChange(Tile.UNIT_CHANGE, unit, null);
+            }
             return true;
         }
         return false;
@@ -3150,17 +3161,20 @@ public final class InGameController implements NetworkConstants {
         Unit carrier = (Unit) unit.getLocation();
 
         // Ask the server
+        Location oldLocation = unit.getLocation();
         if (askDisembark(unit) && unit.getLocation() != carrier) {
             // Update GUI
-            carrier.firePropertyChange(Unit.CARGO_CHANGE, null, unit);
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, unit, null);
             if (checkCashInTreasureTrain(unit)) {
                 nextActiveUnit();
-            } else if (carrier.getTile() != null) {
-                carrier.getTile().firePropertyChange(Tile.UNIT_CHANGE, null, unit);
-            } else if (carrier.isInEurope()) {
-                Europe europe = (Europe) carrier.getLocation();
-                europe.firePropertyChange(Europe.UNIT_CHANGE, europe.getUnitCount(),
-                                          europe.getUnitCount() - 1);
+            } else if (oldLocation instanceof Europe) {
+                Europe europe = (Europe) oldLocation;
+                europe.firePropertyChange(Europe.UNIT_CHANGE,
+                                          europe.getUnitCount() - 1,
+                                          europe.getUnitCount());
+            } else if (oldLocation instanceof Tile) {
+                Tile tile = (Tile) oldLocation;
+                tile.firePropertyChange(Tile.UNIT_CHANGE, null, unit);
             }
             return true;
         }
