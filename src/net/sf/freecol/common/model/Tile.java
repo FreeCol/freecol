@@ -1573,27 +1573,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     }
 
     /**
-     * Updates the skill available from the <code>IndianSettlement</code>
-     * located on this <code>Tile</code>.
-     * <p>
-     * 
-     * @param player The <code>Player</code> which should get the updated
-     *            information.
-     * @exception NullPointerException If there is no settlement on this
-     *                <code>Tile</code>.
-     * @exception ClassCastException If the <code>Settlement</code> on this
-     *                <code>Tile</code> is not an
-     *                <code>IndianSettlement</code>.
-     * @see IndianSettlement
-     */
-    public void updateIndianSettlementSkill(Player player) {
-        IndianSettlement is = (IndianSettlement) getSettlement();
-        PlayerExploredTile pet = getPlayerExploredTile(player);
-        pet.setSkill(is.getLearnableSkill());
-        pet.setVisited();
-    }
-
-    /**
      * Updates the information about the <code>IndianSettlement</code> located
      * on this <code>Tile</code>.
      * <p>

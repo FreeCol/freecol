@@ -103,6 +103,7 @@ import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
@@ -122,6 +123,7 @@ import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
+import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -2051,34 +2053,56 @@ public final class InGameController implements NetworkConstants {
                                           settlement,
                                           "%unit%", unit.getName(),
                                           "%skill%", skill.getName());
-        } else {
-            Element learnSkill = Message.createNewRootElement("learnSkillAtSettlement");
-            learnSkill.setAttribute("unit", unit.getId());
-            learnSkill.setAttribute("direction", direction.toString());
-            if (!canvas.showConfirmDialog("learnSkill.text",
-                                          "learnSkill.yes", "learnSkill.no",
-                                          "%replace%", skill.getName())) {
-                // the player declined to learn the skill
-                learnSkill.setAttribute("action", "cancel");
-            }
-
-            Element reply2 = freeColClient.getClient().ask(learnSkill);
-            String result = reply2.getAttribute("result");
-            if (result.equals("die")) {
-                unit.dispose();
-                canvas.showInformationMessage("learnSkill.die");
-            } else if (result.equals("leave")) {
-                canvas.showInformationMessage("learnSkill.leave");
-            } else if (result.equals("success")) {
-                unit.learnFromIndianSettlement(settlement);
-            } else if (result.equals("cancelled")) {
-                // do nothing
-            } else {
-                logger.warning("Server gave an invalid reply to an learnSkillAtSettlement message");
+        } else if (canvas.showConfirmDialog("learnSkill.text",
+                                            "learnSkill.yes", "learnSkill.no",
+                                            "%skill%", skill.getName())) {
+            if (askLearnSkill(unit, direction)) {
+                if (unit.isDisposed()) {
+                    canvas.showInformationMessage("learnSkill.die");
+                } else if (unit.getType() != skill) {
+                    canvas.showInformationMessage("learnSkill.leave");
+                }
             }
         }
-
         nextActiveUnit(unit.getTile());
+    }
+
+    /**
+     * Server query-response for finding out the skill taught at a settlement.
+     *
+     * @param unit The <code>Unit</code> that is asking.
+     * @param direction The direction to a settlement to ask.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askSkill(Unit unit, Direction direction) {
+        Client client = freeColClient.getClient();
+        AskSkillMessage message = new AskSkillMessage(unit, direction);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "update");
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+    /**
+     * Server query-response for learning the skill taught at a settlement.
+     *
+     * @param unit The <code>Unit</code> that is asking.
+     * @param direction The direction to a settlement to ask.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askLearnSkill(Unit unit, Direction direction) {
+        Client client = freeColClient.getClient();
+        LearnSkillMessage message = new LearnSkillMessage(unit, direction);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
     }
 
     /**

@@ -71,6 +71,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
@@ -90,6 +91,7 @@ import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
+import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
@@ -159,10 +161,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new MoveMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("askSkill", new CurrentPlayerNetworkRequestHandler() {
+        register(AskSkillMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return askSkill(connection, element);
+                return new AskSkillMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("attack", new CurrentPlayerNetworkRequestHandler() {
@@ -177,10 +179,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new EmbarkMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("learnSkillAtSettlement", new CurrentPlayerNetworkRequestHandler() {
+        register(LearnSkillMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return learnSkillAtSettlement(connection, element);
+                return new LearnSkillMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("scoutIndianSettlement", new CurrentPlayerNetworkRequestHandler() {
@@ -832,48 +834,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles an "askSkill"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     * @exception IllegalArgumentException If the data format of the message is
-     *                invalid.
-     * @exception IllegalStateException If the request is not accepted by the
-     *                model.
-     */
-    private Element askSkill(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
-        Map map = getGame().getMap();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
-        if (unit == null) {
-            throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
-                    + element.getAttribute("unit"));
-        }
-        if (unit.getMovesLeft() == 0) {
-            throw new IllegalArgumentException("Unit has no moves left.");
-        }
-        if (unit.getTile() == null) {
-            throw new IllegalArgumentException("'Unit' not on map: ID: " + element.getAttribute("unit"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
-                .getSettlement();
-        
-        unit.setMovesLeft(0);
-        Element reply = Message.createNewRootElement("provideSkill");
-        if (settlement.getLearnableSkill() != null) {
-            reply.setAttribute("skill", settlement.getLearnableSkill().getId());
-        }
-        // Set the Tile.PlayerExploredTile attribute.
-        settlement.getTile().updateIndianSettlementSkill(player);
-        return reply;
-    }
-
-    /**
      * Handles an "attack"-message from a client.
      * 
      * @param connection The connection the message came from.
@@ -1088,63 +1048,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             update.appendChild(unit.getTile().toXMLElement(player, update.getOwnerDocument()));
             reply.appendChild(update);
-        }
-        return reply;
-    }
-
-    /**
-     * Handles a "learnSkillAtSettlement"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element learnSkillAtSettlement(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
-        Map map = getGame().getMap();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
-        boolean cancelAction = false;
-        if (element.getAttribute("action").equals("cancel")) {
-            cancelAction = true;
-        }
-        if (unit.getTile() == null) {
-            throw new IllegalArgumentException("'Unit' not on map: ID: " + element.getAttribute("unit"));
-        }
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
-        IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
-        if (settlement == null) {
-            throw new IllegalStateException("No settlement to learn skill from.");
-        }
-        if (!unit.getType().canBeUpgraded(settlement.getLearnableSkill(), ChangeType.NATIVES)) {
-            throw new IllegalStateException("Unit can't learn that skill from settlement!");
-        }
-        
-        Element reply = Message.createNewRootElement("learnSkillResult");
-        if (!cancelAction) {
-            Tension tension = settlement.getAlarm(player);
-            if (tension == null) {
-                tension = new Tension(0);
-            }
-            switch (tension.getLevel()) {
-            case HATEFUL:
-                reply.setAttribute("result", "die");
-                unit.dispose();
-                break;
-            case ANGRY:
-                reply.setAttribute("result", "leave");
-                break;
-            default:
-                unit.learnFromIndianSettlement(settlement);
-                // Set the Tile.PlayerExploredTile attribute.
-                settlement.getTile().updateIndianSettlementSkill(player);
-                reply.setAttribute("result", "success");
-            }
-        } else {
-            reply.setAttribute("result", "cancelled");
         }
         return reply;
     }
