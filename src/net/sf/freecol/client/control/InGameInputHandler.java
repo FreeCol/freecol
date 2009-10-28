@@ -618,7 +618,7 @@ public final class InGameInputHandler extends InputHandler {
                                                 "%nation%", nation).show();
             return null;
         }
-        agreement = new ShowNegotiationDialogSwingTask(message.getUnit(),
+        agreement = new ShowNegotiationDialogSwingTask(message.getUnit(element),
                                                        message.getSettlement(),
                                                        message.getAgreement()).select();
         if (agreement == null) {

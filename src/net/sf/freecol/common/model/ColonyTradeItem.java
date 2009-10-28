@@ -30,10 +30,20 @@ import javax.xml.stream.XMLStreamWriter;
 public class ColonyTradeItem extends TradeItem {
     
     /**
+     * The ID of the colony to change hands.
+     */
+    private String colonyID;
+
+    /**
      * The colony to change hands.
      */
     private Colony colony;
-        
+
+    /**
+     * The colony name, when the colony is unknown to the offer recipient.
+     */
+    private String colonyName;
+
     /**
      * Creates a new <code>ColonyTradeItem</code> instance.
      *
@@ -45,6 +55,8 @@ public class ColonyTradeItem extends TradeItem {
     public ColonyTradeItem(Game game, Player source, Player destination, Colony colony) {
         super(game, "tradeItem.colony", source, destination);
         this.colony = colony;
+        colonyID = colony.getId();
+        colonyName = colony.getName();
     }
 
     /**
@@ -96,7 +108,17 @@ public class ColonyTradeItem extends TradeItem {
     public boolean isUnique() {
         return false;
     }
-    
+
+    /**
+     * Extract the colony name.  Necessary as the colony may not actually be
+     * known by a recipient of an offer.
+     *
+     * @return The colony name.
+     */
+    public String getColonyName() {
+        return colonyName;
+    }
+
     /**
      * Concludes the trade.
      *
@@ -117,8 +139,9 @@ public class ColonyTradeItem extends TradeItem {
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readFromXMLImpl(in);
-        String colonyID = in.getAttributeValue(null, "colony");
-        this.colony = (Colony) getGame().getFreeColGameObject(colonyID);
+        colonyID = in.getAttributeValue(null, "colony");
+        colonyName = in.getAttributeValue(null, "colonyName");
+        colony = (Colony) getGame().getFreeColGameObject(colonyID);
         in.nextTag();
     }
 
@@ -133,7 +156,8 @@ public class ColonyTradeItem extends TradeItem {
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         super.toXMLImpl(out);
-        out.writeAttribute("colony", this.colony.getId());
+        out.writeAttribute("colony", colonyID);
+        out.writeAttribute("colonyName", colonyName);
         out.writeEndElement();
     }
     

@@ -79,6 +79,7 @@ public class DiplomacyMessage extends Message {
         ACCEPT_TRADE,
         REJECT_TRADE
     }
+
     /**
      * The agreement status.
      */
@@ -128,21 +129,29 @@ public class DiplomacyMessage extends Message {
 
     /**
      * Get the <code>Unit</code> which began this diplomatic exchange.
-     * This is a helper routine to be called in-client as it blindly trusts its field.
+     * This is a helper routine to be called in-client as it blindly
+     * trusts its field.
      *
+     * @param element An <code>Element</code> in which to search for
+     *                the unit if it is not known.
      * @return The unit, or null if none.
      */
-    public Unit getUnit() {
-        try {
-            return (Unit) agreement.getGame().getFreeColGameObject(unitId);
-        } catch (Exception e) {
+    public Unit getUnit(Element element) {
+        Game game = agreement.getGame();
+        Unit unit = (Unit) game.getFreeColGameObject(unitId);
+        if (unit == null && element != null) {
+            NodeList nodes = element.getChildNodes();
+            if (nodes.getLength() >= 2) {
+                unit = new Unit(game, (Element) nodes.item(1));
+            }
         }
-        return null;
+        return unit;
     }
 
     /**
-     * Get the <code>Settlement</code> at which a diplomatic exchange happens.
-     * This is a helper routine to be called in-client as it blindly trusts all fields.
+     * Get the <code>Settlement</code> at which a diplomatic exchange
+     * happens.  This is a helper routine to be called in-client as it
+     * blindly trusts all fields.
      *
      * @return The settlement, or null if none.
      */
@@ -189,6 +198,8 @@ public class DiplomacyMessage extends Message {
 
     /**
      * Set the agreement (a <code>DiplomaticTrade</code>) in this message.
+     *
+     * @param agreement The <code>DiplomaticTrade</code> to set.
      */
     public void setAgreement(DiplomaticTrade agreement) {
         this.agreement = agreement;
@@ -226,6 +237,11 @@ public class DiplomacyMessage extends Message {
         status = TradeStatus.REJECT_TRADE;
     }
 
+    /**
+     * Drop outdated agreements.
+     *
+     * @param turn The <code>Turn</code> to drop before.
+     */
     private void flushAgreements(Turn turn) {
         if (savedAgreements == null || agreementTurn == null
             || !agreementTurn.equals(turn)) {
@@ -233,13 +249,27 @@ public class DiplomacyMessage extends Message {
         }
         agreementTurn = turn;
     }
+
+    /**
+     * Save an agreement for a specified turn.
+     *
+     * @param message The <code>DiplomacyMessage</code> to save.
+     * @param turn The <code>Turn</code> of the agreement to save.
+     */
     private void saveAgreement(DiplomacyMessage message, Turn turn) {
         flushAgreements(turn);
         savedAgreements.add(message);
     }
+
+    /**
+     * Try to find an agreement in the saved agreements.
+     *
+     * @param message The <code>DiplomacyMessage</code> to find the original for.
+     * @param turn The <code>Turn</code> of the agreement to find.
+     * @return A suitable message or null on failure.
+     */
     private DiplomacyMessage loadAgreement(DiplomacyMessage message, Turn turn) {
         DiplomacyMessage result = null;
-
         flushAgreements(turn);
         for (DiplomacyMessage dm : savedAgreements) {
             if (dm.isSameTransaction(message)) {
@@ -263,7 +293,6 @@ public class DiplomacyMessage extends Message {
      * TradeItems.
      *
      * @param message A <code>DiplomacyMessage</code> to check.
-     *
      * @return True if the message is from the same transaction.
      **/
     private boolean isSameTransaction(DiplomacyMessage message) {
@@ -283,7 +312,6 @@ public class DiplomacyMessage extends Message {
      * "accept" set.
      *
      * @param message A <code>DiplomacyMessage</code> to examine.
-     *
      * @return True if the message is a valid acceptance.
      */
     private boolean isValidAcceptance(DiplomacyMessage message) {
@@ -299,7 +327,6 @@ public class DiplomacyMessage extends Message {
      * proposal.
      *
      * @param message A <code>DiplomacyMessage</code> to examine.
-     *
      * @return True if the message is a valid counter-proposal.
      */
     private boolean isValidCounterProposal(DiplomacyMessage message) {
@@ -314,7 +341,6 @@ public class DiplomacyMessage extends Message {
      *
      * @param player The <code>Player</code> which will receive the update.
      * @param items The array of <code>FreeColGameObject</code>s transferred.
-     *
      * @return An <code>Element</code> containing a suitable update message,
      *         or null if none is required.
      */
@@ -334,7 +360,6 @@ public class DiplomacyMessage extends Message {
                 Colony colony = (Colony) object;
                 Tile colonyTile = colony.getTile();
                 Map map = colony.getGame().getMap();
-
                 update.appendChild(colonyTile.toXMLElement(player, doc));
                 for (Tile tile : map.getSurroundingTiles(colonyTile, 1)) {
                     update.appendChild(tile.toXMLElement(player, doc));
@@ -362,8 +387,9 @@ public class DiplomacyMessage extends Message {
                              final ServerPlayer enemy,
                              final List<FreeColGameObject> objects) {
         Element update;
-        Unit unit = getUnit();
+        Unit unit = getUnit(null);
 
+        // Update for the enemy.
         if ((update = createUpdateFor(enemy, objects)) != null) {
             try {
                 enemy.getConnection().send(update);
@@ -372,9 +398,11 @@ public class DiplomacyMessage extends Message {
             }
         }
 
-        // Always need to update the unit, due to setMovesLeft(0).
-        if (!objects.contains(unit)) objects.add(unit);
-
+        // Always need to update the unit for the player because of
+        // the setMovesLeft(0).
+        if (!objects.contains(unit)) {
+            objects.add(unit);
+        }
         if ((update = createUpdateFor(player, objects)) != null) {
             try {
                 player.getConnection().send(update);
@@ -389,17 +417,14 @@ public class DiplomacyMessage extends Message {
      *
      * @param server The <code>FreeColServer</code> that handles the message.
      * @param connection The <code>Connection</code> the message is from.
-     *
      * @return An <code>Element</code> describing the trade with either
      *         "accept" or "reject" status, null on trade failure,
      *         or an error <code>Element</code> on outright error.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = serverPlayer.getGame();
-        Unit unit;
-        DiplomacyMessage response;
 
+        Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
@@ -409,6 +434,7 @@ public class DiplomacyMessage extends Message {
             return Message.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
+        Game game = serverPlayer.getGame();
         Tile newTile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         if (newTile == null) {
             return Message.clientError("Could not find tile"
@@ -439,11 +465,10 @@ public class DiplomacyMessage extends Message {
             return Message.clientError("DiplomaticTrade recipient: " + enemyPlayer.getId()
                                        + " does not match Settlement owner: " + settlementPlayer);
         }
-        if(enemyPlayer == serverPlayer.getREFPlayer()){
+        if (enemyPlayer == serverPlayer.getREFPlayer()) {
             return Message.clientError("Player " + serverPlayer.getId()
                     + " tried to negotiate with his REF");
         }
-        
         Connection enemyConnection = enemyPlayer.getConnection();
         if (enemyConnection == null) {
             return Message.createError("server.communicate",
@@ -451,6 +476,7 @@ public class DiplomacyMessage extends Message {
         }
 
         // Clean out continuations of existing trades
+        DiplomacyMessage response;
         switch (status) {
         case ACCEPT_TRADE:
             response = loadAgreement(this, game.getTurn());
@@ -483,11 +509,18 @@ public class DiplomacyMessage extends Message {
             return Message.clientError("Invalid diplomacy status.");
         }
 
-        // New trade proposal
+        // New trade proposal.
         unit.setMovesLeft(0);
         TradeStatus state = TradeStatus.PROPOSE_TRADE;
+        Element proposal = this.toXMLElement();
+        if (unit.isOnCarrier()) {
+            // If the unit is on a carrier we need to update the
+            // client with it first as the diplomacy message refers to it.
+            Document doc = proposal.getOwnerDocument();
+            proposal.appendChild(unit.toXMLElement(null, doc));
+        }
         try {
-            Element reply = enemyConnection.ask(this.toXMLElement());
+            Element reply = enemyConnection.ask(proposal);
             if (reply == null) {
                 response = this;
                 state = TradeStatus.REJECT_TRADE;
