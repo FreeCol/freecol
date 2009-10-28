@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
@@ -1148,11 +1149,9 @@ public class TransportMission extends Mission {
                 Unit u = au.getUnit();
                 if (u.getTile() == carrier.getTile() && carrier.getState() != UnitState.TO_EUROPE
                         && carrier.getState() != UnitState.TO_AMERICA) {
-                    Element boardShipElement = Message.createNewRootElement("boardShip");
-                    boardShipElement.setAttribute("unit", u.getId());
-                    boardShipElement.setAttribute("carrier", carrier.getId());
+                    EmbarkMessage embark = new EmbarkMessage(u, carrier, null);
                     try {
-                        connection.sendAndWait(boardShipElement);
+                        connection.sendAndWait(embark.toXMLElement());
                         tli.remove();
                         transportListChanged = true;
                     } catch (IOException e) {
