@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -802,7 +803,9 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             addButton.addActionListener(this);
             addButton.setActionCommand("add");
             spinner = new JSpinner(new SpinnerNumberModel(0, 0, gold, 1));
-
+            // adjust entry size
+            ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setColumns(5);
+            
             setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK),
                                                          BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             setLayout(new MigLayout("wrap 1", "", ""));
