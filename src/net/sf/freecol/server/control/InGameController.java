@@ -71,6 +71,8 @@ import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
+import net.sf.freecol.common.model.UnitTypeChange;
+import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
@@ -1704,5 +1706,66 @@ public final class InGameController extends Controller {
             sendRemoveUnitToAll(unit, serverPlayer);
         }
         return true;
+    }
+
+    /**
+     * Scout a native settlement.
+     *
+     * @param unit The scout <code>Unit</code>.
+     * @param settlement The <code>IndianSettlement</code> to scout.
+     * @return A string describing the result.
+     */
+    public String scoutIndianSettlement(Unit unit,
+                                        IndianSettlement settlement) {
+        // Hateful natives kill the scout right away.
+        Player player = unit.getOwner();
+        Tension tension = settlement.getAlarm(player);
+        if (tension != null && tension.getLevel() == Tension.Level.HATEFUL) {
+            unit.dispose();
+            return "die";
+        }
+
+        // Otherwise player gets to visit, and learn about the settlement.
+        String result;
+        Tile tile = settlement.getTile();
+        tile.updateIndianSettlementInformation(player);
+        UnitType skill = settlement.getLearnableSkill();
+
+        if (settlement.hasBeenVisited()) {
+            // Pre-visited settlements are a noop.
+            result = "nothing";
+        } else if (skill != null
+                   && skill.hasAbility("model.ability.expertScout")
+                   && unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
+            // If the scout can be taught to be an expert it will be.
+            // TODO: in the old code the settlement retains the
+            // teaching ability.  Is this Col1 compliant?
+            unit.setType(settlement.getLearnableSkill());
+            // settlement.setLearnableSkill(null);
+            result = "expert";
+        } else if (getPseudoRandom().nextInt(3) == 0) {
+            // Otherwise 1/3 of cases are tales...
+            Map map = getFreeColServer().getGame().getMap();
+            for (Tile t : map.getSurroundingTiles(tile, IndianSettlement.TALES_RADIUS)) {
+                if (t.isLand() || t.isCoast()) {
+                    player.setExplored(t);
+                }
+            }
+            result = "tales";
+        } else {
+            // ...and the rest are beads.
+            int gold = (getPseudoRandom().nextInt(400)
+                        * settlement.getBonusMultiplier()) + 50;
+            if (unit.hasAbility("model.ability.expertScout")) {
+                gold = (gold * 11) / 10;
+            }
+            player.modifyGold(gold);
+            settlement.getOwner().modifyGold(-gold);
+            return "beads";
+        }
+
+        // Always visit.
+        settlement.setVisited(player);
+        return result;
     }
 }

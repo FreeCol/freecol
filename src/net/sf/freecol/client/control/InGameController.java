@@ -130,6 +130,7 @@ import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
@@ -1665,12 +1666,7 @@ public final class InGameController implements NetworkConstants {
             case INDIAN_SETTLEMENT_ATTACK:
                 break; // Go on to usual attack confirmation.
             case INDIAN_SETTLEMENT_TRIBUTE:
-                if (askDemandTribute(unit, direction)) {
-                    // Assume tribute paid.
-                    canvas.updateGoldLabel();
-                    nextModelMessage();
-                    nextActiveUnit(unit.getTile());
-                }
+                moveTribute(unit, direction);
                 return;
             default:
                 logger.warning("showArmedUnitIndianSettlementDialog failure.");
@@ -1682,6 +1678,21 @@ public final class InGameController implements NetworkConstants {
         if (confirmHostileAction(unit, target)
             && confirmPreCombat(unit, target)) {
             attack(unit, direction);
+        }
+    }
+
+    /**
+     * Demand a tribute.
+     *
+     * @param unit The <code>Unit</code> to perform the attack.
+     * @param direction The direction in which to attack.
+     */
+    private void moveTribute(Unit unit, Direction direction) {
+        if (askDemandTribute(unit, direction)) {
+            // Assume tribute paid
+            freeColClient.getCanvas().updateGoldLabel();
+            nextModelMessage();
+            nextActiveUnit(unit.getTile());
         }
     }
 
@@ -2122,103 +2133,71 @@ public final class InGameController implements NetworkConstants {
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
 
-        // The scout loses his moves because the skill data and
-        // tradeable goods data is fetched from the server and the
-        // moves are the price we have to pay to obtain that data.
-        // In case we want to attack the settlement, we backup movesLeft.
-        int movesLeft = unit.getMovesLeft();
-        unit.setMovesLeft(0);
-
-        Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
-        scoutMessage.setAttribute("unit", unit.getId());
-        scoutMessage.setAttribute("direction", direction.toString());
-        scoutMessage.setAttribute("action", "basic");
-        Element reply = client.ask(scoutMessage);
-
-        if (reply.getTagName().equals("scoutIndianSettlementResult")) {
-            UnitType skill = null;
-            String skillStr = reply.getAttribute("skill");
-            // TODO: find out how skillStr can be empty
-            if (skillStr != null && !skillStr.equals("")) {
-                skill = FreeCol.getSpecification().getUnitType(skillStr);
-            }
-            settlement.setLearnableSkill(skill);
-            settlement.setWantedGoods(0, FreeCol.getSpecification().getGoodsType(reply.getAttribute("highlyWantedGoods")));
-            settlement.setWantedGoods(1, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods1")));
-            settlement.setWantedGoods(2, FreeCol.getSpecification().getGoodsType(reply.getAttribute("wantedGoods2")));
-            settlement.setVisited(unit.getOwner());
-            settlement.getOwner().setNumberOfSettlements(Integer.parseInt(reply.getAttribute("numberOfCamps")));
-            freeColClient.getInGameInputHandler().update(reply);
-        } else {
-            logger.warning("Server gave an invalid reply to an askSkill message");
+        // Offer the choices.
+        switch (canvas.showScoutIndianSettlementDialog(settlement)) {
+        case CANCEL:
             return;
-        }
-
-        ScoutAction userAction = canvas.showScoutIndianSettlementDialog(settlement);
-
-        switch (userAction) {
         case INDIAN_SETTLEMENT_ATTACK:
-            scoutMessage.setAttribute("action", "attack");
-            // The movesLeft has been set to 0 when the scout initiated its
-            // action.If it wants to attack then it can and it will need some
-            // moves to do it.
-            unit.setMovesLeft(movesLeft);
-            client.sendAndWait(scoutMessage);
-            // TODO: Check if this dialog is needed, one has just been displayed
             if (confirmPreCombat(unit, tile)) {
                 attack(unit, direction);
-            } else {
-                //The player chose to not attack, so the scout shouldn't get back his moves
-                unit.setMovesLeft(0);
             }
-            return;
-        case CANCEL:
-            scoutMessage.setAttribute("action", "cancel");
-            client.sendAndWait(scoutMessage);
             return;
         case INDIAN_SETTLEMENT_SPEAK:
-            scoutMessage.setAttribute("action", "speak");
-            reply = client.ask(scoutMessage);
-            break;
-        case INDIAN_SETTLEMENT_TRIBUTE:
-            askDemandTribute(unit, direction);
-            return;
-        default:
-            logger.warning("Incorrect response returned from Canvas.showScoutIndianSettlementDialog()");
-            return;
-        }
-
-        if (reply.getTagName().equals("scoutIndianSettlementResult")) {
-            String result = reply.getAttribute("result"), action = scoutMessage.getAttribute("action");
-            if (result.equals("die")) {
-                // unit killed
-                unit.dispose();
-                canvas.showInformationMessage("scoutSettlement.speakDie", settlement);
-            } else if (action.equals("speak") && result.equals("tales")) {
-                // receive an update of the surrounding tiles.
-                Element updateElement = getChildElement(reply, "update");
-                if (updateElement != null) {
-                    freeColClient.getInGameInputHandler().handle(client.getConnection(), updateElement);
-                }
-                canvas.showInformationMessage("scoutSettlement.speakTales", settlement);
-            } else if (action.equals("speak") && result.equals("beads")) {
-                // receive a small gift of gold
-                String amount = reply.getAttribute("amount");
-                unit.getOwner().modifyGold(Integer.parseInt(amount));
-                freeColClient.getCanvas().updateGoldLabel();
+            Player player = unit.getOwner();
+            int gold = player.getGold();
+            String result = askScoutSpeak(unit, direction);
+            if (result == null) return;
+            if ("die".equals(result)) {
+                canvas.showInformationMessage("scoutSettlement.speakDie",
+                                              settlement);
+            } else if ("expert".equals(result)) {
+                canvas.showInformationMessage("scoutSettlement.expertScout",
+                                              settlement,
+                                              "%unit%", unit.getType().getName());
+            } else if ("tales".equals(result)) {
+                canvas.showInformationMessage("scoutSettlement.speakTales",
+                                              settlement);
+            } else if ("beads".equals(result)) {
+                canvas.updateGoldLabel();
                 canvas.showInformationMessage("scoutSettlement.speakBeads",
                                               settlement,
-                                              "%replace%", amount);
-            } else if (action.equals("speak") && result.equals("nothing")) {
-                // nothing special
-                canvas.showInformationMessage("scoutSettlement.speakNothing", settlement);
+                                              "%amount%", Integer.toString(player.getGold() - gold));
+            } else if ("nothing".equals(result)) {
+                canvas.showInformationMessage("scoutSettlement.speakNothing",
+                                              settlement);
+            } else {
+                logger.warning("No valid result attribute from askScoutSpeak.");
             }
-        } else {
-            logger.warning("Server gave an invalid reply to an scoutIndianSettlement message");
-            return;
+            nextActiveUnit(unit.getTile());
+            break;
+        case INDIAN_SETTLEMENT_TRIBUTE:
+            moveTribute(unit, direction);
+            break;
+        default:
+            logger.warning("Bad return from showScoutIndianSettlementDialog.");
+            break;
         }
+    }
 
-        nextActiveUnit(unit.getTile());
+    /**
+     * Server query-response for speaking with a native chief.
+     *
+     * @param unit The <code>Unit</code> that is speaking.
+     * @param direction The direction to a settlement to ask.
+     * @return A string containing the value of the "result" attribute on the
+     *         reply from the server, or null on failure.
+     */
+    private String askScoutSpeak(Unit unit, Direction direction) {
+        Client client = freeColClient.getClient();
+        ScoutIndianSettlementMessage message
+            = new ScoutIndianSettlementMessage(unit, direction);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
+        if (reply == null) return null;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return reply.getAttribute("result");
     }
 
     /**

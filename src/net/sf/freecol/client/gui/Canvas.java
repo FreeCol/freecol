@@ -951,21 +951,25 @@ public final class Canvas extends JDesktopPane {
         text.append(Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
                                      "%nation%", settlement.getOwner().getNationAsString()));
         text.append("\n\n");
+        int number = settlement.getOwner().getNumberOfSettlements();
         text.append(Messages.message("scoutSettlement.greetings",
                                      "%nation%", settlement.getOwner().getNationAsString(),
                                      "%settlement%", settlement.getName(),
-                                     "%number%", String.valueOf(settlement.getOwner().getNumberOfSettlements())));
+                                     "%number%", String.valueOf(number)));
         text.append(" ");
         if (settlement.getLearnableSkill() != null) {
             text.append(Messages.message("scoutSettlement.skill", "%skill%",
                                          settlement.getLearnableSkill().getName()));
             text.append(" ");
         }
-        text.append(Messages.message("scoutSettlement.trade",
-                                     "%goods1%", settlement.getWantedGoods()[0].getName(),
-                                     "%goods2%", settlement.getWantedGoods()[1].getName(),
-                                     "%goods3%", settlement.getWantedGoods()[2].getName()));
-        text.append("\n\n");
+        GoodsType[] wantedGoods = settlement.getWantedGoods();
+        if (wantedGoods[0] != null) {
+            text.append(Messages.message("scoutSettlement.trade",
+                                         "%goods1%", wantedGoods[0].getName(),
+                                         "%goods2%", wantedGoods[1].getName(),
+                                         "%goods3%", wantedGoods[2].getName()));
+            text.append("\n\n");
+        }
 
         List<ChoiceItem<ScoutAction>> choices = new ArrayList<ChoiceItem<ScoutAction>>();
         choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.speak"),

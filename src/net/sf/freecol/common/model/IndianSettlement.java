@@ -58,6 +58,7 @@ public class IndianSettlement extends Settlement {
     public static final int ALARM_TILE_IN_USE = 2;
     public static final int ALARM_NEW_MISSIONARY = -100;
     public static final int MAX_HORSES_PER_TURN = 2;
+    public static final int TALES_RADIUS = 6;
 
     public static final String UNITS_TAG_NAME = "units";
     public static final String OWNED_UNITS_TAG_NAME = "ownedUnits";

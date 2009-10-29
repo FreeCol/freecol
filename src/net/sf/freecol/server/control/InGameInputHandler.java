@@ -99,6 +99,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.RenameMessage;
+import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
@@ -185,10 +186,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new LearnSkillMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("scoutIndianSettlement", new CurrentPlayerNetworkRequestHandler() {
+        register(ScoutIndianSettlementMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return scoutIndianSettlement(connection, element);
+                return new ScoutIndianSettlementMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("missionaryAtSettlement", new CurrentPlayerNetworkRequestHandler() {
@@ -1048,96 +1049,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             update.appendChild(unit.getTile().toXMLElement(player, update.getOwnerDocument()));
             reply.appendChild(update);
-        }
-        return reply;
-    }
-
-    /**
-     * Handles a "scoutIndianSettlement"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element scoutIndianSettlement(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
-        Map map = getGame().getMap();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
-        String action = element.getAttribute("action");
-        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
-        Element reply = Message.createNewRootElement("scoutIndianSettlementResult");
-        if (action.equals("basic")) {
-            unit.setMovesLeft(0);
-            // Just return the skill and wanted goods.
-            UnitType skill = settlement.getLearnableSkill();
-            if (skill != null) {
-                reply.setAttribute("skill", skill.getId());
-            }
-            settlement.updateWantedGoods();
-            GoodsType[] wantedGoods = settlement.getWantedGoods();
-            reply.setAttribute("highlyWantedGoods", wantedGoods[0].getId());
-            reply.setAttribute("wantedGoods1", wantedGoods[1].getId());
-            reply.setAttribute("wantedGoods2", wantedGoods[2].getId());
-            reply.setAttribute("numberOfCamps", String.valueOf(settlement.getOwner().getSettlements().size()));
-            for (Tile tile : getGame().getMap().getSurroundingTiles(settlement.getTile(), unit.getLineOfSight())) {
-                reply.appendChild(tile.toXMLElement(player, reply.getOwnerDocument()));
-            }
-            // Set the Tile.PlayerExploredTile attribute.
-            settlement.getTile().updateIndianSettlementInformation(player);
-        } else if (action.equals("cancel")) {
-            return null;
-        } else if (action.equals("attack")) {
-            // The movesLeft has been set to 0 when the scout
-            // initiated its action.  If it wants to attack then it
-            // can and it will need some moves to do it.
-            unit.setMovesLeft(1);
-            return null;
-        } else if (settlement.getAlarm(player) != null &&
-                   settlement.getAlarm(player).getLevel() == Tension.Level.HATEFUL) {
-            reply.setAttribute("result", "die");
-            unit.dispose();
-        } else if (action.equals("speak")) {
-            if (!settlement.hasBeenVisited()) {
-                if (settlement.getLearnableSkill() != null
-                    && settlement.getLearnableSkill().hasAbility("model.ability.expertScout")
-                    && !unit.hasAbility("model.ability.expertScout")) {
-                    unit.setType(settlement.getLearnableSkill());
-                    reply.setAttribute("result", "expert");
-                    Element update = reply.getOwnerDocument().createElement("update");
-                    update.appendChild(unit.toXMLElement(player, update.getOwnerDocument(), false, false));
-                    reply.appendChild(update);
-                } else if (getPseudoRandom().nextInt(9) < 3) {
-                    reply.setAttribute("result", "tales");
-                    Element update = reply.getOwnerDocument().createElement("update");
-                    Position center = new Position(settlement.getTile().getX(), settlement.getTile().getY());
-                    Iterator<Position> circleIterator = map.getCircleIterator(center, true, 6);
-                    while (circleIterator.hasNext()) {
-                        Position position = circleIterator.next();
-                        if ((!position.equals(center))
-                                && (map.getTile(position).isLand() || map.getTile(position).isCoast())) {
-                            Tile t = map.getTile(position);
-                            player.setExplored(t);
-                            update.appendChild(t.toXMLElement(player, update.getOwnerDocument(), false, false));
-                        }
-                    }
-                    reply.appendChild(update);
-                } else {
-                    int beadsGold = (getPseudoRandom().nextInt(400) * settlement.getBonusMultiplier()) + 50;
-                    if (unit.hasAbility("model.ability.expertScout")) {
-                        beadsGold = (beadsGold * 11) / 10;
-                    }
-                    reply.setAttribute("result", "beads");
-                    reply.setAttribute("amount", Integer.toString(beadsGold));
-                    player.modifyGold(beadsGold);
-                }
-                settlement.setVisited(player);
-            } else {
-                reply.setAttribute("result", "nothing");
-            }
         }
         return reply;
     }

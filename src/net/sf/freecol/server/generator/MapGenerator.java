@@ -571,6 +571,7 @@ public class MapGenerator implements IMapGenerator {
             }
         }
         settlement.placeSettlement();
+        player.setNumberOfSettlements(player.getNumberOfSettlements() + 1);
 
         // START DEBUG:
         if (FreeCol.isInDebugMode()) {
