@@ -90,9 +90,11 @@ import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GiveIndependenceMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
+import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
@@ -192,16 +194,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new ScoutIndianSettlementMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("missionaryAtSettlement", new CurrentPlayerNetworkRequestHandler() {
+        register(MissionaryMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return missionaryAtSettlement(connection, element);
+                return new MissionaryMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("inciteAtSettlement", new CurrentPlayerNetworkRequestHandler() {
+        register(InciteMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return inciteAtSettlement(connection, element);
+                return new InciteMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(DemandTributeMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -1051,103 +1053,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(update);
         }
         return reply;
-    }
-
-    /**
-     * Handles a "missionaryAtSettlement"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element missionaryAtSettlement(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
-        InGameController inGameController = freeColServer.getInGameController();
-        Map map = getGame().getMap();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
-        String action = element.getAttribute("action");
-        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
-                .getSettlement();
-        unit.setMovesLeft(0);
-        if (action.equals("cancel")) {
-            return null;
-        } else if (action.equals("establish")) {
-            sendRemoveUnitToAll(unit, player);
-            
-            boolean success = inGameController.createMission(settlement,unit);
-            
-        	Element reply = Message.createNewRootElement("missionaryReply");
-        	reply.setAttribute("success", String.valueOf(success));
-        	reply.setAttribute("tension", settlement.getAlarm(unit.getOwner()).getLevel().toString());
-            return reply;
-        } else if (action.equals("heresy")) {
-            Element reply = Message.createNewRootElement("missionaryReply");
-            sendRemoveUnitToAll(unit, player);
-            double random = Math.random() * settlement.getMissionary().getOwner().getImmigration() /
-                (unit.getOwner().getImmigration() + 1);
-            if (settlement.getMissionary().hasAbility("model.ability.expertMissionary")) {
-                random += 0.2;
-            }
-            if (unit.hasAbility("model.ability.expertMissionary")) {
-                random -= 0.2;
-            }
-            if (random < 0.5) {
-            	boolean success = inGameController.createMission(settlement,unit);
-            	reply.setAttribute("success", String.valueOf(success));
-            	reply.setAttribute("tension", settlement.getAlarm(unit.getOwner()).getLevel().toString());    
-            } else {
-                reply.setAttribute("success", "false");
-                unit.dispose();
-            }
-            return reply;
-        } else if (action.equals("incite")) {
-            Element reply = Message.createNewRootElement("missionaryReply");
-            Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("incite"));
-            reply.setAttribute("amount", String.valueOf(Game.getInciteAmount(player, enemy, settlement.getOwner())));
-            // Move the unit into the settlement while we wait for the client's
-            // response.
-            unit.setLocation(settlement);
-            return reply;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Handles a "inciteAtSettlement"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param element The element containing the request.
-     */
-    private Element inciteAtSettlement(Connection connection, Element element) {
-        FreeColServer freeColServer = getFreeColServer();
-        Map map = getGame().getMap();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
-        Direction direction = Enum.valueOf(Direction.class, element.getAttribute("direction"));
-        String confirmed = element.getAttribute("confirmed");
-        IndianSettlement settlement = (IndianSettlement) unit.getTile().getSettlement();
-        // Move the unit back to its original Tile.
-        unit.setLocation(map.getNeighbourOrNull(direction.getReverseDirection(), unit.getTile()));
-        if (confirmed.equals("true")) {
-            Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
-            int amount = Game.getInciteAmount(player, enemy, settlement.getOwner());
-            if (player.getGold() < amount) {
-                throw new IllegalStateException("Not enough gold to incite indians!");
-            } else {
-                player.modifyGold(-amount);
-            }
-            // Set the indian player at war with the european player (and vice
-            // versa).
-            settlement.getOwner().changeRelationWithPlayer(enemy, Stance.WAR);
-            // Increase tension levels:
-            settlement.modifyAlarm(enemy, 1000); // let propagation works
-            enemy.modifyTension(settlement.getOwner(), 500);
-            enemy.modifyTension(player, 250);
-        }
-        // else: no need to do anything: unit's moves are already zero.
-        return null;
     }
 
     /**

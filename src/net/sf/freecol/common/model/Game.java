@@ -764,36 +764,6 @@ public class Game extends FreeColGameObject {
     }
 
     /**
-     * Gets the amount of gold needed for inciting. This method should NEVER be
-     * randomized: it should always return the same amount if given the same
-     * three parameters.
-     * 
-     * @param payingPlayer The <code>Player</code> paying for the incite.
-     * @param targetPlayer The <code>Player</code> to be attacked by the
-     *            <code>attackingPlayer</code>.
-     * @param attackingPlayer The player that would be receiving the money for
-     *            incite.
-     * @return The amount of gold that should be payed by
-     *         <code>payingPlayer</code> to <code>attackingPlayer</code> in
-     *         order for <code>attackingPlayer</code> to attack
-     *         <code>targetPlayer</code>.
-     */
-    public static int getInciteAmount(Player payingPlayer, Player targetPlayer, Player attackingPlayer) {
-        int amount = 0;
-        Tension payingTension = attackingPlayer.getTension(payingPlayer);
-        Tension targetTension = attackingPlayer.getTension(targetPlayer);
-        if (targetTension != null && 
-            payingTension.getValue() > targetTension.getValue()) {
-            amount = 10000;
-        } else {
-            amount = 5000;
-        }
-        amount += 20 * (payingTension.getValue() - targetTension.getValue());
-
-        return Math.max(amount, 650);
-    }
-
-    /**
      * This method writes an XML-representation of this object to the given
      * stream.
      * 

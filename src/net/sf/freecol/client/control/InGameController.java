@@ -122,9 +122,11 @@ import net.sf.freecol.common.networking.EmbarkMessage;
 import net.sf.freecol.common.networking.EmigrateUnitMessage;
 import net.sf.freecol.common.networking.GetTransactionMessage;
 import net.sf.freecol.common.networking.GoodsForSaleMessage;
+import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.common.networking.NewLandNameMessage;
@@ -2211,123 +2213,101 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
-        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile())
-            .getSettlement();
+        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
 
+        // Offer the choices.
         List<Object> response = canvas.showUseMissionaryDialog(settlement);
         MissionaryAction action = (MissionaryAction) response.get(0);
-
-        Element missionaryMessage = Message.createNewRootElement("missionaryAtSettlement");
-        missionaryMessage.setAttribute("unit", unit.getId());
-        missionaryMessage.setAttribute("direction", direction.toString());
-
-        Element reply = null;
-
-        unit.setMovesLeft(0);
-
-        String success = "";
-
         switch (action) {
         case CANCEL:
-            missionaryMessage.setAttribute("action", "cancel");
-            client.sendAndWait(missionaryMessage);
-            break;
+            return;
         case ESTABLISH_MISSION:
-            missionaryMessage.setAttribute("action", "establish");
-            reply = client.ask(missionaryMessage);
-
-            if (!reply.getTagName().equals("missionaryReply")) {
-                logger.warning("Server gave an invalid reply to a missionaryAtSettlement message");
-                return;
+            if (askMissionary(unit, direction, false)) {
+                if (settlement.getMissionary() == unit) {
+                    freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
+                }
+                nextModelMessage();
+                nextActiveUnit();
             }
-
-            success = reply.getAttribute("success");
-
-            Tension.Level tension = Tension.Level.valueOf(reply.getAttribute("tension"));
-
-            String missionResponse = null;
-
-            String[] data = new String [] {"%nation%",settlement.getOwner().getNationAsString() };
-
-            if (success.equals("true")) {
-                settlement.setMissionary(unit);
-                freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
-                missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
-
-                canvas.showInformationMessage(missionResponse,settlement,data);
-            }
-            else{
-                missionResponse = settlement.getResponseToMissionaryAttempt(tension, success);
-                canvas.showInformationMessage(missionResponse,settlement,data);
-                unit.dispose();
-            }
-            nextActiveUnit(); // At this point: unit.getTile() == null
-            return;
+            break;
         case DENOUNCE_HERESY:
-            missionaryMessage.setAttribute("action", "heresy");
-            reply = client.ask(missionaryMessage);
-
-            if (!reply.getTagName().equals("missionaryReply")) {
-                logger.warning("Server gave an invalid reply to a missionaryAtSettlement message");
-                return;
+            if (askMissionary(unit, direction, true)) {
+                if (settlement.getMissionary() == unit) {
+                    freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
+                }
+                nextModelMessage();
+                nextActiveUnit();
             }
-
-            success = reply.getAttribute("success");
-            if (success.equals("true")) {
-                freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
-                settlement.setMissionary(unit);
-                nextActiveUnit(); // At this point: unit.getTile() == null
-            } else {
-                unit.dispose();
-                nextActiveUnit(); // At this point: unit == null
-            }
-            return;
+            break;
         case INCITE_INDIANS:
-            missionaryMessage.setAttribute("action", "incite");
-            missionaryMessage.setAttribute("incite", ((Player) response.get(1)).getId());
-
-            reply = client.ask(missionaryMessage);
-
-            if (reply.getTagName().equals("missionaryReply")) {
-                int amount = Integer.parseInt(reply.getAttribute("amount"));
-
-                boolean confirmed = canvas.showInciteDialog((Player) response.get(1), amount);
-                if (confirmed && unit.getOwner().getGold() < amount) {
+            Player enemy = (Player) response.get(1);
+            int gold = askIncite(unit, direction, enemy, -1);
+            if (gold < 0) return;
+            if (canvas.showInciteDialog(enemy, gold)) {
+                int goldOut = askIncite(unit, direction, enemy, gold);
+                if (goldOut < 0) {
+                    ; // protocol fail
+                } else if (goldOut == 0) {
                     canvas.showInformationMessage("notEnoughGold");
-                    confirmed = false;
+                } else {
+                    // model messages from setStance are asynchronous
+                    // at present
+                    canvas.updateGoldLabel();
                 }
-
-                Element inciteMessage = Message.createNewRootElement("inciteAtSettlement");
-                inciteMessage.setAttribute("unit", unit.getId());
-                inciteMessage.setAttribute("direction", direction.toString());
-                inciteMessage.setAttribute("confirmed", confirmed ? "true" : "false");
-                inciteMessage.setAttribute("enemy", ((Player) response.get(1)).getId());
-
-                if (confirmed) {
-                    Player briber = unit.getOwner();
-                    Player indianNation = settlement.getOwner();
-                    Player proposedEnemy = (Player) response.get(1);
-
-
-                    briber.modifyGold(-amount);
-
-                    // Maybe at this point we can keep track of the fact that
-                    // the indian is now at
-                    // war with the chosen european player, but is this really
-                    // necessary at the client
-                    // side?
-
-                    indianNation.changeRelationWithPlayer(proposedEnemy, Stance.WAR);
-                }
-
-                client.sendAndWait(inciteMessage);
-            } else {
-                logger.warning("Server gave an invalid reply to a missionaryAtSettlement message");
-                return;
             }
+            nextActiveUnit();
+            break;
+        default:
+            logger.warning("Bad return from showUseMissionaryDialog.");
+            break;
         }
+    }
 
-        nextActiveUnit(unit.getTile());
+    /**
+     * Server query-response for establishing/denouncing a mission.
+     *
+     * @param unit The missionary <code>Unit</code>.
+     * @param direction The direction to a settlement to establish with.
+     * @param denounce True if this is a denouncement.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askMissionary(Unit unit, Direction direction,
+                                  boolean denounce) {
+        Client client = freeColClient.getClient();
+        MissionaryMessage message
+            = new MissionaryMessage(unit, direction, denounce);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+    /**
+     * Server query-response for inciting the natives.
+     *
+     * @param unit The missionary <code>Unit</code>.
+     * @param direction The direction to a settlement to speak to.
+     * @param enemy An enemy <code>Player</code>.
+     * @param gold The amount of bribe, negative to enquire.
+     * @return An amount of gold needed or paid, or negative if the
+     *         server interaction failed.
+     */
+    private int askIncite(Unit unit, Direction direction, Player enemy,
+                          int gold) {
+        Client client = freeColClient.getClient();
+        InciteMessage message
+            = new InciteMessage(unit, direction, enemy, gold);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "update");
+        if (reply == null || reply.getAttribute("gold") == null) return -1;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return Integer.parseInt(reply.getAttribute("gold"));
     }
 
     /**

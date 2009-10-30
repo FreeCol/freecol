@@ -1093,32 +1093,30 @@ public final class Canvas extends JDesktopPane {
      *         cancelled.
      */
     public List<Object> showUseMissionaryDialog(IndianSettlement settlement) {
-        StringBuilder introText = new StringBuilder(Messages
-                                                    .message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
-                     "%nation%", settlement.getOwner().getNationAsString()));
+        Player player = freeColClient.getMyPlayer();
+        Unit missionary = settlement.getMissionary();
+        StringBuilder introText
+            = new StringBuilder(Messages.message(settlement.getAlarmLevelMessage(player),
+                                                 "%nation%", settlement.getOwner().getNationAsString()));
         introText.append("\n\n");
         introText.append(Messages.message("missionarySettlement.question",
                                           "%settlement%", settlement.getName()));
 
         List<ChoiceItem<MissionaryAction>> choices = new ArrayList<ChoiceItem<MissionaryAction>>();
-        choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.establish"),
-                                                     MissionaryAction.ESTABLISH_MISSION));
+        if (missionary == null) {
+            choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.establish"),
+                                                         MissionaryAction.ESTABLISH_MISSION));
+        }
+        if (missionary != null && missionary.getOwner() != player) {
+            choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.heresy"),
+                                                         MissionaryAction.DENOUNCE_HERESY));
+        }
         choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.incite"),
                                                      MissionaryAction.INCITE_INDIANS));
         choices.add(new ChoiceItem<MissionaryAction>(Messages.message("cancel"),
                                                      MissionaryAction.CANCEL));
-
         FreeColDialog<ChoiceItem<MissionaryAction>> missionaryDialog;
-        if (settlement.getMissionary() == null) {
-            // no missionary yet, we can establish a new religious mission
-            missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null, choices);
-        } else {
-            // we can denounce it as heresy
-            choices.add(0, new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.heresy"),
-                                                            MissionaryAction.DENOUNCE_HERESY));
-            missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null, choices);
-        }
-
+        missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null, choices);
         addAsFrame(missionaryDialog);
         missionaryDialog.requestFocus();
 
