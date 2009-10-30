@@ -23,25 +23,23 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
 /**
- * The message sent when spying on a settlement.
+ * The message sent when extracting debugging information for a colony.
  */
 public class DebugForeignColonyMessage extends Message {
 
-    Tile tile;
-
     /**
-     * An Element describing the settlement spied upon.
+     * The ID of the tile the colony is on.
      */
-    Element tileElement;
+    String tileId;
 
     /**
      * Create a new <code>DebugForeignColonyMessage</code> with the
@@ -50,8 +48,7 @@ public class DebugForeignColonyMessage extends Message {
      * @param tile a <code>Tile</code> value
      */
     public DebugForeignColonyMessage(Tile tile) {
-        this.tile = tile;
-        this.tileElement = null;
+        this.tileId = tile.getId();
     }
 
     /**
@@ -62,44 +59,40 @@ public class DebugForeignColonyMessage extends Message {
      * @param element The <code>Element</code> to use to create the message.
      */
     public DebugForeignColonyMessage(Game game, Element element) {
-        this.tile = (Tile) game.getFreeColGameObject(element.getAttribute("tile"));
-        this.tileElement = (element.getChildNodes().getLength() != 1) ? null
-            : (Element) element.getChildNodes().item(0);
-    }
-
-    public Element getTileElement() {
-        return tileElement;
+        this.tileId = element.getAttribute("tile");
     }
 
 
     /**
-     * Handle a "spySettlement"-message.
+     * Handle a "debugForeignColony"-message.
      *
      * @param server The <code>FreeColServer</code> that is handling the message.
      * @param connection The <code>Connection</code> the message was received on.
      *
-     * @return An <code>Element</code> containing a representation of the
-     *         settlement being spied upon and any units at that position,
-     *         or an error <code>Element</code> on failure.
+     * @return An <code>Element</code> containing a representation of
+     *         the settlement to view any units at that position, or
+     *         an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+        Game game = serverPlayer.getGame();
+
         if (!FreeCol.isInDebugMode()) {
             return Message.clientError("Not in Debug Mode!");
-        } else if (tile == null) {
-            return Message.clientError("Could not find tile");
         }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null) {
-            return Message.clientError("There is no settlement at: " + tile.getId());
+        Tile tile;
+        if (game.getFreeColGameObjectSafely(tileId) instanceof Tile) {
+            tile = (Tile) game.getFreeColGameObjectSafely(tileId);
+        } else {
+            return Message.clientError("Invalid tileId");
+        }
+        if (tile.getColony() == null) {
+            return Message.clientError("There is no colony at: " + tileId);
         }
 
         // Two versions of the tile, one detailed, one not.
-        // The client is trusted (gritch gritch) to pop the first off,
+        // The client is trusted to pop the first off,
         // show it, then process the update as normal.
-        // Given we are *correctly* revealing information the client
-        // would not normally have, there is not much to be done about
-        // the trust issue.
         Element reply = createNewRootElement("update");
         Document doc = reply.getOwnerDocument();
         reply.appendChild(tile.toXMLElement(serverPlayer, doc, true, false));
@@ -114,7 +107,7 @@ public class DebugForeignColonyMessage extends Message {
      */
     public Element toXMLElement() {
         Element result = createNewRootElement(getXMLElementTagName());
-        result.setAttribute("tile", tile.getId());
+        result.setAttribute("tile", tileId);
         return result;
     }
 

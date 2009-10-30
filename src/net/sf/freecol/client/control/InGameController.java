@@ -2336,66 +2336,14 @@ public final class InGameController implements NetworkConstants {
             moveAttack(unit, direction);
             break;
         case FOREIGN_COLONY_NEGOTIATE:
-            negotiateWithColony(unit, direction);
+            moveTradeColony(unit, direction);
             break;
         case FOREIGN_COLONY_SPY:
-            spyColony(unit, direction);
+            moveSpy(unit, direction);
             break;
         default:
             logger.warning("Incorrect response returned from Canvas.showScoutForeignColonyDialog()");
             return;
-        }
-    }
-
-    /**
-     * Spy on a foreign colony.
-     *
-     * @param unit The <code>Unit</code> that is spying.
-     * @param direction The direction of a colony to spy on.
-     */
-    private void spyColony(Unit unit, Direction direction) {
-        Game game = freeColClient.getGame();
-        Tile tile = game.getMap().getNeighbourOrNull(direction,
-                                                     unit.getTile());
-        if (tile == null || tile.getColony() == null) return;
-
-        Client client = freeColClient.getClient();
-        SpySettlementMessage message = new SpySettlementMessage(unit, direction);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
-        if (reply != null) {
-            // Sleight of hand here.  The update contains two versions
-            // of the colony tile.  The first child node is a detailed
-            // view, which is read explicitly, displayed, removed, then
-            // superseded as the update is processed normally.
-            Element tileElement = (Element) reply.getFirstChild();
-            tile.readFromXMLElement(tileElement);
-            freeColClient.getCanvas().showColonyPanel(tile.getColony());
-            reply.removeChild(tileElement);
-            freeColClient.getInGameInputHandler().update(reply);
-        }
-        nextActiveUnit();
-    }
-
-    /**
-     * Arrive at a settlement with a laden carrier following a move of
-     * MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS.
-     *
-     * @param unit The carrier.
-     * @param direction The direction to the settlement.
-     */
-    private void moveTrade(Unit unit, Direction direction) {
-        Map map = freeColClient.getGame().getMap();
-        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
-        Settlement settlement = tile.getSettlement();
-        Player player = unit.getOwner();
-        if (settlement instanceof Colony) {
-            negotiateWithColony(unit, direction);
-        } else if (player.hasContacted(settlement.getOwner())) {
-            tradeWithSettlement(unit, direction);
-        } else {
-            Canvas canvas = freeColClient.getCanvas();
-            canvas.showInformationMessage("noContactWithIndians");
         }
     }
 
@@ -2410,7 +2358,7 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> negotiating.
      * @param direction The direction of a settlement to negotiate with.
      */
-    private void negotiateWithColony(Unit unit, Direction direction) {
+    private void moveTradeColony(Unit unit, Direction direction) {
         Game game = freeColClient.getGame();
         Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         if (tile == null) return;
@@ -2444,14 +2392,9 @@ public final class InGameController implements NetworkConstants {
             }
 
             // Send this acceptance or proposal to the other player
-            message = new DiplomacyMessage(unit, direction, newAgreement);
-            if (newAgreement.isAccept()) message.setAccept();
-            reply = askExpecting(client, message.toXMLElement(),
-                                 message.getXMLElementTagName());
-            if (reply == null) break; // fail
+            message = askDiplomacy(unit, direction, newAgreement);
 
             // What did they say?
-            message = new DiplomacyMessage(game, reply);
             if (message.isReject()) {
                 String nation = message.getOtherNationName(player);
                 canvas.showInformationMessage("negotiationDialog.offerRejected",
@@ -2470,6 +2413,90 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
+     * Handler server query-response for diplomatic messages.
+     *
+     * @param unit The <code>Unit</code> conducting the diplomacy.
+     * @param direction The <code>Direction</code> in which the settlement is.
+     * @param agreement The <code>DiplomaticTrade</code> agreement to propose.
+     * @return The agreement returned from the other party, or null.
+     */
+    private DiplomacyMessage askDiplomacy(Unit unit, Direction direction,
+                                          DiplomaticTrade agreement) {
+        Client client = freeColClient.getClient();
+        Game game = freeColClient.getGame();
+        DiplomacyMessage message = new DiplomacyMessage(unit, direction,
+                                                        agreement);
+        if (agreement.isAccept()) message.setAccept();
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     message.getXMLElementTagName());
+        return (reply == null) ? null : new DiplomacyMessage(game, reply);
+    }
+
+    /**
+     * Spy on a foreign colony.
+     *
+     * @param unit The <code>Unit</code> that is spying.
+     * @param direction The <code>Direction</code> of a colony to spy on.
+     */
+    private void moveSpy(Unit unit, Direction direction) {
+        Game game = freeColClient.getGame();
+        Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Element reply;
+        if (tile != null && tile.getColony() != null
+            && (reply = askSpy(unit, direction)) != null) {
+            // Sleight of hand here.  The update contains two versions
+            // of the colony tile.  The first child node is a detailed
+            // view, which is read explicitly, displayed, removed, then
+            // superseded as the update is processed normally.
+            Element tileElement = (Element) reply.getFirstChild();
+            tile.readFromXMLElement(tileElement);
+            freeColClient.getCanvas().showColonyPanel(tile.getColony());
+            reply.removeChild(tileElement);
+            freeColClient.getInGameInputHandler().update(reply);
+        }
+        nextActiveUnit();
+    }
+
+    /**
+     * Server query-response for spying on a colony.
+     *
+     * @param unit The <code>Unit</code> that is spying.
+     * @param direction The <code>Direction</code> of a colony to spy on.
+     * @return An element containing two views of the tile containing the colony.
+     */
+    private Element askSpy(Unit unit, Direction direction) {
+        Client client = freeColClient.getClient();
+        SpySettlementMessage message = new SpySettlementMessage(unit, direction);
+        return askExpecting(client, message.toXMLElement(), "update");
+    }
+
+    /**
+     * Arrive at a settlement with a laden carrier following a move of
+     * MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS.
+     *
+     * @param unit The carrier.
+     * @param direction The direction to the settlement.
+     */
+    private void moveTrade(Unit unit, Direction direction) {
+        Map map = freeColClient.getGame().getMap();
+        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        Settlement settlement = tile.getSettlement();
+        Player player = unit.getOwner();
+        if (settlement instanceof Colony) {
+            moveTradeColony(unit, direction);
+        } else if (settlement instanceof IndianSettlement) {
+            if (player.hasContacted(settlement.getOwner())) {
+                moveTradeIndianSettlement(unit, direction);
+            } else {
+                Canvas canvas = freeColClient.getCanvas();
+                canvas.showInformationMessage("noContactWithIndians");
+            }
+        } else {
+            logger.warning("Bogus settlement: " + settlement.getId());
+        }
+    }
+
+    /**
      * Trading with the natives, including buying, selling and
      * delivering gifts.  (Deliberate use of Settlement rather than
      * IndianSettlement throughout these routines as some unification
@@ -2484,7 +2511,7 @@ public final class InGameController implements NetworkConstants {
      *                direction.
      * @see Settlement
      */
-    private void tradeWithSettlement(Unit unit, Direction direction) {
+    private void moveTradeIndianSettlement(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer()
             != freeColClient.getMyPlayer()) {
@@ -2494,12 +2521,14 @@ public final class InGameController implements NetworkConstants {
 
         // Sanity check
         if (!unit.canCarryGoods()) {
-            throw new IllegalArgumentException("Unit " + unit.getId() + " can not carry goods.");
+            throw new IllegalArgumentException("Unit " + unit.getId()
+                                               + " can not carry goods.");
         }
         Map map = freeColClient.getGame().getMap();
         Tile tile = unit.getTile();
         if (tile == null) {
-            throw new IllegalArgumentException("Unit " + unit.getId() + " is not on the map!");
+            throw new IllegalArgumentException("Unit " + unit.getId()
+                                               + " is not on the map!");
         }
         if ((tile = map.getNeighbourOrNull(direction, tile)) == null) {
             throw new IllegalArgumentException("No tile in " + direction);
@@ -2514,7 +2543,6 @@ public final class InGameController implements NetworkConstants {
         }
 
         java.util.Map<String, Boolean> session;
-        TradeAction tradeType;
         while ((session = askOpenTransactionSession(unit, settlement)) != null) {
             // The session tracks buy/sell/gift events and disables
             // canFoo when one happens.  So only offer such options if
@@ -2522,10 +2550,10 @@ public final class InGameController implements NetworkConstants {
             boolean buy = session.get("canBuy")  && (unit.getSpaceLeft() > 0);
             boolean sel = session.get("canSell") && (unit.getGoodsCount() > 0);
             boolean gif = session.get("canGift") && (unit.getGoodsCount() > 0);
-
             if (!buy && !sel && !gif) break;
-            tradeType = canvas.showIndianSettlementTradeDialog(settlement,
-                                                               buy, sel, gif);
+
+            TradeAction tradeType
+                = canvas.showIndianSettlementTradeDialog(settlement, buy, sel, gif);
             if (tradeType == null) break; // Aborted
             switch (tradeType) {
             case BUY:
@@ -2559,20 +2587,15 @@ public final class InGameController implements NetworkConstants {
      */
     private java.util.Map<String,Boolean> askOpenTransactionSession(Unit unit, Settlement settlement) {
         Client client = freeColClient.getClient();
-        GetTransactionMessage message
-            = new GetTransactionMessage(unit, settlement);
+        GetTransactionMessage message = new GetTransactionMessage(unit, settlement);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "getTransactionAnswer");
         if (reply == null) return null;
 
-        java.util.Map<String,Boolean> transactionSession
-            = new HashMap<String,Boolean>();
-        transactionSession.put("canBuy",
-            new Boolean(reply.getAttribute("canBuy")));
-        transactionSession.put("canSell",
-            new Boolean(reply.getAttribute("canSell")));
-        transactionSession.put("canGift",
-            new Boolean(reply.getAttribute("canGift")));
+        java.util.Map<String,Boolean> transactionSession = new HashMap<String,Boolean>();
+        transactionSession.put("canBuy", new Boolean(reply.getAttribute("canBuy")));
+        transactionSession.put("canSell", new Boolean(reply.getAttribute("canSell")));
+        transactionSession.put("canGift", new Boolean(reply.getAttribute("canGift")));
         return transactionSession;
     }
 
@@ -2886,16 +2909,19 @@ public final class InGameController implements NetworkConstants {
     // End of move-consequents
 
 
+    /**
+     * Detailed view of a foreign colony when in debug mode.
+     *
+     * @param tile The <code>Tile</code> with the colony.
+     */
     public void debugForeignColony(Tile tile) {
         if (FreeCol.isInDebugMode() && tile != null) {
             DebugForeignColonyMessage message = new DebugForeignColonyMessage(tile);
-            Element reply = askExpecting(freeColClient.getClient(), message.toXMLElement(),
+            Element reply = askExpecting(freeColClient.getClient(),
+                                         message.toXMLElement(),
                                          "update");
             if (reply != null) {
-                // Sleight of hand here.  The update contains two versions
-                // of the colony tile.  The first child node is a detailed
-                // view, which is read explicitly, displayed, removed, then
-                // superseded as the update is processed normally.
+                // Similar sleight of hand as in moveSpy.
                 Element tileElement = (Element) reply.getFirstChild();
                 tile.readFromXMLElement(tileElement);
                 freeColClient.getCanvas().showColonyPanel(tile.getColony());
@@ -3186,17 +3212,25 @@ public final class InGameController implements NetworkConstants {
     /**
      * Loads a cargo onto a carrier.
      *
-     * @param goods The goods which are going aboard the carrier.
-     * @param carrier The carrier.
+     * @param goods The <code>Goods</code> which are going aboard the carrier.
+     * @param carrier The <code>Unit</code> acting as carrier.
      */
     public void loadCargo(Goods goods, Unit carrier) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
+        // Sanity checks.
+        if (goods == null) {
+            logger.warning("goods == null");
+            return;
+        }
         if (carrier == null) {
-            throw new NullPointerException();
+            logger.warning("carrier == null");
+            return;
         }
 
         freeColClient.playSound(SoundEffect.LOAD_CARGO);

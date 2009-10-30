@@ -50,11 +50,6 @@ public class SpySettlementMessage extends Message {
     private String directionString;
 
     /**
-     * An Element describing the settlement spied upon.
-     */
-    Element tileElement;
-
-    /**
      * Create a new <code>SpySettlementMessage</code> with the
      * supplied unit and direction.
      *
@@ -64,7 +59,6 @@ public class SpySettlementMessage extends Message {
     public SpySettlementMessage(Unit unit, Direction direction) {
         this.unitId = unit.getId();
         this.directionString = String.valueOf(direction);
-        this.tileElement = null;
     }
 
     /**
@@ -77,12 +71,6 @@ public class SpySettlementMessage extends Message {
     public SpySettlementMessage(Game game, Element element) {
         this.unitId = element.getAttribute("unit");
         this.directionString = element.getAttribute("direction");
-        this.tileElement = (element.getChildNodes().getLength() != 1) ? null
-            : (Element) element.getChildNodes().item(0);
-    }
-
-    public Element getTileElement() {
-        return tileElement;
     }
 
 
@@ -98,8 +86,8 @@ public class SpySettlementMessage extends Message {
      */
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Unit unit;
 
+        Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
@@ -109,7 +97,8 @@ public class SpySettlementMessage extends Message {
             return Message.clientError("Unit is not on the map: " + unitId);
         }
         Direction direction = Enum.valueOf(Direction.class, directionString);
-        Tile tile = serverPlayer.getGame().getMap().getNeighbourOrNull(direction, unit.getTile());
+        Game game = serverPlayer.getGame();
+        Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
         if (tile == null) {
             return Message.clientError("Could not find tile"
                                        + " in direction: " + direction
@@ -121,7 +110,6 @@ public class SpySettlementMessage extends Message {
         }
 
         unit.setMovesLeft(0);
-
         // Two versions of the tile, one detailed, one not.
         // The client is trusted (gritch gritch) to pop the first off,
         // show it, then process the update as normal.
