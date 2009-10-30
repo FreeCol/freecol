@@ -114,7 +114,6 @@ public class ScoutIndianSettlementMessage extends Message {
         IndianSettlement indianSettlement = (IndianSettlement) settlement;
         String result = server.getInGameController()
             .scoutIndianSettlement(unit, indianSettlement);
-        unit.setMovesLeft(0);
 
         // Build the reply, either a remove or an update.
         // Always return the result string to help the client display

@@ -41,6 +41,7 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
@@ -182,21 +183,12 @@ public class ScoutingMission extends Mission {
                 if (direction != null) {
                     final MoveType mt = getUnit().getMoveType(direction);             
                     if (mt == MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
-                        Element scoutMessage = Message.createNewRootElement("scoutIndianSettlement");
-                        scoutMessage.setAttribute("unit", getUnit().getId());
-                        scoutMessage.setAttribute("direction", direction.toString());
-                        scoutMessage.setAttribute("action", "basic");
+                        ScoutIndianSettlementMessage message
+                            = new ScoutIndianSettlementMessage(getUnit(), direction);
                         try {
-                            connection.ask(scoutMessage);
+                            connection.ask(message.toXMLElement());
                         } catch (IOException e) {
-                            logger.warning("Could not send \"scoutIndianSettlement\"-message!");
-                            return;
-                        }
-                        scoutMessage.setAttribute("action", "speak");
-                        try {
-                            connection.ask(scoutMessage);
-                        } catch (IOException e) {
-                            logger.warning("Could not send \"scoutIndianSettlement (speak)\"-message!");
+                            logger.warning("Could not send \"" + message.getXMLElementTagName() + "\"-message!");
                             return;
                         }
                         if (getUnit().isDisposed()) {
@@ -303,9 +295,9 @@ public class ScoutingMission extends Mission {
                 }
             }
             return false;
-        } else if (t.getSettlement() != null && t.getSettlement() instanceof IndianSettlement
-                && !((IndianSettlement) t.getSettlement()).hasBeenVisited()) {
-            return true;
+        } else if (t.getSettlement() != null && t.getSettlement() instanceof IndianSettlement) {
+            IndianSettlement settlement = (IndianSettlement) t.getSettlement();
+            return !settlement.hasBeenVisited(u.getOwner());
         } else {
             return false;
         }

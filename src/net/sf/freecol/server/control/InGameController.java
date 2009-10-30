@@ -1728,9 +1728,7 @@ public final class InGameController extends Controller {
         // Otherwise player gets to visit, and learn about the settlement.
         String result;
         Tile tile = settlement.getTile();
-        tile.updateIndianSettlementInformation(player);
         UnitType skill = settlement.getLearnableSkill();
-
         if (settlement.hasBeenVisited()) {
             // Pre-visited settlements are a noop.
             result = "nothing";
@@ -1761,11 +1759,13 @@ public final class InGameController extends Controller {
             }
             player.modifyGold(gold);
             settlement.getOwner().modifyGold(-gold);
-            return "beads";
+            result = "beads";
         }
 
         // Always visit.
         settlement.setVisited(player);
+        tile.updateIndianSettlementInformation(player);
+        unit.setMovesLeft(0);
         return result;
     }
 }
