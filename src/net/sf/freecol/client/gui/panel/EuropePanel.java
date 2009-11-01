@@ -574,18 +574,7 @@ public final class EuropePanel extends FreeColPanel {
                     comp.getParent().remove(comp);
 
                     getController().moveToAmerica(unit);
-                    docksPanel.removeAll();
-                    for (Unit u : europe.getUnitList()) {
-                        UnitLabel unitLabel = new UnitLabel(u, getCanvas());
-                        unitLabel.setTransferHandler(defaultTransferHandler);
-                        unitLabel.addMouseListener(pressListener);
-
-                        if (!u.isNaval()) {
-                            // If it's not a naval unit, it belongs on the docks.
-                            docksPanel.add(unitLabel, false);
-                        }
-                    }
-                    docksPanel.revalidate();
+                    docksPanel.update();
                 } else {
                     logger.warning("An invalid component got dropped on this ToAmericaPanel.");
                     return null;

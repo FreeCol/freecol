@@ -286,6 +286,9 @@ public final class DefaultTransferHandler extends TransferHandler {
                         ((EuropePanel.ToAmericaPanel)comp).add(data, true);
                     } else if (comp instanceof EuropePanel.DocksPanel) {
                         ((EuropePanel.DocksPanel)comp).add(data, true);
+                        if (unit.isDisposed()) {
+                            ((EuropePanel.DocksPanel)comp).update();
+                        }
                     } else if (comp instanceof ColonyPanel.BuildingsPanel.ASingleBuildingPanel) {
                         ((ColonyPanel.BuildingsPanel.ASingleBuildingPanel) comp).add(data, true);
                     } else if (comp instanceof ColonyPanel.OutsideColonyPanel) {
