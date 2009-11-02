@@ -707,6 +707,12 @@ public final class EuropePanel extends FreeColPanel {
             update();
         }
 
+        public Component add(Component comp, boolean editState) {
+            Component c = add(comp);
+            update();
+            return c;
+        }
+
         public void update() {
 
             removeAll();
