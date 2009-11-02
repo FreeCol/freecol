@@ -187,12 +187,13 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Opens a dialog where the user should specify the filename and saves the
-     * game.
+     * Opens a dialog where the user should specify the filename and
+     * saves the game.
      */
     public void saveGame() {
-        final Canvas canvas = freeColClient.getCanvas();
-        String fileName = freeColClient.getMyPlayer().getName() + "_" + freeColClient.getMyPlayer().getNationAsString()
+        Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
+        String fileName = player.getName() + "_" + player.getNationAsString()
             + "_" + freeColClient.getGame().getTurn().toSaveGameString();
         fileName = fileName.replaceAll(" ", "_");
         if (freeColClient.canSaveCurrentGame()) {
@@ -210,8 +211,7 @@ public final class InGameController implements NetworkConstants {
      * @param file The <code>File</code>.
      */
     public void saveGame(final File file) {
-        final Canvas canvas = freeColClient.getCanvas();
-
+        Canvas canvas = freeColClient.getCanvas();
         canvas.showStatusPanel(Messages.message("status.savingGame"));
         try {
             freeColClient.getFreeColServer().saveGame(file, freeColClient.getMyPlayer().getName());
@@ -223,30 +223,27 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Opens a dialog where the user should specify the filename and loads the
-     * game.
+     * Opens a dialog where the user should specify the filename and
+     * loads the game.
      */
     public void loadGame() {
         Canvas canvas = freeColClient.getCanvas();
-
         File file = canvas.showLoadDialog(FreeCol.getSaveDirectory());
-
         if (file == null) {
             return;
         }
-
         if (!file.isFile()) {
             canvas.errorMessage("fileNotFound");
             return;
         }
-
-        if (!canvas.showConfirmDialog("stopCurrentGame.text", "stopCurrentGame.yes", "stopCurrentGame.no")) {
+        if (!canvas.showConfirmDialog("stopCurrentGame.text",
+                                      "stopCurrentGame.yes",
+                                      "stopCurrentGame.no")) {
             return;
         }
 
         freeColClient.getConnectController().quitGame(true);
         canvas.removeInGameComponents();
-
         freeColClient.getConnectController().loadGame(file);
     }
     
@@ -255,8 +252,7 @@ public final class InGameController implements NetworkConstants {
      * {@link FreeCol#setInDebugMode(boolean)} and reinitialize the
      * <code>FreeColMenuBar</code>.
      * 
-     * @param debug Should be set to <code>true</code> in order to enable
-     *            debug mode.
+     * @param debug Set to <code>true</code> to enable debug mode.
      */
     public void setInDebugMode(boolean debug) {
         FreeCol.setInDebugMode(debug);
@@ -278,8 +274,8 @@ public final class InGameController implements NetworkConstants {
      * @see #ask
      */
     private Element askExpecting(Client client, Element element, String tag) {
+        // Send the element, return null on failure or null return.
         Element reply = null;
-
         try {
             reply = client.ask(element);
         } catch (Exception e) {
@@ -288,10 +284,18 @@ public final class InGameController implements NetworkConstants {
         }
         if (reply == null) {
             logger.warning("Received null reply to " + element);
-        } else if ("error".equals(reply.getTagName())) {
+            return null;
+        }
+
+        // Success!
+        if (tag.equals(reply.getTagName())) {
+            return reply;
+        }
+
+        // Process explicit errors.
+        if ("error".equals(reply.getTagName())) {
             String messageID = null;
             String message = null;
-
             if (element.hasAttribute("message")) {
                 message = element.getAttribute("message");
                 logger.warning(message);
@@ -304,68 +308,73 @@ public final class InGameController implements NetworkConstants {
             if (messageID != null || FreeCol.isInDebugMode()) {
                 freeColClient.getCanvas().errorMessage(messageID, message);
             }
-        } else if (tag.equals(reply.getTagName())) {
-            return reply;
-        } else {
-            logger.warning("Received reply"
-                           + " with tag " + reply.getTagName()
-                           + " which should have been " + tag
-                           + " to message " + element);
+            return null;
         }
+
+        // Unexpected reply.  Whine and fail.
+        logger.warning("Received reply"
+                       + " with tag " + reply.getTagName()
+                       + " which should have been " + tag
+                       + " to message " + element);
         return null;
     }
 
 
     /**
-     * Sets <code>player</code> as the new <code>currentPlayer</code> of the
-     * game.
+     * Set a player to be the new current player.
      *
-     * @param currentPlayer The player.
+     * @param player The <code>Player</code> to be the new current player.
      */
-    public void setCurrentPlayer(Player currentPlayer) {
+    public void setCurrentPlayer(Player player) {
         logger.finest("Entering client setCurrentPlayer("
-                      + currentPlayer.getName() + ")");
+                      + player.getName() + ")");
         Game game = freeColClient.getGame();
-        game.setCurrentPlayer(currentPlayer);
+        game.setCurrentPlayer(player);
 
-        if (freeColClient.getMyPlayer().equals(currentPlayer)) {
+        if (freeColClient.getMyPlayer().equals(player)) {
             autosaveGame();
-
             removeUnitsOutsideLOS();
-            if (currentPlayer.checkEmigrate()) {
-                if (currentPlayer.hasAbility("model.ability.selectRecruit") &&
-                    currentPlayer.getEurope().recruitablesDiffer()) {
-                    int index = freeColClient.getCanvas().showEmigrationPanel(false);
-                    emigrateUnitInEurope(index+1);
+
+            if (player.checkEmigrate()) {
+                if (player.hasAbility("model.ability.selectRecruit")
+                    && player.getEurope().recruitablesDiffer()) {
+                    Canvas canvas = freeColClient.getCanvas();
+                    int index = canvas.showEmigrationPanel(false);
+                    emigrateUnitInEurope(index + 1);
                 } else {
                     emigrateUnitInEurope(0);
                 }
             }
 
             if (!freeColClient.isSingleplayer()) {
-                freeColClient.playSound(currentPlayer.getNation().getAnthem());
+                freeColClient.playSound(player.getNation().getAnthem());
             }
             
             checkTradeRoutesInEurope();
-
             displayModelMessages(true);
             nextActiveUnit();
         }
         logger.finest("Exiting client setCurrentPlayer("
-                      + currentPlayer.getName() + ")");
+                      + player.getName() + ")");
     }
 
-    public void autosaveGame() {
-        // Autosave the game:
+    /**
+     * Autosave the game.
+     */
+    private void autosaveGame() {
         if (freeColClient.getFreeColServer() != null) {
-            final int turnNumber = freeColClient.getGame().getTurn().getNumber();
-            final int savegamePeriod = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_PERIOD);
-            if (savegamePeriod == 1 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
-                final String filename = Messages.message("clientOptions.savegames.autosave.fileprefix") + '-'
-                    + freeColClient.getGame().getTurn().toSaveGameString() + ".fsg";
-                File saveGameFile = new File(FreeCol.getAutosaveDirectory(), filename);
+            Game game = freeColClient.getGame();
+            ClientOptions options = freeColClient.getClientOptions();
+            int savegamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
+            int turnNumber = game.getTurn().getNumber();
+            if (savegamePeriod == 1 || (savegamePeriod != 0
+                                        && turnNumber % savegamePeriod == 0)) {
+                String filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
+                    + '-' + game.getTurn().toSaveGameString() + ".fsg";
+                File saveGameFile = new File(FreeCol.getAutosaveDirectory(),
+                                             filename);
                 saveGame(saveGameFile);
-                int generations = freeColClient.getClientOptions().getInteger(ClientOptions.AUTOSAVE_GENERATIONS);
+                int generations = options.getInteger(ClientOptions.AUTOSAVE_GENERATIONS);
                 if (generations > 0) {
                     allSaveGames.add(saveGameFile);
                     if (allSaveGames.size() > generations) {
@@ -407,7 +416,6 @@ public final class InGameController implements NetworkConstants {
      *             a specific one, otherwise the server will choose one.
      */
     private void emigrateUnitInEurope(int slot) {
-        Client client = freeColClient.getClient();
         Game game = freeColClient.getGame();
         Player player = freeColClient.getMyPlayer();
         if (game.getCurrentPlayer() != player) {
@@ -415,6 +423,17 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
+        askEmigrate(slot);
+    }
+
+    /**
+     * Handle server query-response for emigration.
+     *
+     * @param slot The slot from which the unit migrates, 1-3 selects
+     *             a specific one, otherwise the server will choose one.
+     */
+    private void askEmigrate(int slot) {
+        Client client = freeColClient.getClient();
         EmigrateUnitMessage message = new EmigrateUnitMessage(slot);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "multiple");
