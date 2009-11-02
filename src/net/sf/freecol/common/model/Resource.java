@@ -48,15 +48,30 @@ public class Resource extends TileItem {
      * @param game The <code>Game</code> in which this object belongs.
      * @param tile The <code>Tile</code> on which this object sits.
      * @param type The <code>ResourceType</code> of this Resource.
+     * @param quantity an <code>int</code> value
      */
-    public Resource(Game game, Tile tile, ResourceType type) {
+    public Resource(Game game, Tile tile, ResourceType type, int quantity) {
         super(game, tile);
         if (type == null) {
             throw new IllegalArgumentException("Parameter 'type' must not be 'null'.");
         }
         this.type = type;
-        this.quantity = type.getRandomValue();
+        this.quantity = quantity;
     }
+
+    /**
+     * Creates a standard <code>Resource</code>-instance.
+     *
+     * This constructor asserts that the game, tile and type are valid.
+     *
+     * @param game The <code>Game</code> in which this object belongs.
+     * @param tile The <code>Tile</code> on which this object sits.
+     * @param type The <code>ResourceType</code> of this Resource.
+     */
+    public Resource(Game game, Tile tile, ResourceType type) {
+        this(game, tile, type, type.getMaxValue());
+    }
+
 
     public Resource(Game game, XMLStreamReader in) throws XMLStreamException {
         super(game, in);

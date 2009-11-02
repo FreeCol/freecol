@@ -43,7 +43,9 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         Map map = new Map(game, tiles);
 
-        map.getTile(5, 8).setResource(FreeCol.getSpecification().getResourceType("model.resource.Grain"));
+        Resource grain = new Resource(game, map.getTile(5, 8),
+                                      FreeCol.getSpecification().getResourceType("model.resource.Grain"));
+        map.getTile(5, 8).setResource(grain);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
                 
@@ -102,7 +104,9 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         Map map = new Map(game, tiles);
 
-        map.getTile(5, 8).setResource(FreeCol.getSpecification().getResourceType("model.resource.Grain"));
+        Resource grain = new Resource(game, map.getTile(5, 8),
+                                      FreeCol.getSpecification().getResourceType("model.resource.Grain"));
+        map.getTile(5, 8).setResource(grain);
         map.getTile(5, 8).setExploredBy(dutch, true);
         map.getTile(6, 8).setExploredBy(dutch, true);
                 

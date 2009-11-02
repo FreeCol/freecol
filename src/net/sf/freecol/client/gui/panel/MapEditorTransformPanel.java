@@ -334,7 +334,9 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 case 0:
                     return;
                 case 1:
-                    t.setResource(resList.get(0));
+                    ResourceType resourceType = resList.get(0);
+                    // TODO: create GUI for setting the quantity
+                    t.setResource(new Resource(t.getGame(), t, resourceType, resourceType.getMaxValue()));
                     return;
                 default:
                     List<ChoiceItem<ResourceType>> choices = new ArrayList<ChoiceItem<ResourceType>>();
@@ -345,7 +347,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                                                                        Messages.message("cancel"),
                                                                        choices);
                     if (choice != null) {
-                        t.setResource(choice);
+                        t.setResource(new Resource(t.getGame(), t, choice, choice.getMaxValue()));
                     }
                 }
             }

@@ -38,13 +38,10 @@ import javax.xml.stream.XMLStreamWriter;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.model.pathfinding.CostDecider;
-import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
-import net.sf.freecol.common.model.Settlement.SettlementType;
 
 import org.w3c.dom.Element;
 
@@ -878,15 +875,14 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
     /**
      * Sets the <code>Resource</code> for this <code>Tile</code>
      */
-    public void setResource(ResourceType r) {
-        if (r == null) {
+    public void setResource(Resource resource) {
+        if (resource == null) {
             return;
         }
         if (tileItemContainer == null) {
             tileItemContainer = new TileItemContainer(getGame(), this);
         }
 
-        Resource resource = new Resource(getGame(), this, r);
         tileItemContainer.addTileItem(resource);
         
         updatePlayerExploredTiles();

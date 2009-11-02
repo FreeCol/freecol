@@ -164,7 +164,7 @@ public class TileTest extends FreeColTestCase {
         Tile tile = new Tile(game, spec().getTileType("model.tile.mountains"), 0, 0);
         assertEquals(0,tile.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(1,tile.potential(spec().getGoodsType("model.goods.silver"), null));
-        tile.setResource(spec().getResourceType("model.resource.Silver"));
+        tile.setResource(new Resource(game, tile, spec().getResourceType("model.resource.Silver")));
         assertEquals(0,tile.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(3,tile.potential(spec().getGoodsType("model.goods.silver"), null));
     }
@@ -177,7 +177,7 @@ public class TileTest extends FreeColTestCase {
         assertEquals(0, tile1.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(1, tile1.potential(spec().getGoodsType("model.goods.silver"), null));
         assertEquals(2, tile1.getMaximumPotential(spec().getGoodsType("model.goods.silver"), null));
-        tile1.setResource(spec().getResourceType("model.resource.Silver"));
+        tile1.setResource(new Resource(game, tile1, spec().getResourceType("model.resource.Silver")));
         assertEquals(0, tile1.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(3, tile1.potential(spec().getGoodsType("model.goods.silver"), null));
         assertEquals(4, tile1.getMaximumPotential(spec().getGoodsType("model.goods.silver"), null));
@@ -185,7 +185,7 @@ public class TileTest extends FreeColTestCase {
         Tile tile2 = new Tile(game, spec().getTileType("model.tile.plains"), 0, 1);
         assertEquals(5, tile2.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(6, tile2.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
-        tile2.setResource(spec().getResourceType("model.resource.Grain"));
+        tile2.setResource(new Resource(game, tile2, spec().getResourceType("model.resource.Grain")));
         // potential assumes expert
         assertEquals(9, tile2.potential(spec().getGoodsType("model.goods.food"), null));
         assertEquals(10, tile2.getMaximumPotential(spec().getGoodsType("model.goods.food"), null));
@@ -331,7 +331,7 @@ public class TileTest extends FreeColTestCase {
         assertTrue(hasBonusFromSource(tile2.getProductionBonus(ore, null), road2.getType()));
 
         ResourceType sugarResource = spec().getResourceType("model.resource.Sugar");
-        tile1.setResource(sugarResource);
+        tile1.setResource(new Resource(game, tile1, sugarResource));
 
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), savannah));
         assertTrue(hasBonusFromSource(tile1.getProductionBonus(sugar, null), river1.getType()));

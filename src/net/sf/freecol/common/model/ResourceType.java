@@ -41,13 +41,12 @@ public final class ResourceType extends FreeColGameObjectType
 
     // ------------------------------------------------------------ retrieval methods
 
-    // TODO: remove this
-    public int getRandomValue() {
-        if (minValue == maxValue)
-            return maxValue;
+    public int getMinValue() {
+        return minValue;
+    }
 
-        Random rand = new Random();
-        return (minValue + rand.nextInt(maxValue-minValue+1));
+    public int getMaxValue() {
+        return maxValue;
     }
 
     public Set<Modifier> getProductionModifier(GoodsType goodsType, UnitType unitType) {

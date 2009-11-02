@@ -444,8 +444,7 @@ public class TileItemContainer extends FreeColGameObject {
             if (item instanceof Resource) {
                 if (importResources) {
                     Resource ticR = (Resource) item;
-                    Resource r = new Resource(getGame(), tile, ticR.getType());
-                    r.setQuantity(ticR.getQuantity());
+                    Resource r = new Resource(getGame(), tile, ticR.getType(), ticR.getQuantity());
                     tileItems.add(r);
                 }
             } else if (item instanceof LostCityRumour) {

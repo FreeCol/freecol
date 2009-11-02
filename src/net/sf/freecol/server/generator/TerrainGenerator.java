@@ -38,6 +38,8 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Map.WholeMapIterator;
 import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Region.RegionType;
+import net.sf.freecol.common.model.Resource;
+import net.sf.freecol.common.model.ResourceType;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -175,7 +177,7 @@ public class TerrainGenerator {
         WholeMapIterator iterator = map.getWholeMapIterator();
         while (iterator.hasNext()) {
             Tile tile = map.getTile(iterator.next());
-            perhapsAddBonus(game, tile, !importBonuses);
+            perhapsAddBonus(tile, !importBonuses);
             if (!tile.isLand()) {
                 encodeStyle(tile);
             }
@@ -218,11 +220,11 @@ public class TerrainGenerator {
      * @param t a <code>Tile</code> value
      * @param generateBonus a <code>boolean</code> value
      */
-    private void perhapsAddBonus(Game game, Tile t, boolean generateBonus) {
+    private void perhapsAddBonus(Tile t, boolean generateBonus) {
         if (t.isLand()) {
             if (generateBonus && random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
                 // Create random Bonus Resource
-                t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
+                t.setResource(createResource(t));
             }
         } else {
             int adjacentLand = 0;
@@ -242,7 +244,7 @@ public class TerrainGenerator {
             //In Col1, ocean tiles with less than 3 land neighbours produce 2 fish,
             //all others produce 4 fish
             if (adjacentLand > 2) {
-                t.add(new TileImprovement(game, t, fishBonusLandType));
+                t.add(new TileImprovement(t.getGame(), t, fishBonusLandType));
             }
                 
             //In Col1, the ocean tile in front of a river mouth would
@@ -250,20 +252,37 @@ public class TerrainGenerator {
             //TODO: This probably has some false positives, means river tiles
             //that are NOT a river mouth next to this tile!
             if (!t.hasRiver() && adjacentRiver) {
-                t.add(new TileImprovement(game, t, fishBonusRiverType));
+                t.add(new TileImprovement(t.getGame(), t, fishBonusRiverType));
             }
 
             if (t.getType().isConnected()) {
                 if (generateBonus && adjacentLand > 1 && random.nextInt(10 - adjacentLand) == 0) {
-                    t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
+                    t.setResource(createResource(t));
                 }
             } else {
                 if (random.nextInt(100) < getMapGeneratorOptions().getPercentageOfBonusTiles()) {
                     // Create random Bonus Resource
-                    t.setResource(RandomChoice.getWeightedRandom(random, t.getType().getWeightedResources()));
+                    t.setResource(createResource(t));
                 }
             }
         }
+    }
+
+
+    public Resource createResource(Tile tile) {
+        if (tile == null) {
+            return null;
+        }
+        ResourceType resourceType = RandomChoice
+            .getWeightedRandom(random, tile.getType().getWeightedResources());
+        if (resourceType == null) {
+            return null;
+        }
+        int minValue = resourceType.getMinValue();
+        int maxValue = resourceType.getMaxValue();
+        int quantity = (minValue == maxValue) ? maxValue :
+            (minValue + random.nextInt(maxValue - minValue + 1));
+        return new Resource(tile.getGame(), tile, resourceType, quantity);
     }
 
 
