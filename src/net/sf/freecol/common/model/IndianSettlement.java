@@ -323,13 +323,14 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Returns true if a European player has visited this settlement to speak with the chief.
-     * @return true if a European player has visited this settlement to speak with the chief.
+     * Returns true if a European player has visited this settlement
+     * to speak with the chief.
+     *
+     * @return True if a European player has visited this settlement.
      */
     public boolean hasBeenVisited() {
         Iterator<Player> playerIterator = visitedBy.iterator();
         while (playerIterator.hasNext()) {
-            System.err.println("VISITED " + this.getId() + " BY " + playerIterator.next().getNationAsString());
             if (playerIterator.next().isEuropean()) {
                 return true;
             }
