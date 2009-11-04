@@ -228,11 +228,12 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
         
         if (editState) {
             if (comp instanceof UnitLabel) {
-                Container oldParent = comp.getParent();
                 Unit unit = ((UnitLabel) comp).getUnit();
                 if (carrier.canAdd(unit)) {
-                    ((UnitLabel) comp).setSmall(false);
+                    Container oldParent = comp.getParent();
                     if (getController().boardShip(unit, carrier)) {
+                        ((UnitLabel) comp).setSmall(false);
+                        oldParent.remove(comp);
                         initialize();
                         return comp;
                     }

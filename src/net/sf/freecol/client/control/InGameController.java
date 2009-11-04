@@ -3447,7 +3447,7 @@ public final class InGameController implements NetworkConstants {
         Unit carrier = null;
         if (unit.isOnCarrier()) {
             carrier = (Unit) unit.getLocation();
-            leaveShip(unit);
+            if (!leaveShip(unit)) return;
         }
 
         Element equipUnitElement = Message.createNewRootElement("equipUnit");

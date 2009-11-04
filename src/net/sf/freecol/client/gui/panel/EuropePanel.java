@@ -427,6 +427,9 @@ public final class EuropePanel extends FreeColPanel {
         return selectedUnit;
     }
 
+    /**
+     * Unload the contents of the currently selected carrier.
+     */
     private void unload() {
         Unit unit = getSelectedUnit();
         if (unit != null && unit.isCarrier()) {
@@ -444,6 +447,8 @@ public final class EuropePanel extends FreeColPanel {
                 Unit newUnit = unitIterator.next();
                 getController().leaveShip(newUnit);
             }
+            cargoPanel.initialize(); // update()?
+            docksPanel.update();
         }
     }
 
@@ -713,8 +718,12 @@ public final class EuropePanel extends FreeColPanel {
             return c;
         }
 
-        public void update() {
+        @Override
+        public void remove(Component comp) {
+            update();
+        }
 
+        public void update() {
             removeAll();
 
             List<Unit> units = europe.getUnitList();

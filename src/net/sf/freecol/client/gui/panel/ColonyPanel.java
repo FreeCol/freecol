@@ -600,6 +600,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 Unit newUnit = unitIterator.next();
                 getController().leaveShip(newUnit);
             }
+            cargoPanel.initialize();
+            outsideColonyPanel.initialize();
         }
         unloadButton.setEnabled(false);
         fillButton.setEnabled(false);
