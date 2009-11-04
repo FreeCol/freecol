@@ -249,6 +249,33 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         }
     }
 
+
+    /**
+     * Can a settlement claim a tile?
+     *
+     * @param tile The <code>Tile</code> to claim.
+     * @return True if the settlement can claim this tile.
+     */
+    private boolean canClaimTile(Tile tile) {
+        // Indian players do not own water tiles per Col1 rules
+        return (owner.isIndian() && !tile.isLand()) ? false
+            : (getTile().getDistanceTo(tile) > getRadius()) ? false
+            : tile.getOwner() == null
+            || tile.getOwningSettlement() == null
+            || tile.getOwningSettlement() == this;
+    }
+
+    /**
+     * Claim ownership of a tile for this settlement.
+     *
+     * @param tile The <code>Tile</code> to claim.
+     */
+    private void claimTile(Tile tile) {
+        tile.setOwningSettlement(this);
+        tile.setOwner(owner);
+        tile.updatePlayerExploredTiles();
+    }
+
     /**
      * Claim and explore the surrounding tiles.
      * Try to be as greedy as possible.
@@ -262,16 +289,8 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         owner.setExplored(settlementTile);
         settlementTile.updatePlayerExploredTiles();
         for (Tile tile : map.getSurroundingTiles(settlementTile, getRadius())) {
-            // Indian players do not own water tiles per Col1 rules
-            if(owner.isIndian() && !tile.isLand()){
-                continue;
-            }
-            if (tile.getOwner() == null
-                || tile.getOwningSettlement() == null
-                || tile.getOwningSettlement() == this) {
-                tile.setOwningSettlement(this);
-                tile.setOwner(owner);
-                tile.updatePlayerExploredTiles();
+            if (canClaimTile(tile)) {
+                claimTile(tile);
             }
         }
         for (Tile tile : map.getSurroundingTiles(settlementTile, getLineOfSight())) {
@@ -384,24 +403,41 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         Player oldOwner = owner;
         Tile settlementTile = getTile();
         Map map = getGame().getMap();
-
+        ArrayList<Tile> lostTiles = new ArrayList<Tile>();
         for (Tile tile : map.getSurroundingTiles(settlementTile, getRadius())) {
             if (tile.getOwningSettlement() == this
                 || (tile.getOwningSettlement() == null && tile.getOwner() == owner)) {
                 tile.setOwningSettlement(null);
                 tile.setOwner(null);
                 tile.updatePlayerExploredTiles();
+                lostTiles.add(tile);
             }
         }
         settlementTile.setSettlement(null);
         settlementTile.setOwner(null);
         settlementTile.updatePlayerExploredTiles();
+        lostTiles.add(settlementTile);
 
         owner = null;
         oldOwner.removeSettlement(this);
         oldOwner.invalidateCanSeeTiles();
         goodsContainer.dispose();
         super.dispose();
+
+        // Allow other settlements to claim the tiles we have just vacated.
+        for (Tile lostTile : lostTiles) {
+            if (lostTile.getOwningSettlement() != null) continue;
+            for (Tile t : map.getSurroundingTiles(lostTile, 1)) {
+                // Find any neighbouring settlements and give them a turn
+                // at reclaiming the tiles.  Perhaps favour certain types
+                // of settlements according to difficulty?
+                Settlement settlement = t.getOwningSettlement();
+                if (settlement != null && settlement.canClaimTile(lostTile)) {
+                    settlement.claimTile(lostTile);
+                    break;
+                }
+            }
+        }
     }
     
     /**
