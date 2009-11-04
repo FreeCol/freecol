@@ -470,12 +470,14 @@ public final class ImageLibrary extends ImageProvider {
             throws FreeColException {
         logger.fine("loading beach images");
         beaches = new ArrayList<ImageIcon>(BEACH_STYLES);
-        beaches.add(new ImageIcon());
         for (int i = 1; i < BEACH_STYLES; i++) {
             String filePath = dataDirectory + path + terrainDirectory + beachDirectory
                 + beachName + i + extension;
             beaches.add(findImage(filePath, resourceLocator, doLookup));
         }
+        // beach0 is never used
+        beaches.add(0, beaches.get(0));
+
     }
 
     /**

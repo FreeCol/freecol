@@ -33,13 +33,10 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * An action for chosing the next unit as the active unit.
  */
 public class ZoomOutAction extends FreeColAction {
+
     private static final Logger logger = Logger.getLogger(ZoomOutAction.class.getName());
 
-
-
-
     public static final String id = "zoomOutAction";
-
 
     /**
      * Creates a new <code>ZoomOutAction</code>.
@@ -86,13 +83,13 @@ public class ZoomOutAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
-        ImageLibrary im;
+        ImageLibrary im = getFreeColClient().getImageLibrary();
+        float oldScaling = im.getScalingFactor();
         try {
-            im = getFreeColClient().getImageLibrary().getScaledImageLibrary(oldScaling - 1/4f);
+            im = im.getScaledImageLibrary(oldScaling - 1/4f);
         } catch (Exception ex) {
             logger.warning("Failed to retrieve scaled image library.");
-            im = getFreeColClient().getImageLibrary();
+            //im = getFreeColClient().getImageLibrary();
         }
         getFreeColClient().getGUI().setImageLibrary(im);
         getFreeColClient().getGUI().forceReposition();
