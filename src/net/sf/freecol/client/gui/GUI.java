@@ -341,42 +341,43 @@ public final class GUI {
 
         cursor = new net.sf.freecol.client.gui.TerrainCursor();
 
-        // TODO: these values depend on the size and geometry
-        // of the tiles used. They should be calculated on the fly.
-        // borders
-        int w = 128;
-        int h = 64;
-        int dx = 8;
-        int dy = 4;
-        // small corners
-        controlPoints.put(Direction.N, new Dimension(w/2, dy));
-        controlPoints.put(Direction.E, new Dimension(w - dx, h/2));
-        controlPoints.put(Direction.S, new Dimension(w/2, h - dy));
-        controlPoints.put(Direction.W, new Dimension(dx, h/2));
-        // big corners
-        controlPoints.put(Direction.SE, new Dimension(w/2, h));
-        controlPoints.put(Direction.NE, new Dimension(w, h/2));
-        controlPoints.put(Direction.SW, new Dimension(0, h/2));
-        controlPoints.put(Direction.NW, new Dimension(w/2, 0));
-        // small corners
-        int ddx = 12;
-        int ddy = 6;
-        borderPoints.put(Direction.NW, new Dimension(dx + ddx, h/2 - ddy));
-        borderPoints.put(Direction.N, new Dimension(w/2 - ddx, dy + ddy));
-        borderPoints.put(Direction.NE, new Dimension(w/2 + ddx, dy + ddy));
-        borderPoints.put(Direction.E, new Dimension(w - dx - ddx, h/2 - ddy));
-        borderPoints.put(Direction.SE, new Dimension(w - dx - ddx, h/2 + ddy));
-        borderPoints.put(Direction.S, new Dimension(w/2 + ddx, h - dy - ddy));
-        borderPoints.put(Direction.SW, new Dimension(w/2 - ddx, h - dy - ddy));
-        borderPoints.put(Direction.W, new Dimension(dx + ddx, h/2 + ddy));
     }
     
     public void setImageLibrary(ImageLibrary lib) {
         this.lib = lib;
         cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
+        // ATTENTION: we assume that all base tiles have the same size
         TileType tileType = FreeCol.getSpecification().getTileTypeList().get(0);
         tileHeight = lib.getTerrainImageHeight(tileType);
         tileWidth = lib.getTerrainImageWidth(tileType);
+
+        int dx = tileWidth/16;
+        int dy = tileHeight/16;
+        int ddx = dx + dx/2;
+        int ddy = dy + dy/2;
+
+        // small corners
+        controlPoints.put(Direction.N, new Dimension(tileWidth/2, dy));
+        controlPoints.put(Direction.E, new Dimension(tileWidth - dx, tileHeight/2));
+        controlPoints.put(Direction.S, new Dimension(tileWidth/2, tileHeight - dy));
+        controlPoints.put(Direction.W, new Dimension(dx, tileHeight/2));
+        // big corners
+        controlPoints.put(Direction.SE, new Dimension(tileWidth/2, tileHeight));
+        controlPoints.put(Direction.NE, new Dimension(tileWidth, tileHeight/2));
+        controlPoints.put(Direction.SW, new Dimension(0, tileHeight/2));
+        controlPoints.put(Direction.NW, new Dimension(tileWidth/2, 0));
+        // small corners
+        borderPoints.put(Direction.NW, new Dimension(dx + ddx, tileHeight/2 - ddy));
+        borderPoints.put(Direction.N, new Dimension(tileWidth/2 - ddx, dy + ddy));
+        borderPoints.put(Direction.NE, new Dimension(tileWidth/2 + ddx, dy + ddy));
+        borderPoints.put(Direction.E, new Dimension(tileWidth - dx - ddx, tileHeight/2 - ddy));
+        borderPoints.put(Direction.SE, new Dimension(tileWidth - dx - ddx, tileHeight/2 + ddy));
+        borderPoints.put(Direction.S, new Dimension(tileWidth/2 + ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.SW, new Dimension(tileWidth/2 - ddx, tileHeight - dy - ddy));
+        borderPoints.put(Direction.W, new Dimension(dx + ddx, tileHeight/2 + ddy));
+
+        borderStroke = new BasicStroke(dy);
+
         updateMapDisplayVariables();
     }
     
@@ -1901,6 +1902,7 @@ public final class GUI {
         if (tile == null) {
             return;
         }
+        // ATTENTION: we assume that all base tiles have the same size
         g.drawImage(lib.getTerrainImage(tile.getType(), tile.getX(), tile.getY()), x, y, null);
 
         Map.Position pos = new Map.Position(tile.getX(), tile.getY());
@@ -2084,7 +2086,8 @@ public final class GUI {
      * (in pixels).
      */
     private void displayTileItems(Graphics2D g, Map map, Tile tile, int x, int y) {  
-
+        // ATTENTION: we assume that only overlays and forests
+        // might be taller than a tile.
         if (!tile.isExplored()) {
             g.drawImage(lib.getTerrainImage(null, tile.getX(), tile.getY()), x, y, null);
         } else {
@@ -2105,8 +2108,8 @@ public final class GUI {
             }
             // Tile Overlays (eg. hills and mountains)
             if (tile.getType().getArtOverlay() != null) {
-                g.drawImage(lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY()), x,
-                            y - (int) (32 * lib.getScalingFactor()), null);
+                Image overlayImage = lib.getOverlayImage(tile.getType(), tile.getX(), tile.getY());
+                g.drawImage(overlayImage, x, y + tileHeight - overlayImage.getHeight(null), null);
             }
             for (int index = startIndex; index < tileItems.size(); index++) {
                 if (tileItems.get(index).getZIndex() < FOREST_INDEX) {
@@ -2119,7 +2122,8 @@ public final class GUI {
             }
             // Forest
             if (tile.isForested()) {
-                g.drawImage(lib.getForestImage(tile.getType()), x, y, null);
+                Image forestImage = lib.getForestImage(tile.getType());
+                g.drawImage(forestImage, x, y + tileHeight - forestImage.getHeight(null), null);
             }
 
             // draw all remaining items
