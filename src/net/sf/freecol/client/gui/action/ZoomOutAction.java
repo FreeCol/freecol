@@ -83,7 +83,7 @@ public class ZoomOutAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        ImageLibrary im = getFreeColClient().getImageLibrary();
+        ImageLibrary im = getFreeColClient().getGUI().getImageLibrary();
         float oldScaling = im.getScalingFactor();
         try {
             im = im.getScaledImageLibrary(oldScaling - 1/4f);
