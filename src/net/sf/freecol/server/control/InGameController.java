@@ -1800,12 +1800,14 @@ public final class InGameController extends Controller {
      * Embark a unit onto a carrier.
      * Checking that the locations are appropriate is not done here.
      *
-     * @param serverPlayer The <code>ServerPlayer</code> whose unit is embarking.
+     * @param serverPlayer The <code>ServerPlayer</code> whose unit is
+     *                     embarking.
      * @param unit The <code>Unit</code> that is embarking.
      * @param carrier The <code>Unit</code> to embark onto.
      * @return True if the the embarkation succeeds.
      */
-    public boolean embarkUnit(ServerPlayer serverPlayer, Unit unit, Unit carrier) {
+    public boolean embarkUnit(ServerPlayer serverPlayer, Unit unit,
+                              Unit carrier) {
         if (unit.isNaval() || carrier.getSpaceLeft() < unit.getSpaceTaken()) {
             return false;
         }
@@ -1818,6 +1820,32 @@ public final class InGameController extends Controller {
         // Update others
         if (sourceLocation instanceof Tile) {
             sendRemoveUnitToAll(unit, serverPlayer);
+        }
+        return true;
+    }
+
+    /**
+     * Disembark unit from a carrier.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> whose unit is
+     *                     embarking.
+     * @param unit The <code>Unit</code> that is disembarking.
+     * @return True if the the disembark succeeds.
+     */
+    public boolean disembarkUnit(ServerPlayer serverPlayer, Unit unit) {
+        if (unit.isNaval() || !(unit.getLocation() instanceof Unit)) {
+            return false;
+        }
+
+        Unit carrier = (Unit) unit.getLocation();
+        Location destination = carrier.getLocation();
+        unit.setLocation(destination);
+        unit.setMovesLeft(0); // In Col1 disembark consumes whole move.
+        unit.setState(UnitState.ACTIVE);
+
+        // Update others, but not Europe.
+        if (!(destination instanceof Europe)) {
+            sendUpdatedTileToAll(destination.getTile(), serverPlayer);
         }
         return true;
     }

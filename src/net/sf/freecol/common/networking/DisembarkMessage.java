@@ -86,24 +86,23 @@ public class DisembarkMessage extends Message {
             return Message.clientError("Not on a carrier: " + unitId);
         }
 
-        // Usually disembark onto a tile, but sometimes to Europe.
+        // Do the disembark.
         Unit carrier = (Unit) unit.getLocation();
-        Europe europe = null;
-        Tile tile = null;
-        if (carrier.isInEurope()) {
-            europe = (Europe) carrier.getLocation();
-            unit.setLocation(europe);
-        } else {
-            tile = carrier.getLocation().getTile();
-            unit.setLocation(tile);
-            server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
+        if (!server.getInGameController().disembarkUnit(serverPlayer, unit)) {
+            return Message.clientError("Unable to disembark " + unitId
+                                       + " from " + carrier.getId());
         }
-        unit.setState(UnitState.ACTIVE);
 
         // Only have to update the new location, as it contains the carrier.
         Element reply = Message.createNewRootElement("update");
         Document doc = reply.getOwnerDocument();
-        reply.appendChild(((europe != null) ? europe : tile).toXMLElement(player, doc));
+        if (carrier.isInEurope()) {
+            Europe europe = (Europe) carrier.getLocation();
+            reply.appendChild(europe.toXMLElement(player, doc));
+        } else {
+            Tile tile = (Tile) carrier.getLocation();
+            reply.appendChild(tile.toXMLElement(player, doc));
+        }
         return reply;
     }
 
