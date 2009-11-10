@@ -2646,14 +2646,18 @@ public final class InGameController implements NetworkConstants {
      */
     private void attemptBuyFromSettlement(Unit unit, Settlement settlement) {
         // Get list of goods for sale
-        Goods goods = null;
-        List<ChoiceItem<Goods>> goodsOffered = new ArrayList<ChoiceItem<Goods>>();
-        for (Goods sell : askGoodsForSaleInSettlement(unit, settlement)) {
-            goodsOffered.add(new ChoiceItem<Goods>(sell));
-        }
+        List<Goods> forSale = askGoodsForSaleInSettlement(unit, settlement);
 
         Canvas canvas = freeColClient.getCanvas();
+        Goods goods = null;
         for (;;) {
+            // Rebuild the choice list
+            List<ChoiceItem<Goods>> goodsOffered
+                = new ArrayList<ChoiceItem<Goods>>();
+            for (Goods sell : forSale) {
+                goodsOffered.add(new ChoiceItem<Goods>(sell));
+            }
+
             // Choose goods to buy
             goods = canvas.showChoiceDialog(Messages.message("buyProposition.text"),
                 Messages.message("buyProposition.nothing"),
@@ -2680,7 +2684,8 @@ public final class InGameController implements NetworkConstants {
                 List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
                 choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), CHOOSE_BUY));
                 choices.add(new ChoiceItem<Integer>(Messages.message("buy.moreGold"), CHOOSE_HAGGLE));
-                Integer offerReply = canvas.showChoiceDialog(text, Messages.message("buyProposition.cancel"), choices);
+                Integer offerReply = canvas.showChoiceDialog(text,
+                        Messages.message("buyProposition.cancel"), choices);
                 if (offerReply == null) {
                     // Cancelled, break out to choice-of-goods loop
                     break;
@@ -2688,8 +2693,7 @@ public final class InGameController implements NetworkConstants {
                 switch (offerReply.intValue()) {
                 case CHOOSE_BUY: // Accept price, make purchase
                     if (askBuyFromSettlement(unit, settlement, goods, gold)) {
-                        // Assume success
-                        canvas.updateGoldLabel();
+                        canvas.updateGoldLabel(); // Assume success
                     }
                     return;
                 case CHOOSE_HAGGLE: // Try to negotiate a lower price
