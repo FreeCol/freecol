@@ -31,6 +31,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -109,6 +110,30 @@ public abstract class FreeColObject {
      */
     public boolean hasAbility(String id) {
         return false;
+    }
+
+    /**
+     * Debugging tool, dump object XML to System.err.
+     */
+    public void dumpObject() {
+        XMLOutputFactory xof = XMLOutputFactory.newInstance();
+        XMLStreamWriter xsw = null;
+        try {
+            xsw = xof.createXMLStreamWriter(System.err, "UTF-8");
+            this.toXML(xsw, null, true, true);
+            System.err.println();
+            xsw.flush();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to dump object", e);
+        } finally {
+            try {
+                if (xsw != null) {
+                    xsw.close();
+                }
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Exception while closing stream.", e);
+            }
+        }
     }
 
     /**

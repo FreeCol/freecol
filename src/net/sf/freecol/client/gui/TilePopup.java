@@ -40,6 +40,7 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
@@ -301,6 +302,16 @@ public final class TilePopup extends JPopupMenu {
                     }
                 });
             add(rumourItem);
+        }
+        if (FreeCol.isInDebugMode()) {
+            JMenuItem dumpItem = new JMenuItem("Dump tile");
+            dumpItem.setOpaque(false);
+            dumpItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        tile.dumpObject();
+                    }
+                });
+            add(dumpItem);
         }
         // END DEBUG
     }
