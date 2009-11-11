@@ -227,6 +227,9 @@ public final class FreeCol {
                         xs.close();
                         
                         freeColServer = new FreeColServer(fis, defaultPublicServer, defaultSingleplayer, serverPort, serverName);
+                        if (checkIntegrity) {
+                            System.exit((freeColServer.getIntegrity()) ? 0 : 1);
+                        }
                     } catch (Exception e) {
                         removeSplash(splash);
                         System.out.println("Could not load savegame.");
@@ -252,10 +255,6 @@ public final class FreeCol {
                             freeColServer.getController().shutdown();
                         }
                     });
-                if (checkIntegrity) {
-                    System.exit((freeColServer.getIntegrity())
-                                ? 0 : 1);
-                }
             } catch (IOException e) {
                 removeSplash(splash);
                 System.err.println("Error while loading server: " + e);
@@ -888,6 +887,7 @@ public final class FreeCol {
             if (line.hasOption("check-savegame")) {
                 setSavegame(line.getOptionValue("load-savegame"));
                 checkIntegrity = true;
+                displaySplash = false;
                 standAloneServer = true;
                 serverPort = DEFAULT_PORT;
             }
