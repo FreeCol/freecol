@@ -251,8 +251,15 @@ public abstract class Feature extends FreeColObject {
             } else if (feature.scopes == null) {
                 return false;
             } else {
+                // not very efficient, but we do not expect many
+                // scopes
                 for (Scope scope : scopes) {
                     if (!feature.scopes.contains(scope)) {
+                        return false;
+                    }
+                }
+                for (Scope scope : feature.scopes) {
+                    if (!scopes.contains(scope)) {
                         return false;
                     }
                 }
