@@ -1452,6 +1452,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Returns the amount of moves this Unit has left.
+     *
+     * @return The amount of moves this Unit has left.
+     */
+    public int getMovesLeft() {
+        return movesLeft;
+    }
+
+    /**
      * Sets the <code>movesLeft</code>.
      * 
      * @param movesLeft The new amount of moves left this <code>Unit</code>
@@ -2410,17 +2419,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                            " player " + owner.getName());
         }
 
-    }
-
-    /**
-     * Returns the amount of moves this Unit has left.
-     * 
-     * @return The amount of moves this Unit has left. If the
-     *         <code>unit.isUnderRepair()</code> then <code>0</code> is
-     *         always returned.
-     */
-    public int getMovesLeft() {
-        return movesLeft;
     }
 
     // TODO: make these go away, if possible, private if not

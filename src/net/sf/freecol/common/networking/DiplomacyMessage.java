@@ -336,7 +336,7 @@ public class DiplomacyMessage extends Message {
     }
 
     /**
-     * Create an "update" message for a given player, from the objects
+     * Build an "update" message for a given player, from the objects
      * that have been transferred in a successful diplomatic agreement.
      *
      * @param player The <code>Player</code> which will receive the update.
@@ -344,9 +344,12 @@ public class DiplomacyMessage extends Message {
      * @return An <code>Element</code> containing a suitable update message,
      *         or null if none is required.
      */
-    private Element createUpdateFor(final Player player,
-                                    final List<FreeColGameObject> objects) {
-        Element update = Message.createNewRootElement("update");
+    private Element buildUpdate(final Player player,
+                                final List<FreeColGameObject> objects,
+                                Element update) {
+        if (update == null) {
+            update = createNewRootElement("update");
+        }
         Document doc = update.getOwnerDocument();
 
         for (FreeColGameObject object : objects) {
@@ -375,35 +378,15 @@ public class DiplomacyMessage extends Message {
     }
 
     /**
-     * Perform an agreed trade, create updates for original player and
-     * the enemy, containing their view of the objects transferred,
-     * and send them.
+     * Perform an agreed trade, create an update a player and send it.
      *
      * @param player The original <code>Player</code> that started this trade.
-     * @param enemy The other <code>Player</code>.
      * @param objects A list of objects that need updating.
      */
-    private void sendUpdates(final ServerPlayer player,
-                             final ServerPlayer enemy,
-                             final List<FreeColGameObject> objects) {
+    private void sendUpdate(final ServerPlayer player,
+                            final List<FreeColGameObject> objects) {
         Element update;
-        Unit unit = getUnit(null);
-
-        // Update for the enemy.
-        if ((update = createUpdateFor(enemy, objects)) != null) {
-            try {
-                enemy.getConnection().send(update);
-            } catch (IOException e) {
-                logger.warning(e.getMessage());
-            }
-        }
-
-        // Always need to update the unit for the player because of
-        // the setMovesLeft(0).
-        if (!objects.contains(unit)) {
-            objects.add(unit);
-        }
-        if ((update = createUpdateFor(player, objects)) != null) {
+        if ((update = buildUpdate(player, objects, null)) != null) {
             try {
                 player.getConnection().send(update);
             } catch (IOException e) {
@@ -488,9 +471,13 @@ public class DiplomacyMessage extends Message {
                 }
                 // Act on what was proposed, not the accept message
                 // to frustrate tricksy client changing the conditions.
-                sendUpdates(serverPlayer, enemyPlayer,
-                            response.getAgreement().makeTrade());
-                return null;
+                List<FreeColGameObject> tradeObjects
+                    = response.getAgreement().makeTrade();
+                sendUpdate(enemyPlayer, tradeObjects);
+                Element update = createNewRootElement("update");
+                Document doc = update.getOwnerDocument();
+                update.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
+                return buildUpdate(serverPlayer, tradeObjects, update);
             }
             logger.warning("Accept of bogus trade.");
             this.setReject();
@@ -510,7 +497,6 @@ public class DiplomacyMessage extends Message {
         }
 
         // New trade proposal.
-        unit.setMovesLeft(0);
         TradeStatus state = TradeStatus.PROPOSE_TRADE;
         Element proposal = this.toXMLElement();
         if (unit.isOnCarrier()) {
@@ -534,6 +520,16 @@ public class DiplomacyMessage extends Message {
             state = TradeStatus.REJECT_TRADE;
         }
 
+        // Return an update containing the unit move change and
+        // changes from the agreement if it is enacted, and
+        // the current state of the agreement.
+        Element result = createNewRootElement("multiple");
+        Document doc = result.getOwnerDocument();
+        Element update = doc.createElement("update");
+        result.appendChild(update);
+        unit.setMovesLeft(0);
+        update.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
+
         switch (state) {
         case PROPOSE_TRADE:
             if (this.isValidCounterProposal(response)) {
@@ -546,12 +542,14 @@ public class DiplomacyMessage extends Message {
         case ACCEPT_TRADE:
             if (this.isValidAcceptance(response)) {
                 // Again, act on the proposal
-                sendUpdates(serverPlayer, enemyPlayer,
-                            this.agreement.makeTrade());
-                return response.toXMLElement();
+                List<FreeColGameObject> tradeObjects
+                    = this.agreement.makeTrade();
+                sendUpdate(enemyPlayer, tradeObjects);
+                update = buildUpdate(serverPlayer, tradeObjects, update);
+            } else {
+                logger.warning("Confused diplomatic acceptance.");
+                response.setReject();
             }
-            logger.warning("Confused diplomatic acceptance.");
-            response.setReject();
             break;
         case REJECT_TRADE:
             response.setReject();
@@ -561,9 +559,8 @@ public class DiplomacyMessage extends Message {
             response.setReject();
             break;
         }
-
-        sendUpdates(serverPlayer, enemyPlayer, new ArrayList<FreeColGameObject>());
-        return response.toXMLElement();
+        result.appendChild(doc.importNode(response.toXMLElement(), true));
+        return result;
     }
 
     /**

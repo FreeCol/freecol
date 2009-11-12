@@ -141,6 +141,7 @@ import net.sf.freecol.common.networking.StatisticsMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -2414,7 +2415,7 @@ public final class InGameController implements NetworkConstants {
             message = askDiplomacy(unit, direction, newAgreement);
 
             // What did they say?
-            if (message.isReject()) {
+            if (message == null || message.isReject()) {
                 String nation = message.getOtherNationName(player);
                 canvas.showInformationMessage("negotiationDialog.offerRejected",
                                               "%nation%", nation);
@@ -2447,8 +2448,24 @@ public final class InGameController implements NetworkConstants {
                                                         agreement);
         if (agreement.isAccept()) message.setAccept();
         Element reply = askExpecting(client, message.toXMLElement(),
-                                     message.getXMLElementTagName());
-        return (reply == null) ? null : new DiplomacyMessage(game, reply);
+                                     "multiple");
+        if (reply == null) return null;
+
+        // The reply should contain updates, and the diplomacy last.
+        Node diplomacy = reply.getLastChild();
+        if (diplomacy == null
+            || diplomacy.getNodeType() != Node.ELEMENT_NODE
+            || !diplomacy.getNodeName().equals("diplomacy")) {
+            System.err.println("DIP = " + ((diplomacy==null) ? "null" : diplomacy.getNodeName()));
+            return null;
+        }
+
+        // We extract the diplomacy to return for interactive handling
+        // rather than processing it in the input handler.
+        diplomacy = reply.removeChild(diplomacy);
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return new DiplomacyMessage(game, (Element) diplomacy);
     }
 
     /**

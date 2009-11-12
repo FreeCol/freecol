@@ -455,8 +455,8 @@ public class StandardAIPlayer extends AIPlayer {
                             // TODO: introduce some kind of counter in order to avoid
                             // Benjamin Franklin exploit
                             value -= 1000;
-                            break;
                         }
+                        break;
                     case ALLIANCE:
                         value -= 2000;
                         break;
