@@ -135,7 +135,7 @@ public class LearnSkillMessage extends Message {
 
             Element remove = doc.createElement("remove");
             reply.appendChild(remove);
-            remove.appendChild(unit.toXMLElementPartial(doc, "ID"));
+            unit.addToRemoveElement(remove);
             break;
         case ANGRY: // Learn nothing, not even a pet update
             unit.setMovesLeft(0);

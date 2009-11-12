@@ -124,13 +124,12 @@ public class ScoutIndianSettlementMessage extends Message {
         if (unit.isDisposed()) {
             Element remove = doc.createElement("remove");
             reply.appendChild(remove);
-            remove.appendChild(unit.toXMLElementPartial(doc, "ID"));
+            unit.addToRemoveElement(remove);
         } else {
             Element update = doc.createElement("update");
             reply.appendChild(update);
-            // Always update the settlement tile, mainly for the pet but also
-            // the settlement visited status.
-            update.appendChild(tile.toXMLElement(player, doc));
+            // Always update the settlement, as it is now visited.
+            update.appendChild(indianSettlement.toXMLElement(player, doc));
             // Update any new tiles the unit can see from the settlement,
             // which can include an enhanced radius from tales.
             int radius = unit.getLineOfSight();

@@ -160,7 +160,7 @@ public class MissionaryMessage extends Message {
         if (unit.isDisposed()) {
             Element remove = doc.createElement("remove");
             reply.appendChild(remove);
-            remove.appendChild(unit.toXMLElementPartial(doc, "ID"));
+            unit.addToRemoveElement(remove);
         } else {
             update.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
         }
