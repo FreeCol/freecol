@@ -233,7 +233,6 @@ public final class TileImprovementType extends FreeColGameObjectType
                             value += change * 3;
                         }
                     }
-
                 }
             }
         }

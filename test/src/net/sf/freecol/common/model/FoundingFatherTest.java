@@ -52,7 +52,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertTrue(dutch.hasAbility("some.new.ability"));
 
         FoundingFather father2 = new FoundingFather(112);
-        Modifier modifier = new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE);
+        Modifier modifier = new Modifier("some.new.modifier", father2, 2f, Modifier.Type.ADDITIVE);
         father2.addModifier(modifier);
         spec().addModifier(modifier);
         dutch.addFather(father2);
@@ -63,14 +63,17 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertEquals(4f, FeatureContainer.applyModifierSet(2, null, modifierSet));
 
         FoundingFather father3 = new FoundingFather(113);
-        father3.addModifier(new Modifier("some.new.modifier", 2f, Modifier.Type.ADDITIVE));
+        father3.addModifier(new Modifier("some.new.modifier", father3, 2f, Modifier.Type.ADDITIVE));
         dutch.addFather(father3);
 
         assertFalse(dutch.getFeatureContainer().getModifierSet("some.new.modifier").isEmpty());
         assertEquals(6f, dutch.getFeatureContainer().applyModifier(2, "some.new.modifier"));
 
         FoundingFather father4 = new FoundingFather(114);
-        father4.addAbility(new Ability("some.new.ability", false));
+        Ability ability2 = new Ability("some.new.ability", false);
+        assertFalse(ability.equals(ability2));
+        assertFalse(ability.hashCode() == ability2.hashCode());
+        father4.addAbility(ability2);
         dutch.addFather(father4);
 
         assertFalse(dutch.getFeatureContainer().hasAbility("some.new.ability"));

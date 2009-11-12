@@ -208,6 +208,62 @@ public abstract class Feature extends FreeColObject {
     }
 
 
+    public int hashCode() {
+        int hash = 7;
+        hash += 31 * hash + (getId() == null ? 0 : getId().hashCode());
+        hash += 31 * hash + (source == null ? 0 : source.hashCode());
+        hash += 31 * hash + (firstTurn == null ? 0 : firstTurn.getNumber());
+        hash += 31 * hash + (lastTurn == null ? 0 : lastTurn.getNumber());
+        if (scopes != null) {
+            for (Scope scope : scopes) {
+                // TODO: is this safe? It is an easy way to ignore the order
+                // of scope elements.
+                hash += scope.hashCode();
+            }
+        }
+        return hash;
+    }
+
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof Feature) {
+            Feature feature = (Feature) o;
+            if (getId() != feature.getId()) {
+                return false;
+            }
+            if (source != feature.source) {
+                return false;
+            }
+            if (firstTurn == null) {
+                if (feature.firstTurn != null) {
+                    return false;
+                }
+            } else if (feature.firstTurn == null) {
+                return false;
+            } else if (firstTurn.getNumber() != feature.firstTurn.getNumber()) {
+                return false;
+            }
+            if (scopes == null) {
+                if (feature.scopes != null) {
+                    return false;
+                }
+            } else if (feature.scopes == null) {
+                return false;
+            } else {
+                for (Scope scope : scopes) {
+                    if (!feature.scopes.contains(scope)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         if (getSource() != null) {
             out.writeAttribute("source", getSource().getId());

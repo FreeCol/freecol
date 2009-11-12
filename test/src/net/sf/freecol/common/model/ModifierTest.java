@@ -230,4 +230,77 @@ public class ModifierTest extends FreeColTestCase {
 
     }
 
+    public void testHashEquals() {
+
+        Scope scope1 = new Scope();
+        scope1.setType("model.unit.frigate");
+        scope1.setAbilityID("whatever");
+
+        Scope scope2 = new Scope();
+        scope2.setType("model.unit.frigate");
+        scope2.setAbilityID("whatever");
+
+        Scope scope3 = new Scope();
+        scope3.setType("model.unit.frigate");
+        scope3.setAbilityID("whatever");
+        scope3.setAbilityValue(false);
+
+        assertEquals(scope1, scope1);
+        assertEquals(scope1.hashCode(), scope1.hashCode());
+        assertEquals(scope1, scope2);
+        assertEquals(scope1.hashCode(), scope2.hashCode());
+        assertFalse(scope1.equals(scope3));
+        assertFalse(scope1.hashCode() == scope3.hashCode());
+
+        Modifier modifier1 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier2 = new Modifier("test", 3, Modifier.Type.ADDITIVE);
+        Modifier modifier3 = new Modifier("test", 2, Modifier.Type.ADDITIVE);
+
+        assertEquals(modifier1, modifier1);
+        assertEquals(modifier1.hashCode(), modifier1.hashCode());
+        assertEquals(modifier1, modifier2);
+        assertEquals(modifier1.hashCode(), modifier2.hashCode());
+        assertFalse(modifier1.equals(modifier3));
+        assertFalse(modifier1.hashCode() == modifier3.hashCode());
+
+        List<Scope> scopeList1 = new ArrayList<Scope>();
+        scopeList1.add(scope1);
+        scopeList1.add(scope3);
+        List<Scope> scopeList2 = new ArrayList<Scope>();
+        scopeList2.add(scope3);
+        scopeList2.add(scope1);
+        List<Scope> scopeList3 = new ArrayList<Scope>();
+        scopeList3.add(scope1);
+        scopeList3.add(scope2);
+
+        modifier1.setScopes(scopeList1);
+        modifier2.setScopes(scopeList1);
+
+        assertEquals(modifier1, modifier1);
+        assertEquals(modifier1.hashCode(), modifier1.hashCode());
+        assertEquals(modifier1, modifier2);
+        assertEquals(modifier1.hashCode(), modifier2.hashCode());
+        assertFalse(modifier1.equals(modifier3));
+        assertFalse(modifier1.hashCode() == modifier3.hashCode());
+
+        modifier2.setScopes(scopeList2);
+
+        assertEquals(modifier2, modifier2);
+        assertEquals(modifier2.hashCode(), modifier2.hashCode());
+        assertEquals(modifier1, modifier2);
+        assertEquals(modifier1.hashCode(), modifier2.hashCode());
+        assertFalse(modifier2.equals(modifier3));
+        assertFalse(modifier2.hashCode() == modifier3.hashCode());
+
+        modifier2.setScopes(scopeList3);
+
+        assertEquals(modifier2, modifier2);
+        assertEquals(modifier2.hashCode(), modifier2.hashCode());
+        assertFalse(modifier1.equals(modifier2));
+        assertFalse(modifier1.hashCode() == modifier2.hashCode());
+        assertFalse(modifier2.equals(modifier3));
+        assertFalse(modifier2.hashCode() == modifier3.hashCode());
+
+    }
+
 }

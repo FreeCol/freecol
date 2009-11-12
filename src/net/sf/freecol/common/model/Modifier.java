@@ -241,6 +241,54 @@ public final class Modifier extends Feature {
         }
     }
 
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = hash + 31 * Float.floatToIntBits(value);
+        hash = hash + 31 * Float.floatToIntBits(increment);
+        hash = hash + 31 * (type == null ? 0 : type.hashCode());
+        hash = hash + 31 * (incrementType == null ? 0 : incrementType.hashCode());
+        return hash;
+    }
+
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof Modifier) {
+            Modifier modifier = (Modifier) o;
+            if (!super.equals(o)) {
+                return false;
+            }
+            if (value != modifier.value) {
+                return false;
+            }
+            if (increment != modifier.increment) {
+                return false;
+            }
+            if (type == null) {
+                if (modifier.type != null) {
+                    return false;
+                }
+            } else if (modifier.type == null) {
+                return false;
+            } else if (!type.equals(modifier.type)) {
+                return false;
+            }
+            if (incrementType == null) {
+                if (modifier.incrementType != null) {
+                    return false;
+                }
+            } else if (modifier.incrementType == null) {
+                return false;
+            } else if (!incrementType.equals(modifier.incrementType)) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     // -- Factory methods --
 
     public static Modifier createTeaPartyModifier(Turn turn) {
