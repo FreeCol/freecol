@@ -1525,6 +1525,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             updateTilePanel();
         } else if (property.startsWith("model.goods.")) {
             updateProductionPanel();
+        } else if (Building.UNIT_CHANGE.equals(property)){
+        	// already processed by BuildingPanel
         } else {
             logger.warning("Unknown property change event: " + e.getPropertyName());
         }

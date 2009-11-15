@@ -347,8 +347,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 student.setTeacher(null);
                 unit.setStudent(null);
             }
-
             units.add(unit);
+            firePropertyChange(Building.UNIT_CHANGE,null,unit);
             // TODO: can we cheaply report the real change?
             GoodsType output = getGoodsOutputType();
             if (output != null) {
@@ -377,9 +377,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      *            this <code>WorkLocation</code>.
      */
     public void remove(final Locatable locatable) {
-        if (locatable instanceof Unit) {
-            if (units.remove(locatable)) {
-                ((Unit) locatable).setMovesLeft(0);
+        if (!(locatable instanceof Unit)) {
+        	throw new IllegalStateException("Can only remove units from building.");
+        }
+        Unit unit = (Unit) locatable;
+        
+        if (units.remove(unit)) {
+        	unit.setMovesLeft(0);
+        	firePropertyChange(Building.UNIT_CHANGE,unit,null);
                 // TODO: can we cheaply report the real change?
                 GoodsType output = getGoodsOutputType();
                 if (output != null) {
@@ -387,9 +392,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                                        new AbstractGoods(output, 1),
                                        new AbstractGoods(output, 0));
                 }
-            }
-        } else {
-            throw new IllegalStateException("Can only add units to building.");
         }
     }
 
