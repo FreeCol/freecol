@@ -408,7 +408,6 @@ public class TileTest extends FreeColTestCase {
 
     }
 
-    /*
     public void testSortedPotential() {
         Game game = getStandardGame();
         Map map = getTestMap(plains);
@@ -462,5 +461,4 @@ public class TileTest extends FreeColTestCase {
         assertEquals(fish, sortedPotential.get(0).getType());
         
     }
-    */
 }

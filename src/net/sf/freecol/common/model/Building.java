@@ -902,7 +902,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         }
 
         int base = buildingType.getBasicProduction();
-        int productivity = prodUnit.getProductionOf(getGoodsOutputType(), base);
+        int productivity = Math.round(FeatureContainer
+                                      .applyModifierSet(base, getGame().getTurn(),
+                                                        prodUnit.getModifierSet(getGoodsOutputType().getId())));
         if (productivity > 0) {
             productivity += colony.getProductionBonus();
             if (productivity < 1)
