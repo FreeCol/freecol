@@ -125,6 +125,7 @@ public class LearnSkillMessage extends Message {
 
         // Learn the skill if possible.
         // Bit of a mess building the reply given the multiple results.
+        unit.setMovesLeft(0);
         Element reply = Message.createNewRootElement("multiple");
         Document doc = reply.getOwnerDocument();
         Tension tension = indianSettlement.getAlarm(player);
@@ -138,8 +139,6 @@ public class LearnSkillMessage extends Message {
             unit.addToRemoveElement(remove);
             break;
         case ANGRY: // Learn nothing, not even a pet update
-            unit.setMovesLeft(0);
-
             Element updateFail = doc.createElement("update");
             reply.appendChild(updateFail);
             updateFail.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));

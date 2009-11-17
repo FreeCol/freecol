@@ -1355,7 +1355,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     private boolean perhapsLearnFromSettlement(IndianSettlement settlement) {
         // If we know the skill is gone, fail.
         if (settlement.getLearnableSkill() == null
-            && settlement.hasBeenVisited()) {
+            && settlement.hasBeenVisited(getOwner())) {
             return false;
         }
         // Generic way of saying: is this unit upgradable with one of the

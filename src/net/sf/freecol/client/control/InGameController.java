@@ -2061,24 +2061,9 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
         UnitType skill = settlement.getLearnableSkill();
-
-        if (skill == null) {
-            Element askSkill = Message.createNewRootElement("askSkill");
-            askSkill.setAttribute("unit", unit.getId());
-            askSkill.setAttribute("direction", direction.toString());
-            Element reply = client.ask(askSkill);
-            if (reply.getTagName().equals("provideSkill")) {
-                if (reply.hasAttribute("skill")) {
-                    skill = FreeCol.getSpecification().getUnitType(reply.getAttribute("skill"));
-                    settlement.setLearnableSkill(skill);
-                }
-            } else {
-                logger.warning("Server gave an invalid reply to an askSkill message");
-                return;
-            }
+        if (skill == null && askSkill(unit, direction)) {
+            skill = settlement.getLearnableSkill();
         }
-
-        unit.setMovesLeft(0);
         if (skill == null) {
             canvas.errorMessage("indianSettlement.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
@@ -2456,7 +2441,6 @@ public final class InGameController implements NetworkConstants {
         if (diplomacy == null
             || diplomacy.getNodeType() != Node.ELEMENT_NODE
             || !diplomacy.getNodeName().equals("diplomacy")) {
-            System.err.println("DIP = " + ((diplomacy==null) ? "null" : diplomacy.getNodeName()));
             return null;
         }
 
