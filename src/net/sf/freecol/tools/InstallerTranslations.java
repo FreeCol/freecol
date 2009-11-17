@@ -47,6 +47,36 @@ public class InstallerTranslations {
     private static final File LANGUAGE_CODES =
         new File(DESTINATION_DIRECTORY, "iso-639-2.txt");
 
+    // it seems IzPack doesn't use ISO codes at all
+    public static final String[][] IZPACK_CODES = new String[][] {
+        { "ca", "cat", "Catalunyan" },
+        { "zh", "chn", "Chinese" },
+        { "cs", "cze", "Czech" },
+        { "da", "dan", "Danish" },
+        { "gl", "glg", "Galician" },
+        { "de", "deu", "German" },
+        { "en", "eng", "English" },
+        { "eu", "eus", "Basque" },
+        { "fi", "fin", "Finnish" },
+        { "fr", "fra", "French" },
+        { "hu", "hun", "Hungarian" },
+        { "it", "ita", "Italian" },
+        { "ja", "jpn", "Japanese" },
+        { "ms", "mys", "Malaysian" },
+        { "nl", "ned", "Nederlands" },
+        { "nn", "nor", "Norwegian" },
+        { "pl", "pol", "Polnish" },
+        { "pt_BR", "por", "Portuguese (Brazilian)" },
+        { "pt_PT", "prt", "Portuguese (European)" },
+        { "ro", "rom", "Romanian" },
+        { "ru", "rus", "Russian" },
+        { "sr", "scg", "Serbian" },
+        { "es", "spa", "Spanish" },
+        { "sk", "svk", "Slovakian" },
+        { "sv", "swe", "Swedish" },
+        { "uk", "ukr", "Ukrainian" }
+    };
+
     private static final String[] KEYS = {
         "FreeCol",
         "FreeCol.description",
@@ -84,9 +114,13 @@ public class InstallerTranslations {
             System.exit(1);
         }
 
-        Map<String, String> languageMappings = readLanguageMappings(LANGUAGE_CODES);
+        //Map<String, String> languageMappings = readLanguageMappings(LANGUAGE_CODES);
+        Map<String, String> languageMappings = new HashMap<String, String>();
+        for (String[] mapping : IZPACK_CODES) {
+            languageMappings.put(mapping[0], mapping[1]);
+        }
         Map<String, String> mainProperties = readFile(MAIN_FILE);
-        Set<String> languages = new HashSet<String>();
+        //Set<String> languages = new HashSet<String>();
 
         String[] sourceFiles = SOURCE_DIRECTORY.list(new FilenameFilter() {
                 public boolean accept(File dir, String name) {
@@ -96,21 +130,28 @@ public class InstallerTranslations {
 
         for (String name : sourceFiles) {
 
-            int index = name.indexOf('_', 16);
+            String languageCode = null;
+            int index = name.indexOf('.', 16);
             if (index < 0) {
-                index = name.indexOf('.', 16);
+                continue;
+            } else {
+                languageCode = languageMappings.get(name.substring(16, index));
+                if (languageCode == null) {
+                    index = name.indexOf('_', 16);
+                    if (index < 0) {
+                        continue;
+                    } else {
+                        languageCode = languageMappings.get(name.substring(16, index));
+                    }
+                }
             }
-            String languageCode = name.substring(16, index);
-            if (languageCode.length() == 2) {
-                languageCode = languageMappings.get(languageCode);
-            }
-            if (languages.contains(languageCode)) {
+
+            if (languageCode == null) {
                 System.out.println("Skipping source file: " + name);
                 continue;
             }
 
             System.out.println("Processing source file: " + name);
-            languages.add(languageCode);
 
             File sourceFile = new File(SOURCE_DIRECTORY, name);
             Map<String, String> sourceProperties = readFile(sourceFile);

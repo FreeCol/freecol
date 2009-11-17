@@ -524,6 +524,28 @@ public final class Specification {
         return allAbilities.get(id);
     }
 
+    /**
+     * Return a list of FreeColGameObjectTypes that provide the required ability.
+     *
+     * @param id the ability id
+     * @param value the ability value
+     * @return a list of FreeColGameObjectTypes that provide the required ability.
+     */
+    public List<FreeColGameObjectType> getTypesProviding(String id, boolean value) {
+        List<FreeColGameObjectType> result = new ArrayList<FreeColGameObjectType>();
+        for (Ability ability : getAbilities(id)) {
+            if (ability.getValue() == value && ability.getSource() != null) {
+                result.add(ability.getSource());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Add a modifier.
+     *
+     * @param modifier a <code>Modifier</code> value
+     */
     public void addModifier(Modifier modifier) {
         String id = modifier.getId();
         if (!allModifiers.containsKey(id)) {

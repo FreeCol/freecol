@@ -102,7 +102,7 @@ public final class PlayersTable extends JTable {
     public PlayersTable(final Canvas canvas, NationOptions nationOptions, Player myPlayer) {
         super();
 
-        library = canvas.getGUI().getImageLibrary();
+        library = canvas.getImageLibrary();
 
         setModel(new PlayersTableModel(canvas.getClient().getPreGameController(), nationOptions, myPlayer));
         setRowHeight(47);

@@ -59,7 +59,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
     * @param parent The parent that knows more than we do.
     */
     public MarketLabel(GoodsType type, Market market, Canvas parent) {
-        super(parent.getGUI().getImageLibrary().getGoodsImageIcon(type));
+        super(parent.getImageLibrary().getGoodsImageIcon(type));
         
         this.type = type;
         /*
@@ -151,10 +151,10 @@ public final class MarketLabel extends JLabel implements ActionListener {
     */
     public void setSmall(boolean isSmall) {
         if (isSmall) {
-            ImageIcon imageIcon = parent.getGUI().getImageLibrary().getGoodsImageIcon(type);
+            ImageIcon imageIcon = parent.getImageLibrary().getGoodsImageIcon(type);
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2, imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
         } else {
-            setIcon(parent.getGUI().getImageLibrary().getGoodsImageIcon(type));
+            setIcon(parent.getImageLibrary().getGoodsImageIcon(type));
         }
     }
 
@@ -194,7 +194,7 @@ public final class MarketLabel extends JLabel implements ActionListener {
                     default:
                         logger.warning("Invalid action");
                 }
-                setIcon(parent.getGUI().getImageLibrary().getGoodsImageIcon(type));
+                setIcon(parent.getImageLibrary().getGoodsImageIcon(type));
                 repaint(0, 0, getWidth(), getHeight());
                 
                 // TODO: Refresh the gold label when goods have prices.

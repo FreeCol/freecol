@@ -391,9 +391,11 @@ public final class InfoPanel extends FreeColPanel {
                     for (EquipmentType equipment : unit.getEquipment().keySet()) {
                         for (AbstractGoods goods : equipment.getGoodsRequired()) {
                             int amount = goods.getAmount() * unit.getEquipment().getCount(equipment);
-                        	String amountStr = String.valueOf(amount);
-                        	JLabel equipmentLabel = 
-                                new JLabel(amountStr,getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f), JLabel.CENTER);
+                            String amountStr = String.valueOf(amount);
+                            JLabel equipmentLabel = 
+                                new JLabel(amountStr,
+                                           getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f),
+                                           JLabel.CENTER);
                             equipmentLabel.setToolTipText(amountStr + " " + goods.getType().getName());
                             add(equipmentLabel);
                         }

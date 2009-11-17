@@ -83,7 +83,7 @@ final class UnitMoveAnimation {
             return;
         }
 
-        float scale = gui.getImageLibrary().getScalingFactor();
+        float scale = gui.getMapScale();
         final int movementRatio = (int) (Math.pow(2, movementSpeed + 1) * scale);
         final Rectangle r1 = gui.getTileBounds(sourceTile);
         final Rectangle r2 = gui.getTileBounds(destinationTile);

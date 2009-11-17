@@ -64,7 +64,7 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
      * @param parent The parent that knows more than we do.
      */
     public GoodsLabel(Goods goods, Canvas parent) {
-        super(parent.getGUI().getImageLibrary().getGoodsImageIcon(goods.getType()));
+        super(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
         this.goods = goods;
         setToolTipText(goods.getName());
         this.parent = parent;
@@ -176,11 +176,11 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
      */
     public void setSmall(boolean isSmall) {
         if (isSmall) {
-            ImageIcon imageIcon = parent.getGUI().getImageLibrary().getGoodsImageIcon(goods.getType());
+            ImageIcon imageIcon = parent.getImageLibrary().getGoodsImageIcon(goods.getType());
             setIcon(new ImageIcon(imageIcon.getImage().getScaledInstance(imageIcon.getIconWidth() / 2,
                     imageIcon.getIconHeight() / 2, Image.SCALE_DEFAULT)));
         } else {
-            setIcon(parent.getGUI().getImageLibrary().getGoodsImageIcon(goods.getType()));
+            setIcon(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
         }
     }
 }

@@ -33,10 +33,8 @@ import net.sf.freecol.client.gui.ImageLibrary;
  * An action for chosing the next unit as the active unit.
  */
 public class ZoomInAction extends FreeColAction {
+
     private static final Logger logger = Logger.getLogger(ZoomInAction.class.getName());
-
-
-
 
     public static final String id = "zoomInAction";
 
@@ -66,7 +64,7 @@ public class ZoomInAction extends FreeColAction {
         if (canvas == null || !canvas.isMapboardActionsEnabled())
         	return false;
         
-        float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
+        float oldScaling = getFreeColClient().getGUI().getMapScale();
 
         return oldScaling < 1.0;
     }
@@ -86,24 +84,7 @@ public class ZoomInAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
-        float newScaling = oldScaling + 1/4f;
-        ImageLibrary im;
-        if (newScaling >= 1f) {
-            newScaling = 1f;
-            im = getFreeColClient().getImageLibrary();
-        } else {
-            try {
-                im = getFreeColClient().getImageLibrary().getScaledImageLibrary(newScaling);
-            } catch(Exception ex) {
-                logger.warning("Failed to retrieve scaled image library.");
-                im = getFreeColClient().getImageLibrary();
-            }
-        }
-        getFreeColClient().getGUI().setImageLibrary(im);
-        getFreeColClient().getGUI().forceReposition();
-        getFreeColClient().getCanvas().refresh();
-
+        getFreeColClient().getGUI().scaleMap(1/4f);
         update();
         freeColClient.getActionManager().getFreeColAction(ZoomOutAction.id).update();
     }

@@ -194,7 +194,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
      * @return the ImageLibrary.
      */
     public ImageLibrary getLibrary() {
-        return canvas.getGUI().getImageLibrary();
+        return canvas.getImageLibrary();
     }
 
     /**

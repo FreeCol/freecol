@@ -77,7 +77,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param parent The parent that knows more than we do.
      */
     public UnitLabel(Unit unit, Canvas parent) {
-        ImageLibrary lib = parent.getGUI().getImageLibrary();
+        ImageLibrary lib = parent.getImageLibrary();
         setIcon(lib.getUnitImageIcon(unit));
         setDisabledIcon(lib.getUnitImageIcon(unit, true));
         this.unit = unit;
@@ -163,8 +163,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
      * @param isSmall The image will be smaller if set to <code>true</code>.
      */
     public void setSmall(boolean isSmall) {
-        ImageIcon imageIcon = parent.getGUI().getImageLibrary().getUnitImageIcon(unit);
-        ImageIcon disabledImageIcon = parent.getGUI().getImageLibrary().getUnitImageIcon(unit, true);
+        ImageIcon imageIcon = parent.getImageLibrary().getUnitImageIcon(unit);
+        ImageIcon disabledImageIcon = parent.getImageLibrary().getUnitImageIcon(unit, true);
         if (isSmall) {
             setPreferredSize(null);
             // setIcon(new
@@ -179,7 +179,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
                 TileType tileType = ((ColonyTile) unit.getLocation()).getTile().getType();
-                setSize(new Dimension(parent.getGUI().getImageLibrary().getTerrainImageWidth(tileType) / 2,
+                setSize(new Dimension(parent.getImageLibrary().getTerrainImageWidth(tileType) / 2,
                                       imageIcon.getIconHeight()));
             } else {
                 setPreferredSize(null);
@@ -355,8 +355,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
 
     public void updateIcon() {
-        setIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unit));
-        setDisabledIcon(parent.getGUI().getImageLibrary().getUnitImageIcon(unit, true));
+        setIcon(parent.getImageLibrary().getUnitImageIcon(unit));
+        setDisabledIcon(parent.getImageLibrary().getUnitImageIcon(unit, true));
 
         Component uc = getParent();
         while (uc != null) {

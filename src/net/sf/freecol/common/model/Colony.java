@@ -178,7 +178,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 landLocked = false;
             }
         }
-        if (!landLocked) {
+        if (landLocked) {
+            buildQueue.add(FreeCol.getSpecification().getBuildingType("model.building.Warehouse"));
+        } else {
+            buildQueue.add(FreeCol.getSpecification().getBuildingType("model.building.Docks"));
             featureContainer.addAbility(HAS_PORT);
         }
         Building building;

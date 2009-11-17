@@ -37,6 +37,7 @@ import javax.swing.event.MouseInputListener;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.action.MiniMapChangeBackgroundAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomInAction;
 import net.sf.freecol.client.gui.action.MiniMapZoomOutAction;
@@ -280,7 +281,7 @@ public final class MiniMap extends JPanel implements MouseInputListener {
     private void paintMap(Graphics graphics, int x, int y, int width, int height) {
         final Graphics2D g = (Graphics2D) graphics;
         final Map map = freeColClient.getGame().getMap();
-        final ImageProvider imageProvider = freeColClient.getGUI().getImageLibrary();
+        final ImageLibrary imageProvider = freeColClient.getImageLibrary();
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                            RenderingHints.VALUE_ANTIALIAS_ON);

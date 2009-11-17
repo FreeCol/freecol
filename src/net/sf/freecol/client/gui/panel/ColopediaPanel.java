@@ -1402,13 +1402,11 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                              Messages.message(entry.getKey() + ".name"),
                              doc.getStyle("regular"));
             List<JButton> requiredTypes = new ArrayList<JButton>();
-            for (Ability ability : Specification.getSpecification().getAbilities(entry.getKey())) {
-                if (ability.getValue() == entry.getValue() &&
-                    ability.getSource() != null) {
-                    JButton typeButton = getButton(ability.getSource());
-                    typeButton.addActionListener(this);
-                    requiredTypes.add(typeButton);
-                }
+            for (FreeColGameObjectType type : Specification.getSpecification()
+                     .getTypesProviding(entry.getKey(), entry.getValue())) {
+                JButton typeButton = getButton(type);
+                typeButton.addActionListener(this);
+                requiredTypes.add(typeButton);
             }
             if (!requiredTypes.isEmpty()) {
                 doc.insertString(doc.getLength(), " (", doc.getStyle("regular"));

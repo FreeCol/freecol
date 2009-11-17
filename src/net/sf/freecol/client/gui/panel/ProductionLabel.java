@@ -147,7 +147,7 @@ public final class ProductionLabel extends JComponent {
             setForeground(Color.WHITE);
         }
         if (goodsType != null) {
-            setGoodsIcon(parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType));
+            setGoodsIcon(parent.getImageLibrary().getGoodsImageIcon(goodsType));
             updateToolTipText();
         }
     }

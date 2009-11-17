@@ -472,7 +472,7 @@ public class DebugMenu extends JMenu {
         loadResource.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    canvas.getGUI().getImageLibrary().init();
+                    canvas.getImageLibrary().init();
                 } catch (Exception ex) {
                     System.out.println("Failed to reload images.");
                 }

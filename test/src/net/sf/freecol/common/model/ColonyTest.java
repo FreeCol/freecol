@@ -72,10 +72,11 @@ public class ColonyTest extends FreeColTestCase {
         Colony colony = getStandardColony();
                 
         colony.setCurrentlyBuilding(wagonTrainType);
-        assertEquals("Building queue should have 1 entry", 1, colony.getBuildQueue().size());
+        // default item will be added to new colony's build queue
+        assertEquals("Building queue should have 2 entry", 2, colony.getBuildQueue().size());
                 
         colony.setCurrentlyBuilding(wagonTrainType);
-        assertEquals("Building queue should have 2 entries", 2, colony.getBuildQueue().size());
+        assertEquals("Building queue should have 3 entries", 3, colony.getBuildQueue().size());
     }
     
     /**
@@ -112,6 +113,7 @@ public class ColonyTest extends FreeColTestCase {
         int initialLumber = 100;
         int initialHammers = 0;
         colony.addGoods(lumberGoodsType, initialLumber);
+        colony.setCurrentlyBuilding(null);
         
         assertEquals("Wrong initial lumber quantity, ",
                      initialLumber, colony.getGoodsCount(lumberGoodsType));

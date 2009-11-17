@@ -42,10 +42,8 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -298,6 +296,10 @@ public final class Canvas extends JDesktopPane {
         return clientOptionsDialog;
     }
 
+    public ImageLibrary getImageLibrary() {
+        return freeColClient.getImageLibrary();
+    }
+
     /**
      * Updates the label displaying the current amount of gold.
      */
@@ -540,7 +542,7 @@ public final class Canvas extends JDesktopPane {
      * @return The appropriate ImageIcon.
      */
     public ImageIcon getImageIcon(Object display, boolean small) {
-        ImageLibrary imageLibrary = getGUI().getImageLibrary();
+        ImageLibrary imageLibrary = freeColClient.getImageLibrary();
         Image image = null;
         if (display == null) {
             return new ImageIcon();

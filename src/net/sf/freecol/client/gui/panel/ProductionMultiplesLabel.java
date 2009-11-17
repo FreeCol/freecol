@@ -165,7 +165,7 @@ public final class ProductionMultiplesLabel extends JComponent {
         if (goodsType != null) {
             goodsIcon = new ImageIcon[goodsType.length];
             for (int ii=0; ii < goodsType.length; ii++) {
-                goodsIcon[ii] = parent.getGUI().getImageLibrary().getGoodsImageIcon(goodsType[ii]);
+                goodsIcon[ii] = parent.getImageLibrary().getGoodsImageIcon(goodsType[ii]);
                 totalProduction += amount[ii];
             }
             compressedWidth = getMaximumIconWidth()*2;

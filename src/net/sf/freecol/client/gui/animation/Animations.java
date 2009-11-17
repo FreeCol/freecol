@@ -60,7 +60,7 @@ public class Animations {
     
     private static SimpleZippedAnimation getAnimation(Canvas canvas, Unit unit, Direction direction, String animation) {
         final GUI gui = canvas.getGUI();
-        final float scalingFactor = gui.getImageLibrary().getScalingFactor();
+        final float scalingFactor = gui.getMapScale();
         final String roleStr = (unit.getRole() != Role.DEFAULT) ? "." + unit.getRole().getId() : "";
         final String startStr = unit.getType().getId() + roleStr + "." + animation + ".";
         final String specialId = startStr + direction.toString().toLowerCase() + ".animation";

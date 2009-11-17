@@ -63,7 +63,7 @@ public class ZoomOutAction extends FreeColAction {
         if (canvas == null || !canvas.isMapboardActionsEnabled())
         	return false;
         
-        float oldScaling = getFreeColClient().getGUI().getImageLibrary().getScalingFactor();
+        float oldScaling = getFreeColClient().getGUI().getMapScale();
    
         return ((oldScaling - 1/8f) * 8 > 1);
     }
@@ -83,18 +83,7 @@ public class ZoomOutAction extends FreeColAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        ImageLibrary im = getFreeColClient().getGUI().getImageLibrary();
-        float oldScaling = im.getScalingFactor();
-        try {
-            im = im.getScaledImageLibrary(oldScaling - 1/4f);
-        } catch (Exception ex) {
-            logger.warning("Failed to retrieve scaled image library.");
-            //im = getFreeColClient().getImageLibrary();
-        }
-        getFreeColClient().getGUI().setImageLibrary(im);
-        getFreeColClient().getGUI().forceReposition();
-        getFreeColClient().getCanvas().refresh();
-        
+        getFreeColClient().getGUI().scaleMap(-1/4f);
         update();
         freeColClient.getActionManager().getFreeColAction(ZoomInAction.id).update();
     }

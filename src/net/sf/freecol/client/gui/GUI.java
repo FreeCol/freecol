@@ -215,6 +215,9 @@ public final class GUI {
 
     private final FreeColClient freeColClient;
     private Dimension size;
+    /**
+     * Scaled ImageLibrary only used for map painting.
+     */
     private ImageLibrary lib;
     private TerrainCursor cursor;
     private ViewMode viewMode;
@@ -343,7 +346,7 @@ public final class GUI {
 
     }
     
-    public void setImageLibrary(ImageLibrary lib) {
+    private void setImageLibrary(ImageLibrary lib) {
         this.lib = lib;
         cursorImage = lib.getMiscImage(ImageLibrary.UNIT_SELECT);
         // ATTENTION: we assume that all base tiles have the same size
@@ -1374,7 +1377,7 @@ public final class GUI {
         */
         if (darkUnits.size() > 0) {
             g.setColor(Color.BLACK);
-            final Image im = getImageLibrary().getMiscImage(ImageLibrary.DARKNESS);
+            final Image im = lib.getMiscImage(ImageLibrary.DARKNESS);
             for (int index=0; index<darkUnits.size(); index++) {
                 final Unit u = darkUnits.get(index);
                 final int x = darkUnitsX.get(index);
@@ -2001,10 +2004,10 @@ public final class GUI {
                     } else {
                         int dx = 0, dy = 0;
                         switch(d) {
-                        case NW: dx = 64; dy = -32; break;
-                        case NE: dx = 64; dy = 32; break;
-                        case SE: dx = -64; dy = 32; break;
-                        case SW: dx = -64; dy = -32; break;
+                        case NW: dx = tileWidth/2; dy = -tileHeight/2; break;
+                        case NE: dx = tileWidth/2; dy = tileHeight/2; break;
+                        case SE: dx = -tileWidth/2; dy = tileHeight/2; break;
+                        case SW: dx = -tileWidth/2; dy = -tileHeight/2; break;
                         }
                         if (tile1 != null && tile1.getOwner() == owner) {
                             // short straight line
@@ -2015,10 +2018,10 @@ public final class GUI {
                             Direction previous2 = previous.getPreviousDirection();
                             int ddx = 0, ddy = 0;
                             switch(d) {
-                            case NW: ddy = -64; break;
-                            case NE: ddx = 128; break;
-                            case SE: ddy = 64; break;
-                            case SW: ddx = -128; break;
+                            case NW: ddy = -tileHeight; break;
+                            case NE: ddx = tileWidth; break;
+                            case SE: ddy = tileHeight; break;
+                            case SW: ddx = -tileWidth; break;
                             }
                             path.quadTo(controlPoints.get(previous).width + dx,
                                         controlPoints.get(previous).height + dy,
@@ -2151,7 +2154,8 @@ public final class GUI {
                 return;
             } else if (improvement.getType().getArtOverlay() != null) {
                 // Has its own Overlay Image in Misc, use it
-                g.drawImage(ResourceManager.getImage(improvement.getType().getArtOverlay()), x, y, null);
+                g.drawImage(ResourceManager.getImage(improvement.getType().getArtOverlay(),
+                                                     lib.getScalingFactor()), x, y, null);
             } else if (improvement.isRiver() && improvement.getMagnitude() < TileImprovement.FJORD_RIVER) {
                 g.drawImage(lib.getRiverImage(improvement.getStyle()), x, y, null);
             } else if (improvement.isRoad()) {
@@ -3420,11 +3424,32 @@ public final class GUI {
 
 
     /**
-     * Returns the ImageLibrary that this GUI uses to draw stuff.
-     * @return The ImageLibrary that this GUI uses to draw stuff.
+     * Get the current scale of the map.
+     *
+     * @return a <code>float</code> value
      */
-    public ImageLibrary getImageLibrary() {
-        return lib;
+    public float getMapScale() {
+        return lib.getScalingFactor();
+    }
+
+    /**
+     * Change the scale of the map by delta.
+     *
+     * @param delta a <code>float</code> value
+     */
+    public void scaleMap(float delta) {
+        float newScale = lib.getScalingFactor() + delta;
+        try {
+            if (newScale >= 1f) {
+                setImageLibrary(freeColClient.getImageLibrary());
+            } else {
+                setImageLibrary(freeColClient.getImageLibrary().getScaledImageLibrary(newScale));
+            }
+        } catch (Exception ex) {
+            logger.warning("Failed to retrieve scaled image library.");
+        }
+        forceReposition();
+        freeColClient.getCanvas().refresh();
     }
 
     /**

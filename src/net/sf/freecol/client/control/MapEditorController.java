@@ -99,10 +99,7 @@ public final class MapEditorController {
             gui.setInGame(true);
             
             // We may need to reset the zoom value to the default value
-            ImageLibrary im = freeColClient.getImageLibrary();
-            if(gui.getImageLibrary() != im){
-            	gui.setImageLibrary(im);
-            }
+            gui.scaleMap(2f);
             
             freeColClient.getFrame().setJMenuBar(new MapEditorMenuBar(freeColClient));
             JInternalFrame f = freeColClient.getCanvas().addAsToolBox(new MapEditorTransformPanel(canvas));

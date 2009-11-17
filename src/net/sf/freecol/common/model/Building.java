@@ -378,20 +378,20 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public void remove(final Locatable locatable) {
         if (!(locatable instanceof Unit)) {
-        	throw new IllegalStateException("Can only remove units from building.");
+            throw new IllegalStateException("Can only remove units from building.");
         }
         Unit unit = (Unit) locatable;
         
         if (units.remove(unit)) {
-        	unit.setMovesLeft(0);
-        	firePropertyChange(Building.UNIT_CHANGE,unit,null);
-                // TODO: can we cheaply report the real change?
-                GoodsType output = getGoodsOutputType();
-                if (output != null) {
-                    firePropertyChange(output.getId(),
-                                       new AbstractGoods(output, 1),
-                                       new AbstractGoods(output, 0));
-                }
+            unit.setMovesLeft(0);
+            firePropertyChange(Building.UNIT_CHANGE,unit,null);
+            // TODO: can we cheaply report the real change?
+            GoodsType output = getGoodsOutputType();
+            if (output != null) {
+                firePropertyChange(output.getId(),
+                                   new AbstractGoods(output, 1),
+                                   new AbstractGoods(output, 0));
+            }
         }
     }
 
