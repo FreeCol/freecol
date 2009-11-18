@@ -530,11 +530,11 @@ public abstract class FreeColObject {
     protected <T> List<T> readFromListElement(String tagName, XMLStreamReader in, Class<T> type)
         throws XMLStreamException {
         if (!in.getLocalName().equals(tagName)) {
-            in.nextTag();
+            throw new XMLStreamException(tagName + " expected, not:" + in.getLocalName());
         }
         final int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
         List<T> list = new ArrayList<T>(length);
-        for (int x=0; x<length; x++) {
+        for (int x = 0; x < length; x++) {
             try {
                 final String value = in.getAttributeValue(null, "x" + Integer.toString(x));
                 final T object;
@@ -555,8 +555,9 @@ public abstract class FreeColObject {
                 throw new RuntimeException(e);
             }
         }
-
-        in.nextTag();
+        if (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            throw new XMLStreamException(tagName + " end expected, not: " + in.getLocalName());
+        }
         return list;
     }
 

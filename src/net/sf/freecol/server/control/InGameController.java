@@ -1399,7 +1399,6 @@ public final class InGameController extends Controller {
         Tile tile = unit.getTile();
         Player player = unit.getOwner();
         RumourType rumour = lostCity.getType();
-
         if (rumour != null) {
             // Filter out failing cases that could only occur if the
             // type was explicitly set in debug mode.
@@ -1445,12 +1444,12 @@ public final class InGameController extends Controller {
         int percentNeutral;
         int percentBad;
         int percentGood;
-
-        if (hasDeSoto) {
+        if (hasDeSoto && isExpertScout) {
             percentBad  = 0;
             percentGood = 100;
             percentNeutral = 0;
-        } else { // First, get "basic" percentages
+        } else {
+            // First, get "basic" percentages
             percentBad  = BAD_EVENT_PERCENTAGE[difficulty];
             percentGood = GOOD_EVENT_PERCENTAGE[difficulty];
 
@@ -1495,8 +1494,9 @@ public final class InGameController extends Controller {
 
         // The SPECIAL
         // Right now, these are considered "good" events that happen randomly.
-        int eventDorado   = 13;
-        int eventFountain = 7;
+        int eventRuins    = 9;
+        int eventCibola   = 6;
+        int eventFountain = 5;
 
         // Finally, apply the Good/Bad/Neutral modifiers from
         // above, so that we end up with a ton of values, some of
@@ -1507,7 +1507,8 @@ public final class InGameController extends Controller {
         eventLearn        *= percentGood;
         eventTrinkets     *= percentGood;
         eventColonist     *= percentGood;
-        eventDorado       *= percentGood;
+        eventRuins        *= percentGood;
+        eventCibola       *= percentGood;
         eventFountain     *= percentGood;
 
         // Add all possible events to a RandomChoice List
@@ -1530,11 +1531,14 @@ public final class InGameController extends Controller {
         if (eventColonist > 0) {
             choices.add(new RandomChoice<RumourType>(RumourType.COLONIST, eventColonist));
         }
+        if (eventRuins > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.RUINS, eventRuins));
+        }
+        if (eventCibola > 0) {
+            choices.add(new RandomChoice<RumourType>(RumourType.CIBOLA, eventCibola));
+        }
         if (eventFountain > 0) {
             choices.add(new RandomChoice<RumourType>(RumourType.FOUNTAIN_OF_YOUTH, eventFountain));
-        }
-        if (eventDorado > 0) {
-            choices.add(new RandomChoice<RumourType>(RumourType.TREASURE, eventDorado));
         }
         return RandomChoice.getWeightedRandom(getPseudoRandom(), choices);
     }
@@ -1546,16 +1550,21 @@ public final class InGameController extends Controller {
      * @param serverPlayer The <code>ServerPlayer</code> that owns the unit.
      * @return A list of FreeColObjects to send to the client as a result.
      */
-    public List<FreeColObject> exploreLostCityRumour(ServerPlayer serverPlayer, Unit unit) {
+    public List<FreeColObject> exploreLostCityRumour(ServerPlayer serverPlayer,
+                                                     Unit unit) {
         List<FreeColObject> result = new ArrayList<FreeColObject>();
+        Tile tile = unit.getTile();
+        LostCityRumour lostCity = tile.getLostCityRumour();
+        if (lostCity == null) return result;
+
         Specification specification = FreeCol.getSpecification();
         int difficulty = specification.getRangeOption("model.option.difficulty").getValue();
         int dx = 10 - difficulty;
         Game game = unit.getGame();
-        Tile tile = unit.getTile();
-        LostCityRumour lostCity = tile.getLostCityRumour();
+        UnitType unitType;
+        Unit newUnit = null;
+        List<UnitType> treasureUnitTypes = null;
 
-        if (lostCity == null) return result;
         switch (getLostCityRumourType(lostCity, unit, difficulty)) {
         case BURIAL_GROUND:
             Player indianPlayer = tile.getOwner();
@@ -1603,29 +1612,57 @@ public final class InGameController extends Controller {
             break;
         case COLONIST:
             List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
-            Unit newUnit = new Unit(game, tile, serverPlayer,
-                                    newUnitTypes.get(getPseudoRandom().nextInt(newUnitTypes.size())),
-                                    UnitState.ACTIVE);
+            newUnit = new Unit(game, tile, serverPlayer,
+                               newUnitTypes.get(getPseudoRandom().nextInt(newUnitTypes.size())),
+                               UnitState.ACTIVE);
             result.add(new ModelMessage(serverPlayer,
                                         ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         newUnit,
                                         "lostCityRumour.Colonist"));
             break;
-        case TREASURE:
-            List<UnitType> treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
-            int treasureAmount = getPseudoRandom().nextInt(dx * 600) + dx * 300;
-            String treasureString = String.valueOf(treasureAmount);
-            UnitType unitType = treasureUnitTypes.get(getPseudoRandom().nextInt(treasureUnitTypes.size()));
-            newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
-            newUnit.setTreasureAmount(treasureAmount);
+        case CIBOLA:
+            String cityName = game.getCityOfCibola();
+            if (cityName != null) {
+                int treasureAmount = getPseudoRandom().nextInt(dx * 600) + dx * 300;
+                String treasureString = String.valueOf(treasureAmount);
+                if (treasureUnitTypes == null) {
+                    treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
+                }
+                unitType = treasureUnitTypes.get(getPseudoRandom().nextInt(treasureUnitTypes.size()));
+                newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
+                newUnit.setTreasureAmount(treasureAmount);
+                result.add(new ModelMessage(serverPlayer,
+                                            ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                            newUnit,
+                                            "lostCityRumour.Cibola",
+                                            "%city%", cityName,
+                                            "%money%", treasureString));
+                result.add(new HistoryEvent(game.getTurn().getNumber(),
+                                            HistoryEvent.Type.CITY_OF_CIBOLA,
+                                            "%city%", cityName,
+                                            "%treasure%", treasureString));
+                break;
+            }
+            // Fall through, found all the cities of gold.
+        case RUINS:
+            int ruinsAmount = getPseudoRandom().nextInt(dx * 2) * 300 + 50;
+            String ruinsString = String.valueOf(ruinsAmount);
+            if (ruinsAmount < 500) { // TODO remove magic number
+                serverPlayer.modifyGold(ruinsAmount);
+                result.add(serverPlayer);
+            } else {
+                if (treasureUnitTypes == null) {
+                    treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
+                }
+                unitType = treasureUnitTypes.get(getPseudoRandom().nextInt(treasureUnitTypes.size()));
+                newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
+                newUnit.setTreasureAmount(ruinsAmount);
+            }
             result.add(new ModelMessage(serverPlayer,
                                         ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                        newUnit,
-                                        "lostCityRumour.TreasureTrain",
-                                        "%money%", treasureString));
-            result.add(new HistoryEvent(game.getTurn().getNumber(),
-                                        HistoryEvent.Type.CITY_OF_GOLD,
-                                        "%treasure%", treasureString));
+                                        ((newUnit != null) ? newUnit : unit),
+                                        "lostCityRumour.Ruins",
+                                        "%money%", ruinsString));
             break;
         case FOUNTAIN_OF_YOUTH:
             Europe europe = serverPlayer.getEurope();

@@ -30,22 +30,23 @@ public class HistoryEvent extends FreeColObject {
 
     public static enum Type {
         DISCOVER_NEW_WORLD,
-            DISCOVER_REGION,
-            MEET_NATION,
-            CITY_OF_GOLD,
-            FOUND_COLONY,
-            ABANDON_COLONY,
-            CONQUER_COLONY,
-            COLONY_DESTROYED,
-            COLONY_CONQUERED,
-            DESTROY_SETTLEMENT,
-            // TODO: when exactly is a European nation destroyed?
-            DESTROY_NATION,
-            NATION_DESTROYED,
-            FOUNDING_FATHER,
-            DECLARE_INDEPENDENCE,
-            INDEPENDENCE,
-            SPANISH_SUCCESSION }
+        DISCOVER_REGION,
+        MEET_NATION,
+        CITY_OF_CIBOLA,
+        FOUND_COLONY,
+        ABANDON_COLONY,
+        CONQUER_COLONY,
+        COLONY_DESTROYED,
+        COLONY_CONQUERED,
+        DESTROY_SETTLEMENT,
+        // TODO: when exactly is a European nation destroyed?
+        DESTROY_NATION,
+        NATION_DESTROYED,
+        FOUNDING_FATHER,
+        DECLARE_INDEPENDENCE,
+        INDEPENDENCE,
+        SPANISH_SUCCESSION
+    }
             
 
     /**

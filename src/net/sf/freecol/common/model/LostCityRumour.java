@@ -54,7 +54,8 @@ public class LostCityRumour extends TileItem {
         LEARN,
         TRIBAL_CHIEF,
         COLONIST,
-        TREASURE,
+        RUINS,
+        CIBOLA,
         FOUNTAIN_OF_YOUTH
     }
 
@@ -218,5 +219,3 @@ public class LostCityRumour extends TileItem {
     }
 
 }
-
-

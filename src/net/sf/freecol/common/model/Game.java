@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.NationOptions.NationState;
 
 /**
@@ -94,6 +95,11 @@ public class Game extends FreeColGameObject {
     protected ModelController modelController;
 
     protected FreeColGameObjectListener freeColGameObjectListener;
+
+    /**
+     * The cities of Cibola remaining in this game.
+     */
+    private List<String> citiesOfCibola = null;
 
     /**
      * The combat model this game uses. At the moment, the only combat
@@ -764,6 +770,29 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Get the next name for a city of Cibola.
+     *
+     * @return The next name for a city of Cibola, or null if none available.
+     */
+    public String getCityOfCibola() {
+        if (citiesOfCibola == null) {
+            // First time we have been asked for a City of Gold.
+            // Pull them out of the messages file and randomize the order.
+            citiesOfCibola = new ArrayList<String>();
+            PseudoRandom random = getModelController().getPseudoRandom();
+            String prefix = "lostCityRumour.cityName.";
+            String name;
+            int n = 0;
+            while (Messages.containsKey(name = prefix + Integer.toString(n))) {
+                citiesOfCibola.add(random.nextInt(n+1), Messages.message(name));
+                n++;
+            }
+        }
+        return (citiesOfCibola == null || citiesOfCibola.size() == 0) ? null
+            : citiesOfCibola.remove(0);
+    }
+
+    /**
      * This method writes an XML-representation of this object to the given
      * stream.
      * 
@@ -805,6 +834,9 @@ public class Game extends FreeColGameObject {
             out.writeAttribute("nextID", Integer.toString(nextId));
         }
 
+        if (citiesOfCibola != null) {
+            toListElement("citiesOfCibola", citiesOfCibola, out);
+        }
         gameOptions.toXML(out);
         nationOptions.toXML(out);
 
@@ -894,6 +926,8 @@ public class Game extends FreeColGameObject {
             } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
                 ModelMessage message = new ModelMessage();
                 message.readFromXML(in, this);
+            } else if (in.getLocalName().equals("citiesOfCibola")) {
+                citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
                 in.nextTag();
