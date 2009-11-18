@@ -336,7 +336,8 @@ public final class InGameController extends Controller {
         element.appendChild(messages);
         ModelMessage m = new ModelMessage(serverPlayer,
                                           ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                          serverPlayer, "model.diplomacy.dead",
+                                          serverPlayer,
+                                          ((serverPlayer.isEuropean()) ? "model.diplomacy.dead.european" : "model.diplomacy.dead.native"),
                                           "%nation%", serverPlayer.getNationAsString());
         messages.appendChild(m.toXMLElement(doc));
 
