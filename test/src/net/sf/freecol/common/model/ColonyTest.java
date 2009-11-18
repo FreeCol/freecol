@@ -188,4 +188,35 @@ public class ColonyTest extends FreeColTestCase {
 
 
     }
+
+    public void testTeaParty() {
+        Game game = getGame();
+        game.setMap(getTestMap(plainsType,true));
+        Colony colony = getStandardColony(5);
+
+        colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
+        colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
+        colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));
+
+        int modifierCount = 0;
+        for (Modifier existingModifier : colony.getFeatureContainer().getModifierSet("model.goods.bells")) {
+            if (spec().COLONY_GOODS_PARTY.equals(existingModifier.getSource())) {
+                modifierCount++;
+            }
+        }
+        assertEquals(1, modifierCount);
+
+        Turn newTurn = new Turn(game.getTurn().getNumber() + 1);
+        colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(newTurn));
+
+        modifierCount = 0;
+        for (Modifier existingModifier : colony.getFeatureContainer().getModifierSet("model.goods.bells")) {
+            if (spec().COLONY_GOODS_PARTY.equals(existingModifier.getSource())) {
+                modifierCount++;
+            }
+        }
+        assertEquals(2, modifierCount);
+
+    }
+
 }

@@ -2264,25 +2264,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 exportData.put(data.getId(), data);
             } else if (Modifier.getXMLElementTagName().equals(in.getLocalName())) {
                 Modifier modifier = new Modifier(in, Specification.getSpecification());
-                if (Specification.COLONY_GOODS_PARTY.equals(modifier.getSource())) {
-                    Set<Modifier> bellsBonus = featureContainer.getModifierSet("model.goods.bells");
-                    for (Modifier existingModifier : bellsBonus) {
-                        if (Specification.COLONY_GOODS_PARTY.equals(existingModifier.getSource()) &&
-                            modifier.getType() == existingModifier.getType() ) {
-                            // there is a already existing goods party modifier.. dont add again..
-                            /* TODO: this is only a work-around; the
-                               actual problem is that we did not
-                               override equals() and hashcode() for
-                               Feature and subclasses.  I *think* this
-                               is the only place where this is a
-                               problem, but I may be mistaken.
-                            */
-                            continue loop;
-                        }
-                    }
-                    // found no matching modifier
-                    featureContainer.addModifier(modifier);
-                }
+                featureContainer.addModifier(modifier);
             } else if ("buildQueue".equals(in.getLocalName())) {
                 buildQueue.clear();
                 int size = getAttribute(in, ARRAY_SIZE, 0);
