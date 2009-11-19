@@ -1523,6 +1523,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             updateSoLLabel();
         } else if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {
             updateTilePanel();
+            updateProductionPanel();
         } else if (property.startsWith("model.goods.")) {
             updateProductionPanel();
         } else if (Building.UNIT_CHANGE.equals(property)){
