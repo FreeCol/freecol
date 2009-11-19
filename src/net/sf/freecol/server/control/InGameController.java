@@ -1302,8 +1302,9 @@ public final class InGameController extends Controller {
         // Create the recruit, move it to the docks.
         Europe europe = player.getEurope();
         UnitType recruitType = europe.getRecruitable(index);
-        Unit unit = new Unit(getGame(), europe, player, recruitType,
-                             UnitState.ACTIVE, recruitType.getDefaultEquipment());
+        Game game = getGame();
+        Unit unit = new Unit(game, europe, player, recruitType, UnitState.ACTIVE,
+                             recruitType.getDefaultEquipment());
         unit.setLocation(europe);
 
         // Update immigration counters if this was an ordinary decision to migrate.
@@ -1313,7 +1314,13 @@ public final class InGameController extends Controller {
         }
 
         // Replace the recruit we used.
-        europe.setRecruitable(index, player.generateRecruitable(player.getId() + "slot." + Integer.toString(slot)));
+        // This annoying taskId stuff can go away when
+        // addFather/generateRecruitable moves server-side.
+        String taskId = player.getId()
+            + ".emigrate." + game.getTurn().toString()
+            + ".slot." + Integer.toString(slot)
+            + "." + Integer.toString(getPseudoRandom().nextInt(1000000));
+        europe.setRecruitable(index, player.generateRecruitable(taskId));
 
         // Return an informative message only if this was an ordinary migration
         // where we did not select the unit type.
