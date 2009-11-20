@@ -139,7 +139,7 @@ public class ListOption<T> extends AbstractOption {
         if (id == null && getId().equals("NO_ID")){
             throw new XMLStreamException("invalid <" + getXMLElementTagName() + "> tag : no id attribute found.");
         }
-        
+        in.nextTag();
         setValueIds(readFromListElement("value", in, String.class));
         
         in.nextTag();
