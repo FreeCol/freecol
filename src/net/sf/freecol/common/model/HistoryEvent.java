@@ -32,7 +32,7 @@ public class HistoryEvent extends FreeColObject {
         DISCOVER_NEW_WORLD,
         DISCOVER_REGION,
         MEET_NATION,
-        CITY_OF_CIBOLA,
+        CITY_OF_GOLD,
         FOUND_COLONY,
         ABANDON_COLONY,
         CONQUER_COLONY,

@@ -1645,7 +1645,7 @@ public final class InGameController extends Controller {
                                             "%city%", cityName,
                                             "%money%", treasureString));
                 result.add(new HistoryEvent(game.getTurn().getNumber(),
-                                            HistoryEvent.Type.CITY_OF_CIBOLA,
+                                            HistoryEvent.Type.CITY_OF_GOLD,
                                             "%city%", cityName,
                                             "%treasure%", treasureString));
                 break;
