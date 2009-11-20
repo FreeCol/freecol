@@ -325,6 +325,18 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
+     * How much of a goods type can be exported from this colony?
+     *
+     * @param goodsType The <code>GoodsType</code> to export.
+     * @return The amount of this type of goods available for export.
+     */
+    public int getExportAmount(GoodsType goodsType) {
+        ExportData data = getExportData(goodsType);
+        return getGoodsContainer().getGoodsCount(goodsType)
+            - data.getExportLevel();
+    }
+
+    /**
      * Returns whether this colony is landlocked, or has access to water.
      * 
      * @return <code>true</code> if there are no adjacent tiles to this

@@ -482,64 +482,55 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Get the current stop.
+     * Get the stop the unit is heading for or at.
      * 
-     * @return the current stop.
+     * @return The target stop.
      */
-    public Stop getCurrentStop() {
-        ArrayList<Stop> stops = getTradeRoute().getStops();
-        if (currentStop < 0 || currentStop >= stops.size()) {
-            // currentStop can be out of range if trade route is modified
-            currentStop = 0;
-        }
-        return (currentStop >= stops.size()) ? null : stops.get(currentStop);
+    public Stop getStop() {
+        return (validateCurrentStop() < 0) ? null
+            : getTradeRoute().getStops().get(currentStop);
     }
 
     /**
-     * Set current stop to the next valid stop if any.
-     * TODO: This should be a server-only method, which is called from the
-     *   UpdateCurrentStopMessage handler.
-     */
-    public void nextStop() {
-        ArrayList<Stop> stops = getTradeRoute().getStops();
-        if (currentStop < 0 || currentStop >= stops.size()) {
-            currentStop = 0;
-        }
-        int oldStop = currentStop;
-        do {
-            if (++currentStop >= stops.size()) currentStop = 0;
-        } while (currentStop != oldStop && !shouldGoToStop(stops.get(currentStop)));
-        // if there is no valid stop, keep in current stop waiting to load
-        setDestination((stops.size() == 0) ? null
-                       : stops.get(currentStop).getLocation());
-    }
-    
-    /**
-     * Returns true if the Unit should proceed to the given stop.
+     * Get the current stop.
      *
-     * @param stop a <code>Stop</code> value
-     * @return a <code>boolean</code> value
+     * @return The current stop (an index in stops).
      */
-    private boolean shouldGoToStop(Stop stop) {
-        ArrayList<GoodsType> goodsTypes = stop.getCargo();
-        for(Goods goods : getGoodsList()) {
-            boolean unload = true;
-            for (int index = 0; index < goodsTypes.size(); index++) {
-                if (goods.getType() == goodsTypes.get(index)) {
-                    goodsTypes.remove(index);
-                    unload = false;
-                    break;
+    public int getCurrentStop() {
+        return currentStop;
+    }
+
+    /**
+     * Set the current stop.
+     *
+     * @param currentStop A new value for the currentStop.
+     */
+    public void setCurrentStop(int currentStop) {
+        this.currentStop = currentStop;
+    }
+
+    /**
+     * Validate and return the current stop.
+     *
+     * @return The current stop (an index in stops).
+     */
+    public int validateCurrentStop() {
+        if (tradeRoute == null) {
+            currentStop = -1;
+        } else {
+            ArrayList<Stop> stops = tradeRoute.getStops();
+            if (stops == null || stops.size() == 0) {
+                currentStop = -1;
+            } else {
+                if (currentStop < 0 || currentStop >= stops.size()) {
+                    // The current stop can become out of range if the trade
+                    // route is modified.
+                    currentStop = 0;
                 }
             }
-            if (unload) { // There is goods to unload
-                return true;
-            }
         }
-        // All loaded goods are in cargo list
-        // go to stop only if there is something to load
-        return getSpaceLeft() > 0 && goodsTypes.size() > 0;
+        return currentStop;
     }
-
 
     /**
      * Checks if the treasure train can be cashed in at it's current

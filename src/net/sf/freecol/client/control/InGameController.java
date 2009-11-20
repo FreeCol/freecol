@@ -247,6 +247,7 @@ public final class InGameController implements NetworkConstants {
         canvas.removeInGameComponents();
         freeColClient.getConnectController().loadGame(file);
     }
+
     
     /**
      * Sets the "debug mode" to be active or not. Calls
@@ -260,12 +261,20 @@ public final class InGameController implements NetworkConstants {
         freeColClient.updateMenuBar();
     }
 
+
     /**
      * Sends the specified message to the server and returns the reply,
      * if it has the specified tag.
      * Handle "error" replies if they have a messageID or when in debug mode.
      * This routine allows code simplification in much of the following
      * client-server communication.
+     *
+     * In following routines we follow the convention that server I/O
+     * is confined to the ask<foo>() routine, which typically returns
+     * true if the server interaction succeeded, which does *not*
+     * necessarily imply that the actual substance of the request was
+     * allowed (e.g. a move may result in the death of a unit rather
+     * than actually moving).
      *
      * @param element The <code>Element</code> (root element in a
      *        DOM-parsed XML tree) that holds all the information
@@ -333,43 +342,12 @@ public final class InGameController implements NetworkConstants {
         game.setCurrentPlayer(player);
 
         if (freeColClient.getMyPlayer().equals(player)) {
-            autosaveGame();
-            removeUnitsOutsideLOS();
-
-            if (player.checkEmigrate()) {
-                if (player.hasAbility("model.ability.selectRecruit")
-                    && player.getEurope().recruitablesDiffer()) {
-                    Canvas canvas = freeColClient.getCanvas();
-                    int index = canvas.showEmigrationPanel(false);
-                    emigrateUnitInEurope(index + 1);
-                } else {
-                    emigrateUnitInEurope(0);
-                }
-            }
-
-            if (!freeColClient.isSingleplayer()) {
-                freeColClient.playSound(player.getNation().getAnthem());
-            }
-            
-            checkTradeRoutesInEurope();
-            displayModelMessages(true);
-            nextActiveUnit();
-        }
-        logger.finest("Exiting client setCurrentPlayer("
-                      + player.getName() + ")");
-    }
-
-    /**
-     * Autosave the game.
-     */
-    private void autosaveGame() {
-        if (freeColClient.getFreeColServer() != null) {
-            Game game = freeColClient.getGame();
+            // Autosave the game.
             ClientOptions options = freeColClient.getClientOptions();
             int savegamePeriod = options.getInteger(ClientOptions.AUTOSAVE_PERIOD);
             int turnNumber = game.getTurn().getNumber();
-            if (savegamePeriod == 1 || (savegamePeriod != 0
-                                        && turnNumber % savegamePeriod == 0)) {
+            if (savegamePeriod == 1
+                || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
                 String filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
                     + '-' + game.getTurn().toSaveGameString() + ".fsg";
                 File saveGameFile = new File(FreeCol.getAutosaveDirectory(),
@@ -384,30 +362,57 @@ public final class InGameController implements NetworkConstants {
                     }
                 }
             }
-        }
-    }
 
-    /**
-     * Removes the units we cannot see anymore from the map.
-     */
-    private void removeUnitsOutsideLOS() {
-        Player player = freeColClient.getMyPlayer();
-        Map map = freeColClient.getGame().getMap();
-
-        player.resetCanSeeTiles();
-
-        Iterator<Position> tileIterator = map.getWholeMapIterator();
-        while (tileIterator.hasNext()) {
-            Tile t = map.getTile(tileIterator.next());
-            if (t != null && !player.canSee(t) && t.getFirstUnit() != null) {
-                if (t.getFirstUnit().getOwner() == player) {
-                    logger.warning("Could not see one of my own units!");
+            // Removes the units we cannot see anymore from the map.
+            Map map = game.getMap();
+            player.resetCanSeeTiles();
+            Iterator<Position> tileIterator = map.getWholeMapIterator();
+            while (tileIterator.hasNext()) {
+                Tile t = map.getTile(tileIterator.next());
+                if (t != null && !player.canSee(t)
+                    && t.getFirstUnit() != null) {
+                    if (t.getFirstUnit().getOwner() == player) {
+                        logger.warning("Could not see one of my own units!");
+                    }
+                    t.disposeAllUnits();
                 }
-                t.disposeAllUnits();
             }
-        }
+            player.resetCanSeeTiles();
 
-        player.resetCanSeeTiles();
+            // Check for emigration.
+            if (player.checkEmigrate()) {
+                if (player.hasAbility("model.ability.selectRecruit")
+                    && player.getEurope().recruitablesDiffer()) {
+                    Canvas canvas = freeColClient.getCanvas();
+                    int index = canvas.showEmigrationPanel(false);
+                    emigrateUnitInEurope(index + 1);
+                } else {
+                    emigrateUnitInEurope(0);
+                }
+            }
+
+            // Follow trade routes for units in Europe.
+            Europe europe = player.getEurope();
+            if (europe != null) {
+                List<Unit> units = europe.getUnitList();
+                for (Unit unit : units) {
+                    if (unit.getTradeRoute() != null && unit.isInEurope()) {
+                        // Must call isInEurope to filter out units in
+                        // Europe but in the TO_EUROPE or TO_AMERICA states.
+                        followTradeRoute(unit);
+                    }
+                }
+            }
+
+            // GUI management.
+            if (!freeColClient.isSingleplayer()) {
+                freeColClient.playSound(player.getNation().getAnthem());
+            }
+            displayModelMessages(true);
+            nextActiveUnit();
+        }
+        logger.finest("Exiting client setCurrentPlayer("
+                      + player.getName() + ")");
     }
 
     /**
@@ -443,6 +448,93 @@ public final class InGameController implements NetworkConstants {
         Connection conn = client.getConnection();
         freeColClient.getInGameInputHandler().handle(conn, reply);
     }
+
+    /**
+     * Follow a trade route.
+     *
+     * @param unit The <code>Unit</code> to move.
+     */
+    private void followTradeRoute(Unit unit) {
+        // Complain and return if the stop is no longer valid.
+        Canvas canvas = freeColClient.getCanvas();
+        Stop stop = unit.getStop();
+        if (!TradeRoute.isStopValid(unit, stop)) {
+            canvas.showInformationMessage("traderoute.broken",
+                                          "%name%",
+                                          unit.getTradeRoute().getName());
+            return;
+        }
+
+        // Return if the stop is Europe but the unit has not arrived yet.
+        if (freeColClient.getMyPlayer().getEurope() == stop.getLocation()
+            && !unit.isInEurope()) {
+            return;
+        }
+
+        if (unit.getInitialMovesLeft() == unit.getMovesLeft()) {
+            // The unit was already at the stop at the beginning of the
+            // turn, so loading is allowed.
+            logger.fine("Load unit " + unit.getId()
+                        + " in trade route " + unit.getTradeRoute().getName()
+                        + " at " + stop.getLocation().getLocationName());
+            if (unit.isInEurope()) {
+                buyTradeGoodsFromEurope(unit);
+            } else {
+                loadTradeGoodsFromColony(unit);
+            }
+
+            // Update to next stop, and move towards it unless the
+            // unit is already there.
+            if (askUpdateCurrentStop(unit)) {
+                Stop nextStop = unit.getStop();
+                if (nextStop != null
+                    && nextStop.getLocation() != unit.getColony()) {
+                    if (unit.isInEurope()) {
+                        moveToAmerica(unit);
+                    } else {
+                        moveToDestination(unit);
+                    }
+                }
+            }
+
+            // The unit may need to wait because there are not enough
+            // goods in warehouse yet.
+            if (stop.getLocation().getTile()
+                == unit.getStop().getLocation().getTile()) {
+                unit.setMovesLeft(0); // TODO: should be in the server
+            }
+        } else {
+            // The unit has just arrived, stop here and unload.
+            logger.fine("Unload unit " + unit.getId()
+                        + " in trade route " + unit.getTradeRoute().getName()
+                        + " at " + stop.getLocation().getLocationName());
+            if (unit.isInEurope()) {
+                sellTradeGoodsInEurope(unit);
+            } else {
+                unloadTradeGoodsToColony(unit);
+            }
+            unit.setMovesLeft(0); // TODO: should be in the server
+        }
+    }
+
+    /**
+     * Handle server query-response for updating the current stop.
+     *
+     * @param unit The <code>Unit</code> whose stop is to be updated.
+     * @return True if the query-response succeeds.
+     */
+    private boolean askUpdateCurrentStop(Unit unit) {
+        Client client = freeColClient.getClient();
+        UpdateCurrentStopMessage message = new UpdateCurrentStopMessage(unit);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "update");
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
 
     /**
      * Moves the active unit in a specified direction. This may result in an
@@ -523,7 +615,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (unit.getTradeRoute() != null) {
-            Stop currStop = unit.getCurrentStop();
+            Stop currStop = unit.getStop();
             if (!TradeRoute.isStopValid(unit, currStop)) {
                 String oldTradeRouteName = unit.getTradeRoute().getName();
                 logger.info("Trade unit " + unit.getId()
@@ -539,13 +631,13 @@ public final class InGameController implements NetworkConstants {
                 // Trade unit is at current stop
                 logger.info("Trade unit " + unit.getId()
                             + " in route " + unit.getTradeRoute().getName()
-                            + " is at " + unit.getCurrentStop().getLocation().getLocationName());
+                            + " is at " + unit.getStop().getLocation().getLocationName());
                 followTradeRoute(unit);
                 return;
             } else {
                 logger.info("Unit " + unit.getId()
                             + " is a trade unit in route " + unit.getTradeRoute().getName()
-                            + ", going to " + unit.getCurrentStop().getLocation().getLocationName());
+                            + ", going to " + unit.getStop().getLocation().getLocationName());
             }
         } else {
             logger.info("Moving unit " + unit.getId()
@@ -663,90 +755,8 @@ public final class InGameController implements NetworkConstants {
         }
     }
 
-    private void checkTradeRoutesInEurope() {
-        Europe europe = freeColClient.getMyPlayer().getEurope();
-        if (europe == null) {
-            return;
-        }
-        List<Unit> units = europe.getUnitList();
-        for(Unit unit : units) {
-            // Process units that have a trade route and
-            //are actually in Europe, not bound to/from
-            if (unit.getTradeRoute() != null && unit.isInEurope()) {
-                followTradeRoute(unit);
-            }
-        }
-    }
-
-    private void followTradeRoute(Unit unit) {
-        Stop stop = unit.getCurrentStop();
-        if (!TradeRoute.isStopValid(unit, stop)) {
-            freeColClient.getCanvas().showInformationMessage("traderoute.broken",
-                                                             "%name%",
-                                                             unit.getTradeRoute().getName());
-            return;
-        }
-
-        boolean inEurope = unit.isInEurope();
-        
-        // ship has not arrived in europe yet
-        if (freeColClient.getMyPlayer().getEurope() == stop.getLocation() &&
-            !inEurope) {
-            return;
-        }
-        
-        // Unit was already in this location at the beginning of the turn
-        // Allow loading
-        if (unit.getInitialMovesLeft() == unit.getMovesLeft()){
-            Stop oldStop = unit.getCurrentStop();
-                
-            if (inEurope) {
-                buyTradeGoodsFromEurope(unit);
-            } else {
-                loadTradeGoodsFromColony(unit);
-            }
-              
-            // Set destination to next stop's location
-            UpdateCurrentStopMessage message = new UpdateCurrentStopMessage(unit);
-            Element reply = askExpecting(freeColClient.getClient(),
-                                         message.toXMLElement(), "update");
-            if (reply != null) {
-                freeColClient.getInGameInputHandler().update(reply);
-
-                Stop nextStop = unit.getCurrentStop();
-                // Advanced to next stop, but the unit can already be there
-                // waiting to load
-                if (nextStop != null && nextStop.getLocation() != unit.getColony()) {
-                    if (unit.isInEurope()) {
-                        moveToAmerica(unit);
-                    } else {
-                        moveToDestination(unit);
-                    }
-                }
-            }
-
-            // It may happen that the unit may need to wait
-            // (Not enough goods in warehouse to load yet)
-            if (oldStop.getLocation().getTile() == unit.getCurrentStop().getLocation().getTile()){
-                unit.setMovesLeft(0);
-            }
-        } else {
-            // Has only just arrived, unload and stop here, no more
-            // moves allowed
-            logger.info("Trade unit " + unit.getId() + " in route " + unit.getTradeRoute().getName() +
-                        " arrives at " + unit.getCurrentStop().getLocation().getLocationName());
-                
-            if (inEurope) {
-                sellTradeGoodsInEurope(unit);
-            } else {
-                unloadTradeGoodsToColony(unit);
-            }               
-            unit.setMovesLeft(0);
-        }
-    }
-    
     private void loadTradeGoodsFromColony(Unit unit){
-        Stop stop = unit.getCurrentStop();
+        Stop stop = unit.getStop();
         Location location = unit.getColony();
 
         logger.info("Trade unit " + unit.getId() + " loading in " + location.getLocationName());
@@ -810,7 +820,7 @@ public final class InGameController implements NetworkConstants {
     }
     
     private void unloadTradeGoodsToColony(Unit unit){
-        Stop stop = unit.getCurrentStop();
+        Stop stop = unit.getStop();
         Location location = unit.getColony();
         
         logger.info("Trade unit " + unit.getId() + " unloading in " + location.getLocationName());
@@ -918,7 +928,7 @@ public final class InGameController implements NetworkConstants {
     
     private void sellTradeGoodsInEurope(Unit unit) {
 
-        Stop stop = unit.getCurrentStop();
+        Stop stop = unit.getStop();
 
         // unload cargo that should not be on board
         ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
@@ -947,7 +957,7 @@ public final class InGameController implements NetworkConstants {
     
     private void buyTradeGoodsFromEurope(Unit unit) {
 
-        Stop stop = unit.getCurrentStop();
+        Stop stop = unit.getStop();
 
         // First, finish loading partially empty slots
         ArrayList<GoodsType> goodsTypesToLoad = stop.getCargo();
@@ -980,12 +990,7 @@ public final class InGameController implements NetworkConstants {
 
     
     // Public user actions that may require interactive confirmation
-    // before requesting an update from the server.  Except in trivial
-    // cases the server I/O is confined to the ask<foo>() routine,
-    // which typically returns true if the server interaction
-    // succeeded, which does *not* necessarily imply that the actual
-    // substance of the request was allowed (e.g. a move may result in
-    // the death of a unit rather than actually moving).
+    // before requesting an update from the server.
 
     /**
      * Declares independence for the home country.

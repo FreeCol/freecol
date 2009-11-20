@@ -67,6 +67,7 @@ import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -1955,4 +1956,68 @@ public final class InGameController extends Controller {
         unit.setMovesLeft(0);
         return result;
     }
+
+
+    /**
+     * Set current stop of a unit to the next valid stop if any.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> the unit belongs to.
+     * @param unit The <code>Unit</code> to update.
+     */
+    public void updateCurrentStop(ServerPlayer serverPlayer, Unit unit) {
+        // Check if there is a valid current stop?
+        int current = unit.validateCurrentStop();
+        if (current < 0) return;
+
+        // Step to next valid stop.
+        ArrayList<Stop> stops = unit.getTradeRoute().getStops();
+        int next = current;
+        for (;;) {
+            if (++next >= stops.size()) next = 0;
+            if (next == current) break;
+            if (hasWorkAtStop(unit, stops.get(next))) break;
+        }
+
+        // Next is the updated stop.
+        unit.setCurrentStop(next);
+        unit.setDestination(stops.get(next).getLocation());
+    }
+
+    /**
+     * Is there work for a unit to do at a stop?
+     *
+     * @param unit The <code>Unit</code> to check.
+     * @param stop The <code>Stop</code> to test.
+     * @return True if the unit should load or unload cargo at the stop.
+     */
+    private boolean hasWorkAtStop(Unit unit, Stop stop) {
+        ArrayList<GoodsType> stopGoods = stop.getCargo();
+        int cargoSize = stopGoods.size();
+        for (Goods goods : unit.getGoodsList()) {
+            GoodsType type = goods.getType();
+            if (stopGoods.contains(type)) {
+                if (unit.getLoadableAmount(type) > 0) {
+                    // There is space on the unit to load some more
+                    // of this goods type, so return true if there is
+                    // some available at the stop.
+                    Location loc = stop.getLocation();
+                    if (loc instanceof Colony) {
+                        if (((Colony) loc).getExportAmount(type) > 0) {
+                            return true;
+                        }
+                    } else if (loc instanceof Europe) {
+                        return true;
+                    }
+                } else {
+                    cargoSize--; // No room for more of this type.
+                }
+            } else {
+                return true; // This type should be unloaded here.
+            }
+        }
+
+        // Return true if there is space left, and something to load.
+        return unit.getSpaceLeft() > 0 && cargoSize > 0;
+    }
+
 }

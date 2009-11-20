@@ -70,15 +70,16 @@ public class UpdateCurrentStopMessage extends Message {
     public Element handle(FreeColServer server, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
         Unit unit;
-
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
 
-        unit.nextStop();
+        server.getInGameController().updateCurrentStop(serverPlayer, unit);
 
+        // Could do just a partial update of currentStop if we did not
+        // also need to set the unit destination.
         Element reply = Message.createNewRootElement("update");
         Document doc = reply.getOwnerDocument();
         reply.appendChild(unit.toXMLElement(serverPlayer, doc));
