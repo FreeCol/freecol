@@ -1504,20 +1504,19 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         }
     }
     
-    public void propertyChange(PropertyChangeEvent e){        
-
+    public void propertyChange(PropertyChangeEvent e) {
         if (!isShowing() || getColony() == null) {
             return;
-    	}
-        String property = e.getPropertyName();
+        }
 
+        String property = e.getPropertyName();
         if (Unit.CARGO_CHANGE.equals(property)) {
             updateInPortPanel();
         } else if (ColonyChangeEvent.POPULATION_CHANGE.toString().equals(property)) {
             updateSoLLabel();
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
             ModelMessage msg = getColony().checkForGovMgtChangeMessage();
-            if (msg != null){
+            if (msg != null) {
                 getCanvas().showInformationMessage(msg.getId(), msg.getDisplay(), msg.getData());
             }
             updateSoLLabel();
@@ -1526,7 +1525,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             updateProductionPanel();
         } else if (property.startsWith("model.goods.")) {
             updateProductionPanel();
-        } else if (Building.UNIT_CHANGE.equals(property)){
+        } else if (Building.UNIT_CHANGE.equals(property)) {
         	// already processed by BuildingPanel
         } else {
             logger.warning("Unknown property change event: " + e.getPropertyName());

@@ -1935,7 +1935,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 getOwner().modifyScore(-getType().getScoreValue());
                 if (oldColony != null) {
                     // this should always be the case, except possibly for unit tests
-                    int newPopulation = oldColony.getUnitCount();
                     oldColony.updatePopulation(-1);
                     setState(UnitState.ACTIVE);
                 }
@@ -1950,7 +1949,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 setType(newType);
                 getOwner().modifyScore(getType().getScoreValue() * 2);
             }
-            int oldPopulation = newLocation.getColony().getUnitCount();
             newLocation.getColony().updatePopulation(1);
             if (getState() != UnitState.IN_COLONY) {
                 logger.warning("Adding unit " + getId() + " with state==" + getState()

@@ -294,8 +294,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             updateSoL();
             updateProductionBonus();
         }
-        firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(), 
-                           population - difference, population);
+        if (difference != 0) {
+            firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
+                               population - difference, population);
+        }
     }
 
     /**
@@ -580,8 +582,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 } else {
                     int oldPopulation = getUnitCount();
                     newUnit.work(w);
-                    firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
-                                       oldPopulation, oldPopulation + 1);
                     updatePopulation(1);
                 }
             } else {
@@ -676,8 +676,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 if (w.contains(locatable)) {
                     int oldPopulation = getUnitCount();
                     w.remove(locatable);
-                    firePropertyChange(ColonyChangeEvent.POPULATION_CHANGE.toString(),
-                                       oldPopulation, oldPopulation - 1);
                     updatePopulation(-1);
                     return;
                 }
@@ -1856,11 +1854,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         
         String msgId = null;
         ModelMessage.MessageType msgType = ModelMessage.MessageType.GOVERNMENT_EFFICIENCY;
-        
         if (sonsOfLiberty == 100) {
             // there are no tories left
             if (oldSonsOfLiberty < 100) {
-            	msgId = "model.colony.SoL100";
+                msgId = "model.colony.SoL100";
                 msgType = ModelMessage.MessageType.SONS_OF_LIBERTY;
             }
         } else if (sonsOfLiberty >= 50) {
@@ -1897,44 +1894,37 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             }
         }
         
-        // no change happened
-        if (msgId == null){
-            return null;
-        }
-        
-        ModelMessage msg = 
-            new ModelMessage(this, msgType,
-                             FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                             msgId, "%colony%", getName());
-     
-        return msg;
+        GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+        return (msgId == null) ? null
+            : new ModelMessage(this, msgType, bells, msgId,
+                               "%colony%", getName());
     }
 
 
+    /**
+     * Update the colony's production bonus.
+     */
     private void updateProductionBonus() {
         final int veryBadGovernment = Specification.getSpecification()
             .getIntegerOption("model.option.veryBadGovernmentLimit").getValue();
         final int badGovernment = Specification.getSpecification()
             .getIntegerOption("model.option.badGovernmentLimit").getValue();
-        int newBonus = 0;
-        if (sonsOfLiberty == 100) {
-            // there are no tories left
-            newBonus = 2;
-        } else if (sonsOfLiberty >= 50) {
-            newBonus = 1;
-        } else if (tories > veryBadGovernment) {
-            newBonus = -2;
-        } else if (tories > badGovernment) {
-            newBonus = -1;
-        }
+        int newBonus = (sonsOfLiberty >= 100) ? 2
+            : (sonsOfLiberty >= 50) ? 1
+            : (tories > veryBadGovernment) ? -2
+            : (tories > badGovernment) ? -1
+            : 0;
         if (getOwner().isAI()) {
-            // TODO-LATER: REMOVE THIS WHEN THE AI CAN HANDLE PRODUCTION PENALTIES:
+            // TODO: Remove this when the ai can handle production penalties
             newBonus = Math.max(0, newBonus);
         }
 
         int oldBonus = productionBonus;
         productionBonus = newBonus;
-        firePropertyChange(ColonyChangeEvent.BONUS_CHANGE.toString(), oldBonus, newBonus);
+        if (oldBonus != newBonus) {
+            firePropertyChange(ColonyChangeEvent.BONUS_CHANGE.toString(),
+                               oldBonus, newBonus);
+        }
     }
 
 

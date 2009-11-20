@@ -3518,6 +3518,9 @@ public final class InGameController implements NetworkConstants {
         unit.work(workLocation);
 
         client.sendAndWait(workElement);
+        if (workLocation instanceof ColonyTile) {
+            ((ColonyTile) workLocation).firePropertyChange(ColonyTile.UNIT_CHANGE, null, unit);
+        }
     }
 
     /**
@@ -3536,7 +3539,8 @@ public final class InGameController implements NetworkConstants {
             throw new IllegalStateException("Colony can not reduce population.");
         }
 
-        int oldPopulation = unit.getColony().getUnitCount();
+        Colony colony = unit.getColony();
+        colony.updatePopulation(-1);
         Location oldLocation = unit.getLocation();
 
         Element putOutsideColonyElement = Message.createNewRootElement("putOutsideColony");
@@ -3552,8 +3556,6 @@ public final class InGameController implements NetworkConstants {
             } else if (oldLocation instanceof ColonyTile) {
                 ((ColonyTile) oldLocation).firePropertyChange(ColonyTile.UNIT_CHANGE, unit, null);
             }
-            unit.getColony().firePropertyChange(Colony.ColonyChangeEvent.POPULATION_CHANGE.toString(),
-                                                oldPopulation, unit.getColony().getUnitCount());
             unit.getTile().firePropertyChange(Tile.UNIT_CHANGE, null, unit);
         } else {
             logger.warning("putOutsideColony message missing update");
