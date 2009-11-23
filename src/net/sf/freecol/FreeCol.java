@@ -273,6 +273,7 @@ public final class FreeCol {
             } else {
                 preloadSize = new Dimension(bounds.width, bounds.height);
             }
+
             try {
                 UIManager.setLookAndFeel(new FreeColLookAndFeel(dataFolder, preloadSize));
             } catch (UnsupportedLookAndFeelException e) {
