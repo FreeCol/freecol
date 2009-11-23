@@ -3224,8 +3224,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void loadCargo(Goods goods, Unit carrier) {
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
+        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
@@ -3237,6 +3236,10 @@ public final class InGameController implements NetworkConstants {
         }
         if (carrier == null) {
             logger.warning("carrier == null");
+            return;
+        }
+
+        if (goods.getAmount() == 0) {
             return;
         }
 
