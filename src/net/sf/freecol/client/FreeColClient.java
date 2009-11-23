@@ -337,6 +337,10 @@ public final class FreeColClient {
         if(getFreeColServer() == null){
             return false;
         }
+
+        if (getMyPlayer() == null) {
+            return false;
+        }
         
         if(getFreeColServer().getGameState() == GameState.IN_GAME
                 && !getMyPlayer().isAdmin()){
