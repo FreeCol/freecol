@@ -3239,11 +3239,10 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (goods.getAmount() == 0) {
-            return;
-        }
 
-        freeColClient.playSound(SoundEffect.LOAD_CARGO);
+        if (goods.getAmount() != 0) {
+            freeColClient.playSound(SoundEffect.LOAD_CARGO);
+        }
 
         Client client = freeColClient.getClient();
         goods.adjustAmount();
