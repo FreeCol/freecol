@@ -128,6 +128,13 @@ public class ClientOptions extends OptionMap {
     public static final String DISPLAY_GRID = "model.option.displayGrid";
 
     /**
+     * Whether to delay on a unit's last move or not.
+     * 
+     * @Todo Add this option's name and short description to languages other than English.
+     */
+    public static final String UNIT_LAST_MOVE_DELAY = "model.option.unitLastMoveDelay";
+    
+    /**
      * Whether to display borders by default or not.
      */
     public static final String DISPLAY_BORDERS = "model.option.displayBorders";

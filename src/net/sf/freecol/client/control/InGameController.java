@@ -153,6 +153,8 @@ public final class InGameController implements NetworkConstants {
 
     private final FreeColClient freeColClient;
 
+    private final short UNIT_LAST_MOVE_DELAY = 300;
+    
     /**
      * Sets that the turn will be ended when all going-to units have been moved.
      */
@@ -1554,7 +1556,17 @@ public final class InGameController implements NetworkConstants {
                    && (unit.getDestination() == null
                        || unit.getDestination().getTile() == unit.getTile())) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
-        } else if (unit.getMovesLeft() <= 0) {
+        } else if (unit.getMovesLeft() <= 0) {	
+            //Perform a short pause on an active unit's last move, if the option is enabled.
+            if (freeColClient.getClientOptions().getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
+                canvas.paintImmediately(canvas.getBounds());
+                try {
+                    //UNIT_LAST_MOVE_DELAY is an instance variable located at the top of this class.
+                    Thread.sleep(UNIT_LAST_MOVE_DELAY);
+                } catch (InterruptedException e) {
+                    //Ignore
+                }
+            }
             nextActiveUnit(unit.getTile());
         }
         nextModelMessage();
