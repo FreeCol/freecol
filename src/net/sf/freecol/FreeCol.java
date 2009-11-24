@@ -20,6 +20,7 @@
 package net.sf.freecol;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
@@ -287,6 +288,16 @@ public final class FreeCol {
                 System.out.println("");
                 printUsage();
                 System.exit(1);
+            }
+
+            Font default_font = ((Font)UIManager.get("NormalFont")).deriveFont(Font.ITALIC, 13);
+            java.util.Enumeration keys = UIManager.getDefaults().keys();
+            while (keys.hasMoreElements()) {
+                Object key = keys.nextElement();
+                Object value = UIManager.get (key);
+                if (value instanceof javax.swing.plaf.FontUIResource) {
+                    UIManager.put (key, default_font);
+                }
             }
 
             // TODO: don't use same datafolder for both images and
