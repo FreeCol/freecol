@@ -107,7 +107,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         EXPLORE_LOST_CITY_RUMOUR(null, true),
         ATTACK(null, false),
         EMBARK(null, false),
-        DISEMBARK(null, false),
         ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST(null, false),
         ENTER_INDIAN_VILLAGE_WITH_SCOUT(null, false),
         ENTER_INDIAN_VILLAGE_WITH_MISSIONARY(null, false),
@@ -115,14 +114,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS(null, false),
         MOVE_ILLEGAL("Unspecified illegal move"),
         MOVE_NO_MOVES("Attempt to move without moves left"),
+        MOVE_NO_ACCESS_LAND("Attempt to move a naval unit onto land"),
         MOVE_NO_ACCESS_BEACHED("Attempt to move onto foreign beached ship"),
         MOVE_NO_ACCESS_EMBARK("Attempt to embark onto absent or foreign carrier"),
-        MOVE_NO_ACCESS_DISEMBARK("Attempt to disembark onto a tile occupied by foreign unit"),
         MOVE_NO_ACCESS_FULL("Attempt to embark onto full carrier"),
         MOVE_NO_ACCESS_SETTLEMENT("Attempt to move into foreign settlement"),
         MOVE_NO_ATTACK_MARINE("Attempt to attack non-settlement from on board ship"),
         MOVE_NO_ATTACK_CIVILIAN("Attempt to attack with civilian unit"),
-        MOVE_NO_UNITS("Attempt to disembark without units"),
         MOVE_NO_EUROPE("Attempt to move to Europe by incapable unit"),
         MOVE_NO_REPAIR("Attempt to move a unit that is under repair");
 
@@ -1298,35 +1296,21 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             return MoveType.MOVE_NO_REPAIR;
         }
 
-        Unit defender = target.getFirstUnit();
-        Settlement settlement = target.getSettlement();
-
         if (target.isLand()) {
-            if (settlement != null) {
-                if (settlement.getOwner() == getOwner()) {
-                    return MoveType.MOVE;
-                } else if (canTradeWith(settlement)) {
-                    return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-                } else {
-                    return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
-                }
-            } else if (defender != null && defender.getOwner() != getOwner()) {
-                return MoveType.MOVE_NO_ACCESS_DISEMBARK;
+            Settlement settlement = target.getSettlement();
+            if (settlement == null) {
+                return MoveType.MOVE_NO_ACCESS_LAND;
+            } else if (settlement.getOwner() == getOwner()) {
+                return MoveType.MOVE;
+            } else if (canTradeWith(settlement)) {
+                return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
             } else {
-                Iterator<Unit> unitIterator = getUnitIterator();
-
-                while (unitIterator.hasNext()) {
-                    Unit u = unitIterator.next();
-                    if (u.getMovesLeft() > 0) {
-                        return MoveType.DISEMBARK;
-                    }
-                }
-                return MoveType.MOVE_NO_UNITS;
+                return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
             }
         } else { // target at sea
-            if (defender != null
-                    && defender.getOwner() != getOwner()
-                    && !ignoreEnemyUnits) {
+            Unit defender = target.getFirstUnit();
+            if (defender != null && !ignoreEnemyUnits
+                && defender.getOwner() != getOwner()) {
                 return (isOffensiveUnit()) ? MoveType.ATTACK
                     : MoveType.MOVE_NO_ATTACK_CIVILIAN;
             } else if (target.canMoveToEurope() && getOwner().canMoveToEurope()) {

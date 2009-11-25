@@ -691,14 +691,10 @@ public final class InGameController implements NetworkConstants {
                     moveMove(unit, path.getDirection());
                 }
                 break;
-            case DISEMBARK:
-                moveDisembark(unit, path.getDirection());
-                path = null;
-                break;
             case MOVE_NO_MOVES:
                 // The unit may have some moves left,
                 // but not enough to move to the destination.
-                unit.setMovesLeft(0);
+                unit.setMovesLeft(0); //TODO: should be in server
                 return;
             default:
                 if (path == path.getLastNode() && mt.isLegal()
@@ -1387,8 +1383,8 @@ public final class InGameController implements NetworkConstants {
      * @todo Unify trade and negotiation.
      */
     public void move(Unit unit, Direction direction) {
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
+        Game game = freeColClient.getGame();
+        if (game.getCurrentPlayer() != freeColClient.getMyPlayer()) {
             freeColClient.getCanvas().showInformationMessage("notYourTurn");
             return;
         }
@@ -1411,9 +1407,6 @@ public final class InGameController implements NetworkConstants {
         case EMBARK:
             moveEmbark(unit, direction);
             break;
-        case DISEMBARK:
-            moveDisembark(unit, direction);
-            break;
         case ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
             moveLearnSkill(unit, direction);
             break;
@@ -1429,6 +1422,11 @@ public final class InGameController implements NetworkConstants {
         case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
             moveTrade(unit, direction);
             break;
+        case MOVE_NO_ACCESS_LAND:
+            if (moveDisembark(unit, direction)) {
+                break;
+            }
+            // Fall through to failure if disembark failed
         default:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
             break;
@@ -2035,32 +2033,50 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Confirm disembark from a carrier in a specified direction following
-     * a move of MoveType.DISEMBARK.
+     * Check the carrier for passengers to disembark, possibly
+     * snatching a useful result from the jaws of a
+     * MOVE_NO_ACCESS_LAND failure.
      *
      * @param unit The carrier containing the unit to disembark.
      * @param direction The direction in which to disembark the unit.
+     * @return True if the disembark "succeeds" (which deliberately includes
+     *         declined disembarks).
      */
-    private void moveDisembark(Unit unit, Direction direction) {
-        // Confirm the user wants to disembark.
-        Canvas canvas = freeColClient.getCanvas();
-        if (!canvas.showConfirmDialog("disembark.text",
-                                      "disembark.yes", "disembark.no")) {
-            return;
+    private boolean moveDisembark(Unit unit, Direction direction) {
+        Map map = freeColClient.getGame().getMap();
+        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        if (tile.getFirstUnit() != null
+            && tile.getFirstUnit().getOwner() != unit.getOwner()) {
+            return false; // Can not disembark onto other nation units.
         }
 
-        // Disembark first available unit (formerly just first unit).
-        // TODO: Choose unit?  All units?
+        // Disembark selected units able to move.
+        ArrayList<Unit> disembarkable = new ArrayList<Unit>();
         unit.setStateToAllChildren(UnitState.ACTIVE);
-        for (Unit toDisembark : unit.getUnitList()) {
-            if (toDisembark.getMovesLeft() > 0) {
-                // Call move() as while the destination tile is known
-                // to be clear of settlements or other player units,
-                // it *may* have a rumour.
-                move(toDisembark, direction);
-                break;
+        for (Unit u : unit.getUnitList()) {
+            if (u.getMoveType(tile).isProgress()) {
+                disembarkable.add(u);
             }
         }
+        if (disembarkable.size() == 0) {
+            // Did not find any unit that could disembark, fail.
+            return false;
+        }
+
+        // Pick units the user wants to disembark.
+        Canvas canvas = freeColClient.getCanvas();
+        while (disembarkable.size() > 0) {
+            Unit u = canvas.showSimpleChoiceDialog("disembark.text",
+                                                   "disembark.cancel",
+                                                   disembarkable);
+            if (u == null) break; // Done
+            // Call move() as while the destination tile is known to
+            // be clear of settlements or other player units, it *may*
+            // have a rumour.
+            move(u, direction);
+            disembarkable.remove(u);
+        }
+        return true;
     }
 
     /**

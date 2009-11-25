@@ -247,6 +247,7 @@ public class MoveMessage extends Message {
             updates.appendChild(((Tile) oldLocation).toXMLElement(player, doc));
         } else if (oldLocation instanceof Unit) {
             updates.appendChild(((Unit) oldLocation).toXMLElement(player, doc));
+            unit.setMovesLeft(0); // Disembark always consumes moves.
         } else {
             throw new IllegalArgumentException("Location not a tile or unit!?!: " + unit.getId());
         }
