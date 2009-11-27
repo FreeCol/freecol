@@ -54,6 +54,7 @@ import net.sf.freecol.client.gui.action.OpenAction;
 import net.sf.freecol.client.gui.action.PreferencesAction;
 import net.sf.freecol.client.gui.action.QuitAction;
 import net.sf.freecol.client.gui.action.SaveAction;
+import net.sf.freecol.client.gui.action.SaveAndQuitAction;
 import net.sf.freecol.client.gui.action.ScaleMapAction;
 import net.sf.freecol.client.gui.action.ShowMainAction;
 import net.sf.freecol.client.gui.action.ZoomInAction;
@@ -145,7 +146,7 @@ public class MapEditorMenuBar extends FreeColMenuBar {
         menu.addSeparator();
 
         menu.add(getMenuItem(ShowMainAction.id));
-        menu.add(getMenuItem(QuitAction.id));
+        menu.add(getMenuItem(SaveAndQuitAction.id));
 
         add(menu);
     }

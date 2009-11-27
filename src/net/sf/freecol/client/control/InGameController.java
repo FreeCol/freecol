@@ -4432,7 +4432,9 @@ public final class InGameController implements NetworkConstants {
                     Canvas canvas = freeColClient.getCanvas();
                     if (messageList.size() > 0) {
                         if (allMessages || messageList.size() > 5) {
-                            canvas.showPanel(new ReportTurnPanel(canvas, messages));
+                            ReportTurnPanel report = new ReportTurnPanel(canvas, messages);
+                            canvas.addAsFrame(report);
+                            report.requestFocus();
                         } else {
                             canvas.showModelMessages(messages);
                         }

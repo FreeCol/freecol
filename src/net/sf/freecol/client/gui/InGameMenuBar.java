@@ -90,6 +90,7 @@ import net.sf.freecol.client.gui.action.ReportTradeAction;
 import net.sf.freecol.client.gui.action.ReportTurnAction;
 import net.sf.freecol.client.gui.action.RetireAction;
 import net.sf.freecol.client.gui.action.SaveAction;
+import net.sf.freecol.client.gui.action.SaveAndQuitAction;
 import net.sf.freecol.client.gui.action.SentryAction;
 import net.sf.freecol.client.gui.action.ShowMainAction;
 import net.sf.freecol.client.gui.action.SkipUnitAction;
@@ -212,7 +213,8 @@ public class InGameMenuBar extends FreeColMenuBar {
         menu.add(getMenuItem(ShowMainAction.id));
         menu.add(getMenuItem(ReportHighScoresAction.id));
         menu.add(getMenuItem(RetireAction.id));
-        menu.add(getMenuItem(QuitAction.id));
+        menu.add(getMenuItem(SaveAndQuitAction.id));
+//        menu.add(getMenuItem(QuitAction.id));
 
         add(menu);
     }

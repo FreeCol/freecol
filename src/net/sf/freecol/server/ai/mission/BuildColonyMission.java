@@ -306,8 +306,11 @@ public class BuildColonyMission extends Mission {
         while (it.hasNext()) {
             Tile tile = game.getMap().getTile(it.next());
             int newColonyValue = -1;
-
-            if (unit.getOwner().getColonyValue(tile) > 0) {
+            int tileColonyValue = unit.getOwner().getColonyValue(tile);
+            
+            if (tileColonyValue > 0
+            	&& (tileColonyValue + 10000) > highestColonyValue) {
+            	// tileColonyValue + 10000 is the highest possible ColonyValue for this  tile
                 if (tile != startTile) {
                     PathNode path;
 
@@ -319,13 +322,13 @@ public class BuildColonyMission extends Mission {
                     }
                     if (path != null) {
                         newColonyValue = 10000
-                            + unit.getOwner().getColonyValue(tile)
+                            + tileColonyValue
                             - path.getTotalTurns()
                             * ((unit.getGame().getTurn().getNumber() < 10
                                 && unit.isOnCarrier()) ? 25 : 4);
                     }
                 } else {
-                    newColonyValue = 10000 + unit.getOwner().getColonyValue(tile);
+                    newColonyValue = 10000 + tileColonyValue;
                 }
                 if (newColonyValue > highestColonyValue) {
                     highestColonyValue = newColonyValue;

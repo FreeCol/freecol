@@ -103,6 +103,7 @@ public class ActionManager extends OptionGroup {
         add(new NewEmptyMapAction(freeColClient));
         add(new OpenAction(freeColClient));
         add(new PreferencesAction(freeColClient));
+        add(new SaveAndQuitAction(freeColClient));
         add(new QuitAction(freeColClient));
         add(new ReconnectAction(freeColClient));
         add(new RenameAction(freeColClient));

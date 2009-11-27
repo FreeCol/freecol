@@ -45,6 +45,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -54,6 +56,7 @@ import javax.swing.JList;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
@@ -130,9 +133,32 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buildQueueList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         buildQueueList.setDragEnabled(true);
         buildQueueList.setCellRenderer(cellRenderer);
-        buildQueueList.addMouseListener(new BuildQueueMouseAdapter());
+        buildQueueList.addMouseListener(new BuildQueueMouseAdapter(false));
 
-        BuildableListMouseAdapter adapter = new BuildableListMouseAdapter();
+        Action deleteAction = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
+                    for (Object type : buildQueueList.getSelectedValues()) {
+                        model.removeElement(type);
+                    }
+                    updateAllLists();
+                }
+            };
+
+        buildQueueList.getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
+        buildQueueList.getActionMap().put("delete", deleteAction);
+
+        Action addAction = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
+                    for (Object type : ((JList) e.getSource()).getSelectedValues()) {
+                        model.addElement(type);
+                    }
+                    updateAllLists();
+                }
+            };
+
+        BuildQueueMouseAdapter adapter = new BuildQueueMouseAdapter(true);
         DefaultListModel units = new DefaultListModel();
         unitList = new JList(units);
         unitList.setTransferHandler(buildQueueHandler);
@@ -141,6 +167,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         unitList.setCellRenderer(cellRenderer);
         unitList.addMouseListener(adapter);
 
+        unitList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "add");
+        unitList.getActionMap().put("add", addAction);
+
         DefaultListModel buildings = new DefaultListModel();
         buildingList = new JList(buildings);
         buildingList.setTransferHandler(buildQueueHandler);
@@ -148,6 +177,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buildingList.setDragEnabled(true);
         buildingList.setCellRenderer(cellRenderer);
         buildingList.addMouseListener(adapter);
+
+        buildingList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "add");
+        buildingList.getActionMap().put("add", addAction);
 
         JLabel headLine = new JLabel(Messages.message("colonyPanel.buildQueue"));
         headLine.setFont(bigHeaderFont);
@@ -388,28 +420,29 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
      * @param event The incoming ActionEvent.
      */
     public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            if(!FreeCol.isInDebugMode() || colony.getOwner() == getMyPlayer()){
-                getController().setBuildQueue(colony, getBuildableTypes(buildQueueList));
+        if (colony.getOwner() == getMyPlayer()) {
+            String command = event.getActionCommand();
+            List<BuildableType> buildables = getBuildableTypes(buildQueueList);
+            // TODO: improve calculation of locked types, so that we
+            // don't need to call colony.canBuild()
+            if (!buildables.isEmpty() && !colony.canBuild(buildables.get(0))) {
+                getCanvas().showInformationMessage("colonyPanel.unbuildable",
+                                                   buildables.get(0),
+                                                   "%colony%", colony.getName(),
+                                                   "%object%", buildables.get(0).getName());
+                return;
             }
-            getCanvas().remove(this);
-        } else if (BUY.equals(command)) {
-            getController().setBuildQueue(colony, getBuildableTypes(buildQueueList));
-            getController().payForBuilding(colony);
-            getCanvas().updateGoldLabel();
-        } else {
-            FreeColGameObjectType type = FreeCol.getSpecification().getType(command);
-            if (type == null) {
-                logger.warning("Unknown FreeColGameObjectType with ID " + command);
-            } else if (type instanceof BuildingType) {
-                getCanvas().showColopediaPanel(ColopediaPanel.PanelType.BUILDINGS, type);
-            } else if (type instanceof UnitType) {
-                getCanvas().showColopediaPanel(ColopediaPanel.PanelType.UNITS, type);
+            getController().setBuildQueue(colony, buildables);
+            if (OK.equals(command)) {
+                // do nothing?
+            } else if (BUY.equals(command)) {
+                getController().payForBuilding(colony);
+                getCanvas().updateGoldLabel();
             } else {
-                logger.warning("Unsupported FreeColGameObjectType with ID " + command);
+                logger.warning("Unsupported command " + command);
             }
         }
+        getCanvas().remove(this);
     }
 
     public void itemStateChanged(ItemEvent event) {
@@ -765,32 +798,33 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     class BuildQueueMouseAdapter extends MouseAdapter {
 
-        public void mousePressed(MouseEvent e) {
-            if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())
-                || (e.getClickCount() > 1 && !e.isConsumed())) {
-                JList source = (JList) e.getSource();
-                if (source.getSelectedIndex() == -1) {
-                    source.setSelectedIndex(source.locationToIndex(e.getPoint()));
-                }
-                for (Object type : source.getSelectedValues()) {
-                    ((DefaultListModel) buildQueueList.getModel()).removeElement(type);
-                }
-                updateAllLists();
-            }
+        private boolean add = true;
+
+        public BuildQueueMouseAdapter(boolean add) {
+            this.add = add;
         }
-    }
 
-    class BuildableListMouseAdapter extends MouseAdapter {
-
-        public void mouseClicked(MouseEvent e) {
-            if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())
-                || (e.getClickCount() > 1 && !e.isConsumed())) {
-                JList source = (JList) e.getSource();
+        public void mousePressed(MouseEvent e) {
+            JList source = (JList) e.getSource();
+            if ((e.getButton() == MouseEvent.BUTTON3 || e.isPopupTrigger())) {
+                int index = source.locationToIndex(e.getPoint());
+                BuildableType type = (BuildableType) source.getModel().getElementAt(index);
+                if (type instanceof BuildingType) {
+                    getCanvas().showColopediaPanel(ColopediaPanel.PanelType.BUILDINGS, type);
+                } else if (type instanceof UnitType) {
+                    getCanvas().showColopediaPanel(ColopediaPanel.PanelType.UNITS, type);
+                }
+            } else if ((e.getClickCount() > 1 && !e.isConsumed())) {
+                DefaultListModel model = (DefaultListModel) buildQueueList.getModel();
                 if (source.getSelectedIndex() == -1) {
                     source.setSelectedIndex(source.locationToIndex(e.getPoint()));
                 }
                 for (Object type : source.getSelectedValues()) {
-                    ((DefaultListModel) buildQueueList.getModel()).addElement(type);
+                    if (add) {
+                        model.addElement(type);
+                    } else {
+                        model.removeElement(type);
+                    }
                 }
                 updateAllLists();
             }
