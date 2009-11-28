@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.ModelMessage;
@@ -136,6 +137,7 @@ public class MissionaryMessage extends Message {
         }
 
         // Valid, proceed to establish/denounce.
+        Location oldLocation = unit.getLocation();
         ModelMessage m = (denounce)
             ? server.getInGameController().denounceMission(indianSettlement, unit)
             : server.getInGameController().establishMission(indianSettlement, unit);
@@ -162,7 +164,12 @@ public class MissionaryMessage extends Message {
             reply.appendChild(remove);
             unit.addToRemoveElement(remove);
         } else {
-            update.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
+            update.appendChild(unit.toXMLElement(player, doc));
+            if (oldLocation instanceof Tile) {
+                update.appendChild(((Tile) oldLocation).toXMLElement(player, doc));
+            } else if (oldLocation instanceof Unit) {
+                update.appendChild(((Unit) oldLocation).toXMLElement(player, doc));
+            }
         }
         return reply;
     }
