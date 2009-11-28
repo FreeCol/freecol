@@ -166,11 +166,13 @@ public class IndianDemandMission extends Mission {
                     demandElement.appendChild(unit.toXMLElement(enemy, demandElement.getOwnerDocument()));
                 }
 
-                Element reply;
+                Element reply = null;
                 try {
                     reply = connection.ask(demandElement);
                 } catch (IOException e) {
                     logger.warning("Could not send \"demand\"-message!");
+                }
+                if (reply == null) {
                     completed = true;
                     return;
                 }
