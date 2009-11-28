@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
@@ -546,16 +547,19 @@ public final class InGameController extends Controller {
                     if (!atLeastOneChoice) {
                         nextPlayer.setCurrentFather(null);
                     } else {
-                        try {
-                            Element reply = nextPlayer.getConnection().ask(chooseFoundingFatherElement);
-                            FoundingFather father = FreeCol.getSpecification().
-                                getFoundingFather(reply.getAttribute("foundingFather"));
-                            if (!randomFoundingFathers.contains(father)) {
-                                throw new IllegalArgumentException();
+                        Connection conn = nextPlayer.getConnection();
+                        if (conn != null) {
+                            try {
+                                Element reply = conn.ask(chooseFoundingFatherElement);
+                                FoundingFather father = FreeCol.getSpecification().
+                                    getFoundingFather(reply.getAttribute("foundingFather"));
+                                if (!randomFoundingFathers.contains(father)) {
+                                    throw new IllegalArgumentException();
+                                }
+                                nextPlayer.setCurrentFather(father);
+                            } catch (IOException e) {
+                                logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
-                            nextPlayer.setCurrentFather(father);
-                        } catch (IOException e) {
-                            logger.warning("Could not send message to: " + nextPlayer.getName());
                         }
                     }
                 }
@@ -664,6 +668,8 @@ public final class InGameController extends Controller {
      */
     private void monarchAction(ServerPlayer player) {
         final ServerPlayer nextPlayer = player;
+        final Connection conn = player.getConnection();
+        if (conn == null) return;
         Thread t = new Thread("monarchAction") {
                 public void run() {
                     try {
@@ -688,7 +694,7 @@ public final class InGameController extends Controller {
                             monarchActionElement.setAttribute("force", String.valueOf(false));
                             try {
                                 nextPlayer.setTax(newTax); // to avoid cheating
-                                Element reply = nextPlayer.getConnection().ask(monarchActionElement);
+                                Element reply = conn.ask(monarchActionElement);
                                 boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
                             
                                 if (!accepted) {
@@ -702,11 +708,11 @@ public final class InGameController extends Controller {
                                             .createTeaPartyModifier(getGame().getTurn()));
                                         removeGoodsElement.appendChild(goods.toXMLElement(nextPlayer, removeGoodsElement
                                                                                           .getOwnerDocument()));
-                                        nextPlayer.getConnection().send(removeGoodsElement);
+                                        conn.send(removeGoodsElement);
                                     } else {
                                         // player has cheated and removed goods from colony, don't restore tax
                                         monarchActionElement.setAttribute("force", String.valueOf(true));
-                                        nextPlayer.getConnection().send(monarchActionElement);
+                                        conn.send(monarchActionElement);
                                     }
                                 }
                             } catch (IOException e) {
@@ -722,7 +728,7 @@ public final class InGameController extends Controller {
                             monarchActionElement.setAttribute("amount", String.valueOf(taxLowered));
                             try {
                                 nextPlayer.setTax(taxLowered); // to avoid cheating
-                                nextPlayer.getConnection().send(monarchActionElement); 
+                                conn.send(monarchActionElement);
                             } catch (IOException e) {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
@@ -736,7 +742,7 @@ public final class InGameController extends Controller {
                             }
                             monarchActionElement.appendChild(additionElement);
                             try {
-                                nextPlayer.getConnection().send(monarchActionElement);
+                                conn.send(monarchActionElement);
                             } catch (IOException e) {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
@@ -755,7 +761,7 @@ public final class InGameController extends Controller {
                             nextPlayer.changeRelationWithPlayer(enemy, Stance.WAR);
                             monarchActionElement.setAttribute("enemy", enemy.getId());
                             try {
-                                nextPlayer.getConnection().send(monarchActionElement);
+                                conn.send(monarchActionElement);
                             } catch (IOException e) {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                             }
@@ -765,7 +771,7 @@ public final class InGameController extends Controller {
                                 int[] additions = monarch.supportLand();
                                 createUnits(additions, monarchActionElement, nextPlayer);
                                 try {
-                                nextPlayer.getConnection().send(monarchActionElement);
+                                conn.send(monarchActionElement);
                                 } catch (IOException e) {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                                 }
@@ -778,7 +784,7 @@ public final class InGameController extends Controller {
                                 monarchActionElement.appendChild(newUnit.toXMLElement(nextPlayer, monarchActionElement
                                 .getOwnerDocument()));
                                 try {
-                                nextPlayer.getConnection().send(monarchActionElement);
+                                conn.send(monarchActionElement);
                                 } catch (IOException e) {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());
                                 }
@@ -794,14 +800,14 @@ public final class InGameController extends Controller {
                             }
                             monarchActionElement.appendChild(mercenaryElement);
                             try {
-                                Element reply = nextPlayer.getConnection().ask(monarchActionElement);
+                                Element reply = conn.ask(monarchActionElement);
                                 boolean accepted = Boolean.valueOf(reply.getAttribute("accepted")).booleanValue();
                                 if (accepted) {
                                     Element updateElement = Message.createNewRootElement("monarchAction");
                                     updateElement.setAttribute("action", String.valueOf(MonarchAction.ADD_UNITS));
                                     nextPlayer.modifyGold(-price);
                                     createUnits(units, updateElement, nextPlayer);
-                                    nextPlayer.getConnection().send(updateElement);
+                                    conn.send(updateElement);
                                 }
                             } catch (IOException e) {
                                 logger.warning("Could not send message to: " + nextPlayer.getName());

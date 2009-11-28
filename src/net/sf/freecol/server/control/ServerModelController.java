@@ -448,8 +448,8 @@ public class ServerModelController implements ModelController,PropertyChangeList
         Iterator<Player> enemyPlayerIterator = game.getPlayerIterator();
         while (enemyPlayerIterator.hasNext()) {
             ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
-
-            if (player != null && player.equals(enemyPlayer)) {
+            if (enemyPlayer.getConnection() == null
+                || (player != null && player.equals(enemyPlayer))) {
                 continue;
             }
 
