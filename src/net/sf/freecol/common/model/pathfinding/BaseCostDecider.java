@@ -69,11 +69,11 @@ class BaseCostDecider implements CostDecider {
             movesLeft = movesLeftBefore - moveCost;
         } else {
             // This move takes an extra turn to complete:
+            final int thisTurnMovesLeft = movesLeftBefore;
             movesLeftBefore = unit.getInitialMovesLeft();
-            //final int mc = getCost(unit, oldTile, newTile, movesLeftBefore, turns+1);
-            final int mc = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
-            moveCost = movesLeft + mc;
-            movesLeft = movesLeftBefore - mc;
+            final int moveCostNextTurn = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
+            moveCost = thisTurnMovesLeft + moveCostNextTurn;
+            movesLeft = movesLeftBefore - moveCostNextTurn;
             newTurn = true;
         }
         
