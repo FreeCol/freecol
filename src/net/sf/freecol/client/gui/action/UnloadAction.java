@@ -111,7 +111,7 @@ public class UnloadAction extends MapboardAction {
         Iterator<Goods> goodsIterator = unit.getGoodsIterator();
         while (goodsIterator.hasNext()) {
             Goods goods = goodsIterator.next();
-            getFreeColClient().getInGameController().unloadCargo(goods);
+            getFreeColClient().getInGameController().unloadCargo(goods, false);
         }
     }
 

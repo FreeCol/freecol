@@ -284,7 +284,7 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
             initialize();
         } else if (comp instanceof GoodsLabel) {
             Goods g = ((GoodsLabel) comp).getGoods();
-            getController().unloadCargo(g);
+            getController().unloadCargo(g, false);
             initialize();
         }
     }

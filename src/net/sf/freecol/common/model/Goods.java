@@ -83,7 +83,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         }
 
         if (location != null && location.getGoodsContainer() == null){
-            throw new IllegalArgumentException("This location cannot store goods");
+            throw new IllegalArgumentException("This location cannot store goods: " + location.toString());
         }
 
         this.game = game;
@@ -232,39 +232,38 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
 
 
     /**
-    * Sets the location of the goods.
-    * @param location The new location of the goods,
-    */
-    public void setLocation(Location location) {
-        
-        if (location != null && location.getGoodsContainer() == null) {
-            throw new IllegalArgumentException("Goods have to be located in a GoodsContainers.");
-        }
-        
-        try {
-            if ((this.location != null)) {
-                this.location.remove(this);
-            }
-
-            if (location != null) {
-                location.add(this);
-            }
-
-            this.location = location;
-        } catch (IllegalStateException e) {
-            throw new IllegalStateException("Could not move the goods of type: "
-                    + getType().getName() + " with amount: " + getAmount() + " from "
-                    + this.location + " to " + location, e);
-        }
-    }
-
-
-    /**
-    * Gets the location of this goods.
-    * @return The location.
-    */
+     * Gets the location of this goods.
+     *
+     * @return The goods location.
+     */
     public Location getLocation() {
         return location;
+    }
+
+    /**
+     * Sets the location of the goods.
+     *
+     * @param location The new <code>Location</code> of the goods.
+     */
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    /** DO NOT USE, this is going away (into the server) soon. */
+    public void changeLocation(Location location) {
+       if (location != null && location.getGoodsContainer() == null) {
+           throw new IllegalArgumentException("Goods have to be located in a GoodsContainers.");
+       }
+
+       if (this.location != null) {
+           this.location.remove(this);
+       }
+       this.location = null;
+
+       if (location != null) {
+           location.add(this);
+       }
+       this.location = location;
     }
 
 
@@ -285,61 +284,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         
         if (getAmount() > maxAmount)
             setAmount(maxAmount);
-    }
-
-    /**
-     * Loads the cargo onto a carrier that is on the same tile.
-     * 
-     * This method has the same effect as setLocation but ensures that: 1.) The
-     * given unit is at the same tile as the goods (including a check if
-     * transfering the goods in Europe makes sense) and 2.) that the source
-     * location of the goods is not null. checks that
-     * 
-     * @param carrier The carrier onto which to the load the goods.
-     * @exception IllegalStateException If the carrier is on another tile than
-     *                this unit, the location of the goods is null or both
-     *                carriers are not in port in Europe.
-     */
-    public void loadOnto(Unit carrier) {
-        if (getLocation() == null) {
-            throw new IllegalStateException("The goods need to be taken from a place, but 'location == null'.");
-        }
-        if ((getLocation().getTile() != carrier.getTile())) {
-            throw new IllegalStateException("It is not allowed to load cargo onto a ship on another tile.");
-        }
-        if (getLocation().getTile() == null){
-            // In Europe
-            Unit source = (Unit)getLocation();
-
-            // Make sure that both carriers are in a port in Europe.
-            if (!carrier.isInEurope() || !source.isInEurope()){
-                throw new IllegalStateException("Loading cargo onto a ship that is not in port in Europe.");
-            }
-        }
-        setLocation(carrier);
-    }
-
-
-    /**
-     * Unload this Goods from a carrier into a colony.
-     * 
-     * This method has the same effect as setLocation but performs checks whether the 
-     * goods are on a carrier and whether the carrier is in a colony.
-     * 
-     * @exception IllegalStateException If the goods are not on a unit or the unit not in a colony.
-     */
-    public void unload() {
-        if (!(getLocation() instanceof Unit)){
-            throw new IllegalStateException("Goods not on a unit");
-        }
-
-        Unit carrier = (Unit) getLocation();
-        Location location = carrier.getLocation();
-
-        if (location instanceof Europe || location.getTile().getSettlement() == null || !(location.getTile().getSettlement() instanceof Colony)) {
-            throw new IllegalStateException("Goods may only be unloaded while the carrier is in a colony");
-        }
-        setLocation(location.getTile().getSettlement());
     }
 
 

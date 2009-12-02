@@ -331,9 +331,21 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @return The amount of this type of goods available for export.
      */
     public int getExportAmount(GoodsType goodsType) {
-        ExportData data = getExportData(goodsType);
-        return getGoodsContainer().getGoodsCount(goodsType)
-            - data.getExportLevel();
+        int present = getGoodsContainer().getGoodsCount(goodsType);
+        int exportable = getExportData(goodsType).getExportLevel();
+        return (present < exportable) ? 0 : present - exportable;
+    }
+
+    /**
+     * How much of a goods type can be imported into this colony?
+     *
+     * @param goodsType The <code>GoodsType</code> to import.
+     * @return The amount of this type of goods that can be imported.
+     */
+    public int getImportAmount(GoodsType goodsType) {
+        int present = getGoodsContainer().getGoodsCount(goodsType);
+        int capacity = getWarehouseCapacity();
+        return (present > capacity) ? 0 : capacity - present;
     }
 
     /**

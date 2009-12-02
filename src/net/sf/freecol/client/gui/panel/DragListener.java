@@ -520,7 +520,7 @@ public final class DragListener extends MouseAdapter {
             JMenuItem unload = new JMenuItem(Messages.message("unload"));
             unload.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    inGameController.unloadCargo(goods);
+                    inGameController.unloadCargo(goods, false);
                     if (parentPanel instanceof CargoPanel) {
                         CargoPanel cargoPanel = (CargoPanel) parentPanel;
                         cargoPanel.initialize();

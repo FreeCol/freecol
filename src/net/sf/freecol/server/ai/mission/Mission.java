@@ -39,6 +39,7 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
@@ -396,13 +397,11 @@ public abstract class Mission extends AIObject {
     }
     
     protected boolean unloadCargoInColony(Connection connection, Unit carrier, Goods goods) {
-        Element unloadCargoElement = Message.createNewRootElement("unloadCargo");
-        unloadCargoElement.appendChild(goods.toXMLElement(carrier.getOwner(),
-                unloadCargoElement.getOwnerDocument()));
+        UnloadCargoMessage message = new UnloadCargoMessage(goods);
         try {
-            connection.sendAndWait(unloadCargoElement);
+            connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"unloadCargoElement\"-message!");
+            logger.warning("Could not send \"unloadCargo\"-message!");
             return false;
         }
         return true;

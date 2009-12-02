@@ -55,6 +55,7 @@ import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.EmbarkMessage;
+import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIColony;
 import net.sf.freecol.server.ai.AIGoods;
@@ -1172,19 +1173,14 @@ public class TransportMission extends Mission {
                             ag.setGoods(new Goods(getGame(), carrier, goodsType, goodsAmount));
                         }
                     } else {
-                        Element loadCargoElement = Message.createNewRootElement("loadCargo");
-                        loadCargoElement.setAttribute("carrier", carrier.getId());
-                        loadCargoElement.appendChild(ag.getGoods().toXMLElement(carrier.getOwner(),
-                                loadCargoElement.getOwnerDocument()));
-
+                        LoadCargoMessage message = new LoadCargoMessage(ag.getGoods(), carrier);
                         try {
-                            connection.sendAndWait(loadCargoElement);
+                            connection.sendAndWait(message.toXMLElement());
                             tli.remove();
                             transportListChanged = true;
                         } catch (IOException e) {
-                            logger.warning("Could not send \"loadCargoElement\"-message!");
+                            logger.warning("Could not send \"loadCargo\"-message!");
                         }
-                        ag.setGoods(new Goods(getGame(), carrier, ag.getGoods().getType(), ag.getGoods().getAmount()));
                     }
                 }
             } else {

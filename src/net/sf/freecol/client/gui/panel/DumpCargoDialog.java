@@ -102,7 +102,7 @@ public final class DumpCargoDialog extends FreeColPanel {
         if (OK.equals(command)) {
             for (int index = 0; index < checkBoxes.size(); index++) {
                 if (checkBoxes.get(index).isSelected()) {
-                    getController().unloadCargo(goodsList.get(index));
+                    getController().unloadCargo(goodsList.get(index), true);
                 }
             }
         }

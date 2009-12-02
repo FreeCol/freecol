@@ -23,7 +23,9 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Market;
@@ -50,7 +52,9 @@ public class ServerPlayerTest extends FreeColTestCase {
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     UnitType caravelType = spec().getUnitType("model.unit.caravel");
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
+    UnitType privateerType = spec().getUnitType("model.unit.privateer");
 
+    GoodsType cottonType = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
 
     FreeColServer server = null;
 	
@@ -267,6 +271,189 @@ public class ServerPlayerTest extends FreeColTestCase {
         // can put colonist on carrier
         assertTrue(igc.embarkUnit(dutch, colonist, caravel));
         assertEquals(UnitState.SENTRY, colonist.getState());
+    }
+
+    public void testLoadInColony() {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        Map map = getCoastTestMap(plains);
+        server.setMapGenerator(new MockMapGenerator(getTestMap()));
+        PreGameController pgc = (PreGameController) server.getController();
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+
+        Colony colony = getStandardColony();
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Unit wagonInColony = new Unit(game, colony.getTile(), dutch,
+                                      wagonTrainType, UnitState.ACTIVE);
+        Unit wagonNotInColony = new Unit(game, map.getTile(10, 10), dutch,
+                                         wagonTrainType, UnitState.ACTIVE);
+        InGameController igc = (InGameController) server.getController();
+        Goods cotton = new Goods(game, null, cottonType, 75);
+
+        // Check if location null
+        assertEquals(null, cotton.getTile());
+
+        // Check that it does not work if current Location == null
+        try {
+            igc.moveGoods(cotton, wagonInColony);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+        try {
+            igc.moveGoods(cotton, wagonNotInColony);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // Check wagon to colony
+        cotton.setLocation(wagonInColony);
+        igc.moveGoods(cotton, colony);
+        assertEquals(cotton.getLocation(), colony);
+        assertEquals(75, colony.getGoodsCount(cottonType));
+
+        // Check from colony to wagon train
+        igc.moveGoods(cotton, wagonInColony);
+        assertEquals(wagonInColony, cotton.getLocation());
+        assertEquals(0, colony.getGoodsCount(cottonType));
+
+        // Check failure units not co-located
+        try {
+            igc.moveGoods(cotton, wagonNotInColony);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // Check failure to non-GoodsContainer (Tile)
+        try {
+            igc.moveGoods(cotton, map.getTile(9, 10));
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // Check from unit to unit
+        wagonInColony.setLocation(wagonNotInColony.getTile());
+        igc.moveGoods(cotton, wagonNotInColony);
+        assertEquals(wagonNotInColony, cotton.getLocation());
+    }
+
+    public void testLoadInEurope() {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        Map map = getCoastTestMap(plains);
+        server.setMapGenerator(new MockMapGenerator(getTestMap()));
+        PreGameController pgc = (PreGameController) server.getController();
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Goods cotton = new Goods(game, null, cottonType, 75);
+        Europe europe = dutch.getEurope();
+        Unit privateer1 = new Unit(game, europe, dutch,
+                                   privateerType, UnitState.ACTIVE);
+        Unit privateer2 = new Unit(game, europe, dutch,
+                                   privateerType, UnitState.ACTIVE);
+        InGameController igc = (InGameController) server.getController();
+
+        // While source in Europe, target in Europe
+        cotton.setLocation(privateer1);
+        igc.moveGoods(cotton, privateer2);
+        assertEquals(privateer2, cotton.getLocation());
+
+        // Can not unload directly to Europe
+        try {
+            igc.moveGoods(cotton, europe);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // While source moving from America, target in Europe
+        cotton.setLocation(privateer1);
+        assertEquals(europe, privateer1.getLocation());
+        privateer1.moveToAmerica();
+        try {
+            igc.moveGoods(cotton, privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // While source moving to America, target in Europe
+        cotton.setLocation(privateer1);
+        privateer1.moveToEurope();
+        try {
+            igc.moveGoods(cotton, privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // While source in Europe, target moving to America
+        privateer1.setLocation(europe);
+        privateer2.moveToAmerica();
+        cotton.setLocation(privateer1);
+        try {
+            igc.moveGoods(cotton, privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // While source moving to America, target moving to America
+        cotton.setLocation(privateer1);
+        privateer1.moveToAmerica();
+        try {
+            igc.moveGoods(cotton, privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // While source moving from America, target moving to America
+        cotton.setLocation(privateer1);
+        privateer1.moveToEurope();
+        try {
+            igc.moveGoods(cotton, privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // While source in Europe, target moving from America
+        privateer1.setLocation(europe);
+        privateer2.moveToEurope();
+
+        cotton.setLocation(privateer1);
+        try {
+            igc.moveGoods(cotton, privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // While source moving to America, target moving from America
+        cotton.setLocation(privateer1);
+        privateer1.moveToAmerica();
+        try {
+            igc.moveGoods(cotton, privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
+
+        // While source moving from America, target moving from America
+        cotton.setLocation(privateer1);
+        privateer1.moveToEurope();
+        try {
+            igc.moveGoods(cotton, privateer2);
+            fail();
+        } catch (IllegalStateException e) {
+        }
     }
 
 }

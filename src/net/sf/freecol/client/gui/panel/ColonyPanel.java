@@ -428,8 +428,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         //"%toryNumber%", Integer.toString(getColony().getUnitCount() - getColony().getMembers()),
     }
     
-    public void updateInPortPanel(){
+    public void updateInPortPanel() {
         inPortPanel.initialize(null);
+    }
+
+    public void updateWarehousePanel() {
+        warehousePanel.update();
     }
 
     public void updateTilePanel() {
@@ -593,7 +597,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             Iterator<Goods> goodsIterator = unit.getGoodsIterator();
             while (goodsIterator.hasNext()) {
                 Goods goods = goodsIterator.next();
-                getController().unloadCargo(goods);
+                getController().unloadCargo(goods, false);
             }
             Iterator<Unit> unitIterator = unit.getUnitIterator();
             while (unitIterator.hasNext()) {
@@ -1525,6 +1529,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             updateProductionPanel();
         } else if (property.startsWith("model.goods.")) {
             updateProductionPanel();
+            updateWarehousePanel();
         } else if (Building.UNIT_CHANGE.equals(property)) {
         	// already processed by BuildingPanel
         } else {

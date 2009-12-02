@@ -140,7 +140,7 @@ public class SellMessage extends Message {
         settlement.modifyAlarm(player, -settlement.getPrice(goods) / 500);
         player.modifyGold(gold);
 
-        goods.setLocation(settlement);
+        server.getInGameController().moveGoods(goods, settlement);
         settlement.updateWantedGoods();
         settlement.getTile().updateIndianSettlementInformation(player);
 

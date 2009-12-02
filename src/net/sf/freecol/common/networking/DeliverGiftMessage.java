@@ -166,7 +166,7 @@ public class DeliverGiftMessage extends Message {
             indianSettlement.modifyAlarm(player, -indianSettlement.getPrice(goods) / 50);
         }
 
-        goods.setLocation(settlement);
+        server.getInGameController().moveGoods(goods, settlement);
         if (indianSettlement != null) {
             indianSettlement.updateWantedGoods();
             indianSettlement.getTile().updateIndianSettlementInformation(player);

@@ -228,11 +228,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      * @param player The <code>Player</code> selling the goods.
      */
     public void sell(Goods goods, Player player) {
-        GoodsType type = goods.getType();
-        int amount = goods.getAmount();
-
-        goods.setLocation(null);
-        sell(type, amount, player, Market.EUROPE);
+        sell(goods.getType(), goods.getAmount(), player, Market.EUROPE);
     }
 
     /**

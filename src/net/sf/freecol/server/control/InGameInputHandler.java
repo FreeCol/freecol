@@ -93,6 +93,7 @@ import net.sf.freecol.common.networking.GoodsForSaleMessage;
 import net.sf.freecol.common.networking.InciteMessage;
 import net.sf.freecol.common.networking.JoinColonyMessage;
 import net.sf.freecol.common.networking.LearnSkillMessage;
+import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.MissionaryMessage;
 import net.sf.freecol.common.networking.MoveMessage;
@@ -107,6 +108,7 @@ import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
 import net.sf.freecol.common.networking.SpySettlementMessage;
 import net.sf.freecol.common.networking.StatisticsMessage;
+import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.UpdateCurrentStopMessage;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.common.util.RandomChoice;
@@ -218,16 +220,16 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new DisembarkMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("loadCargo", new CurrentPlayerNetworkRequestHandler() {
+        register(LoadCargoMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return loadCargo(connection, element);
+                return new LoadCargoMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("unloadCargo", new CurrentPlayerNetworkRequestHandler() {
+        register(UnloadCargoMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return unloadCargo(connection, element);
+                return new UnloadCargoMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("buyGoods", new CurrentPlayerNetworkRequestHandler() {
@@ -1056,39 +1058,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
     }
 
     /**
-     * Handles a "loadCargo"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param loadCargoElement The element containing the request.
-     */
-    private Element loadCargo(Connection connection, Element loadCargoElement) {
-        Unit carrier = (Unit) getGame().getFreeColGameObject(loadCargoElement.getAttribute("carrier"));
-        Goods goods = new Goods(getGame(), (Element) loadCargoElement.getChildNodes().item(0));
-        goods.loadOnto(carrier);
-        return null;
-    }
-
-    /**
-     * Handles an "unloadCargo"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param unloadCargoElement The element containing the request.
-     */
-    private Element unloadCargo(Connection connection, Element unloadCargoElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Goods goods = new Goods(getGame(), (Element) unloadCargoElement.getChildNodes().item(0));
-        if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getColony() != null) {
-            goods.unload();
-        } else {
-            goods.setLocation(null);
-        }
-        return null;
-    }
-
-    /**
      * Handles a "buyGoods"-message from a client.
      * 
      * @param connection The connection the message came from.
@@ -1126,6 +1095,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
             throw new IllegalStateException("Not your unit!");
         }
+        goods.changeLocation(null);/*fixme*/
         player.getMarket().sell(goods, player);
 
         Element marketElement = Message.createNewRootElement("marketElement");

@@ -790,7 +790,7 @@ public final class EuropePanel extends FreeColPanel {
                             getController().payArrears(goods);
                             break;
                         case DUMP_CARGO:
-                            getController().unloadCargo(goods);
+                            getController().unloadCargo(goods, true);
                             break;
                         case CANCEL:
                         default:

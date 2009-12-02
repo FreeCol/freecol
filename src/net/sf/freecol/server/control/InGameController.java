@@ -2025,4 +2025,48 @@ public final class InGameController extends Controller {
         return unit.getSpaceLeft() > 0 && cargoSize > 0;
     }
 
+    /**
+     * Move goods from current location to another.
+     *
+     * @param goods The <code>Goods</code> to move.
+     * @param loc The new <code>Location</code>.
+     */
+    public void moveGoods(Goods goods, Location loc)
+        throws IllegalStateException {
+        Location oldLoc = goods.getLocation();
+        if (oldLoc == null) {
+            throw new IllegalStateException("Goods in null location.");
+        } else if (loc == null) {
+            ;
+        } else if (loc instanceof Unit) {
+            if (((Unit) loc).isInEurope()) {
+                if (!(oldLoc instanceof Unit && ((Unit) oldLoc).isInEurope())) {
+                    throw new IllegalStateException("Goods and carrier not both in Europe.");
+                }
+            } else if (loc.getTile() == null) {
+                throw new IllegalStateException("Carrier not on the map.");
+            } else if (oldLoc instanceof IndianSettlement) {
+                // Can not be co-located when buying from natives.
+            } else if (loc.getTile() != oldLoc.getTile()) {
+                throw new IllegalStateException("Goods and carrier not co-located.");
+            }
+        } else if (loc instanceof IndianSettlement) {
+            // Can not be co-located when selling to natives.
+        } else if (loc instanceof Colony) {
+            if (loc.getTile() != oldLoc.getTile()) {
+                throw new IllegalStateException("Goods and carrier not both in Colony.");
+            }
+        } else if (loc.getGoodsContainer() == null) {
+            throw new IllegalStateException("New location with null GoodsContainer.");
+        }
+
+        oldLoc.remove(goods);
+        goods.setLocation(null);
+
+        if (loc != null) {
+            loc.add(goods);
+            goods.setLocation(loc);
+        }
+    }
+
 }

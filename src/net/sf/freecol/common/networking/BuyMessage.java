@@ -140,7 +140,7 @@ public class BuyMessage extends Message {
         settlementPlayer.modifyGold(gold);
         player.modifyGold(-gold);
 
-        goods.setLocation(unit);
+        server.getInGameController().moveGoods(goods, unit);
         settlement.updateWantedGoods();
         settlement.getTile().updateIndianSettlementInformation(player);
 

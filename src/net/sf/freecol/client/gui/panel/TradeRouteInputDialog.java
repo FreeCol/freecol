@@ -434,7 +434,7 @@ public final class TradeRouteInputDialog extends FreeColDialog<Boolean> implemen
                     cargoPanel.remove(label);
                     Stop stop = (Stop) stopList.getSelectedValue();
                     if (stop != null) {
-                        ArrayList<GoodsType> cargo = stop.getCargo();
+                        ArrayList<GoodsType> cargo = new ArrayList<GoodsType>(stop.getCargo());
                         for (int index = 0; index < cargo.size(); index++) {
                             if (cargo.get(index) == label.getType()) {
                                 cargo.remove(index);

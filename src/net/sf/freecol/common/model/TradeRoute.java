@@ -343,9 +343,8 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
          * 
          * @return a cloned <code>ArrayList<Integer></code> value
          */
-        @SuppressWarnings("unchecked")
         public final ArrayList<GoodsType> getCargo() {
-            return (ArrayList<GoodsType>) cargo.clone();
+            return cargo;
         }
 
         /**

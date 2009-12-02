@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
+import net.sf.freecol.common.networking.LoadCargoMessage;
 import net.sf.freecol.server.ai.AIMain;
 import net.sf.freecol.server.ai.AIObject;
 import net.sf.freecol.server.ai.AIUnit;
@@ -135,7 +136,12 @@ public class IndianDemandMission extends Mission {
 
                 if (goodsList.size() > 0) {
                     Goods goods = goodsList.get(getRandom().nextInt(goodsList.size()));
-                    goods.setLocation(getUnit());
+                    LoadCargoMessage message = new LoadCargoMessage(goods, getUnit());
+                    try {
+                        connection.sendAndWait(message.toXMLElement());
+                    } catch (IOException e) {
+                        logger.warning("Could not send \"loadCargo\"-message!");
+                    }
                 }
             }
         } else {
