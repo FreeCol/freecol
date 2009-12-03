@@ -251,6 +251,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             }
             if (locked) {
                 lockedTypes.add(unitType);
+            } else {
+                lockedTypes.remove(unitType);
             }
             if (!locked || showAll.isSelected()) {
                 units.addElement(unitType);
@@ -265,7 +267,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         loop: for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
             // compare colony.getNoBuildReason()
             boolean locked = false;
-            if (current.contains(buildingType)) {
+            Building colonyBuilding = colony.getBuilding(buildingType);
+            if (current.contains(buildingType)
+                || (colonyBuilding != null
+                    && colonyBuilding.getType() == buildingType)) {
                 // only one building of any kind
                 continue;
             } else if (unbuildableTypes.contains(buildingType)) {
@@ -298,7 +303,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             if (!locked
                 && buildingType.getUpgradesFrom() != null
                 && !current.contains(buildingType.getUpgradesFrom())) {
-                Building colonyBuilding = colony.getBuilding(buildingType);
                 if (colonyBuilding == null
                     || colonyBuilding.getType() != buildingType.getUpgradesFrom()) {
                     locked = true;
@@ -306,6 +310,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             }
             if (locked) {
                 lockedTypes.add(buildingType);
+            } else {
+                lockedTypes.remove(buildingType);
             }
             if (!locked || showAll.isSelected()) {
                 buildings.addElement(buildingType);
@@ -323,7 +329,6 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 current.removeElement(type);
             }
         }
-        lockedTypes.clear();
         // ATTENTION: buildings must be updated first, since units
         // might depend on the build ability of an unbuildable
         // building
@@ -423,9 +428,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         if (colony.getOwner() == getMyPlayer()) {
             String command = event.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(buildQueueList);
-            // TODO: improve calculation of locked types, so that we
-            // don't need to call colony.canBuild()
-            if (!buildables.isEmpty() && !colony.canBuild(buildables.get(0))) {
+            if (!buildables.isEmpty() && lockedTypes.contains(buildables.get(0))) {
                 getCanvas().showInformationMessage("colonyPanel.unbuildable",
                                                    buildables.get(0),
                                                    "%colony%", colony.getName(),

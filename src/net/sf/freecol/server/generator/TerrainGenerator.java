@@ -184,7 +184,7 @@ public class TerrainGenerator {
         }
     }
 
-    private void encodeStyle(Tile tile) {
+    public static void encodeStyle(Tile tile) {
         int x = tile.getX();
         int y = tile.getY();
         int base = 1;

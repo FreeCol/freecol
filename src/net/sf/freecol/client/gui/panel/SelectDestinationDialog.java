@@ -32,6 +32,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -39,6 +41,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -137,6 +140,30 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
 
         destinationList.setCellRenderer(new LocationRenderer());
         destinationList.setFixedCellHeight(48);
+
+        final SelectDestinationDialog dialog = this;
+        Action selectAction = new AbstractAction(Messages.message("ok")) {
+                public void actionPerformed(ActionEvent e) {
+                    Destination d = (Destination) destinationList.getSelectedValue();
+                    if (d != null) {
+                        setResponse((Location) d.location);
+                    }
+                    getCanvas().remove(dialog);
+                }
+            };
+
+        Action quitAction = new AbstractAction(Messages.message("selectDestination.cancel")) {
+                public void actionPerformed(ActionEvent e) {
+                    getCanvas().remove(dialog);
+                }
+            };
+
+        destinationList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "select");
+        destinationList.getActionMap().put("select", selectAction);
+        destinationList.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "quit");
+        destinationList.getActionMap().put("quit", quitAction);
+
+
         JScrollPane listScroller = new JScrollPane(destinationList);
         listScroller.setPreferredSize(new Dimension(250, 250));
 
@@ -162,9 +189,8 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         }
         add(comparatorBox, "left");
 
-        cancelButton.setText(Messages.message("selectDestination.cancel"));
-        cancelButton.addActionListener(this);
-        okButton.addActionListener(this);
+        cancelButton.setAction(quitAction);
+        okButton.setAction(selectAction);
 
         add(okButton, "newline 30, split 2, tag ok");
         add(cancelButton, "tag cancel");
@@ -172,21 +198,9 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         setSize(getPreferredSize());
     }
 
-    /**
-     * This function analyses an event and calls the right methods to take care
-     * of the user's requests.
-     * 
-     * @param event The incoming ActionEvent.
-     */
-    public void actionPerformed(ActionEvent event) {
-        String command = event.getActionCommand();
-        if (OK.equals(command)) {
-            Destination d = (Destination) destinationList.getSelectedValue();
-            if (d != null) {
-                setResponse((Location) d.location);
-            }
-        }
-        getCanvas().remove(this);
+    @Override
+    public void requestFocus() {
+        destinationList.requestFocus();
     }
 
     public void stateChanged(ChangeEvent event) {

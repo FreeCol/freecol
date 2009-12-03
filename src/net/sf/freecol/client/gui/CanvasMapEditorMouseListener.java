@@ -34,7 +34,9 @@ import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
+import net.sf.freecol.client.control.MapEditorController;
 import net.sf.freecol.client.gui.panel.EditSettlementDialog;
+import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.TileTypeTransform;
 import net.sf.freecol.client.gui.panel.RiverStylePanel;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
@@ -42,6 +44,8 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
+import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.server.generator.TerrainGenerator;
 
 /**
  * Listens to the mouse being moved at the level of the Canvas.
@@ -189,11 +193,38 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         if (gui.getFocus() != null) {
             Position start = gui.convertToMapCoordinates(startPoint.x, startPoint.y);
             Position end = gui.convertToMapCoordinates(oldPoint.x, oldPoint.y);
-            for (int x = Math.min(start.x, end.x); x <= Math.max(start.x, end.x); x++) {
-                for (int y = Math.min(start.y, end.y); y <= Math.max(start.y, end.y); y++) {
-                    Tile t = getMap().getTile(x, y);
+            MapEditorController controller = canvas.getClient().getMapEditorController();
+            Tile t;
+            int min_x, max_x, min_y, max_y;
+            if (start.x < end.x) {
+                min_x = start.x;
+                max_x = end.x;
+            } else {
+                min_x = end.x;
+                max_x = start.x;
+            }
+            if (start.y < end.y) {
+                min_y = start.y;
+                max_y = end.y;
+            } else {
+                min_y = end.y;
+                max_y = start.y;
+            }
+            for (int x = min_x; x <= max_x; x++) {
+                for (int y = min_y; y <= max_y; y++) {
+                    t = getMap().getTile(x, y);
                     if (t != null) {
-                        canvas.getClient().getMapEditorController().transform(t);
+                        controller.transform(t);
+                    }
+                }
+            }
+            if (controller.getMapTransform() instanceof TileTypeTransform) {
+                for (int x = min_x - 2; x <= max_x + 2; x++) {
+                    for (int y = min_y - 2; y <= max_y + 2; y++) {
+                        t = getMap().getTile(x, y);
+                        if (t != null && t.getType().isWater()) {
+                            TerrainGenerator.encodeStyle(t);
+                        }
                     }
                 }
             }

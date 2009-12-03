@@ -246,11 +246,15 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         }
     }
 
-    private class TileTypeTransform extends MapTransform {
+    public class TileTypeTransform extends MapTransform {
         private TileType tileType;
 
         private TileTypeTransform(TileType tileType) {
             this.tileType = tileType;
+        }
+
+        public TileType getTileType() {
+            return tileType;
         }
 
         public void transform(Tile t) {
