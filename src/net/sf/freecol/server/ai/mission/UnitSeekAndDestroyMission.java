@@ -328,7 +328,9 @@ public class UnitSeekAndDestroyMission extends Mission {
         out.writeStartElement(getXMLElementTagName());
         
         out.writeAttribute("unit", getUnit().getId());
-        out.writeAttribute("target", getTarget().getId());
+        if (getTarget() != null) {
+            out.writeAttribute("target", getTarget().getId());
+        }
 
         out.writeEndElement();
     }
