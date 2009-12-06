@@ -898,6 +898,7 @@
       <ability id="model.ability.captureUnits" value="false"/>
       <ability id="model.ability.captureEquipment" value="true"/>
       <ability id="model.ability.canBeEquipped" value="true"/>
+      <ability id="model.ability.foundColony" value="true"/>
       <required-ability id="model.ability.native"/>
     </unit-type>
     <unit-type id="model.unit.colonialRegular" movement="3" lineOfSight="1"

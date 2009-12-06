@@ -2917,6 +2917,23 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         colony.placeSettlement();
         joinColony(colony);
     }
+    
+    /**
+     * Makes this unit build the specified Indian settlement.
+     * 
+     * @param settlement The settlement this unit shall build.
+     */
+    public void buildIndianSettlement(IndianSettlement indianSettlement) {
+        if (!canBuildColony()) {
+            throw new IllegalStateException("Unit " + getName() + " can not build settlement on " + getTile().getName() + "!");
+        }
+        if (!getTile().getPosition().equals(indianSettlement.getTile().getPosition())) {
+            throw new IllegalStateException("A Unit can only build a settlement if on the same tile as the settlement");
+        }
+
+        indianSettlement.placeSettlement();
+        joinIndianSettlement(indianSettlement);
+    }
 
     /**
      * Join existing colony.
@@ -2926,6 +2943,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public void joinColony(Colony colony) {
         setState(UnitState.IN_COLONY);
         setLocation(colony);
+        setMovesLeft(0);
+    }
+    
+    /**
+     * Join existing settlement.
+     *
+     * @param settlement a <code>IndianSettlement</code> value
+     */
+    public void joinIndianSettlement(IndianSettlement indianSettlement) {
+        setState(UnitState.IN_COLONY);
+        setLocation(indianSettlement);
         setMovesLeft(0);
     }
 

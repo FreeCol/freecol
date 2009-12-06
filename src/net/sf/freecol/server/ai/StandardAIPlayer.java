@@ -281,11 +281,11 @@ public class StandardAIPlayer extends AIPlayer {
         }
         int numberOfColonies = 0;
         int numberOfWorkers = 0;
-        for (Colony colony : getPlayer().getColonies()) {
+        for (Settlement settlment : getPlayer().getSettlements()) {
             numberOfColonies++;
-            numberOfWorkers += colony.getUnitCount();
+            numberOfWorkers += settlment.getUnitCount();
         }
-
+        
         logger.finest("Leaving method hasFewColonies");
         return numberOfColonies <= 2 || numberOfColonies >= 3
                 && numberOfWorkers / numberOfColonies > numberOfColonies - 2;
