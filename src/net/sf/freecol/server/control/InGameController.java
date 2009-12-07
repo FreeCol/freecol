@@ -1457,7 +1457,7 @@ public final class InGameController extends Controller {
         int percentNeutral;
         int percentBad;
         int percentGood;
-        if (hasDeSoto && isExpertScout) {
+        if (hasDeSoto) {
             percentBad  = 0;
             percentGood = 100;
             percentNeutral = 0;
