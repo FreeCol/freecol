@@ -104,9 +104,8 @@ public class BuildColonyMessage extends Message {
     public Element handle(FreeColServer server, Player player, Connection connection) {
         Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
-        Settlement colony = null;
-        
         try {
             unit = server.getUnitSafely(builderId, serverPlayer);
         } catch (Exception e) {
@@ -125,21 +124,21 @@ public class BuildColonyMessage extends Message {
         }
 
         Tile tile = unit.getTile();
+        Settlement settlement = null;
         // Build can proceed.
-        if(player.isIndian()) {
-            colony = new Colony(game, serverPlayer, colonyName, tile);
-            unit.buildColony((Colony)colony);
+        if (player.isEuropean()) {
+            settlement = new Colony(game, serverPlayer, colonyName, tile);
+            unit.buildColony((Colony)settlement);
         } else {
-            colony = new IndianSettlement(game, serverPlayer, tile, colonyName, false,
-                                          generateSkillForLocation(game.getMap(), tile, player.getNationType()),
-                                          new HashSet<Player>(), null);
-            unit.buildIndianSettlement((IndianSettlement)colony);
+            settlement = new IndianSettlement(game, serverPlayer, tile, 
+                                              colonyName, false,
+                                              generateSkillForLocation(game.getMap(), tile, player.getNationType()),
+                                              new HashSet<Player>(), null);
+            unit.buildIndianSettlement((IndianSettlement)settlement);
         }
-        
-        
         HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
                                           HistoryEvent.Type.FOUND_COLONY,
-                                          "%colony%", colony.getName());
+                                          "%colony%", settlement.getName());
         player.getHistory().add(h);
         server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
 
@@ -150,8 +149,8 @@ public class BuildColonyMessage extends Message {
         reply.appendChild(update);
         update.appendChild(tile.toXMLElement(player, doc));
         Map map = game.getMap();
-        for (Tile t : map.getSurroundingTiles(tile, colony.getRadius())) {
-            if (t.getOwningSettlement() == colony) {
+        for (Tile t : map.getSurroundingTiles(tile, settlement.getRadius())) {
+            if (t.getOwningSettlement() == settlement) {
                 update.appendChild(t.toXMLElement(player, doc));
             }
         }
@@ -161,7 +160,7 @@ public class BuildColonyMessage extends Message {
         // smarter--- collect the tiles before building so we can filter
         // out the ones we could see anyway with canSee().
         for (int range = unit.getLineOfSight() + 1; 
-             range <= colony.getLineOfSight(); range++) {
+             range <= settlement.getLineOfSight(); range++) {
             CircleIterator circle = map.getCircleIterator(tile.getPosition(),
                                                           false, range);
             while (circle.hasNext()) {
