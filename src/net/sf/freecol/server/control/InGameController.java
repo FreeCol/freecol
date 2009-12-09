@@ -75,6 +75,7 @@ import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.UpdateMarketMessage;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -2067,6 +2068,22 @@ public final class InGameController extends Controller {
             loc.add(goods);
             goods.setLocation(loc);
         }
+    }
+
+    /**
+     * Propagate a market change to the other markets.
+     *
+     * @param type The type of goods that was traded.
+     * @param amount The amount of goods that was traded.
+     * @param serverPlayer The player that performed the trade.
+     */
+    public void propagateToMarkets(GoodsType type, int amount,
+                                   ServerPlayer serverPlayer) {
+        amount /= 4; // Only propagate 25% of the original change.
+        if (amount == 0) return;
+        UpdateMarketMessage message = new UpdateMarketMessage(type, amount);
+        getFreeColServer().getServer().sendToAll(message.toXMLElement(),
+                       serverPlayer.getConnection());
     }
 
 }

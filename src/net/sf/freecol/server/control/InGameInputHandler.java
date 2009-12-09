@@ -1075,11 +1075,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new IllegalStateException();
         }
         carrier.buyGoods(type, amount);
-       
-        Element marketElement = Message.createNewRootElement("marketElement");
-        marketElement.setAttribute("type", type.getId());
-        marketElement.setAttribute("amount", String.valueOf(-amount/4));
-        getFreeColServer().getServer().sendToAll(marketElement, player.getConnection());
+
+        getFreeColServer().getInGameController()
+            .propagateToMarkets(type, -amount, player);
         return null;
     }
 
@@ -1097,11 +1095,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         goods.changeLocation(null);/*fixme*/
         player.getMarket().sell(goods, player);
-
-        Element marketElement = Message.createNewRootElement("marketElement");
-        marketElement.setAttribute("type", goods.getType().getId());
-        marketElement.setAttribute("amount", String.valueOf(goods.getAmount()/4));
-        getFreeColServer().getServer().sendToAll(marketElement, player.getConnection());
+        
+        getFreeColServer().getInGameController()
+            .propagateToMarkets(goods.getType(), goods.getAmount(), player);
         return null;
     }
 

@@ -67,10 +67,11 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.UpdateMarketMessage;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -149,8 +150,9 @@ public final class InGameInputHandler extends InputHandler {
                 reply = newConvert(element);
             } else if (type.equals("diplomacy")) {
                 reply = diplomacy(element);
-            } else if (type.equals("marketElement")) {
-                reply = marketElement(element);
+            } else if (type.equals("updateMarket")) {
+                reply = new UpdateMarketMessage(getGame(), element)
+                    .clientHandler(getFreeColClient().getMyPlayer());
             } else if (type.equals("addPlayer")) {
                 reply = addPlayer(element);
             } else if (type.equals("spanishSuccession")) {
@@ -1020,23 +1022,6 @@ public final class InGameInputHandler extends InputHandler {
             getGame().getFreeColGameObject(playerElement.getAttribute("ID")).readFromXMLElement(playerElement);
         }
 
-        return null;
-    }
-
-    /**
-     * Handles a "marketElement"-request.
-     * 
-     * @param element The element (root element in a DOM-parsed XML tree) that
-     *        holds all the information.
-     */
-    private Element marketElement(Element element) {
-        Player player = getFreeColClient().getMyPlayer();
-        GoodsType type = FreeCol.getSpecification().getGoodsType(element.getAttribute("type"));
-        int amount = Integer.parseInt(element.getAttribute("amount"));
-        Market market = player.getMarket();
-        if (market.addGoodsToMarket(type, amount)) {
-            player.addModelMessage(market.makePriceMessage(type));
-        }
         return null;
     }
 
