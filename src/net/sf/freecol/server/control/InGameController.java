@@ -75,7 +75,6 @@ import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.UpdateMarketMessage;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -188,6 +187,7 @@ public final class InGameController extends Controller {
     }
 
 
+
     /**
      * Ends the turn of the given player.
      * 
@@ -274,8 +274,10 @@ public final class InGameController extends Controller {
                 if (type == removeType) {
                     amount += getPseudoRandom().nextInt(21);
                 }
-                if (market.addGoodsToMarket(type, -amount)) {
-                    messages.add(market.makePriceMessage(type));
+                market.addGoodsToMarket(type, -amount);
+                if (market.hasPriceChanged(type)) {
+                    messages.add(market.makePriceChangeMessage(type));
+                    market.flushPriceChange(type);
                 }
             }
         }
@@ -2071,19 +2073,31 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Propagate a market change to the other markets.
+     * Propagate an European market change to the other European markets.
      *
      * @param type The type of goods that was traded.
      * @param amount The amount of goods that was traded.
      * @param serverPlayer The player that performed the trade.
      */
-    public void propagateToMarkets(GoodsType type, int amount,
-                                   ServerPlayer serverPlayer) {
-        amount /= 4; // Only propagate 25% of the original change.
+    public void propagateToEuropeanMarkets(GoodsType type, int amount,
+                                           ServerPlayer serverPlayer) {
+        // Propagate 5-30% of the original change.
+        final int lowerBound = 5; // TODO: make into game option?
+        final int upperBound = 30;// TODO: make into game option?
+        amount *= getPseudoRandom().nextInt(upperBound - lowerBound + 1)
+            + lowerBound;
+        amount /= 100;
         if (amount == 0) return;
-        UpdateMarketMessage message = new UpdateMarketMessage(type, amount);
-        getFreeColServer().getServer().sendToAll(message.toXMLElement(),
-                       serverPlayer.getConnection());
+
+        // Do not need to update the clients here, these changes happen
+        // while it is not their turn, and they will get a fresh copy
+        // of the altered market in the update sent in nextPlayer above.
+        Market market;
+        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
+            if (other.isEuropean() && (market = other.getMarket()) != null) {
+                market.addGoodsToMarket(type, amount);
+            }
+        }
     }
 
 }

@@ -75,8 +75,8 @@ public final class Market extends FreeColGameObject implements Ownable {
                 data.setPaidForSale(goodsType.getInitialSellPrice());
                 data.setCostToBuy(goodsType.getInitialBuyPrice());
                 data.setInitialPrice(goodsType.getInitialSellPrice());
-                data.setOldPrice(goodsType.getInitialBuyPrice());
                 priceGoods(goodsType);
+                data.setOldPrice(data.getCostToBuy());
             }
             marketData.put(goodsType, data);
         }
@@ -125,14 +125,11 @@ public final class Market extends FreeColGameObject implements Ownable {
     /**
      * Adjust the price for a particular type of goods.
      *
-     * @param goodsType a <code>GoodsType</code> value
-     * @return True if the price of the goods in the market has changed.
+     * @param goodsType The type of goods to consider.
      */
-    private boolean priceGoods(GoodsType goodsType) {
-        boolean changed = false;
+    private void priceGoods(GoodsType goodsType) {
         MarketData data = marketData.get(goodsType);
         if (data != null) {
-            int oldPrice = data.getCostToBuy();
             int newSalePrice = data.getInitialPrice();
             newSalePrice = Math.round(newSalePrice * goodsType.getInitialAmount()
                                       / (float) data.getAmountInMarket());
@@ -145,12 +142,9 @@ public final class Market extends FreeColGameObject implements Ownable {
                 newPrice = newSalePrice + goodsType.getPriceDifference();
             }
 
-            data.setOldPrice(oldPrice);
             data.setCostToBuy(newPrice);
             data.setPaidForSale(newSalePrice);
-            changed = newPrice != oldPrice;
         }
-        return changed;
     }
 
     // ------------------------------------------------------------ API methods
@@ -271,9 +265,7 @@ public final class Market extends FreeColGameObject implements Ownable {
             amount = (int) player.getFeatureContainer()
                 .applyModifier(amount, "model.modifier.tradeBonus",
                                type, getGame().getTurn());
-            if (addGoodsToMarket(type, amount)) {
-                player.addModelMessage(makePriceMessage(type));
-            }
+            addGoodsToMarket(type, amount);
         } else {
             addModelMessage(this, ModelMessage.MessageType.WARNING,
                             "model.europe.market", "%goods%", type.getName());
@@ -313,9 +305,7 @@ public final class Market extends FreeColGameObject implements Ownable {
         amount = (int) player.getFeatureContainer()
             .applyModifier(amount, "model.modifier.tradeBonus",
                            goodsType, getGame().getTurn());
-        if (addGoodsToMarket(goodsType, -amount)) {
-            player.addModelMessage(makePriceMessage(goodsType));
-        }
+        addGoodsToMarket(goodsType, -amount);
     }
 
     /**
@@ -323,9 +313,8 @@ public final class Market extends FreeColGameObject implements Ownable {
      * 
      * @param goodsType The <code>GoodsType</code> to add.
      * @param amount The amount of goods.
-     * @return True if the goods changes price due to this change.
      */
-    public boolean addGoodsToMarket(GoodsType goodsType, int amount) {
+    public void addGoodsToMarket(GoodsType goodsType, int amount) {
         MarketData data = getMarketData(goodsType);
         if (data == null) {
             data = new MarketData(goodsType);
@@ -338,7 +327,7 @@ public final class Market extends FreeColGameObject implements Ownable {
          */
         data.setAmountInMarket(Math.max(100, data.getAmountInMarket() + amount));
         data.setTraded(true);
-        return priceGoods(goodsType);
+        priceGoods(goodsType);
     }
 
     /**
@@ -377,6 +366,54 @@ public final class Market extends FreeColGameObject implements Ownable {
 
 
     /**
+     * Has the price of a type of goods changed in this market?
+     *
+     * @param goodsType The type of goods to consider.
+     * @return True if the price has changed.
+     */
+    public boolean hasPriceChanged(GoodsType goodsType) {
+        MarketData data = marketData.get(goodsType);
+        return data != null && data.getOldPrice() != data.getCostToBuy();
+    }
+
+    /**
+     * Clear any price changes for a type of goods.
+     *
+     * @param goodsType The type of goods to consider.
+     */
+    public void flushPriceChange(GoodsType goodsType) {
+        MarketData data = marketData.get(goodsType);
+        if (data != null) {
+            data.setOldPrice(data.getCostToBuy());
+        }
+    }
+
+    /**
+     * Make up a <code>ModelMessage</code> describing the change in this
+     * <code>Market</code> for a specified type of goods.
+     *
+     * @param goodsType The <code>GoodsType</code> that has changed price.
+     * @return A message describing the change.
+     */
+    public ModelMessage makePriceChangeMessage(GoodsType goodsType) {
+        MarketData data = marketData.get(goodsType);
+        int oldPrice = data.getOldPrice();
+        int newPrice = data.getCostToBuy();
+        int newSalePrice = data.getPaidForSale();
+        return (oldPrice == newPrice) ? null
+            : new ModelMessage(this,
+                               ModelMessage.MessageType.MARKET_PRICES,
+                               goodsType,
+                               ((newPrice > oldPrice)
+                                ? "model.market.priceIncrease"
+                                : "model.market.priceDecrease"),
+                               "%market%", owner.getMarketName(),
+                               "%goods%", goodsType.getName(),
+                               "%buy%", String.valueOf(newPrice),
+                               "%sell%", String.valueOf(newSalePrice));
+    }
+
+    /**
      * Adds a transaction listener for notification of any transaction
      *
      * @param listener the listener
@@ -406,32 +443,6 @@ public final class Market extends FreeColGameObject implements Ownable {
 
 
     // -------------------------------------------------------- support methods
-
-    /**
-     * Make up a <code>ModelMessage</code> describing the change in this
-     * <code>Market</code> for a specified type of goods.
-     *
-     * @param goodsType The <code>GoodsType</code> that has changed price.
-     * @return A message describing the change.
-     */
-    public ModelMessage makePriceMessage(GoodsType goodsType) {
-        MarketData data = marketData.get(goodsType);
-        int oldPrice = data.getOldPrice();
-        int newPrice = data.getCostToBuy();
-        int newSalePrice = data.getPaidForSale();
-
-        return (oldPrice == newPrice) ? null
-            : new ModelMessage(this,
-                               ModelMessage.MessageType.MARKET_PRICES,
-                               goodsType,
-                               ((newPrice > oldPrice)
-                                ? "model.market.priceIncrease"
-                                : "model.market.priceDecrease"),
-                               "%market%", owner.getMarketName(),
-                               "%goods%", goodsType.getName(),
-                               "%buy%", String.valueOf(newPrice),
-                               "%sell%", String.valueOf(newSalePrice));
-    }
 
     /**
      * This method writes an XML-representation of this object to

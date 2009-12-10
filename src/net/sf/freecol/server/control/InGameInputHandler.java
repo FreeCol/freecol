@@ -1077,7 +1077,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         carrier.buyGoods(type, amount);
 
         getFreeColServer().getInGameController()
-            .propagateToMarkets(type, -amount, player);
+            .propagateToEuropeanMarkets(type, -amount, player);
         return null;
     }
 
@@ -1097,7 +1097,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         player.getMarket().sell(goods, player);
         
         getFreeColServer().getInGameController()
-            .propagateToMarkets(goods.getType(), goods.getAmount(), player);
+            .propagateToEuropeanMarkets(goods.getType(), goods.getAmount(), player);
         return null;
     }
 

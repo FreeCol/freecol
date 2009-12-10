@@ -71,7 +71,6 @@ import net.sf.freecol.common.networking.ChatMessage;
 import net.sf.freecol.common.networking.DeliverGiftMessage;
 import net.sf.freecol.common.networking.DiplomacyMessage;
 import net.sf.freecol.common.networking.Message;
-import net.sf.freecol.common.networking.UpdateMarketMessage;
 import net.sf.freecol.common.util.Utils;
 
 import org.w3c.dom.Element;
@@ -150,9 +149,6 @@ public final class InGameInputHandler extends InputHandler {
                 reply = newConvert(element);
             } else if (type.equals("diplomacy")) {
                 reply = diplomacy(element);
-            } else if (type.equals("updateMarket")) {
-                reply = new UpdateMarketMessage(getGame(), element)
-                    .clientHandler(getFreeColClient().getMyPlayer());
             } else if (type.equals("addPlayer")) {
                 reply = addPlayer(element);
             } else if (type.equals("spanishSuccession")) {
