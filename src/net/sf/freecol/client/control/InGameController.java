@@ -105,6 +105,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
+import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
@@ -592,8 +593,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean loadGoods(Goods goods, Colony colony, Unit carrier) {
         if (colony == null) {
-            buyGoods(goods.getType(), goods.getAmount(), carrier);
-            return true; /*FIXME when buyGoods is encapsulated */
+            return buyGoods(goods.getType(), goods.getAmount(), carrier);
         }
         GoodsType type = goods.getType();
         GoodsContainer container = colony.getGoodsContainer();
@@ -3355,53 +3355,86 @@ public final class InGameController implements NetworkConstants {
     }
 
     /**
-     * Buys goods in Europe. The amount of goods is adjusted if there is lack of
-     * space in the <code>carrier</code>.
+     * Buy goods in Europe.
+     * The amount of goods is adjusted to the space in the carrier.
      *
      * @param type The type of goods to buy.
      * @param amount The amount of goods to buy.
-     * @param carrier The carrier.
+     * @param carrier The <code>Unit</code> acting as carrier.
+     * @return True if the purchase succeeds.
      */
-    public void buyGoods(GoodsType type, int amount, Unit carrier) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-
-        Client client = freeColClient.getClient();
-        Player myPlayer = freeColClient.getMyPlayer();
+    public boolean buyGoods(GoodsType type, int amount, Unit carrier) {
         Canvas canvas = freeColClient.getCanvas();
-
-        if (carrier == null) {
-            throw new NullPointerException();
+        Player player = freeColClient.getMyPlayer();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return false;
         }
 
-        if (carrier.getOwner() != myPlayer
-            || (carrier.getSpaceLeft() <= 0 && (carrier.getGoodsContainer().getGoodsCount(type) % 100 == 0))) {
-            return;
+        // Sanity checks.  Should not happen!
+        if (type == null) {
+            throw new NullPointerException("Goods type must not be null.");
+        } else if (carrier == null) {
+            throw new NullPointerException("Carrier must not be null.");
+        } else if (carrier.getOwner() != player) {
+            throw new IllegalArgumentException("Carrier owned by someone else.");
+        } else if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive.");
         }
 
+        // Size check, if there are spare holds they can be filled, but...
+        int toBuy = GoodsContainer.CARGO_SIZE;
         if (carrier.getSpaceLeft() <= 0) {
-            amount = Math.min(amount, 100 - carrier.getGoodsContainer().getGoodsCount(type) % 100);
+            // ...if there are no spare holds, we can only fill a hold
+            // already partially filled with this type, otherwise fail.
+            int partial = carrier.getGoodsContainer().getGoodsCount(type)
+                % GoodsContainer.CARGO_SIZE;
+            if (partial == 0) return false;
+            toBuy -= partial;
         }
+        if (amount < toBuy) toBuy = amount;
 
-        if (myPlayer.getMarket().getBidPrice(type, amount) > myPlayer.getGold()) {
+        // Check that the purchase is funded.
+        if (player.getMarket().getBidPrice(type, toBuy) > player.getGold()) {
             canvas.errorMessage("notEnoughGold");
-            return;
+            return false;
         }
 
-        freeColClient.playSound(SoundEffect.LOAD_CARGO);
+        // Try to purchase.
+        int oldAmount = carrier.getGoodsContainer().getGoodsCount(type);
+        int newAmount;
+        if (askBuyGoods(carrier, type, toBuy)
+            && (newAmount = carrier.getGoodsContainer().getGoodsCount(type)) > oldAmount) {
+            freeColClient.playSound(SoundEffect.LOAD_CARGO);
+            canvas.updateGoldLabel();
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
+            return true;
+        }
 
-        Element buyGoodsElement = Message.createNewRootElement("buyGoods");
-        buyGoodsElement.setAttribute("carrier", carrier.getId());
-        buyGoodsElement.setAttribute("type", type.getId());
-        buyGoodsElement.setAttribute("amount", Integer.toString(amount));
-
-        carrier.buyGoods(type, amount);
-        freeColClient.getCanvas().updateGoldLabel();
-
-        client.sendAndWait(buyGoodsElement);
+        // Purchase failed for some reason.
+        return false;
     }
+
+    /**
+     * Server query-response for buying goods in Europe.
+     *
+     * @param carrier The <code>Unit</code> to load with the goods.
+     * @param type The type of goods to buy.
+     * @param amount The amount of goods to buy.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askBuyGoods(Unit carrier, GoodsType type, int amount) {
+        Client client = freeColClient.getClient();
+        BuyGoodsMessage message = new BuyGoodsMessage(carrier, type, amount);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
 
     /**
      * Sells goods in Europe.

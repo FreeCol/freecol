@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
+import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.Message;
@@ -516,28 +517,30 @@ public abstract class Mission extends AIObject {
     }
     
     
-    protected void unitLeavesShip(Connection connection, Unit u) {
+    protected boolean unitLeavesShip(Connection connection, Unit unit) {
+        DisembarkMessage message = new DisembarkMessage(unit);
         try {
-            connection.sendAndWait(new DisembarkMessage(u).toXMLElement());
+            connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"disembark\"-message!");
+            logger.warning("Could not send \"" + message.getXMLElementTagName()
+                           + "\"-message to the server!");
+            return false;
         }
+        return true;
     }
     
-    public boolean buyGoods(Connection connection, Unit carrier, GoodsType goodsType, int amount){
-        boolean success = true;
-        Element buyGoodsElement = Message.createNewRootElement("buyGoods");
-        buyGoodsElement.setAttribute("carrier", carrier.getId());
-        buyGoodsElement.setAttribute("type", goodsType.getId());
-        buyGoodsElement.setAttribute("amount", Integer.toString(amount));
+    public boolean buyGoods(Connection connection, Unit carrier,
+                            GoodsType goodsType, int amount) {
+        BuyGoodsMessage message = new BuyGoodsMessage(carrier, goodsType,
+                                                      amount);
         try {
-            connection.sendAndWait(buyGoodsElement);
+            connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"buyGoods\"-message to the server.");
-            success = false;
+            logger.warning("Could not send \"" + message.getXMLElementTagName()
+                           + "\"-message to the server.");
+            return false;
         }
-        
-        return success;
+        return true;
     }
     
     public PathNode findNearestColony(Unit unit){

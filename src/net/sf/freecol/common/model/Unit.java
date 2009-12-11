@@ -2258,27 +2258,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Buys goods of a specified type and amount and adds it to this
-     * <code>Unit</code>. Can only be used when the <code>Unit</code> is a
-     * carrier and is located in {@link Europe}.
-     * 
-     * @param goodsType The type of goods to buy.
-     * @param amount The amount of goods to buy.
-     */
-    public void buyGoods(GoodsType goodsType, int amount) {
-        if (!canCarryGoods() || !isInEurope()) {
-            throw new IllegalStateException("Cannot buy goods when not a carrier or in Europe.");
-        }
-
-        try {
-            getOwner().getMarket().buy(goodsType, amount, getOwner());
-            goodsContainer.addGoods(goodsType, amount);
-        } catch (IllegalStateException ise) {
-            this.addModelMessage(this, ModelMessage.MessageType.DEFAULT, "notEnoughGold");
-        }
-    }
-
-    /**
      * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
      * 
      * @return 'true' if this unit can carry other units, 'false' otherwise.

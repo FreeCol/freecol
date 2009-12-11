@@ -73,6 +73,7 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
+import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
@@ -232,10 +233,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new UnloadCargoMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("buyGoods", new CurrentPlayerNetworkRequestHandler() {
+        register(BuyGoodsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return buyGoods(connection, element);
+                return new BuyGoodsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("sellGoods", new CurrentPlayerNetworkRequestHandler() {
@@ -1055,30 +1056,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(update);
         }
         return reply;
-    }
-
-    /**
-     * Handles a "buyGoods"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param buyGoodsElement The element containing the request.
-     */
-    private Element buyGoods(Connection connection, Element buyGoodsElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit carrier = (Unit) getGame().getFreeColGameObject(buyGoodsElement.getAttribute("carrier"));
-        GoodsType type = FreeCol.getSpecification().getGoodsType(buyGoodsElement.getAttribute("type"));
-        int amount = Integer.parseInt(buyGoodsElement.getAttribute("amount"));
-        if (carrier.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        if (carrier.getOwner() != player) {
-            throw new IllegalStateException();
-        }
-        carrier.buyGoods(type, amount);
-
-        getFreeColServer().getInGameController()
-            .propagateToEuropeanMarkets(type, -amount, player);
-        return null;
     }
 
     /**
