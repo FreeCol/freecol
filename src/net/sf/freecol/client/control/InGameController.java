@@ -2716,7 +2716,7 @@ public final class InGameController implements NetworkConstants {
                 final int CHOOSE_HAGGLE = 2;
                 String text = Messages.message("buy.text",
                         "%nation%", settlement.getOwner().getNationAsString(),
-                        "%goods%", goods.getName(),
+                        "%goods%", goods.toString(),
                         "%gold%", Integer.toString(gold));
                 List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
                 choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), CHOOSE_BUY));
