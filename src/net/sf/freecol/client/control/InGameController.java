@@ -135,6 +135,7 @@ import net.sf.freecol.common.networking.NewLandNameMessage;
 import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
+import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
@@ -726,8 +727,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
         if (colony == null) {
-            sellGoods(goods);
-            return true; /*FIXME when sellGoods gets encapsulated */
+            return sellGoods(goods);
         }
         GoodsType type = goods.getType();
         GoodsContainer container = colony.getGoodsContainer();
@@ -3440,30 +3440,62 @@ public final class InGameController implements NetworkConstants {
      * Sells goods in Europe.
      *
      * @param goods The goods to be sold.
+     * @return True if the sale succeeds.
      */
-    public void sellGoods(Goods goods) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
+    public boolean sellGoods(Goods goods) {
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
+            return false;
         }
 
-        Client client = freeColClient.getClient();
-        Player player = freeColClient.getMyPlayer();
+        // Sanity checks.
+        if (goods == null) {
+            throw new NullPointerException("Goods must not be null.");
+        }
+        Unit carrier = null;
+        if (goods.getLocation() instanceof Unit) {
+            carrier = (Unit) goods.getLocation();
+        }
+        if (carrier == null) {
+            throw new IllegalStateException("Goods not on carrier.");
+        }
+        if (!carrier.isInEurope()) {
+            throw new IllegalStateException("Goods not on carrier in Europe.");
+        }
 
-        freeColClient.playSound(SoundEffect.SELL_CARGO);
+        // Try to sell.
+        if (askSellGoods(goods, carrier)) {
+            freeColClient.playSound(SoundEffect.SELL_CARGO);
+            canvas.updateGoldLabel();
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
+            return true;
+        }
 
-        goods.adjustAmount();
-
-        Element sellGoodsElement = Message.createNewRootElement("sellGoods");
-        sellGoodsElement.appendChild(goods.toXMLElement(freeColClient.getMyPlayer(), sellGoodsElement
-                                                        .getOwnerDocument()));
-
-        goods.changeLocation(null);/*fixme*/
-        player.getMarket().sell(goods, player);
-        freeColClient.getCanvas().updateGoldLabel();
-
-        client.sendAndWait(sellGoodsElement);
+        // Sale failed for some reason.
+        return false;
     }
+
+    /**
+     * Server query-response for selling goods in Europe.
+     *
+     * @param goods The <code>Goods</code> to sell.
+     * @param carrier The <code>Unit</code> in Europe with the goods.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askSellGoods(Goods goods, Unit carrier) {
+        Client client = freeColClient.getClient();
+        SellGoodsMessage message = new SellGoodsMessage(goods, carrier);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
 
     /**
      * Sets the export settings of the custom house.

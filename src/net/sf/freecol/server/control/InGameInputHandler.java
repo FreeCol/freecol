@@ -104,6 +104,7 @@ import net.sf.freecol.common.networking.NewRegionNameMessage;
 import net.sf.freecol.common.networking.NoRouteToServerException;
 import net.sf.freecol.common.networking.RenameMessage;
 import net.sf.freecol.common.networking.ScoutIndianSettlementMessage;
+import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.SellMessage;
 import net.sf.freecol.common.networking.SellPropositionMessage;
 import net.sf.freecol.common.networking.SetDestinationMessage;
@@ -239,10 +240,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return new BuyGoodsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
-        register("sellGoods", new CurrentPlayerNetworkRequestHandler() {
+        register(SellGoodsMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return sellGoods(connection, element);
+                return new SellGoodsMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register("moveToEurope", new CurrentPlayerNetworkRequestHandler() {
@@ -1056,26 +1057,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             reply.appendChild(update);
         }
         return reply;
-    }
-
-    /**
-     * Handles a "sellGoods"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param sellGoodsElement The element containing the request.
-     */
-    private Element sellGoods(Connection connection, Element sellGoodsElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Goods goods = new Goods(getGame(), (Element) sellGoodsElement.getChildNodes().item(0));
-        if (goods.getLocation() instanceof Unit && ((Unit) goods.getLocation()).getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        goods.changeLocation(null);/*fixme*/
-        player.getMarket().sell(goods, player);
-        
-        getFreeColServer().getInGameController()
-            .propagateToEuropeanMarkets(goods.getType(), goods.getAmount(), player);
-        return null;
     }
 
     /**

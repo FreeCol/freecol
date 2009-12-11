@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
 import net.sf.freecol.common.networking.DisembarkMessage;
+import net.sf.freecol.common.networking.SellGoodsMessage;
 import net.sf.freecol.common.networking.UnloadCargoMessage;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -402,7 +403,8 @@ public abstract class Mission extends AIObject {
         try {
             connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"unloadCargo\"-message!");
+            logger.warning("Could not send \"" + message.getXMLElementTagName()
+                           + "\"-message!");
             return false;
         }
         return true;
@@ -416,13 +418,12 @@ public abstract class Mission extends AIObject {
             p.modifyGold(p.getMarket().getSalePrice(goods));
         }
         // END: TODO-AI-CHEATING.
-        Element sellGoodsElement = Message.createNewRootElement("sellGoods");
-        sellGoodsElement.appendChild(goods.toXMLElement(carrier.getOwner(),
-                sellGoodsElement.getOwnerDocument()));
+        SellGoodsMessage message = new SellGoodsMessage(goods, carrier);
         try {
-            connection.sendAndWait(sellGoodsElement);
+            connection.sendAndWait(message.toXMLElement());
         } catch (IOException e) {
-            logger.warning("Could not send \"sellGoodsElement\"-message!");
+            logger.warning("Could not send \"" + message.getXMLElementTagName()
+                           + "\"-message!");
             return false;
         }
         return true;
