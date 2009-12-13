@@ -2069,8 +2069,8 @@ public final class InGameController implements NetworkConstants {
         // Pick units the user wants to disembark.
         Canvas canvas = freeColClient.getCanvas();
         while (disembarkable.size() > 0) {
-            Unit u = canvas.showSimpleChoiceDialog("disembark.text",
-                                                   "disembark.cancel",
+            Unit u = canvas.showSimpleChoiceDialog(Messages.message("disembark.text"),
+                                                   Messages.message("disembark.cancel"),
                                                    disembarkable);
             if (u == null) break; // Done
             // Call move() as while the destination tile is known to
