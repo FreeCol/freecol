@@ -2686,6 +2686,7 @@ public final class InGameController implements NetworkConstants {
         List<Goods> forSale = askGoodsForSaleInSettlement(unit, settlement);
 
         Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
         Goods goods = null;
         for (;;) {
             // Rebuild the choice list
@@ -2719,7 +2720,9 @@ public final class InGameController implements NetworkConstants {
                         "%goods%", goods.toString(),
                         "%gold%", Integer.toString(gold));
                 List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), CHOOSE_BUY));
+                if (player.getGold() >= gold) {
+                    choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), CHOOSE_BUY));
+                }
                 choices.add(new ChoiceItem<Integer>(Messages.message("buy.moreGold"), CHOOSE_HAGGLE));
                 Integer offerReply = canvas.showChoiceDialog(text,
                         Messages.message("buyProposition.cancel"), choices);

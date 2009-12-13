@@ -134,6 +134,10 @@ public class BuyMessage extends Message {
         if (returnGold != gold) {
             return Message.clientError("This was not the price we agreed upon! Cheater?");
         }
+        // Check this is funded.
+        if (player.getGold() < gold) {
+            return Message.clientError("Insufficient gold to buy.");
+        }
 
         Player settlementPlayer = settlement.getOwner();
         settlement.modifyAlarm(player, -gold / 50);
