@@ -3381,25 +3381,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         return (location != null ? location.getColony() : null);
     }
 
-    /**
-     * Clear the specialty of a <code>Unit</code> changing the
-     * UnitType to the UnitType specified for clearing.
-     */
-    public void clearSpeciality() {
-        UnitType newType = unitType.getUnitTypeChange(ChangeType.CLEAR_SKILL, owner);
-
-        // There can be some restrictions that may prevent the clearing of the specialty
-        // For example, teachers cannot not be cleared of their specialty
-        if (this.getLocation() instanceof Building &&
-            !((Building) this.getLocation()).canAdd(newType)){
-                throw new IllegalStateException("Cannot clear specialty, building does not allow new unit type");
-        }
-                
-        if (newType != null) {
-            setType(newType);
-        }
-    }
-
     /** 
      * Given a type of goods to produce in the field and a tile,
      * returns the unit's potential to produce goods.

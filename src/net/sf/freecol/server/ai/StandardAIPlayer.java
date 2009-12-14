@@ -79,6 +79,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Message;
+import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.NetworkConstants;
 import net.sf.freecol.server.ai.mission.BuildColonyMission;
 import net.sf.freecol.server.ai.mission.CashInTreasureTrainMission;
@@ -714,9 +715,7 @@ public class StandardAIPlayer extends AIPlayer {
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.MUSKETS, 50));
                     getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.HORSES, 50));
 
-                    Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
-                    clearSpecialityElement.setAttribute("unit", unit.getId());
-                    sendAndWaitSafely(clearSpecialityElement);
+                    sendAndWaitSafely(new ClearSpecialityMessage(unit).toXMLElement());
                     Element equipMusketsElement = Message.createNewRootElement("equipUnit");
                     equipMusketsElement.setAttribute("unit", unit.getId());
                     equipMusketsElement.setAttribute("type", "model.equipment.muskets");

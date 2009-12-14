@@ -110,6 +110,7 @@ import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChatMessage;
+import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
@@ -3324,38 +3325,6 @@ public final class InGameController implements NetworkConstants {
         unloadGoods(goods, carrier, colony);
     }
 
-    /**
-     * Clear the speciality of a <code>Unit</code>. That is, makes it a
-     * <code>Unit.FREE_COLONIST</code>.
-     *
-     * @param unit The <code>Unit</code> to clear the speciality of.
-     */
-    public void clearSpeciality(Unit unit) {
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        } else {
-            UnitType newUnit = unit.getType().getUnitTypeChange(ChangeType.CLEAR_SKILL, unit.getOwner());
-            if (newUnit == null) {
-                freeColClient.getCanvas().showInformationMessage("clearSpeciality.impossible",
-                                                                 "%unit%", unit.getName());
-                return;
-            } else if (!freeColClient.getCanvas().showConfirmDialog("clearSpeciality.areYouSure", "yes", "no",
-                                                                    "%oldUnit%", unit.getName(),
-                                                                    "%unit%", newUnit.getName())) {
-                return;
-            }
-        }
-
-        Client client = freeColClient.getClient();
-
-        Element clearSpecialityElement = Message.createNewRootElement("clearSpeciality");
-        clearSpecialityElement.setAttribute("unit", unit.getId());
-
-        unit.clearSpeciality();
-
-        client.sendAndWait(clearSpecialityElement);
-    }
 
     /**
      * Buy goods in Europe.
@@ -3492,6 +3461,60 @@ public final class InGameController implements NetworkConstants {
         SellGoodsMessage message = new SellGoodsMessage(goods, carrier);
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "multiple");
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+
+    /**
+     * Clear the speciality of a Unit, making it a Free Colonist.
+     *
+     * @param unit The <code>Unit</code> to clear the speciality of.
+     */
+    public void clearSpeciality(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+
+        // Check this makes sense and confirm.
+        UnitType oldType = unit.getType();
+        UnitType newType = oldType.getUnitTypeChange(ChangeType.CLEAR_SKILL,
+                                                     unit.getOwner());
+        if (newType == null) {
+            canvas.showInformationMessage("clearSpeciality.impossible",
+                                          "%unit%", unit.getName());
+            return;
+        }
+        if (!canvas.showConfirmDialog("clearSpeciality.areYouSure",
+                                      "yes", "no",
+                                      "%oldUnit%", unit.getName(),
+                                      "%unit%", newType.getName())) {
+            return;
+        }
+
+        // Try to clear.
+        if (askClearSpeciality(unit) && unit.getType() == newType) {
+            ;//unit.firePropertyChange(Unit.UNIT_TYPE_CHANGE, oldType, newType);
+        }
+    }
+
+    /**
+     * Server query-response for clearing a unit speciality.
+     *
+     * @param unit The <code>Unit</code> to operate on.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askClearSpeciality(Unit unit) {
+        Client client = freeColClient.getClient();
+        ClearSpecialityMessage message = new ClearSpecialityMessage(unit);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "update");
         if (reply == null) return false;
 
         Connection conn = client.getConnection();

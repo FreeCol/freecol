@@ -22,6 +22,8 @@ package net.sf.freecol.server.model;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Building;
+import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -45,16 +47,19 @@ import net.sf.freecol.util.test.MockMapGenerator;
 
 
 public class ServerPlayerTest extends FreeColTestCase {	
+    BuildingType schoolHouseType = spec().getBuildingType("model.building.Schoolhouse");
+
+    GoodsType cottonType = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
+
     TileType plains = spec().getTileType("model.tile.plains");
     
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+    UnitType hardyPioneerType = spec().getUnitType("model.unit.hardyPioneer");
     UnitType treasureTrainType = spec().getUnitType("model.unit.treasureTrain");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     UnitType caravelType = spec().getUnitType("model.unit.caravel");
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
     UnitType privateerType = spec().getUnitType("model.unit.privateer");
-
-    GoodsType cottonType = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
 
     FreeColServer server = null;
 	
@@ -452,6 +457,48 @@ public class ServerPlayerTest extends FreeColTestCase {
         try {
             igc.moveGoods(cotton, privateer2);
             fail();
+        } catch (IllegalStateException e) {
+        }
+    }
+
+    public void testClearSpecialty() {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        Map map = getTestMap(plains);
+        server.setMapGenerator(new MockMapGenerator(getTestMap()));
+        PreGameController pgc = (PreGameController) server.getController();
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Unit unit = new Unit(game, map.getTile(5, 8), dutch, hardyPioneerType,
+                             UnitState.ACTIVE);
+        assertTrue("Unit should be a hardy pioneer",
+                   unit.getType() == hardyPioneerType);
+        InGameController igc = (InGameController) server.getController();
+
+        // Basic function
+        igc.clearSpeciality(unit, dutch);
+        assertFalse("Unit was not cleared of its specialty",
+                    unit.getType() == hardyPioneerType);
+
+        // Can not clear speciality while teaching
+        Colony colony = getStandardColony();
+        Building school = new Building(game, colony, schoolHouseType);
+        colony.addBuilding(school);
+        Unit teacher = new Unit(game, school, colony.getOwner(),
+                                hardyPioneerType, UnitState.ACTIVE);
+        assertTrue("Unit should be a hardy pioneer",
+                   teacher.getType() == hardyPioneerType);
+        try {
+            igc.clearSpeciality(teacher, dutch);
+            fail("Unit specialty cannot be cleared, a IllegalStateException should have been raised");
         } catch (IllegalStateException e) {
         }
     }

@@ -79,6 +79,7 @@ import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.ClaimLandMessage;
+import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.DebugForeignColonyMessage;
 import net.sf.freecol.common.networking.DeclareIndependenceMessage;
@@ -330,10 +331,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                 return putOutsideColony(connection, element);
             }
         });
-        register("clearSpeciality", new CurrentPlayerNetworkRequestHandler() {
+        register(ClearSpecialityMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
             @Override
             public Element handle(Player player, Connection connection, Element element) {
-                return clearSpeciality(connection, element);
+                return new ClearSpecialityMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(NewLandNameMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -1455,25 +1456,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         ExportData exportData = new ExportData();
         exportData.readFromXMLElement((Element) setGoodsLevelsElement.getChildNodes().item(0));
         colony.setExportData(exportData);
-        return null;
-    }
-
-    /**
-     * Handles a "clearSpeciality"-request from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param clearSpecialityElement The element containing the request.
-     */
-    private Element clearSpeciality(Connection connection, Element clearSpecialityElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
-        Unit unit = (Unit) getGame().getFreeColGameObject(clearSpecialityElement.getAttribute("unit"));
-        if (unit.getOwner() != player) {
-            throw new IllegalStateException("Not your unit!");
-        }
-        unit.clearSpeciality();
-        if (unit.getLocation() instanceof Tile) {
-            sendUpdatedTileToAll(unit.getTile(), player);
-        }
         return null;
     }
 

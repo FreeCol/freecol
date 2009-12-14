@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.CombatModel;
 import net.sf.freecol.common.model.EquipmentType;
@@ -2100,4 +2101,30 @@ public final class InGameController extends Controller {
         }
     }
 
+
+    /**
+     * Clear the specialty of a unit.
+     *
+     * @param unit The <code>Unit</code> to clear the speciality of.
+     * @param serverPlayer The owner of the unit.
+     */
+    public void clearSpeciality(Unit unit, ServerPlayer serverPlayer) {
+        UnitType newType = unit.getType().getUnitTypeChange(ChangeType.CLEAR_SKILL,
+                                                            serverPlayer);
+        if (newType == null) {
+            throw new IllegalStateException("Can not clear this unit speciality: " + unit.getId());
+        }
+        // There can be some restrictions that may prevent the
+        // clearing of the speciality.  For example, teachers cannot
+        // not be cleared of their speciality.
+        if (unit.getLocation() instanceof Building
+            && !((Building) unit.getLocation()).canAdd(newType)) {
+            throw new IllegalStateException("Cannot clear speciality, building does not allow new unit type");
+        }
+
+        unit.setType(newType);
+        if (unit.getLocation() instanceof Tile) {
+            sendUpdatedTileToAll(unit.getTile(), serverPlayer);
+        }
+    }
 }

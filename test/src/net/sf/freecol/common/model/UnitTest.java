@@ -75,7 +75,6 @@ public class UnitTest extends FreeColTestCase {
     GoodsType foodType = spec().getGoodsType("model.goods.food");
     GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
 
-    BuildingType schoolHouseType = spec().getBuildingType("model.building.Schoolhouse");
     BuildingType carpenterHouseType = spec().getBuildingType("model.building.CarpenterHouse");
     
     /**
@@ -906,44 +905,6 @@ public class UnitTest extends FreeColTestCase {
         assertTrue("Colonist should not have lost experience, compatible role",colonist.getExperience() > 0);
     }
 
-    public void testClearSpecialty(){
-        Game game = getStandardGame();
-        Map map = getTestMap(plains);
-        game.setMap(map);
-        
-        Player dutch = game.getPlayer("model.nation.dutch");
-        
-        Unit unit = new Unit(game, map.getTile(5, 8), dutch, hardyPioneerType, UnitState.ACTIVE);
-        
-        assertTrue("Unit should be a hardy pioneer",unit.getType() == hardyPioneerType);
-                
-        unit.clearSpeciality();
-        
-        assertFalse("Unit was not cleared of its specialty", unit.getType() == hardyPioneerType);
-    }
-
-    public void testInvalidSpecialtyClearing(){
-        Game game = getStandardGame();
-        Map map = getTestMap(plains);
-        game.setMap(map);
-        
-        Colony colony = getStandardColony();
-        
-        Building school = new Building(game, colony, schoolHouseType);
-        colony.addBuilding(school);
-        
-        Unit unit = new Unit(game, school, colony.getOwner(), hardyPioneerType, UnitState.ACTIVE);
-        
-        assertTrue("Unit should be a hardy pioneer",unit.getType() == hardyPioneerType);
-                
-        try{
-            unit.clearSpeciality();
-            fail("Unit specialty cannot be cleared, a IllegalStateException should have been raised");
-        }
-        catch(IllegalStateException e){   
-        }
-    }
-    
     public void testUnitPromotionWorkingInWorkTile(){
         Game game = getStandardGame();
         Map map = getTestMap(plains);
