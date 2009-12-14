@@ -1338,7 +1338,11 @@ public final class GUI {
                 // paint full borders
                 paintBorders(g, tile, xx, yy, true);
                 // Display the Tile overlays:
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                   RenderingHints.VALUE_ANTIALIAS_OFF);
                 displayTileOverlays(g, map, tile, xx, yy, true, true);
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                   RenderingHints.VALUE_ANTIALIAS_ON);
                 // paint transparent borders
                 paintBorders(g, tile, xx, yy, false);
 

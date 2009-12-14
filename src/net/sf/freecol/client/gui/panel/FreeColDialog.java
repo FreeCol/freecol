@@ -282,7 +282,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                 okButton.requestFocus();
             }
         };
-        confirmDialog.setLayout(new MigLayout("wrap 2", "", ""));
+        confirmDialog.setLayout(new MigLayout("wrap 2", "[][fill]", ""));
 
         okButton.addActionListener(new ActionListener() {
                 public void actionPerformed( ActionEvent event ) {
@@ -300,10 +300,10 @@ public class FreeColDialog<T> extends FreeColPanel {
         for (int i = 0; i < texts.length; i++) {
             if (icons != null && icons[i] != null) {
                 confirmDialog.add(new JLabel(icons[i]));
+                confirmDialog.add(getDefaultTextArea(texts[i]));
             } else {
-                confirmDialog.add(new JLabel());
+                confirmDialog.add(getDefaultTextArea(texts[i]), "skip");
             }
-            confirmDialog.add(getDefaultTextArea(texts[i]));
         }
 
         confirmDialog.add(okButton, "newline 20, span, split 2, tag ok");

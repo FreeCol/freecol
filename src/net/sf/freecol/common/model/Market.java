@@ -134,6 +134,17 @@ public final class Market extends FreeColGameObject implements Ownable {
             newSalePrice = Math.round(newSalePrice * goodsType.getInitialAmount()
                                       / (float) data.getAmountInMarket());
             int newPrice = newSalePrice + goodsType.getPriceDifference();
+
+            // dirty work-around to limit prices of new world goods
+            // and related manufactured goods
+            if ((goodsType.isNewWorldGoodsType()
+                 || (goodsType.getRawMaterial() != null
+                     && goodsType.getRawMaterial().isNewWorldGoodsType()))
+                && newSalePrice > data.getInitialPrice() + 2) {
+                newSalePrice = data.getInitialPrice() + 2;
+                newPrice = newSalePrice + goodsType.getPriceDifference();
+            }
+
             if (newPrice > MAXIMUM_PRICE) {
                 newPrice = MAXIMUM_PRICE;
                 newSalePrice = newPrice - goodsType.getPriceDifference();

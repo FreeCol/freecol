@@ -21,28 +21,21 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
 
 
 public class InformationDialog extends FreeColDialog<Boolean> {
-
-    private JButton okButton = new JButton(Messages.message("ok"));
 
     private static Image bgImage = ResourceManager.getImage("InformationDialog.backgroundImage");
 

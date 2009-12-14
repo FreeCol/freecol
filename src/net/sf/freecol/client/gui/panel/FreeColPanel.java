@@ -55,10 +55,10 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import javax.swing.text.StyledDocument;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
@@ -134,6 +134,8 @@ public class FreeColPanel extends JPanel implements ActionListener {
     protected boolean editable = true;
 
     protected JButton okButton = new JButton(Messages.message("ok"));
+
+    protected static StyleContext styleContext = null;
 
 
     /**
@@ -245,28 +247,41 @@ public class FreeColPanel extends JPanel implements ActionListener {
     }
 
     public static JTextPane getDefaultTextPane() {
-        JTextPane textPane = new JTextPane();
+        return getDefaultTextPane(null);
+    }
+
+    public static JTextPane getDefaultTextPane(String text) {
+        if (styleContext == null) {
+            styleContext = createStyleContext();
+        }
+        JTextPane textPane = new JTextPane(new DefaultStyledDocument(styleContext));
         textPane.setOpaque(false);
         textPane.setEditable(false);
+        textPane.setLogicalStyle(styleContext.getStyle("regular"));
 
-        StyledDocument doc = textPane.getStyledDocument();
-        //Initialize some styles.
-        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-        
-        Style regular = doc.addStyle("regular", def);
-        StyleConstants.setFontFamily(def, "Dialog");
-        StyleConstants.setBold(def, true);
-        StyleConstants.setFontSize(def, 12);
-
-        Style buttonStyle = doc.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
-
-        Style right = doc.addStyle("right", regular);
-        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
-
+        textPane.setText(text);
         return textPane;
     }
 
+
+    private static StyleContext createStyleContext() {
+        StyleContext defaultContext = new StyleContext();
+        Style defaultStyle = defaultContext.getDefaultStyleContext()
+            .getStyle(StyleContext.DEFAULT_STYLE);
+
+        Style regular = defaultContext.addStyle("regular", defaultStyle);
+        StyleConstants.setFontFamily(regular, "Dialog");
+        StyleConstants.setBold(regular, true);
+        StyleConstants.setFontSize(regular, 12);
+
+        Style buttonStyle = defaultContext.addStyle("button", regular);
+        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
+
+        Style right = defaultContext.addStyle("right", regular);
+        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
+
+        return defaultContext;
+    }
 
     /**
      * Returns a text area with standard settings suitable for use in FreeCol

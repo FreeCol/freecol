@@ -334,16 +334,12 @@ public final class FreeColClient {
      * @return true if this client can save the game in progress, false otherwise
      */
     public boolean canSaveCurrentGame(){
-        if(getFreeColServer() == null){
+        if (getFreeColServer() == null) {
             return false;
-        }
-
-        if (getMyPlayer() == null) {
+        } else if (getMyPlayer() == null) {
             return false;
-        }
-
-        if(getFreeColServer().getGameState() == GameState.IN_GAME
-                && !getMyPlayer().isAdmin()){
+        } else if (getFreeColServer().getGameState() == GameState.IN_GAME
+                   && !getMyPlayer().isAdmin()) {
             return false;
         }
         return true;

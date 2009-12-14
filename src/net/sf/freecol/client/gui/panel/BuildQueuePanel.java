@@ -268,9 +268,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             // compare colony.getNoBuildReason()
             boolean locked = false;
             Building colonyBuilding = colony.getBuilding(buildingType);
-            if (current.contains(buildingType)
-                || (colonyBuilding != null
-                    && colonyBuilding.getType() == buildingType)) {
+            if (current.contains(buildingType) || hasBuildingType(buildingType)) {
                 // only one building of any kind
                 continue;
             } else if (unbuildableTypes.contains(buildingType)) {
@@ -346,13 +344,13 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
     }
 
-    private boolean hasBuildingType(Colony colony, BuildingType buildingType) {
+    private boolean hasBuildingType(BuildingType buildingType) {
         if (colony.getBuilding(buildingType) == null) {
             return false;
         } else if (colony.getBuilding(buildingType).getType() == buildingType) {
             return true;
         } else if (buildingType.getUpgradesTo() != null) {
-            return hasBuildingType(colony, buildingType.getUpgradesTo());
+            return hasBuildingType(buildingType.getUpgradesTo());
         } else {
             return false;
         }

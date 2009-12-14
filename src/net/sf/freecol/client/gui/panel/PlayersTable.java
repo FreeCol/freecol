@@ -340,7 +340,9 @@ public final class PlayersTable extends JTable {
         public PlayerCellEditor() {
             button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        fireEditingStopped();
+                        if (button.isEnabled()) {
+                            fireEditingStopped();
+                        }
                     }
                 });
         }
@@ -535,10 +537,12 @@ public final class PlayersTable extends JTable {
                     break;
                 case PLAYER_COLUMN:
                     Nation nation = nations.get(row);
-                    preGameController.setNation(nation);
-                    preGameController.setColor(nation.getColor());
-                    preGameController.setNationType(nation.getType());
-                    update();
+                    if (nationOptions.getNationState(nation) == NationState.AVAILABLE) {
+                        preGameController.setNation(nation);
+                        preGameController.setColor(nation.getColor());
+                        preGameController.setNationType(nation.getType());
+                        update();
+                    }
                     break;
                 }
 

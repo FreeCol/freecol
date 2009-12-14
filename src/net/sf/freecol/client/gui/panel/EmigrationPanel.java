@@ -79,7 +79,7 @@ public final class EmigrationPanel extends FreeColDialog<Integer> {
             question.insert(Messages.message("lostCityRumour.FountainOfYouth") + "\n\n", 0);
         }
 
-        setLayout(new MigLayout("wrap 1", "", ""));
+        setLayout(new MigLayout("wrap 1", "[fill]", ""));
 
         add(question, "wrap 20");
 

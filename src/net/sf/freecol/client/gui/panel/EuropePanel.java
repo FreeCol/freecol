@@ -219,17 +219,16 @@ public final class EuropePanel extends FreeColPanel {
         logScroll.getViewport().setOpaque(false);
         log.setOpaque(false);
 
-        setLayout(new MigLayout("wrap 3, fill, align center, insets 30",
-                                "[fill, 280:][fill, 280:][fill, 200:]", 
-                                "[90:, align top][90:, align top][90:, align top][][]"));
-        add(toAmericaScroll, "grow");
-        add(toEuropeScroll, "grow");
-        //add(logScroll, "span 1 4");
-        add(whitePanel, "span 1 4, grow");
-        add(inPortScroll, "grow");
-        add(docksScroll, "span 1 2, grow");
-        add(cargoScroll, "grow");
-        add(marketScroll, "span 2, grow");
+        setLayout(new MigLayout("wrap 3, fill, top, center, insets 30",
+                                "[fill, 280:, sg][fill, sg][fill, 200:]", 
+                                "[fill, 124:, sg][fill, sg][fill, sg][fill][]"));
+        add(toAmericaScroll);
+        add(toEuropeScroll);
+        add(whitePanel, "span 1 4");
+        add(inPortScroll);
+        add(docksScroll, "span 1 2");
+        add(cargoScroll);
+        add(marketScroll, "span 2");
 
         add(recruitButton, "span, split 6");
         add(purchaseButton);
