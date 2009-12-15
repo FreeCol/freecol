@@ -2097,10 +2097,13 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
-        UnitType skill = settlement.getLearnableSkill();
-        if (skill == null && askSkill(unit, direction)) {
-            skill = settlement.getLearnableSkill();
+
+        // Refresh knowledge of settlement skill.  It may have been
+        // learned by another player.
+        if (!askSkill(unit, direction)) {
+            return;
         }
+        UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
             canvas.errorMessage("indianSettlement.noMoreSkill");
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
