@@ -65,6 +65,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
@@ -1803,14 +1804,10 @@ public final class GUI {
         Unit occupyingUnit = null;
         int price = 0;
         if (colony != null) {
-            occupyingUnit = colony.getColonyTile(tile).getOccupyingUnit();
-            Settlement settlement = tile.getOwningSettlement();
+            ColonyTile colonyTile = colony.getColonyTile(tile);
+            occupyingUnit = colonyTile.getOccupyingUnit();
             price = colony.getOwner().getLandPrice(tile);
-            if ((settlement != null &&
-                 (settlement instanceof Colony && settlement != colony) ||
-                 (settlement instanceof IndianSettlement && price > 0)) ||
-                occupyingUnit != null) {
-                // tile is used by another Settlement
+            if (!colonyTile.canBeWorked()) {
                 g.drawImage(lib.getMiscImage(ImageLibrary.TILE_TAKEN), x, y, null);
             }
         }

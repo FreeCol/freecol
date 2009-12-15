@@ -262,6 +262,52 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     /**
+     * Check if this <code>WorkLocation</code> is available to the colony.
+     * Used by canAdd() and the gui to decide whether to draw a border
+     * on this tile in the colony panel.
+     *
+     * @return True if the location can be worked.
+     */
+    public boolean canBeWorked() {
+        Player player = getOwner();
+
+        // Not workable if there is a settlement, hostile occupation,
+        // unable to work water, or lost city rumour to Europeans.
+        Tile tile = getWorkTile();
+        if (tile.getSettlement() != null
+            || tile.getOccupyingUnit() != null
+            || !(tile.isLand() || colony.hasAbility("model.ability.produceInWater"))
+            || (player.isEuropean() && tile.hasLostCityRumour())) {
+            return false;
+        }
+
+        // Special cases when tile owned by another settlement.
+        Settlement settlement = tile.getOwningSettlement();
+        if (settlement == null) {
+            ; // OK
+        } else if (settlement instanceof Colony) {
+            // Disallow if owned by other Europeans or in active use.
+            Colony otherColony = (Colony) settlement;
+            if (otherColony != colony) {
+                if (otherColony.getOwner() != player
+                    || otherColony.getColonyTile(tile).getUnit() != null) {
+                    return false;
+                }
+            }
+        } else if (settlement instanceof IndianSettlement) {
+            // Disallow if owned and valued by natives.
+            if (player.getLandPrice(tile) > 0) {
+                return false;
+            }
+        } else {
+            throw new IllegalStateException("Bogus settlement");
+        }
+
+        return true;
+    }
+
+
+    /**
      * Checks if the specified <code>Locatable</code> may be added to
      * this <code>WorkLocation</code>.
      *
@@ -270,52 +316,16 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      *         and <code>false</code> otherwise.
      */
     public boolean canAdd(Locatable locatable) {
-        if (workTile.getSettlement() != null) {
+        if (!canBeWorked()) {
             return false;
         }
         if (!(locatable instanceof Unit)) {
             return false;
         }
-
         Unit unit = (Unit) locatable;
-        Colony colony = getColony();
-        Tile tile = getWorkTile();
-        Settlement settlement = tile.getOwningSettlement();
-
-        if (settlement != null) {
-            if (settlement instanceof Colony) {
-                // Disallow if owned by other Europeans,
-                // or by the player but already in use.
-                Colony otherColony = (Colony) settlement;
-                if (otherColony != colony) {
-                    if (otherColony.getOwner() != getOwner()
-                        || otherColony.getColonyTile(tile).getUnit() != null) {
-                        return false;
-                    }
-                }
-            } else if (settlement instanceof IndianSettlement) {
-                // Disallow if owned and valued by natives.
-                if (unit.getOwner().getLandPrice(tile) > 0) {
-                    return false;
-                }
-            }
-        }
-
-        if (!(tile.isLand()
-              || colony.hasAbility("model.ability.produceInWater"))) {
-            return false;
-        } else if (tile.hasLostCityRumour()) {
-            return false;
-        }
-
         if (!unit.getType().hasSkill()) {
             return false;
         }
-
-        if (tile.hasLostCityRumour()) {
-            return false;
-        }
-
         return getUnit() == null || unit == getUnit();
     }
 
