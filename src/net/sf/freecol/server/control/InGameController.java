@@ -572,44 +572,47 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * 
-     * Returns a List of FoundingFathers, not including the founding
-     * fathers the player already has, one of each type, or null if no
-     * FoundingFather of that type is available.
+     * Build a list of random FoundingFathers, one per type.
+     * Do not include any the player has or are not available.
      * 
      * @param player The <code>Player</code> that should pick a founding
      *            father from this list.
+     * @return A list of FoundingFathers.
      */
     private List<FoundingFather> getRandomFoundingFathers(Player player) {
+        // Build weighted random choice for each father type
+        Specification spec = FreeCol.getSpecification();
         int age = getGame().getTurn().getAge();
-        List<FoundingFather> randomFoundingFathers = new ArrayList<FoundingFather>();
-        EnumMap<FoundingFatherType, Integer> weightSums = new
-            EnumMap<FoundingFatherType, Integer>(FoundingFatherType.class);
-        for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
+        EnumMap<FoundingFatherType, List<RandomChoice<FoundingFather>>> choices
+            = new EnumMap<FoundingFatherType,
+                List<RandomChoice<FoundingFather>>>(FoundingFatherType.class);
+        for (FoundingFather father : spec.getFoundingFathers()) {
             if (!player.hasFather(father) && father.isAvailableTo(player)) {
-                Integer weightSum = weightSums.get(father.getType());
-                if (weightSum == null) {
-                    weightSum = new Integer(0);
+                FoundingFatherType type = father.getType();
+                List<RandomChoice<FoundingFather>> rc = choices.get(type);
+                if (rc == null) {
+                    rc = new ArrayList<RandomChoice<FoundingFather>>();
                 }
-                weightSums.put(father.getType(), weightSum + father.getWeight(age));
+                int weight = father.getWeight(age);
+                rc.add(new RandomChoice<FoundingFather>(father, weight));
+                choices.put(father.getType(), rc);
             }
         }
-        for (java.util.Map.Entry<FoundingFatherType, Integer> entry : weightSums.entrySet()) {
-            if (entry.getValue() != 0) {
-                int r = getPseudoRandom().nextInt(entry.getValue()) + 1;
-                int weightSum = 0;
-                for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
-                    if (!player.hasFather(father) && father.getType() == entry.getKey()) {
-                        weightSum += father.getWeight(age);
-                        if (weightSum >= r) {
-                            randomFoundingFathers.add(father);
-                            break;
-                        }
-                    }
-                }
+
+        // Select one from each father type
+        List<FoundingFather> randomFathers = new ArrayList<FoundingFather>();
+        String logMessage = "Random fathers";
+        for (FoundingFatherType type : FoundingFatherType.values()) {
+            List<RandomChoice<FoundingFather>> rc = choices.get(type);
+            if (rc != null) {
+                FoundingFather father
+                    = RandomChoice.getWeightedRandom(getPseudoRandom(), rc);
+                randomFathers.add(father);
+                logMessage += ":" + father.getName();
             }
         }
-        return randomFoundingFathers;
+        logger.info(logMessage);
+        return randomFathers;
     }
 
     /**

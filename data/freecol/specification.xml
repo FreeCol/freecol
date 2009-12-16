@@ -1318,7 +1318,7 @@
       <event id="model.event.seeAllColonies"/>
     </founding-father>
     <founding-father id="model.foundingFather.hernandoDeSoto" type="exploration"
-                     weight1="10" weight2="2" weight3="2">
+                     weight1="5" weight2="10" weight3="5">
       <modifier id="model.modifier.lineOfSightBonus" type="additive" value="1">
         <scope ability-id="model.ability.navalUnit" ability-value="false"/>
       </modifier>
