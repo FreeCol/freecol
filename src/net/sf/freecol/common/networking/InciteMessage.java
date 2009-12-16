@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -127,6 +128,11 @@ public class InciteMessage extends Message {
                                        + tile.getId());
         }
         IndianSettlement indianSettlement = (IndianSettlement) settlement;
+        if (!indianSettlement.allowContact(unit)) {
+            // Do not allow contact from water
+            return Message.clientError("Contact denied at "
+                                       + settlement.getName());
+        }
         Player settlementPlayer = indianSettlement.getOwner();
         Player enemy;
         if (enemyId == null || enemyId.length() == 0) {
@@ -146,13 +152,12 @@ public class InciteMessage extends Message {
         int gold = Integer.parseInt(goldString);
 
         // Valid, proceed to incite.
+        InGameController igc = server.getInGameController();
         int goldToPay;
         if (gold < 0) { // Initial inquiry.
-            goldToPay = server.getInGameController()
-                .getInciteAmount(player, enemy, settlementPlayer);
-        } else if (server.getInGameController()
-                   .inciteIndianSettlement(indianSettlement, player,
-                                           enemy, gold)) {
+            goldToPay = igc.getInciteAmount(player, enemy, settlementPlayer);
+        } else if (igc.inciteIndianSettlement(indianSettlement, player,
+                                              enemy, gold)) {
             goldToPay = gold; // Pay this amount.
         } else {
             goldToPay = 0;

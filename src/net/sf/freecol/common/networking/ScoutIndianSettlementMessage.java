@@ -32,6 +32,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -112,8 +113,13 @@ public class ScoutIndianSettlementMessage extends Message {
 
         // Valid request, do the scouting.
         IndianSettlement indianSettlement = (IndianSettlement) settlement;
-        String result = server.getInGameController()
-            .scoutIndianSettlement(unit, indianSettlement);
+        InGameController igc = server.getInGameController();
+        String result;
+        try {
+            result = igc.scoutIndianSettlement(unit, indianSettlement);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
 
         // Build the reply, either a remove or an update.
         // Always return the result string to help the client display

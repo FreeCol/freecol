@@ -860,7 +860,7 @@ public final class InGameController implements NetworkConstants {
                 logger.info("Trade unit " + unit.getId()
                             + " in route " + oldTradeRouteName
                             + " cannot continue: stop invalid.");
-                canvas.showInformationMessage("traderoute.broken",
+                canvas.showInformationMessage("traderoute.broken", unit,
                                               "%name%", oldTradeRouteName);
                 clearOrders(unit);
                 return;
@@ -2096,16 +2096,25 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
+
+        // Must arrive by land if not previously visited.
         IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
+        if (!settlement.allowContact(unit)) {
+            canvas.showInformationMessage("indianSettlement.noContact",
+                                          settlement);
+            return;
+        }
 
         // Refresh knowledge of settlement skill.  It may have been
         // learned by another player.
         if (!askSkill(unit, direction)) {
             return;
         }
+
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
-            canvas.errorMessage("indianSettlement.noMoreSkill");
+            canvas.showInformationMessage("indianSettlement.noMoreSkill",
+                                          settlement);
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
             canvas.showInformationMessage("indianSettlement.cantLearnSkill",
                                           settlement,
@@ -2116,9 +2125,11 @@ public final class InGameController implements NetworkConstants {
                                             "%skill%", skill.getName())) {
             if (askLearnSkill(unit, direction)) {
                 if (unit.isDisposed()) {
-                    canvas.showInformationMessage("learnSkill.die");
+                    canvas.showInformationMessage("learnSkill.die",
+                                                  settlement);
                 } else if (unit.getType() != skill) {
-                    canvas.showInformationMessage("learnSkill.leave");
+                    canvas.showInformationMessage("learnSkill.leave",
+                                                  settlement);
                 }
             }
         }
@@ -2179,6 +2190,13 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
+
+        // Do not allow contact from water
+        if (!settlement.allowContact(unit)) {
+            canvas.showInformationMessage("indianSettlement.noContact",
+                                          settlement);
+            return;
+        }
 
         // Offer the choices.
         switch (canvas.showScoutIndianSettlementDialog(settlement)) {
@@ -2260,6 +2278,13 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
+
+        // Do not allow contact from water
+        if (!settlement.allowContact(unit)) {
+            canvas.showInformationMessage("indianSettlement.noContact",
+                                          settlement);
+            return;
+        }
 
         // Offer the choices.
         List<Object> response = canvas.showUseMissionaryDialog(settlement);
@@ -2545,11 +2570,12 @@ public final class InGameController implements NetworkConstants {
         if (settlement instanceof Colony) {
             moveTradeColony(unit, direction);
         } else if (settlement instanceof IndianSettlement) {
-            if (player.hasContacted(settlement.getOwner())) {
+            if (((IndianSettlement) settlement).hasBeenVisited(player)) {
                 moveTradeIndianSettlement(unit, direction);
             } else {
                 Canvas canvas = freeColClient.getCanvas();
-                canvas.showInformationMessage("noContactWithIndians");
+                canvas.showInformationMessage("indianSettlement.noTradeContact",
+                                              settlement);
             }
         } else {
             logger.warning("Bogus settlement: " + settlement.getId());
@@ -2710,7 +2736,8 @@ public final class InGameController implements NetworkConstants {
             for (;;) {
                 gold = askBuyPriceFromSettlement(unit, settlement, goods, gold);
                 if (gold == NO_TRADE) { // Proposal was refused
-                    canvas.showInformationMessage("trade.noTrade");
+                    canvas.showInformationMessage("trade.noTrade",
+                                                  settlement);
                     return;
                 } else if (gold < NO_TRADE) { // failure
                     return;
@@ -2842,10 +2869,12 @@ public final class InGameController implements NetworkConstants {
                 gold = askSellPriceToSettlement(unit, settlement, goods, gold);
                 if (gold == NO_NEED_FOR_THE_GOODS) {
                     canvas.showInformationMessage("trade.noNeedForTheGoods",
+                                                  settlement,
                                                   "%goods%", goods.getName());
                     return;
                 } else if (gold == NO_TRADE) {
-                    canvas.showInformationMessage("trade.noTrade");
+                    canvas.showInformationMessage("trade.noTrade",
+                                                  settlement);
                     return;
                 } else if (gold < NO_TRADE) { // error
                     return;
@@ -3491,6 +3520,7 @@ public final class InGameController implements NetworkConstants {
                                                      unit.getOwner());
         if (newType == null) {
             canvas.showInformationMessage("clearSpeciality.impossible",
+                                          unit,
                                           "%unit%", unit.getName());
             return;
         }

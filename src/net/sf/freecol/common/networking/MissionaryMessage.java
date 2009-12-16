@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -137,11 +138,16 @@ public class MissionaryMessage extends Message {
         }
 
         // Valid, proceed to establish/denounce.
+        InGameController igc = server.getInGameController();
         Location oldLocation = unit.getLocation();
-        ModelMessage m = (denounce)
-            ? server.getInGameController().denounceMission(indianSettlement, unit)
-            : server.getInGameController().establishMission(indianSettlement, unit);
-        server.getInGameController().sendRemoveUnitToAll(unit, serverPlayer);
+        ModelMessage m;
+        try {
+            m = (denounce) ? igc.denounceMission(indianSettlement, unit)
+                : igc.establishMission(indianSettlement, unit);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
+        igc.sendRemoveUnitToAll(unit, serverPlayer);
         if (!unit.isDisposed()) {
             settlement.getTile().updateIndianSettlementInformation(player);
             unit.setMovesLeft(0);

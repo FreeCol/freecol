@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
@@ -83,12 +84,10 @@ public class GetTransactionMessage extends Message {
      *         or an error <code>Element</code> on failure.
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
-        InGameController controller = (InGameController) server.getController();
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Game game = player.getGame();
-        Unit unit;
-        Settlement settlement;
 
+        Unit unit;
+        IndianSettlement settlement;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
             settlement = server.getAdjacentIndianSettlementSafely(settlementId, unit);
@@ -96,13 +95,20 @@ public class GetTransactionMessage extends Message {
             return Message.clientError(e.getMessage());
         }
 
-        // if starting a transaction session, the unit needs movement points
-        if (!controller.isTransactionSessionOpen(unit, settlement)
+        // Do not allow contact from water
+        if (!settlement.allowContact(unit)) {
+            return Message.clientError("Contact denied at "
+                                       + settlement.getName());
+        }
+        // If starting a transaction session, the unit needs movement points
+        InGameController igc = server.getInGameController();
+        if (!igc.isTransactionSessionOpen(unit, settlement)
             && unit.getMovesLeft() <= 0) {
-            return Message.clientError("Unit " + unitId + "has no moves left.");
+            return Message.clientError("Unit " + unitId + "has 0 moves left.");
         }
 
-        java.util.Map<String,Object> session = controller.getTransactionSession(unit, settlement);
+        java.util.Map<String,Object> session
+            = igc.getTransactionSession(unit, settlement);
         Element reply = Message.createNewRootElement("getTransactionAnswer");
         reply.setAttribute("canBuy", ((Boolean) session.get("canBuy")).toString());
         reply.setAttribute("canSell", ((Boolean) session.get("canSell")).toString());

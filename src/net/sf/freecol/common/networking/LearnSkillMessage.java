@@ -36,6 +36,7 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -112,22 +113,13 @@ public class LearnSkillMessage extends Message {
             return Message.clientError("There is no native settlement at: "
                                        + tile.getId());
         }
-        IndianSettlement indianSettlement = (IndianSettlement) settlement;
-        UnitType skill = indianSettlement.getLearnableSkill();
-        if (skill == null) {
-            return Message.clientError("Tried to learn null skill: " + unitId);
-        }
-        if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            return Message.clientError("Unit " + unitId
-                                       + " can not learn skill " + skill.getName()
-                                       + " from settlement " + settlement.getName());
-        }
 
         // Learn the skill if possible.
         // Bit of a mess building the reply given the multiple results.
-        unit.setMovesLeft(0);
+        InGameController igc = server.getInGameController();
         Element reply = Message.createNewRootElement("multiple");
         Document doc = reply.getOwnerDocument();
+        IndianSettlement indianSettlement = (IndianSettlement) settlement;
         Tension tension = indianSettlement.getAlarm(player);
         if (tension == null) tension = new Tension(0);
         switch (tension.getLevel()) {
@@ -139,14 +131,18 @@ public class LearnSkillMessage extends Message {
             unit.addToRemoveElement(remove);
             break;
         case ANGRY: // Learn nothing, not even a pet update
+            unit.setMovesLeft(0);
+
             Element updateFail = doc.createElement("update");
             reply.appendChild(updateFail);
             updateFail.appendChild(unit.toXMLElementPartial(doc, "movesLeft"));
             break;
-        default: // Learning succeeds
-            unit.learnFromIndianSettlement(indianSettlement);
-            // Do a full update as the unit is in close contact
-            tile.updateIndianSettlementInformation(player);
+        default: // Unit clear to try to learn
+            try {
+                igc.learnFromIndianSettlement(unit, indianSettlement);
+            } catch (Exception e) {
+                return Message.clientError(e.getMessage());
+            }
 
             Element updateSuccess = doc.createElement("update");
             reply.appendChild(updateSuccess);

@@ -361,6 +361,21 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
+     * Is a unit permitted to make contact with this settlement?
+     * The unit must be from a nation that has already made contact,
+     * or in the first instance, must be arriving by land.
+     *
+     * @param unit The <code>Unit</code> that proposes to contact this
+     *             settlement.
+     * @return True if the settlement accepts such contact.
+     */
+    public boolean allowContact(Unit unit) {
+        return hasBeenVisited(unit.getOwner())
+            || (unit.getLocation() instanceof Tile
+                && ((Tile) unit.getLocation()).isLand());
+    }
+
+    /**
      * Adds the given <code>Unit</code> to the list of units that belongs to this
      * <code>IndianSettlement</code>.
      * 

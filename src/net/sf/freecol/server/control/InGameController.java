@@ -954,135 +954,6 @@ public final class InGameController extends Controller {
         return unitsList;
     }
 
-    /**
-     * Denounce an existing mission.
-     *
-     * @param settlement The <code>IndianSettlement</code> containing the
-     *                   mission to denounce.
-     * @param unit The <code>Unit</code> denouncing.
-     * @return A <code>ModelMessage</code> describing the result.
-     */
-    public ModelMessage denounceMission(IndianSettlement settlement, Unit unit) {
-        // Determine resuly
-        Player player = unit.getOwner();
-        Unit missionary = settlement.getMissionary();
-        Player enemy = missionary.getOwner();
-        double random = Math.random();
-        random *= enemy.getImmigration() / (player.getImmigration() + 1);
-        if (missionary.hasAbility("model.ability.expertMissionary")) {
-            random += 0.2;
-        }
-        if (unit.hasAbility("model.ability.expertMissionary")) {
-            random -= 0.2;
-        }
-
-        if (random < 0.5) { // Success, remove old mission and establish ours
-            settlement.setMissionary(null);
-            // TODO: send enemy a message informing of the loss of mission.
-            return establishMission(settlement, unit);
-        }
-
-        // Failed, missionary dies.
-        unit.dispose();
-        return new ModelMessage(player, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                unit, "indianSettlement.mission.noDenounce",
-                                "%nation%", settlement.getOwner().getNationAsString());
-    }
-
-    /**
-     * Establish a new mission.
-     *
-     * @param settlement The <code>IndianSettlement</code> to establish at.
-     * @param unit The missionary <code>Unit</code>.
-     * @return A <code>ModelMessage</code> describing the result.
-     */
-    public ModelMessage establishMission(IndianSettlement settlement,
-                                         Unit unit) {
-        // Result depends on tension wrt this settlement.
-        Player player = unit.getOwner();
-        Tension tension = settlement.getAlarm(player);
-        if (tension == null) {
-            tension = new Tension(0);
-            settlement.setAlarm(player, tension);
-        }
-
-        // Establish, or dispose.
-        switch (tension.getLevel()) {
-        case HAPPY: case CONTENT: case DISPLEASED:
-            settlement.setMissionary(unit);
-            break;
-        case ANGRY: case HATEFUL:
-            unit.dispose();
-            break;
-        }
-
-        // Report result.
-        String messageId = "indianSettlement.mission." + tension.toString().toLowerCase();
-        return new ModelMessage(player, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                unit, messageId,
-                                "%nation%", settlement.getOwner().getNationAsString());
-    }
-
-    /**
-     * Gets the amount of gold needed for inciting. This method should
-     * NEVER be randomized: it should always return the same amount if
-     * given the same three parameters.
-     *
-     * @param payingPlayer The <code>Player</code> paying for the incite.
-     * @param targetPlayer The <code>Player</code> to be attacked by the
-     *            <code>attackingPlayer</code>.
-     * @param attackingPlayer The player that would be receiving the
-     *            money for incite.
-     * @return The amount of gold that should be payed by
-     *         <code>payingPlayer</code> to <code>attackingPlayer</code> in
-     *         order for <code>attackingPlayer</code> to attack
-     *         <code>targetPlayer</code>.
-     * @todo Magic numbers.
-     */
-    public int getInciteAmount(Player payingPlayer, Player targetPlayer,
-                               Player attackingPlayer) {
-        Tension payingTension = attackingPlayer.getTension(payingPlayer);
-        Tension targetTension = attackingPlayer.getTension(targetPlayer);
-        int payingValue = (payingTension == null) ? 0 : payingTension.getValue();
-        int targetValue = (targetTension == null) ? 0 : targetTension.getValue();
-        int amount = (payingTension != null && targetTension != null
-                      && payingValue > targetValue) ? 10000 : 5000;
-        amount += 20 * (payingValue - targetValue);
-        return Math.max(amount, 650);
-    }
-
-    /**
-     * Incite a settlement against an enemy.
-     *
-     * @param settlement The <code>IndianSettlement</code> to incite.
-     * @param inciter The <code>Player</code> that is inciting.
-     * @param enemy The <code>Player</code> to be incited against.
-     * @param gold The amount of gold in the bribe.
-     * @return True if the incitement succeeded.
-     * @todo Magic numbers.
-     */
-    public boolean inciteIndianSettlement(IndianSettlement settlement,
-                                          Player inciter, Player enemy,
-                                          int gold) {
-        // Enough gold?
-        Player indianPlayer = settlement.getOwner();
-        int toIncite = getInciteAmount(inciter, enemy, indianPlayer);
-        if (inciter.getGold() < gold) {
-            return false;
-        }
-
-        // Success.  Set the indian player at war with the european
-        // player (and vice versa) and raise tension.
-        inciter.modifyGold(-gold);
-        indianPlayer.modifyGold(gold);
-        indianPlayer.changeRelationWithPlayer(enemy, Stance.WAR);
-        settlement.modifyAlarm(enemy, 1000); // Let propagation work.
-        enemy.modifyTension(indianPlayer, 500);
-        enemy.modifyTension(inciter, 250);
-        return true;
-    }
-
-
     private void bombardEnemyShips(ServerPlayer currentPlayer) {
         logger.finest("Entering method bombardEnemyShips.");
         Map map = getFreeColServer().getGame().getMap();
@@ -1906,6 +1777,44 @@ public final class InGameController extends Controller {
     }
 
     /**
+     * Learn a skill at an IndianSettlement.
+     *
+     * @param unit The <code>Unit</code> that is learning.
+     * @param settlement The <code>Settlement</code> to learn from.
+     */
+    public void learnFromIndianSettlement(Unit unit,
+                                          IndianSettlement settlement) {
+        Player player = unit.getOwner();
+        // Sanity checks.
+        if (!settlement.allowContact(unit)) {
+            throw new IllegalStateException("Contact denied at "
+                                            + settlement.getName());
+        }
+        UnitType skill = settlement.getLearnableSkill();
+        if (skill == null) {
+            throw new IllegalStateException("No skill to learn at "
+                                            + settlement.getName());
+        }
+        if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
+            throw new IllegalStateException("Unit " + unit.getName()
+                                            + " can not learn skill " + skill.getName()
+                                            + " at " + settlement.getName());
+        }
+
+        // Teach the unit, end its move and expend the skill if necessary.
+        unit.setType(skill);
+        unit.setMovesLeft(0);
+        if (!settlement.isCapital()) {
+            settlement.setLearnableSkill(null);
+        }
+
+        // Consider this a visit, and do a full information update as
+        // the unit is in close contact.
+        settlement.setVisited(player);
+        settlement.getTile().updateIndianSettlementInformation(player);
+    }
+
+    /**
      * Scout a native settlement.
      *
      * @param unit The scout <code>Unit</code>.
@@ -1914,6 +1823,11 @@ public final class InGameController extends Controller {
      */
     public String scoutIndianSettlement(Unit unit,
                                         IndianSettlement settlement) {
+        if (!settlement.allowContact(unit)) {
+            throw new IllegalStateException("Contact denied at "
+                                            + settlement.getName());
+        }
+
         // Hateful natives kill the scout right away.
         Player player = unit.getOwner();
         Tension tension = settlement.getAlarm(player);
@@ -1964,6 +1878,146 @@ public final class InGameController extends Controller {
         tile.updateIndianSettlementInformation(player);
         unit.setMovesLeft(0);
         return result;
+    }
+
+    /**
+     * Denounce an existing mission.
+     *
+     * @param settlement The <code>IndianSettlement</code> containing the
+     *                   mission to denounce.
+     * @param unit The <code>Unit</code> denouncing.
+     * @return A <code>ModelMessage</code> describing the result.
+     */
+    public ModelMessage denounceMission(IndianSettlement settlement, Unit unit) {
+        // Do not allow contact from water
+        if (!settlement.allowContact(unit)) {
+            throw new IllegalArgumentException("Contact denied at "
+                                               + settlement.getName());
+        }
+
+        // Determine result
+        Player player = unit.getOwner();
+        Unit missionary = settlement.getMissionary();
+        Player enemy = missionary.getOwner();
+        double random = Math.random();
+        random *= enemy.getImmigration() / (player.getImmigration() + 1);
+        if (missionary.hasAbility("model.ability.expertMissionary")) {
+            random += 0.2;
+        }
+        if (unit.hasAbility("model.ability.expertMissionary")) {
+            random -= 0.2;
+        }
+
+        if (random < 0.5) { // Success, remove old mission and establish ours
+            settlement.setMissionary(null);
+            // TODO: send enemy a message informing of the loss of mission.
+            return establishMission(settlement, unit);
+        }
+
+        // Failed, missionary dies.
+        unit.dispose();
+        return new ModelMessage(player, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                unit, "indianSettlement.mission.noDenounce",
+                                "%nation%", settlement.getOwner().getNationAsString());
+    }
+
+    /**
+     * Establish a new mission.
+     *
+     * @param settlement The <code>IndianSettlement</code> to establish at.
+     * @param unit The missionary <code>Unit</code>.
+     * @return A <code>ModelMessage</code> describing the result.
+     */
+    public ModelMessage establishMission(IndianSettlement settlement,
+                                         Unit unit) {
+        // Do not allow contact from water
+        if (!settlement.allowContact(unit)) {
+            throw new IllegalArgumentException("Contact denied at "
+                                               + settlement.getName());
+        }
+
+        // Result depends on tension wrt this settlement.
+        Player player = unit.getOwner();
+        Tension tension = settlement.getAlarm(player);
+        if (tension == null) {
+            tension = new Tension(0);
+            settlement.setAlarm(player, tension);
+        }
+
+        // Establish, or dispose.
+        switch (tension.getLevel()) {
+        case HAPPY: case CONTENT: case DISPLEASED:
+            settlement.setMissionary(unit);
+            break;
+        case ANGRY: case HATEFUL:
+            unit.dispose();
+            break;
+        }
+
+        // Report result.
+        String messageId = "indianSettlement.mission." + tension.toString().toLowerCase();
+        return new ModelMessage(player, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                unit, messageId,
+                                "%nation%", settlement.getOwner().getNationAsString());
+    }
+
+    /**
+     * Gets the amount of gold needed for inciting. This method should
+     * NEVER be randomized: it should always return the same amount if
+     * given the same three parameters.
+     *
+     * @param payingPlayer The <code>Player</code> paying for the incite.
+     * @param targetPlayer The <code>Player</code> to be attacked by the
+     *            <code>attackingPlayer</code>.
+     * @param attackingPlayer The player that would be receiving the
+     *            money for incite.
+     * @return The amount of gold that should be payed by
+     *         <code>payingPlayer</code> to <code>attackingPlayer</code> in
+     *         order for <code>attackingPlayer</code> to attack
+     *         <code>targetPlayer</code>.
+     * @todo Magic numbers.
+     */
+    public int getInciteAmount(Player payingPlayer, Player targetPlayer,
+                               Player attackingPlayer) {
+        Tension payingTension = attackingPlayer.getTension(payingPlayer);
+        Tension targetTension = attackingPlayer.getTension(targetPlayer);
+        int payingValue = (payingTension == null) ? 0 : payingTension.getValue();
+        int targetValue = (targetTension == null) ? 0 : targetTension.getValue();
+        int amount = (payingTension != null && targetTension != null
+                      && payingValue > targetValue) ? 10000 : 5000;
+        amount += 20 * (payingValue - targetValue);
+        return Math.max(amount, 650);
+    }
+
+    /**
+     * Incite a settlement against an enemy.
+     *
+     * @param settlement The <code>IndianSettlement</code> to incite.
+     * @param inciter The <code>Player</code> that is inciting.
+     * @param enemy The <code>Player</code> to be incited against.
+     * @param gold The amount of gold in the bribe.
+     * @return True if the incitement succeeded.
+     * @todo Magic numbers.
+     */
+    public boolean inciteIndianSettlement(IndianSettlement settlement,
+                                          Player inciter, Player enemy,
+                                          int gold) {
+        // Enough gold?
+        Player indianPlayer = settlement.getOwner();
+        int toIncite = getInciteAmount(inciter, enemy, indianPlayer);
+        if (inciter.getGold() < gold) {
+            return false;
+        }
+
+        // Success.  Set the indian player at war with the european
+        // player (and vice versa) and raise tension.
+        inciter.modifyGold(-gold);
+        indianPlayer.modifyGold(gold);
+        indianPlayer.changeRelationWithPlayer(enemy, Stance.WAR);
+        settlement.modifyAlarm(enemy, 1000); // Let propagation work.
+        enemy.modifyTension(indianPlayer, 500);
+        enemy.modifyTension(inciter, 250);
+        return true;
     }
 
 
@@ -2100,7 +2154,6 @@ public final class InGameController extends Controller {
             }
         }
     }
-
 
     /**
      * Clear the specialty of a unit.
