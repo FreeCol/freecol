@@ -305,7 +305,6 @@ public final class EuropePanel extends FreeColPanel {
         //
         // Remove the old components from the panels.
         //
-
         toAmericaPanel.removeAll();
         toEuropePanel.removeAll();
         inPortPanel.initialize();
@@ -317,8 +316,8 @@ public final class EuropePanel extends FreeColPanel {
         //
         // Place new components on the panels.
         //
-
-        UnitLabel lastCarrier = null;
+        //TODO: this should be moved to an initialization method on each panel 
+        //
         for (Unit unit : europe.getUnitList()) {
             UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
             unitLabel.setTransferHandler(defaultTransferHandler);
@@ -326,30 +325,19 @@ public final class EuropePanel extends FreeColPanel {
 
             if (!unit.isNaval()) {
                 // If it's not a naval unit, it belongs on the docks.
-                // docksPanel.add(unitLabel, false);
-            } else {
-                // Naval units can either be in the port, going to europe or
-                // going to america.
-                switch (unit.getState()) {
-                case ACTIVE:
-                default:
-                    lastCarrier = unitLabel;
-                    //inPortPanel.add(unitLabel);
-                    break;
-                case TO_EUROPE:
-                    toEuropePanel.add(unitLabel, false);
-                    break;
-                case TO_AMERICA:
-                    toAmericaPanel.add(unitLabel, false);
-                    break;
-                }
+                continue;
             }
-        }
-        // We set the last carrier in the list active.
-        setSelectedUnitLabel(lastCarrier);
-
-        if (lastCarrier != null) {
-            cargoPanel.setCarrier(lastCarrier.getUnit());
+            
+            // Naval units can either be in the port, going to europe or
+            // going to america.
+            switch (unit.getState()) {
+            	case TO_EUROPE:
+            		toEuropePanel.add(unitLabel, false);
+            		break;
+            	case TO_AMERICA:
+            		toAmericaPanel.add(unitLabel, false);
+            		break;
+            }       
         }
 
         List<GoodsType> goodsTypes = FreeCol.getSpecification().getGoodsTypeList();
@@ -373,6 +361,11 @@ public final class EuropePanel extends FreeColPanel {
      * @param unit The unit that is being selected.
      */
     public void setSelectedUnit(Unit unit) {
+    	// null param should be forward
+    	if(unit == null){
+    		setSelectedUnitLabel(null);
+    		return;
+    	}
         Component[] components = inPortPanel.getComponents();
         for (int i = 0; i < components.length; i++) {
             if (components[i] instanceof UnitLabel && ((UnitLabel) components[i]).getUnit() == unit) {
@@ -387,9 +380,13 @@ public final class EuropePanel extends FreeColPanel {
      * 
      * @param unitLabel The unit that is being selected.
      */
-    public void setSelectedUnitLabel(UnitLabel unitLabel) {
+    public void setSelectedUnitLabel(UnitLabel unitLabel) {    	
         if (selectedUnit == unitLabel) {
-            // No need to change anything
+            // Make sure the selected unit is really selected
+        	if(unitLabel != null){
+        		unitLabel.setSelected(true);
+        		inPortPanel.revalidate();
+        	}
             return;
         }
         if (selectedUnit != null) {
@@ -402,6 +399,8 @@ public final class EuropePanel extends FreeColPanel {
             cargoPanel.setCarrier(unitLabel.getUnit());
             unitLabel.setSelected(true);
         }
+        
+        inPortPanel.revalidate();
     }
 
     /**
@@ -488,6 +487,7 @@ public final class EuropePanel extends FreeColPanel {
                 if (unit != null && unit.isNaval()) {
                     getController().moveToAmerica(unit);
                     UnitLabel unitLabel = getSelectedUnitLabel();
+                    setSelectedUnitLabel(null);
                     inPortPanel.remove(unitLabel);
                     toAmericaPanel.add(unitLabel, false);
                     revalidate();
@@ -584,7 +584,6 @@ public final class EuropePanel extends FreeColPanel {
                     return null;
                 }
             }
-            setSelectedUnitLabel(null);
             Component c = add(comp);
             toAmericaPanel.revalidate();
             europePanel.refresh();
@@ -636,7 +635,6 @@ public final class EuropePanel extends FreeColPanel {
                     return null;
                 }
             }
-            setSelectedUnitLabel(null);
             Component c = add(comp);
             europePanel.refresh();
             return c;
@@ -662,6 +660,7 @@ public final class EuropePanel extends FreeColPanel {
             removeAll();
 
             List<Unit> units = europe.getUnitList();
+            UnitLabel lastCarrier = null;
             for (Unit unit : units) {
                 if ((unit.getState() == UnitState.ACTIVE || unit.getState() == UnitState.SENTRY)
                         && (unit.isNaval())) {
@@ -669,14 +668,20 @@ public final class EuropePanel extends FreeColPanel {
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
                     add(unitLabel);
+                    lastCarrier = unitLabel;
+                    
+                    // we are redoing the labels, so we need to update the reference
+                    //of the selected unit
+                    if(selectedUnit != null && selectedUnit.getUnit() == unit){
+                    	selectedUnit = unitLabel;
+                    	selectedUnit.setSelected(true);
+                    }
                 }
             }
-
-            if (!units.isEmpty()) {
-                setSelectedUnit(units.get(units.size() - 1));
+            // Default on the last carrier
+            if (selectedUnit == null && lastCarrier != null) {
+                setSelectedUnitLabel(lastCarrier);
             }
-            revalidate();
-            repaint();
         }
 
         public void propertyChange(PropertyChangeEvent event) {
@@ -799,11 +804,6 @@ public final class EuropePanel extends FreeColPanel {
                     revalidate();
                     getController().nextModelMessage();
                     europePanel.refresh();
-
-                    // TODO: Make this look prettier :-)
-                    UnitLabel t = selectedUnit;
-                    selectedUnit = null;
-                    setSelectedUnitLabel(t);
 
                     return comp;
                 }

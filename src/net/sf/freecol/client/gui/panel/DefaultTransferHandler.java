@@ -312,16 +312,23 @@ public final class DefaultTransferHandler extends TransferHandler {
                         return false;
                     }
 
-                    comp.revalidate();
-
+                    // Update unit selection
+                    
+                    // moved unit to ToAmericaPanel, de-select it
+                    if (comp instanceof EuropePanel.ToAmericaPanel) {
+                    	((EuropePanel) parentPanel).setSelectedUnitLabel(null);
+                    	
+                    }
                     if (oldSelectedUnit != null) {
-                        if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
+                    	if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
                             ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
                         } else {
                             ((ColonyPanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
                         }
                     }
 
+                    comp.revalidate();
+                    
                     return true;
                 }
             } else if (data instanceof GoodsLabel) {
