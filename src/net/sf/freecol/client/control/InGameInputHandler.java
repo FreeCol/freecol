@@ -251,34 +251,34 @@ public final class InGameInputHandler extends InputHandler {
 
     /**
      * Handles an "opponentMove"-message.
+     * This now only performs the animation if any.  The real move
+     * happens in an update.
      * 
      * @param element An element (root element in a DOM-parsed XML tree)
      *                that holds attributes for the old and new tiles and
      *                an element for the unit that is moving (which are
-     *                used solely to operate the animation), and a "multiple"
-     *                element containing the real changes from the server.
+     *                used solely to operate the animation).
      */
     private Element opponentMove(Element element) {
         FreeColClient freeColClient = getFreeColClient();
-
-        // The messy bit is the animation, which needs to be done first
-        // before applying the update to the client state, as that may
-        // show the unit at its new location.
         String key = ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
         if (freeColClient.getClientOptions().getInteger(key) > 0) {
             Game game = getGame();
             String unitId = element.getAttribute("unit");
-            Tile newTile = (Tile) game.getFreeColGameObjectSafely(element.getAttribute("newTile"));
-            Tile oldTile = (Tile) game.getFreeColGameObjectSafely(element.getAttribute("oldTile"));
-            Unit unit = (Unit) game.getFreeColGameObjectSafely(element.getAttribute("unit"));
+            Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
             if (unit == null) {
                 unit = new Unit(game, (Element) element.getFirstChild());
             }
+            String oldTileId = element.getAttribute("oldTile");
+            Tile oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId);
+            String newTileId = element.getAttribute("newTile");
+            Tile newTile = (Tile) game.getFreeColGameObjectSafely(newTileId);
             if (newTile == null || oldTile == null || unit == null) {
                 throw new IllegalStateException("opponentMove"
-                                                + ((newTile == null) ? ": null newTile" : "")
+                                                + ((unit == null) ? ": null unit" : "")
                                                 + ((oldTile == null) ? ": null oldTile" : "")
-                                                + ((unit == null) ? ": null unit" : ""));
+                                                + ((newTile == null) ? ": null newTile" : "")
+                                                );
             }
             try {
                 new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile).invokeAndWait();
@@ -287,11 +287,6 @@ public final class InGameInputHandler extends InputHandler {
                                + exception.toString());
             }
         }
-
-        // Now that the unit looks like it is in the right place,
-        // process the real server response, which might even remove the unit.
-        handle(freeColClient.getClient().getConnection(),
-               Message.getChildElement(element, "multiple"));
         return null;
     }
 

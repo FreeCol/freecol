@@ -111,11 +111,14 @@ public class MoveMessage extends Message {
             Boolean seeNew = enemyPlayer.canSee(newTile)
                 && newTile.getSettlement() == null;
             if (seeOld || seeNew) {
-                Element move = Message.createNewRootElement("opponentMove");
-                Document doc = move.getOwnerDocument();
-                // The animation needs to know which unit is moving,
-                // from, and to.  We put this in attributes up front
-                // as it needs to be independent of the real update.
+                Element multiple = Message.createNewRootElement("multiple");
+                Document doc = multiple.getOwnerDocument();
+                // To animate we need to know which unit is moving,
+                // from, and to.  We put this in attributes on
+                // opponentMove up front as it needs to be independent
+                // of the real update.
+                Element move = doc.createElement("opponentMove");
+                multiple.appendChild(move);
                 move.setAttribute("unit", unit.getId());
                 move.setAttribute("oldTile", oldTile.getId());
                 move.setAttribute("newTile", newTile.getId());
@@ -135,11 +138,6 @@ public class MoveMessage extends Message {
 
                 // The real state-changing part of the message follows.
                 // Add stance setting if this is a new contact.
-                // If this player can see the new tile we just update
-                // both tiles.
-                // If not, update the old tile and remove the unit.
-                Element multiple = doc.createElement("multiple");
-                move.appendChild(multiple);
                 if (contacts.contains(enemyPlayer)) {
                     // TODO: make a message type.
                     Element stance = doc.createElement("setStance");
@@ -149,6 +147,9 @@ public class MoveMessage extends Message {
                     stance.setAttribute("second", unit.getOwner().getId());
                 }
 
+                // If this player can see the new tile we just update
+                // both tiles. If not, update the old tile and remove
+                // the unit.
                 Element update = doc.createElement("update");
                 multiple.appendChild(update);
                 if (seeOld) {
@@ -164,7 +165,7 @@ public class MoveMessage extends Message {
                     unit.addToRemoveElement(remove);
                 }
                 try {
-                    enemyPlayer.getConnection().sendAndWait(move);
+                    enemyPlayer.getConnection().sendAndWait(multiple);
                 } catch (IOException e) {
                     logger.warning(e.getMessage());
                 }
