@@ -7,32 +7,32 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class IndianSettlementTest extends FreeColTestCase {
-	private static GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
-	private static GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+    private static GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
+    private static GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
     
-	/**
-	 * Changes the ownership of a number of tiles from and around camp1 to camp2.
-	 * The param 'nTiles' defines the number of tiles to change ownership of.
-	 * @param game
-	 * @param camp1
-	 * @param camp2
-	 * @param nTiles
-	 */
-	private void setOverlapingCamps(Game game, IndianSettlement camp1, IndianSettlement camp2, int nTiles){
+    /**
+     * Changes the ownership of a number of tiles from and around camp1 to camp2.
+     * The param 'nTiles' defines the number of tiles to change ownership of.
+     * @param game
+     * @param camp1
+     * @param camp2
+     * @param nTiles
+     */
+    private void setOverlapingCamps(Game game, IndianSettlement camp1, IndianSettlement camp2, int nTiles){
         Map map = game.getMap();
-		Tile settlementTile = camp1.getTile();
+        Tile settlementTile = camp1.getTile();
         
-		// Change tile ownership around camp1 to camp2
+        // Change tile ownership around camp1 to camp2
         CircleIterator tilesAroundCamp = map.getCircleIterator(settlementTile.getPosition(), true, camp1.getRadius());    
         while(tilesAroundCamp.hasNext()){
-        	Position p = tilesAroundCamp.next();
-        	Tile t = map.getTile(p);
-        	t.setOwningSettlement(camp2);
+            Position p = tilesAroundCamp.next();
+            Tile t = map.getTile(p);
+            t.setOwningSettlement(camp2);
         }
-	}
+    }
 	
-	public void testFoodConsumption(){
-		Game game = getStandardGame();
+    public void testFoodConsumption(){
+        Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
         
@@ -51,54 +51,54 @@ public class IndianSettlementTest extends FreeColTestCase {
         int foodRemaining = Math.max(foodProduced - foodConsumed, 0);
         
         assertEquals("Unexpected value for remaining food, ", foodRemaining,camp.getFoodCount());      
-	}
+    }
 	
-	/*
-	public void testDeathByStarvation(){
-		Game game = getStandardGame();
+    /*
+      public void testDeathByStarvation(){
+      Game game = getStandardGame();
 
-        TileType desertType = FreeCol.getSpecification().getTileType("model.tile.desert");
-        Map map = getTestMap(desertType);
-        game.setMap(map);
+      TileType desertType = FreeCol.getSpecification().getTileType("model.tile.desert");
+      Map map = getTestMap(desertType);
+      game.setMap(map);
         
-        int initialBravesInCamp = 3;
-        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-        IndianSettlement camp1 = builder.initialBravesInCamp(initialBravesInCamp).build();
-        IndianSettlement camp2 = builder.reset().build();
+      int initialBravesInCamp = 3;
+      FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+      IndianSettlement camp1 = builder.initialBravesInCamp(initialBravesInCamp).build();
+      IndianSettlement camp2 = builder.reset().build();
         
-        //////////////////////
-        // Simulate that only the center tile is owned by camp 1
-        // Does not matter where camp 2 is, so we put it in the same tile as camp1
+      //////////////////////
+      // Simulate that only the center tile is owned by camp 1
+      // Does not matter where camp 2 is, so we put it in the same tile as camp1
 
-        int overlappingTiles = 8; // all the tiles around the camp
+      int overlappingTiles = 8; // all the tiles around the camp
         
-        setOverlapingCamps(game, camp1, camp2, overlappingTiles);
+      setOverlapingCamps(game, camp1, camp2, overlappingTiles);
         
-        //verify initial conditions
-        assertEquals(initialBravesInCamp, camp1.getUnitCount());
-        assertEquals(0, camp1.getFoodCount());
+      //verify initial conditions
+      assertEquals(initialBravesInCamp, camp1.getUnitCount());
+      assertEquals(0, camp1.getFoodCount());
         
-        GoodsType foodType = FreeCol.getSpecification().getGoodsType("model.goods.food");
-        int foodProduced = camp1.getProductionOf(foodType);
-        int foodConsumed = camp1.getFoodConsumption();
-        assertTrue("Food Produced should be less than food consumed",foodProduced < foodConsumed);
+      GoodsType foodType = FreeCol.getSpecification().getGoodsType("model.goods.food");
+      int foodProduced = camp1.getProductionOf(foodType);
+      int foodConsumed = camp1.getFoodConsumption();
+      assertTrue("Food Produced should be less than food consumed",foodProduced < foodConsumed);
         
-        // Execute
-        camp1.newTurn();
+      // Execute
+      camp1.newTurn();
         
-        // Verify conditions
-        int foodRemaining = 0;
-        assertEquals("Unexpected value for remaining food, ", foodRemaining,camp1.getFoodCount());
-        assertTrue("Some braves should have died of starvation",camp1.getUnitCount() < initialBravesInCamp);
+      // Verify conditions
+      int foodRemaining = 0;
+      assertEquals("Unexpected value for remaining food, ", foodRemaining,camp1.getFoodCount());
+      assertTrue("Some braves should have died of starvation",camp1.getUnitCount() < initialBravesInCamp);
         
-	}
-	*/
+      }
+    */
 	
-	public void testHorseBreeding(){
-		GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+    public void testHorseBreeding(){
+        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
         GoodsType foodType = FreeCol.getSpecification().getGoodsType("model.goods.food");
         
-		Game game = getStandardGame();
+        Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
         
@@ -127,13 +127,13 @@ public class IndianSettlementTest extends FreeColTestCase {
         
         int horsesBreeded = camp.getGoodsCount(horsesType) - initialHorses;
         assertEquals("Wrong number of horses breeded",expectedHorseProd,horsesBreeded);
-	}
+    }
 	
-	public void testHorseBreedingNoHorsesAvail(){
-		GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+    public void testHorseBreedingNoHorsesAvail(){
+        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
         GoodsType foodType = FreeCol.getSpecification().getGoodsType("model.goods.food");
         
-		Game game = getStandardGame();
+        Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
         
@@ -150,13 +150,13 @@ public class IndianSettlementTest extends FreeColTestCase {
         int expectedHorses = 0;
         int horsesAvail = camp.getGoodsCount(horsesType);
         assertEquals("No horses should be in settlement",expectedHorses,horsesAvail);
-	}
+    }
 	
-	public void testHorseBreedingNoFoodAvail(){
-		GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
-		GoodsType foodType = FreeCol.getSpecification().getGoodsType("model.goods.food");
+    public void testHorseBreedingNoFoodAvail(){
+        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+        GoodsType foodType = FreeCol.getSpecification().getGoodsType("model.goods.food");
 		
-		Game game = getStandardGame();
+        Game game = getStandardGame();
 
         TileType desertType = FreeCol.getSpecification().getTileType("model.tile.desert");
         Map map = getTestMap(desertType);
@@ -190,13 +190,13 @@ public class IndianSettlementTest extends FreeColTestCase {
         int expectedHorsesBreeded = 0;
         int horsesBreeded = camp1.getGoodsCount(horsesType) - initialHorses;
         assertEquals("No horses should be bred",expectedHorsesBreeded,horsesBreeded);
-	}
+    }
 	
-	public void testEquipBraves(){
-		GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+    public void testEquipBraves(){
+        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
         GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
         
-		Game game = getStandardGame();
+        Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
         
@@ -216,12 +216,12 @@ public class IndianSettlementTest extends FreeColTestCase {
         assertEquals("No muskets should exist in camp",0,camp.getGoodsCount(musketsType));
 
         for(Unit unit : camp.getUnitList()){
-        	if(unit.isMounted()){
-        		fail("Indian should not have mounted braves");
-        	}
-        	if(unit.isArmed()){
-        		fail("Indian should not have armed braves");
-        	}
+            if(unit.isMounted()){
+                fail("Indian should not have mounted braves");
+            }
+            if(unit.isArmed()){
+                fail("Indian should not have armed braves");
+            }
         }
         
         // Setup
@@ -241,22 +241,22 @@ public class IndianSettlementTest extends FreeColTestCase {
         int mounted = 0;
         int armed = 0;
         for(Unit unit : camp.getUnitList()){
-        	if(unit.isMounted()){ 
-        		mounted++;
-        	}
-        	if(unit.isArmed()){
-        		armed++;
-        	}
+            if(unit.isMounted()){ 
+                mounted++;
+            }
+            if(unit.isArmed()){
+                armed++;
+            }
         }
         assertEquals("Wrong number of units armed",camp.getUnitCount(),armed);
         assertEquals("Wrong number of units mounted",camp.getUnitCount(),mounted);
-	}
+    }
 	
-	public void testEquipBravesNotEnoughReqGoods(){
-		GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
+    public void testEquipBravesNotEnoughReqGoods(){
+        GoodsType horsesType = FreeCol.getSpecification().getGoodsType("model.goods.horses");
         GoodsType musketsType = FreeCol.getSpecification().getGoodsType("model.goods.muskets");
         
-		Game game = getStandardGame();
+        Game game = getStandardGame();
         Map map = getTestMap();
         game.setMap(map);
         
@@ -274,12 +274,12 @@ public class IndianSettlementTest extends FreeColTestCase {
         assertEquals("No muskets should exist in camp",0,camp.getGoodsCount(musketsType));
 
         for(Unit unit : camp.getUnitList()){
-        	if(unit.isMounted()){
-        		fail("Indian should not have mounted braves");
-        	}
-        	if(unit.isArmed()){
-        		fail("Indian should not have armed braves");
-        	}
+            if(unit.isMounted()){
+                fail("Indian should not have mounted braves");
+            }
+            if(unit.isArmed()){
+                fail("Indian should not have armed braves");
+            }
         }
         
         // Setup
@@ -299,67 +299,67 @@ public class IndianSettlementTest extends FreeColTestCase {
         int mounted = 0;
         int armed = 0;
         for(Unit unit : camp.getUnitList()){
-        	if(unit.isMounted()){ 
-        		mounted++;
-        	}
-        	if(unit.isArmed()){
-        		armed++;
-        	}
+            if(unit.isMounted()){ 
+                mounted++;
+            }
+            if(unit.isArmed()){
+                armed++;
+            }
         }
         assertEquals("Wrong number of units armed",bravesToEquip,armed);
         assertEquals("Wrong number of units mounted",bravesToEquip,mounted);
-	}
+    }
 
-	public void testAutomaticEquipBraves(){
-	    Game game = getStandardGame();
-	    Map map = getTestMap();
-	    game.setMap(map);
+    public void testAutomaticEquipBraves(){
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
 
-	    FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-	    IndianSettlement camp = builder.initialBravesInCamp(1).build();
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.initialBravesInCamp(1).build();
 
-	    Unit indianBrave = camp.getFirstUnit();
+        Unit indianBrave = camp.getFirstUnit();
 	    
-	    String errMsg = "Unit should not be able to automatically equip, no muskets available";
-	    assertTrue(errMsg, indianBrave.getAutomaticEquipment() == null);
+        String errMsg = "Unit should not be able to automatically equip, no muskets available";
+        assertTrue(errMsg, indianBrave.getAutomaticEquipment() == null);
 	    
-	    camp.addGoods(musketsType, 100);
+        camp.addGoods(musketsType, 100);
 	    
-	    errMsg = "Unit should be able to automatically equip, camp has muskets available";
-	    assertFalse(errMsg, indianBrave.getAutomaticEquipment() == null);
-	}
+        errMsg = "Unit should be able to automatically equip, camp has muskets available";
+        assertFalse(errMsg, indianBrave.getAutomaticEquipment() == null);
+    }
 	   
-	public void testWarDeclarationAffectsSettlementAlarm(){
-	    Game game = getStandardGame();
-	    Map map = getTestMap();
-	    game.setMap(map);
+    public void testWarDeclarationAffectsSettlementAlarm(){
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
 
         Player dutch = game.getPlayer("model.nation.dutch");
         Player inca = game.getPlayer("model.nation.inca");
-	    inca.setContacted(dutch);
+        inca.setContacted(dutch);
         
-	    FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
-	    IndianSettlement camp = builder.player(inca).build();
-	    camp.setVisited(dutch);
+        FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
+        IndianSettlement camp = builder.player(inca).build();
+        camp.setVisited(dutch);
 	    
-	    assertEquals("Inca should be at peace with dutch", Stance.PEACE, inca.getStance(dutch));
-	    Tension campAlarm = camp.getAlarm(dutch);
-	    assertNotNull("Camp should have had contact with dutch",campAlarm);
-	    assertEquals("Camp should be hateful", Tension.Level.HAPPY, campAlarm.getLevel());
+        assertEquals("Inca should be at peace with dutch", Stance.PEACE, inca.getStance(dutch));
+        Tension campAlarm = camp.getAlarm(dutch);
+        assertNotNull("Camp should have had contact with dutch",campAlarm);
+        assertEquals("Camp should be hateful", Tension.Level.HAPPY, campAlarm.getLevel());
 
-	    dutch.changeRelationWithPlayer(inca, Stance.WAR);
+        dutch.changeRelationWithPlayer(inca, Stance.WAR);
 	    
-	    assertEquals("Inca should be at war with dutch", Stance.WAR, inca.getStance(dutch));
-	    campAlarm = camp.getAlarm(dutch);
-	    assertEquals("Camp should be hateful", Tension.Level.HATEFUL, campAlarm.getLevel());
-	}
+        assertEquals("Inca should be at war with dutch", Stance.WAR, inca.getStance(dutch));
+        campAlarm = camp.getAlarm(dutch);
+        assertEquals("Camp should be hateful", Tension.Level.HATEFUL, campAlarm.getLevel());
+    }
 	
-	/*
-	 * Test settlement adjacent tiles ownership
-	 * Per Col1 rules, Indian settlements do not own water tiles
-	 */
-	public void testSettlementDoesNotOwnWaterTiles(){
-	    Game game = getStandardGame();
+    /*
+     * Test settlement adjacent tiles ownership
+     * Per Col1 rules, Indian settlements do not own water tiles
+     */
+    public void testSettlementDoesNotOwnWaterTiles(){
+        Game game = getStandardGame();
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
         
@@ -381,9 +381,9 @@ public class IndianSettlementTest extends FreeColTestCase {
         assertTrue("Indian player should own camp tile", campTile.getOwner() == indianPlayer);
         assertTrue("Indian player should own land tile", landTile.getOwner() == indianPlayer);
         assertFalse("Indian player should not own water tile", waterTile.getOwner() == indianPlayer);
-	}
+    }
 	
-	/*
+    /*
      * Test settlement trade
      */
     public void testTradeGoodsWithSetlement(){

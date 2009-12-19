@@ -130,12 +130,6 @@ public class GameOptions extends OptionMap {
     protected void addDefaultOptions() {
         Specification spec = Specification.getSpecification();
         
-        if (FreeCol.isInDebugMode()) {
-            spec.getIntegerOption(STARTING_MONEY).setValue(10000);
-        }
-        
-        /* Starting options: */
-        add(spec.getOptionGroup("gameOptions.starting"));
         /* Map options: */
         add(spec.getOptionGroup("gameOptions.map"));
         /* Colony options: */
@@ -144,6 +138,7 @@ public class GameOptions extends OptionMap {
         add(spec.getOptionGroup("gameOptions.victoryConditions"));
         /* Difficulty settings */
         add(spec.getOptionGroup("gameOptions.difficultySettings"));
+
     }
 
     protected boolean isCorrectTagName(String tagName) {

@@ -67,6 +67,7 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -632,16 +633,25 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * Closes the <code>ColonyPanel</code>.
      */
     public void closeColonyPanel() {
-        if (getColony().getUnitCount() > 0 ||
-            getCanvas().showConfirmDialog("abandonColony.text",
-                                          "abandonColony.yes",
-                                          "abandonColony.no")) {
-            if (getColony().getUnitCount() <= 0) {
+        if (getColony().getUnitCount() == 0) {
+            if (getCanvas().showConfirmDialog("abandonColony.text",
+                                              "abandonColony.yes",
+                                              "abandonColony.no")) {
                 getController().abandonColony(getColony());
+                getCanvas().remove(this);
             }
-
+        } else {
+            BuildableType buildable = colony.getCurrentlyBuilding();
+            if (buildable != null
+                && buildable.getPopulationRequired() > colony.getUnitCount()
+                && !getCanvas().showConfirmDialog("colonyPanel.reducePopulation",
+                                                  "ok", "cancel",
+                                                  "%colony%", colony.getName(),
+                                                  "%number%", String.valueOf(buildable.getPopulationRequired()),
+                                                  "%buildable%", buildable.getName())) {
+                return;
+            }
             getCanvas().remove(this);
-
             // remove property listeners
             if (colony != null) {
                 colony.removePropertyChangeListener(this);
@@ -803,9 +813,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             removeAll();
 
             MouseAdapter mouseAdapter = new MouseAdapter() {
-                    BuildQueuePanel queuePanel = new BuildQueuePanel(colony, getCanvas());
                     public void mousePressed(MouseEvent e) {
-                        getCanvas().showSubPanel(queuePanel);
+                        getCanvas().showSubPanel(new BuildQueuePanel(colony, getCanvas()));
                     }
                 };
             ASingleBuildingPanel aSingleBuildingPanel;
@@ -1382,9 +1391,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                         Tile tile = colonyTile.getWorkTile();
                         Player player = unit.getOwner();
 
-                        logger.warning("Colony " + colony.getName()
-                                       + " claims tile " + tile.toString()
-                                       + " with unit " + unit.getId());
+                        logger.info("Colony " + colony.getName()
+                                    + " claims tile " + tile.toString()
+                                    + " with unit " + unit.getId());
                         if ((tile.getOwner() != player
                              || tile.getOwningSettlement() != colony)
                             && !getController().claimLand(tile, colony, 0)) {
@@ -1394,22 +1403,28 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             return null;
                         }
 
-                        if (colonyTile.canAdd(unit)) { 
+                        if (colonyTile.canAdd(unit)) {
                             oldParent.remove(comp);
 
-                            getController().work(unit, colonyTile);
-
-                            // check whether worktype is suitable
                             GoodsType workType = colonyTile.getWorkType(unit);
+                            ColonyTile bestTile = colony.getVacantColonyTileFor(unit, workType, false);
+
+                            getController().work(unit, colonyTile);
+                            // check whether worktype is suitable
                             if (workType != unit.getWorkType()) {
                                 getController().changeWorkType(unit, workType);
                             }
 
-                            //updateDescriptionLabel((UnitLabel) comp, true);
-
                             ((UnitLabel) comp).setSmall(false);
 
-                            //colonyPanel.updateSoLLabel();
+                            if (colonyTile != bestTile
+                                && (colonyTile.getProductionOf(unit, workType)
+                                    < bestTile.getProductionOf(unit, workType))) {
+                                getCanvas().showInformationMessage("colonyPanel.notBestTile",
+                                                                   "%unit%", unit.getName(),
+                                                                   "%goods%", workType.getName(),
+                                                                   "%tile%", bestTile.getLabel());
+                            }
                         } else {
                             // could not add the unit on the tile
                             Canvas canvas = getCanvas();

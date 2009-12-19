@@ -94,7 +94,7 @@ public class WorkProductionPanel extends FreeColPanel {
                 basicModifiers.addAll(unit.getModifierSet(goodsType.getId()));
             }
             modifiers = sortModifiers(basicModifiers);
-            colonyModifiers = unit.getColony().getModifierSet(goodsType.getId());
+            colonyModifiers.addAll(colony.getModifierSet(goodsType.getId()));
             modifiers.addAll(unit.getColony().getModifierSet(goodsType.getId()));
             if (colony.getProductionBonus() != 0) {
                 colonyModifiers.add(colony.getProductionModifier(goodsType));

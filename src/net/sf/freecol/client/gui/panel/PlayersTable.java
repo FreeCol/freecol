@@ -268,9 +268,17 @@ public final class PlayersTable extends JTable {
         private JComboBox allStateBox = new JComboBox(allStates);
         private JComboBox activeBox;
 
+        private ActionListener listener = new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    stopCellEditing();
+                }
+            };
+
         public AvailableCellEditor() {
             aiStateBox.setRenderer(new NationStateRenderer());
+            aiStateBox.addActionListener(listener);
             allStateBox.setRenderer(new NationStateRenderer());
+            allStateBox.addActionListener(listener);
         }
 
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
@@ -320,12 +328,12 @@ public final class PlayersTable extends JTable {
                 if (nationType instanceof EuropeanNationType) {
                     NationState nationState = (NationState) table
                         .getValueAt(row, AVAILABILITY_COLUMN);
-                    button.setEnabled(nationState == NationState.AVAILABLE);
-                    return button;
-                } else {
-                    Nation nation = (Nation) table.getValueAt(row, NATION_COLUMN);
-                    label.setText(nation.getRulerName());
+                    if (nationState == NationState.AVAILABLE) {
+                        return button;
+                    }
                 }
+                Nation nation = (Nation) table.getValueAt(row, NATION_COLUMN);
+                label.setText(nation.getRulerName());
             } else {
                 label.setText(player.getName());
             }
@@ -340,9 +348,7 @@ public final class PlayersTable extends JTable {
         public PlayerCellEditor() {
             button.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if (button.isEnabled()) {
-                            fireEditingStopped();
-                        }
+                        fireEditingStopped();
                     }
                 });
         }
@@ -531,6 +537,7 @@ public final class PlayersTable extends JTable {
                     break;
                 case AVAILABILITY_COLUMN:
                     preGameController.setAvailable(nations.get(row), (NationState) value);
+                    update();
                     break;
                 case COLOR_COLUMN:
                     preGameController.setColor((Color) value);

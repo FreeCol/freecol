@@ -19,9 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,17 +29,21 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
+import javax.swing.KeyStroke;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Player;
 
@@ -47,7 +51,8 @@ import net.miginfocom.swing.MigLayout;
 
 
 /**
- * Centers the map on a known settlement or colony.
+ * Centers the map on a known settlement or colony. Pressing ENTER
+ * opens a panel if appropriate.
  */
 public final class FindSettlementDialog extends FreeColDialog implements ListSelectionListener {
 
@@ -90,6 +95,32 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
         JScrollPane listScroller = new JScrollPane(settlementList);
         listScroller.setPreferredSize(new Dimension(250, 250));
         settlementList.addListSelectionListener(this);
+
+        Action selectAction = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    Settlement settlement = (Settlement) settlementList.getSelectedValue();
+                    if (settlement instanceof Colony
+                        && settlement.getOwner() == getMyPlayer()) {
+                        getCanvas().remove(FindSettlementDialog.this);
+                        getCanvas().showColonyPanel((Colony) settlement);
+                    } else if (settlement instanceof IndianSettlement) {
+                        getCanvas().remove(FindSettlementDialog.this);
+                        getCanvas().showPanel(new IndianSettlementPanel(getCanvas(),
+                                                                        (IndianSettlement) settlement));
+                    }                        
+                }
+            };
+
+        Action quitAction = new AbstractAction() {
+                public void actionPerformed(ActionEvent e) {
+                    getCanvas().remove(FindSettlementDialog.this);
+                }
+            };
+
+        settlementList.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "select");
+        settlementList.getActionMap().put("select", selectAction);
+        settlementList.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "quit");
+        settlementList.getActionMap().put("quit", quitAction);
         add(listScroller, "growx, growy");
 
         add(okButton, "tag ok");

@@ -606,11 +606,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public int getNeededTurnsOfTraining() {
         // number of turns is 4/6/8 for skill 1/2/3
+        int result = 0;
         if (student != null) {
-            return getNeededTurnsOfTraining(unitType, student.unitType);
-        } else {
-            return 0;
+            result = getNeededTurnsOfTraining(unitType, student.unitType);
+            if (getColony() != null) {
+                result -= getColony().getProductionBonus();
+            }
         }
+        return result;
     }
 
     /**
@@ -1385,7 +1388,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                                 }
                                 break;
                             case MISSIONARY:
-                                return MoveType.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                                if (((IndianSettlement) settlement).getAlarm(getOwner()) == null) {
+                                    return MoveType.MOVE_ILLEGAL;
+                                } else {
+                                    return MoveType.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                                }
                             case SCOUT:
                                 return MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT;
                             case SOLDIER: case DRAGOON:
@@ -2554,17 +2561,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public String getOccupationIndicator() {
 
         if (getDestination() != null) {
-                if(getTradeRoute() != null)
-                        return Messages.message("model.unit.occupation.inTradeRoute");
-                else
-                        return Messages.message("model.unit.occupation.goingSomewhere");
+            if(getTradeRoute() != null)
+                return Messages.message("model.unit.occupation.inTradeRoute");
+            else
+                return Messages.message("model.unit.occupation.goingSomewhere");
         } else if (state == UnitState.IMPROVING && workImprovement != null) {
             return workImprovement.getOccupationString();
         } else if (state == UnitState.ACTIVE && getMovesLeft() == 0) {
-                if(isUnderRepair())
-                        return Messages.message("model.unit.occupation.underRepair");
-                else
-                        return Messages.message("model.unit.occupation.activeNoMovesLeft");
+            if(isUnderRepair())
+                return Messages.message("model.unit.occupation.underRepair");
+            else
+                return Messages.message("model.unit.occupation.activeNoMovesLeft");
         } else {
             return Messages.message("model.unit.occupation." + state.toString().toLowerCase());
         }
@@ -2583,10 +2590,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (getMovesLeft() != 0) break;
             return (isUnderRepair())
                 ? Messages.message("model.unit.occupation.underRepair")
-                    + ": " + Integer.toString(getTurnsForRepair())
+                + ": " + Integer.toString(getTurnsForRepair())
                 : (tradeRoute != null)
                 ? Messages.message("model.unit.occupation.inTradeRoute")
-                    + ": " + tradeRoute.getName()
+                + ": " + tradeRoute.getName()
                 : Messages.message("model.unit.occupation.activeNoMovesLeft");
         case IMPROVING:
             if (workImprovement == null) break;
@@ -2603,7 +2610,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
         return (tradeRoute != null)
             ? Messages.message("model.unit.occupation.inTradeRoute")
-                + ": " + tradeRoute.getName()
+            + ": " + tradeRoute.getName()
             : (getDestination() != null)
             ? Messages.message("model.unit.occupation.goingSomewhere")
             : Messages.message("model.unit.occupation."

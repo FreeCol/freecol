@@ -180,16 +180,21 @@ some panels will look a bit cramped. You can play the game with an
 even smaller screen, but we do not support that, and some things might
 not work.
 
-\hypertarget{FreeCol on Intel Macs}{\subsection{FreeCol on Intel Macs}}
+\hypertarget{FreeCol on OSX}{\subsection{FreeCol on OSX}}
 
 Some users report that they can not start FreeCol on their 64-bit
 Intel Macs. It seems that these Macs use a 32-bit version of Java 1.5
 by default. In order to solve this problem, you can either edit the
-file "Info.plist" within the application package to select 1.6+,
-or you can change the default Java version under
-"/Applications/Utilities/Java/Java Preferences".
-Just drag "1.5 64-bit" or "1.6 64-bit" to the top of the list and
-FreeCol should run without any changes in "Info.plist".
+file "Info.plist" within the application package to select 1.6+, or
+you can change the default Java version under
+"/Applications/Utilities/Java/Java Preferences".  Just drag "1.5
+64-bit" or "1.6 64-bit" to the top of the list and FreeCol should run
+without any changes in "Info.plist".
+
+FreeCol uses context menus in several places. On most platforms,
+context menus are opened with a click of the right mouse button. If
+you have only one mouse button, holding down the \texttt{control} key
+while clicking the mouse button should also work.
 
 
 \hypertarget{Compiling FreeCol}{\section{Compiling FreeCol}}
@@ -2250,6 +2255,13 @@ Master Blacksmith and the Master Gunsmith all require at least a
 \hyperlink{College}{College}, while the Elder Statesman, the Firebrand
 Preacher and the Jesuit Missionary even require a
 \hyperlink{University}{University} to teach their profession.
+
+Usually, units need four turns to learn a profession taught in
+schoolhouse, six turns to learn a profession taught in college, and
+eight turns to learn a profession taught at university. However, the
+colony's production bonus or penalty is subtracted from this value, so
+that units in colonies with a production bonus learn faster, and units
+in colonies with a production penalty require more time to learn.
 
 A Free Colonist can learn any skill or profession in this manner, but
 Petty Criminals and Indentured Servants can not.  However, a Petty

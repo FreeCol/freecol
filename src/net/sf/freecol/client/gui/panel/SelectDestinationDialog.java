@@ -141,20 +141,19 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         destinationList.setCellRenderer(new LocationRenderer());
         destinationList.setFixedCellHeight(48);
 
-        final SelectDestinationDialog dialog = this;
         Action selectAction = new AbstractAction(Messages.message("ok")) {
                 public void actionPerformed(ActionEvent e) {
                     Destination d = (Destination) destinationList.getSelectedValue();
                     if (d != null) {
                         setResponse((Location) d.location);
                     }
-                    getCanvas().remove(dialog);
+                    getCanvas().remove(SelectDestinationDialog.this);
                 }
             };
 
         Action quitAction = new AbstractAction(Messages.message("selectDestination.cancel")) {
                 public void actionPerformed(ActionEvent e) {
-                    getCanvas().remove(dialog);
+                    getCanvas().remove(SelectDestinationDialog.this);
                 }
             };
 

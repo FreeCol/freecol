@@ -68,8 +68,8 @@ public final class TilePopup extends JPopupMenu {
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(TilePopup.class.getName());
 
-    public static final int UNITS_IN_FIRST_MENU = 9;
-    public static final int UNITS_IN_OTHER_MENUS = 19;
+    public static final int UNIT_LINES_IN_FIRST_MENU = 9;
+    public static final int UNIT_LINES_IN_OTHER_MENUS = 19;
 
     private final Canvas canvas;
     private final FreeColClient freeColClient;
@@ -134,46 +134,6 @@ public final class TilePopup extends JPopupMenu {
             }
         }
 
-        int unitCount = 0;
-        int maxUnits = UNITS_IN_FIRST_MENU;
-        Container currentMenu = this;
-        for (final Unit currentUnit : tile.getUnitList()) {
-
-            if (unitCount > maxUnits) {
-                JMenu more = new JMenu(Messages.message("more"));
-                more.setFont(more.getFont().deriveFont(Font.ITALIC));
-                more.setOpaque(false);
-                currentMenu.add(more);
-                currentMenu = more;
-                unitCount = 0;
-                maxUnits = UNITS_IN_OTHER_MENUS;
-            }
-
-            addUnit(currentMenu, currentUnit, !currentUnit.isUnderRepair(), false);
-            unitCount++;
-
-            for (Unit unit : currentUnit.getUnitList()) {
-                addUnit(currentMenu, unit, true, true);
-                unitCount++;
-            }
-
-            boolean hasGoods = false;
-            for (Goods goods: currentUnit.getGoodsList()) {
-                addGoods(goods, false, true);
-                hasGoods = true;
-            }
-
-            if (hasGoods) {
-                JMenuItem dumpItem = new JMenuItem(Messages.message("dumpCargo"));
-                dumpItem.setAction(new UnloadAction(freeColClient));
-                add(dumpItem);
-            }
-        }
-
-        if (tile.getUnitCount() > 0) {
-            addSeparator();
-        }
-
         Settlement settlement = tile.getSettlement();
         if (settlement != null) {
             if (settlement.getOwner() == freeColClient.getMyPlayer()) {
@@ -187,6 +147,29 @@ public final class TilePopup extends JPopupMenu {
         }
 
         addTile(tile);
+        addSeparator();
+
+        int lineCount = 0;
+        int maxUnits = UNIT_LINES_IN_FIRST_MENU;
+        Container currentMenu = this;
+        for (final Unit currentUnit : tile.getUnitList()) {
+
+            if (lineCount > maxUnits) {
+                JMenu more = new JMenu(Messages.message("more"));
+                more.setFont(more.getFont().deriveFont(Font.ITALIC));
+                more.setOpaque(false);
+                currentMenu.add(more);
+                currentMenu = more;
+                lineCount = 0;
+                maxUnits = UNIT_LINES_IN_OTHER_MENUS;
+            }
+
+            lineCount += addUnit(currentMenu, currentUnit, !currentUnit.isUnderRepair(), false);
+        }
+
+        if (tile.getUnitCount() > 0) {
+            addSeparator();
+        }
 
         // START DEBUG
         if (FreeCol.isInDebugMode()
@@ -318,12 +301,14 @@ public final class TilePopup extends JPopupMenu {
 
     /**
      * Adds a unit entry to this popup.
+     * @param menu a <code>Container</code> value
      * @param unit The unit that will be represented on the popup.
      * @param enabled The initial state for the menu item.
      * @param indent Should be <code>true</code> if the text should be
      *      indented on the menu.
+     * @return an <code>int</code> value
      */
-    private void addUnit(Container menu, final Unit unit, boolean enabled, boolean indent) {
+    private int addUnit(Container menu, final Unit unit, boolean enabled, boolean indent) {
         String occ = unit.getDetailedOccupationIndicator();
         if (occ.length() > 0) occ = " (" + occ + ")";
         String text = (indent ? "    " : "")
@@ -337,34 +322,41 @@ public final class TilePopup extends JPopupMenu {
                     gui.setActiveUnit(unit);
                 }
             });
+        int lineCount = 1;
         if (indent) {
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
         }
-        if (!enabled) {
-            menuItem.setEnabled(false);
-        }
+        menuItem.setEnabled(enabled);
         menu.add(menuItem);
-        hasAnItem = true;
-    }
 
-    /**
-     * Adds a goods entry to this popup.
-     * @param goods The goods that will be represented on the popup.
-     * @param enabled The initial state for the menu item.
-     * @param indent Should be <code>true</code> if the text should be
-     *      indented on the menu.
-     */
-    private void addGoods(Goods goods, boolean enabled, boolean indent) {
-        String text = (indent ? "    " : "") + goods.toString();
-        JMenuItem menuItem = new JMenuItem(text);
-        if (indent) {
+        for (Unit passenger : unit.getUnitList()) {
+            lineCount += addUnit(menu, passenger, true, true);
+        }
+
+        boolean hasGoods = false;
+        for (Goods goods: unit.getGoodsList()) {
+            text = (indent ? "         " : "     ") + goods.toString();
+            menuItem = new JMenuItem(text);
             menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
-        }
-        if (!enabled) {
             menuItem.setEnabled(false);
+            menu.add(menuItem);
+            lineCount++;
+            hasGoods = true;
         }
-        add(menuItem);
+
+        if (hasGoods) {
+            JMenuItem dumpItem = new JMenuItem(Messages.message("dumpCargo"));
+            dumpItem.setAction(new UnloadAction(freeColClient));
+            menu.add(dumpItem);
+            lineCount++;
+        }
+        if (menu instanceof JMenu) {
+            ((JMenu) menu).addSeparator();
+        } else {
+            ((JPopupMenu) menu).addSeparator();
+        }
         hasAnItem = true;
+        return lineCount;
     }
 
     /**

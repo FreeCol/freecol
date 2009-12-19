@@ -19,6 +19,8 @@
 
 package net.sf.freecol.common.model;
 
+import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -70,6 +72,17 @@ public class SchoolTest extends FreeColTestCase {
             colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse")).newTurn();
         }
     }
+
+    private void setProductionBonus(Colony colony, int value) {
+        try {
+            Field productionBonus = Colony.class.getDeclaredField("productionBonus");
+            productionBonus.setAccessible(true);
+            productionBonus.setInt(colony, value);
+        } catch (Exception e) {
+            // do nothing
+        }
+    }
+
 
     BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
     
@@ -285,6 +298,7 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getStandardColony(10);
+        setProductionBonus(colony, 0);
 
         Iterator<Unit> units = colony.getUnitIterator();
 
@@ -450,6 +464,7 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
+        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -532,6 +547,7 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
     	
         Colony colony = getUniversityColony();
+        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -559,6 +575,7 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
+        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -625,6 +642,7 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
+        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -643,7 +661,9 @@ public class SchoolTest extends FreeColTestCase {
         // In this case, the colonist will become a miner (and the criminal 
         // will become a servant).
         teacher1.setLocation(school);
+        assertEquals(4, teacher1.getNeededTurnsOfTraining());
         teacher2.setLocation(school);
+        assertEquals(4, teacher2.getNeededTurnsOfTraining());
 
         // wait a little
         school.newTurn();
@@ -682,6 +702,7 @@ public class SchoolTest extends FreeColTestCase {
         
         // Move teacher1 back to school
         teacher1.setLocation(school);
+        setProductionBonus(colony, 0);
 
         school.newTurn();
         assertEquals(3, teacher1.getTurnsOfTraining());
@@ -768,6 +789,7 @@ public class SchoolTest extends FreeColTestCase {
         outsider.setType(freeColonistType);
 
         Colony colony = getUniversityColony();
+        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -813,6 +835,8 @@ public class SchoolTest extends FreeColTestCase {
         teacher2.setLocation(school);
         assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(0, teacher2.getTurnsOfTraining());
+
+        setProductionBonus(colony, 0);
         
         // Check that 2 new turns aren't enough for training
         school.newTurn();
@@ -921,6 +945,7 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getUniversityColony();
+        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -968,6 +993,8 @@ public class SchoolTest extends FreeColTestCase {
         // remove servant from colony
         indenturedServant.setLocation(getGame().getMap().getTile(10,8));
 
+        setProductionBonus(colony, 0);
+
         // Criminal training
         assertEquals(0, getUnitList(colony, freeColonistType).size());
         assertEquals(0, getUnitList(colony, indenturedServantType).size());
@@ -990,6 +1017,7 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getUniversityColony();
+        setProductionBonus(colony, 0);
         Building school = colony.getBuilding(schoolType);
         
         Iterator<Unit> units = colony.getUnitIterator();
@@ -1042,6 +1070,7 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
 
         Colony colony = getStandardColony(10);
+        setProductionBonus(colony, 0);
         Player owner = colony.getOwner();
         owner.getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
 
@@ -1151,5 +1180,41 @@ public class SchoolTest extends FreeColTestCase {
         criminal2.setWorkType(lumber);
         assertEquals(criminal2, school.findStudent(lumberJack));
 
+    }
+
+    public void testProductionBonus() {
+
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType, true));
+        
+        Colony colony = getUniversityColony();
+        Building school = colony.getBuilding(schoolType);
+
+        Iterator<Unit> units = colony.getUnitIterator();
+
+        Unit carpenter = units.next();
+        carpenter.setType(masterCarpenterType);
+        carpenter.setLocation(school);
+
+        Unit blacksmith = units.next();
+        blacksmith.setType(masterBlacksmithType);
+        blacksmith.setLocation(school);
+
+        Unit statesman = units.next();
+        statesman.setType(elderStatesmanType);
+        statesman.setLocation(school);
+
+        units.next().setType(freeColonistType);
+        units.next().setType(freeColonistType);
+        units.next().setType(freeColonistType);
+
+        school.newTurn();
+
+        for (int bonus = -2; bonus < 3; bonus++) {
+            setProductionBonus(colony, bonus);
+            assertEquals(4 - bonus, carpenter.getNeededTurnsOfTraining());
+            assertEquals(6 - bonus, blacksmith.getNeededTurnsOfTraining());
+            assertEquals(8 - bonus, statesman.getNeededTurnsOfTraining());
+        }
     }
 }

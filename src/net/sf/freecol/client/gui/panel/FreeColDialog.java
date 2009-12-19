@@ -78,7 +78,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     public FreeColDialog(Canvas parent) {
         super(parent);
 
-        cancelButton.setActionCommand(String.valueOf(CANCEL));
+        cancelButton.setActionCommand(CANCEL);
         cancelButton.addActionListener(this);
         enterPressesWhenFocused(cancelButton);
         setCancelComponent(cancelButton);
@@ -115,19 +115,6 @@ public class FreeColDialog<T> extends FreeColPanel {
                     // This is essentially the body of EventDispatchThread
                     AWTEvent event = theQueue.getNextEvent();
                     Object src = event.getSource();
-
-                    // Block 'MouseEvent' being sent to other components:
-                    /*
-                    if (event instanceof MouseEvent) {
-                        MouseEvent me = (MouseEvent) event;
-                        Component dc = SwingUtilities.getDeepestComponentAt(((ComponentEvent) event).getComponent(), me.getX(), me.getY());
-                        // Block only MOUSE_CLICKED and MOUSE_PRESSED
-                        if ((event.getId() == MouseEvent.MOUSE_CLICKED || event.getId() == MouseEvent.MOUSE_PRESSED) &&
-                                (dc == null || !SwingUtilities.isDescendingFrom(dc, this) || dc.getListeners(MouseListener.class).length == 0)) {
-                            continue;
-                        }
-                    }
-                    */
 
                     // We cannot call theQueue.dispatchEvent, so I pasted its body here:
                     if (event instanceof ActiveEvent) {
@@ -238,16 +225,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         }
 
         if (cancelText != null) {
-            final JButton cancelButton = new JButton();           
-            cancelButton.setText(cancelText);
-            cancelButton.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        choiceDialog.setResponse(null);
-                    }
-                });
-            choiceDialog.add(cancelButton, "newline 20, tag cancel");
-            choiceDialog.setCancelComponent(cancelButton);
-            enterPressesWhenFocused(cancelButton);            
+            choiceDialog.cancelButton.setText(cancelText);
+            choiceDialog.add(choiceDialog.cancelButton, "newline 20, tag cancel");
         }
 
         choiceDialog.setSize(choiceDialog.getPreferredSize());
@@ -270,28 +249,23 @@ public class FreeColDialog<T> extends FreeColPanel {
         return createConfirmDialog(new String[] {text}, null, okText, cancelText);
     }
 
-    public static FreeColDialog<Boolean> createConfirmDialog(String[] texts, ImageIcon[] icons, String okText, String cancelText) {
-
-        // create the OK button early so that the dialog may refer to it
-        final JButton  okButton = new JButton(okText);
-
+    public static FreeColDialog<Boolean> createConfirmDialog(String[] texts, ImageIcon[] icons,
+                                                             String okText, String cancelText) {
         // create the dialog
         final FreeColDialog<Boolean> confirmDialog =
-            new FreeColDialog<Boolean>(FreeCol.getFreeColClient().getCanvas()) {
-            public void requestFocus() {
-                okButton.requestFocus();
-            }
-        };
+            new FreeColDialog<Boolean>(FreeCol.getFreeColClient().getCanvas());
+
         confirmDialog.setLayout(new MigLayout("wrap 2", "[][fill]", ""));
 
-        okButton.addActionListener(new ActionListener() {
+        confirmDialog.okButton.setText(okText);
+        confirmDialog.okButton.addActionListener(new ActionListener() {
                 public void actionPerformed( ActionEvent event ) {
                     confirmDialog.setResponse(Boolean.TRUE);
                 }
             });
 
-        JButton cancelButton = new JButton(cancelText);
-        cancelButton.addActionListener(new ActionListener() {
+        confirmDialog.cancelButton.removeActionListener(confirmDialog);
+        confirmDialog.cancelButton.addActionListener(new ActionListener() {
                 public void actionPerformed( ActionEvent event ) {
                     confirmDialog.setResponse(Boolean.FALSE);
                 }
@@ -306,11 +280,8 @@ public class FreeColDialog<T> extends FreeColPanel {
             }
         }
 
-        confirmDialog.add(okButton, "newline 20, span, split 2, tag ok");
-        confirmDialog.add(cancelButton, "tag cancel");
-        confirmDialog.setCancelComponent(cancelButton);
-        enterPressesWhenFocused(okButton);
-        enterPressesWhenFocused(cancelButton);
+        confirmDialog.add(confirmDialog.okButton, "newline 20, span, split 2, tag ok");
+        confirmDialog.add(confirmDialog.cancelButton, "tag cancel");
 
         return confirmDialog;
     }
@@ -326,7 +297,8 @@ public class FreeColDialog<T> extends FreeColPanel {
     * @param cancelText The text displayed on the "cancel"-button.
     * @return The <code>FreeColDialog</code>.
     */
-    public static FreeColDialog<String> createInputDialog(String text, String defaultValue, String okText, String cancelText) {
+    public static FreeColDialog<String> createInputDialog(String text, String defaultValue,
+                                                          String okText, String cancelText) {
 
         final JTextField input = new JTextField(defaultValue);
         
@@ -339,22 +311,12 @@ public class FreeColDialog<T> extends FreeColPanel {
 
         inputDialog.setLayout(new MigLayout("wrap 1, gapy 20", "", ""));
 
-        JButton okButton = new JButton(okText);
-        okButton.addActionListener(new ActionListener() {
+        inputDialog.okButton.setText(okText);
+        inputDialog.okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
                 inputDialog.setResponse(input.getText());
             }
         });
-
-        JButton cancelButton = null;
-        if (cancelText != null) {
-            cancelButton = new JButton(cancelText);
-            cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    inputDialog.setResponse(null);
-                }
-            });
-        }
 
         input.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -367,13 +329,13 @@ public class FreeColDialog<T> extends FreeColPanel {
         inputDialog.add(getDefaultTextArea(text));
         inputDialog.add(input, "width 180:, growx");
 
-        if (cancelButton == null) {
-            inputDialog.add(okButton, "tag ok");
-            inputDialog.setCancelComponent(okButton);
+        if (cancelText == null) {
+            inputDialog.add(inputDialog.okButton, "tag ok");
+            inputDialog.setCancelComponent(inputDialog.okButton);
         } else {
-            inputDialog.add(okButton, "split 2, tag ok");
-            inputDialog.add(cancelButton, "tag cancel");
-            inputDialog.setCancelComponent(cancelButton);
+            inputDialog.cancelButton.setText(cancelText);
+            inputDialog.add(inputDialog.okButton, "split 2, tag ok");
+            inputDialog.add(inputDialog.cancelButton, "tag cancel");
         }
 
         inputDialog.setSize(inputDialog.getPreferredSize());
@@ -397,17 +359,12 @@ public class FreeColDialog<T> extends FreeColPanel {
         final JTextField inputHeight = new JTextField(Integer.toString(defaultHeight), COLUMNS);
 
         final FreeColDialog<Dimension> mapSizeDialog =
-            new FreeColDialog<Dimension>(FreeCol.getFreeColClient().getCanvas()) {
-            public void requestFocus() {
-                okButton.requestFocus();
-            }
-        };
+            new FreeColDialog<Dimension>(FreeCol.getFreeColClient().getCanvas());
 
         mapSizeDialog.setLayout(new MigLayout("wrap 2", "", ""));
 
-        JButton cancelButton = new JButton(Messages.message("cancel"));
-        JButton okButton = new JButton(Messages.message("ok"));
-        okButton.addActionListener(new ActionListener() {
+        mapSizeDialog.okButton.setText(Messages.message("ok"));
+        mapSizeDialog.okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     try {
                         int width = Integer.parseInt(inputWidth.getText());
@@ -434,8 +391,8 @@ public class FreeColDialog<T> extends FreeColPanel {
         mapSizeDialog.add(heightLabel);
         mapSizeDialog.add(inputHeight);
 
-        mapSizeDialog.add(okButton, "newline 20, span, split2, tag ok");
-        mapSizeDialog.add(cancelButton, "tag cancel");
+        mapSizeDialog.add(mapSizeDialog.okButton, "newline 20, span, split2, tag ok");
+        mapSizeDialog.add(mapSizeDialog.cancelButton, "tag cancel");
 
         mapSizeDialog.setSize(mapSizeDialog.getPreferredSize());
 
@@ -456,11 +413,6 @@ public class FreeColDialog<T> extends FreeColPanel {
             new FreeColDialog<File>(FreeCol.getFreeColClient().getCanvas());
         final JFileChooser fileChooser = new JFileChooser(directory);
 
-        loadDialog.cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    loadDialog.setResponse(null);
-                }
-            });
         loadDialog.okButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     File selectedFile = fileChooser.getSelectedFile();
@@ -503,7 +455,8 @@ public class FreeColDialog<T> extends FreeColPanel {
     * @param defaultName Default filename for the savegame.
     * @return The <code>FreeColDialog</code>.
     */
-    public static FreeColDialog<File> createSaveDialog(File directory, final String standardName, FileFilter[] fileFilters, String defaultName) {
+    public static FreeColDialog<File> createSaveDialog(File directory, final String standardName,
+                                                       FileFilter[] fileFilters, String defaultName) {
         final FreeColDialog<File> saveDialog =
             new FreeColDialog<File>(FreeCol.getFreeColClient().getCanvas());
         final JFileChooser fileChooser = new JFileChooser(directory);
@@ -615,5 +568,19 @@ public class FreeColDialog<T> extends FreeColPanel {
      */
     public void initialize() {}
 
+    /**
+     * This function analyses an event and calls the right methods to take care
+     * of the user's requests.
+     * 
+     * @param event The incoming ActionEvent.
+     */
+    public void actionPerformed(ActionEvent event) {
+        String command = event.getActionCommand();
+        if (CANCEL.equals(command)) {
+            setResponse(null);
+        } else {
+            super.actionPerformed(event);
+        }
+    }
 
 }

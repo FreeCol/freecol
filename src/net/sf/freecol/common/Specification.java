@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.action.ImprovementActionType;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.BuildingType;
@@ -44,6 +45,7 @@ import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
@@ -1021,6 +1023,10 @@ public final class Specification {
     public void applyDifficultyLevel(int difficultyLevel) {
         for (String key : difficultyLevels.get(difficultyLevel).getOptions().keySet()) {
             allOptions.put(key, difficultyLevels.get(difficultyLevel).getOptions().get(key));
+        }
+        // TODO: find a better place for this!
+        if (FreeCol.isInDebugMode()) {
+            getIntegerOption(GameOptions.STARTING_MONEY).setValue(10000);
         }
     }
 

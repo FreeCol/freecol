@@ -24,7 +24,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -189,7 +192,14 @@ public final class DragListener extends MouseAdapter {
             if (addEducationItems(unitLabel, menu)) {
                 menu.addSeparator();
             }
-            if (!(tempUnit.getLocation() instanceof WorkLocation)) {
+            if (tempUnit.getLocation() instanceof WorkLocation) {
+                if (tempUnit.getColony().canReducePopulation()) {
+                    JMenuItem menuItem = new JMenuItem(Messages.message("leaveTown"));
+                    menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
+                    menuItem.addActionListener(unitLabel);
+                    menu.add(menuItem);
+                }
+            } else {
                 if (addCommandItems(unitLabel, menu)) {
                     menu.addSeparator();
                 }
@@ -396,6 +406,24 @@ public final class DragListener extends MouseAdapter {
         final Unit tempUnit = unitLabel.getUnit();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         boolean separatorNeeded = false;
+        if (tempUnit.getEquipment().size() > 1) {
+            JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.removeAll"));
+            newItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        Map<EquipmentType, Integer> equipment =
+                            new HashMap<EquipmentType, Integer>(tempUnit.getEquipment().getValues());
+                        for (Map.Entry<EquipmentType, Integer> entry: equipment.entrySet()) {
+                            canvas.getClient().getInGameController()
+                                .equipUnit(tempUnit, entry.getKey(), -entry.getValue());
+                        }
+                        unitLabel.updateIcon();
+                    }
+                });
+            menu.add(newItem);
+        }
+
+        EquipmentType horses = null;
+        EquipmentType muskets = null;
         for (EquipmentType equipmentType : Specification.getSpecification().getEquipmentTypeList()) {
             int count = tempUnit.getEquipment().getCount(equipmentType);
             if (count > 0) {
@@ -409,7 +437,7 @@ public final class DragListener extends MouseAdapter {
                 final EquipmentType type = equipmentType; 
                 newItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            unitLabel.getCanvas().getClient().getInGameController()
+                            canvas.getClient().getInGameController()
                                 .equipUnit(tempUnit, type, -items);
                             unitLabel.updateIcon();
                         }
@@ -453,6 +481,12 @@ public final class DragListener extends MouseAdapter {
                     newItem.setText(Messages.message(equipmentType.getId() + ".add"));
                 }
                 if (newItem != null) {
+                    // for convenience menu only
+                    if ("model.equipment.horses".equals(equipmentType.getId())) {
+                        horses = equipmentType;
+                    } else if ("model.equipment.muskets".equals(equipmentType.getId())) {
+                        muskets = equipmentType;
+                    }
                     final int items = count;
                     final EquipmentType type = equipmentType; 
                     newItem.addActionListener(new ActionListener() {
@@ -466,17 +500,24 @@ public final class DragListener extends MouseAdapter {
                 }
             }
         }
-        separatorNeeded = true;
+        // convenience menu for equipping dragoons
+        if (horses != null && muskets != null && horses.isCompatibleWith(muskets)) {
+            final EquipmentType horseType = horses;
+            final EquipmentType musketType = muskets;
+            JMenuItem newItem = new JMenuItem(Messages.message("model.equipment.dragoon"));
+            newItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        canvas.getClient().getInGameController()
+                            .equipUnit(tempUnit, horseType, 1);
+                        canvas.getClient().getInGameController()
+                            .equipUnit(tempUnit, musketType, 1);
+                        unitLabel.updateIcon();
+                    }
+                });
+            menu.add(newItem);
+        }            
 
-        if (tempUnit.getLocation() instanceof WorkLocation
-            && tempUnit.getColony().canReducePopulation()) {
-            JMenuItem menuItem = new JMenuItem(Messages.message("leaveTown"));
-            menuItem.setActionCommand(UnitAction.LEAVE_TOWN.toString());
-            menuItem.addActionListener(unitLabel);
-            menu.add(menuItem);
-                
-            separatorNeeded = true;
-        }
+        separatorNeeded = true;
 
         if (separatorNeeded) {
             menu.addSeparator();

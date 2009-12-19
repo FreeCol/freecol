@@ -341,7 +341,7 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 if (label.isPartialChosen()) {
                     int amount = getAmount(label.getGoods().getType(), label.getGoods().getAmount(), false);
-                    if (amount == -1) {
+                    if (amount <= 0) {
                         return false;
                     }
                     label.getGoods().setAmount(amount);
@@ -420,12 +420,11 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                 if (label.isPartialChosen()) {
                     int amount = getAmount(label.getType(), label.getAmount(), true);
-                    if (amount == -1) {
+                    if (amount <= 0) {
                         return false;
                     }
                     label.setAmount(amount);
                 }
-
 
                 if (comp instanceof UnitLabel) {
                     UnitLabel unitLabel = (UnitLabel) comp;

@@ -151,7 +151,8 @@ public final class PreGameController extends Controller {
             ServerPlayer player = (ServerPlayer) playerIterator.next();
             
             if (player.isEuropean() && !player.isREF()) {
-                player.modifyGold(game.getGameOptions().getInteger(GameOptions.STARTING_MONEY));
+                player.modifyGold(Specification.getSpecification()
+                                  .getIntegerOption(GameOptions.STARTING_MONEY).getValue());
 
                 // Generates the initial recruits for this player.
                 // Recruits may be determined by the difficulty level,

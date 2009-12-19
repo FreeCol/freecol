@@ -2399,8 +2399,10 @@ public class Player extends FreeColGameObject implements Nameable {
         if (!canRecruitUnits()) {
             return;
         }
-        immigrationRequired += (int) featureContainer.applyModifier(Specification.getSpecification().getIntegerOption(
-                                                                                                                  "model.option.crossesIncrement").getValue(), "model.modifier.religiousUnrestBonus");
+        immigrationRequired += (int) featureContainer
+            .applyModifier(Specification.getSpecification()
+                           .getIntegerOption("model.option.crossesIncrement").getValue(),
+                           "model.modifier.religiousUnrestBonus");
         // The book I have tells me the crosses needed is:
         // [(colonist count in colonies + total colonist count) * 2] + 8.
         // So every unit counts as 2 unless they're in a colony,

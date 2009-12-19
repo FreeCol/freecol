@@ -1691,6 +1691,7 @@
     -->
   <difficultyLevels>
     <difficultyLevel id="model.difficulty.veryEasy">
+      <integerOption id="model.option.startingMoney" value="1000"/>
       <integerOption id="model.option.crossesIncrement" value="6"/>
       <integerOption id="model.option.badGovernmentLimit" value="8"/>
       <integerOption id="model.option.veryBadGovernmentLimit" value="12"/>
@@ -1706,6 +1707,7 @@
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.easy">
+      <integerOption id="model.option.startingMoney" value="300"/>
       <integerOption id="model.option.crossesIncrement" value="8"/>
       <integerOption id="model.option.badGovernmentLimit" value="7"/>
       <integerOption id="model.option.veryBadGovernmentLimit" value="11"/>
@@ -1721,6 +1723,7 @@
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.medium">
+      <integerOption id="model.option.startingMoney" value="0"/>
       <integerOption id="model.option.crossesIncrement" value="10"/>
       <integerOption id="model.option.badGovernmentLimit" value="6"/>
       <integerOption id="model.option.veryBadGovernmentLimit" value="10"/>
@@ -1736,6 +1739,7 @@
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.hard">
+      <integerOption id="model.option.startingMoney" value="0"/>
       <integerOption id="model.option.crossesIncrement" value="12"/>
       <integerOption id="model.option.badGovernmentLimit" value="5"/>
       <integerOption id="model.option.veryBadGovernmentLimit" value="9"/>
@@ -1751,6 +1755,7 @@
       <integerOption id="model.option.priceIncrease.artillery" value="100"/>
     </difficultyLevel>
     <difficultyLevel id="model.difficulty.veryHard">
+      <integerOption id="model.option.startingMoney" value="0"/>
       <integerOption id="model.option.crossesIncrement" value="14"/>
       <integerOption id="model.option.badGovernmentLimit" value="4"/>
       <integerOption id="model.option.veryBadGovernmentLimit" value="8"/>
@@ -1768,10 +1773,6 @@
   </difficultyLevels>
   <options>
     <integerOption id="model.option.turnsToSail" defaultValue="3" minimumValue="1" maximumValue="10"/>
-    <optionGroup id="gameOptions.starting">
-      <!-- The amount of money each player will receive before the game starts -->
-      <integerOption id="model.option.startingMoney" defaultValue="0" minimumValue="0" maximumValue="50000"/>
-    </optionGroup>
     <optionGroup id="gameOptions.map">
       <!-- Enables/disables fog of war -->
       <booleanOption id="model.option.fogOfWar" defaultValue="true"/>
