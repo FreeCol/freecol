@@ -1107,7 +1107,10 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Europe europe = player.getEurope();
         int slot = Integer.parseInt(recruitUnitInEuropeElement.getAttribute("slot"));
         UnitType recruitable = europe.getRecruitable(slot);
-        UnitType newRecruitable = player.generateRecruitable(player.getId() + "slot." + Integer.toString(slot));
+        String taskId = player.getId()
+            + ".slot." + Integer.toString(slot)
+            + "." + Integer.toString(getPseudoRandom().nextInt(1000000));
+        UnitType newRecruitable = player.generateRecruitable(taskId);
         Unit unit = new Unit(getGame(), europe, player, recruitable, UnitState.ACTIVE, recruitable.getDefaultEquipment());
         Element reply = Message.createNewRootElement("recruitUnitInEuropeConfirmed");
         reply.setAttribute("newRecruitable", newRecruitable.getId());
