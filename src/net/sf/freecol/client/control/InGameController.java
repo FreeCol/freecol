@@ -2718,6 +2718,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
         Goods goods = null;
+        
         for (;;) {
             // Rebuild the choice list
             List<ChoiceItem<Goods>> goodsOffered
@@ -2726,6 +2727,12 @@ public final class InGameController implements NetworkConstants {
                 goodsOffered.add(new ChoiceItem<Goods>(sell));
             }
 
+            // there is nothing to sell to the player
+            if(goodsOffered.isEmpty()){
+            	canvas.showInformationMessage(Messages.message("trade.nothingToSell"));
+            	return;
+            }
+            
             // Choose goods to buy
             goods = canvas.showChoiceDialog(Messages.message("buyProposition.text"),
                 Messages.message("buyProposition.nothing"),
