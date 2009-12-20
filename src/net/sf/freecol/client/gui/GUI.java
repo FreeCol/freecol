@@ -1643,9 +1643,11 @@ public final class GUI {
             nameFont = nameFont.deriveFont(Font.BOLD, fontSize);
             nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
             bi = new BufferedImage(nameFontMetrics.stringWidth(nameString) + 4, 
-                                   nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(), BufferedImage.TYPE_INT_ARGB);
+                                   nameFontMetrics.getMaxAscent() + nameFontMetrics.getMaxDescent(),
+                                   BufferedImage.TYPE_INT_ARGB);
             fontSize -= 2;
-        } while (bi.getWidth() > maxWidth);
+        } while (maxWidth > 0 && bi.getWidth() > maxWidth);
+
 
         // draw the string with selected color
         Graphics2D big = bi.createGraphics();

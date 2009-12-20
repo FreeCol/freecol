@@ -417,6 +417,27 @@ public final class ProductionLabel extends JComponent {
             return;
         }
 
+        BufferedImage stringImage = null;
+        int stringWidth = 0;
+        if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber > 0
+            || (maximumProduction > production && production > 0)) {
+            String number = "";
+            if (stockNumber >= 0 ) {
+                number = Integer.toString(stockNumber);  // Show stored items in ReportColonyPanel
+                drawPlus = true;
+            }
+            if (production >=0 && drawPlus ) {
+                number = number + "+" + Integer.toString(production);
+            } else {
+                number = number + Integer.toString(production);
+            }
+            if (maximumProduction > production && production > 0) {
+                number = number + "/" + String.valueOf(maximumProduction);
+            }
+            stringImage = parent.getGUI().createStringImage(this, number, getForeground(), -1, 12);
+            stringWidth = stringImage.getWidth(null);
+        }
+
         int drawImageCount = Math.min(Math.abs(production), maxIcons);
         if (drawImageCount==0) {
             drawImageCount=1;
@@ -439,12 +460,11 @@ public final class ProductionLabel extends JComponent {
         int coverage = pixelsPerIcon * (drawImageCount - 1) + iconWidth;
         int leftOffset = 0;
 
-        boolean needToCenterImages = centered && coverage < getWidth();
-        if (needToCenterImages) {
-            leftOffset = (getWidth() - coverage)/2;
+        if (centered && coverage < stringWidth) {
+            leftOffset = (stringWidth - coverage)/2;
         }
 
-        int width = Math.max(getWidth(), coverage);
+        int width = Math.max(stringWidth, coverage);
         int height = Math.max(getHeight(), goodsIcon.getImage().getHeight(null));
         setSize(new Dimension(width, height));
 
@@ -454,26 +474,11 @@ public final class ProductionLabel extends JComponent {
             goodsIcon.paintIcon(null, g, leftOffset + i*pixelsPerIcon, 0);
         }
 
-        if (production >= displayNumber || production < 0 || maxIcons < production || stockNumber > 0
-            || (maximumProduction > production && production > 0)) {
-            String number = "";
-            if (stockNumber >= 0 ) {
-                number = Integer.toString(stockNumber);  // Show stored items in ReportColonyPanel
-                drawPlus = true;
-            }
-            if (production >=0 && drawPlus ) {
-                number = number + "+" + Integer.toString(production);
-            } else {
-                number = number + Integer.toString(production);
-            }
-            if (maximumProduction > production && production > 0) {
-                number = number + "/" + String.valueOf(maximumProduction);
-            }
-            BufferedImage stringImage = parent.getGUI().createStringImage(this, number, getForeground(), width, 12);
-            int textOffset = leftOffset + (coverage - stringImage.getWidth())/2;
+        if (stringImage != null) {
+            int textOffset = coverage > stringWidth ? (coverage - stringWidth)/2 : 0;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,
-                    goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
+                        goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);
         }
     }
 

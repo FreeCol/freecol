@@ -38,9 +38,7 @@ import net.sf.freecol.common.model.Player;
  * This label holds Goods data in addition to the JLabel data, which makes it
  * ideal to use for drag and drop purposes.
  */
-public final class GoodsLabel extends JLabel {// implements ActionListener {
-    
-    
+public final class GoodsLabel extends JLabel {
     
     @SuppressWarnings("unused")
     private static Logger logger = Logger.getLogger(GoodsLabel.class.getName());
@@ -49,7 +47,6 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
     
     private final Canvas parent;
     
-    @SuppressWarnings("unused")
     private boolean selected;
     
     private boolean partialChosen;
@@ -97,21 +94,23 @@ public final class GoodsLabel extends JLabel {// implements ActionListener {
             player = ((Ownable) location).getOwner();
         }
         if (player == null
-                || !goods.getType().isStorable()
-                || player.canTrade(goods)
-                || (location instanceof Colony && player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT) &&
-                    ((Colony) location).hasAbility("model.ability.export"))) {
+            || !goods.getType().isStorable()
+            || player.canTrade(goods)
+            || (location instanceof Colony
+                && player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
+                && ((Colony) location).hasAbility("model.ability.export"))) {
             setToolTipText(goods.getName());
-            setEnabled(true);
         } else {
             setToolTipText(goods.getName(false));
-            setEnabled(false);
+            setIcon(getDisabledIcon());
         }
         
-        if (goods.getType() != Goods.FOOD && location instanceof Colony
-                && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
+        if (!goods.getType().limitIgnored()
+            && location instanceof Colony
+            && ((Colony) location).getWarehouseCapacity() < goods.getAmount()) {
             setForeground(Color.RED);
-        } else if (location instanceof Colony && goods.getType().isStorable()
+        } else if (location instanceof Colony
+                   && goods.getType().isStorable()
                    && ((Colony) location).getExportData(goods.getType()).isExported()) {
             setForeground(Color.GREEN);
         } else if (goods.getAmount() == 0) {

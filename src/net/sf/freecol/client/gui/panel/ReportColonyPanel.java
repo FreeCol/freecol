@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
@@ -37,6 +38,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -63,7 +65,7 @@ public final class ReportColonyPanel extends ReportPanel {
         // Display Panel
         Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
-        reportPanel.setLayout(new MigLayout("wrap 12, fillx", "", ""));
+        reportPanel.setLayout(new MigLayout("fill, wrap 24", "", ""));
 
         for (Colony colony : colonies) {
 
@@ -78,22 +80,30 @@ public final class ReportColonyPanel extends ReportPanel {
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
-                reportPanel.add(unitLabel);
+                reportPanel.add(unitLabel, "span 2");
             }
+            if (unitList.size() % 12 != 0) {
+                reportPanel.add(new JLabel(), "wrap");
+            }
+
             unitList = colony.getTile().getUnitList();
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
-                reportPanel.add(unitLabel);
+                reportPanel.add(unitLabel, "span 2");
             }
-            reportPanel.add(new JLabel(), "newline, span");
+            if (unitList.size() % 12 != 0) {
+                reportPanel.add(new JLabel(), "wrap");
+            }
 
             // Production
+            int count = 0;
             int netFood = colony.getFoodProduction() - colony.getFoodConsumption();
             if (netFood != 0) {
                 ProductionLabel productionLabel = new ProductionLabel(Goods.FOOD, netFood, getCanvas());
                 productionLabel.setStockNumber(colony.getFoodCount());
-                reportPanel.add(productionLabel, "span 2");
+                reportPanel.add(productionLabel, "span 3, top");
+                count++;
             }
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
                 if (goodsType.isFoodType()) {
@@ -111,25 +121,32 @@ public final class ReportColonyPanel extends ReportPanel {
                         productionLabel.setMaxGoodsIcons(1);
                     }
                     productionLabel.setStockNumber(stockValue);   // Show stored items in ReportColonyPanel
-                    reportPanel.add(productionLabel, "span 2");
+                    reportPanel.add(productionLabel, "span 3, top");
+                    count++;
                 }
             }
-            reportPanel.add(new JLabel(), "newline, span");
+            if (count % 8 != 0) {
+                reportPanel.add(new JLabel(), "wrap");
+            }
 
-            for (Building building : colony.getBuildings()) {
-                reportPanel.add(new JLabel(building.getName()), "span 3");
+            List<Building> buildingList = colony.getBuildings();
+            Collections.sort(buildingList, Building.getBuildingComparator());
+            for (Building building : buildingList) {
+                JLabel buildingLabel =
+                    new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId()
+                                                                      + ".image", 0.66)));
+                buildingLabel.setToolTipText(building.getName());
+                reportPanel.add(buildingLabel, "span 3");
             }
 
             // Buildings
             BuildableType currentType = colony.getCurrentlyBuilding();
-            JLabel buildableLabel = new JLabel();
-            if (currentType == null) {
-                buildableLabel.setText(Messages.message("nothing"));
-                buildableLabel.setForeground(Color.RED);
-            } else {
-                buildableLabel.setText(currentType.getName());
-                buildableLabel.setForeground(Color.GRAY);
-            }
+            JLabel buildableLabel =
+                new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
+                                                                  + ".image", 0.66)));
+            buildableLabel.setToolTipText(Messages.message("colonyPanel.currentlyBuilding",
+                                                           "%buildable%", currentType.getName()));
+            buildableLabel.setIcon(buildableLabel.getDisabledIcon());
             reportPanel.add(buildableLabel, "span 3");
 
         }

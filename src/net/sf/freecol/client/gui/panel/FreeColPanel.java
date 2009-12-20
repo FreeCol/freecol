@@ -175,7 +175,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
         addMouseListener(new MouseAdapter() {
         });
 
-        okButton.setActionCommand(String.valueOf(OK));
+        okButton.setActionCommand(OK);
         okButton.addActionListener(this);
         enterPressesWhenFocused(okButton);
         setCancelComponent(okButton);
