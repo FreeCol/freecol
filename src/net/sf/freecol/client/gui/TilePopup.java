@@ -86,7 +86,7 @@ public final class TilePopup extends JPopupMenu {
      * @param canvas The component containing the map.
      * @param gui An object with methods used for making the popup.
      */
-    public TilePopup(final Tile tile, final FreeColClient freeColClient, final Canvas canvas, GUI gui) {
+    public TilePopup(final Tile tile, final FreeColClient freeColClient, final Canvas canvas, final GUI gui) {
         super(Messages.message("tile",
                                "%x%", String.valueOf(tile.getX()),
                                "%y%", String.valueOf(tile.getY())));
@@ -168,6 +168,22 @@ public final class TilePopup extends JPopupMenu {
         }
 
         if (tile.getUnitCount() > 0) {
+            if (tile.getUnitCount() > 1) {
+                addSeparator();
+                JMenuItem activateAllItem = new JMenuItem(Messages.message("activateAllUnits"));
+                activateAllItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent event) {
+                            Unit lastUnit = null;
+                            for (Unit unit: tile.getUnitList()) {
+                                freeColClient.getInGameController().clearOrders(unit);
+                                lastUnit = unit;
+                            }
+                            gui.setActiveUnit(lastUnit);
+                        }
+                    }
+                );
+                add(activateAllItem);
+            }
             addSeparator();
         }
 
