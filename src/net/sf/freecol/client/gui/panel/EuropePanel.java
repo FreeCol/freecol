@@ -307,8 +307,8 @@ public final class EuropePanel extends FreeColPanel {
         //
         toAmericaPanel.removeAll();
         toEuropePanel.removeAll();
+        // inPortPanel initializes cargoPanel 
         inPortPanel.initialize();
-        cargoPanel.removeAll();
         marketPanel.removeAll();
         docksPanel.initialize();
         log.setText("");
@@ -380,13 +380,8 @@ public final class EuropePanel extends FreeColPanel {
      * 
      * @param unitLabel The unit that is being selected.
      */
-    public void setSelectedUnitLabel(UnitLabel unitLabel) {    	
+    public void setSelectedUnitLabel(UnitLabel unitLabel) {
         if (selectedUnit == unitLabel) {
-            // Make sure the selected unit is really selected
-        	if(unitLabel != null){
-        		unitLabel.setSelected(true);
-        		inPortPanel.revalidate();
-        	}
             return;
         }
         if (selectedUnit != null) {
@@ -401,6 +396,7 @@ public final class EuropePanel extends FreeColPanel {
         }
         
         inPortPanel.revalidate();
+        inPortPanel.repaint();
     }
 
     /**
@@ -682,6 +678,8 @@ public final class EuropePanel extends FreeColPanel {
             if (selectedUnit == null && lastCarrier != null) {
                 setSelectedUnitLabel(lastCarrier);
             }
+            revalidate();
+            repaint();
         }
 
         public void propertyChange(PropertyChangeEvent event) {
