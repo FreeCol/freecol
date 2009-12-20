@@ -350,11 +350,11 @@ public final class TilePopup extends JPopupMenu {
             menu.add(dumpItem);
             lineCount++;
         }
-        if (menu instanceof JMenu) {
-            ((JMenu) menu).addSeparator();
-        } else {
-            ((JPopupMenu) menu).addSeparator();
-        }
+//        if (menu instanceof JMenu) {
+//            ((JMenu) menu).addSeparator();
+//        } else {
+//            ((JPopupMenu) menu).addSeparator();
+//        }
         hasAnItem = true;
         return lineCount;
     }
