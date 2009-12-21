@@ -21,6 +21,7 @@ package net.sf.freecol.common.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 
 /**
@@ -135,7 +136,7 @@ public class Introspector {
 
         if (argType.isEnum()) {
             try {
-                method = argType.getMethod("name", (Class<?>[]) null);
+                method = argType.getMethod("name");
             } catch (Exception e) {
                 throw new IllegalArgumentException(argType.getName()
                                                    + ".getMethod(name()): "
@@ -233,12 +234,22 @@ public class Introspector {
                                                    + e.toString());
             }
             Method convertMethod = getToStringConverter(fieldType);
-            try {
-                return (String) convertMethod.invoke(null, result);
-            } catch (Exception e) {
-                throw new IllegalArgumentException(convertMethod.getName()
-                                                   + "(null, result): "
-                                                   + e.toString());
+            if (Modifier.isStatic(convertMethod.getModifiers())) {
+                try {
+                    return (String) convertMethod.invoke(null, result);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(convertMethod.getName()
+                                                       + "(null, result): "
+                                                       + e.toString());
+                }
+            } else {
+                try {
+                    return (String) convertMethod.invoke(result);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(convertMethod.getName()
+                                                       + "(result): "
+                                                       + e.toString());
+                }
             }
         }
     }
