@@ -334,18 +334,35 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             unit.removeAllEquipment(false);
             unit.setState(Unit.UnitState.IN_COLONY);
 
-            Unit student = unit.getStudent();
+            Unit potentialStudent = unit.getStudent();
             if (buildingType.hasAbility("model.ability.teach")) {
-                if (student == null) {
-                    student = findStudent(unit);
-                    if (student != null) {
-                        unit.setStudent(student);
-                        student.setTeacher(unit);
+                if (potentialStudent == null) {
+                    potentialStudent = findStudent(unit);
+                    if (potentialStudent != null) {
+                        unit.setStudent(potentialStudent);
+                        potentialStudent.setTeacher(unit);
                     }
                 }
-            } else if (student != null) {
-                student.setTeacher(null);
-                unit.setStudent(null);
+            } else {
+                if (potentialStudent != null) {
+                    potentialStudent.setTeacher(null);
+                    unit.setStudent(null);
+                } else {
+                    if (unit.getTeacher() == null) {
+                        for (Building building: getColony().getBuildings()) {
+                            if (building.getType().hasAbility("model.ability.teach")) {
+                                for (Unit potentialTeacher: building.getUnitList()) {
+                                    if (potentialTeacher.getStudent() == null && unit.canBeStudent(potentialTeacher)) {
+                                        potentialTeacher.setStudent(unit);
+                                        unit.setTeacher(potentialTeacher);
+                                    }
+                                }
+                                // Break assumes only one educational facility.
+                                break;
+                            }
+                        }
+                    }
+                }
             }
             units.add(unit);
             firePropertyChange(Building.UNIT_CHANGE,null,unit);
