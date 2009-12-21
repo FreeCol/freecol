@@ -22,9 +22,12 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
+import java.util.Hashtable;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -50,11 +53,14 @@ import net.sf.freecol.common.option.BooleanOption;
 
 import net.miginfocom.swing.MigLayout;
 
-
 /**
  * This panel displays the Turn Report.
  */
 public final class ReportTurnPanel extends ReportPanel {
+
+    private ModelMessage[] _messages;
+    private Hashtable<String, Vector<JComponent>> textPanesByMessage = new Hashtable<String, Vector<JComponent>>();
+    private Hashtable<String, Vector<JComponent>> labelsByMessage = new Hashtable<String, Vector<JComponent>>();
 
     /**
      * The constructor that will add the items to this panel.
@@ -63,6 +69,8 @@ public final class ReportTurnPanel extends ReportPanel {
      */
     public ReportTurnPanel(Canvas parent, ModelMessage... messages) {
         super(parent, Messages.message("menuBar.report.turn"));
+
+        this._messages = messages;
 
         Comparator<ModelMessage> comparator = getClient().getClientOptions().getModelMessageComparator();
         if (comparator != null) {
@@ -142,6 +150,7 @@ public final class ReportTurnPanel extends ReportPanel {
             reportPanel.add(component, "newline");
 
             final JTextPane textPane = getDefaultTextPane();
+
             insertMessage(textPane.getStyledDocument(), message, getMyPlayer());
             reportPanel.add(textPane);
 
@@ -161,24 +170,53 @@ public final class ReportTurnPanel extends ReportPanel {
                 reportPanel.add(ignoreButton);
                 ignore = true;
             }
+
+            // So that we can iterate through rows in ActionListeners by message ID.
+            if (!textPanesByMessage.containsKey(message.getId())) {
+                textPanesByMessage.put(message.getId(), new Vector<JComponent>());
+            }
+            textPanesByMessage.get(message.getId()).add(textPane);
+
+            if (!labelsByMessage.containsKey(message.getId())) {
+                labelsByMessage.put(message.getId(), new Vector<JComponent>());
+            }
+            textPanesByMessage.get(message.getId()).add(textPane);
+            textPanesByMessage.get(message.getId()).add(label);
+
             final BooleanOption filterOption = options.getBooleanOption(message);
             // Message type can be filtered
             if (filterOption != null) {
                 JButton filterButton = new JButton("X");
-                filterButton.setToolTipText(Messages.message("model.message.filter", 
-                    "%type%", message.getTypeName()));
+                filterButton.setToolTipText(Messages.message("model.message.filter", "%type%", message.getTypeName()));
                 filterButton.addActionListener(new ActionListener() {
+
                     public void actionPerformed(ActionEvent event) {
                         boolean flag = filterOption.getValue();
                         filterOption.setValue(!flag);
-                        textPane.setEnabled(!flag);
-                        label.setEnabled(!flag);
+                        //textPane.setEnabled(!flag);
+                        //label.setEnabled(!flag);
+
+                        setEnabledByType(message.getType(), !flag);
                     }
+
                 });
                 if (ignore) {
                     reportPanel.add(filterButton);
                 } else {
                     reportPanel.add(filterButton, "skip");
+                }
+            }
+        }
+    }
+
+    private void setEnabledByType(ModelMessage.MessageType type, boolean enabled) {
+        for (int i = 0; i < _messages.length; i++) {
+            if (_messages[i].getType() == type) {
+                for (JComponent textPane: textPanesByMessage.get(_messages[i].getId())) {
+                    textPane.setEnabled(enabled);
+                }
+                for (JComponent label: labelsByMessage.get(_messages[i].getId())) {
+                    label.setEnabled(enabled);
                 }
             }
         }
@@ -236,7 +274,6 @@ public final class ReportTurnPanel extends ReportPanel {
     }
 
     private void insertMessage(StyledDocument document, ModelMessage message, Player player) {
-
         try {
             String input = Messages.message(message.getId());
             int start = input.indexOf('%');
