@@ -391,9 +391,9 @@ public final class InGameController implements NetworkConstants {
                     && player.getEurope().recruitablesDiffer()) {
                     Canvas canvas = freeColClient.getCanvas();
                     int index = canvas.showEmigrationPanel(false);
-                    emigrateUnitInEurope(index + 1);
+                    askEmigrate(index + 1);
                 } else {
-                    emigrateUnitInEurope(0);
+                    askEmigrate(0);
                 }
             }
 
@@ -418,22 +418,6 @@ public final class InGameController implements NetworkConstants {
             nextActiveUnit();
         }
         logger.finest("Exiting client setCurrentPlayer: " + player.getName());
-    }
-
-    /**
-     * Request a unit to migrate from a specified "slot" in Europe.
-     *
-     * @param slot The slot from which the unit migrates, 1-3 selects
-     *             a specific one, otherwise the server will choose one.
-     */
-    private void emigrateUnitInEurope(int slot) {
-        Game game = freeColClient.getGame();
-        Player player = freeColClient.getMyPlayer();
-        if (game.getCurrentPlayer() != player) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
-            return;
-        }
-        askEmigrate(slot);
     }
 
     /**
@@ -1543,8 +1527,7 @@ public final class InGameController implements NetworkConstants {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (int i = 0; i < emigrants; i++) {
-                            int index = canvas.showEmigrationPanel(true);
-                            emigrateUnitInEurope(index + 1);
+                            askEmigrate(canvas.showEmigrationPanel(true) + 1);
                         }
                     }
                 });
