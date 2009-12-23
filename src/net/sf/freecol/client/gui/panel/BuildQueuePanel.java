@@ -120,7 +120,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             featureContainer.add(type.getFeatureContainer());
         }
 
-        cellRenderer = new DefaultBuildQueueCellRenderer();
+        cellRenderer = getCellRenderer();
 
         compact.setText(Messages.message("colonyPanel.compactView"));
         compact.addItemListener(this);
@@ -448,20 +448,31 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     public void itemStateChanged(ItemEvent event) {
         if (event.getSource() == compact) {
-            if (compact.isSelected()) {
-                if (cellRenderer instanceof DefaultBuildQueueCellRenderer) {
-                    cellRenderer = new SimpleBuildQueueCellRenderer();
-                }
-            } else if (cellRenderer instanceof SimpleBuildQueueCellRenderer) {
-                cellRenderer = new DefaultBuildQueueCellRenderer();
-            }
-            buildQueueList.setCellRenderer(cellRenderer);
-            buildingList.setCellRenderer(cellRenderer);
-            unitList.setCellRenderer(cellRenderer);
+            updateDetailView();
         } else if (event.getSource() == showAll) {
             updateAllLists();
         }
     }
+
+	private void updateDetailView() {
+		cellRenderer = getCellRenderer();
+		buildQueueList.setCellRenderer(cellRenderer);
+		buildingList.setCellRenderer(cellRenderer);
+		unitList.setCellRenderer(cellRenderer);
+	}
+
+	private ListCellRenderer getCellRenderer() {
+		if (compact.isSelected()) {
+		    if (cellRenderer == null || cellRenderer instanceof DefaultBuildQueueCellRenderer) {
+		        return new SimpleBuildQueueCellRenderer();
+		    }
+		} else if (cellRenderer == null || cellRenderer instanceof SimpleBuildQueueCellRenderer) {
+		    return new DefaultBuildQueueCellRenderer();
+		}
+		
+		// return current one
+		return cellRenderer;
+	}
 
     /**
      * This class implements a transfer handler able to transfer
