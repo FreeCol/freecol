@@ -119,12 +119,21 @@ public final class TilePopup extends JPopupMenu {
             if (gotoMenuItem != null) {
                 gotoMenuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent event) {
-                            if (activeUnit.getTile()!=tile) {
-                                // just checking we are not already at the destination
-                                freeColClient.getInGameController().setDestination(activeUnit, tile);
-                                if (freeColClient.getGame().getCurrentPlayer() == freeColClient.getMyPlayer()) {
-                                    freeColClient.getInGameController().moveToDestination(activeUnit);
-                                }
+                            if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+                            	return;
+                            }
+                            Tile currTile = activeUnit.getTile();
+                        	// just checking we are not already at the destination
+                            if (currTile==tile) {
+                            	return;
+                            }
+
+                            freeColClient.getInGameController().setDestination(activeUnit, tile);
+                            freeColClient.getInGameController().moveToDestination(activeUnit);
+                            
+                            //if unit did not move, we should show the goto path
+                            if(activeUnit.getTile() == currTile){
+                            	gui.updateGotoPathForActiveUnit();
                             }
                         }
                     });
