@@ -20,16 +20,41 @@
 
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Settlement.SettlementType;
+
 /**
  * Represents one of the nations present in the game.
  */
 public abstract class NationType extends FreeColGameObjectType {
 
     /**
+     * The type of settlement this Nation has.
+     */
+    private SettlementType typeOfSettlement;
+
+    /**
      * Sole constructor.
      */
     public NationType(int index) {
         setIndex(index);
+    }
+
+    /**
+     * Get the <code>TypeOfSettlement</code> value.
+     *
+     * @return an <code>SettlementType</code> value
+     */
+    public final SettlementType getTypeOfSettlement() {
+        return typeOfSettlement;
+    }
+
+    /**
+     * Set the <code>TypeOfSettlement</code> value.
+     *
+     * @param newTypeOfSettlement The new TypeOfSettlement value.
+     */
+    public final void setTypeOfSettlement(final SettlementType newTypeOfSettlement) {
+        this.typeOfSettlement = newTypeOfSettlement;
     }
 
     /**

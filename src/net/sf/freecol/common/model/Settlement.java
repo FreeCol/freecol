@@ -42,13 +42,13 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     private static final Logger logger = Logger.getLogger(Settlement.class.getName()); 
     
     public static enum SettlementType {
-        SMALL, MEDIUM, LARGE, 
+        SMALL_COLONY, MEDIUM_COLONY, LARGE_COLONY, 
             SMALL_STOCKADE,
             MEDIUM_STOCKADE, MEDIUM_FORT,
             LARGE_STOCKADE, LARGE_FORT, LARGE_FORTRESS, 
             UNDEAD, 
             INDIAN_CAMP, INDIAN_VILLAGE, AZTEC_CITY, INCA_CITY }
-    
+
     public static final int RADIUS = 1;
     public static final int FOOD_CONSUMPTION = 2;
 

@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.Specification;
 
 /**
@@ -52,6 +53,7 @@ public class EuropeanNationType extends NationType {
      */
     public EuropeanNationType(int index) {
         super(index);
+        setTypeOfSettlement(SettlementType.SMALL_COLONY);
     }
 
     /**

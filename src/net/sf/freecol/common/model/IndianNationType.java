@@ -54,11 +54,6 @@ public class IndianNationType extends NationType {
     private AggressionLevel aggression;
 
     /**
-     * The type of settlement this Nation has.
-     */
-    private SettlementType typeOfSettlement;
-
-    /**
      * Stores the ids of the skills taught by this Nation.
      */
     private List<RandomChoice<UnitType>> skills = 
@@ -131,21 +126,12 @@ public class IndianNationType extends NationType {
     }
 
     /**
-     * Get the <code>TypeOfSettlement</code> value.
-     *
-     * @return an <code>SettlementType</code> value
-     */
-    public final SettlementType getTypeOfSettlement() {
-        return typeOfSettlement;
-    }
-
-    /**
      * Describe <code>getSettlementTypeAsString</code> method here.
      *
      * @return a <code>String</code> value
      */
     public final String getSettlementTypeAsString() {
-        switch (typeOfSettlement) {
+        switch (getTypeOfSettlement()) {
         case INCA_CITY:
         case AZTEC_CITY:
             return Messages.message("settlementType.city");
@@ -155,16 +141,6 @@ public class IndianNationType extends NationType {
         default:
             return Messages.message("settlementType.camp");
         }
-    }
-
-
-    /**
-     * Set the <code>TypeOfSettlement</code> value.
-     *
-     * @param newTypeOfSettlement The new TypeOfSettlement value.
-     */
-    public final void setTypeOfSettlement(final SettlementType newTypeOfSettlement) {
-        this.typeOfSettlement = newTypeOfSettlement;
     }
 
     /**
@@ -230,7 +206,7 @@ public class IndianNationType extends NationType {
         aggression = Enum.valueOf(AggressionLevel.class, valueString);
 
         valueString = in.getAttributeValue(null, "type-of-settlement").toUpperCase();
-        typeOfSettlement = Enum.valueOf(SettlementType.class, valueString);
+        setTypeOfSettlement(Enum.valueOf(SettlementType.class, valueString));
     }
 
     public void readChildren(XMLStreamReader in, Specification specification)

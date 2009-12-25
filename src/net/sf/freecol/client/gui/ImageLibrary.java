@@ -1207,11 +1207,11 @@ public final class ImageLibrary extends ImageProvider {
                 switch(stockadeLevel) {
                 case 0:
                     if (unitCount <= 3) {
-                        return getSettlementImage(SettlementType.SMALL);
+                        return getSettlementImage(SettlementType.SMALL_COLONY);
                     } else if (unitCount <= 7) {
-                        return getSettlementImage(SettlementType.MEDIUM);
+                        return getSettlementImage(SettlementType.MEDIUM_COLONY);
                     } else {
-                        return getSettlementImage(SettlementType.LARGE);
+                        return getSettlementImage(SettlementType.LARGE_COLONY);
                     }
                 case 1:
                     if (unitCount > 7) {
@@ -1230,7 +1230,7 @@ public final class ImageLibrary extends ImageProvider {
                 case 3:
                     return getSettlementImage(SettlementType.LARGE_FORTRESS);
                 default:
-                    return getSettlementImage(SettlementType.SMALL);
+                    return getSettlementImage(SettlementType.SMALL_COLONY);
                 }
             }
 
