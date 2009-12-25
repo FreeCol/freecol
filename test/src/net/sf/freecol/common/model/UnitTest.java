@@ -363,19 +363,26 @@ public class UnitTest extends FreeColTestCase {
     public void testIsColonist() {
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
+        Player sioux = game.getPlayer("model.nation.sioux");
         Map map = getTestMap(plains, true);
         game.setMap(map);
-
         
-        Unit merchantman = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.merchantman"),
+        Tile tile1 = map.getTile(6, 8);
+        Tile tile2 = map.getTile(6, 9);
+      
+        Unit merchantman = new Unit(game, tile1, dutch, spec().getUnitType("model.unit.merchantman"),
                                     UnitState.ACTIVE);
         
         assertFalse("Merchantman isnt a colonist",merchantman.isColonist());
         
-        Unit soldier = new Unit(game, map.getTile(6, 8), dutch, spec().getUnitType("model.unit.veteranSoldier"),
+        Unit soldier = new Unit(game, tile1, dutch, spec().getUnitType("model.unit.veteranSoldier"),
                                 UnitState.ACTIVE);
         
         assertTrue("A soldier is a colonist",soldier.isColonist());
+        
+        UnitType braveType = FreeCol.getSpecification().getUnitType("model.unit.brave");
+        Unit brave = new Unit(game, tile2, sioux, braveType, UnitState.ACTIVE);
+        assertFalse("A brave is not a colonist", brave.isColonist());
     }
 
     /**
