@@ -593,7 +593,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         otherwise.
      */
     public boolean isColonist() {
-        return unitType.hasAbility("model.ability.foundColony");
+        return unitType.hasAbility("model.ability.foundColony")
+            && owner.isEuropean();
     }
 
     /**
