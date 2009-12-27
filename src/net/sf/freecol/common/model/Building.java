@@ -349,17 +349,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                     unit.setStudent(null);
                 } else {
                     if (unit.getTeacher() == null) {
-                        for (Building building: getColony().getBuildings()) {
-                            if (building.getType().hasAbility("model.ability.teach")) {
-                                for (Unit potentialTeacher: building.getUnitList()) {
-                                    if (potentialTeacher.getStudent() == null && unit.canBeStudent(potentialTeacher)) {
-                                        potentialTeacher.setStudent(unit);
-                                        unit.setTeacher(potentialTeacher);
-                                    }
-                                }
-                                // Break assumes only one educational facility.
-                                break;
-                            }
+                        Unit potentialTeacher = getColony().findTeacher(unit);
+                        if (potentialTeacher != null) {
+                            potentialTeacher.setStudent(unit);
+                            unit.setTeacher(potentialTeacher);
                         }
                     }
                 }

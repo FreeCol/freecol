@@ -1770,6 +1770,26 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         }
     }
 
+    // Find and a teacher of given Unit, if teacher available
+    public Unit findTeacher(Unit unit) {
+        // Remains null if no teacher found.
+        Unit foundTeacher = null;
+
+        for (Building building: getColony().getBuildings()) {
+            if (building.getType().hasAbility("model.ability.teach")) {
+                for (Unit potentialTeacher: building.getUnitList()) {
+                    if (potentialTeacher.getStudent() == null && unit.canBeStudent(potentialTeacher)) {
+                        foundTeacher = potentialTeacher;
+                        break;
+                    }
+                }
+                // Break assumes only one educational facility.
+                break;
+            }
+        }
+
+        return foundTeacher;
+    }
 
     // Warn about levels that will be exceeded next turn
     private void createWarehouseCapacityWarning() {

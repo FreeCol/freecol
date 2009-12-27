@@ -349,6 +349,14 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         Unit u = (Unit) locatable;
         u.removeAllEquipment(false);
         u.setState(Unit.UnitState.IN_COLONY);
+
+        // Find a teacher if available.
+        Unit potentialTeacher = getColony().findTeacher(u);
+        if (potentialTeacher != null) {
+            potentialTeacher.setStudent(u);
+            u.setTeacher(potentialTeacher);
+        }
+
         setUnit(u);
     }
     
