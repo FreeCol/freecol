@@ -634,7 +634,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (teaching != null) {
             return typeStudent.getEducationTurns(teaching);
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("typeTeacher=" + typeTeacher + " typeStudent=" + typeStudent);
         }
     }
 
@@ -840,12 +840,24 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param newStudent The new Student value.
      */
     public final void setStudent(final Unit newStudent) {
+    	Unit oldStudent = this.student;
+    	if(oldStudent == newStudent){
+    		return;
+    	}
+    	
         if (newStudent == null) {
-            this.student = null;
+        	this.student = null;
+        	if(oldStudent != null && oldStudent.getTeacher() == this){
+        		oldStudent.setTeacher(null);
+        	}
         } else if (newStudent.getColony() != null &&
                    newStudent.getColony() == getColony() &&
                    newStudent.canBeStudent(this)) {
-            this.student = newStudent;
+        	if(oldStudent != null && oldStudent.getTeacher() == this){
+        		oldStudent.setTeacher(null);
+        	}
+        	this.student = newStudent;
+        	newStudent.setTeacher(this);
         } else {
             throw new IllegalStateException("unit can not be student: " + newStudent.getName());
         }
@@ -866,14 +878,26 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @param newTeacher The new Teacher value.
      */
     public final void setTeacher(final Unit newTeacher) {
+    	Unit oldTeacher = this.teacher;
+    	if(newTeacher == oldTeacher){
+    		return;
+    	}
+    	
         if (newTeacher == null) {
-            this.teacher = null;
+        	this.teacher = null;
+        	if(oldTeacher != null && oldTeacher.getStudent() == this){
+        		oldTeacher.setStudent(null);
+        	}
         } else {
             UnitType skillTaught = FreeCol.getSpecification().getUnitType(newTeacher.getType().getSkillTaught());
             if (newTeacher.getColony() != null &&
                 newTeacher.getColony() == getColony() &&
                 getColony().canTrain(skillTaught)) {
-                this.teacher = newTeacher;
+            	if(oldTeacher != null && oldTeacher.getStudent() == this){
+            		oldTeacher.setStudent(null);
+            	}
+            	this.teacher = newTeacher;
+            	this.teacher.setStudent(this);
             } else {
                 throw new IllegalStateException("unit can not be teacher: " + newTeacher.getName());
             }

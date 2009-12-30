@@ -25,10 +25,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.common.option.BooleanOption;
+import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
+import net.sf.freecol.util.test.FreeColTestUtils.ColonyBuilder;
 
 public class SchoolTest extends FreeColTestCase {
+	
+	private enum SchoolLevel { SCHOOLHOUSE, COLLEGE, UNIVERSITY };
 
     private UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
     private UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
@@ -50,12 +54,10 @@ public class SchoolTest extends FreeColTestCase {
      * @return A list of all the units of the given type in this colony.
      */
     private List<Unit> getUnitList(Colony colony, UnitType type) {
-        ArrayList<Unit> units = new ArrayList<Unit>();
-        for (WorkLocation wl : colony.getWorkLocations()) {
-            for (Unit unit : wl.getUnitList()) {
-                if (type.equals(unit.getType())) {
-                    units.add(unit);
-                }
+        List<Unit> units = new ArrayList<Unit>() ;
+        for (Unit unit : colony.getUnitList()) {
+            if (type.equals(unit.getType())) {
+                units.add(unit);
             }
         }
         return units;
@@ -71,6 +73,25 @@ public class SchoolTest extends FreeColTestCase {
                          1, getUnitList(colony, unitType).size()); */
             colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse")).newTurn();
         }
+    }
+    
+    private Building addSchoolToColony(Game game, Colony colony, SchoolLevel level){
+    	BuildingType schoolType = null;;
+        switch(level){
+        	case SCHOOLHOUSE:
+        		schoolType = spec().getBuildingType("model.building.Schoolhouse");
+        		break;
+        	case COLLEGE:
+        		schoolType = spec().getBuildingType("model.building.College");
+        		break;
+        	case UNIVERSITY:
+        		schoolType = spec().getBuildingType("model.building.University");
+        		break;
+        	default:
+        		fail("Setup error, cannot setup school");
+        }
+        colony.addBuilding(new Building(game, colony, schoolType));
+        return colony.getBuilding(schoolType);
     }
 
     private void setProductionBonus(Colony colony, int value) {
@@ -1216,5 +1237,37 @@ public class SchoolTest extends FreeColTestCase {
             assertEquals(6 - bonus, blacksmith.getNeededTurnsOfTraining());
             assertEquals(8 - bonus, statesman.getNeededTurnsOfTraining());
         }
+    }
+    
+    public void testChangeTeachers(){
+    	Game game = getGame();
+    	game.setMap(getTestMap());
+
+    	// Setup
+    	ColonyBuilder colBuilder = FreeColTestUtils.getColonyBuilder();
+    	colBuilder.initialColonists(3).addColonist(expertLumberJackType).addColonist(expertLumberJackType);
+    	Colony colony = colBuilder.build();
+    	Building school = addSchoolToColony(game, colony, SchoolLevel.COLLEGE);
+    
+    	Unit student = getUnitList(colony, freeColonistType).get(0);
+    	List<Unit> teacherList = getUnitList(colony, expertLumberJackType);
+    	Unit teacher1 = teacherList.get(0);
+    	Unit teacher2 = teacherList.get(1);
+    	assertTrue("Teacher1 should not have a student yet",teacher1.getStudent() == null);
+    	assertTrue("Teacher2 should not have a student yet",teacher2.getStudent() == null);
+    	// add first teacher
+    	school.add(teacher1);
+    	assertTrue("Teacher1 should now have a student",teacher1.getStudent() == student);
+    	assertTrue("Student should have assigned teacher1",student.getTeacher() == teacher1);
+    	// add a second teacher
+    	school.add(teacher2);
+    	assertTrue("Teacher1 should still have a student",teacher1.getStudent() == student);
+    	assertTrue("Teacher2 should not have a student yet",teacher2.getStudent() == null);
+    	assertTrue("Student should have assigned teacher1",student.getTeacher() == teacher1);
+    	// change teacher
+    	student.setTeacher(teacher2);
+    	assertTrue("Teacher1 should not have a student now",teacher1.getStudent() == null);
+    	assertTrue("Teacher2 should now have a student",teacher2.getStudent() == student);
+    	assertTrue("Student should have assigned teacher2",student.getTeacher() == teacher2);
     }
 }

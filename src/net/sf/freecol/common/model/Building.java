@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -39,7 +40,8 @@ import org.w3c.dom.Element;
  * Represents a building in a colony.
  */
 public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named {
-
+	private static Logger logger = Logger.getLogger(Building.class.getName());
+	
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
     /** The colony containing this building. */
@@ -592,6 +594,14 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         final Iterator<Unit> teachers = getUnitIterator();
         while (teachers.hasNext()) {
             final Unit teacher = teachers.next();
+            
+            //Sanitation, make sure we have the proper teacher/student relation
+            if (teacher.getStudent() != null && teacher.getStudent().getTeacher() != teacher){
+            	logger.warning("Teacher assigned to student who does not know teacher");
+            	teacher.setStudent(null);
+            }
+            
+            // student may have changed
             if (teacher.getStudent() == null && !assignStudent(teacher)) {
                 continue;
             }
