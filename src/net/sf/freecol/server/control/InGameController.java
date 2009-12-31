@@ -2114,7 +2114,10 @@ public final class InGameController extends Controller {
         } else if (loc instanceof IndianSettlement) {
             // Can not be co-located when selling to natives.
         } else if (loc instanceof Colony) {
-            if (loc.getTile() != oldLoc.getTile()) {
+            if (oldLoc instanceof Unit
+                && ((Unit) oldLoc).getOwner() != ((Colony) loc).getOwner()) {
+                // Gift delivery
+            } else if (loc.getTile() != oldLoc.getTile()) {
                 throw new IllegalStateException("Goods and carrier not both in Colony.");
             }
         } else if (loc.getGoodsContainer() == null) {
