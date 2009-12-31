@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JTextPane;
+import javax.swing.JViewport;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
@@ -38,6 +39,8 @@ import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
+
+import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel displays the Advanced Colony Report.
@@ -169,6 +172,8 @@ public final class ReportRequirementsPanel extends ReportPanel {
             }
 
             // text area
+            int width = ((JViewport) reportPanel.getParent()).getWidth();
+            reportPanel.setLayout(new MigLayout("width " + width + "!"));
             reportPanel.add(textPane);
 
         }

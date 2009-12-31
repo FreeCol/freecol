@@ -1028,6 +1028,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         	defendingPlayer.surrenderTo(player);
         }
         
+        // We need to send an update of the unit, may have been changed
+        //like getting cargo
+        if (result.type.compareTo(CombatResultType.WIN) >= 0 && unit.isNaval()){
+        	Element update = reply.getOwnerDocument().createElement("update");
+        	update.appendChild(unit.toXMLElement(player,update.getOwnerDocument()));
+        	reply.appendChild(update);
+        }
+        
         if (result.type.compareTo(CombatResultType.WIN) >= 0 
             && unit.getTile() != newTile
             && oldUnits < unit.getTile().getUnitCount()) {

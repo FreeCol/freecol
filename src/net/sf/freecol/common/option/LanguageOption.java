@@ -58,7 +58,9 @@ public class LanguageOption extends AbstractOption {
         {"arz", "\u0645\u0635\u0631\u064A"},
         {"hsb", "Serb\u0161\u0107ina"},
         {"nds", "Plattd\u00fc\u00fctsch"},
-        {"pms", "Piemont\u00e9s"}
+        {"pms", "Piemont\u00e9s"},
+        {"be-tarask", "\u0411\u0435\u043b\u0430\u0440\u0443\u0441\u043a\u0430\u044f "
+         + "(\u0442\u0430\u0440\u0430\u0448\u043a\u0435\u0432\u0456\u0446\u0430)" }
     };
 
 

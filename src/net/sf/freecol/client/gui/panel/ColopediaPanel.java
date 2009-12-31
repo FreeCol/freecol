@@ -114,6 +114,12 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     private JTree tree;
 
     /**
+     * The saved size of this panel.
+     */
+    private static Dimension savedSize = new Dimension(850, 600);
+
+
+    /**
      * The constructor that will add the items to this panel.
      * 
      * @param parent The parent of this panel.
@@ -123,7 +129,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         none = Messages.message("none");
 
-        setLayout(new MigLayout("", "[]unrelated[grow, fill]", "[][grow, fill][]"));
+        setLayout(new MigLayout("fill", "[200:]unrelated[550:, grow, fill]", "[][grow, fill][]"));
 
         header = getDefaultHeader(Messages.message("menuBar.colopedia"));
         add(header, "span, align center");
@@ -139,29 +145,36 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel = new JPanel();
         detailPanel.setOpaque(false);
-        JScrollPane detail = new JScrollPane(detailPanel, 
+        JScrollPane detail = new JScrollPane(detailPanel,
                                              JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                                             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         detail.getVerticalScrollBar().setUnitIncrement(16);
         detail.getViewport().setOpaque(false);
-        add(detail);
+        add(detail, "grow");
 
         add(okButton, "newline 20, span, tag ok");
 
-        setSize(getPreferredSize());
+        setPreferredSize(savedSize);
 
     }
-    
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(850, 600);
-    }
-    
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(850, getCanvas().getHeight() - 100);
+
+    /**
+     * Get the <code>SavedSize</code> value.
+     *
+     * @return a <code>Dimension</code> value
+     */
+    public final Dimension getSavedSize() {
+        return savedSize;
     }
 
+    /**
+     * Set the <code>SavedSize</code> value.
+     *
+     * @param newSavedSize The new SavedSize value.
+     */
+    public final void setSavedSize(final Dimension newSavedSize) {
+        this.savedSize = newSavedSize;
+    }
 
     /**
      * Prepares this panel to be displayed.
@@ -633,7 +646,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             return;
         }
 
-        detailPanel.setLayout(new MigLayout("wrap 4, fillx, gap 20", "[][]push[][]", ""));
+        detailPanel.setLayout(new MigLayout("wrap 4, gap 20", "[][]push[][]", ""));
 
         String movementCost = String.valueOf(tileType.getBasicMoveCost() / 3);
         String defenseBonus = none;
@@ -693,7 +706,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.description")));
-        detailPanel.add(getDefaultTextArea(tileType.getDescription()), "span, growx");
+        detailPanel.add(getDefaultTextArea(tileType.getDescription(), 20), "span, growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -746,7 +759,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.add(goodsPanel);
 
         detailPanel.add(new JLabel(Messages.message("colopedia.resource.description")), "newline 20");
-        detailPanel.add(getDefaultTextArea(type.getDescription()), "growx");
+        detailPanel.add(getDefaultTextArea(type.getDescription(), 20), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -881,7 +894,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
                         "newline 20");
-        detailPanel.add(getDefaultTextArea(type.getDescription()), "growx");
+        detailPanel.add(getDefaultTextArea(type.getDescription(), 20), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -953,7 +966,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         detailPanel.add(new JLabel(Messages.message("colopedia.goods.description")));
-        detailPanel.add(getDefaultTextArea(type.getDescription()), "growx");
+        detailPanel.add(getDefaultTextArea(type.getDescription(), 20), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -1108,7 +1121,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         // Notes
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.notes")), "newline 20, top");
-        detailPanel.add(getDefaultTextArea(buildingType.getDescription()), "growx");
+        detailPanel.add(getDefaultTextArea(buildingType.getDescription(), 20), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -1146,8 +1159,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         String text = Messages.message(father.getDescription()) + "\n\n" + "["
                 + Messages.message(father.getBirthAndDeath()) + "] "
                 + Messages.message(father.getText());
-        JTextArea description = getDefaultTextArea(text);
-        detailPanel.add(description, "top, growx, shrink");
+        JTextArea description = getDefaultTextArea(text, 20);
+        detailPanel.add(description, "top, growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();

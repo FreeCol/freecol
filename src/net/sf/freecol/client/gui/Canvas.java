@@ -176,8 +176,6 @@ public final class Canvas extends JDesktopPane {
 
     private static final Integer STATUS_LAYER = JLayeredPane.POPUP_LAYER;
 
-    //private static final int EXIT = 0, RECRUIT = 1, PURCHASE = 2, TRAIN = 3, UNLOAD = 4;
-
     /**
      * To save the most recently open dialog in Europe
      * (<code>RecruitDialog</code>, <code>PurchaseDialog</code>, <code>TrainDialog</code>)
@@ -1429,8 +1427,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showColonyPanel(Colony colony) {
         freeColClient.getGUI().stopBlinking();
-        ColonyPanel colonyPanel = new ColonyPanel(this);
-        colonyPanel.initialize(colony);
+        ColonyPanel colonyPanel = new ColonyPanel(colony, this);
         addAsFrame(colonyPanel);
         colonyPanel.requestFocus();
     }
@@ -1529,7 +1526,10 @@ public final class Canvas extends JDesktopPane {
     public void remove(Component comp, boolean update) {
         if (comp == null) {
             return;
+        } else if (comp instanceof FreeColPanel) {
+            ((FreeColPanel) comp).setSavedSize(comp.getSize());
         }
+
         final Rectangle updateBounds = comp.getBounds();
         final JInternalFrame frame = getInternalFrame(comp);
         if (frame != null && frame != comp) {

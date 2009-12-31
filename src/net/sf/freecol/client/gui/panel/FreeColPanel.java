@@ -21,6 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
@@ -131,12 +132,37 @@ public class FreeColPanel extends JPanel implements ActionListener {
         BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, LINK_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
+    private static final FreeColImageBorder imageBorder =
+        new FreeColImageBorder(ResourceManager.getImage("menuborder.n.image"),
+                               ResourceManager.getImage("menuborder.w.image"),
+                               ResourceManager.getImage("menuborder.s.image"),
+                               ResourceManager.getImage("menuborder.e.image"),
+                               ResourceManager.getImage("menuborder.nw.image"),
+                               ResourceManager.getImage("menuborder.ne.image"),
+                               ResourceManager.getImage("menuborder.sw.image"),
+                               ResourceManager.getImage("menuborder.se.image"));
+
     protected boolean editable = true;
 
     protected JButton okButton = new JButton(Messages.message("ok"));
 
-    protected static StyleContext styleContext = null;
+    protected static StyleContext styleContext = new StyleContext();
 
+    static {
+        Style defaultStyle = styleContext.getDefaultStyleContext()
+            .getStyle(StyleContext.DEFAULT_STYLE);
+
+        Style regular = styleContext.addStyle("regular", defaultStyle);
+        StyleConstants.setFontFamily(regular, "Dialog");
+        StyleConstants.setBold(regular, true);
+        StyleConstants.setFontSize(regular, 12);
+
+        Style buttonStyle = styleContext.addStyle("button", regular);
+        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
+
+        Style right = styleContext.addStyle("right", regular);
+        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
+    }
 
     /**
      * Constructor.
@@ -157,18 +183,8 @@ public class FreeColPanel extends JPanel implements ActionListener {
         this.canvas = parent;
         setFocusCycleRoot(true);
 
-        Image menuborderN = ResourceManager.getImage("menuborder.n.image");
-        Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
-        Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
-        Image menuborderW = ResourceManager.getImage("menuborder.w.image");
-        Image menuborderE = ResourceManager.getImage("menuborder.e.image");
-        Image menuborderS = ResourceManager.getImage("menuborder.s.image");
-        Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
-        Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
-        final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
-                menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
         setBorder(BorderFactory.createCompoundBorder(imageBorder,
-                BorderFactory.createEmptyBorder(margin, margin,margin,margin)));
+                BorderFactory.createEmptyBorder(margin, margin, margin, margin)));
 
         // See the message of Ulf Onnen for more information about the presence
         // of this fake mouse listener.
@@ -179,6 +195,15 @@ public class FreeColPanel extends JPanel implements ActionListener {
         okButton.addActionListener(this);
         enterPressesWhenFocused(okButton);
         setCancelComponent(okButton);
+    }
+
+    /**
+     * Set the <code>SavedSize</code> value.
+     *
+     * @param newSavedSize The new SavedSize value.
+     */
+    public void setSavedSize(final Dimension newSavedSize) {
+        // override this if you want a panel to remember its size
     }
 
     /**
@@ -242,18 +267,30 @@ public class FreeColPanel extends JPanel implements ActionListener {
         return editable;
     }
 
+    /**
+     * The OK button requests focus.
+     *
+     */
     public void requestFocus() {
         okButton.requestFocus();
     }
 
+    /**
+     * Get a JTextPane with default styles.
+     *
+     * @return a <code>JTextPane</code> value
+     */
     public static JTextPane getDefaultTextPane() {
         return getDefaultTextPane(null);
     }
 
+    /**
+     * Get a JTextPane with default styles and given text.
+     *
+     * @param text a <code>String</code> value
+     * @return a <code>JTextPane</code> value
+     */
     public static JTextPane getDefaultTextPane(String text) {
-        if (styleContext == null) {
-            styleContext = createStyleContext();
-        }
         JTextPane textPane = new JTextPane(new DefaultStyledDocument(styleContext));
         textPane.setOpaque(false);
         textPane.setEditable(false);
@@ -264,24 +301,6 @@ public class FreeColPanel extends JPanel implements ActionListener {
     }
 
 
-    private static StyleContext createStyleContext() {
-        StyleContext defaultContext = new StyleContext();
-        Style defaultStyle = defaultContext.getDefaultStyleContext()
-            .getStyle(StyleContext.DEFAULT_STYLE);
-
-        Style regular = defaultContext.addStyle("regular", defaultStyle);
-        StyleConstants.setFontFamily(regular, "Dialog");
-        StyleConstants.setBold(regular, true);
-        StyleConstants.setFontSize(regular, 12);
-
-        Style buttonStyle = defaultContext.addStyle("button", regular);
-        StyleConstants.setForeground(buttonStyle, LINK_COLOR);
-
-        Style right = defaultContext.addStyle("right", regular);
-        StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
-
-        return defaultContext;
-    }
 
     /**
      * Returns a text area with standard settings suitable for use in FreeCol
@@ -294,6 +313,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
     public static JTextArea getDefaultTextArea(String text) {
         return getDefaultTextArea(text, COLUMNS);
     }
+
     /**
      * Returns a text area with standard settings suitable for use in FreeCol
      * dialogs.
@@ -316,6 +336,15 @@ public class FreeColPanel extends JPanel implements ActionListener {
         return textArea;
     }
 
+    /**
+     * Return a button suitable for linking to another panel
+     * (e.g. ColopediaPanel).
+     *
+     * @param text a <code>String</code> value
+     * @param icon an <code>Icon</code> value
+     * @param action a <code>String</code> value
+     * @return a <code>JButton</code> value
+     */
     public static JButton getLinkButton(String text, Icon icon, String action) {
         JButton button = new JButton(text, icon);
         button.setMargin(emptyMargin);
@@ -341,6 +370,11 @@ public class FreeColPanel extends JPanel implements ActionListener {
         return header;
     }
 
+    /**
+     * Make the given button the CANCEL button.
+     *
+     * @param cancelButton an <code>AbstractButton</code> value
+     */
     public void setCancelComponent(AbstractButton cancelButton) {
         if (cancelButton == null) {
             throw new NullPointerException();
@@ -354,7 +388,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Registers enter key for a jbutton.
+     * Registers enter key for a JButton.
      * 
      * @param button
      */
@@ -367,10 +401,20 @@ public class FreeColPanel extends JPanel implements ActionListener {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, true), JComponent.WHEN_FOCUSED);
     }
 
+    /**
+     * Returns the default modifier value format.
+     *
+     * @return a <code>DecimalFormat</code> value
+     */
     public static final DecimalFormat getModifierFormat() {
         return modifierFormat;
     }
 
+    /**
+     * Sort the given modifiers according to type.
+     *
+     * @return a sorted Set of Modifiers
+     */
     public Set<Modifier> sortModifiers(Set<Modifier> result) {
         EnumMap<Modifier.Type, List<Modifier>> modifierMap =
             new EnumMap<Modifier.Type, List<Modifier>>(Modifier.Type.class);

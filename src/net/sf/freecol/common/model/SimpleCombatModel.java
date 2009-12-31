@@ -709,17 +709,19 @@ public class SimpleCombatModel implements CombatModel {
             // the attacker is Indian, which cannot be a player
             // only messages directed to the losing player need to be sent
             if (colony.getUnitCount() <= 1) {
-                defendingPlayer.getHistory().add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
-                                                           HistoryEvent.Type.COLONY_DESTROYED,
-                                                           "%nation%", defendingPlayer.getNationAsString(),
-                                                           "%colony%", colony.getName()));
-                defendingPlayer.addModelMessage(defendingPlayer,
-                                         ModelMessage.MessageType.COMBAT_RESULT,
-                                         "model.unit.colonyBurning",
-                                         "%colony%", colony.getName(),
-                                         "%amount%", Integer.toString(plunderGold),
-                                         "%nation%", attackingPlayer.getNationAsString(),
-                                         "%unit%", attacker.getName());
+                defendingPlayer.getHistory()
+                    .add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
+                                          HistoryEvent.Type.COLONY_DESTROYED,
+                                          "%nation%", attackingPlayer.getNationAsString(),
+                                          "%colony%", colony.getName()));
+                defendingPlayer
+                    .addModelMessage(defendingPlayer,
+                                     ModelMessage.MessageType.COMBAT_RESULT,
+                                     "model.unit.colonyBurning",
+                                     "%colony%", colony.getName(),
+                                     "%amount%", Integer.toString(plunderGold),
+                                     "%nation%", attackingPlayer.getNationAsString(),
+                                     "%unit%", attacker.getName());
                 attackingPlayer.modifyGold(plunderGold);
                 defendingPlayer.modifyGold(-plunderGold);
                 damageAllShips(colony, attacker, repairLocation);

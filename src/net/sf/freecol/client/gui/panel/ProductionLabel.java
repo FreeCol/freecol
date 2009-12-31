@@ -460,11 +460,12 @@ public final class ProductionLabel extends JComponent {
         int coverage = pixelsPerIcon * (drawImageCount - 1) + iconWidth;
         int leftOffset = 0;
 
-        if (centered && coverage < stringWidth) {
-            leftOffset = (stringWidth - coverage)/2;
+        int width = Math.max(getWidth(), Math.max(stringWidth, coverage));
+
+        if (centered && coverage < width) {
+            leftOffset = (width - coverage)/2;
         }
 
-        int width = Math.max(stringWidth, coverage);
         int height = Math.max(getHeight(), goodsIcon.getImage().getHeight(null));
         setSize(new Dimension(width, height));
 
@@ -475,7 +476,7 @@ public final class ProductionLabel extends JComponent {
         }
 
         if (stringImage != null) {
-            int textOffset = coverage > stringWidth ? (coverage - stringWidth)/2 : 0;
+            int textOffset = width > stringWidth ? (width - stringWidth)/2 : 0;
             textOffset = (textOffset >= 0) ? textOffset : 0;
             g.drawImage(stringImage, textOffset,
                         goodsIcon.getIconHeight()/2 - stringImage.getHeight()/2, null);

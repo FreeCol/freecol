@@ -22,6 +22,7 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -39,6 +40,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -46,7 +48,6 @@ import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComponentInputMap;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -55,6 +56,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolTip;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
@@ -67,6 +69,8 @@ import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
@@ -115,8 +119,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     private final JLabel popLabel = new JLabel();
     private final JLabel royalistMemberLabel = new JLabel();
 
-    private final JPanel productionPanel = new JPanel();
-    private final JPanel populationPanel = new JPanel();
+    private final JPanel rightProductionPanel = new JPanel();
+    private final JPanel populationPanel = new JPanel() {
+            public JToolTip createToolTip() {
+                return new RebelToolTip(colony, getCanvas());
+            }
+        };
 
     private final JComboBox nameBox;
 
@@ -152,13 +160,18 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private static final Font hugeFont = new Font("Dialog", Font.BOLD, 24);
 
+    /**
+     * The saved size of this panel.
+     */
+    private static Dimension savedSize = null;
+
 
     /**
      * The constructor for the panel.
      * 
      * @param parent The parent of this panel
      */
-    public ColonyPanel(Canvas parent) {
+    public ColonyPanel(Colony colony, Canvas parent) {
         super(parent);
 
         setFocusCycleRoot(true);
@@ -179,9 +192,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         fillInputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0, true), "released");
         SwingUtilities.replaceUIInputMap(fillButton, JComponent.WHEN_IN_FOCUSED_WINDOW, fillInputMap);
 
-        productionPanel.setOpaque(false);
+        rightProductionPanel.setOpaque(false);
 
         populationPanel.setOpaque(false);
+        populationPanel.setToolTipText(" ");
         populationPanel.setLayout(new MigLayout("wrap 5, fill, insets 0",
                                                 "[][]:push[center]:push[right][]", ""));
         populationPanel.add(rebelShield, "bottom");
@@ -245,6 +259,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         // Make the colony label
         nameBox = new JComboBox();
         nameBox.setFont(smallHeaderFont);
+        List<Colony> settlements = colony.getOwner().getColonies();
+        sortColonies(settlements);
+        for (Colony aColony : settlements) {
+            nameBox.addItem(aColony);
+        }
+        nameBox.setSelectedItem(colony);
+        nameBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    initialize((Colony) nameBox.getSelectedItem());
+                }
+            });
 
         buildingsScroll.setAutoscrolls(true);
 
@@ -281,8 +306,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         setLayout(new MigLayout("fill, wrap 2", "[390!][fill]", ""));
 
-        add(nameBox, "growx, height 48:");
-        add(productionPanel, "align center");
+        add(nameBox, "height 48:, grow");
+        add(rightProductionPanel);
         add(tilesScroll, "width 390!, height 200!, top");
         add(buildingsScroll, "span 1 3, grow 200");
         add(populationPanel, "grow");
@@ -295,13 +320,34 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(warehouseButton);
         add(exitButton);
 
-        setSize(parent.getWidth(), parent.getHeight());
+        initialize(colony);
+        if (savedSize != null) {
+            setPreferredSize(savedSize);
+        }
 
     }
 
     @Override
     public void requestFocus() {
         exitButton.requestFocus();
+    }
+
+    /**
+     * Get the <code>SavedSize</code> value.
+     *
+     * @return a <code>Dimension</code> value
+     */
+    public final Dimension getSavedSize() {
+        return savedSize;
+    }
+
+    /**
+     * Set the <code>SavedSize</code> value.
+     *
+     * @param newSavedSize The new SavedSize value.
+     */
+    public final void setSavedSize(final Dimension newSavedSize) {
+        this.savedSize = newSavedSize;
     }
 
     /**
@@ -331,9 +377,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                                                                    + ".coat-of-arms.image", 0.5)));
         royalistShield.setIcon(new ImageIcon(ResourceManager.getImage(colony.getOwner().getNation().getRefNation().getId()
                                                                       + ".coat-of-arms.image", 0.5)));
-        popLabel.setText(Messages.message("colonyPanel.populationLabel", "%number%",
-                                          Integer.toString(colony.getUnitCount())));
-
         // Set listeners and transfer handlers
         outsideColonyPanel.removeMouseListener(releaseListener);
         inPortPanel.removeMouseListener(releaseListener);
@@ -394,10 +437,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
         tilePanel.initialize();
 
-        updateNameBox();
         updateProductionPanel();
         updateSoLLabel();
-
 
         outsideColonyPanel.setColony(colony);
 
@@ -428,20 +469,35 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * Updates the SoL membership label.
      */
     private void updateSoLLabel() {
-        if (getColony() == null) {
-            // Apparently this can happen
-            logger.warning("Colony panel has 'null' colony.");
-            return;
-        }
+        int population = colony.getUnitCount();
         int members = getColony().getMembers();
         int rebels = getColony().getSoL();
-        rebelLabel.setText(Messages.message("colonyPanel.rebelLabel", "%number%",
-                                            Integer.toString(members)));
+        String rebelNumber = Messages.message("colonyPanel.rebelLabel", "%number%",
+                                              Integer.toString(members));
+        String royalistNumber = Messages.message("colonyPanel.royalistLabel", "%number%",
+                                                 Integer.toString(population - members));
+        /*
+         * TODO : remove compatibility code sometime after 0.9.1
+         *
+         * The string templates were changed from percentages to
+         * absolute numbers shortly before 0.9.0, so that translators
+         * had no chance to catch up.
+         */
+        if (rebelNumber.endsWith("%")) {
+            rebelNumber = rebelNumber.substring(0, rebelNumber.length() - 1);
+        }
+        if (royalistNumber.endsWith("%")) {
+            royalistNumber = royalistNumber.substring(0, royalistNumber.length() - 1);
+        }
+        // end TODO
+
+        popLabel.setText(Messages.message("colonyPanel.populationLabel", "%number%",
+                                          Integer.toString(population)));
+        rebelLabel.setText(rebelNumber);
         rebelMemberLabel.setText(Integer.toString(rebels) + "%");
         bonusLabel.setText(Messages.message("colonyPanel.bonusLabel", "%number%",
                                             Integer.toString(getColony().getProductionBonus())));
-        royalistLabel.setText(Messages.message("colonyPanel.royalistLabel", "%number%",
-                                               Integer.toString(getColony().getUnitCount() - members)));
+        royalistLabel.setText(royalistNumber);
         royalistMemberLabel.setText(Integer.toString(getColony().getTory()) + "%");
     }
     
@@ -457,24 +513,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         tilePanel.initialize();
     }
 
-    public void updateNameBox() {
-        if (getColony() == null) {
-            // Apparently this can happen
-            return;
-        } else if (((DefaultComboBoxModel) nameBox.getModel()).getSize() == 0) {
-            List<Colony> settlements = getColony().getOwner().getColonies();
-            sortColonies(settlements);
-            for (Colony colony : settlements) {
-                nameBox.addItem(colony);
-            }
-            nameBox.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        initialize((Colony) nameBox.getSelectedItem());
-                    }
-                });
-        }
-    }
-
     private void sortBuildings(List<Building> buildings) {
         Collections.sort(buildings, Building.getBuildingComparator());
     }
@@ -484,66 +522,50 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     }
 
     public void updateProductionPanel() {
-        productionPanel.removeAll();
+        rightProductionPanel.removeAll();
 
-        final int foodFarmsProduction = colony.getProductionOf(Goods.FOOD);
-        final int foodFishProduction = colony.getProductionOf(Goods.FISH);
-        final int humanFoodConsumption = colony.getFoodConsumption();
-        final int horsesProduced = colony.getGoodsCount(Goods.HORSES) <= 0 ?
-            0 : colony.getProductionOf(Goods.HORSES);
-        final int bells = colony.getProductionOf(Goods.BELLS);
-        final int crosses = colony.getProductionOf(Goods.CROSSES);
-        
-        int foodProduction = foodFarmsProduction + foodFishProduction;
-        
-        // The food that is used. If not enough food is produced, the
-        // complete production.  Horses consume 1 food each, so they
-        // need to be added to the used food.
-        
-        // Fish should be consumed preferably, to allow surplus for production of horses
-        final int usedFood = Math.min(humanFoodConsumption, foodProduction) + horsesProduced;
-        final int usedFish = colony.getFoodConsumptionByType(Goods.FISH);
-        final int usedCorn = Math.max(usedFood - usedFish, 0);
-        
-        if (usedFish == 0) {
-            ProductionLabel label = new ProductionLabel(Goods.FOOD, usedFood, getCanvas());
-            label.setToolTipPrefix(Messages.message("totalProduction"));
-            productionPanel.add(label);
-        } else {
-            ProductionMultiplesLabel label = new ProductionMultiplesLabel(Goods.FOOD, usedCorn,
-                                                                          Goods.FISH, usedFish, getCanvas());
-            label.setToolTipPrefix(Messages.message("totalProduction"));
-            productionPanel.add(label);
+        List<AbstractGoods> foodProduction = new ArrayList<AbstractGoods>();
+        List<AbstractGoods> surplusProduction = new ArrayList<AbstractGoods>();
+        for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
+            int production = colony.getProductionOf(goodsType);
+            if (production != 0) {
+                if (goodsType.isFoodType()) {
+                    int surplus = production - colony.getFoodConsumptionByType(goodsType);
+                    foodProduction.add(new AbstractGoods(goodsType, production));
+                    surplusProduction.add(new AbstractGoods(goodsType, surplus));
+                } else if (goodsType.isBreedable()) {
+                    ProductionLabel horseLabel = new ProductionLabel(goodsType, production, getCanvas());
+                    horseLabel.setMaxGoodsIcons(1);
+                    rightProductionPanel.add(horseLabel);
+                } else if (goodsType.isImmigrationType() || goodsType.isLibertyType()) {
+                    int consumption = colony.getConsumption(goodsType);
+                    ProductionLabel bellsLabel = new ProductionLabel(goodsType, production, getCanvas());
+                    bellsLabel.setToolTipPrefix(Messages.message("totalProduction"));
+                    if (consumption != 0) {
+                        int surplus = production - consumption;
+                        ProductionLabel surplusLabel = new ProductionLabel(goodsType, surplus, getCanvas());
+                        surplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
+                        rightProductionPanel.add(surplusLabel, 0);
+                    }
+                    rightProductionPanel.add(bellsLabel, 0);
+                } else {
+                    production = colony.getProductionNetOf(goodsType);
+                    rightProductionPanel.add(new ProductionLabel(goodsType, production, getCanvas()));
+                }
+            } 
         }
-        
-        int remainingCorn = foodFarmsProduction - usedCorn;
-        final int remainingFish = foodFishProduction  - usedFish;
 
-        int surplusFood = foodProduction - humanFoodConsumption - horsesProduced;
-        remainingCorn = Math.min(surplusFood, remainingCorn);
         ProductionMultiplesLabel surplusLabel =
-            new ProductionMultiplesLabel(Goods.FOOD, remainingCorn, Goods.FISH, remainingFish, getCanvas());
+            new ProductionMultiplesLabel(surplusProduction, getCanvas());
         surplusLabel.setDrawPlus(true);
         surplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
-        productionPanel.add(surplusLabel);
+        rightProductionPanel.add(surplusLabel, 0);
 
-        if (horsesProduced != 0) {
-            // Skip the horses label if there is no stock
-            ProductionLabel horseLabel = new ProductionLabel(Goods.HORSES, horsesProduced, getCanvas());
-            horseLabel.setMaxGoodsIcons(1);
-            productionPanel.add(horseLabel);
-        }
+        ProductionMultiplesLabel label = new ProductionMultiplesLabel(foodProduction, getCanvas());
+        label.setToolTipPrefix(Messages.message("totalProduction"));
+        rightProductionPanel.add(label, 0);
 
-        ProductionLabel bellsLabel = new ProductionLabel(Goods.BELLS, bells, getCanvas());
-        bellsLabel.setToolTipPrefix(Messages.message("totalProduction"));
-        productionPanel.add(bellsLabel);
-        int surplusBells = bells - colony.getConsumption(Goods.BELLS);
-        ProductionLabel bellsSurplusLabel = new ProductionLabel(Goods.BELLS, surplusBells, getCanvas());
-        bellsSurplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
-        productionPanel.add(bellsSurplusLabel);
-        
-        productionPanel.add(new ProductionLabel(Goods.CROSSES, crosses, getCanvas()));
-        productionPanel.revalidate();
+        rightProductionPanel.revalidate();
     }
     
     /**

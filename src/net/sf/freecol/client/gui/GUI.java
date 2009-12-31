@@ -2572,23 +2572,17 @@ public final class GUI {
     *         are none.
     */
     public int getBreakingPoint(String string) {
-        int center = string.length() / 2;
-        int bestIndex = string.indexOf(' ');
-
         int index = 0;
-        while (index != -1 && index != bestIndex) {
-            if (Math.abs(center-index) < Math.abs(center-bestIndex)) {
-                bestIndex = index;
+        int center = string.length() / 2;
+        for (int offset = 0; offset < center; offset++) {
+            if (string.charAt(center + offset) == ' ') {
+                return center + offset;
+            } else if (string.charAt(center - offset) == ' ') {
+                index = center - offset;
+                return center - offset;
             }
-
-            index = string.indexOf(' ', bestIndex);
         }
-
-        if (bestIndex == 0 || bestIndex == string.length()) {
-            return -1;
-        } else {
-            return bestIndex;
-        }
+        return -1;
     }
     
     /**

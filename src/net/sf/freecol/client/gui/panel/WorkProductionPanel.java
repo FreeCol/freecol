@@ -30,6 +30,7 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
@@ -50,6 +51,10 @@ import net.miginfocom.swing.MigLayout;
 
 public class WorkProductionPanel extends FreeColPanel {
 
+    private static final Border border = BorderFactory
+        .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK),
+                              BorderFactory.createEmptyBorder(2, 2, 2, 2));
+
     public WorkProductionPanel(Canvas canvas, Unit unit) {
         super(canvas);
 
@@ -69,7 +74,6 @@ public class WorkProductionPanel extends FreeColPanel {
             modifiers = sortModifiers(basicModifiers);
             basicModifiers.addAll(colony.getModifierSet(goodsType.getId()));
             if (colony.getProductionBonus() != 0) {
-                colonyModifiers.add(colony.getProductionModifier(goodsType));
                 modifiers.add(colony.getProductionModifier(goodsType));
             }
 
@@ -91,13 +95,16 @@ public class WorkProductionPanel extends FreeColPanel {
                 basicModifiers.add(building.getType().getProductionModifier());
             }
             if (goodsType != null) {
-                basicModifiers.addAll(unit.getModifierSet(goodsType.getId()));
+                basicModifiers.addAll(unit.getType().getModifierSet(goodsType.getId()));
             }
             modifiers = sortModifiers(basicModifiers);
-            colonyModifiers.addAll(colony.getModifierSet(goodsType.getId()));
-            modifiers.addAll(unit.getColony().getModifierSet(goodsType.getId()));
+            for (Modifier modifier : colony.getModifierSet(goodsType.getId())) {
+                if (modifier.getSource() != building.getType()) {
+                    colonyModifiers.add(modifier);
+                }
+            }
+            modifiers.addAll(sortModifiers(colonyModifiers));
             if (colony.getProductionBonus() != 0) {
-                colonyModifiers.add(colony.getProductionModifier(goodsType));
                 modifiers.add(colony.getProductionModifier(goodsType));
             }
             add(new JLabel(building.getName()), "span, align center, wrap 30");
@@ -107,6 +114,7 @@ public class WorkProductionPanel extends FreeColPanel {
 
         add(new UnitLabel(unit, canvas, false, false), "wrap");
 
+        int totalPercentage = 0;
         for (Modifier modifier : modifiers) {
             FreeColGameObjectType source = modifier.getSource();
             String sourceName;
@@ -122,7 +130,6 @@ public class WorkProductionPanel extends FreeColPanel {
                     }
                 }
             }
-            add(new JLabel(sourceName), "newline");
             String bonus = getModifierFormat().format(modifier.getValue());
             boolean percentage = false;
             switch(modifier.getType()) {
@@ -141,7 +148,21 @@ public class WorkProductionPanel extends FreeColPanel {
                 bonus = "\u00D7" + bonus;
                 break;
             default:
-            }                
+            }
+            if (modifier.getType() == Modifier.Type.PERCENTAGE) {
+                totalPercentage += modifier.getValue();
+            } else if (totalPercentage != 0) {
+                String result = getModifierFormat().format(totalPercentage);
+                if (totalPercentage > 0) {
+                    result = "+" + result;
+                }
+                JLabel resultLabel = new JLabel(result);
+                resultLabel.setBorder(border);
+                add(resultLabel, "skip");
+                add(new JLabel("%"));
+                totalPercentage = 0;
+            }
+            add(new JLabel(sourceName), "newline");
             add(new JLabel(bonus));
             if (percentage) {
                 add(new JLabel("%"));
@@ -150,17 +171,17 @@ public class WorkProductionPanel extends FreeColPanel {
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 16);
 
-        int result = (int) (FeatureContainer.applyModifierSet(0, getGame().getTurn(), basicModifiers)
-                            + FeatureContainer.applyModifierSet(0, getGame().getTurn(), colonyModifiers));
+        int result = (int) FeatureContainer.applyModifierSet(0, getGame().getTurn(), basicModifiers);
+        result = (int) FeatureContainer.applyModifierSet(result, getGame().getTurn(), colonyModifiers);
+        result += colony.getProductionBonus();
+
         JLabel finalLabel = new JLabel(Messages.message("model.source.finalResult.name"));
         finalLabel.setFont(bigFont);
         add(finalLabel, "newline");
 
         JLabel finalResult = new JLabel(getModifierFormat().format(result));
         finalResult.setFont(bigFont);
-        finalResult.setBorder(BorderFactory
-                              .createCompoundBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.BLACK),
-                                                    BorderFactory.createEmptyBorder(2, 2, 2, 2)));
+        finalResult.setBorder(border);
         add(finalResult, "wrap 30");
 
         add(okButton, "span, tag ok");

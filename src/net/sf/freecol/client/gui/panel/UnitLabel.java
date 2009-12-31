@@ -228,9 +228,12 @@ public final class UnitLabel extends JLabel implements ActionListener {
      */
     public void paintComponent(Graphics g) {
 
-        if (getToolTipText() == null) {
-            setToolTipText(unit.getName());
+        String name = unit.getName();
+        String equipmentLabel = unit.getEquipmentLabel();
+        if (equipmentLabel != null) {
+            name = name + " (" + equipmentLabel + ")";
         }
+        setToolTipText(name);
 
         if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != UnitState.SENTRY)) {
             setEnabled(true);

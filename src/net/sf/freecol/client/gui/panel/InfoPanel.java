@@ -424,18 +424,28 @@ public final class InfoPanel extends FreeColPanel {
      */
     public class EndTurnPanel extends JPanel {
         
-        private JLabel endTurnLabel = new JLabel(Messages.message("infoPanel.endTurnPanel.text"), JLabel.CENTER);
-        
         private JButton endTurnButton = new JButton(Messages.message("infoPanel.endTurnPanel.endTurnButton"));
         
-        
         public EndTurnPanel() {
-            super(new FlowLayout(FlowLayout.CENTER, 10, 10));
-            
-            add(endTurnLabel);
+            super(new MigLayout("wrap 1, center", "[center]", ""));
+
+            String labelString = Messages.message("infoPanel.endTurnPanel.text");
+            int width = getFontMetrics(getFont()).stringWidth(labelString);
+            if (width > 150 ) {
+                int index = getCanvas().getGUI().getBreakingPoint(labelString);
+                if (index > 0) {
+                    add(new JLabel(labelString.substring(0, index)));
+                    add(new JLabel(labelString.substring(index + 1)));
+                } else {
+                    add(new JLabel(labelString));
+                }
+            } else {
+                add(new JLabel(labelString));
+            }
+
             add(endTurnButton);
             setOpaque(false);
-            setSize(230, endTurnLabel.getPreferredSize().height + endTurnButton.getPreferredSize().height + 30);
+            setSize(getPreferredSize());
             
             /*
              * TODO: The action listener does not work, because this button

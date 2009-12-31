@@ -58,7 +58,12 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
     protected JScrollPane scrollPane;
 
-    private static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
+    /**
+     * The saved size of this panel.
+     */
+    private static Dimension savedSize = new Dimension(850, 600);
+
+    public static final Comparator<Unit> unitTypeComparator = new Comparator<Unit>() {
         public int compare(Unit unit1, Unit unit2) {
             int deltaType = unit2.getType().getIndex() - unit1.getType().getIndex();
             if (deltaType == 0) {
@@ -95,23 +100,30 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
 
         add(okButton, "tag ok");
 
-        setSize(850, 600);
+        setPreferredSize(savedSize);
     }
     
     protected Border createBorder() {
         return new EmptyBorder(20, 20, 20, 20);
     }
 
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(850, 600);
-    }
-    
-    @Override
-    public Dimension getPreferredSize() {
-        return getMinimumSize();
+    /**
+     * Get the <code>SavedSize</code> value.
+     *
+     * @return a <code>Dimension</code> value
+     */
+    public final Dimension getSavedSize() {
+        return savedSize;
     }
 
+    /**
+     * Set the <code>SavedSize</code> value.
+     *
+     * @param newSavedSize The new SavedSize value.
+     */
+    public final void setSavedSize(final Dimension newSavedSize) {
+        this.savedSize = newSavedSize;
+    }
 
     /**
      * Prepares this panel to be displayed.

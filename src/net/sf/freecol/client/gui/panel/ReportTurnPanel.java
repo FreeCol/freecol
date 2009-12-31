@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -97,7 +96,7 @@ public final class ReportTurnPanel extends ReportPanel {
 
         // Display Panel
         reportPanel.removeAll();
-        reportPanel.setLayout(new MigLayout("wrap 4, fillx", "[][500!][][]", ""));
+        reportPanel.setLayout(new MigLayout("wrap 4", "[center][550!]:push[][]", ""));
 
         source = this;
         type = null;

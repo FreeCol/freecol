@@ -19,11 +19,13 @@
 
 package net.sf.freecol.client.gui;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -31,6 +33,7 @@ import java.util.logging.Logger;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.FreeColClient;
@@ -38,6 +41,7 @@ import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
+import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FreeColObject;
@@ -101,7 +105,8 @@ public final class TilePopup extends JPopupMenu {
             if (activeUnit.isOffensiveUnit() &&
                 activeUnit.getTile().isAdjacent(tile) && 
                 activeUnit.getMoveType(tile) == MoveType.ATTACK) {
-                CombatOdds combatOdds = activeUnit.getGame().getCombatModel().calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
+                CombatOdds combatOdds = activeUnit.getGame().getCombatModel()
+                    .calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
                     
                 String victoryPercent;
                 //If attacking a settlement, the true odds are never known because units may be hidden within
@@ -161,7 +166,10 @@ public final class TilePopup extends JPopupMenu {
         int lineCount = 0;
         int maxUnits = UNIT_LINES_IN_FIRST_MENU;
         Container currentMenu = this;
-        for (final Unit currentUnit : tile.getUnitList()) {
+        boolean moreUnits = false;
+        List<Unit> units = new ArrayList<Unit>(tile.getUnitList());
+        Collections.sort(units, ReportPanel.unitTypeComparator);
+        for (final Unit currentUnit : units) {
 
             if (lineCount > maxUnits) {
                 JMenu more = new JMenu(Messages.message("more"));
@@ -169,6 +177,7 @@ public final class TilePopup extends JPopupMenu {
                 more.setOpaque(false);
                 currentMenu.add(more);
                 currentMenu = more;
+                moreUnits = true;
                 lineCount = 0;
                 maxUnits = UNIT_LINES_IN_OTHER_MENUS;
             }
@@ -176,24 +185,22 @@ public final class TilePopup extends JPopupMenu {
             lineCount += addUnit(currentMenu, currentUnit, !currentUnit.isUnderRepair(), false);
         }
 
-        if (tile.getUnitCount() > 0) {
-            if (tile.getUnitCount() > 1) {
+        if (tile.getUnitCount() > 1) {
+            if (moreUnits) {
                 addSeparator();
-                JMenuItem activateAllItem = new JMenuItem(Messages.message("activateAllUnits"));
-                activateAllItem.addActionListener(new ActionListener() {
-                        public void actionPerformed(ActionEvent event) {
-                            Unit lastUnit = null;
-                            for (Unit unit: tile.getUnitList()) {
-                                freeColClient.getInGameController().clearOrders(unit);
-                                lastUnit = unit;
-                            }
-                            gui.setActiveUnit(lastUnit);
-                        }
-                    }
-                );
-                add(activateAllItem);
             }
-            addSeparator();
+            JMenuItem activateAllItem = new JMenuItem(Messages.message("activateAllUnits"));
+            activateAllItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent event) {
+                        Unit lastUnit = null;
+                        for (Unit unit: tile.getUnitList()) {
+                            freeColClient.getInGameController().clearOrders(unit);
+                            lastUnit = unit;
+                        }
+                        gui.setActiveUnit(lastUnit);
+                    }
+                });
+            add(activateAllItem);
         }
 
         // START DEBUG
@@ -322,6 +329,10 @@ public final class TilePopup extends JPopupMenu {
             add(dumpItem);
         }
         // END DEBUG
+        Component lastComponent = getComponent(getComponentCount() - 1);
+        if (lastComponent instanceof JSeparator) {
+            remove(lastComponent);
+        }
     }
 
     /**

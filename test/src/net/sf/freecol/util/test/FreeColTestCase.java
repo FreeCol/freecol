@@ -19,6 +19,8 @@
 
 package net.sf.freecol.util.test;
 
+import java.lang.reflect.Field;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Locale;
@@ -523,4 +525,23 @@ public class FreeColTestCase extends TestCase {
     		return this;
     	}
     }
+
+
+    /**
+     * Set the production bonus of the given colony to the given
+     * value.
+     *
+     * @param colony a <code>Colony</code> value
+     * @param value an <code>int</code> value
+     */
+    public void setProductionBonus(Colony colony, int value) {
+        try {
+            Field productionBonus = Colony.class.getDeclaredField("productionBonus");
+            productionBonus.setAccessible(true);
+            productionBonus.setInt(colony, value);
+        } catch (Exception e) {
+            // do nothing
+        }
+    }
+
 }

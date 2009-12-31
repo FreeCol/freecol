@@ -65,7 +65,7 @@ public final class ReportColonyPanel extends ReportPanel {
         // Display Panel
         Collections.sort(colonies, getClient().getClientOptions().getColonyComparator());
 
-        reportPanel.setLayout(new MigLayout("fill, wrap 24", "", ""));
+        reportPanel.setLayout(new MigLayout("fill, wrap 16"));
 
         for (Colony colony : colonies) {
 
@@ -80,9 +80,9 @@ public final class ReportColonyPanel extends ReportPanel {
             Collections.sort(unitList, getUnitTypeComparator());
             for (Unit unit : unitList) {
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
-                reportPanel.add(unitLabel, "span 2");
+                reportPanel.add(unitLabel, "sg units");
             }
-            if (unitList.size() % 12 != 0) {
+            if (unitList.size() % 16 != 0) {
                 reportPanel.add(new JLabel(), "wrap");
             }
 
@@ -92,7 +92,7 @@ public final class ReportColonyPanel extends ReportPanel {
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true, true);
                 reportPanel.add(unitLabel, "span 2");
             }
-            if (unitList.size() % 12 != 0) {
+            if (unitList.size() % 8 != 0) {
                 reportPanel.add(new JLabel(), "wrap");
             }
 
@@ -102,7 +102,7 @@ public final class ReportColonyPanel extends ReportPanel {
             if (netFood != 0) {
                 ProductionLabel productionLabel = new ProductionLabel(Goods.FOOD, netFood, getCanvas());
                 productionLabel.setStockNumber(colony.getFoodCount());
-                reportPanel.add(productionLabel, "span 3, top");
+                reportPanel.add(productionLabel, "span 2, top");
                 count++;
             }
             for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
@@ -121,7 +121,7 @@ public final class ReportColonyPanel extends ReportPanel {
                         productionLabel.setMaxGoodsIcons(1);
                     }
                     productionLabel.setStockNumber(stockValue);   // Show stored items in ReportColonyPanel
-                    reportPanel.add(productionLabel, "span 3, top");
+                    reportPanel.add(productionLabel, "span 2, top");
                     count++;
                 }
             }
@@ -136,19 +136,20 @@ public final class ReportColonyPanel extends ReportPanel {
                     new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId()
                                                                       + ".image", 0.66)));
                 buildingLabel.setToolTipText(building.getName());
-                reportPanel.add(buildingLabel, "span 3");
+                reportPanel.add(buildingLabel, "span 2");
             }
 
             // Buildings
             BuildableType currentType = colony.getCurrentlyBuilding();
-            JLabel buildableLabel =
-                new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
-                                                                  + ".image", 0.66)));
-            buildableLabel.setToolTipText(Messages.message("colonyPanel.currentlyBuilding",
-                                                           "%buildable%", currentType.getName()));
-            buildableLabel.setIcon(buildableLabel.getDisabledIcon());
-            reportPanel.add(buildableLabel, "span 3");
-
+            if (currentType != null) {
+                JLabel buildableLabel =
+                    new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
+                                                                      + ".image", 0.66)));
+                buildableLabel.setToolTipText(Messages.message("colonyPanel.currentlyBuilding",
+                                                               "%buildable%", currentType.getName()));
+                buildableLabel.setIcon(buildableLabel.getDisabledIcon());
+                reportPanel.add(buildableLabel, "span 2");
+            }
         }
 
     }

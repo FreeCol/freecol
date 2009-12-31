@@ -199,7 +199,9 @@ public class FreeColProgressBar extends JPanel {
         String stepSignal = (step < 0) ? "-" : "+"; 
         String progressString = String.valueOf(value) + stepSignal + Math.abs(step) + "/" + max;
         String turnsString = Messages.message("notApplicable.short");
-        if (max > value && step > 0) {
+        if (max <= value) {
+            turnsString = "0";
+        } else if (step > 0) {
             // There is progress, find how many turns necessary with current production
             int turns = (max - value) / step;
             if ((max - value) % step > 0) {

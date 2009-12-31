@@ -229,13 +229,7 @@ public abstract class Feature extends FreeColObject {
             return true;
         } else if (o instanceof Feature) {
             Feature feature = (Feature) o;
-            if (getId() == null) {
-                if (feature.getId() != null) {
-                    return false;
-                }
-            } else if (feature.getId() == null) {
-                return false;
-            } else if (!getId().equals(feature.getId())) {
+            if (getId() != feature.getId()) {
                 return false;
             }
             if (source != feature.source) {

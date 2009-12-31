@@ -1,0 +1,486 @@
+\documentclass[12pt]{book}
+\usepackage[T1]{fontenc}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{index}
+\usepackage[colorlinks=true,hyperindex=true]{hyperref}
+\makeindex
+
+\begin{document}
+\author{\href{http://freecol.sourceforge.net/index.php?section=8}{The FreeCol Team}}
+\title{FreeCol Documentation\\Developer Guide for Version v0.9.0}
+\maketitle{}
+
+\tableofcontents
+\newpage
+
+\hypertarget{Changing the Rules}{\chapter{Changing the Rules}}
+
+We would like to make FreeCol configurable, so that the game engine
+becomes capable of emulating many similar games. For this purpose,
+we have made many of the game's features configurable.
+
+At some point in the future, we will probably add a special rule set
+editor, but at the moment, your only option is to edit the file
+specification.xml directly. This file defines the abilities of units,
+founding fathers, buildings, terrain types, goods and equipment, for
+example. You can find this file in the \textit{data/freecol} directory.
+
+This is still work in progress, however, and the schema for the rule
+set certain to change again in the future. If you wish to develop your
+own rule set, you will have to monitor FreeCol development closely.
+
+This having been said, we are particularly interested in hearing about
+problems caused by your changes to the rule set. Some dialogs might be
+unable to display more types of goods than are currently defined, for
+example. Or other dialogs might not recognize your new Minuteman unit
+as an armed unit. Please help us improve FreeCol by telling us about
+such problems.
+
+If you have a working rule set that adds a new flavour to the game, we
+will gladly distribute it along with our default rule set. If you have
+ideas that can not currently be implemented, we will probably try to
+remove these limitations.
+
+If you try to modify the rule set, you are strongly encouraged to
+check whether the result is still valid. You can do this by validating
+the result with the command \verb$ant validate$.
+
+
+\hypertarget{Modifiers and Abilities}{\section{Modifiers and Abilities}}
+
+Most of the objects defined by the rule set can be customized via
+modifiers and abilities.  Abilities are boolean values (``true'' or
+``false''). If the value is not explicitly stated, it defaults to
+true. If an ability is not present, it defaults to false. Modifiers
+define a bonus or penalty to be applied to a numeric value, such as
+the number of goods produced by a unit. The modifier may be an
+additive, multiplicative or a percentage modifier. Modifiers default
+to ``identity'', which means they have no effect.
+
+The code also checks that all abilities and modifiers it uses are
+defined by the specification. Therefore, you must define all of them,
+even if you do not use them. You can do this by setting their value to
+the default value, e.g. ``false'' in the case of an ability, or ``0''
+in the case of an additive modifier.
+
+\newcommand{\ability}[1]{\index{#1}\index{Ability!#1}\hypertarget{#1}{\vspace{1em}\noindent\textbf{#1}}}
+\newcommand{\modifier}[1]{\index{#1}\index{Modifier!#1}\hypertarget{#1}{\vspace{1em}\noindent\textbf{#1}}}
+\newcommand{\affectsPlayer}{\\\textit{Affects: Player\\Provided by:
+    Nation, Nation Type, Founding Father}}
+\newcommand{\affectsUnit}{\\\textit{Affects: Unit\\Provided by:
+    Nation, Nation Type, Founding Father, Unit Type, Equipment Type}}
+\newcommand{\affectsBuilding}{\\\textit{Affects: Building\\Provided by:
+    Building Type}}
+\newcommand{\affectsColony}{\\\textit{Affects: Colony\\Provided by:
+    Map}}
+\newcommand{\affectsColonyTwo}{\\\textit{Affects: Colony\\Provided by:
+    Building Type, Nation, Nation Type, Founding Father}}
+\newcommand{\affectsTile}{\\\textit{Affects: Tile\\Provided by:
+    Tile Type}}
+
+
+\ability{model.ability.addTaxToBells}
+\affectsPlayer
+
+The player adds the current tax rate as a bonus to bells
+production. The bonus is modified every time the tax increases or
+decreases.
+
+\ability{model.ability.alwaysOfferedPeace}
+\affectsPlayer
+
+The player is always offered peace in negotiations with AI players.
+
+\ability{model.ability.ambushBonus}
+\affectsUnit
+
+The unit is granted an ambush bonus equal to the terrain's defence value.
+
+\ability{model.ability.ambushPenalty}
+\affectsUnit
+
+The unit suffers an ambush penalty equal to the terrain's defence value.
+
+\ability{model.ability.autoProduction}
+\affectsBuilding
+
+The building needs no units to produce goods, and will never produce
+more goods than can be stored in the colony.
+
+\ability{model.ability.automaticEquipment}
+\affectsUnit
+
+The unit automatically picks up equipment if attacked.
+
+\ability{model.ability.automaticPromotion}
+\affectsUnit
+
+A unit that can be promoted will always be promoted when successful in
+battle.
+
+\ability{model.ability.betterForeignAffairsReport}
+\affectsPlayer
+
+The player is provided with more information about foreign powers.
+
+\ability{model.ability.bombard}
+\affectsUnit
+
+The unit is able to bombard other units.
+
+\ability{model.ability.bombardShips}
+\affectsBuilding
+
+The building has the ability to bombard enemy ships on adjacent tiles.
+
+\ability{model.ability.bornInColony}
+\affectsUnit
+
+The unit can be born in a colony, provided that enough food is available.
+
+\ability{model.ability.bornInIndianSettlement}
+\affectsUnit
+
+The unit can be born in an Indian settlement, provided that enough food is available.
+
+\ability{model.ability.build}
+\affectsBuilding
+
+The building can build units or equipment.
+
+\ability{model.ability.buildCustomHouse}
+\affectsPlayer
+
+The player can build custom houses.
+
+\ability{model.ability.buildFactory}
+\affectsPlayer
+
+The player can build factories.
+
+\ability{model.ability.canBeCaptured}
+\affectsUnit
+
+The unit can be captured. Land units that can not be captured are
+destroyed, naval units that can not be captured are either sunk or
+damaged.
+
+\ability{model.ability.canBeEquipped}
+\affectsUnit
+
+The unit can be equipped.
+
+\ability{model.ability.canNotRecruitUnit}
+\affectsPlayer
+
+The player can not recruit specified units.
+
+\ability{model.ability.captureEquipment}
+\affectsUnit
+
+The unit can capture equipment from another unit.
+
+\ability{model.ability.captureGoods}
+\affectsUnit
+
+The unit can capture goods from another unit.
+
+\ability{model.ability.captureUnits}
+\affectsUnit
+
+The unit can capture enemy units.
+
+\ability{model.ability.carryGoods}
+\affectsUnit
+
+The unit can transport goods.
+
+\ability{model.ability.carryTreasure}
+\affectsUnit
+
+The unit can transport treasures, not treasure trains.
+
+\ability{model.ability.carryUnits}
+\affectsUnit
+
+The unit can transport other units.
+
+\ability{model.ability.convert}
+\affectsUnit
+
+The unit is a native convert.
+
+\ability{model.ability.dressMissionary}
+\affectsBuilding
+
+The building can commission missionaries.
+
+\ability{model.ability.electFoundingFather}
+\affectsPlayer
+
+The player can elect Founding Fathers.
+
+\ability{model.ability.expertMissionary}
+\affectsUnit
+
+The unit is an expert missionary, but not necessarily commissioned.
+
+\ability{model.ability.expertPioneer}
+\affectsUnit
+
+The unit is an expert pioneer, but not necessarily equipped with tools.
+
+\ability{model.ability.expertScout}
+\affectsUnit
+
+The unit is an expert scout, but not necessarily equipped with horses.
+
+\ability{model.ability.expertSoldier}
+\affectsUnit
+
+The unit is an expert soldier, but not necessarily equipped with muskets.
+
+\ability{model.ability.expertsUseConnections}
+\affectsPlayer
+
+Experts working in factories can produce a small amount of goods even
+if the raw materials are not available in the colony.
+
+\ability{model.ability.export}
+\affectsBuilding
+
+The building can export goods to Europe directly.
+
+\ability{model.ability.foundColony}
+\affectsUnit
+
+The unit can found new colonies.
+
+\ability{model.ability.foundInLostCity}
+\affectsUnit
+
+The unit may be generated as the result of exploring a Lost City Rumour.
+
+\ability{model.ability.hasPort}
+\affectsColony
+
+The colony has access to at least one water tile. This ability can not
+be set by the specification, but it can be used as a required ability.
+
+\ability{model.ability.ignoreEuropeanWars}
+\affectsPlayer
+
+The player will not be affected by the Monarch's declarations of war.
+
+\ability{model.ability.improveTerrain}
+\affectsUnit
+
+The unit is able to improve terrain.
+
+\ability{model.ability.independenceDeclared}
+\affectsPlayer
+
+The player has declared independence.
+
+\ability{model.ability.mercenaryUnit}
+\affectsUnit
+
+The unit may be offered as a mercenary unit.
+
+\ability{model.ability.missionary}
+\affectsUnit
+
+The unit is able to establish missions and incite unrest in native
+settlements.
+
+\ability{model.ability.moveToEurope}
+\affectsTile
+
+Units on the tile are able to move to Europe.
+
+\ability{model.ability.multipleAttacks}
+\affectsUnit
+
+The unit can attack more than once.
+
+\ability{model.ability.native}
+\affectsUnit
+
+The unit is a native unit.
+
+\ability{model.ability.navalUnit}
+\affectsUnit
+
+The unit is a naval unit.
+
+\ability{model.ability.pillageUnprotectedColony}
+\affectsUnit
+
+The unit is able to steal goods from and destroy buildings in an
+unprotected colony.
+
+\ability{model.ability.piracy}
+\affectsUnit
+
+The unit is a privateer.
+
+\ability{model.ability.produceInWater}
+\affectsBuilding
+
+The building enables units to produce on water tiles.
+
+\ability{model.ability.refUnit}
+\affectsUnit
+
+The unit can be part of the Royal Expeditionary Force.
+
+\ability{model.ability.repairUnits}
+\affectsBuilding
+
+The building can repair units.
+
+\ability{model.ability.royalExpeditionaryForce}
+\affectsPlayer
+
+The player is a Royal Expeditionary Force.
+
+\ability{model.ability.rumoursAlwaysPositive}
+\affectsPlayer
+
+The player will always get positive results from exploring Lost City
+Rumours.
+
+\ability{model.ability.scoutForeignColony}
+\affectsUnit
+
+The unit can scout out foreign colonies.
+
+\ability{model.ability.scoutIndianSettlement}
+\affectsUnit
+
+The unit can scout out native settlements.
+
+\ability{model.ability.selectRecruit}
+\affectsPlayer
+
+The player can select a unit to recruit in Europe. This also applies
+to units generated as a result of finding a Fountain of Youth.
+
+\ability{model.ability.teach}
+\affectsBuilding
+
+The building enables experts to teach other units. However, the
+building may place limits on the experience level of teachers.
+
+\ability{model.ability.tradeWithForeignColonies}
+\affectsPlayer
+
+The player may trade goods in foreign colonies.
+
+\ability{model.ability.undead}
+\affectsUnit
+
+The unit is an undead unit (used only in revenge mode).
+
+
+
+
+
+\modifier{model.modifier.bombardBonus}
+\affectsPlayer
+
+The player's units are granted a bombard bonus when attacking.
+
+\modifier{model.modifier.buildingPriceBonus}
+\affectsPlayer
+
+The player can build or buy buildings at a reduced price.
+
+\modifier{model.modifier.defence}
+\affectsUnit
+
+The unit has a defence bonus or penalty.
+
+\modifier{model.modifier.immigration}
+\textit{Affects: Player\\Provided by: Goods Type}
+
+Goods of this type contribute to the player's immigration points.
+
+\modifier{model.modifier.landPaymentModifier}
+\affectsPlayer
+
+The player can buy Indian land at a reduced price.
+
+\modifier{model.modifier.liberty}
+\textit{Affects: Player\\Provided by: Goods Type}
+
+Goods of this type contribute to the colony's and the owning player's
+liberty points.
+
+\modifier{model.modifier.lineOfSightBonus}
+\affectsUnit
+
+The unit has an increased line of sight.
+
+\modifier{model.modifier.minimumColonySize}
+\affectsColonyTwo
+
+The population of the colony can not be voluntarily reduced below this
+number. The modifier does not in any way affect a population reduction
+due to starvation or other events.
+
+\modifier{model.modifier.movementBonus}
+\affectsUnit
+
+The unit has an increased movement range.
+
+\modifier{model.modifier.nativeAlarmModifier}
+\affectsPlayer
+
+The player generates less native alarm.
+
+\modifier{model.modifier.nativeConvertBonus}
+\affectsPlayer
+
+The player has a greater chance of converting natives.
+
+\modifier{model.modifier.nativeTreasureModifier}
+\affectsPlayer
+
+The player generates greater treasures when destroying native settlements.
+
+\modifier{model.modifier.offence}
+\affectsUnit
+
+The unit has an offence bonus or penalty.
+
+\modifier{model.modifier.religiousUnrestBonus}
+\affectsPlayer
+
+The player generates greater religious unrest in Europe.
+
+\modifier{model.modifier.sailHighSeas}
+\affectsUnit
+
+The unit's travel time between Europe and the New World is reduced.
+
+\modifier{model.modifier.tradeBonus}
+\affectsPlayer
+
+Prices in the player's market remain stable for longer.
+
+\modifier{model.modifier.treasureTransportFee}
+\affectsPlayer
+
+The player pays a smaller fee for transporting treasures to Europe.
+
+\modifier{model.modifier.warehouseStorage}
+\affectsBuilding
+
+The building increases the capacity of the warehouse.
+
+
+\printindex
+
+\end{document}

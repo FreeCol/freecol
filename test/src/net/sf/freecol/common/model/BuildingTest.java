@@ -395,15 +395,76 @@ public class BuildingTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
         
         Colony colony = getStandardColony(6);
-        Unit unit = colony.getRandomUnit();
-        Building building = colony.getBuilding(spec().getBuildingType("model.building.TownHall"));
-        int bellProduction = building.getProduction();
-        int expectBellProd = 1;
-        assertEquals("Wrong initial bell production",expectBellProd,bellProduction);
-        building.add(unit);
-        bellProduction = building.getProduction();
-        expectBellProd = 4; // 1 initial plus 3 from the colonist
-        assertEquals("Wrong bell production",expectBellProd,bellProduction); 
+        Player owner = colony.getOwner();
+        Unit unit1 = colony.getUnitList().get(0);
+        Unit unit2 = colony.getUnitList().get(1);
+        BuildingType townHall = spec().getBuildingType("model.building.TownHall");
+        Building building = colony.getBuilding(townHall);
+
+        Set<Modifier> modifiers = colony.getModifierSet("model.goods.bells");
+        assertEquals(1, modifiers.size());
+        Modifier bellsModifier = modifiers.iterator().next();
+        assertEquals(Modifier.Type.ADDITIVE, bellsModifier.getType());
+        assertEquals(1.0f, bellsModifier.getValue());
+
+        assertEquals("Wrong initial bell production",
+                     (int) bellsModifier.getValue(), building.getProduction());
+
+        building.add(unit1);
+        // 3 from the colonist
+        assertEquals(3, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(3, building.getUnitProductivity(unit1));
+        // 3 from the colonist + 1
+        assertEquals("Wrong bell production", 4, building.getProduction());
+
+        owner.addFather(spec().getFoundingFather("model.foundingFather.thomasJefferson"));
+        // 3 from the colonist + 50% = 5
+        assertEquals(5, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, building.getUnitProductivity(unit1));
+        // 3 from the colonist + 50% + 1 = 6
+        assertEquals("Wrong bell production with Jefferson", 6, building.getProduction());
+
+        building.add(unit2);
+        // 3 from each colonist + 50% = 5
+        assertEquals(5, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, building.getUnitProductivity(unit1));
+        assertEquals(5, unit2.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, building.getUnitProductivity(unit2));
+        // 5 + 5 + 1 = 11
+        assertEquals("Wrong bell production with Jefferson", 11, building.getProduction());
+
+        setProductionBonus(colony, 2);
+        // 3 from each colonist + 50% + 2 = 7
+        assertEquals(5, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(7, building.getUnitProductivity(unit1));
+        assertEquals(5, unit2.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(7, building.getUnitProductivity(unit2));
+        // 7 + 7 + 1 = 15
+        assertEquals("Wrong bell production with Jefferson and +2 production bonus",
+                     15, building.getProduction());
+        
+        Building newspaper = new Building(getGame(), colony, newspaperType);
+        colony.addBuilding(newspaper);
+
+        System.out.println("unit");
+        for (Modifier modifier : unit1.getModifierSet("model.goods.bells")) {
+            System.out.println(modifier);
+        }
+        System.out.println("colony");
+        for (Modifier modifier : colony.getModifierSet("model.goods.bells")) {
+            System.out.println(modifier);
+        }
+
+        // 3 from each colonist + 50% + 2 = 7
+        assertEquals(5, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(7, building.getUnitProductivity(unit1));
+        assertEquals(5, unit2.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(7, building.getUnitProductivity(unit2));
+        // 7 + 7 + 1 + 150% = 38
+        assertEquals("Wrong bell production with Jefferson, newspaper and +2 production bonus",
+                     38, building.getProduction());
+        
+
     }
     
     public void testPrintingPressBonus() {

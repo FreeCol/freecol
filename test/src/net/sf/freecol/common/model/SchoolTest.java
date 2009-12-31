@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.lang.reflect.Field;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -92,16 +90,6 @@ public class SchoolTest extends FreeColTestCase {
         }
         colony.addBuilding(new Building(game, colony, schoolType));
         return colony.getBuilding(schoolType);
-    }
-
-    private void setProductionBonus(Colony colony, int value) {
-        try {
-            Field productionBonus = Colony.class.getDeclaredField("productionBonus");
-            productionBonus.setAccessible(true);
-            productionBonus.setInt(colony, value);
-        } catch (Exception e) {
-            // do nothing
-        }
     }
 
 

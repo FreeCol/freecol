@@ -24,6 +24,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
@@ -31,6 +32,7 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.util.Utils;
@@ -104,43 +106,6 @@ public final class ProductionMultiplesLabel extends JComponent {
     private String toolTipPrefix = null;
 
     /**
-     * Creates a new <code>ProductionLabel</code> instance.
-     *
-     * @param goods a <code>Goods</code> value
-     * @param parent a <code>Canvas</code> value
-     */
-    public ProductionMultiplesLabel(Goods goods, Canvas parent) {
-        this(goods.getType(), goods.getAmount(), -1, parent);
-    }
-
-    /**
-     * Creates a new <code>ProductionLabel</code> instance.
-     *
-     * @param goodsType an <code>int</code> value
-     * @param amount an <code>int</code> value
-     * @param parent a <code>Canvas</code> value
-     */
-    public ProductionMultiplesLabel(GoodsType goodsType, int amount, Canvas parent) {
-        this(goodsType, amount, -1, parent);
-    }
-
-    /**
-     * Creates a new <code>ProductionLabel</code> instance.
-     *
-     * @param goodsType an <code>int</code> value
-     * @param amount an <code>int</code> value
-     * @param maximumProduction an <code>int</code> value
-     * @param parent a <code>Canvas</code> value
-     */
-    public ProductionMultiplesLabel(GoodsType goodsType, int amount, int maximumProduction, Canvas parent) {
-    	this( new GoodsType[]{goodsType}, new int[]{amount}, maximumProduction, parent);
-    }
-    
-    public ProductionMultiplesLabel(GoodsType goodsType, int amount, GoodsType goodsType2, int amount2, Canvas parent) {
-    	this( new GoodsType[]{goodsType, goodsType2}, new int[]{amount, amount2}, -1, parent);
-    }
-    
-    /**
      * Allow labels to include multiple goods.
      * This is especially useful for Food.
      * 
@@ -149,12 +114,10 @@ public final class ProductionMultiplesLabel extends JComponent {
      * @param maximumProduction
      * @param parent
      */
-    public ProductionMultiplesLabel(GoodsType[] goodsType, int[] amount, int maximumProduction, Canvas parent) {
+    public ProductionMultiplesLabel(List<AbstractGoods> goods, Canvas parent) {
         super();
         this.parent = parent;
-        this.production = amount;
-        this.goodsType = goodsType;
-        this.maximumProduction = maximumProduction;
+        //this.maximumProduction = maximumProduction;
         ClientOptions options = parent.getClient().getClientOptions();
         maxIcons = options.getInteger(ClientOptions.MAX_NUMBER_OF_GOODS_IMAGES);
         displayNumber = options.getInteger(ClientOptions.MIN_NUMBER_FOR_DISPLAYING_GOODS_COUNT);
@@ -162,11 +125,17 @@ public final class ProductionMultiplesLabel extends JComponent {
         setFont(new Font("Dialog", Font.BOLD, 12));
         totalProduction = 0;
     	
-        if (goodsType != null) {
-            goodsIcon = new ImageIcon[goodsType.length];
-            for (int ii=0; ii < goodsType.length; ii++) {
-                goodsIcon[ii] = parent.getImageLibrary().getGoodsImageIcon(goodsType[ii]);
-                totalProduction += amount[ii];
+        if (goods != null) {
+            int size = goods.size();
+            goodsType = new GoodsType[size];
+            goodsIcon = new ImageIcon[size];
+            production = new int[size];
+            for (int ii=0; ii < size; ii++) {
+                AbstractGoods current = goods.get(ii);
+                goodsType[ii] = current.getType();
+                goodsIcon[ii] = parent.getImageLibrary().getGoodsImageIcon(current.getType());
+                production[ii] = current.getAmount();
+                totalProduction += current.getAmount();
             }
             compressedWidth = getMaximumIconWidth()*2;
             updateToolTipText();

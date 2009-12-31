@@ -2458,6 +2458,36 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Return a description of the unit's equipment.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getEquipmentLabel() {
+        if (equipment != null && !equipment.isEmpty()) {
+            List<String> equipmentStrings = new ArrayList<String>();
+            for (java.util.Map.Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
+                EquipmentType type = entry.getKey();
+                int amount = entry.getValue().intValue();
+                if (type.getGoodsRequired().isEmpty()) {
+                    equipmentStrings.add(Messages.message("model.goods.goodsAmount",
+                                                          "%goods%", type.getName(),
+                                                          "%amount%", Integer.toString(amount)));
+                } else {
+                    for (AbstractGoods goods : type.getGoodsRequired()) {
+                        equipmentStrings.add(Messages.message("model.goods.goodsAmount",
+                                                              "%goods%", goods.getType().getName(),
+                                                              "%amount%", Integer.toString(amount * goods.getAmount())));
+                    }
+                }
+            }
+            return Utils.join("/", equipmentStrings.toArray(new String[equipmentStrings.size()]));
+        } else {
+            return null;
+        }
+    }
+
+
+    /**
      * Returns the name of a unit in a human readable format. The return value
      * can be used when communicating with the user.
      * 
