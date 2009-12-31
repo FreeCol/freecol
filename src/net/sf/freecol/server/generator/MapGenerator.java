@@ -48,7 +48,6 @@ import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.EuropeanNationType;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
@@ -68,7 +67,6 @@ import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.UnitState;
-import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.common.util.XMLStream;
 import net.sf.freecol.server.FreeColServer;
@@ -386,9 +384,16 @@ public class MapGenerator implements IMapGenerator {
         List<Tile> settlementTiles = new ArrayList<Tile>();
 
         final int minSettlementDistance = 3;
-        int level = map.getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY);
-        int number = mapGeneratorOptions.getNumberOfSettlements() *
-        Specification.getSpecification().getIntegerOption("model.option.nativeSettlementDensity").getValue() / 100;
+        
+        // Default value for map editor
+        int nativeSettlementDensity = 50;
+        boolean isNativeSettlementDensitySet = Specification.getSpecification().hasOption("model.option.nativeSettlementDensity");
+        // A difficulty level was set, use the level value instead
+        if(isNativeSettlementDensitySet){
+        	nativeSettlementDensity = Specification.getSpecification().getIntegerOption("model.option.nativeSettlementDensity").getValue();
+        }
+        
+        int number = mapGeneratorOptions.getNumberOfSettlements() * nativeSettlementDensity / 100;
 
         for (int i = 0; i < number; i++) {
             nextTry: for (int tries = 0; tries < 100; tries++) {
