@@ -32,7 +32,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import net.sf.freecol.FreeCol;
@@ -69,7 +68,6 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.ExportData;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsContainer;
 import net.sf.freecol.common.model.GoodsType;
@@ -82,10 +80,7 @@ import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Player.PlayerType;
-import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
@@ -98,6 +93,7 @@ import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
@@ -110,8 +106,8 @@ import net.sf.freecol.common.networking.BuyMessage;
 import net.sf.freecol.common.networking.BuyPropositionMessage;
 import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.ChatMessage;
-import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.ClaimLandMessage;
+import net.sf.freecol.common.networking.ClearSpecialityMessage;
 import net.sf.freecol.common.networking.CloseTransactionMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.DebugForeignColonyMessage;
@@ -3045,10 +3041,14 @@ public final class InGameController implements NetworkConstants {
                 final int CLAIM_ACCEPT = 1;
                 final int CLAIM_STEAL = 2;
                 List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                if (price <= player.getGold()) {
-                    choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
-                                                                         Integer.toString(price)), CLAIM_ACCEPT));
+                
+                boolean canBuyLand = true;
+                if (price > player.getGold()) {
+                	canBuyLand = false;
                 }
+
+                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
+                                                                         Integer.toString(price)), CLAIM_ACCEPT, canBuyLand));
                 choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), CLAIM_STEAL));
                 Integer ci = canvas.showChoiceDialog(Messages.message("indianLand.text",
                                                                       "%player%", owner.getNationAsString()),
