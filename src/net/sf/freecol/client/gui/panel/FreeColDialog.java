@@ -30,6 +30,7 @@ import java.awt.MenuComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -46,12 +47,11 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 
+import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
-
-import net.miginfocom.swing.MigLayout;
 
 
 /**
@@ -166,17 +166,20 @@ public class FreeColDialog<T> extends FreeColPanel {
             throw new IllegalArgumentException("Can not create choice dialog with 0 choices!");
         }
 
-        final JButton firstButton;
-        firstButton = new JButton(choices.get(0).toString());
+        
+        final List<JButton> choiceBtnLst = new ArrayList<JButton>();
 
         final FreeColDialog<ChoiceItem<T>> choiceDialog =
             new FreeColDialog<ChoiceItem<T>>(FreeCol.getFreeColClient().getCanvas()) {
             public void requestFocus() {
-                firstButton.requestFocus();
+            	for(JButton b : choiceBtnLst){
+            		if(b.isEnabled()){
+            			b.requestFocus();
+            			return;
+            		}
+            	}
             }
         };
-
-        enterPressesWhenFocused(firstButton);
 
         choiceDialog.setLayout(new MigLayout("fillx, wrap 1", "[align center]", ""));
         JTextArea textArea = getDefaultTextArea(text);
@@ -195,23 +198,32 @@ public class FreeColDialog<T> extends FreeColPanel {
         choicesPanel.setBorder(new CompoundBorder(choicesPanel.getBorder(), 
                                                   new EmptyBorder(10, 20, 10, 20)));
 
+        /*
         final ChoiceItem<T> firstObject = choices.get(0);
-        firstButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    choiceDialog.setResponse(firstObject);
-                }
-            });
+        if(firstObject.isEnabled()){
+        	firstButton.addActionListener(new ActionListener() {
+        		public void actionPerformed(ActionEvent event) {
+        			choiceDialog.setResponse(firstObject);
+        		}
+        	});
+        }
+        firstButton.setEnabled(firstObject.isEnabled());
         choicesPanel.add(firstButton);
         choices.remove(0);
+		*/
 
         for (final ChoiceItem<T> object : choices) {
             final JButton objectButton = new JButton(object.toString());
-            objectButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    choiceDialog.setResponse(object);
-                }
-            });
-            enterPressesWhenFocused(objectButton);
+            if(object.isEnabled()){
+            	objectButton.addActionListener(new ActionListener() {
+            		public void actionPerformed(ActionEvent event) {
+            			choiceDialog.setResponse(object);
+            		}
+            	});
+            	enterPressesWhenFocused(objectButton);
+            }
+            objectButton.setEnabled(object.isEnabled());
+            choiceBtnLst.add(objectButton);
             choicesPanel.add(objectButton);
         }
         if (choices.size() > 20) {

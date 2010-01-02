@@ -27,7 +27,25 @@ public class ChoiceItem<T> {
 
     private String text;
     private T object;
+    private boolean enabled;
 
+    /**
+     * Creates a new <code>ChoiceItem</code> with the
+     * given object.
+     *
+     * @param text The text that should be used to represent 
+     *        this choice.
+     * @param object The <code>Object</code> contained by this
+     *        choice.
+     * @param enable Sets if the option should be enabled or not       
+     */
+    public ChoiceItem(String text, T object, boolean enable) {
+        this.text = text;
+        this.object = object;
+        this.enabled = enable;
+    }
+    
+    
     /**
      * Creates a new <code>ChoiceItem</code> with the
      * given object.
@@ -38,8 +56,7 @@ public class ChoiceItem<T> {
      *        choice.
      */
     public ChoiceItem(String text, T object) {
-        this.text = text;
-        this.object = object;
+    	this(text, object, true);
     }
 
 
@@ -51,8 +68,7 @@ public class ChoiceItem<T> {
      *        choice.
      */
     public ChoiceItem(T object) {
-        this.text = object.toString();
-        this.object = object;
+    	this(object.toString(), object, true);
     }
 
 
@@ -75,7 +91,14 @@ public class ChoiceItem<T> {
     public int getChoice() {
         return ((Integer) object).intValue();
     }
-
+    
+    /**
+     * Checks if the option should be enabled or not
+     * @return enable status
+     */
+    public boolean isEnabled(){
+    	return this.enabled;
+    }
 
     /**
      * Gets a textual presentation of this object.
