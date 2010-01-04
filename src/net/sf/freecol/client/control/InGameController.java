@@ -824,11 +824,9 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code> to move.
      */
     public void moveToDestination(Unit unit) {
-        final Canvas canvas = freeColClient.getCanvas();
-        final Map map = freeColClient.getGame().getMap();
-        final Location destination = unit.getDestination();
-
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
@@ -837,13 +835,20 @@ public final class InGameController implements NetworkConstants {
             Stop currStop = unit.getStop();
             if (!TradeRoute.isStopValid(unit, currStop)) {
                 String oldTradeRouteName = unit.getTradeRoute().getName();
-                logger.info("Trade unit " + unit.getId()
-                            + " in route " + oldTradeRouteName
-                            + " cannot continue: stop invalid.");
+                logger.warning("Trade unit " + unit.getId()
+                               + " in route " + oldTradeRouteName
+                               + " cannot continue: stop invalid.");
                 canvas.showInformationMessage("traderoute.broken", unit,
                                               "%name%", oldTradeRouteName);
                 clearOrders(unit);
                 return;
+            }
+
+            // If the unit was activated the destination is cleared,
+            // make sure we reset the destination to the next stop,
+            // which will avoid the unit being considered an "active" unit.
+            if (unit.getDestination() == null) {
+                unit.setDestination(currStop.getLocation());
             }
         	
             if (unit.getLocation().getTile() == currStop.getLocation().getTile()) {
@@ -865,6 +870,7 @@ public final class InGameController implements NetworkConstants {
 
         // Destination is either invalid (like an abandoned colony,
         // for example) or is current tile.
+        final Location destination = unit.getDestination();
         if (!(destination instanceof Europe)
             && (destination.getTile() == null
                 || unit.getTile() == destination.getTile())) {
@@ -872,6 +878,7 @@ public final class InGameController implements NetworkConstants {
             return;
         }
         
+        final Map map = freeColClient.getGame().getMap();
         PathNode path;
         if (destination instanceof Europe) {
             path = map.findPathToEurope(unit, unit.getTile());

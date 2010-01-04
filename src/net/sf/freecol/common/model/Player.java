@@ -3448,9 +3448,13 @@ public class Player extends FreeColGameObject implements Nameable {
          * Returns true if the unit is active (and going nowhere).
          */
         public boolean obtains(Unit unit) {
-            return (!unit.isDisposed() && (unit.getMovesLeft() > 0) && (unit.getState() == UnitState.ACTIVE)
-                    && (unit.getDestination() == null) && !(unit.getLocation() instanceof WorkLocation) && unit
-                    .getTile() != null);
+            return !unit.isDisposed()
+                && unit.getMovesLeft() > 0
+                && unit.getState() == UnitState.ACTIVE
+                && unit.getDestination() == null
+                && unit.getTradeRoute() == null
+                && !(unit.getLocation() instanceof WorkLocation)
+                && unit.getTile() != null;
         }
     }
 
@@ -3462,8 +3466,11 @@ public class Player extends FreeColGameObject implements Nameable {
          * Returns true if the unit has order to go somewhere.
          */
         public boolean obtains(Unit unit) {
-            return (!unit.isDisposed() && (unit.getMovesLeft() > 0) && (unit.getDestination() != null)
-                    && !(unit.getLocation() instanceof WorkLocation) && unit.getTile() != null);
+            return !unit.isDisposed()
+                && unit.getMovesLeft() > 0
+                && (unit.getDestination() != null || unit.getTradeRoute() != null)
+                && !(unit.getLocation() instanceof WorkLocation)
+                && unit.getTile() != null;
         }
     }
 
