@@ -36,6 +36,7 @@ import net.sf.freecol.server.model.ServerPlayer;
  * The message sent when the client requests claiming land.
  */
 public class ClaimLandMessage extends Message {
+	public static int STEAL_LAND = -1;
     /**
      * The ID of the tile to claim.
      */
@@ -147,6 +148,11 @@ public class ClaimLandMessage extends Message {
         if (price < 0) {
             if (ownerSettlement != null) {
                 reply.appendChild(ownerSettlement.toXMLElement(player, doc, false, false));
+                // previous owner will be less happy, so an update is required
+                reply.appendChild(ownerSettlement.getOwner().toXMLElement(player, doc, false, false));
+            }
+            else{
+            	logger.warning("Stealing land from a non-existing settlement");
             }
         } else if (price > 0) {
             reply.appendChild(player.toXMLElementPartial(doc, "gold"));

@@ -3074,7 +3074,7 @@ public final class InGameController implements NetworkConstants {
                 } else if (ci.intValue() == CLAIM_ACCEPT) { // accepted price
                     ;
                 } else if (ci.intValue() == CLAIM_STEAL) {
-                    price = -1; // steal
+                    price = ClaimLandMessage.STEAL_LAND; // steal
                 } else {
                     logger.warning("Impossible choice");
                     return false;
