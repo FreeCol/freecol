@@ -26,11 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
@@ -39,16 +35,19 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.NationType;
+import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Position;
-import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.util.RandomChoice;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -124,6 +123,11 @@ public class BuildColonyMessage extends Message {
         }
 
         Tile tile = unit.getTile();
+        if(tile.getOwner() != null && tile.getOwner() != player){
+        	return Message.createError("server.buildColony.tileHasOwner",
+        			"Tile " + tile + " belongs to someone else");
+        }
+
         Settlement settlement = null;
         // Build can proceed.
         if (player.isEuropean()) {

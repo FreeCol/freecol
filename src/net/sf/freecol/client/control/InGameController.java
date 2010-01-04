@@ -1142,6 +1142,14 @@ public final class InGameController implements NetworkConstants {
             && !showColonyWarnings(tile, unit)) {
             return;
         }
+        
+        // check ownership of central tile
+        if(tile.getOwner() != null && tile.getOwner()!= player){
+        	boolean isNewOwner = claimLand(tile, null, 0);
+        	if(!isNewOwner){
+        		return;
+        	}
+        }
 
         // Get and check the name.
         String name = canvas.showInputDialog("nameColony.text",
