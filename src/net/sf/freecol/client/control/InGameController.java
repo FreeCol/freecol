@@ -1448,21 +1448,6 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which to move the Unit.
      */
     private void moveMove(Unit unit, Direction direction) {
-        // Handle the animation showing the unit movement.
-        final Canvas canvas = freeColClient.getCanvas();
-        Game game = freeColClient.getGame();
-        Player player = unit.getOwner();
-        Map map = game.getMap();
-        String speed = (freeColClient.getMyPlayer() == player)
-            ? ClientOptions.MOVE_ANIMATION_SPEED
-            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-        if (!freeColClient.isHeadless()
-            && freeColClient.getClientOptions().getInteger(speed) > 0) {
-            Tile src = unit.getTile();
-            Tile dst = map.getNeighbourOrNull(direction, src);
-            Animations.unitMove(canvas, unit, src, dst);
-        }
-
         // If we are in a colony, or Europe, load sentries.
         if (unit.getSpaceLeft() > 0
             && (unit.getColony() != null || unit.isInEurope())) {
@@ -1485,6 +1470,9 @@ public final class InGameController implements NetworkConstants {
         if (reply == null) return;
 
         // Handle special cases
+        Game game = freeColClient.getGame();
+        final Canvas canvas = freeColClient.getCanvas();
+        Player player = freeColClient.getMyPlayer();
         if (reply.hasAttribute("slowedBy")) { // ship slowed
             Unit slowedBy = (Unit) game.getFreeColGameObject(reply.getAttribute("slowedBy"));
             String enemy = slowedBy.getOwner().getNationAsString();
@@ -2021,7 +2009,6 @@ public final class InGameController implements NetworkConstants {
         // Proceed to embark
         if (askEmbark(unit, carrier, direction)
             && unit.getLocation() == carrier) {
-            Animations.unitMove(canvas, unit, sourceTile, destinationTile);
             if (carrier.getMovesLeft() > 0) {
                 freeColClient.getGUI().setActiveUnit(carrier);
             } else {

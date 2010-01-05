@@ -3459,6 +3459,9 @@ public final class GUI {
      *      not drawn on the mapboard.
      */
     public Point getTilePosition(Tile t) {
+        if (bottomRow < 0) {
+            positionMap();
+        }
         if (t.getY() >= topRow 
                 && t.getY() <= bottomRow 
                 && t.getX() >= leftColumn 
