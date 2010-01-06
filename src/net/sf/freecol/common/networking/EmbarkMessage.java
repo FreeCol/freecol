@@ -110,8 +110,6 @@ public class EmbarkMessage extends Message {
             return Message.clientError(e.getMessage());
         }
         Location sourceLocation = unit.getLocation();
-        Tile sourceTile = null;
-        Tile destinationTile = null;
         Direction direction;
         if (directionString == null) {
             if (sourceLocation != carrier.getLocation()) {
@@ -127,12 +125,12 @@ public class EmbarkMessage extends Message {
             } catch (Exception e) {
                 return Message.clientError(e.getMessage());
             }
-            sourceTile = unit.getTile();
+            Tile sourceTile = unit.getTile();
             if (sourceTile == null) {
                 return Message.clientError("Unit is not on the map: " + unitId);
             }
             Map map = serverPlayer.getGame().getMap();
-            destinationTile = map.getNeighbourOrNull(direction, sourceTile);
+            Tile destinationTile = map.getNeighbourOrNull(direction, sourceTile);
             if (destinationTile == null) {
                 return Message.clientError("Could not find tile"
                                            + " in direction: " + direction
@@ -157,20 +155,10 @@ public class EmbarkMessage extends Message {
 
 
         // Return the updated carrier and the source location.
-        // Splice in an animation if there was movement between tiles.
-        Element reply = Message.createNewRootElement("multiple");
+        Element reply = Message.createNewRootElement("update");
         Document doc = reply.getOwnerDocument();
-        if (sourceTile != null && destinationTile != null) {
-            Element animate = doc.createElement("animateMove");
-            reply.appendChild(animate);
-            animate.setAttribute("unit", unit.getId());
-            animate.setAttribute("oldTile", sourceTile.getId());
-            animate.setAttribute("newTile", destinationTile.getId());
-        }
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(carrier.toXMLElement(serverPlayer, doc));
-        update.appendChild(((FreeColGameObject) sourceLocation).toXMLElement(serverPlayer, doc));
+        reply.appendChild(carrier.toXMLElement(serverPlayer, doc));
+        reply.appendChild(((FreeColGameObject) sourceLocation).toXMLElement(serverPlayer, doc));
         return reply;
     }
 
