@@ -179,23 +179,26 @@ public class DeliverGiftMessage extends Message {
         ServerPlayer receiver = (ServerPlayer) settlement.getOwner();
         if (!receiver.isAI() && receiver.isConnected()
             && settlement instanceof Colony) {
-            ModelMessage m = new ModelMessage(settlement, ModelMessage.MessageType.GIFT_GOODS, goods.getType(),
-                                              "model.unit.gift",
-                                              "%player%", player.getNationAsString(),
-                                              "%type%", goods.getName(),
-                                              "%amount%", Integer.toString(goods.getAmount()),
-                                              "%colony%", settlement.getName());
-            Element reply = Message.createNewRootElement("multiple");
-            Document doc = reply.getOwnerDocument();
+            Element gift = Message.createNewRootElement("multiple");
+            Document doc = gift.getOwnerDocument();
             Element update = doc.createElement("update");
-            Element messages = doc.createElement("addMessages");
-            reply.appendChild(update);
-            reply.appendChild(messages);
+            gift.appendChild(update);
             update.appendChild(unit.toXMLElement(receiver, doc, false, false));
             update.appendChild(settlement.toXMLElement(receiver, doc));
+            Element messages = doc.createElement("addMessages");
+            gift.appendChild(messages);
+            ModelMessage m
+                = new ModelMessage(settlement,
+                                   ModelMessage.MessageType.GIFT_GOODS,
+                                   goods.getType(),
+                                   "model.unit.gift",
+                                   "%player%", player.getNationAsString(),
+                                   "%type%", goods.getName(),
+                                   "%amount%", Integer.toString(goods.getAmount()),
+                                   "%colony%", settlement.getName());
             messages.appendChild(m.toXMLElement(receiver, doc));
             try {
-                receiver.getConnection().send(update);
+                receiver.getConnection().send(gift);
             } catch (IOException e) {
                 logger.warning(e.getMessage());
             }
