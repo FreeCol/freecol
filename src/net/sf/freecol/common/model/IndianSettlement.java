@@ -270,6 +270,10 @@ public class IndianSettlement extends Settlement {
                 listener.propertyChange(e);
             }
         }
+        logger.finest("Alarm at " + getName()
+                      + " modified by " + Integer.toString(addToAlarm)
+                      + " now = " + ((alarm.get(player) == null) ? "(none)"
+                                     : Integer.toString(alarm.get(player).getValue())));
     }
 
     /**
