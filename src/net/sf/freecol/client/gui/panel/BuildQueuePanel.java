@@ -37,6 +37,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,8 +75,10 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
+import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
+import net.sf.freecol.common.util.Utils;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -100,7 +103,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     private FeatureContainer featureContainer = new FeatureContainer();
 
-    private Set<BuildableType> lockedTypes = new HashSet<BuildableType>();
+    private Map<BuildableType, String> lockReasons = new HashMap<BuildableType, String>();
     private Set<BuildableType> unbuildableTypes = new HashSet<BuildableType>();
 
     /**
@@ -218,49 +221,58 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         units.clear();
         loop: for (UnitType unitType : buildableUnits) {
             // compare colony.getNoBuildReason()
-            boolean locked = false;
+            List<String> lockReason = new ArrayList<String>();
             if (unbuildableTypes.contains(unitType)) {
                 continue;
-            } else if (unitType.getPopulationRequired() > unitCount) {
-                locked = true;
-            } else if (!(colony.getFeatureContainer()
-                         .hasAbility("model.ability.build", unitType, getGame().getTurn())
-                         || featureContainer.hasAbility("model.ability.build", unitType))) {
+            }
+
+            if (unitType.getPopulationRequired() > unitCount) {
+                lockReason.add(Messages.message("colonyPanel.populationTooSmall", "%number%",
+                                                Integer.toString(unitType.getPopulationRequired())));
+            }
+
+            if (!(colony.getFeatureContainer()
+                  .hasAbility("model.ability.build", unitType, getGame().getTurn())
+                  || featureContainer.hasAbility("model.ability.build", unitType))) {
+                boolean builderFound = false;
                 for (Ability ability : FreeCol.getSpecification().getAbilities("model.ability.build")) {
                     if (ability.appliesTo(unitType)
                         && ability.getValue()
                         && ability.getSource() != null
                         && !unbuildableTypes.contains(ability.getSource())) {
-                        locked = true;
+                        builderFound = true;
+                        lockReason.add(ability.getSource().getName());
                         break;
                     }
                 }
-                if (!locked) {
+                if (!builderFound) {
                     unbuildableTypes.add(unitType);
                     continue;
                 }
-            } else {
-                Map<String, Boolean> requiredAbilities = unitType.getAbilitiesRequired();
-                for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
-                    if (colony.hasAbility(entry.getKey()) != entry.getValue()
-                        && featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
-                        if (FreeCol.getSpecification()
-                            .getTypesProviding(entry.getKey(), entry.getValue()).isEmpty()) {
-                            // no type provides the required ability
-                            unbuildableTypes.add(unitType);
-                            continue loop;
-                        } else {
-                            locked = true;
-                        }
+            }
+
+            Map<String, Boolean> requiredAbilities = unitType.getAbilitiesRequired();
+            for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
+                if (colony.hasAbility(entry.getKey()) != entry.getValue()
+                    && featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
+                    List<FreeColGameObjectType> sources = FreeCol.getSpecification()
+                        .getTypesProviding(entry.getKey(), entry.getValue());
+                    if (sources.isEmpty()) {
+                        // no type provides the required ability
+                        unbuildableTypes.add(unitType);
+                        continue loop;
+                    } else {
+                        lockReason.add(sources.get(0).getName());
                     }
                 }
             }
-            if (locked) {
-                lockedTypes.add(unitType);
+            if (lockReason.isEmpty()) {
+                lockReasons.put(unitType, null);
             } else {
-                lockedTypes.remove(unitType);
+                lockReasons.put(unitType, Messages.message("colonyPanel.requires", "%string%",
+                                                           Utils.join("/", lockReason)));
             }
-            if (!locked || showAll.isSelected()) {
+            if (lockReason.isEmpty() || showAll.isSelected()) {
                 units.addElement(unitType);
             }
         }
@@ -272,7 +284,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         buildings.clear();
         loop: for (BuildingType buildingType : FreeCol.getSpecification().getBuildingTypeList()) {
             // compare colony.getNoBuildReason()
-            boolean locked = false;
+            List<String> lockReason = new ArrayList<String>();
             Building colonyBuilding = colony.getBuilding(buildingType);
             if (current.contains(buildingType) || hasBuildingType(buildingType)) {
                 // only one building of any kind
@@ -286,38 +298,43 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 // impossible upgrade path
                 unbuildableTypes.add(buildingType);
                 continue;
-            } else if (buildingType.getPopulationRequired() > unitCount) {
-                locked = true;
-            } else {
-                Map<String, Boolean> requiredAbilities = buildingType.getAbilitiesRequired();
-                for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
-                    if (colony.hasAbility(entry.getKey()) != entry.getValue()
-                        && featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
-                        if (FreeCol.getSpecification()
-                            .getTypesProviding(entry.getKey(), entry.getValue()).isEmpty()) {
-                            // no type provides the required ability
-                            unbuildableTypes.add(buildingType);
-                            continue loop;
-                        } else {
-                            locked = true;
-                        }
+            }
+
+            if (buildingType.getPopulationRequired() > unitCount) {
+                lockReason.add(Messages.message("colonyPanel.populationTooSmall", "%number%",
+                                                Integer.toString(buildingType.getPopulationRequired())));
+            }
+
+            Map<String, Boolean> requiredAbilities = buildingType.getAbilitiesRequired();
+            for (Entry<String, Boolean> entry : requiredAbilities.entrySet()) {
+                if (colony.hasAbility(entry.getKey()) != entry.getValue()
+                    && featureContainer.hasAbility(entry.getKey()) != entry.getValue()) {
+                    List<FreeColGameObjectType> sources = FreeCol.getSpecification()
+                        .getTypesProviding(entry.getKey(), entry.getValue());
+                    if (sources.isEmpty()) {
+                        // no type provides the required ability
+                        unbuildableTypes.add(buildingType);
+                        continue loop;
+                    } else {
+                        lockReason.add(sources.get(0).getName());
                     }
                 }
             }
-            if (!locked
-                && buildingType.getUpgradesFrom() != null
+
+            if (buildingType.getUpgradesFrom() != null
                 && !current.contains(buildingType.getUpgradesFrom())) {
                 if (colonyBuilding == null
                     || colonyBuilding.getType() != buildingType.getUpgradesFrom()) {
-                    locked = true;
+                    lockReason.add(buildingType.getUpgradesFrom().getName());
                 }
             }
-            if (locked) {
-                lockedTypes.add(buildingType);
+            if (lockReason.isEmpty()) {
+                lockReasons.put(buildingType, null);
             } else {
-                lockedTypes.remove(buildingType);
+                lockReasons.put(buildingType, Messages.message("colonyPanel.requires", "%string%",
+                                                               Utils.join("/", lockReason)));
             }
-            if (!locked || showAll.isSelected()) {
+            if (lockReason.isEmpty() || showAll.isSelected()) {
                 buildings.addElement(buildingType);
             }
         }
@@ -432,7 +449,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         if (colony.getOwner() == getMyPlayer()) {
             String command = event.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(buildQueueList);
-            if (!buildables.isEmpty() && lockedTypes.contains(buildables.get(0))) {
+            if (!buildables.isEmpty() && lockReasons.get(buildables.get(0)) != null) {
                 getCanvas().showInformationMessage("colonyPanel.unbuildable",
                                                    buildables.get(0),
                                                    "%colony%", colony.getName(),
@@ -776,12 +793,13 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                                                                                  buildingDimension));
 
             nameLabel.setText(item.getName());
+            panel.setToolTipText(lockReasons.get(item));
             panel.add(imageLabel, "span 1 2");
-            if (lockedTypes.contains(item)) {
+            if (lockReasons.get(item) == null) {
+                panel.add(nameLabel, "wrap");
+            } else {
                 panel.add(nameLabel, "split 2");
                 panel.add(lockLabel, "wrap");
-            } else {
-                panel.add(nameLabel, "wrap");
             }
 
             List<AbstractGoods> goodsRequired = item.getGoodsRequired();
