@@ -583,7 +583,7 @@ public final class Specification {
         } else if (allTypes.containsKey(Id)) {
             return type.cast(allTypes.get(Id));
         } else if (initialized) {
-            throw new IllegalArgumentException("Retrieved FreeColGameObjectType" + " with ID '" + Id + " was already initialized.");
+            throw new IllegalArgumentException("Undefined FreeColGameObjectType" + " with ID '" + Id + "'.");
         } else {
             // forward declaration of new type
             try {
