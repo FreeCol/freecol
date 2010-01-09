@@ -23,9 +23,9 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -37,7 +37,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +73,6 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -90,14 +88,14 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
     private final BuildQueueTransferHandler buildQueueHandler = new BuildQueueTransferHandler();
 
-    private static ListCellRenderer cellRenderer;
+    private ListCellRenderer cellRenderer;
     private static JCheckBox compact = new JCheckBox();
     private static JCheckBox showAll = new JCheckBox();
     private JList buildQueueList;
     private JList unitList;
     private JList buildingList;
     private JButton buyBuilding;
-    private Colony colony; 
+    private Colony colony;
     private int unitCount;
 
     private FeatureContainer featureContainer = new FeatureContainer();
@@ -105,12 +103,24 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     private Set<BuildableType> lockedTypes = new HashSet<BuildableType>();
     private Set<BuildableType> unbuildableTypes = new HashSet<BuildableType>();
 
-    private BuildQueuePanel buildQueuePanel;
+    /**
+     * A list of unit types that can be build. Most unit types are
+     * human and can never be built.
+     */
+    private static final List<UnitType> buildableUnits = new ArrayList<UnitType>();
+
+    static {
+        for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+            if (!unitType.getGoodsRequired().isEmpty()) {
+                // can be built
+                buildableUnits.add(unitType);
+            }
+        }
+    }
 
     public BuildQueuePanel(Colony colony, Canvas parent) {
 
         super(parent, new MigLayout("wrap 3", "[260:][260:][260:]", "[][][300:400:][]"));
-        buildQueuePanel = this;
         this.colony = colony;
         this.unitCount = colony.getUnitCount();
 
@@ -206,14 +216,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     private void updateUnitList() {
         DefaultListModel units = (DefaultListModel) unitList.getModel();
         units.clear();
-        loop: for (UnitType unitType : FreeCol.getSpecification().getUnitTypeList()) {
+        loop: for (UnitType unitType : buildableUnits) {
             // compare colony.getNoBuildReason()
             boolean locked = false;
             if (unbuildableTypes.contains(unitType)) {
-                continue;
-            } else if (unitType.getGoodsRequired().isEmpty()) {
-                // can't be built
-                unbuildableTypes.add(unitType);
                 continue;
             } else if (unitType.getPopulationRequired() > unitCount) {
                 locked = true;
@@ -414,7 +420,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             }
         }
         return -1;
-    }            
+    }
 
 
     /**
@@ -454,25 +460,25 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
         }
     }
 
-	private void updateDetailView() {
-		cellRenderer = getCellRenderer();
-		buildQueueList.setCellRenderer(cellRenderer);
-		buildingList.setCellRenderer(cellRenderer);
-		unitList.setCellRenderer(cellRenderer);
-	}
+    private void updateDetailView() {
+        cellRenderer = getCellRenderer();
+        buildQueueList.setCellRenderer(cellRenderer);
+        buildingList.setCellRenderer(cellRenderer);
+        unitList.setCellRenderer(cellRenderer);
+    }
 
-	private ListCellRenderer getCellRenderer() {
-		if (compact.isSelected()) {
-		    if (cellRenderer == null || cellRenderer instanceof DefaultBuildQueueCellRenderer) {
-		        return new SimpleBuildQueueCellRenderer();
-		    }
-		} else if (cellRenderer == null || cellRenderer instanceof SimpleBuildQueueCellRenderer) {
-		    return new DefaultBuildQueueCellRenderer();
-		}
-		
-		// return current one
-		return cellRenderer;
-	}
+    private ListCellRenderer getCellRenderer() {
+        if (compact.isSelected()) {
+            if (cellRenderer == null || cellRenderer instanceof DefaultBuildQueueCellRenderer) {
+                return new SimpleBuildQueueCellRenderer();
+            }
+        } else if (cellRenderer == null || cellRenderer instanceof SimpleBuildQueueCellRenderer) {
+            return new DefaultBuildQueueCellRenderer();
+        }
+                
+        // return current one
+        return cellRenderer;
+    }
 
     /**
      * This class implements a transfer handler able to transfer
@@ -482,7 +488,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     public class BuildQueueTransferHandler extends TransferHandler {
 
         private final DataFlavor buildQueueFlavor = new DataFlavor(List.class, "BuildingQueueFlavor");
-        
+
         JList source = null;
         int[] indices = null;
         int targetIndex = -1;  // preferred index of target list
@@ -521,7 +527,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                             buildQueue.add((BuildableType) object);
                         }
                     }
-                }                    
+                }
             } catch (Exception e) {
                 logger.warning(e.toString());
                 return false;
@@ -538,7 +544,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             if (source.equals(target)) {
                 if (target == buildQueueList) {
                     // don't drop selection on itself
-                    if (indices != null && 
+                    if (indices != null &&
                         preferredIndex >= indices[0] - 1 &&
                         preferredIndex <= indices[indices.length - 1]) {
                         indices = null;
@@ -622,7 +628,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
          * the build queue.
          * @param comp The source of the build queue.
          * @return A Transferable suitable for wrapping the build
-         * queue. 
+         * queue.
          */
         protected Transferable createTransferable(JComponent comp) {
             if (comp instanceof JList) {
@@ -725,7 +731,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             g2d.fillRect(0, 0, getWidth(), getHeight());
             g2d.setComposite(oldComposite);
             g2d.setColor(oldColor);
-            
+
             super.paintComponent(g);
         }
     }
@@ -742,19 +748,19 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
         JPanel itemPanel = new JPanel();
         JPanel selectedPanel = new SelectedPanel();
-        JLabel imageLabel = new JLabel();
+        JLabel imageLabel = new JLabel(new ImageIcon());
         JLabel nameLabel = new JLabel();
-        JLabel lockLabel =
+
+        private JLabel lockLabel =
             new JLabel(new ImageIcon(ResourceManager.getImage("lock.image", 0.5)));
 
-        Map<FreeColGameObjectType, ImageIcon> imageCache
-            = new HashMap<FreeColGameObjectType, ImageIcon>();
+        private Dimension buildingDimension = new Dimension(-1, 48);
 
         public DefaultBuildQueueCellRenderer() {
             itemPanel.setOpaque(false);
-            itemPanel.setLayout(new MigLayout("", "", ""));
+            itemPanel.setLayout(new MigLayout());
             selectedPanel.setOpaque(false);
-            selectedPanel.setLayout(new MigLayout("", "", ""));
+            selectedPanel.setLayout(new MigLayout());
         }
 
         public Component getListCellRendererComponent(JList list,
@@ -766,16 +772,8 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             JPanel panel = isSelected ? selectedPanel : itemPanel;
             panel.removeAll();
 
-            ImageIcon buildableIcon = imageCache.get(value);
-            if (buildableIcon == null) {
-                Image buildableImage = ResourceManager.getImage(item.getId() + ".image");
-                if (buildableImage != null) {
-                    buildableImage = buildableImage.getScaledInstance(-1, 48, Image.SCALE_SMOOTH);
-                    buildableIcon = new ImageIcon(buildableImage);
-                    imageCache.put(item, buildableIcon);
-                }
-            }
-            imageLabel.setIcon(buildableIcon);
+            ((ImageIcon) imageLabel.getIcon()).setImage(ResourceManager.getImage(item.getId() + ".image",
+                                                                                 buildingDimension));
 
             nameLabel.setText(item.getName());
             panel.add(imageLabel, "span 1 2");
@@ -790,14 +788,9 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             int size = goodsRequired.size();
             for (int i = 0; i < size; i++) {
                 AbstractGoods goods = goodsRequired.get(i);
-                ImageIcon goodsIcon = imageCache.get(goods.getType());
-                if (goodsIcon == null) {
-                    goodsIcon = getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f);
-                    imageCache.put(goods.getType(), goodsIcon);
-                }
-                JLabel goodsLabel = new JLabel(Integer.toString(goods.getAmount()), 
-                                               goodsIcon,
-                                               SwingConstants.CENTER);
+                ImageIcon icon = new ImageIcon(ResourceManager.getImage(goods.getType().getId() + ".image", 0.66));
+                JLabel goodsLabel =
+                    new JLabel(Integer.toString(goods.getAmount()), icon, SwingConstants.CENTER);
                 if (i == 0 && size > 1) {
                     panel.add(goodsLabel, "split " + size);
                 } else {
