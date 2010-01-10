@@ -111,7 +111,8 @@ public final class FreeCol {
                             sound = true,
                             javaCheck = true,
                             memoryCheck = true,
-                            consoleLogging = false;
+                            consoleLogging = false,
+                            introVideo = true;
     private static Dimension windowSize = new Dimension(-1, -1);
     private static String   dataFolder = "data" + FILE_SEP;
     private static String logFile = null;
@@ -338,7 +339,8 @@ public final class FreeCol {
             }
 
             final boolean loadSavegame = (savegameFile != null);
-            freeColClient = new FreeColClient(windowed, preloadSize, lib, musicLibrary, sfxLibrary, !loadSavegame);
+            boolean showVideo = (introVideo && !loadSavegame);
+            freeColClient = new FreeColClient(windowed, preloadSize, lib, musicLibrary, sfxLibrary, showVideo);
 
             if (loadSavegame) {
                 final FreeColClient theFreeColClient = freeColClient;
@@ -737,6 +739,9 @@ public final class FreeCol {
         options.addOption(OptionBuilder.withLongOpt("no-memory-check")
                           .withDescription(Messages.message("cli.no-memory-check"))
                           .create());
+        options.addOption(OptionBuilder.withLongOpt("no-intro")
+                          .withDescription(Messages.message("cli.no-intro"))
+                          .create());
         options.addOption(OptionBuilder.withLongOpt("no-sound")
                           .withDescription(Messages.message("cli.no-sound"))
                           .create());
@@ -864,6 +869,9 @@ public final class FreeCol {
             }
             if (line.hasOption("no-sound")) {
                 sound = false;
+            }
+            if (line.hasOption("no-intro")) {
+                introVideo = false;
             }
             if (line.hasOption("no-memory-check")) {
                 memoryCheck = false;

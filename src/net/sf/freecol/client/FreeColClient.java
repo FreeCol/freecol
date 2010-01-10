@@ -305,6 +305,9 @@ public final class FreeColClient {
                     canvas.showOpeningVideoPanel();
                 }
             });
+        } else {
+            canvas.showMainPanel();
+            playMusic("intro");
         }
         gui.startCursorBlinking();
     }
