@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
-import java.awt.Shape;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
@@ -31,7 +30,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.border.CompoundBorder;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.ActionManager;
@@ -69,8 +67,6 @@ public abstract class FreeColMenuBar extends JMenuBar {
     public static final int UNIT_ORDER_DISBAND = 11;
 
     protected final FreeColClient freeColClient;
-
-    //protected final FreeColImageBorder outerBorder;
 
     JMenuItem reportsTradeMenuItem = null;
 
@@ -110,17 +106,7 @@ public abstract class FreeColMenuBar extends JMenuBar {
 
         this.am = f.getActionManager();
 
-        Image menuborderN = ResourceManager.getImage("menuborder.n.image");
-        Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
-        Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
-        Image menuborderW = ResourceManager.getImage("menuborder.w.image");
-        Image menuborderE = ResourceManager.getImage("menuborder.e.image");
-        Image menuborderS = ResourceManager.getImage("menuborder.s.image");
-        Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
-        Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
-        final FreeColImageBorder innerBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
-                menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-        setBorder(innerBorder);
+        setBorder(FreeColImageBorder.imageBorder);
     }
 
     

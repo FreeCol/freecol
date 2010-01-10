@@ -132,15 +132,6 @@ public class FreeColPanel extends JPanel implements ActionListener {
         BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, LINK_COLOR),
                                            BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
-    private static final FreeColImageBorder imageBorder =
-        new FreeColImageBorder(ResourceManager.getImage("menuborder.n.image"),
-                               ResourceManager.getImage("menuborder.w.image"),
-                               ResourceManager.getImage("menuborder.s.image"),
-                               ResourceManager.getImage("menuborder.e.image"),
-                               ResourceManager.getImage("menuborder.nw.image"),
-                               ResourceManager.getImage("menuborder.ne.image"),
-                               ResourceManager.getImage("menuborder.sw.image"),
-                               ResourceManager.getImage("menuborder.se.image"));
 
     protected boolean editable = true;
 
@@ -183,8 +174,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
         this.canvas = parent;
         setFocusCycleRoot(true);
 
-        setBorder(BorderFactory.createCompoundBorder(imageBorder,
-                BorderFactory.createEmptyBorder(margin, margin, margin, margin)));
+        setBorder(FreeColImageBorder.imageBorder);
 
         // See the message of Ulf Onnen for more information about the presence
         // of this fake mouse listener.

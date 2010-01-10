@@ -1642,20 +1642,7 @@ public final class Canvas extends JDesktopPane {
             if (comp.getBorder() instanceof EmptyBorder) {
                 f.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             } else {
-                Image menuborderN = ResourceManager.getImage("menuborder.n.image");
-                Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
-                Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
-                Image menuborderW = ResourceManager.getImage("menuborder.w.image");
-                Image menuborderE = ResourceManager.getImage("menuborder.e.image");
-                Image menuborderS = ResourceManager.getImage("menuborder.s.image");
-                Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
-                Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
-                final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
-                        menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-                // comp.setBorder(BorderFactory.createCompoundBorder(imageBorder,
-                // BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-
-                f.setBorder(imageBorder);
+                f.setBorder(comp.getBorder());
                 comp.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             }
         } else {

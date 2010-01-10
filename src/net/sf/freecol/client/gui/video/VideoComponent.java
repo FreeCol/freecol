@@ -138,16 +138,6 @@ public class VideoComponent extends JPanel {
     }
     
     private Border createBorder() {
-        final Image menuborderN = ResourceManager.getImage("menuborder.n.image");
-        final Image menuborderNW = ResourceManager.getImage("menuborder.nw.image");
-        final Image menuborderNE = ResourceManager.getImage("menuborder.ne.image");
-        final Image menuborderW = ResourceManager.getImage("menuborder.w.image");
-        final Image menuborderE = ResourceManager.getImage("menuborder.e.image");
-        final Image menuborderS = ResourceManager.getImage("menuborder.s.image");
-        final Image menuborderSW = ResourceManager.getImage("menuborder.sw.image");
-        final Image menuborderSE = ResourceManager.getImage("menuborder.se.image");
-        final FreeColImageBorder imageBorder = new FreeColImageBorder(menuborderN, menuborderW, menuborderS,
-                menuborderE, menuborderNW, menuborderNE, menuborderSW, menuborderSE);
-        return imageBorder;
+        return FreeColImageBorder.imageBorder;
     }
 }
