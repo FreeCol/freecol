@@ -236,11 +236,11 @@ are the work of the devil!
 \item Change the \verb$FREECOL_VERSION$ constant to match the release version in
   FreeCol.java and commit the change. Start a clean compile, run all
   tests and verify the specification(s). You can do that by calling
-  "ant prepare-commit".
+  \verb+ant prepare-commit+.
 
-\item Call "ant dist" in order to build all packages. It might be
+\item Call \verb+ant dist+ in order to build all packages. It might be
   necessary to increase the memory available for ant, for example by
-  setting the environment variable \verb$ANT_OPTS="-Xms256m -Xmx256m"$.
+  setting the environment variable \verb+ANT_OPTS="-Xms256m -Xmx256m"+.
 
 \item Install one of the generated packages and verify that you can play
   normally for at least five turns. Other good tests include loading a
@@ -282,8 +282,9 @@ are the work of the devil!
   (http://www.freecol.org/administrator > Mambots > Site Mambots >
   Version)
 
-\item Publish/unpublish "Download Unstable Version" (this page should only
-  be displayed if the unstable version is the latest release).
+\item Publish/unpublish "Download Unstable Version" in the static
+  content manager (this page should only be displayed if the unstable
+  version is the latest release).
 
 \item Add a news item to our website.
 
@@ -303,7 +304,7 @@ The following items can be omitted for unstable releases:
   "Fixed (Trunk)" to Fixed (FreeCol x.y.z). Create new groups with the
   names you just renamed from. Change the links on "Tracker > Admin >
   Bugs/Feature... > Preferences". Add redirects for "bugtracker/x.y.z"
-  and "featuretracker/x.y.z". Create a new group for "In 0.y.x".
+  and "featuretracker/x.y.z". Create a new group for "In x.y.z".
 
 \item Update JavaDoc and User Documentation on freecol.org
 
@@ -313,8 +314,8 @@ The following items should be omitted for unstable releases:
 
 \begin{itemize}
 
-\item Update the links to "Added (0.x.y-branch)" and "Fixed
-  (0.x.y-branch)" on the roadmap (and release status etc).
+\item Update the links to "Added (x.y.z-branch)" and "Fixed
+  (x.y.z-branch)" on the roadmap (and release status etc).
 
 \item Post a news item on SF.net
 

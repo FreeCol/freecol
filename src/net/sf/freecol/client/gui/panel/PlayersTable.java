@@ -115,13 +115,13 @@ public final class PlayersTable extends JTable {
 
         nationButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showColopediaPanel(PanelType.NATIONS);
+                    canvas.showPanel(new ColopediaPanel(canvas, PanelType.NATIONS, null));
                 }
             });
 
         advantageButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showColopediaPanel(PanelType.NATION_TYPES);
+                    canvas.showPanel(new ColopediaPanel(canvas, PanelType.NATION_TYPES, null));
                 }
             });
 

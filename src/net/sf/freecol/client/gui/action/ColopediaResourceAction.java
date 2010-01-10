@@ -24,6 +24,7 @@ import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
 
 
@@ -69,6 +70,7 @@ public class ColopediaResourceAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        freeColClient.getCanvas().showColopediaPanel(ColopediaPanel.PanelType.RESOURCES);
+        Canvas canvas = freeColClient.getCanvas();
+        canvas.showPanel(new ColopediaPanel(canvas, ColopediaPanel.PanelType.RESOURCES, null));
     }
 }

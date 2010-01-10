@@ -833,9 +833,11 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 int index = source.locationToIndex(e.getPoint());
                 BuildableType type = (BuildableType) source.getModel().getElementAt(index);
                 if (type instanceof BuildingType) {
-                    getCanvas().showColopediaPanel(ColopediaPanel.PanelType.BUILDINGS, type);
+                    getCanvas().showPanel(new ColopediaPanel(getCanvas(),
+                                                             ColopediaPanel.PanelType.BUILDINGS, type));
                 } else if (type instanceof UnitType) {
-                    getCanvas().showColopediaPanel(ColopediaPanel.PanelType.UNITS, type);
+                    getCanvas().showPanel(new ColopediaPanel(getCanvas(),
+                                                             ColopediaPanel.PanelType.UNITS, type));
                 }
             } else if ((e.getClickCount() > 1 && !e.isConsumed())) {
                 DefaultListModel model = (DefaultListModel) buildQueueList.getModel();

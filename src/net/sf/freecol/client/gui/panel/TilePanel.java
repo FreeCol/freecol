@@ -172,7 +172,8 @@ public final class TilePanel extends FreeColPanel {
         if (OK.equals(command)) {
             getCanvas().remove(this);
         } else {
-            getCanvas().showColopediaPanel(ColopediaPanel.PanelType.TERRAIN, tileType);
+            getCanvas().showPanel(new ColopediaPanel(getCanvas(),
+                                                     ColopediaPanel.PanelType.TERRAIN, tileType));
         }
     }
 }

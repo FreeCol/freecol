@@ -124,7 +124,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * 
      * @param parent The parent of this panel.
      */
-    public ColopediaPanel(Canvas parent) {
+    public ColopediaPanel(Canvas parent, PanelType panelType, FreeColGameObjectType objectType) {
         super(parent);
 
         none = Messages.message("none");
@@ -155,7 +155,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         add(okButton, "newline 20, span, tag ok");
 
         setPreferredSize(savedSize);
-
+        initialize(panelType, objectType);
     }
 
     /**
@@ -179,15 +179,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     /**
      * Prepares this panel to be displayed.
      * 
-     * @param type - the panel type
-     */
-    public void initialize(PanelType type) {
-        initialize(type, null);
-    }
-
-    /**
-     * Prepares this panel to be displayed.
-     * 
      * @param panelType - the panel type
      * @param type - the FreeColGameObjectType of the item to be displayed
      */
@@ -200,40 +191,33 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.validate();
     }
 
+    /**
+     * Prepares this panel to be displayed.
+     * 
+     * @param type - the FreeColGameObjectType of the item to be displayed
+     */
     public void initialize(FreeColGameObjectType type) {
-        listPanel.removeAll();
-        detailPanel.removeAll();
-        tree = buildTree();
         if (type instanceof TileType) {
-            tree.expandRow(PanelType.TERRAIN.ordinal());
-            buildTerrainDetail((TileType) type);
+            initialize(PanelType.TERRAIN, type);
         } else if (type instanceof ResourceType) {
-            tree.expandRow(PanelType.RESOURCES.ordinal());
-            buildResourceDetail((ResourceType) type);
+            initialize(PanelType.RESOURCES, type);
         } else if (type instanceof UnitType) {
             if (((UnitType) type).hasSkill()) {
-                tree.expandRow(PanelType.SKILLS.ordinal());
+                initialize(PanelType.SKILLS, type);
             } else {
-                tree.expandRow(PanelType.UNITS.ordinal());
+                initialize(PanelType.UNITS, type);
             }
-            buildUnitDetail((UnitType) type);
         } else if (type instanceof GoodsType) {
-            tree.expandRow(PanelType.GOODS.ordinal());
-            buildGoodsDetail((GoodsType) type);
+            initialize(PanelType.GOODS, type);
         } else if (type instanceof BuildingType) {
-            tree.expandRow(PanelType.BUILDINGS.ordinal());
-            buildBuildingDetail((BuildingType) type);
+            initialize(PanelType.BUILDINGS, type);
         } else if (type instanceof FoundingFather) {
-            tree.expandRow(PanelType.FATHERS.ordinal());
-            buildFatherDetail((FoundingFather) type);
+            initialize(PanelType.FATHERS, type);
         } else if (type instanceof Nation) {
-            tree.expandRow(PanelType.NATIONS.ordinal());
-            buildNationDetail((Nation) type);
+            initialize(PanelType.NATIONS, type);
         } else if (type instanceof NationType) {
-            tree.expandRow(PanelType.NATION_TYPES.ordinal());
-            buildNationTypeDetail((NationType) type);
+            initialize(PanelType.NATION_TYPES, type);
         }
-        detailPanel.validate();
     }
 
 
