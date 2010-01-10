@@ -224,7 +224,7 @@ public class MapGeneratorTest extends FreeColTestCase {
                 try {
                     gen.createMap(g);
                 } catch (FreeColException e) {
-                    fail();
+                    fail("Failed to import file " + importFile.getName());
                 }
             }
         }
