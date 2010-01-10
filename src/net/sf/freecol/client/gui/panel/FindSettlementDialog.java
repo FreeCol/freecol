@@ -22,7 +22,9 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -98,16 +100,7 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
 
         Action selectAction = new AbstractAction() {
                 public void actionPerformed(ActionEvent e) {
-                    Settlement settlement = (Settlement) settlementList.getSelectedValue();
-                    if (settlement instanceof Colony
-                        && settlement.getOwner() == getMyPlayer()) {
-                        getCanvas().remove(FindSettlementDialog.this);
-                        getCanvas().showColonyPanel((Colony) settlement);
-                    } else if (settlement instanceof IndianSettlement) {
-                        getCanvas().remove(FindSettlementDialog.this);
-                        getCanvas().showPanel(new IndianSettlementPanel(getCanvas(),
-                                                                        (IndianSettlement) settlement));
-                    }                        
+                    selectSettlement();      
                 }
             };
 
@@ -121,11 +114,34 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
         settlementList.getActionMap().put("select", selectAction);
         settlementList.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "quit");
         settlementList.getActionMap().put("quit", quitAction);
+
+        MouseListener mouseListener = new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) {
+                        selectSettlement();
+                    }
+                }
+            };
+        settlementList.addMouseListener(mouseListener);
+
         add(listScroller, "growx, growy");
 
         add(okButton, "tag ok");
 
         setSize(getPreferredSize());
+    }
+
+    private void selectSettlement() {
+        Settlement settlement = (Settlement) settlementList.getSelectedValue();
+        if (settlement instanceof Colony
+            && settlement.getOwner() == getMyPlayer()) {
+            getCanvas().remove(FindSettlementDialog.this);
+            getCanvas().showColonyPanel((Colony) settlement);
+        } else if (settlement instanceof IndianSettlement) {
+            getCanvas().remove(FindSettlementDialog.this);
+            getCanvas().showPanel(new IndianSettlementPanel(getCanvas(),
+                                                            (IndianSettlement) settlement));
+        }
     }
 
     @Override

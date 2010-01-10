@@ -25,6 +25,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -162,6 +165,18 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         destinationList.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "quit");
         destinationList.getActionMap().put("quit", quitAction);
 
+        MouseListener mouseListener = new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) {
+                        Destination d = (Destination) destinationList.getSelectedValue();
+                        if (d != null) {
+                            setResponse((Location) d.location);
+                        }
+                        getCanvas().remove(SelectDestinationDialog.this);
+                    }
+                }
+            };
+        destinationList.addMouseListener(mouseListener);
 
         JScrollPane listScroller = new JScrollPane(destinationList);
         listScroller.setPreferredSize(new Dimension(250, 250));
