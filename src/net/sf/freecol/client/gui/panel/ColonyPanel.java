@@ -1309,7 +1309,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 // Size and position:
                 setSize(getLibrary().getTerrainImageWidth(tileType), getLibrary().getTerrainImageHeight(tileType));
                 setLocation(((2 - x) + y) * getLibrary().getTerrainImageWidth(tileType) / 2,
-                            (x + y) * getLibrary().getTerrainImageHeight(tileType) / 2);
+                            (x + y) * getLibrary().getTerrainImage(tileType, 0, 0).getHeight(null) / 2);
                 initialize();
             }
                 

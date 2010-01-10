@@ -841,21 +841,23 @@ public final class ImageLibrary extends ImageProvider {
                 .getDefaultConfiguration();
         Image terrainImage = getTerrainImage(type, 0, 0);
         int width = getTerrainImageWidth(type);
-        int height = getTerrainImageHeight(type);
+        int height = getCompoundTerrainImageHeight(type);
         // Currently used for hills and mountains
         if (type.getArtOverlay() != null) {
+            Image overlayImage = getOverlayImage(type, 0, 0);
             BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0, 0, null);
-            g.drawImage(getOverlayImage(type, 0, 0), 0, -32, null);
+            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
+            g.drawImage(overlayImage, 0, height - overlayImage.getHeight(null), null);
             g.dispose();
             terrainImage = compositeImage;
         }
         if (type.isForested()) {
+            Image forestImage = getForestImage(type);
             BufferedImage compositeImage = gc.createCompatibleImage(width, height, Transparency.TRANSLUCENT);
             Graphics2D g = compositeImage.createGraphics();
-            g.drawImage(terrainImage, 0, 0, null);
-            g.drawImage(getForestImage(type), 0, 0, null);
+            g.drawImage(terrainImage, 0, height - terrainImage.getHeight(null), null);
+            g.drawImage(forestImage, 0, height - forestImage.getHeight(null), null);
             g.dispose();
             terrainImage = compositeImage;
         }
@@ -1172,6 +1174,28 @@ public final class ImageLibrary extends ImageProvider {
             key = unexploredName;
         }
         return terrain1.get(key).getIconHeight();
+    }
+
+    /**
+     * Returns the height of the terrain-image including overlays and
+     * forests for the given terrain type.
+     * 
+     * @param type The type of the terrain-image.
+     * @return The height of the terrain-image at the given index.
+     */
+    public int getCompoundTerrainImageHeight(TileType type) {
+        if (type == null) {
+            return terrain1.get(unexploredName).getIconHeight();
+        } else {
+            int height = terrain1.get(type.getId()).getIconHeight();
+            if (type.getArtOverlay() != null) {
+                height = Math.max(height, getOverlayImage(type, 0, 0).getHeight(null));
+            }
+            if (type.isForested()) {
+                height = Math.max(height, getForestImage(type).getHeight(null));
+            }
+            return height;
+        }
     }
 
     /**

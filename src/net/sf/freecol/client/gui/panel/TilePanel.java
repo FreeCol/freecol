@@ -92,10 +92,11 @@ public final class TilePanel extends FreeColPanel {
         add(new JLabel(name));
 
         int width = getLibrary().getTerrainImageWidth(tileType);
-        int height = getLibrary().getTerrainImageHeight(tileType);
+        int height = getLibrary().getCompoundTerrainImageHeight(tileType);
+        int baseHeight = getLibrary().getTerrainImageHeight(tileType);
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         getCanvas().getGUI().displayColonyTile((Graphics2D) image.getGraphics(), tile.getMap(),
-                                          tile, 0, 0, null);
+                                          tile, 0, height - baseHeight, null);
         add(new JLabel(new ImageIcon(image)));
 
         if (tile.getRegion() != null) {
