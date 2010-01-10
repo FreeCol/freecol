@@ -1021,9 +1021,16 @@ public final class Specification {
      * @param difficultyLevel difficulty level to apply
      */
     public void applyDifficultyLevel(int difficultyLevel) {
-        for (String key : difficultyLevels.get(difficultyLevel).getOptions().keySet()) {
-            allOptions.put(key, difficultyLevels.get(difficultyLevel).getOptions().get(key));
+        DifficultyLevel level = difficultyLevels.get(difficultyLevel);
+        logger.info("Applying difficulty level '" + level.getId()
+                    +"' (" + Integer.toString(difficultyLevel) + ")." );
+        for (String key : level.getOptions().keySet()) {
+            allOptions.put(key, level.getOptions().get(key));
         }
+        for (EuropeanNationType nationType : europeanNationTypes) {
+            nationType.applyDifficultyLevel(level.getId());
+        }
+
         // TODO: find a better place for this!
         if (FreeCol.isInDebugMode()) {
             getIntegerOption(GameOptions.STARTING_MONEY).setValue(10000);

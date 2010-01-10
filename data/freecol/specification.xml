@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.21 -->
+<!-- specification version 0.22 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -1420,9 +1420,11 @@
   <nation-types>
     <!-- default nation for multi-player games -->
     <european-nation-type id="model.nationType.default">
-      <unit id="model.unit.freeColonist" role="pioneer"/>
-      <unit id="model.unit.freeColonist" role="soldier"/>
-      <unit id="model.unit.caravel"/>
+      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
+      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
@@ -1439,9 +1441,11 @@
     <!-- this was the Dutch player -->
     <european-nation-type id="model.nationType.trade">
       <modifier id="model.modifier.tradeBonus" type="percentage" value="-50"/>
-      <unit id="model.unit.freeColonist" role="pioneer"/>
-      <unit id="model.unit.freeColonist" role="soldier"/>
-      <unit id="model.unit.merchantman"/>
+      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
+      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="ship" type="model.unit.merchantman"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
@@ -1450,9 +1454,11 @@
     <!-- this was the French player -->
     <european-nation-type id="model.nationType.cooperation">
       <modifier id="model.modifier.nativeAlarmModifier" type="percentage" value="-50"/>
-      <unit id="model.unit.hardyPioneer" role="pioneer"/>
-      <unit id="model.unit.freeColonist" role="soldier"/>
-      <unit id="model.unit.caravel"/>
+      <unit id="pioneer" type="model.unit.hardyPioneer" role="pioneer"/>
+      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
@@ -1461,9 +1467,11 @@
     <!-- this was the English player -->
     <european-nation-type id="model.nationType.immigration">
       <modifier id="model.modifier.religiousUnrestBonus" type="percentage" value="-33"/>
-      <unit id="model.unit.freeColonist" role="pioneer"/>
-      <unit id="model.unit.freeColonist" role="soldier"/>
-      <unit id="model.unit.caravel"/>
+      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
+      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
@@ -1473,9 +1481,9 @@
     <european-nation-type id="model.nationType.conquest">
       <modifier id="model.modifier.nativeConvertBonus" type="percentage" value="200"/>
       <modifier id="model.modifier.nativeTreasureModifier" type="percentage" value="200"/>
-      <unit id="model.unit.freeColonist" role="pioneer"/>
-      <unit id="model.unit.veteranSoldier" role="soldier" mounted="true"/>
-      <unit id="model.unit.caravel"/>
+      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" mounted="true"/>
+      <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
@@ -1485,9 +1493,11 @@
       <modifier id="model.modifier.movementBonus" type="additive" value="3">
         <scope ability-id="model.ability.navalUnit"/>
       </modifier>
-      <unit id="model.unit.freeColonist" role="pioneer"/>
-      <unit id="model.unit.freeColonist" role="soldier"/>
-      <unit id="model.unit.merchantman"/>
+      <unit id="pioneer" type="model.unit.freeColonist" role="pioneer"/>
+      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="ship" type="model.unit.merchantman"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
@@ -1496,9 +1506,11 @@
     <european-nation-type id="model.nationType.building">
       <modifier id="model.goods.lumber" type="additive" value="2"/>
       <modifier id="model.goods.hammers" type="additive" value="2"/>
-      <unit id="model.unit.expertLumberJack" role="pioneer"/>
-      <unit id="model.unit.masterCarpenter" role="soldier"/>
-      <unit id="model.unit.caravel"/>
+      <unit id="pioneer" type="model.unit.expertLumberJack" role="pioneer"/>
+      <unit id="soldier" type="model.unit.masterCarpenter" role="soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
@@ -1506,9 +1518,11 @@
     </european-nation-type>
     <european-nation-type id="model.nationType.agriculture">
       <modifier id="model.goods.food" type="additive" value="2"/>
-      <unit id="model.unit.expertFarmer" role="pioneer"/>
-      <unit id="model.unit.freeColonist" role="soldier"/>
-      <unit id="model.unit.caravel"/>
+      <unit id="pioneer" type="model.unit.expertFarmer" role="pioneer"/>
+      <unit id="soldier" type="model.unit.freeColonist" role="soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
@@ -1517,9 +1531,11 @@
     <european-nation-type id="model.nationType.furTrapping">
       <modifier id="model.goods.furs" type="additive" value="2"/>
       <modifier id="model.goods.coats" type="additive" value="2"/>
-      <unit id="model.unit.expertFurTrapper" role="pioneer"/>
-      <unit id="model.unit.masterFurTrader" role="soldier"/>
-      <unit id="model.unit.caravel"/>
+      <unit id="pioneer" type="model.unit.expertFurTrapper" role="pioneer"/>
+      <unit id="soldier" type="model.unit.masterFurTrader" role="soldier"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.veryEasy"/>
+      <unit id="soldier" type="model.unit.veteranSoldier" role="soldier" difficulty="model.difficulty.easy"/>
+      <unit id="ship" type="model.unit.caravel"/>
       <ability id="model.ability.foundColony" value="true"/>
       <ability id="model.ability.electFoundingFather"/>
       <modifier id="model.modifier.settlementDefence" source="model.source.inSettlement"
