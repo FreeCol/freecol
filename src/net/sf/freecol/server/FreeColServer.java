@@ -661,16 +661,9 @@ public final class FreeColServer {
             xs = createXMLStreamReader(fis);
             final XMLStreamReader xsr = xs.getXMLStreamReader();
             xsr.nextTag();
-            final String version = xsr.getAttributeValue(null, "version");
-            int savegameVersion = 0;
-            try {
-                savegameVersion = Integer.parseInt(version);
-            } catch(Exception e) {
-                throw new FreeColException("incompatibleVersions");
-            }
-            if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
-                throw new FreeColException("incompatibleVersions");
-            }
+            
+            checkSavegameVersion(xsr);
+            
             String randomState = xsr.getAttributeValue(null, "randomState");
             if (randomState != null && randomState.length() > 0) {
                 try {
@@ -764,6 +757,20 @@ public final class FreeColServer {
             xs.close();
         }
     }
+
+	public static void checkSavegameVersion(final XMLStreamReader xsr)
+			throws FreeColException {
+		final String version = xsr.getAttributeValue(null, "version");
+		int savegameVersion = 0;
+		try {
+		    savegameVersion = Integer.parseInt(version);
+		} catch(Exception e) {
+		    throw new FreeColException("incompatibleVersions");
+		}
+		if (savegameVersion < MINIMUM_SAVEGAME_VERSION) {
+		    throw new FreeColException("incompatibleVersions");
+		}
+	}
 
     /**
      * Sets the mode of the game: singleplayer/multiplayer.
