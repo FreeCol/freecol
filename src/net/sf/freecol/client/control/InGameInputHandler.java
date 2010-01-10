@@ -365,11 +365,10 @@ public final class InGameInputHandler extends InputHandler {
                         throw new NullPointerException("defender == null");
                     }
                     
-                    Animations.unitAttack(getFreeColClient().getCanvas(), unit, defender, result);
-
                     if (colony != null) {
                         getGame().getCombatModel().bombard(colony, defender, new CombatResult(result, damage), repairLocation);
-                    } else {            
+                    } else {
+                    	Animations.unitAttack(getFreeColClient().getCanvas(), unit, defender, result);
                         unit.getGame().getCombatModel().attack(unit, defender, new CombatResult(result, damage), plunderGold, repairLocation);
                         if (!unit.isDisposed() &&
                                 (unit.getLocation() == null ||

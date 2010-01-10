@@ -963,123 +963,102 @@ public final class InGameController extends Controller {
         CombatModel combatModel = getFreeColServer().getGame().getCombatModel();
         for (Settlement settlement : currentPlayer.getSettlements()) {
             Colony colony = (Colony) settlement;
-            if (colony.canBombardEnemyShip()){
-                logger.fine("Colony " + colony.getName() + " can bombard enemy ships.");
-                Position colonyPosition = colony.getTile().getPosition();
-                for (Direction direction : Direction.values()) {
-                    Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
-                    
-                    // ignore land tiles and borders
-                    if(tile == null || tile.isLand()){
-                        continue;
-                    }
-                    
-                    // Go through the units in the tile
-                    // a new list must be created, since the original may be changed while iterating
-                    List<Unit> unitList = new ArrayList<Unit>(tile.getUnitList());
-                    Iterator<Unit> unitIterator = unitList.iterator();
-                    while (unitIterator.hasNext()) {
-                        Unit unit = unitIterator.next();
-                        Player player = unit.getOwner();
-                    
-                        // ignore own units
-                        if(player == currentPlayer){
-                                continue;
-                        }
-                        
-                        // ignore friendly units
-                        if(currentPlayer.getStance(player) != Stance.WAR &&
-                                                !unit.hasAbility("model.ability.piracy")){
-                                continue;
-                        }
+            
+            if (!colony.canBombardEnemyShip()){
+            	continue;
+            }
 
-                        logger.info(colony.getName() + " found enemy unit to bombard: " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
-                        // generate bombardment result
-                        CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
+            logger.fine("Colony " + colony.getName() + " can bombard enemy ships.");
+            Position colonyPosition = colony.getTile().getPosition();
+            for (Direction direction : Direction.values()) {
+            	Tile tile = map.getTile(Map.getAdjacent(colonyPosition, direction));
 
-                        // ship was damaged, get repair location
-                        Location repairLocation = null;
-                        if(result.type == CombatModel.CombatResultType.WIN){
-                                        repairLocation = player.getRepairLocation(unit);
-                        }
-                                        
-                        // update server data
-                        getGame().getCombatModel().bombard(colony, unit, result, repairLocation);
+            	// ignore land tiles and borders
+            	if(tile == null || tile.isLand()){
+            		continue;
+            	}
 
-                        // Inform the players (other then the player
-                        // attacking) about the attack:
-                        int plunderGold = -1;
-                        Iterator<Player> enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
-                        while (enemyPlayerIterator.hasNext()) {
-                                ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+            	// Go through the units in the tile
+            	// a new list must be created, since the original may be changed while iterating
+            	List<Unit> unitList = new ArrayList<Unit>(tile.getUnitList());
+            	for(Unit unit : unitList){
+            		logger.fine(colony.getName() + " found unit : " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
+            		// we need to save the tile of the unit
+            		//before the location of the unit can change
+            		Tile unitTile = unit.getTile();
+            		
+            		Player player = unit.getOwner();
 
-                                if (//currentPlayer.equals(enemyPlayer) ||
-                                                enemyPlayer.getConnection() == null) {
-                                        continue;
-                                }
-                                
-                                // unit not visible to player, move to next player
-                                if(!unit.isVisibleTo(enemyPlayer)){
-                                        continue;
-                                }
-                                
-                                Element opponentAttackElement = Message.createNewRootElement("opponentAttack");                                 
-                                opponentAttackElement.setAttribute("direction", direction.toString());
-                                opponentAttackElement.setAttribute("result", result.type.toString());
-                                opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
-                            opponentAttackElement.setAttribute("colony", colony.getId());
-                                opponentAttackElement.setAttribute("defender", unit.getId());
-                                opponentAttackElement.setAttribute("damage", String.valueOf(result.damage));
+            		// ignore own units
+            		if(player == currentPlayer){
+            			continue;
+            		}
 
-                                // Add repair location to defending player
-                                if(enemyPlayer == player && repairLocation != null){
-                                        opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
-                                }
-                                
-                                // Every player who witness the confrontation needs to know about the attacker
-                                if (!enemyPlayer.canSee(colony.getTile())) {
-                                        opponentAttackElement.setAttribute("update", "tile");
-                                        enemyPlayer.setExplored(colony.getTile());
-                                        opponentAttackElement.appendChild(colony.getTile().toXMLElement(
-                                                        enemyPlayer, opponentAttackElement.getOwnerDocument()));
-                                }
-                                
-                                // update players view of the unit
-                                if (enemyPlayer.canSee(unit.getTile())) { 
-                            opponentAttackElement.setAttribute("update", "unit");
-                            opponentAttackElement.appendChild(unit.toXMLElement(enemyPlayer, opponentAttackElement.getOwnerDocument()));
-                                }
-                                
-                                // Send response
-                                try {
-                                        enemyPlayer.getConnection().send(opponentAttackElement);
-                                } catch (IOException e) {
-                                        logger.warning("Could not send message to: " + enemyPlayer.getName()
-                                                        + " with connection " + enemyPlayer.getConnection());
-                                }
-                        }
+            		// ignore friendly units
+            		if(currentPlayer.getStance(player) != Stance.WAR &&
+            				!unit.hasAbility("model.ability.piracy")){
+                		logger.warning(colony.getName() + " found unit to not bombard: " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
+            			continue;
+            		}
 
-                        // Create the reply for the attacking player:
-                        /*
-                         * Element bombardElement =
-                         * Message.createNewRootElement("bombardResult");
-                         * bombardElement.setAttribute("result",
-                         * Integer.toString(result));
-                         * bombardElement.setAttribute("colony",
-                         * colony.getId());
-                         * 
-                         * if (!unit.isVisibleTo(player)) {
-                         * bombardElement.appendChild(unit.toXMLElement(player,
-                         * bombardElement.getOwnerDocument())); }
-                         * colony.bombard(unit, result); try {
-                         * currentPlayer.getConnection().send(bombardElement); }
-                         * catch (IOException e) { logger.warning("Could
-                         * not send message to: " +
-                         * currentPlayer.getName() + " with connection " +
-                         * currentPlayer.getConnection()); }
-                         */
-                    }
+            		logger.warning(colony.getName() + " found enemy unit to bombard: " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
+            		// generate bombardment result
+            		CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
 
+            		// ship was damaged, get repair location
+            		Location repairLocation = null;
+            		if(result.type == CombatModel.CombatResultType.WIN){
+            			repairLocation = player.getRepairLocation(unit);
+            		}
+
+            		// update server data
+            		getGame().getCombatModel().bombard(colony, unit, result, repairLocation);
+
+            		// Inform the players (other then the player
+            		// attacking) about the attack:
+            		int plunderGold = -1;
+            		Iterator<Player> enemyPlayerIterator = getFreeColServer().getGame().getPlayerIterator();
+            		while (enemyPlayerIterator.hasNext()) {
+            			ServerPlayer enemyPlayer = (ServerPlayer) enemyPlayerIterator.next();
+
+            			if (enemyPlayer.getConnection() == null) {
+            				continue;
+            			}
+
+            			// unit tile not visible to player, move to next player
+            			if(!enemyPlayer.canSee(unitTile)){
+            				continue;
+            			}
+
+            			Element opponentAttackElement = Message.createNewRootElement("opponentAttack");                                 
+            			opponentAttackElement.setAttribute("direction", direction.toString());
+            			opponentAttackElement.setAttribute("result", result.type.toString());
+            			opponentAttackElement.setAttribute("plunderGold", Integer.toString(plunderGold));
+            			opponentAttackElement.setAttribute("colony", colony.getId());
+            			opponentAttackElement.setAttribute("defender", unit.getId());
+            			opponentAttackElement.setAttribute("damage", String.valueOf(result.damage));
+
+            			// Add repair location to defending player
+            			if(enemyPlayer == player && repairLocation != null){
+            				opponentAttackElement.setAttribute("repairIn", repairLocation.getId());
+            			}
+
+            			// Every player who witness the confrontation needs to know about the attacker
+            			if (!enemyPlayer.canSee(colony.getTile())) {
+            				opponentAttackElement.setAttribute("update", "tile");
+            				enemyPlayer.setExplored(colony.getTile());
+            				opponentAttackElement.appendChild(colony.getTile().toXMLElement(
+            						enemyPlayer, opponentAttackElement.getOwnerDocument()));
+            			}
+
+            			// Send response
+            			try {
+            				enemyPlayer.getConnection().send(opponentAttackElement);
+            			} catch (IOException e) {
+            				logger.warning("Could not send message to: " + enemyPlayer.getName()
+            						+ " with connection " + enemyPlayer.getConnection());
+            			}
+            		}
                 }
             }
         }
