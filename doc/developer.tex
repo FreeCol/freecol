@@ -14,6 +14,397 @@
 \tableofcontents
 \newpage
 
+
+\hypertarget{How to become a FreeCol developer}
+            {\chapter{How to become a FreeCol developer}}
+
+
+
+\hypertarget{The goal of our project}{\section{The goal of our project}}
+
+We are aiming towards making a clone of the old computer
+classic "Sid Meier's Colonization".
+
+New features should in general not be added before we reach
+FreeCol 1.0.0, unless they are implemented as optional features
+using the class "GameOptions".
+
+The big exception to this rule is the our client-server model that
+will allow players from all over the world to compete in a game
+of FreeCol.
+
+Read more \href{http://www.freecol.org/index.php?section=2}{here}.
+
+
+\hypertarget{SourceForge project site}{\section{SourceForge project site}}
+
+You should visit and get familiar with our project site at
+\href{http://sourceforge.net/projects/freecol/}{SourceForge}.
+
+This site contains trackers for bugs and features requests,
+a task manager and lots of other important services.
+
+We expect developers to use this site regularly when making
+changes to the codebase.
+
+
+\hypertarget{How to get tasks}{\section{How to get tasks}}
+
+You may find available tasks in the bug and feature request
+trackers --- just grab any task you are planning to do (in the
+immediate future) by posting a comment telling that you intend
+to do this task. Please create a new bug report/feature request
+for tasks that is not being listed here (and before you start
+working on them). Please remember to post a comment when
+you are done, or if you are unable to complete the work.
+
+Major changes to the code should be discussed on the
+developer's mailing list before they are implemented. This is to
+ensure that your work will not be in vain if somebody else knows
+a better way of doing it. It is also a good idea to discuss changes
+that is not directly related to the next release on our 
+\href{http://www.freecol.org/index.php?section=18}{roadmap}.
+
+
+\hypertarget{How to use the trackers}{\section{How to use the trackers}}
+
+This is how a bug tracker item should be updated while you are working:
+
+\begin{enumerate}
+\item Assign yourself to the tracker item before you start working on it.
+
+\item Please verify that no duplicate entry has been posted.
+
+\begin{itemize}
+\item If you can find a duplicate and the bug has NOT been fixed:
+  Please use the resolution "Duplicate", set the status to "Closed"
+  and post a comment with the ID of the other tracker item (add a
+  comment to the other tracker item as well).
+
+\item If you can find a duplicate and the bug has been fixed: Use the
+  resolution "Out of date" and close the tracker item.
+\end{itemize}
+
+\item Set the item's status to pending if you require input from the person
+   originally submitting the item.
+
+\item If you are unable to complete the item: Assign it to "None" and
+   make a comment describing any problems relevant for another developer.
+
+\item After you have completed the work: Set the group to "Fixed (SVN)",
+   resolution to "Fixed" and the status to "Closed". Please also write
+   a comment telling that the work is done.
+\end{enumerate}
+
+This is how a feature request item should be updated while you are
+working:
+
+\begin{enumerate}
+\item Assign yourself to the tracker item before you start working on it.
+
+\item Please verify that no duplicate entry has been posted.
+
+\begin{itemize}
+\item If you can find a duplicate and the feature has NOT been
+  implemented: Please use the group "Duplicated", set the status to
+  "Closed" and post a comment with the ID of the other tracker item
+  (add a comment to the other tracker item as well).
+
+\item If you can find a duplicate and the feature has been
+  implemented: Use the group "Out of date" and close the tracker item.
+\end{itemize}
+
+\item Set the item's status to pending if you require input from the person
+   originally submitting the item.
+
+\item Set the group to "Accepted" if you decide that this feature
+   request should be added before the next release (please discuss on
+   the mailing list if there are any reasons not to include this
+   feature).
+
+\item If you are unable to complete the item (or you think someone else
+   should be implementing it): Assign it to "None" and make a comment
+   describing any issues relevant for another developer.
+
+\item After you have completed the work: Set the group to "Added (SVN)"
+   and the status to "Closed". Please also write a comment telling that
+   the work is done.
+\end{enumerate}
+
+You can use any suitable canned response instead of writing a comment.
+For example: You can use the "Fixed: Use SVN" after you have fixed a bug.
+
+
+\hypertarget{Mailing lists}{\section{Mailing lists}}
+
+Our primary means of communication is the developers mailing list:
+freecol-developers@lists.sourceforge.net
+
+You can (and should) subscribe to this list 
+\href{http://lists.sourceforge.net/lists/listinfo/freecol-developers}{here}.
+
+
+\hypertarget{Subversion (SVN)}{\section{Subversion (SVN)}}
+
+Subversion (SVN) is the tool we are using to
+manage the changes within our source code tree. This system
+makes it possible for all developers to have their own
+"working copy" by supporting synchronization between the
+central version of the code ("the repository") and a copy.
+SVN also makes it possible to "undo" changes that were
+previously committed to the repository.
+
+\href{http://www.freecol.org/index.php?section=17}{This page}
+describes how you can start using SVN and get a working copy of the
+code (without commit privileges).
+
+You can use \verb+svn update+ for updating an existing working
+copy. Changes can only be applied by those who have write-access, so
+you will need to either send the changes to the developer mailing list
+or use the patch tracking system.
+
+
+\hypertarget{Compiling the code}{\section{Compiling the code}}
+
+We use the {\textit Apache Ant} build system for compiling the
+game. You can get a copy of this program
+\href{http://ant.apache.org}{here}. After it has been installed, you
+simply type \verb+ant+ in the top directory of your "working copy" in
+order to compile the game.  The file \verb+FreeCol.jar+ will then be
+generated, and you can start the game simply by writing:
+
+\verb+java -Xmx128M -jar FreeCol.jar+
+
+
+
+\hypertarget{Code documentation}{\section{Code documentation}}
+
+Our primary code documentation is the Javadoc generated
+documentation. You can convert this documentation to HTML by
+typing \verb+ant javadoc+. The directory "javadoc" will then be
+created and you can start watching the documentation by opening
+"index.html" from that directory.
+
+There is also some additional documentation 
+\href{http://www.freecol.org/index.php?section=3}{here}.
+
+
+\hypertarget{Quality of code}{\section{Quality of code}}
+
+First of all, your code will be read and modified by several
+different developers. Therefore it is important to create a
+block of JavaDoc documentation with all methods/classes/packages
+you implement.
+
+You should also spend more time thinking about the overall
+structure than when you are working alone.
+
+Please read the \href{http://java.sun.com/docs/codeconv/}{Java Code
+  Conventions}. This will only take about 15 minutes and will really
+help you write beautiful code.
+
+And one more thing. Please configure your editor in such a way
+that code indentations result in the insertion of 4 spaces. Tabs
+are the work of the devil!
+
+
+
+
+\hypertarget{How to build a FreeCol release}{\chapter{How to build a FreeCol release}}
+
+\begin{itemize}
+
+\item Make sure that all relevant changes have been committed to the
+  branch you are about to release. In particular, remember to merge
+  translations from trunk if the release is not made from trunk.
+
+\item Create a copy of the branch you want to release in the tags
+  folder. Subversion does not distinguish between tags and
+  branches. Example:
+
+{\small
+\begin{verbatim}
+  svn copy -m "Creating tag for release 0.9.0-alpha2." \
+  https://freecol.svn.sourceforge.net/svnroot/freecol/freecol/branches/0.9.x \
+  https://freecol.svn.sourceforge.net/svnroot/freecol/freecol/tags/0.9.0-alpha2
+\end{verbatim}
+}
+
+\item Check out the newly created branch and do all further work in that
+  new branch.
+
+\item Change the \verb$FREECOL_VERSION$ constant to match the release version in
+  FreeCol.java and commit the change. Start a clean compile, run all
+  tests and verify the specification(s). You can do that by calling
+  "ant prepare-commit".
+
+\item Call "ant dist" in order to build all packages. It might be
+  necessary to increase the memory available for ant, for example by
+  setting the environment variable \verb$ANT_OPTS="-Xms256m -Xmx256m"$.
+
+\item Install one of the generated packages and verify that you can play
+  normally for at least five turns. Other good tests include loading a
+  saved game and running the game in debug mode for a hundred turns or
+  so. It might also be a good idea to compile the game from one of the
+  source packages.
+
+\item Upload the packages to \verb$sftp://frs.sourceforge.net/$ and ensure that
+  all packages get uploaded. You can use a script similar to this:
+
+\begin{verbatim}
+  #!/bin/sh
+
+  FREECOL_VERSION=0.9.0-alpha2
+  PREFIX=freecol-$FREECOL_VERSION
+  USERNAME=myUserName
+
+  sftp $USERNAME,freecol@frs.sourceforge.net <<FILE
+  cd /home/frs/project/f/fr/freecol/freecol
+  mkdir $PREFIX
+  cd $PREFIX
+  put $PREFIX-installer.exe
+  put $PREFIX-installer.jar
+  put $PREFIX-installer-with-sources.jar
+  put $PREFIX-mac.tar.bz2
+  put $PREFIX-src.tar.gz
+  put $PREFIX-src.zip
+  put $PREFIX.tar.gz
+  put $PREFIX.zip
+  exit
+  FILE
+\end{verbatim}
+
+
+\item Compile the feature list for the news announcement (use the tracker
+  and/or run the previous version for comparison).
+
+\item Update the release number in the "Version"-mambot.
+  (http://www.freecol.org/administrator > Mambots > Site Mambots >
+  Version)
+
+\item Publish/unpublish "Download Unstable Version" (this page should only
+  be displayed if the unstable version is the latest release).
+
+\item Add a news item to our website.
+
+\item Remove the download button from the previous release news item.
+
+\item Post release messages on our mailing lists: developers, translators
+  and users.
+
+\end{itemize}
+
+The following items can be omitted for unstable releases:
+
+\begin{itemize}
+
+\item Trackers: Rename the group "Added (Trunk)"/"Added (x.y,z-branch)" to
+  Added (FreeCol x.y.z). Rename the group "Fixed (x.y,z-branch)"/
+  "Fixed (Trunk)" to Fixed (FreeCol x.y.z). Create new groups with the
+  names you just renamed from. Change the links on "Tracker > Admin >
+  Bugs/Feature... > Preferences". Add redirects for "bugtracker/x.y.z"
+  and "featuretracker/x.y.z". Create a new group for "In 0.y.x".
+
+\item Update JavaDoc and User Documentation on freecol.org
+
+\end{itemize}
+
+The following items should be omitted for unstable releases:
+
+\begin{itemize}
+
+\item Update the links to "Added (0.x.y-branch)" and "Fixed
+  (0.x.y-branch)" on the roadmap (and release status etc).
+
+\item Post a news item on SF.net
+
+\item Create news items at \href{Linuxgames.com}{Linuxgames.com},
+  \href{linux-gamers.com}{linux-gamers.com} and
+  \href{happypenguin.org}{happypenguin.org}.
+
+\end{itemize}
+
+
+\hypertarget{Missing features}{\chapter{Missing features}}
+
+We know that FreeCol does not yet emulate all features of the original
+game. In particular, the initial contact with other nations differs
+considerably from that in the original game. At some point, we will
+fix this, as far AI players are concerned. In a multi-player game,
+however, European nations played by other humans will never behave
+like the AI nations in the original game.
+
+Other missing features include the intervention force. You can report
+any missing feature as a bug.
+
+Since we do not have access to the source code of the original game,
+we can only guess at the algorithms used to calculate production,
+combat results, bells required to elect a founding father and so
+on. In some cases, players have reverse-engineered the algorithm. If
+you know of some calcuation in FreeCol that differs from that of the
+original game, please tell us about it.
+
+We know that the calculation of the player's score differs from that
+of Colonization, and we will fix that issue.
+
+We also know that the calculation of production differs, but we lack
+the necessary data to fix the issue. If you have further information,
+please contribute by telling us about your conclusions.
+
+
+\hypertarget{Colonization production reports}
+            {\section{Colonization production reports}}
+
+
+All production numbers are given for colonists and experts for the
+production of the goods (col/ex). When adding to the list, please give
+all relevant data, particularly the difficulty level, production bonus
+of the colony and all relevant founding fathers.
+
+\begin{itemize}
+
+\item Difficulty: viceroy, colony production bonus: 0
+
+\begin{tabular}{lr@{ / }r}
+Food production:\\
+
+Hills: & 2 & 4\\
+Conifer forest: & 2 & 4\\
+Broadleaf forest: & 2 & 4\\
+\bigskip
+Plains / minor river / plowed: & 7 & 9\\
+
+
+Lumber production:\\
+
+Conifer forest: & 6 & 12\\
+Broadleaf forest: & 4 & 8\\
+Conifer forest / road: & 8 & 14\\
+\end{tabular}
+
+
+\item Difficulty viceroy, colony production bonus: 1
+
+\begin{tabular}{lr@{ / }r}
+Food production:\\
+
+Hills: & 3 & 6\\
+Conifer forest: & 3 & 6\\
+Broadleaf forest: & 3 & 6\\
+\bigskip
+Plains / minor river / plowed: & 8 & 11\\
+
+Lumber production:\\
+
+Conifer forest: & 8 & 16\\
+Broadleaf forest: & 6 & 12\\
+Conifer forest / road: & 10 & 18\\
+\end{tabular}
+
+\end{itemize}
+
+
+
 \hypertarget{Changing the Rules}{\chapter{Changing the Rules}}
 
 We would like to make FreeCol configurable, so that the game engine
