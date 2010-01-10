@@ -3011,10 +3011,13 @@ public class Player extends FreeColGameObject implements Nameable {
             if (!hasAbility("model.ability.independenceDeclared") &&
                 getLiberty() >= getTotalFoundingFatherCost() &&
                 currentFather != null) {
-                addFather(currentFather);
-                currentFather = null;
+                // do this first, as the addition of the founding
+                // father will change the return value of
+                // getTotalFoundingFatherCost()
                 liberty -= getGameOptions().getBoolean(GameOptions.SAVE_PRODUCTION_OVERFLOW) ?
                     getTotalFoundingFatherCost() : liberty;
+                addFather(currentFather);
+                currentFather = null;
             }
 
             // CO: since the pioneer already finishes faster, changing
