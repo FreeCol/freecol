@@ -282,9 +282,9 @@ are the work of the devil!
   (http://www.freecol.org/administrator > Mambots > Site Mambots >
   Version)
 
-\item Publish/unpublish "Download Unstable Version" in the static
-  content manager (this page should only be displayed if the unstable
-  version is the latest release).
+\item Publish/unpublish "Download Unstable Version" in the main menu
+  (this page should only be displayed if the unstable version is the
+  latest release).
 
 \item Add a news item to our website.
 
@@ -306,7 +306,28 @@ The following items can be omitted for unstable releases:
   Bugs/Feature... > Preferences". Add redirects for "bugtracker/x.y.z"
   and "featuretracker/x.y.z". Create a new group for "In x.y.z".
 
-\item Update JavaDoc and User Documentation on freecol.org
+\item Update JavaDoc and User Documentation on
+  \href{freecol.org}{freecol.org}. You can do that with a script like
+  this:
+
+\begin{verbatim}
+#!/bin/sh
+
+USERNAME=myUserName
+
+cd docs
+
+{
+    echo cd /home/groups/f/fr/freecol/htdocs
+    echo put FreeCol.pdf
+    echo put FreeCol.html
+    echo put images/* images
+    find javadoc/ -printf "put %p %p\n"
+} | sftp $USERNAME,freecol@web.sf.net
+
+\end{verbatim}
+
+
 
 \end{itemize}
 
