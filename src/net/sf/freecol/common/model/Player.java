@@ -1751,7 +1751,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Returns how many liberty points in total are needed to earn the
-     * Founding Father we are trying to recruit.
+     * Founding Father we are trying to recruit. The description of the
+     * algorithm was taken from
+     * http://t-a-w.blogspot.com/2007/05/colonization-tips.html
      *
      * @return Total number of liberty points the <code>Player</code>
      *         needs to recruit the next founding father.
@@ -1759,8 +1761,14 @@ public class Player extends FreeColGameObject implements Nameable {
      * @see #incrementLiberty
      */
     public int getTotalFoundingFatherCost() {
-        return (getFatherCount() * getFatherCount() * Specification.getSpecification()
-                .getIntegerOption("model.option.foundingFatherFactor").getValue() + 50);
+        int base = Specification.getSpecification()
+            .getIntegerOption("model.option.foundingFatherFactor").getValue();
+        int count = getFatherCount();
+        int previous = 1;
+        for (int index = 0; index < count; index++) {
+            previous += 2 * (index + 2);
+        }
+        return previous * base + count;
     }
 
     /**

@@ -231,7 +231,8 @@ public class FoundingFatherTest extends FreeColTestCase {
         
         // increasing population to 3 should give access to stockade
         UnitType pioneerType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
-        Unit unit = new Unit(getGame(), colony.getTile(), player, pioneerType, UnitState.ACTIVE, pioneerType.getDefaultEquipment());
+        Unit unit = new Unit(getGame(), colony.getTile(), player, pioneerType, UnitState.ACTIVE, 
+                             pioneerType.getDefaultEquipment());
         // set the unit as a farmer in the colony
         unit.setWorkType(Goods.FOOD);
         ColonyTile farmLand = colony.getVacantColonyTileFor(unit, Goods.FOOD, true);
@@ -253,7 +254,8 @@ public class FoundingFatherTest extends FreeColTestCase {
         Tile settlementTile = getGame().getMap().getNeighbourOrNull(Direction.NE, colonyCenterTile);
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(getGame());
-        IndianSettlement indianSettlement = builder.player(iroquois).settlementTile(settlementTile).skillToTeach(null).build();
+        IndianSettlement indianSettlement = builder.player(iroquois).settlementTile(settlementTile)
+            .skillToTeach(null).build();
 
         disputedTile.setOwner(iroquois);
         disputedTile.setOwningSettlement(indianSettlement);
@@ -362,5 +364,28 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertTrue(dutch.canTrade(musketsType, Market.CUSTOM_HOUSE));
 
     }
+
+    public void testBellsRequired() {
+
+        int[] expectedValues = new int[] {
+            40, 201, 442, 763, 1164, 1645 , 2206, 2847, 3568, 4369,
+            5250, 6211, 7252, 8373, 9574, 10855, 12216, 13657, 15178,
+            16779, 18460, 20221, 22062, 23983, 25984
+        };
+
+    	Game game = getGame();
+        Player dutch = game.getPlayer("model.nation.dutch");
+
+        assertEquals(2, getGame().getGameOptions().getInteger(GameOptions.DIFFICULTY));
+        assertEquals(40, spec().getIntegerOption("model.option.foundingFatherFactor").getValue());
+
+        for (int index = 0; index < expectedValues.length; index++) {
+            assertEquals(index, dutch.getFatherCount());
+            assertEquals(expectedValues[index], dutch.getTotalFoundingFatherCost());
+            dutch.addFather(new FoundingFather(100 + index));
+        }
+
+    }
+
 
 }
