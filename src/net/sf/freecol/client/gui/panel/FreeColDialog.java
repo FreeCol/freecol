@@ -276,6 +276,7 @@ public class FreeColDialog<T> extends FreeColPanel {
                 }
             });
 
+        confirmDialog.cancelButton.setText(cancelText);
         confirmDialog.cancelButton.removeActionListener(confirmDialog);
         confirmDialog.cancelButton.addActionListener(new ActionListener() {
                 public void actionPerformed( ActionEvent event ) {
