@@ -454,7 +454,7 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getIndex() {
         return index;
     }
-
+	
     /**
      * Get the <code>FeatureContainer</code> value.
      *
