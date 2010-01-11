@@ -2451,7 +2451,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             completeName = completeName + customName;
         } else {
             completeName = completeName.substring(0, index) + customName + 
-                completeName.substring(index + 1);
+                completeName.substring(index);
         }
 
         return completeName;
