@@ -230,10 +230,22 @@ public final class FreeCol {
                         
                         freeColServer = new FreeColServer(fis, defaultPublicServer, defaultSingleplayer, serverPort, serverName);
                         if (checkIntegrity) {
-                            System.exit((freeColServer.getIntegrity()) ? 0 : 1);
+                        	String integrityCheckMsg = "";
+                        	boolean integrityOK = freeColServer.getIntegrity();
+                        	if(integrityOK){
+                        		integrityCheckMsg = Messages.message("cli.check-savegame.success");
+                        	}
+                        	else{
+                        		integrityCheckMsg = Messages.message("cli.check-savegame.failure");
+                        	}
+                        	System.out.println(integrityCheckMsg);
+                        	System.exit(integrityOK ? 0 : 1);
                         }
                     } catch (Exception e) {
                         removeSplash(splash);
+                        if (checkIntegrity) {
+                        	System.out.println(Messages.message("cli.check-savegame.failure"));
+                        }
                         System.out.println("Could not load savegame.");
                         System.exit(1);
                         return;
