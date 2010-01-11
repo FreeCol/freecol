@@ -1682,11 +1682,16 @@ public final class GUI {
 
     private BufferedImage createSettlementNameImage(Graphics g, Settlement settlement,
                                                 int maxWidth, int preferredFontSize) {        
-        return createStringImage((Graphics2D) g,
+        Font oldFont = g.getFont();
+//      g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(Font.BOLD, 16));
+        g.setFont((Font)UIManager.get("BoldFont"));
+        BufferedImage result = createStringImage((Graphics2D) g,
                 settlement.getName(),
                 settlement.getOwner().getColor(),
                 maxWidth,
                 preferredFontSize);
+        g.setFont(oldFont);
+        return result;
     }
 
     /**
