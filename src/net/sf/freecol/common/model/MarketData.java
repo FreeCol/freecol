@@ -254,7 +254,7 @@ public class MarketData extends FreeColObject {
      * @return The old price.
      */
     public final int getOldPrice() {
-        return oldPrice;
+        return (oldPrice != 0) ? oldPrice : costToBuy;
     }
 
     /**
