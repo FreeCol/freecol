@@ -189,6 +189,12 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
             return;
         }
         JComponent component = (JComponent)e.getSource();
+        if(startPoint == null){
+        	startPoint = e.getPoint();
+        }
+        if(oldPoint == null){
+        	oldPoint = e.getPoint();
+        }
         drawBox(component, startPoint, oldPoint);
         if (gui.getFocus() != null) {
             Position start = gui.convertToMapCoordinates(startPoint.x, startPoint.y);
