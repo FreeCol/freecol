@@ -141,10 +141,12 @@ public class TerrainGenerator {
                     Tile importTile = importGame.getMap().getTile(x, y);
                     if (importTile.isLand() == landMap[x][y]) {
                         t = new Tile(game, importTile.getType(), x, y);
-                        // TileItemContainer copies everything including Resource unless importBonuses == false
                         if (importTile.getTileItemContainer() != null) {
                             TileItemContainer container = new TileItemContainer(game, t);
-                            container.copyFrom(importTile.getTileItemContainer(), importBonuses);
+                            // TileItemContainer copies every natural item
+                            //including Resource unless importBonuses == false
+                            // Rumors and roads are not copied
+                            container.copyFrom(importTile.getTileItemContainer(), importBonuses, true);
                             t.setTileItemContainer(container);
                         }
                     } else {

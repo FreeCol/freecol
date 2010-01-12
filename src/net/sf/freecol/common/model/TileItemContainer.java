@@ -441,14 +441,14 @@ public class TileItemContainer extends FreeColGameObject {
     }
     public void copyFrom(TileItemContainer tic, boolean importResources, boolean copyOnlyNatural) {
         tileItems.clear();
-        for (TileItem item : tileItems) {
+        for (TileItem item : tic.getTileItems()) {
             if (item instanceof Resource) {
                 if (importResources) {
                     Resource ticR = (Resource) item;
                     Resource r = new Resource(getGame(), tile, ticR.getType(), ticR.getQuantity());
                     tileItems.add(r);
                 }
-            } else if (item instanceof LostCityRumour) {
+            } else if (item instanceof LostCityRumour && !copyOnlyNatural) {
                 LostCityRumour ticR = (LostCityRumour) item;
                 LostCityRumour r = new LostCityRumour(getGame(), tile, ticR.getType(), ticR.getName());
                 addTileItem(r);

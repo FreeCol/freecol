@@ -53,6 +53,7 @@ public class AllTests {
 	suite.addTestSuite(SchoolTest.class);
 	suite.addTestSuite(ScopeTest.class);
 	suite.addTestSuite(SoLTest.class);
+	suite.addTestSuite(TileItemContainerTest.class);
 	suite.addTestSuite(TileTest.class);
 	suite.addTestSuite(UnitTest.class);
 	suite.addTestSuite(UnitTypeChangeTest.class);
