@@ -243,10 +243,15 @@ public class MapGenerator implements IMapGenerator {
         
         if (importGame != null && importRumours) {
             for (Tile importTile : importGame.getMap().getAllTiles()) {
+            	LostCityRumour rumor = importTile.getLostCityRumour();
+            	// no rumor
+            	if(rumor == null){
+            		continue;
+            	}
                 final Position p = importTile.getPosition();
                 if (map.isValid(p)) {
                     final Tile t = map.getTile(p);
-                    t.add(importTile.getLostCityRumour());
+                    t.add(rumor);
                 }
             }
         } else {
