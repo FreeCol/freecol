@@ -1147,7 +1147,9 @@ public class IndianSettlement extends Settlement {
         while (ownedUnits.size() > 0) {
             ownedUnits.remove(0).setIndianSettlement(null);
         }
-        for (Unit unit : units) {
+        // list can be changed inside loop, causing ConcurrentModificationExpections
+        List<Unit> unitLst = new ArrayList<Unit>(units);
+        for (Unit unit : unitLst) {
             unit.dispose();
         }
         super.dispose();
