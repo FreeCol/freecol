@@ -285,7 +285,14 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
     }
 	
     private void drawBox(JComponent component, Point startPoint, Point endPoint) {
-        Graphics2D graphics = (Graphics2D) component.getGraphics ();
+        if(startPoint == null || endPoint == null){
+        	return;
+        }
+        if(startPoint.distance(endPoint) == 0){
+        	return;
+        }
+    	
+    	Graphics2D graphics = (Graphics2D) component.getGraphics ();
         graphics.setColor(Color.WHITE);
         int x = Math.min(startPoint.x, endPoint.x);
         int y = Math.min(startPoint.y, endPoint.y);

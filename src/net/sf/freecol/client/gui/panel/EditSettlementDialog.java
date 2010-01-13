@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tension;
+import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
@@ -65,6 +66,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
 
     private static final UnitType BRAVE = Specification.getSpecification().getUnitType("model.unit.brave");
 
+    private static final String REMOVE = "REMOVE";
+    
     private final IndianSettlement settlement;
 
     private final JCheckBox capital;
@@ -138,6 +141,11 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
         units = new JSpinner(spinnerModel);
         add(units);
         
+        JButton remove = new JButton(Messages.message("editor.removeSettlement"));
+        remove.setActionCommand(REMOVE);
+        remove.addActionListener(this);
+        add(remove,"span,align center");
+        
         add(okButton, "newline 20, span, split 2, tag ok");
         add(cancelButton, "tag cancel");
 
@@ -188,7 +196,22 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
                     unit.dispose();
                 }
             } 
-        }                   
+        }
+        else if(REMOVE.equals(command)) {
+        	boolean confirm = getCanvas().showConfirmDialog(Messages.message("editor.removeSettlement.text"),
+        			Messages.message("ok"), Messages.message("cancel"));
+        	if(!confirm){
+        		return;
+        	}
+        	// Dispose of units and settlement on tile
+        	Tile t = settlement.getTile();
+        	List<Unit> unitList = new ArrayList<Unit>(t.getUnitList());
+            for (Unit unit : unitList) {
+                unit.dispose();
+            }
+        	t.setSettlement(null);
+            settlement.dispose();
+        }
         getCanvas().remove(this);
     }
 }

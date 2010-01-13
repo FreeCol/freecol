@@ -376,15 +376,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
             if (t.isLand()) {
                 Settlement settlement = t.getSettlement();
                 if (settlement == null) {
-                    /*
-                    if (nativePlayer == null) {
-                        nativePlayer = t.getGame().getPlayers().get(0);
-                        SettlementType settlementType = ((IndianNationType) nativePlayer.getNationType())
-                            .getTypeOfSettlement();
-                        Image image = getLibrary().getSettlementImage(settlementType);
-                        settlementButton.setIcon(new ImageIcon(getLibrary().scaleImage(image, 0.5f)));
-                    }
-                    */
                     UnitType skill = ((IndianNationType) nativePlayer.getNationType()).getSkills().get(0)
                         .getObject();
                     String name = nativePlayer.getDefaultSettlementName(false);
@@ -395,9 +386,6 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                         settlement.add(new Unit(settlement.getGame(), settlement, settlement.getOwner(),
                                                 BRAVE, UnitState.ACTIVE));
                     }
-                } else {
-                    t.setSettlement(null);
-                    settlement.dispose();
                 }
             }
         }
