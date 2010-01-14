@@ -182,7 +182,7 @@ public class ScoutingMission extends Mission {
                 Direction direction = moveTowards(connection, bestPath);
                 if (direction != null) {
                     final MoveType mt = getUnit().getMoveType(direction);             
-                    if (mt == MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT) {
+                    if (mt == MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
                         ScoutIndianSettlementMessage message
                             = new ScoutIndianSettlementMessage(getUnit(), direction);
                         try {

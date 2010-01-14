@@ -185,7 +185,7 @@ public class MovementTest extends FreeColTestCase {
         colonist.equipWith(muskets, true);
         assertEquals(Unit.MoveType.ATTACK, colonist.getMoveType(tile1));
 
-        Unit brave = new Unit(game, tile3, french, braveType, UnitState.ACTIVE);
+        Unit brave = new Unit(game, tile3, iroquois, braveType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
         brave.equipWith(indianHorses, true);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
@@ -216,13 +216,13 @@ public class MovementTest extends FreeColTestCase {
         IndianSettlement settlement = builder.player(inca).settlementTile(tile1).skillToTeach(null).build();
 
         Unit colonist = new Unit(game, tile2, french, colonistType, UnitState.ACTIVE);
-        assertEquals(Unit.MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST, colonist.getMoveType(tile1));
         colonist.equipWith(horses, true);
-        assertEquals(Unit.MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT, colonist.getMoveType(tile1));
+        assertEquals(Unit.MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT, colonist.getMoveType(tile1));
         colonist.equipWith(muskets, true);
         assertEquals(Unit.MoveType.ATTACK, colonist.getMoveType(tile1));
 
-        Unit brave = new Unit(game, tile3, french, braveType, UnitState.ACTIVE);
+        Unit brave = new Unit(game, tile3, iroquois, braveType, UnitState.ACTIVE);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));
         brave.equipWith(indianHorses, true);
         assertEquals(Unit.MoveType.ATTACK, brave.getMoveType(tile1));

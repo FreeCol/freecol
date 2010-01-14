@@ -1406,13 +1406,13 @@ public final class InGameController implements NetworkConstants {
         case EMBARK:
             moveEmbark(unit, direction);
             break;
-        case ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST:
+        case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
             moveLearnSkill(unit, direction);
             break;
-        case ENTER_INDIAN_VILLAGE_WITH_SCOUT:
+        case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
             moveScoutIndianSettlement(unit, direction);
             break;
-        case ENTER_INDIAN_VILLAGE_WITH_MISSIONARY:
+        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
             moveUseMissionary(unit, direction);
             break;
         case ENTER_FOREIGN_COLONY_WITH_SCOUT:
@@ -2079,7 +2079,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Move a free colonist to a native settlement to learn a skill following
-     * a move of MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST.
+     * a move of MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST.
      * The colonist does not physically get into the village, it will
      * just stay where it is and gain the skill.
      *
@@ -2171,7 +2171,7 @@ public final class InGameController implements NetworkConstants {
     /**
      * Move a scout into an Indian settlement to speak with the chief,
      * or demand a tribute following a move of
-     * MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT.
+     * MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT.
      * The scout does not physically get into the village, it will
      * just stay where it is.
      *
@@ -2261,7 +2261,7 @@ public final class InGameController implements NetworkConstants {
 
     /**
      * Move a missionary into a native settlement, following a move of
-     * MoveType.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY.
+     * MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY.
      *
      * @param unit The <code>Unit</code> that will enter the settlement.
      * @param direction The direction in which the Indian settlement lies.

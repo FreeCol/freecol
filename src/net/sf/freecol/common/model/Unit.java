@@ -107,9 +107,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         EXPLORE_LOST_CITY_RUMOUR(null, true),
         ATTACK(null, false),
         EMBARK(null, false),
-        ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST(null, false),
-        ENTER_INDIAN_VILLAGE_WITH_SCOUT(null, false),
-        ENTER_INDIAN_VILLAGE_WITH_MISSIONARY(null, false),
+        ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST(null, false),
+        ENTER_INDIAN_SETTLEMENT_WITH_SCOUT(null, false),
+        ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY(null, false),
         ENTER_FOREIGN_COLONY_WITH_SCOUT(null, false),
         ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS(null, false),
         MOVE_ILLEGAL("Unspecified illegal move"),
@@ -1409,17 +1409,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                             switch (getRole()) {
                             case DEFAULT: case PIONEER:
                                 if (perhapsLearnFromSettlement((IndianSettlement) settlement)) {
-                                    return MoveType.ENTER_INDIAN_VILLAGE_WITH_FREE_COLONIST;
+                                    return MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST;
                                 }
                                 break;
                             case MISSIONARY:
                                 if (((IndianSettlement) settlement).getAlarm(getOwner()) == null) {
                                     return MoveType.MOVE_ILLEGAL;
                                 } else {
-                                    return MoveType.ENTER_INDIAN_VILLAGE_WITH_MISSIONARY;
+                                    return MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY;
                                 }
                             case SCOUT:
-                                return MoveType.ENTER_INDIAN_VILLAGE_WITH_SCOUT;
+                                return MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT;
                             case SOLDIER: case DRAGOON:
                                 break;
                             }
