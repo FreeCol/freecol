@@ -495,12 +495,18 @@ public class Map extends FreeColGameObject {
             throw new IllegalArgumentException("Argument 'unit' must not be 'null'.");
         }
 
-        Unit currentUnit = (carrier == null) ? unit : carrier;
+        // Short circuit if the final goal is unattainable.
+        if (unit != null && !unit.getSimpleMoveType(end).isLegal()) return null;
+
+        // What unit starts the path?
+        Unit currentUnit = (carrier != null) ? carrier : unit;
 
         final PathNode firstNode;
         if (currentUnit != null) {
-            firstNode = new PathNode(start, 0, getDistance(start.getPosition(),
-                    end.getPosition()), Direction.N, currentUnit.getMovesLeft(), 0);
+            firstNode = new PathNode(start, 0,
+                                     getDistance(start.getPosition(),
+                                                 end.getPosition()),
+                                     Direction.N, currentUnit.getMovesLeft(), 0);
             firstNode.setOnCarrier(carrier != null);
         } else {
             firstNode = new PathNode(start, 0, getDistance(start.getPosition(),
@@ -557,7 +563,6 @@ public class Map extends FreeColGameObject {
             // Try every direction:
             for (Direction direction : Direction.values()) {
                 final Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
-
                 if (newTile == null) {
                     continue;
                 }
@@ -593,7 +598,7 @@ public class Map extends FreeColGameObject {
                 } else {
                     moveUnit = (currentNode.isOnCarrier()) ? carrier : unit;
                 }
-                
+
                 if (moveUnit != null) {
                     int extraCost = costDecider.getCost(moveUnit,
                         currentNode.getTile(), newTile, movesLeft, turns);
@@ -870,7 +875,8 @@ public class Map extends FreeColGameObject {
             throw new IllegalArgumentException("startTile must not be 'null'.");
         }
 
-        Unit currentUnit = (carrier == null)  ? unit : carrier;
+        // What unit starts the path?
+        Unit currentUnit = (carrier != null) ? carrier : unit;
 
         final int ml = (currentUnit != null) ? currentUnit.getMovesLeft() : -1;
         final PathNode firstNode = new PathNode(startTile, 0, 0, Direction.N, ml, 0);

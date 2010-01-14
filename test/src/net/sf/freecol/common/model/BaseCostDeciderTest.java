@@ -18,6 +18,7 @@
  */
 package net.sf.freecol.common.model;
 
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
@@ -64,8 +65,9 @@ public class BaseCostDeciderTest extends FreeColTestCase {
     }
 
     /**
-     * Checks that {@link  BaseCostDecider#getMovesLeft() } and
-     * {@link  BaseCostDecider#isNewTurn() } return the expected values after a move.
+     * Checks that {@link BaseCostDecider#getMovesLeft() } and {@link
+     * BaseCostDecider#isNewTurn() } return the expected values after
+     * a move.
      */
     public void testGetRemainingMovesAndNewTurn() {
         final CostDecider decider = CostDeciders.avoidSettlements();
@@ -172,27 +174,33 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         
         // Execute
         final CostDecider decider = CostDeciders.avoidSettlements();
+        /*
+         * The CostDecider.getCost() returns ILLEGAL_MOVE because it
+         * is supposed to avoid settlements.  findPath correctly
+         * handles the end tile to make this work.
+         */
         int cost = decider.getCost(unit, unitTile, settlementTile, 4,4);
-        assertTrue("Move should be invalid, nothing to trade",cost == CostDecider.ILLEGAL_MOVE);
-        
+        assertTrue("Move should be invalid, decider avoids settlements",
+                   cost == CostDecider.ILLEGAL_MOVE);
+        assertNull("Move should be invalid, no contact or goods to trade",
+                   map.findPath(unit, unitTile, settlementTile));
+
+        // Add contact
+        unit.getOwner().setContacted(settlement.getOwner());
+        settlement.getOwner().setContacted(unit.getOwner());
+        assertNull("Move should be invalid, no goods to trade",
+                   map.findPath(unit, unitTile, settlementTile));
+
         // Add goods to trade
         Goods goods = new Goods(game, null, tradeGoodsType, 50);
         unit.add(goods);
-        
-        /*
-         * FIXME: The CostDecider should really return ILLEGAL_MOVE here.
-         *        We need to test findPath to verify the correct behaviour (
-         *        since this is the place to allow exceptions for the
-         *        end tile/destination).
-         */
-        cost = decider.getCost(unit, unitTile, settlementTile, 4,4);
-        assertFalse("Move should be valid, has goods to trade",cost == CostDecider.ILLEGAL_MOVE);
-        
+        assertNotNull("Move should be valid, has contact and goods to trade",
+                      map.findPath(unit, unitTile, settlementTile));
+
         // Set players at war
         Player indianPlayer = settlement.getOwner();
         indianPlayer.changeRelationWithPlayer(unit.getOwner(), Stance.WAR);
-        
-        cost = decider.getCost(unit, unitTile, settlementTile, 4,4);
-        assertTrue("Move should be invalid, players at war",cost == CostDecider.ILLEGAL_MOVE);
+        assertNull("Move should be invalid, players at war",
+                   map.findPath(unit, unitTile, settlementTile));
     }
 }
