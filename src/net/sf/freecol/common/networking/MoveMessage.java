@@ -115,13 +115,13 @@ public class MoveMessage extends Message {
                 Document doc = multiple.getOwnerDocument();
                 // To animate we need to know which unit is moving,
                 // from, and to.  We put this in attributes on
-                // opponentMove up front as it needs to be independent
+                // animateMove up front as it needs to be independent
                 // of the real update.
-                Element move = doc.createElement("opponentMove");
-                multiple.appendChild(move);
-                move.setAttribute("unit", unit.getId());
-                move.setAttribute("oldTile", oldTile.getId());
-                move.setAttribute("newTile", newTile.getId());
+                Element animate = doc.createElement("animateMove");
+                multiple.appendChild(animate);
+                animate.setAttribute("unit", unit.getId());
+                animate.setAttribute("oldTile", oldTile.getId());
+                animate.setAttribute("newTile", newTile.getId());
                 // We can not rely on the unit that is about to move
                 // being present on the client side, and it is needed
                 // before we can run the animation, so it is sent in
@@ -133,8 +133,8 @@ public class MoveMessage extends Message {
                 // occurred.  Thus for the present, the unit is always
                 // sent, on the principle of getting it right first and
                 // optimizing later.
-                move.appendChild(unit.toXMLElement(enemyPlayer, doc,
-                                                   false, false));
+                animate.appendChild(unit.toXMLElement(enemyPlayer, doc,
+                                                      false, false));
 
                 // The real state-changing part of the message follows.
                 // Add stance setting if this is a new contact.
@@ -237,42 +237,41 @@ public class MoveMessage extends Message {
         // Begin building the reply,
         Element reply = Message.createNewRootElement("multiple");
         Document doc = reply.getOwnerDocument();
-        Element addMessages = null;
-        Element addHistory = null;
-        Element remove = null;
+        Element update = doc.createElement("update");
+        Element addMessages = doc.createElement("addMessages");
+        Element addHistory = doc.createElement("addHistory");
+        Element remove = doc.createElement("remove");
 
         // always updating the old location,
-        Element updates = doc.createElement("update");
-        reply.appendChild(updates);
         if (oldLocation instanceof Tile) {
-            updates.appendChild(((Tile) oldLocation).toXMLElement(player, doc));
+            update.appendChild(((Tile) oldLocation).toXMLElement(player, doc));
         } else if (oldLocation instanceof Unit) {
-            updates.appendChild(((Unit) oldLocation).toXMLElement(player, doc));
+            update.appendChild(((Unit) oldLocation).toXMLElement(player, doc));
             unit.setMovesLeft(0); // Disembark always consumes moves.
         } else {
             throw new IllegalArgumentException("Location not a tile or unit!?!: " + unit.getId());
         }
         // ...but delay doing the new location as more can happen there still.
 
-        // Deal with unit death.
+        // If the unit dies, remove it, if not, animate the move.
         if (unit.isDisposed()) {
             remove = doc.createElement("remove");
             unit.addToRemoveElement(remove);
+        } else {
+            Element animate = doc.createElement("animateMove");
+            reply.appendChild(animate);
+            animate.setAttribute("unit", unit.getId());
+            animate.setAttribute("oldTile", oldLocation.getTile().getId());
+            animate.setAttribute("newTile", newTile.getId());
         }
 
         // Consider all the other objects known to have changed.
         for (FreeColObject object : objects) {
             if (object == player) { // Only returned if received gold
-                updates.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
+                update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
             } else if (object instanceof ModelMessage) {
-                if (addMessages == null) {
-                    addMessages = doc.createElement("addMessages");
-                }
                 addMessages.appendChild(object.toXMLElement(player, doc));
             } else if (object instanceof HistoryEvent) {
-                if (addHistory == null) {
-                    addHistory = doc.createElement("addHistory");
-                }
                 addHistory.appendChild(object.toXMLElement(player, doc));
             } else if (object instanceof ServerPlayer && contacts.contains(object)) {
                 ServerPlayer other = (ServerPlayer) object;
@@ -286,12 +285,9 @@ public class MoveMessage extends Message {
                                                   HistoryEvent.Type.MEET_NATION,
                                                   "%nation%", other.getNationAsString());
                 serverPlayer.addHistory(h);
-                if (addHistory == null) {
-                    addHistory = doc.createElement("addHistory");
-                }
                 addHistory.appendChild(h.toXMLElement(player, doc));
             } else { // native player, Europe, Tile
-                updates.appendChild(object.toXMLElement(player, doc,
+                update.appendChild(object.toXMLElement(player, doc,
                                                         false, false));
             }
         }
@@ -337,12 +333,9 @@ public class MoveMessage extends Message {
                     }
                 }
                 if (h != null) {
-                    if (addHistory == null) {
-                        addHistory = doc.createElement("addHistory");
-                    }
                     serverPlayer.addHistory(h);
                     addHistory.appendChild(h.toXMLElement(player, doc));
-                    updates.appendChild(region.toXMLElement(player, doc));
+                    update.appendChild(region.toXMLElement(player, doc));
                 }
             }
 
@@ -358,12 +351,13 @@ public class MoveMessage extends Message {
         // to update the new tile, even if the unit died as that only
         // happens as a result of a LostCityRumour so the tile must
         // now show the rumour has been explored.
-        updates.appendChild(newTile.toXMLElement(player, doc, false, false));
+        update.appendChild(newTile.toXMLElement(player, doc, false, false));
 
-        // Add on optional parts.
-        if (addMessages != null) reply.appendChild(addMessages);
-        if (addHistory != null) reply.appendChild(addHistory);
-        if (remove != null) reply.appendChild(remove);
+        // Add on the parts.
+        reply.appendChild(update);
+        if (addMessages.hasChildNodes()) reply.appendChild(addMessages);
+        if (addHistory.hasChildNodes()) reply.appendChild(addHistory);
+        if (remove.hasChildNodes()) reply.appendChild(remove);
         return reply;
     }
 

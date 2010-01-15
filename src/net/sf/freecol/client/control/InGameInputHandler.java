@@ -31,6 +31,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.animation.Animations;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChooseFoundingFatherDialog;
@@ -83,6 +84,8 @@ public final class InGameInputHandler extends InputHandler {
 
     private static final Logger logger = Logger.getLogger(InGameInputHandler.class.getName());
 
+    private Unit lastAnimatedUnit = null;
+
     /**
      * The constructor to use.
      * 
@@ -113,8 +116,8 @@ public final class InGameInputHandler extends InputHandler {
                 reply = update(element);
             } else if (type.equals("remove")) {
                 reply = remove(element);
-            } else if (type.equals("opponentMove")) {
-                reply = opponentMove(element);
+            } else if (type.equals("animateMove")) {
+                reply = animateMove(element);
             } else if (type.equals("opponentAttack")) {
                 reply = opponentAttack(element);
             } else if (type.equals("setCurrentPlayer")) {
@@ -250,42 +253,55 @@ public final class InGameInputHandler extends InputHandler {
     }
 
     /**
-     * Handles an "opponentMove"-message.
-     * This now only performs the animation if any.  The real move
-     * happens in an update.
+     * Handles an "animateMove"-message.
+     * This only performs animation, if required.  It does not actually
+     * change unit positions, which happens in an "update".
      * 
      * @param element An element (root element in a DOM-parsed XML tree)
      *                that holds attributes for the old and new tiles and
      *                an element for the unit that is moving (which are
      *                used solely to operate the animation).
      */
-    private Element opponentMove(Element element) {
-        FreeColClient freeColClient = getFreeColClient();
-        String key = ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
-        if (freeColClient.getClientOptions().getInteger(key) > 0) {
-            Game game = getGame();
-            String unitId = element.getAttribute("unit");
-            Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
-            if (unit == null) {
-                unit = new Unit(game, (Element) element.getFirstChild());
+    private Element animateMove(Element element) {
+        FreeColClient client = getFreeColClient();
+        Game game = getGame();
+        String unitId = element.getAttribute("unit");
+        Unit unit = (Unit) game.getFreeColGameObjectSafely(unitId);
+        if (unit == null) {
+            if (element.getFirstChild() == null) {
+                throw new IllegalStateException("Unit " + unitId
+                                                + " wrongly omitted from animateMove");
             }
+            unit = new Unit(game, (Element) element.getFirstChild());
+        }
+        ClientOptions options = client.getClientOptions();
+        boolean ourUnit = unit.getOwner() == client.getMyPlayer();
+        String key = (ourUnit) ? ClientOptions.MOVE_ANIMATION_SPEED
+            : ClientOptions.ENEMY_MOVE_ANIMATION_SPEED;
+        if (!client.isHeadless() && options.getInteger(key) > 0) {
             String oldTileId = element.getAttribute("oldTile");
             Tile oldTile = (Tile) game.getFreeColGameObjectSafely(oldTileId);
             String newTileId = element.getAttribute("newTile");
             Tile newTile = (Tile) game.getFreeColGameObjectSafely(newTileId);
             if (newTile == null || oldTile == null || unit == null) {
-                throw new IllegalStateException("opponentMove"
+                throw new IllegalStateException("animateMove"
                                                 + ((unit == null) ? ": null unit" : "")
                                                 + ((oldTile == null) ? ": null oldTile" : "")
                                                 + ((newTile == null) ? ": null newTile" : "")
                                                 );
             }
+
+            // All is well, queue the animation.
+            // Use lastAnimatedUnit as a filter to avoid excessive refocussing.
             try {
-                new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile).invokeAndWait();
-            } catch (InvocationTargetException exception) {
+                new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile,
+                                                     unit != lastAnimatedUnit)
+                    .invokeSpecial(client.getCanvas());
+            } catch (Exception exception) {
                 logger.warning("UnitMoveAnimationCanvasSwingTask raised "
                                + exception.toString());
             }
+            lastAnimatedUnit = unit;
         }
         return null;
     }
@@ -1423,13 +1439,31 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected void doWork(Canvas canvas) {
-            if (_focus) {
-                canvas.getGUI().setFocusImmediately(_sourceTile.getPosition());
+            GUI gui = canvas.getGUI();
+            if (_focus || !gui.onScreen(_sourceTile.getPosition())) {
+                gui.setFocusImmediately(_sourceTile.getPosition());
             }
             Animations.unitMove(canvas, _unit, _sourceTile, _destinationTile);
             canvas.refresh();
         }
-   }
+
+        /*
+         * Movement animations can be required from both within the
+         * EventDispatchThread (when the client controller calls
+         * InGameInputHandler.handle() with replies to its requests to
+         * the server), and from outside of the thread when handling
+         * other player moves.  The former case must be done right
+         * now, the latter needs to be queued and waited for.
+         */
+        public void invokeSpecial(Canvas canvas)
+            throws InvocationTargetException {
+            if (SwingUtilities.isEventDispatchThread()) {
+                doWork(canvas);
+            } else {
+                this.invokeAndWait();
+            }
+        }
+    }
     
     /**
      * This task reconnects to the server.
