@@ -80,7 +80,6 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
 
         comboBox = new JComboBox(values);
         comboBox.setEditable(true);
-        comboBox.addActionListener(this);
 
         ok = new JButton(Messages.message("ok"));
         enterPressesWhenFocused(ok);
@@ -117,15 +116,17 @@ public final class SelectAmountDialog extends FreeColDialog<Integer> implements 
      * @param event The incoming action event
      */
     public void actionPerformed(ActionEvent event) {
-        Object item = comboBox.getSelectedItem();
-        if (item instanceof Integer) {
-            setResponse((Integer) item);
-        } else if (item instanceof String) {
-            try {
-                setResponse(Integer.valueOf((String) item));
-            } catch (NumberFormatException e) {
-                // do nothing
-            }
-        }
+    	if(OK.equals(event.getActionCommand())){
+    		Object item = comboBox.getSelectedItem();
+    		if (item instanceof Integer) {
+    			setResponse((Integer) item);
+    		} else if (item instanceof String) {
+    			try {
+    				setResponse(Integer.valueOf((String) item));
+    			} catch (NumberFormatException e) {
+    				// do nothing
+    			}
+    		}
+    	}
     }
 }
