@@ -141,6 +141,13 @@ public final class Canvas extends JDesktopPane {
 
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
 
+    public static enum PopupPosition {
+        ORIGIN,
+        CENTERED,
+        CENTERED_LEFT,
+        CENTERED_RIGHT,
+    }
+
     public static enum ScoutAction {
         CANCEL,
         INDIAN_SETTLEMENT_SPEAK,
@@ -362,8 +369,7 @@ public final class Canvas extends JDesktopPane {
 
         if (game != null && player != null) {
             startGamePanel.initialize(singlePlayerMode);
-            addAsFrame(startGamePanel);
-            startGamePanel.requestFocus();
+            showSubPanel(startGamePanel);
         } else {
             logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
         }
@@ -382,8 +388,7 @@ public final class Canvas extends JDesktopPane {
         closeMenus();
 
         serverListPanel.initialize(username, serverList);
-        addAsFrame(serverListPanel);
-        serverListPanel.requestFocus();
+        showSubPanel(serverListPanel);
     }
 
     /**
@@ -394,12 +399,7 @@ public final class Canvas extends JDesktopPane {
     public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
         NegotiationDialog negotiationDialog = new NegotiationDialog(this, unit, settlement, agreement);
         negotiationDialog.initialize();
-
-        // TODO: Not a standard dialog, special treatment for now.
-        addAsFrame(negotiationDialog);
-        DiplomaticTrade offer = (DiplomaticTrade) negotiationDialog.getResponse();
-        remove(negotiationDialog);
-        return offer;
+        return showFreeColDialog(negotiationDialog, unit.getTile());
     }
 
     /**
@@ -409,8 +409,7 @@ public final class Canvas extends JDesktopPane {
      */
     public void showPanel(FreeColPanel panel) {
         closeMenus();
-        addAsFrame(panel);
-        panel.requestFocus();
+        showSubPanel(panel);
     }
 
     /**
@@ -421,7 +420,8 @@ public final class Canvas extends JDesktopPane {
      */
     public void showPanel(FreeColPanel panel, boolean centered) {
         closeMenus();
-        addAsFrame(panel, false, centered);
+        addAsFrame(panel, false, (centered) ? PopupPosition.CENTERED
+                   : PopupPosition.ORIGIN);
         panel.requestFocus();
     }
 
@@ -435,6 +435,16 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Displays a <code>FreeColPanel</code> at a generalized position.
+     *
+     * @param popupPosition The generalized position to place the panel.
+     */
+    public void showSubPanel(FreeColPanel panel, PopupPosition popupPosition) {
+        addAsFrame(panel, false, popupPosition);
+        panel.requestFocus();
+    }
+
+    /**
      * Displays the <code>ChatPanel</code>.
      * 
      * @see ChatPanel
@@ -442,14 +452,12 @@ public final class Canvas extends JDesktopPane {
     // TODO: does it have state, or can we create a new one?
     public void showChatPanel() {
     	
-    	// in single player, no chat available
-    	if(freeColClient.isSingleplayer()){
-    		return;
-    	}
+        // in single player, no chat available
+        if (freeColClient.isSingleplayer()) {
+            return;
+        }
     	
-        closeMenus();
-        addAsFrame(chatPanel);
-        chatPanel.requestFocus();
+        showPanel(chatPanel);
     }
 
     /**
@@ -501,11 +509,11 @@ public final class Canvas extends JDesktopPane {
 
             FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(messageText, messageIcon, okText,
                     cancelText);
-            addAsFrame(confirmDialog);
-            confirmDialog.requestFocus();
-
-            if (!confirmDialog.getResponse()) {
-                remove(confirmDialog);
+            if (showFreeColDialog(confirmDialog)) {
+                if (!isShowingSubPanel()) {
+                    freeColClient.getInGameController().nextModelMessage();
+                }
+            } else {
                 if (source instanceof Europe) {
                     showEuropePanel();
                 } else if (source instanceof Colony) {
@@ -513,20 +521,10 @@ public final class Canvas extends JDesktopPane {
                 } else if (source instanceof WorkLocation) {
                     showColonyPanel(((WorkLocation) source).getColony());
                 }
-            } else {
-                remove(confirmDialog);
-                if (!isShowingSubPanel()) {
-                    freeColClient.getInGameController().nextModelMessage();
-                }
             }
         } else {
-            InformationDialog informationDialog = new InformationDialog(this, messageText, messageIcon);
-            addAsFrame(informationDialog);
-            informationDialog.requestFocus();
-
-            informationDialog.getResponse();
-            remove(informationDialog);
-
+            showFreeColDialog(new InformationDialog(this,
+                                                    messageText, messageIcon));
             if (!isShowingSubPanel()) {
                 freeColClient.getInGameController().nextModelMessage();
             }
@@ -594,20 +592,38 @@ public final class Canvas extends JDesktopPane {
      * Displays the given dialog.
      * 
      * @param freeColDialog The dialog to be displayed
-     * @return The {@link FreeColDialog#getResponse reponse} returned by the dialog.
+     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     *         the dialog.
      */
     public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog) {
-        addAsFrame(freeColDialog);
-        freeColDialog.requestFocus();
+        return showFreeColDialog(freeColDialog, null);
+    }
+
+    /**
+     * Displays the given dialog, making sure a tile is visible.
+     *
+     * @param freeColDialog The dialog to be displayed
+     * @param tile A <code>Tile</code> to make visible (not under the dialog!)
+     * @return The {@link FreeColDialog#getResponse reponse} returned by
+     *         the dialog.
+     */
+    public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile) {
+        PopupPosition popupPosition = PopupPosition.CENTERED;
+        if (tile != null) {
+            int where = gui.setOffsetFocus(tile.getPosition());
+            popupPosition = (where > 0) ? PopupPosition.CENTERED_LEFT
+                : (where < 0) ? PopupPosition.CENTERED_RIGHT
+                : PopupPosition.CENTERED;
+        }
+        showSubPanel(freeColDialog, popupPosition);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
-
         return response;
     }
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
-     * 
+     *
      * @param text The text that explains the choice for the user.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
@@ -617,24 +633,20 @@ public final class Canvas extends JDesktopPane {
      *         otherwise.
      * @see FreeColDialog
      */
-    public boolean showConfirmDialog(String text, String okText, String cancelText, String... replace) {
+    public boolean showConfirmDialog(String text,
+                                     String okText, String cancelText,
+                                     String... replace) {
         try {
             text = Messages.message(text, replace);
             okText = Messages.message(okText);
             cancelText = Messages.message(cancelText);
         } catch (MissingResourceException e) {
-            logger.warning("could not find message with id: " + text + ", " + okText + " or " + cancelText + ".");
+            logger.warning("could not find message with id: " + text
+                           + ", " + okText + " or " + cancelText + ".");
         }
-
-        FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(text, okText, cancelText);
-        addAsFrame(confirmDialog);
-        confirmDialog.requestFocus();
-
-        boolean response = confirmDialog.getResponse();
-
-        remove(confirmDialog);
-
-        return response;
+        return showFreeColDialog(FreeColDialog.createConfirmDialog(text,
+                                                                   okText,
+                                                                   cancelText));
     }
 
     /**
@@ -672,14 +684,7 @@ public final class Canvas extends JDesktopPane {
         }
 
         FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(texts, images, okText, cancelText);
-        addAsFrame(confirmDialog);
-        confirmDialog.requestFocus();
-
-        boolean response = confirmDialog.getResponse();
-
-        remove(confirmDialog);
-
-        return response;
+        return showFreeColDialog(confirmDialog);
     }
 
     /**
@@ -752,14 +757,7 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
         loadingSavegameDialog.initialize(publicServer, singleplayer);
-
-        addAsFrame(loadingSavegameDialog);
-        loadingSavegameDialog.requestFocus();
-
-        boolean r = loadingSavegameDialog.getResponse();
-        remove(loadingSavegameDialog);
-
-        return r;
+        return showFreeColDialog(loadingSavegameDialog);
     }
 
     /**
@@ -770,15 +768,10 @@ public final class Canvas extends JDesktopPane {
      */
     public boolean showClientOptionsDialog() {
         clientOptionsDialog.initialize();
-
         clientOptionsDialogShowing = true;
-        addAsFrame(clientOptionsDialog);
-        clientOptionsDialog.requestFocus();
-        boolean r = clientOptionsDialog.getResponse();
-        remove(clientOptionsDialog);
+        boolean r = showFreeColDialog(clientOptionsDialog);
         clientOptionsDialogShowing = false;
         freeColClient.getActionManager().update();
-
         return r;
     }
 
@@ -806,13 +799,7 @@ public final class Canvas extends JDesktopPane {
     public boolean showMapGeneratorOptionsDialog(boolean editable, MapGeneratorOptions mgo) {
         MapGeneratorOptionsDialog mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this);
         mapGeneratorOptionsDialog.initialize(editable, mgo);
-
-        addAsFrame(mapGeneratorOptionsDialog);
-        mapGeneratorOptionsDialog.requestFocus();
-        boolean r = mapGeneratorOptionsDialog.getResponse();
-        remove(mapGeneratorOptionsDialog);
-
-        return r;
+        return showFreeColDialog(mapGeneratorOptionsDialog);
     }
 
     /**
@@ -845,16 +832,13 @@ public final class Canvas extends JDesktopPane {
     public File showLoadDialog(File directory, FileFilter[] fileFilters) {
         FreeColDialog<File> loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
 
-        addAsFrame(loadDialog);
-        loadDialog.requestFocus();
-
-        File response = (File) loadDialog.getResponse();
-
-        while (response != null && !response.isFile()) {
-            errorMessage("noSuchFile");
+        File response = null;
+        showSubPanel(loadDialog);
+        for (;;) {
             response = (File) loadDialog.getResponse();
+            if (response != null && response.isFile()) break;
+            errorMessage("noSuchFile");
         }
-
         remove(loadDialog);
 
         return response;
@@ -894,14 +878,7 @@ public final class Canvas extends JDesktopPane {
      */
     public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
         FreeColDialog<File> saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters, defaultName);
-        addAsFrame(saveDialog);
-        saveDialog.requestFocus();
-
-        File response = (File) saveDialog.getResponse();
-
-        remove(saveDialog);
-
-        return response;
+        return showFreeColDialog(saveDialog);
     }
 
     /**
@@ -927,10 +904,7 @@ public final class Canvas extends JDesktopPane {
                                                  "%europe%", europe.getName(),
                                                  "%amount%", String.valueOf(arrears)),
                                 null, choices);
-        addAsFrame(boycottedGoodsDialog);
-        ChoiceItem<BoycottAction> response = boycottedGoodsDialog.getResponse();
-        remove(boycottedGoodsDialog);
-        return response.getObject();
+        return showFreeColDialog(boycottedGoodsDialog).getObject();
     }
 
     /**
@@ -980,19 +954,9 @@ public final class Canvas extends JDesktopPane {
                                                 ScoutAction.INDIAN_SETTLEMENT_ATTACK));
         choices.add(new ChoiceItem<ScoutAction>(Messages.message("cancel"),
                                                 ScoutAction.CANCEL));    
-        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog = 
-            FreeColDialog.createChoiceDialog(text.toString(), null, choices);
-
-
-        addAsFrame(scoutDialog);
-        scoutDialog.requestFocus();
-
-        ChoiceItem<ScoutAction> responseItem = scoutDialog.getResponse();
-        ScoutAction response = responseItem.getObject();
-
-        remove(scoutDialog);
-
-        return response;
+        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog
+            = FreeColDialog.createChoiceDialog(text.toString(), null, choices);
+        return showFreeColDialog(scoutDialog, settlement.getTile()).getObject();
     }
 
     /**
@@ -1028,15 +992,7 @@ public final class Canvas extends JDesktopPane {
                                                 ScoutAction.CANCEL));
         FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog =
             FreeColDialog.createChoiceDialog(mainText, null, choices);
-        addAsFrame(scoutDialog);
-        scoutDialog.requestFocus();
-
-        ChoiceItem<ScoutAction> responseItem = scoutDialog.getResponse();
-        ScoutAction response = responseItem.getObject();
-
-        remove(scoutDialog);
-
-        return response;
+        return showFreeColDialog(scoutDialog, colony.getTile()).getObject();
     }
 
     /**
@@ -1065,15 +1021,7 @@ public final class Canvas extends JDesktopPane {
                                                 ScoutAction.CANCEL));
         FreeColDialog<ChoiceItem<ScoutAction>> armedUnitDialog =
             FreeColDialog.createChoiceDialog(introText, null, choices);
-        addAsFrame(armedUnitDialog);
-        armedUnitDialog.requestFocus();
-
-        ChoiceItem<ScoutAction> responseItem = armedUnitDialog.getResponse();
-        ScoutAction response = responseItem.getObject();
-
-        remove(armedUnitDialog);
-
-        return response;
+        return showFreeColDialog(armedUnitDialog, settlement.getTile()).getObject();
     }
 
     /**
@@ -1115,18 +1063,12 @@ public final class Canvas extends JDesktopPane {
                                                      MissionaryAction.INCITE_INDIANS));
         choices.add(new ChoiceItem<MissionaryAction>(Messages.message("cancel"),
                                                      MissionaryAction.CANCEL));
-        FreeColDialog<ChoiceItem<MissionaryAction>> missionaryDialog;
-        missionaryDialog = FreeColDialog.createChoiceDialog(introText.toString(), null, choices);
-        addAsFrame(missionaryDialog);
-        missionaryDialog.requestFocus();
-
-        ChoiceItem<MissionaryAction> responseItem = missionaryDialog.getResponse();
-        MissionaryAction response = responseItem.getObject();
+        FreeColDialog<ChoiceItem<MissionaryAction>> missionaryDialog
+            = FreeColDialog.createChoiceDialog(introText.toString(), null, choices);
+        MissionaryAction response = showFreeColDialog(missionaryDialog, settlement.getTile()).getObject();
         ArrayList<Object> returnValue = new ArrayList<Object>();
         // TODO: Find a solution so that we can use a more specialized list.
         returnValue.add(response);
-
-        remove(missionaryDialog);
 
         if (MissionaryAction.INCITE_INDIANS.equals(response)) {
             List<Player> enemies = new ArrayList<Player>(freeColClient.getGame().getEuropeanPlayers());
@@ -1167,11 +1109,7 @@ public final class Canvas extends JDesktopPane {
 
         FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(message, Messages.message("yes"), Messages
                 .message("no"));
-        addAsFrame(confirmDialog);
-        confirmDialog.requestFocus();
-        boolean result = confirmDialog.getResponse();
-        remove(confirmDialog);
-        return result;
+        return showFreeColDialog(confirmDialog);
     }
 
     /**
@@ -1218,8 +1156,7 @@ public final class Canvas extends JDesktopPane {
         }
 
         FreeColDialog<String> inputDialog = FreeColDialog.createInputDialog(text, defaultValue, okText, cancelText);
-        addAsFrame(inputDialog);
-        inputDialog.requestFocus();
+        showSubPanel(inputDialog);
 
         String response = (String) inputDialog.getResponse();
 
@@ -1233,19 +1170,11 @@ public final class Canvas extends JDesktopPane {
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + txt + " or " + okTxt + ".");
             }
-
-            InformationDialog informationDialog = new InformationDialog(this, txt, null);
-
             remove(inputDialog);
-            addAsFrame(informationDialog);
-            informationDialog.requestFocus();
 
-            informationDialog.getResponse();
-            remove(informationDialog);
+            showFreeColDialog(new InformationDialog(this, txt, null));
 
-            addAsFrame(inputDialog);
-            inputDialog.requestFocus();
-
+            showSubPanel(inputDialog);
             response = (String) inputDialog.getResponse();
         }
 
@@ -1270,12 +1199,7 @@ public final class Canvas extends JDesktopPane {
         if (choiceDialog.getHeight() > getHeight() / 3) {
             choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
         }
-        addAsFrame(choiceDialog);
-        choiceDialog.requestFocus();
-
-        ChoiceItem<T> response = choiceDialog.getResponse();
-        remove(choiceDialog);
-
+        ChoiceItem<T> response = showFreeColDialog(choiceDialog);
         return (response == null) ? null : response.getObject();
     }
 
@@ -1380,12 +1304,8 @@ public final class Canvas extends JDesktopPane {
         localDialog.initialize();
         europeOpenDialog = localDialog; // Set the open dialog to the class variable
         
-        addAsFrame(localDialog);
-        localDialog.requestFocus();
+        int response = showFreeColDialog(localDialog);
 
-        int response = localDialog.getResponse();
-
-        remove(localDialog);
         if (europeOpenDialog == localDialog) {
             europeOpenDialog = null;    // Clear class variable when it's closed
         }
@@ -1402,8 +1322,7 @@ public final class Canvas extends JDesktopPane {
     public void showColonyPanel(Colony colony) {
         freeColClient.getGUI().stopBlinking();
         ColonyPanel colonyPanel = new ColonyPanel(colony, this);
-        addAsFrame(colonyPanel);
-        colonyPanel.requestFocus();
+        showSubPanel(colonyPanel);
     }
 
     /**
@@ -1451,15 +1370,7 @@ public final class Canvas extends JDesktopPane {
     public int showEmigrationPanel(boolean fountainOfYouth) {
         EmigrationPanel emigrationPanel = new EmigrationPanel(this);
         emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope(), fountainOfYouth);
-
-        addAsFrame(emigrationPanel);
-        emigrationPanel.requestFocus();
-
-        int response = emigrationPanel.getResponse();
-
-        remove(emigrationPanel);
-
-        return response;
+        return showFreeColDialog(emigrationPanel);
     }
 
     /**
@@ -1588,7 +1499,7 @@ public final class Canvas extends JDesktopPane {
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     private JInternalFrame addAsFrame(JComponent comp, boolean toolBox) {
-        return addAsFrame(comp, toolBox, true);
+        return addAsFrame(comp, toolBox, PopupPosition.CENTERED);
     }
 
     /**
@@ -1602,7 +1513,7 @@ public final class Canvas extends JDesktopPane {
      * @param centered a <code>boolean</code> value
      * @return The <code>JInternalFrame</code> that was created and added.
      */
-    private JInternalFrame addAsFrame(JComponent comp, boolean toolBox, boolean centered) {
+    private JInternalFrame addAsFrame(JComponent comp, boolean toolBox, PopupPosition popupPosition) {
         final int FRAME_EMPTY_SPACE = 60;
 
         final JInternalFrame f = (toolBox) ? new ToolBoxFrame() : new JInternalFrame();
@@ -1646,12 +1557,25 @@ public final class Canvas extends JDesktopPane {
             height = Math.min(height, getHeight());
         }
         f.setSize(width, height);
-        if (centered) {
-            addCentered(f, MODAL_LAYER);
-        } else {
+        switch (popupPosition) {
+        case CENTERED:
+            f.setLocation((getWidth() - f.getWidth()) / 2,
+                         (getHeight() - f.getHeight()) / 2);
+            break;
+        case CENTERED_LEFT:
+            f.setLocation((getWidth() - f.getWidth()) / 4,
+                          (getHeight() - f.getHeight()) / 2);
+            break;
+        case CENTERED_RIGHT:
+            f.setLocation(((getWidth() - f.getWidth()) * 3) / 4,
+                          (getHeight() - f.getHeight()) / 2);
+            break;
+        case ORIGIN:
+        default:
             f.setLocation(0, 0);
-            add(f, MODAL_LAYER);
+            break;
         }
+        add(f, MODAL_LAYER);
         f.setName(comp.getClass().getSimpleName());
 
         f.setFrameIcon(null);
@@ -1865,12 +1789,8 @@ public final class Canvas extends JDesktopPane {
         }
 
         ErrorPanel errorPanel = new ErrorPanel(this);
-
         errorPanel.initialize(message);
-        addAsFrame(errorPanel);
-        errorPanel.requestFocus();
-        errorPanel.getResponse();
-        remove(errorPanel);
+        showFreeColDialog(errorPanel);
     }
 
     /**
@@ -1934,13 +1854,7 @@ public final class Canvas extends JDesktopPane {
         if (displayObject != null) {
             icon = getImageIcon(displayObject, false);
         }
-        InformationDialog infoDialog = new InformationDialog(this, text, icon);
-        addAsFrame(infoDialog);
-        infoDialog.requestFocus();
-
-        infoDialog.getResponse();
-
-        remove(infoDialog);
+        showFreeColDialog(new InformationDialog(this, text, icon));
     }
 
     /**
@@ -2122,7 +2036,8 @@ public final class Canvas extends JDesktopPane {
      * order to get a "Are you sure"-confirmation from the user.
      */
     public void retire() {
-        if (showConfirmDialog("retireDialog.areYouSure.text", "ok", "cancel")) {
+        if (showConfirmDialog("retireDialog.areYouSure.text",
+                              "ok", "cancel")) {
             if (freeColClient.retire()) {
                 showPanel(new ReportHighScoresPanel(this));
             }
@@ -2224,7 +2139,8 @@ public final class Canvas extends JDesktopPane {
      * shows the new game panel.
      */
     public void newGame() {
-        if (!showConfirmDialog("stopCurrentGame.text", "stopCurrentGame.yes", "stopCurrentGame.no")) {
+        if (!showConfirmDialog("stopCurrentGame.text",
+                               "stopCurrentGame.yes", "stopCurrentGame.no")) {
             return;
         }
 

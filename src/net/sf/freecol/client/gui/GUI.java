@@ -831,6 +831,37 @@ public final class GUI {
     }
 
     /**
+     * Sets the focus of the map but offset to the left or right so that
+     * the focus position can still be visible when a popup is raised.
+     * If successful, the supplied position will either be at the center of
+     * the left or right half of the map.
+     *
+     * @param tilePos The <code>Position</code> of a tile of the
+     *                displayed map.
+     * @return Positive if the focus is on the right hand side, negative
+     *         if on the left, zero on failure.
+     * @see #getFocus
+     */
+    public int setOffsetFocus(Position tilePos) {
+        int where = 0;
+        if (tilePos != null) {
+            positionMap(tilePos);
+            Map map = freeColClient.getGame().getMap();
+            if (leftColumn == 0) {
+                where = -1; // At left edge already
+            } else if (rightColumn == map.getWidth() - 1) {
+                where = 1; // At right edge already
+            } else { // Move focus left 1/4 screen
+                int x = tilePos.getX() - (tilePos.getX() - leftColumn) / 2;
+                tilePos = new Position(x, tilePos.getY());
+                where = 1;
+            }
+            setFocus(tilePos);
+        }
+        return where;
+    }
+
+    /**
     * Sets the focus of the map and repaints the screen immediately.
     *
     * @param focus The <code>Position</code> of the center tile of the
@@ -1061,14 +1092,20 @@ public final class GUI {
      * displayed at the center.
      */
     private void positionMap() {
-        Game gameData = freeColClient.getGame();
+        if (focus != null) positionMap(focus);
+    }
 
-        if (focus == null) {
-            return;
-        }
+    /**
+     * Position the map so that the supplied location is
+     * displayed at the center.
+     *
+     * @param pos The position to center at.
+     */
+    private void positionMap(Position pos) {
+        Game gameData = freeColClient.getGame();
         
-        int x = focus.getX(),
-            y = focus.getY();
+        int x = pos.getX(),
+            y = pos.getY();
         int leftColumns = getLeftColumns(),
             rightColumns = getRightColumns();
 
