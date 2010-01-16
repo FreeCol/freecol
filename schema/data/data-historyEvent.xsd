@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation>
+        
+Copyright (C) 2002-2007 The FreeCol Team
+
+This file is part of FreeCol.
+
+FreeCol is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+FreeCol is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FreeCol. If not, see http://www.gnu.org/licenses
+ 		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="data-common.xsd" />
+
+	<xs:element name="historyEvent">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="strings">
+					<xs:complexType>
+						<xs:attribute name="xLength" type="xs:int" use="required"></xs:attribute>
+						<xs:anyAttribute namespace="##local"></xs:anyAttribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="id" type="xs:string" use="required"></xs:attribute>
+			<xs:attribute name="turn" type="xs:int" use="required"></xs:attribute>
+			<xs:attribute name="type" type="HistoryEventType" use="required"></xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="HistoryEventType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="DISCOVER_NEW_WORLD" />
+			<xs:enumeration value="DISCOVER_REGION" />
+			<xs:enumeration value="MEET_NATION" />
+			<xs:enumeration value="CITY_OF_GOLD" />
+			<xs:enumeration value="FOUND_COLONY" />
+			<xs:enumeration value="ABANDON_COLONY" />
+			<xs:enumeration value="CONQUER_COLONY" />
+			<xs:enumeration value="COLONY_DESTROYED" />
+			<xs:enumeration value="COLONY_CONQUERED" />
+			<xs:enumeration value="DESTROY_SETTLEMENT" />
+			<xs:enumeration value="DESTROY_NATION" />
+			<xs:enumeration value="FOUNDING_FATHER" />
+			<xs:enumeration value="DECLARE_INDEPENDENCE" />
+			<xs:enumeration value="INDEPENDENCE" />
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>

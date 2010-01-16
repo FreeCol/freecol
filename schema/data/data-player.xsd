@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation>
+Copyright (C) 2002-2007 The FreeCol Team
+
+This file is part of FreeCol.
+
+FreeCol is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+FreeCol is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FreeCol. If not, see http://www.gnu.org/licenses
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="data-common.xsd" />
+	<xs:include schemaLocation="data-historyEvent.xsd" />
+	<xs:include schemaLocation="data-unit.xsd" />
+	<xs:include schemaLocation="data-market.xsd" />
+	<xs:include schemaLocation="data-monarch.xsd" />
+    <xs:include schemaLocation="data-europe.xsd" />
+    <xs:include schemaLocation="data-tradeRoute.xsd" />
+
+	<xs:element name="player">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="tension">
+					<xs:complexType>
+						<xs:attribute name="player" type="xs:string" use="required"></xs:attribute>
+						<xs:attribute name="value" type="xs:int" use="optional"
+							default="0"></xs:attribute>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="foundingFathers">
+					<xs:complexType>
+						<xs:attribute name="xLength" use="required">
+							<xs:annotation>
+								<xs:documentation>Element count</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+
+						<xs:anyAttribute namespace="##local">
+							<xs:annotation>
+								<xs:documentation>
+									ID of father with the names "x0", "x1", "x2"
+									etc.
+                                </xs:documentation>
+							</xs:annotation>
+						</xs:anyAttribute>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="stance">
+					<xs:complexType>
+						<xs:attribute name="player" type="xs:string" use="required"></xs:attribute>
+						<xs:attribute name="value" type="PlayerStance" use="required"></xs:attribute>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element ref="europe"/>
+				<xs:element ref="monarch" />
+				<xs:element ref="historyEvent" />
+				<xs:element ref="tradeRoute"/>
+				<xs:element ref="market" />
+
+			</xs:choice>
+
+			<xs:attribute name="ID" type="object-id" use="required"></xs:attribute>
+			<xs:attribute name="index" type="xs:int" use="required"></xs:attribute>
+			<xs:attribute name="username" type="xs:string" use="required"></xs:attribute>
+			<xs:attribute name="nationID" type="xs:string" use="required"></xs:attribute>
+			<xs:attribute name="nationType" type="xs:string" use="optional"></xs:attribute>
+			<xs:attribute name="color" type="xs:int" use="required"></xs:attribute>
+
+			<xs:attribute name="admin" type="xs:boolean" use="optional"
+				default="false"></xs:attribute>
+			<xs:attribute name="gold" type="xs:int" use="required"></xs:attribute>
+			<xs:attribute name="crosses" type="xs:int" use="required"></xs:attribute>
+			<xs:attribute name="bells" type="xs:int" use="required"></xs:attribute>
+			<xs:attribute name="oldSoL" type="xs:int" use="optional"
+				default="0"></xs:attribute>
+			<xs:attribute name="score" type="xs:int" use="optional"
+				default="0"></xs:attribute>
+
+			<xs:attribute name="ready" type="xs:boolean" use="optional"
+				default="false"></xs:attribute>
+			<xs:attribute name="ai" type="xs:boolean" use="optional"
+				default="false"></xs:attribute>
+			<xs:attribute name="dead" type="xs:boolean" use="optional"
+				default="false"></xs:attribute>
+
+			<xs:attribute name="tax" type="xs:int" use="required"></xs:attribute>
+			<xs:attribute name="numberOfSettlements" type="xs:int"
+				use="optional" default="0"></xs:attribute>
+			<xs:attribute name="playerType" type="PlayerType" use="required"></xs:attribute>
+
+			<xs:attribute name="coressesRequired" type="xs:int" use="optional"
+				default="12"></xs:attribute>
+
+			<xs:attribute name="newLandName" type="xs:string" use="optional"></xs:attribute>
+			<xs:attribute name="independentNationName" type="xs:string"
+				use="optional"></xs:attribute>
+
+			<xs:attribute name="attackedByPrivateers" type="xs:boolean"
+				use="optional" default="false"></xs:attribute>
+			<xs:attribute name="entryLocation" type="xs:string" use="optional"></xs:attribute>
+
+
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:simpleType name="PlayerType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="NATIVE" />
+			<xs:enumeration value="COLONIAL" />
+			<xs:enumeration value="REBEL" />
+			<xs:enumeration value="INDEPENDENT" />
+			<xs:enumeration value="ROYAL" />
+			<xs:enumeration value="UNDEAD" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PlayerStance">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="WAR" />
+			<xs:enumeration value="CEASE_FIRE" />
+			<xs:enumeration value="PEACE" />
+			<xs:enumeration value="ALLIANCE" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

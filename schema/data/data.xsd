@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation>
+        
+Copyright (C) 2002-2007 The FreeCol Team
+
+This file is part of FreeCol.
+
+FreeCol is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+FreeCol is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FreeCol. If not, see http://www.gnu.org/licenses
+ 		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="data-common.xsd" />
+
+    <xs:include schemaLocation="data-building.xsd" />
+    <xs:include schemaLocation="data-colony.xsd" />
+    <xs:include schemaLocation="data-colonyTile.xsd" />
+    <xs:include schemaLocation="data-equipment.xsd" />
+    <xs:include schemaLocation="data-europe.xsd" />
+    <xs:include schemaLocation="data-exportData.xsd" />
+    <xs:include schemaLocation="data-goods.xsd" />
+    <xs:include schemaLocation="data-goodsContainer.xsd" />
+    <xs:include schemaLocation="data-historyEvent.xsd" />
+    <xs:include schemaLocation="data-indianSettlement.xsd" />
+    <xs:include schemaLocation="data-market.xsd" />
+    <xs:include schemaLocation="data-modifier.xsd" />
+    <xs:include schemaLocation="data-monarch.xsd" />
+    <xs:include schemaLocation="data-player.xsd" />
+    <xs:include schemaLocation="data-playerExploredTile.xsd" />
+    <xs:include schemaLocation="data-region.xsd" />
+    <xs:include schemaLocation="data-resource.xsd" />
+    <xs:include schemaLocation="data-template.xsd" />
+    <xs:include schemaLocation="data-tile.xsd" />
+    <xs:include schemaLocation="data-tileimprovement.xsd" />
+    <xs:include schemaLocation="data-tileitemcontainer.xsd" />
+    <xs:include schemaLocation="data-tradeRoute.xsd" />
+    <xs:include schemaLocation="data-unit.xsd" />
+
+</xs:schema>

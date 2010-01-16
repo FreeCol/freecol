@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation>
+        
+Copyright (C) 2002-2007 The FreeCol Team
+
+This file is part of FreeCol.
+
+FreeCol is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+FreeCol is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FreeCol. If not, see http://www.gnu.org/licenses
+         </xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="data-common.xsd">
+		<xs:annotation>
+			<xs:documentation>
+				Include common data model type definitions.
+            </xs:documentation>
+		</xs:annotation>
+	</xs:include>
+
+    <xs:include schemaLocation="data-goodsContainer.xsd"/>
+    <xs:include schemaLocation="data-equipment.xsd"/>
+    <xs:include schemaLocation="data-tileimprovement.xsd"/>
+
+	<xs:element name="unit" type="unitElementType">
+		<xs:annotation>
+			<xs:documentation>
+				Represents all pieces that can be moved on the
+				map-board. This includes: colonists, ships, wagon trains e.t.c.
+
+				Every Unit is owned by a Player and has a Location.
+            </xs:documentation>
+		</xs:annotation>
+
+	</xs:element>
+
+    <xs:element name="missionary" type="unitElementType">
+        <xs:annotation>
+            <xs:documentation>
+                Unit specialization used in Indian settlements.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+	<xs:complexType name="unitElementType">
+
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="goodsContainer"></xs:element>
+			<xs:element ref="equipment"></xs:element>
+			<xs:element ref="tileimprovement"></xs:element>
+		</xs:choice>
+
+		<xs:attribute name="ID" type="object-id" use="required">
+		</xs:attribute>
+		<xs:attribute name="name" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="unitType" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute name="movesLeft" type="xs:int" use="required"></xs:attribute>
+		<xs:attribute name="state" type="UnitState" use="required"></xs:attribute>
+		<xs:attribute name="role" type="UnitRole" use="required"></xs:attribute>
+		<xs:attribute name="owner" type="object-id" use="required"></xs:attribute>
+		<xs:attribute name="turnsOfTraining" type="xs:int" use="required"></xs:attribute>
+		<xs:attribute name="workType" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute name="experience" type="xs:int" use="required"></xs:attribute>
+		<xs:attribute name="treasureAmount" type="xs:int" use="required"></xs:attribute>
+		<xs:attribute name="hitpoints" type="xs:int" use="required"></xs:attribute>
+		<xs:attribute name="attrition" type="xs:int" use="required"></xs:attribute>
+		<xs:attribute name="student" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="teacher" type="xs:string" use="optional"></xs:attribute>
+
+		<xs:attribute name="indianSettlement" type="xs:string"
+			use="optional"></xs:attribute>
+		<xs:attribute name="workLeft" type="xs:integer" use="required"></xs:attribute>
+
+		<xs:attribute name="entryLocation" type="object-id" use="optional"></xs:attribute>
+		<xs:attribute name="location" type="object-id" use="optional"></xs:attribute>
+
+		<xs:attribute name="tradeRoute" type="object-id" use="optional"></xs:attribute>
+		<xs:attribute name="currentStop" type="xs:int" use="optional"></xs:attribute>
+
+		<xs:attribute name="visibleGoodsCount" type="xs:int" use="optional"></xs:attribute>
+
+	</xs:complexType>
+
+
+    <xs:simpleType name="UnitState">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="ACTIVE" />
+            <xs:enumeration value="FORTIFIED" />
+            <xs:enumeration value="SENTRY" />
+            <xs:enumeration value="IN_COLONY" />
+            <xs:enumeration value="IMPROVING" />
+            <xs:enumeration value="TO_EUROPE" />
+            <xs:enumeration value="IN_EUROPE" />
+            <xs:enumeration value="TO_AMERICA" />
+            <xs:enumeration value="FORTIFYING" />
+            <xs:enumeration value="SKIPPED" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="UnitRole">
+        <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="DEFAULT" />
+            <xs:enumeration value="PIONEER" />
+            <xs:enumeration value="MISSIONARY" />
+            <xs:enumeration value="SOLDIER" />
+            <xs:enumeration value="SCOUT" />
+            <xs:enumeration value="DRAGOON" />
+        </xs:restriction>
+    </xs:simpleType>
+
+
+</xs:schema>

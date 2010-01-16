@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation>
+        
+Copyright (C) 2002-2007 The FreeCol Team
+
+This file is part of FreeCol.
+
+FreeCol is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+FreeCol is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FreeCol. If not, see http://www.gnu.org/licenses
+ 		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="data-common.xsd" />
+
+	<xs:element name="region">
+		<xs:annotation>
+			<xs:documentation>Region reveal information</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="children">
+					<xs:complexType>
+						<xs:attribute name="xLength" type="xs:int" use="required"></xs:attribute>
+						<xs:anyAttribute namespace="##local">
+							<xs:annotation>
+								<xs:documentation>
+									Value enumeration x0, x1, x2, x3 etc.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:anyAttribute>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="ID" type="object-id" use="required">
+				<xs:annotation>
+					<xs:documentation>
+						Object ID
+                    </xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="nameKey" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>
+						Key used to retrieve description from Messages
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="claimable" type="xs:boolean" use="optional"
+				default="false">
+				<xs:annotation>
+					<xs:documentation>
+						Whether this Region is claimable. Ocean Regions
+						and non-leaf Regions
+						should not be claimable.
+                    </xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="discoverable" type="xs:boolean" use="optional"
+				default="false">
+				<xs:annotation>
+					<xs:documentation>
+						Whether this Region is discoverable. The Eastern
+						Ocean regions should not
+						be discoverable. In general, non-leaf
+						regions should not be
+						discoverable. The Pacific Ocean is an
+						exception, however.
+                    </xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="prediscovered" type="xs:boolean"
+				use="optional" default="false">
+				<xs:annotation>
+					<xs:documentation>
+						Whether the Region is already discovered when the
+						game starts.
+                    </xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="scoreValue" type="xs:int" use="optional"
+				default="0">
+				<xs:annotation>
+					<xs:documentation>
+						How much discovering this Region contributes to
+						your score. This
+						should be zero unless the Region is discoverable.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="type" type="RegionType" use="required">
+				<xs:annotation>
+					<xs:documentation>
+						Object ID
+                    </xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="discoveredIn" type="xs:int" use="optional"
+				default="-1">
+				<xs:annotation>
+					<xs:documentation>
+						Which Turn the Region was discovered in.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="discoveredBy" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>
+						Which Player the Region was discovered by.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="parent" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>
+						The parent Region of this Region.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:simpleType name="RegionType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="OCEAN" />
+			<xs:enumeration value="COAST" />
+			<xs:enumeration value="LAKE" />
+			<xs:enumeration value="RIVER" />
+			<xs:enumeration value="LAND" />
+			<xs:enumeration value="MOUNTAIN" />
+			<xs:enumeration value="DESERT" />
+		</xs:restriction>
+	</xs:simpleType>
+
+
+</xs:schema>

@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation>
+Copyright (C) 2002-2007 The FreeCol Team
+
+This file is part of FreeCol.
+
+FreeCol is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+FreeCol is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FreeCol. If not, see http://www.gnu.org/licenses
+ 		</xs:documentation>
+	</xs:annotation>
+
+	<xs:include schemaLocation="data-common.xsd" />
+	<xs:include schemaLocation="data-unit.xsd" />
+	<xs:include schemaLocation="data-resource.xsd" />
+
+	<xs:element name="playerExploredTile">
+		<xs:annotation>
+			<xs:documentation>
+				This class contains the data visible to a specific
+				player.
+            </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="missionary"></xs:element>
+				<xs:element ref="resource"></xs:element>
+				<xs:element ref="tileimprovement"></xs:element>
+			</xs:choice>
+			<xs:attribute name="player" type="object-id" use="required"></xs:attribute>
+			<xs:attribute name="explored" type="xs:boolean" use="optional"
+				default="true"></xs:attribute>
+			<xs:attribute name="colonyUnitCount" type="xs:int" use="optional"
+				default="0"></xs:attribute>
+			<xs:attribute name="colonyStockadeLevel" type="xs:int"
+				use="optional" default="0"></xs:attribute>
+			<xs:attribute name="lostCityRumour" type="xs:boolean"
+				use="optional"></xs:attribute>
+			<xs:attribute name="connected" type="xs:boolean" use="optional"
+				default="false"></xs:attribute>
+			<xs:attribute name="fishBonus" type="xs:int" use="optional"></xs:attribute>
+			<xs:attribute name="owner" type="xs:string" use="optional"></xs:attribute>
+			<xs:attribute name="region" type="xs:string" use="optional"></xs:attribute>
+			<xs:attribute name="settlementVisited" type="xs:boolean"
+				use="optional" default="false"></xs:attribute>
+
+			<xs:attribute name="learnableSkill" type="xs:string"
+				use="optional"></xs:attribute>
+			<xs:attribute name="wantedGoods0" type="xs:string" use="optional"></xs:attribute>
+			<xs:attribute name="wantedGoods1" type="xs:string" use="optional"></xs:attribute>
+			<xs:attribute name="wantedGoods2" type="xs:string" use="optional"></xs:attribute>
+
+		</xs:complexType>
+	</xs:element>
+
+
+</xs:schema>
