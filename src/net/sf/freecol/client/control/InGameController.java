@@ -3220,7 +3220,7 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         EmbarkMessage message = new EmbarkMessage(unit, carrier, direction);
         Element reply = askExpecting(client, message.toXMLElement(),
-                                     "update");
+                                     "multiple");
         if (reply == null) return false;
 
         Connection conn = client.getConnection();
