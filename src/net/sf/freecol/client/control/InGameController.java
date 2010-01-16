@@ -707,17 +707,19 @@ public final class InGameController implements NetworkConstants {
      * @return True if the unload succeeded.
      */
     private boolean unloadGoods(Goods goods, Unit carrier, Colony colony) {
-        if (colony == null) {
+        if (colony == null && carrier.isInEurope()) {
             return sellGoods(goods);
         }
         GoodsType type = goods.getType();
-        GoodsContainer container = colony.getGoodsContainer();
-        int oldAmount = container.getGoodsCount(type);
-        int newAmount;
+        int oldAmount = (colony == null) ? 0 
+            : colony.getGoodsContainer().getGoodsCount(type);
         if (askUnloadCargo(goods)
-            && (newAmount = container.getGoodsCount(type)) != oldAmount) {
+            && (carrier.getGoodsContainer().getGoodsCount(type)) == 0) {
             carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
-            colony.firePropertyChange(type.getId(), oldAmount, newAmount);
+            if (colony != null) {
+                colony.firePropertyChange(type.getId(), oldAmount,
+                                          colony.getGoodsContainer().getGoodsCount(type));
+            }
             return true;
         }
         return false;

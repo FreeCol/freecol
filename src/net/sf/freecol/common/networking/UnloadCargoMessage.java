@@ -98,7 +98,11 @@ public class UnloadCargoMessage extends Message {
             ? (Colony) tile.getSettlement()
             : null;
         goods.adjustAmount();
-        server.getInGameController().moveGoods(goods, colony);
+        try {
+            server.getInGameController().moveGoods(goods, colony);
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
+        }
         if (carrier.getInitialMovesLeft() != carrier.getMovesLeft()) {
             carrier.setMovesLeft(0);
         }
