@@ -152,14 +152,18 @@ public class TileTest extends FreeColTestCase {
         Tile tile = new Tile(game, spec().getTileType("model.tile.prairie"), 0, 0);
         assertEquals(spec().getGoodsType("model.goods.food"),
                      tile.getType().getPrimaryGoods().getType());
+        assertEquals(3, tile.getPrimaryProduction());
         assertEquals(spec().getGoodsType("model.goods.cotton"),
                      tile.getType().getSecondaryGoods().getType());
+        assertEquals(3, tile.getSecondaryProduction());
         
         Tile tile2 = new Tile(game, spec().getTileType("model.tile.mixedForest"), 0, 0);
         assertEquals(spec().getGoodsType("model.goods.food"),
                      tile2.getType().getPrimaryGoods().getType());
+        assertEquals(3, tile2.getPrimaryProduction());
         assertEquals(spec().getGoodsType("model.goods.furs"),
                      tile2.getType().getSecondaryGoods().getType());
+        assertEquals(3, tile2.getSecondaryProduction());
         
     }
 

@@ -21,7 +21,9 @@ package net.sf.freecol.common.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -77,6 +79,13 @@ public final class TileType extends FreeColGameObjectType {
      * Describe production here.
      */
     private List<AbstractGoods> production;
+
+    private Map<String, AbstractGoods> primaryGoodsMap =
+        new HashMap<String, AbstractGoods>();
+
+    private Map<String, AbstractGoods> secondaryGoodsMap =
+        new HashMap<String, AbstractGoods>();
+
 
     // ------------------------------------------------------------ constructor
 
@@ -284,6 +293,23 @@ public final class TileType extends FreeColGameObjectType {
         }
     }
 
+    /**
+     * Applies the difficulty level to this TileType.
+     *
+     * @param difficultyLevel difficulty level to apply
+     */
+    public void applyDifficultyLevel(String difficulty) {
+        primaryGoods = primaryGoodsMap.get(difficulty);
+        if (primaryGoods == null) {
+            primaryGoods = primaryGoodsMap.get(null);
+        }
+        secondaryGoods = secondaryGoodsMap.get(difficulty);
+        if (secondaryGoods == null) {
+            secondaryGoods = secondaryGoodsMap.get(null);
+        }
+    }
+
+
     // ------------------------------------------------------------ API methods
 
     public void readAttributes(XMLStreamReader in, Specification specification)
@@ -328,10 +354,11 @@ public final class TileType extends FreeColGameObjectType {
                 AbstractGoods goods = new AbstractGoods(type, amount);
                 String difficulty = in.getAttributeValue(null, "difficulty");
                 if ("primary-production".equals(childName)) {
-                    primaryGoods = goods;
+                    primaryGoodsMap.put(difficulty, goods);
                 } else if ("secondary-production".equals(childName)) {
-                    secondaryGoods = goods;
+                    secondaryGoodsMap.put(difficulty, goods);
                 } else {
+                    // ignore difficulty for now
                     production.add(goods);
                     addModifier(new Modifier(type.getId(), this, amount, Modifier.Type.ADDITIVE));
                 }
