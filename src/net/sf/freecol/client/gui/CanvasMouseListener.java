@@ -30,6 +30,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.UnitState;
 
 /**
  * Listens to mouse buttons being pressed at the level of the Canvas.
@@ -170,6 +171,12 @@ public final class CanvasMouseListener implements MouseListener {
                 ctlr.setDestination(unit, temp.getLastNode().getTile());
                 if (canvas.getClient().getGame().getCurrentPlayer() == canvas.getClient().getMyPlayer()) {
                     ctlr.moveToDestination(unit);
+                    boolean canStayActive = unit.getState() == UnitState.ACTIVE
+                    						&& unit.getDestination() == null
+                    						&& unit.getMovesLeft() > 0;
+                    if(canStayActive){
+                    	return;
+                    }
                     ctlr.nextActiveUnit();
                 }
                 
