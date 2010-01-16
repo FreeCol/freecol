@@ -39,8 +39,10 @@ import org.w3c.dom.Element;
 /**
  * Represents a building in a colony.
  */
-public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named {
-	private static Logger logger = Logger.getLogger(Building.class.getName());
+public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named,
+                                                                 Comparable<Building> {
+
+    private static Logger logger = Logger.getLogger(Building.class.getName());
 	
     public static final String UNIT_CHANGE = "UNIT_CHANGE";
 
@@ -985,14 +987,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                                                                      buildingType, getGame().getTurn()));
     }
     
-    private static Comparator<Building> buildingComparator = new Comparator<Building>() {
-        public int compare(Building b1, Building b2) {
-            return b1.getType().getSequence() - b2.getType().getSequence();
-        }
-    };
-    
-    public static Comparator<Building> getBuildingComparator() {
-        return buildingComparator;
+    public int compareTo(Building other) {
+        return getType().compareTo(other.getType());
     }
 
     /**

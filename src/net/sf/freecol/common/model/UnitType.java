@@ -33,7 +33,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
-public final class UnitType extends BuildableType {
+public final class UnitType extends BuildableType implements Comparable<UnitType> {
 
     public static final int DEFAULT_OFFENCE = 0;
     public static final int DEFAULT_DEFENCE = 1;
@@ -496,6 +496,11 @@ public final class UnitType extends BuildableType {
      */
     public void setFoodConsumed(final int newFoodConsumed) {
         this.foodConsumed = newFoodConsumed;
+    }
+
+
+    public int compareTo(UnitType other) {
+        return getIndex() - other.getIndex();
     }
 
     /**

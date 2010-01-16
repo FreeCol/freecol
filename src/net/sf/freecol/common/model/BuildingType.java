@@ -32,7 +32,7 @@ import net.sf.freecol.common.resources.ResourceManager;
  * given building type can have. The levels contain the information about the
  * name of the building in a given level and what is needed to build it.
  */
-public final class BuildingType extends BuildableType {
+public final class BuildingType extends BuildableType implements Comparable<BuildingType> {
     
     private int level;
   
@@ -99,6 +99,10 @@ public final class BuildingType extends BuildableType {
 
     public Modifier getProductionModifier() {
         return productionModifier;
+    }
+
+    public int compareTo(BuildingType other) {
+        return getIndex() - other.getIndex();
     }
 
     public void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
