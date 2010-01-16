@@ -249,7 +249,9 @@
     <tile-type id="model.tile.desert" basic-move-cost="3" basic-work-turns="3">
       <art basic="terrain/desert/" minimap-color="#63732b"/><!--0.39,0.45,0.17"-->
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
+      <primary-production goods-type="model.goods.food" value="3" difficulty="model.difficulty.veryEasy"/>
       <primary-production goods-type="model.goods.food" value="2"/>
+      <primary-production goods-type="model.goods.food" value="1" difficulty="model.difficulty.veryHard"/>
       <secondary-production goods-type="model.goods.cotton" value="1"/>
       <production goods-type="model.goods.food"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
@@ -344,7 +346,9 @@
       <art basic="terrain/desert/" forest="forest/scrub.png" minimap-color="#24731f"/>
       <gen humidityMin="0" humidityMax="25" temperatureMin="10" temperatureMax="40" altitudeMin="1" altitudeMax="2"/>
       <modifier id="model.modifier.defence" type="percentage" value="50"/>
+      <primary-production goods-type="model.goods.food" value="3" difficulty="model.difficulty.veryEasy"/>
       <primary-production goods-type="model.goods.food" value="2"/>
+      <primary-production goods-type="model.goods.food" value="1" difficulty="model.difficulty.veryHard"/>
       <secondary-production goods-type="model.goods.furs" value="2"/>
       <production goods-type="model.goods.food"       value="2"/>
       <production goods-type="model.goods.cotton"     value="1"/>
