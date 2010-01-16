@@ -464,13 +464,15 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     private void produceGoodsCenterTile() {
-        
-        GoodsType goodsFood = workTile.primaryGoods();
-        colony.addGoods(goodsFood, getProductionOf(goodsFood));
-        
-        GoodsType type2 = workTile.secondaryGoods();
-        if (type2 != null)
-                colony.addGoods(type2, getProductionOf(type2));
+
+        if (workTile.getType().getPrimaryGoods() != null) {
+            GoodsType goodsType = workTile.getType().getPrimaryGoods().getType();
+            colony.addGoods(goodsType, workTile.getPrimaryProduction());
+        }
+        if (workTile.getType().getSecondaryGoods() != null) {
+            GoodsType goodsType = workTile.getType().getSecondaryGoods().getType();
+            colony.addGoods(goodsType, workTile.getSecondaryProduction());
+        }
 
     }
    
@@ -503,16 +505,20 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * @return an <code>int</code> value
      */
     public int getProductionOf(GoodsType goodsType) {
-        if (goodsType == null) {
-            throw new IllegalArgumentException("GoodsType must not be 'null'.");
-        } else if (getUnit() == null) {
-            if (isColonyCenterTile() &&
-                (goodsType.isFoodType() || 
-                 goodsType.equals(workTile.secondaryGoods()))) {
-                return workTile.potential(goodsType, null);
+        if (isColonyCenterTile()) {
+            if (workTile.getType().getPrimaryGoods() != null
+                && workTile.getType().getPrimaryGoods().getType() == goodsType) {
+                return workTile.getPrimaryProduction();
+            } else if (workTile.getType().getSecondaryGoods() != null
+                       && workTile.getType().getSecondaryGoods().getType() == goodsType) {
+                return workTile.getSecondaryProduction();
             } else {
                 return 0;
             }
+        } else if (goodsType == null) {
+            throw new IllegalArgumentException("GoodsType must not be 'null'.");
+        } else if (getUnit() == null) {
+            return 0;
         } else if (goodsType.equals(getUnit().getWorkType())) {
             return getProductionOf(getUnit(), goodsType);
         } else {
@@ -534,8 +540,8 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
             Set<Modifier> result = new HashSet<Modifier>();
             if (getUnit() == null) {
                 if (isColonyCenterTile() &&
-                    (goodsType.isFoodType() || 
-                     goodsType.equals(workTile.secondaryGoods()))) {
+                    (workTile.getType().isPrimaryGoodsType(goodsType)
+                     || workTile.getType().isSecondaryGoodsType(goodsType))) {
                     result.addAll(workTile.getProductionBonus(goodsType, null));
                     result.addAll(getColony().getFeatureContainer().getModifierSet(goodsType.getId()));
                 }

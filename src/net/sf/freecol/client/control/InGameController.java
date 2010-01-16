@@ -1205,7 +1205,7 @@ public final class InGameController implements NetworkConstants {
         for (GoodsType goodsType : FreeCol.getSpecification().getGoodsTypeList()) {
             if (goodsType.isFoodType()) {
                 int potential = 0;
-                if (tile.primaryGoods() == goodsType) {
+                if (tile.getType().isPrimaryGoodsType(goodsType)) {
                     potential = tile.potential(goodsType, null);
                 }
                 goodsMap.put(goodsType, new Integer(potential));
@@ -1214,7 +1214,7 @@ public final class InGameController implements NetworkConstants {
                     goodsType = goodsType.getRawMaterial();
                 }
                 int potential = 0;
-                if (tile.secondaryGoods() == goodsType) {
+                if (tile.getType().isSecondaryGoodsType(goodsType)) {
                     potential = tile.potential(goodsType, null);
                 }
                 goodsMap.put(goodsType, new Integer(potential));

@@ -54,12 +54,24 @@ public final class TileType extends FreeColGameObjectType {
 
     private List<RandomChoice<ResourceType>> resourceType;
 
-    private GoodsType secondaryGoods = null;
 
     /**
      * Whether this TileType is connected to Europe.
      */
     private boolean connected;
+
+    /**
+     * The primary goods produced by this tile type. In the original
+     * game, this is always food or null (in the case of the arctic).
+     */
+    private AbstractGoods primaryGoods = null;
+
+    /**
+     * The secondary goods produced by this tile type. In the original
+     * game, this is never food, but may be null (in the case of the
+     * arctic).
+     */
+    private AbstractGoods secondaryGoods = null;
 
     /**
      * Describe production here.
@@ -169,12 +181,67 @@ public final class TileType extends FreeColGameObjectType {
         return featureContainer.getModifierSet(goodsType.getId());
     }
 
-    public GoodsType getSecondaryGoods() {
+    /**
+     * Get the <code>PrimaryGoods</code> value.
+     *
+     * @return an <code>AbstractGoods</code> value
+     */
+    public AbstractGoods getPrimaryGoods() {
+        return primaryGoods;
+    }
+
+    /**
+     * Returns true if the given <code>GoodsType</code> is the primary
+     * goods type of this TileType.
+     *
+     * @param type a <code>GoodsType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean isPrimaryGoodsType(GoodsType type) {
+        return (primaryGoods != null && primaryGoods.getType() == type);
+    }
+
+    /**
+     * Set the <code>PrimaryGoods</code> value.
+     *
+     * @param newPrimaryGoods The new PrimaryGoods value.
+     */
+    public void setPrimaryGoods(final AbstractGoods newPrimaryGoods) {
+        this.primaryGoods = newPrimaryGoods;
+    }
+
+    /**
+     * Get the <code>SecondaryGoods</code> value.
+     *
+     * @return an <code>AbstractGoods</code> value
+     */
+    public AbstractGoods getSecondaryGoods() {
         return secondaryGoods;
     }
 
     /**
-     * Get the <code>Production</code> value.
+     * Set the <code>SecondaryGoods</code> value.
+     *
+     * @param newSecondaryGoods The new SecondaryGoods value.
+     */
+    public void setSecondaryGoods(final AbstractGoods newSecondaryGoods) {
+        this.secondaryGoods = newSecondaryGoods;
+    }
+
+    /**
+     * Returns true if the given <code>GoodsType</code> is the secondary
+     * goods type of this TileType.
+     *
+     * @param type a <code>GoodsType</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean isSecondaryGoodsType(GoodsType type) {
+        return (secondaryGoods != null && secondaryGoods.getType() == type);
+    }
+
+    /**
+     * Returns a list of all types of AbstractGoods produced by this
+     * TileType when it is not the colony center tile.
      *
      * @return a <code>List<AbstractGoods></code> value
      */
@@ -227,10 +294,6 @@ public final class TileType extends FreeColGameObjectType {
         water = getAttribute(in, "is-water", false);
         canSettle = getAttribute(in, "can-settle", !water);
         connected = getAttribute(in, "is-connected", false);
-
-        if (!water && canSettle) {
-            secondaryGoods = specification.getGoodsType(in.getAttributeValue(null, "secondary-goods"));
-        }
     }
         
     public void readChildren(XMLStreamReader in, Specification specification)
@@ -257,11 +320,21 @@ public final class TileType extends FreeColGameObjectType {
                 altitude[0] = getAttribute(in, "altitudeMin", 0);
                 altitude[1] = getAttribute(in, "altitudeMax", 0);
                 in.nextTag(); // close this element
-            } else if ("production".equals(childName)) {
+            } else if ("production".equals(childName)
+                       || "primary-production".equals(childName)
+                       || "secondary-production".equals(childName)) {
                 GoodsType type = specification.getGoodsType(in.getAttributeValue(null, "goods-type"));
                 int amount = Integer.parseInt(in.getAttributeValue(null, "value"));
-                production.add(new AbstractGoods(type, amount));
-                addModifier(new Modifier(type.getId(), this, amount, Modifier.Type.ADDITIVE));
+                AbstractGoods goods = new AbstractGoods(type, amount);
+                String difficulty = in.getAttributeValue(null, "difficulty");
+                if ("primary-production".equals(childName)) {
+                    primaryGoods = goods;
+                } else if ("secondary-production".equals(childName)) {
+                    secondaryGoods = goods;
+                } else {
+                    production.add(goods);
+                    addModifier(new Modifier(type.getId(), this, amount, Modifier.Type.ADDITIVE));
+                }
                 in.nextTag(); // close this element
             } else if ("resource".equals(childName)) {
                 ResourceType type = specification.getResourceType(in.getAttributeValue(null, "type"));

@@ -1301,6 +1301,32 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
         return potential;
     }
 
+    public int getPrimaryProduction() {
+        AbstractGoods primaryProduction = type.getPrimaryGoods();
+        if (primaryProduction == null) {
+            return 0;
+        } else {
+            int potential = primaryProduction.getAmount();
+            if (tileItemContainer != null) {
+                potential = tileItemContainer.getTotalBonusPotential(primaryProduction.getType(), null, potential);
+            }
+            return potential;
+        }
+    }        
+
+    public int getSecondaryProduction() {
+        AbstractGoods secondaryProduction = type.getSecondaryGoods();
+        if (secondaryProduction == null) {
+            return 0;
+        } else {
+            int potential = secondaryProduction.getAmount();
+            if (tileItemContainer != null) {
+                potential = tileItemContainer.getTotalBonusPotential(secondaryProduction.getType(), null, potential);
+            }
+            return potential;
+        }
+    }        
+
     /**
      * Sorts GoodsTypes according to potential based on TileType,
      * TileItemContainer if any.
@@ -1362,40 +1388,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
         }
         return goodsTypeList;
-    }
-
-    /**
-     * The type of primary good (food) this tile produces best (used for Town Commons
-     * squares).
-     * 
-     * @return The type of primary good best produced by this tile.
-     * 
-     */
-    public GoodsType primaryGoods() {
-        if (type == null) {
-            return null;
-        }
-        
-        for (AbstractGoods goods : getSortedPotential()) {
-            if (goods.getType().isFoodType()) {
-                return goods.getType();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * The type of secondary good (non-food) this tile produces best (used for Town Commons
-     * squares).
-     * 
-     * @return The type of secondary good best produced by this tile (or null if none found).
-     */
-    public GoodsType secondaryGoods() {
-        if (type == null) {
-            return null;
-        } else {
-            return type.getSecondaryGoods();
-        }
     }
 
     /**

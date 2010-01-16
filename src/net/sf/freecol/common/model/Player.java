@@ -2608,9 +2608,10 @@ public class Player extends FreeColGameObject implements Nameable {
             }
             
             //add secondary goods being produced by a colony on this tile
-            GoodsType secondary = t.secondaryGoods();
-            value += market.getSalePrice(secondary,t.potential(secondary, null));
-            
+            if (t.getType().getSecondaryGoods() != null) {
+                GoodsType secondary = t.getType().getSecondaryGoods().getType();
+                value += market.getSalePrice(secondary,t.potential(secondary, null));
+            }
             if (nearbyTileIsOcean) {
                 return Math.max(0, (int) (value * advantages));
             }
@@ -2682,7 +2683,10 @@ public class Player extends FreeColGameObject implements Nameable {
         }
 
         //initialize tile value        
-        int value = t.potential(t.primaryGoods(), null) * PRIMARY_GOODS_VALUE;
+        int value = 0;
+        if (t.getType().getPrimaryGoods() != null) {
+            value += t.potential(t.getType().getPrimaryGoods().getType(), null) * PRIMARY_GOODS_VALUE;
+        }
         //value += t.potential(t.secondaryGoods(), null) * t.secondaryGoods().getInitialSellPrice();
 
         //multiplicative modifier, to be applied to value later

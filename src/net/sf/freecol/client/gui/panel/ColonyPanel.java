@@ -514,7 +514,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     }
 
     private void sortBuildings(List<Building> buildings) {
-        Collections.sort(buildings, Building.getBuildingComparator());
+        Collections.sort(buildings);
     }
     
     private void sortColonies(List<Colony> colonies) {
@@ -1353,20 +1353,27 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 setLayout(new GridLayout(2, 1));
 
                 TileType tileType = colonyTile.getTile().getType();
-                // A colony always produces food.
-                GoodsType primaryGood = colonyTile.getTile().primaryGoods();
-                ImageIcon goodsIcon = getLibrary().getGoodsImageIcon(primaryGood);
-                ProductionLabel pl = new ProductionLabel(primaryGood, colonyTile.getProductionOf(primaryGood), getCanvas());
-                pl.setSize(getLibrary().getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
-                add(pl);
 
-                // A colony may produce one additional good
-                GoodsType secondaryGood = colonyTile.getTile().secondaryGoods();
-                if (colonyTile.getProductionOf(secondaryGood) != 0) {
-                    goodsIcon = getLibrary().getGoodsImageIcon(secondaryGood);
-                    ProductionLabel sl = new ProductionLabel(secondaryGood, colonyTile.getProductionOf(secondaryGood), getCanvas());
-                    sl.setSize(getLibrary().getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
-                    add(sl);
+                AbstractGoods primaryGoods = tileType.getPrimaryGoods();
+                if (primaryGoods != null) {
+                    GoodsType goodsType = primaryGoods.getType();
+                    ImageIcon goodsIcon = getLibrary().getGoodsImageIcon(goodsType);
+                    ProductionLabel pl =
+                        new ProductionLabel(goodsType, colonyTile.getProductionOf(goodsType),
+                                            getCanvas());
+                    pl.setSize(getLibrary().getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
+                    add(pl);
+                }
+
+                AbstractGoods secondaryGoods = tileType.getSecondaryGoods();
+                if (secondaryGoods != null) {
+                    GoodsType goodsType = secondaryGoods.getType();
+                    ImageIcon goodsIcon = getLibrary().getGoodsImageIcon(goodsType);
+                    ProductionLabel pl =
+                        new ProductionLabel(goodsType, colonyTile.getProductionOf(goodsType),
+                                            getCanvas());
+                    pl.setSize(getLibrary().getTerrainImageWidth(tileType), goodsIcon.getIconHeight());
+                    add(pl);
                 }
             }
 

@@ -130,7 +130,7 @@ public final class ReportColonyPanel extends ReportPanel {
             }
 
             List<Building> buildingList = colony.getBuildings();
-            Collections.sort(buildingList, Building.getBuildingComparator());
+            Collections.sort(buildingList);
             for (Building building : buildingList) {
                 JLabel buildingLabel =
                     new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId()

@@ -810,8 +810,8 @@ public class ColonyPlan {
         }
 
         // Add values for the center tile:
-        if (goodsType == colony.getTile().primaryGoods() ||
-            goodsType == colony.getTile().secondaryGoods()) {
+        if (colony.getTile().getType().isPrimaryGoodsType(goodsType)
+            || colony.getTile().getType().isSecondaryGoodsType(goodsType)) {
             amount += colony.getTile().getMaximumPotential(goodsType, null);
         }
 

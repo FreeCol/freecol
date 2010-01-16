@@ -639,8 +639,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             defenseBonus = getModifierAsString(defenceModifiers.iterator().next());
         }
 
-        GoodsType secondaryGoodsType = tileType.getSecondaryGoods();
-
         JLabel nameLabel = new JLabel(tileType.getName());
         nameLabel.setFont(smallHeaderFont);
         detailPanel.add(nameLabel, "span, align center");
