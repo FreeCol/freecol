@@ -1250,9 +1250,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         MoveType move = getSimpleMoveType(from, target, ignoreEnemyUnits);
 
         if (move.isLegal()) {
-            if (ml <= 0
-                || (from != null && getMoveCost(from, target, ml) > ml)) {
-                move = MoveType.MOVE_NO_MOVES;
+            switch(move) {
+                // these move types don't really move and may ignore
+                // movement points
+            case ATTACK:
+                //case DISEMBARK:
+                break;
+            default:
+                if (ml <= 0
+                    || (from != null && getMoveCost(from, target, ml) > ml)) {
+                    move = MoveType.MOVE_NO_MOVES;
+                }
             }
         }
         return move;

@@ -667,4 +667,37 @@ public class CombatTest extends FreeColTestCase {
         combatModel.attack(soldier, scout, victory, 0, null);
         assertTrue("Scout should be dead", scout.isDisposed());
     }
+
+
+    public void testAttackIgnoresMovementPoints() throws Exception {
+
+        Game game = getStandardGame();
+        CombatModel combatModel = game.getCombatModel();
+        Player dutch = game.getPlayer("model.nation.dutch");
+        Player french = game.getPlayer("model.nation.french");
+        Map map = getTestMap(plains, true);
+        game.setMap(map);
+        Tile tile1 = map.getTile(5, 8);
+        Tile tile2 = map.getTile(4, 8);
+        tile1.setType(hills);
+        assertEquals(hills, tile1.getType());
+
+        dutch.setStance(french, Player.Stance.WAR);
+        french.setStance(dutch, Player.Stance.WAR);
+
+        Unit colonist = new Unit(game, tile1, dutch, colonistType, UnitState.FORTIFIED);
+        Unit soldier = new Unit(game, tile2, french, veteranType, UnitState.ACTIVE);
+
+        soldier.equipWith(muskets, true);
+        soldier.equipWith(horses, true);
+
+        assertEquals(tile1, colonist.getLocation());
+        assertEquals(tile2, soldier.getLocation());
+
+        assertEquals(Unit.MoveType.ATTACK, soldier.getMoveType(tile2, tile1, 9, false));
+        assertEquals(Unit.MoveType.ATTACK, soldier.getMoveType(tile2, tile1, 1, false));
+
+
+    }
+
 }
