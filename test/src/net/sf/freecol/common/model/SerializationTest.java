@@ -58,7 +58,7 @@ public class SerializationTest extends FreeColTestCase {
 
     public void testColony() throws Exception {
 
-        Validator colonyValidator = buildValidator("schema/data/data-colony.xsd");
+        Validator validator = buildValidator("schema/data/data-player.xsd");
 
         Game game = getGame();
     	game.setMap(getTestMap(plainsType,true));
@@ -68,7 +68,7 @@ public class SerializationTest extends FreeColTestCase {
         colony.newTurn();
         colony.newTurn();
 
-        colonyValidator.validate(buildSource(colony, player, true, true));
+        validator.validate(buildSource(player, player, true, true));
     }
 
 }

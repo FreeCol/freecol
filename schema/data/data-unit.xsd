@@ -118,6 +118,12 @@ along with FreeCol. If not, see http://www.gnu.org/licenses
             <xs:enumeration value="SOLDIER" />
             <xs:enumeration value="SCOUT" />
             <xs:enumeration value="DRAGOON" />
+            <xs:enumeration value="default" />
+            <xs:enumeration value="pioneer" />
+            <xs:enumeration value="missionary" />
+            <xs:enumeration value="soldier" />
+            <xs:enumeration value="scout" />
+            <xs:enumeration value="dragoon" />
         </xs:restriction>
     </xs:simpleType>
 

@@ -52,6 +52,7 @@ public class AllTests {
 	suite.addTestSuite(PlayerTest.class);
 	suite.addTestSuite(SchoolTest.class);
 	suite.addTestSuite(ScopeTest.class);
+	suite.addTestSuite(SerializationTest.class);
 	suite.addTestSuite(SoLTest.class);
 	suite.addTestSuite(TileItemContainerTest.class);
 	suite.addTestSuite(TileTest.class);
