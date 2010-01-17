@@ -76,7 +76,8 @@ public final class TileType extends FreeColGameObjectType {
     private AbstractGoods secondaryGoods = null;
 
     /**
-     * Describe production here.
+     * A list of AbstractGoods produced by this TileType when it is
+     * not the colony center tile.
      */
     private List<AbstractGoods> production;
 
@@ -85,6 +86,9 @@ public final class TileType extends FreeColGameObjectType {
 
     private Map<String, AbstractGoods> secondaryGoodsMap =
         new HashMap<String, AbstractGoods>();
+
+    private Map<String, Map<GoodsType, AbstractGoods>> productionMap =
+        new HashMap<String, Map<GoodsType, AbstractGoods>>();
 
 
     // ------------------------------------------------------------ constructor
@@ -200,6 +204,20 @@ public final class TileType extends FreeColGameObjectType {
     }
 
     /**
+     * Get the <code>PrimaryGoods</code> value at the difficulty level
+     * with the ID given.
+     *
+     * @return an <code>AbstractGoods</code> value
+     */
+    public AbstractGoods getPrimaryGoods(String difficulty) {
+        AbstractGoods result = primaryGoodsMap.get(difficulty);
+        if (result == null) {
+            result = primaryGoodsMap.get(null);
+        }
+        return result;
+    }
+
+    /**
      * Returns true if the given <code>GoodsType</code> is the primary
      * goods type of this TileType.
      *
@@ -226,6 +244,20 @@ public final class TileType extends FreeColGameObjectType {
      */
     public AbstractGoods getSecondaryGoods() {
         return secondaryGoods;
+    }
+
+    /**
+     * Get the <code>SecondaryGoods</code> value at the difficulty level
+     * with the ID given.
+     *
+     * @return an <code>AbstractGoods</code> value
+     */
+    public AbstractGoods getSecondaryGoods(String difficulty) {
+        AbstractGoods result = secondaryGoodsMap.get(difficulty);
+        if (result == null) {
+            result = secondaryGoodsMap.get(null);
+        }
+        return result;
     }
 
     /**
@@ -256,6 +288,26 @@ public final class TileType extends FreeColGameObjectType {
      */
     public List<AbstractGoods> getProduction() {
         return production;
+    }
+
+    /**
+     * Returns a list of all types of AbstractGoods produced by this
+     * TileType when it is not the colony center tile.
+     *
+     * @param difficulty
+     * @return a <code>List<AbstractGoods></code> value
+     */
+    public List<AbstractGoods> getProduction(String difficulty) {
+        Map<GoodsType, AbstractGoods> result = new HashMap<GoodsType, AbstractGoods>();
+        Map<GoodsType, AbstractGoods> defaultMap = productionMap.get(null);
+        Map<GoodsType, AbstractGoods> difficultyMap = productionMap.get(difficulty);
+        if (defaultMap != null) {
+            result.putAll(defaultMap);
+        }
+        if (difficultyMap != null) {
+            result.putAll(difficultyMap);
+        }
+        return new ArrayList<AbstractGoods>(result.values());
     }
 
     public List<RandomChoice<ResourceType>> getWeightedResources() {
@@ -299,13 +351,21 @@ public final class TileType extends FreeColGameObjectType {
      * @param difficultyLevel difficulty level to apply
      */
     public void applyDifficultyLevel(String difficulty) {
-        primaryGoods = primaryGoodsMap.get(difficulty);
-        if (primaryGoods == null) {
-            primaryGoods = primaryGoodsMap.get(null);
+        primaryGoods = getPrimaryGoods(difficulty);
+        secondaryGoods = getSecondaryGoods(difficulty);
+        // remove old modifiers
+        if (production != null) {
+            for (AbstractGoods goods : production) {
+                Modifier oldModifier = new Modifier(goods.getType().getId(), this, goods.getAmount(),
+                                                    Modifier.Type.ADDITIVE);
+                getFeatureContainer().removeModifier(oldModifier);
+            }
         }
-        secondaryGoods = secondaryGoodsMap.get(difficulty);
-        if (secondaryGoods == null) {
-            secondaryGoods = secondaryGoodsMap.get(null);
+        production = getProduction(difficulty);
+        // add new modifiers
+        for (AbstractGoods goods : production) {
+            addModifier(new Modifier(goods.getType().getId(), this, goods.getAmount(),
+                                     Modifier.Type.ADDITIVE));
         }
     }
 
@@ -358,9 +418,12 @@ public final class TileType extends FreeColGameObjectType {
                 } else if ("secondary-production".equals(childName)) {
                     secondaryGoodsMap.put(difficulty, goods);
                 } else {
-                    // ignore difficulty for now
-                    production.add(goods);
-                    addModifier(new Modifier(type.getId(), this, amount, Modifier.Type.ADDITIVE));
+                    Map<GoodsType, AbstractGoods> oldValue = productionMap.get(difficulty);
+                    if (oldValue == null) {
+                        oldValue = new HashMap<GoodsType, AbstractGoods>();
+                        productionMap.put(difficulty, oldValue);
+                    }
+                    oldValue.put(type, goods);
                 }
                 in.nextTag(); // close this element
             } else if ("resource".equals(childName)) {
