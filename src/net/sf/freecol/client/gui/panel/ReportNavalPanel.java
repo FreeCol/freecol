@@ -170,6 +170,12 @@ public final class ReportNavalPanel extends ReportPanel {
 
     private void handleLocation(String location, boolean makeButton) {
         List<Unit> unitList = locations.get(location);
+        
+        // Do not show locations without units
+        if (unitList == null) {
+        	return;
+        }
+        
         JComponent component;
         if (makeButton) {
             JButton button = FreeColPanel.getLinkButton(location, null, location);
@@ -181,30 +187,26 @@ public final class ReportNavalPanel extends ReportPanel {
         reportPanel.add(component, "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 
-        if (unitList == null) {
-            reportPanel.add(new JLabel(Messages.message("none")), "sg");
-        } else {
-            Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
-            for (Unit unit : unitList) {
-                UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true);
-                if (unit.getDestination() != null) {
-                    String destination = unit.getDestination().getLocationName();
-                    unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" +
-                                             Messages.message("goingTo", "%location%", destination) +
-                                             "</html>");
-                }
-                // this is necessary because UnitLabel deselects carriers
-                unitLabel.setSelected(true);
-                reportPanel.add(unitLabel, "newline, sg");
-                for (Goods goods : unit.getGoodsList()) {
-                    GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
-                    reportPanel.add(goodsLabel);
-                }
-                for (Unit unitLoaded : unit.getUnitList()) {
-                    UnitLabel unitLoadedLabel = new UnitLabel(unitLoaded, getCanvas(), true);
-                    reportPanel.add(unitLoadedLabel);
-                }
-            }
+        Collections.sort(unitList, ReportPanel.getUnitTypeComparator());
+        for (Unit unit : unitList) {
+        	UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true);
+        	if (unit.getDestination() != null) {
+        		String destination = unit.getDestination().getLocationName();
+        		unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" +
+        				Messages.message("goingTo", "%location%", destination) +
+        		"</html>");
+        	}
+        	// this is necessary because UnitLabel deselects carriers
+        	unitLabel.setSelected(true);
+        	reportPanel.add(unitLabel, "newline, sg");
+        	for (Goods goods : unit.getGoodsList()) {
+        		GoodsLabel goodsLabel = new GoodsLabel(goods, getCanvas());
+        		reportPanel.add(goodsLabel);
+        	}
+        	for (Unit unitLoaded : unit.getUnitList()) {
+        		UnitLabel unitLoadedLabel = new UnitLabel(unitLoaded, getCanvas(), true);
+        		reportPanel.add(unitLoadedLabel);
+        	}
         }
     }
 
