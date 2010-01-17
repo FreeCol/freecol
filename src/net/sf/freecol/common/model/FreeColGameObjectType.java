@@ -110,6 +110,18 @@ public class FreeColGameObjectType extends FreeColObject {
         return featureContainer.getModifierSet(id);
     }
 
+    /**
+     * Applies the difficulty level with the given ID to this
+     * FreeColGameObjectType. This method does nothing. If the
+     * behaviour of a FreeColGameObjectType depends on difficulty, it
+     * must override this method.
+     *
+     * @param difficultyLevel difficulty level to apply
+     */
+    public void applyDifficultyLevel(String difficulty) {
+        // do nothing
+    }
+
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // currently, FreeColGameObjectTypes are not serialized
     }

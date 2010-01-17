@@ -1027,11 +1027,9 @@ public final class Specification {
         for (String key : level.getOptions().keySet()) {
             allOptions.put(key, level.getOptions().get(key));
         }
-        for (TileType tileType : tileTypeList) {
-            tileType.applyDifficultyLevel(level.getId());
-        }
-        for (EuropeanNationType nationType : europeanNationTypes) {
-            nationType.applyDifficultyLevel(level.getId());
+
+        for (FreeColGameObjectType type : allTypes.values()) {
+            type.applyDifficultyLevel(level.getId());
         }
 
         // TODO: find a better place for this!
