@@ -3470,12 +3470,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Try to sell.
-        int gold = player.getGold();
         if (askSellGoods(goods, carrier)) {
             freeColClient.playSound(SoundEffect.SELL_CARGO);
             canvas.updateGoldLabel();
-            Market market = player.getMarket();
             carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
+            Market market = player.getMarket();
             for (TransactionListener listener : market.getTransactionListener()) {
                 listener.logSale(goods.getType(), goods.getAmount(),
                                  market.paidForSale(goods.getType()),
