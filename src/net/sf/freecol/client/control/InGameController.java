@@ -75,6 +75,7 @@ import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
+import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Ownable;
@@ -86,6 +87,7 @@ import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TradeRoute;
+import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -3393,7 +3395,8 @@ public final class InGameController implements NetworkConstants {
         if (amount < toBuy) toBuy = amount;
 
         // Check that the purchase is funded.
-        if (player.getMarket().getBidPrice(type, toBuy) > player.getGold()) {
+        Market market = player.getMarket();
+        if (market.getBidPrice(type, toBuy) > player.getGold()) {
             canvas.errorMessage("notEnoughGold");
             return false;
         }
@@ -3406,6 +3409,9 @@ public final class InGameController implements NetworkConstants {
             freeColClient.playSound(SoundEffect.LOAD_CARGO);
             canvas.updateGoldLabel();
             carrier.firePropertyChange(Unit.CARGO_CHANGE, oldAmount, newAmount);
+            for (TransactionListener listener : market.getTransactionListener()) {
+                listener.logPurchase(type, toBuy, market.costToBuy(type));
+            }
             return true;
         }
 
@@ -3441,9 +3447,9 @@ public final class InGameController implements NetworkConstants {
      * @return True if the sale succeeds.
      */
     public boolean sellGoods(Goods goods) {
+        Player player = freeColClient.getMyPlayer();
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
             canvas.showInformationMessage("notYourTurn");
             return false;
         }
@@ -3464,10 +3470,17 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Try to sell.
+        int gold = player.getGold();
         if (askSellGoods(goods, carrier)) {
             freeColClient.playSound(SoundEffect.SELL_CARGO);
             canvas.updateGoldLabel();
+            Market market = player.getMarket();
             carrier.firePropertyChange(Unit.CARGO_CHANGE, goods, null);
+            for (TransactionListener listener : market.getTransactionListener()) {
+                listener.logSale(goods.getType(), goods.getAmount(),
+                                 market.paidForSale(goods.getType()),
+                                 player.getTax());
+            }
             return true;
         }
 
