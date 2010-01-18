@@ -363,6 +363,9 @@ public class DebugMenu extends JMenu {
                             	for(Unit u : list){
                             		sb.append('\n');
                                     sb.append(u.getName());
+                                    if(u.isUnderRepair()){
+                                    	sb.append(" (Repairing)");
+                                    }
                                     sb.append("    " + ((AIUnit) aiMain.getAIObject(u)).getMission().toString().replaceAll("\n", "    \n"));
                             	}
                             	sb.append('\n');
