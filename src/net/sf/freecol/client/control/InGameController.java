@@ -3204,6 +3204,13 @@ public final class InGameController implements NetworkConstants {
         Location oldLocation = unit.getLocation();
         if (askEmbark(unit, carrier, null) && unit.getLocation() == carrier) {
             freeColClient.playSound(SoundEffect.LOAD_CARGO);
+            if (oldLocation instanceof Tile) {
+                ((Tile) oldLocation).firePropertyChange(Tile.UNIT_CHANGE, unit, null);
+            } else if (oldLocation instanceof Europe) {
+                ((Europe) oldLocation).firePropertyChange(Europe.UNIT_CHANGE, unit, null);
+            }
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, null, unit);
+            nextActiveUnit();
             return true;
         }
         return false;
@@ -3252,9 +3259,16 @@ public final class InGameController implements NetworkConstants {
 
         // Ask the server
         if (askDisembark(unit) && unit.getLocation() != carrier) {
-            if (checkCashInTreasureTrain(unit)) {
-                nextActiveUnit();
+            carrier.firePropertyChange(Unit.CARGO_CHANGE, unit, null);
+            if (!checkCashInTreasureTrain(unit)) {
+                Location newLocation = unit.getLocation();
+                if (newLocation instanceof Tile) {
+                    ((Tile) newLocation).firePropertyChange(Tile.UNIT_CHANGE, null, unit);
+                } else if (newLocation instanceof Europe) {
+                    ((Europe) newLocation).firePropertyChange(Europe.UNIT_CHANGE, null, unit);
+                }
             }
+            nextActiveUnit();
             return true;
         }
         return false;

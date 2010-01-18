@@ -83,7 +83,9 @@ public class DisembarkMessage extends Message {
             return Message.clientError(e.getMessage());
         }
         if (!(unit.getLocation() instanceof Unit)) {
-            return Message.clientError("Not on a carrier: " + unitId);
+            return Message.clientError("Unit " + unitId
+                                       + " at " + unit.getLocation().getId()
+                                       + " which is not a carrier.");
         }
 
         // Do the disembark.

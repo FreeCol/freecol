@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.action;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
@@ -99,19 +100,25 @@ public class UnloadAction extends MapboardAction {
         }
     }
 
-    private void unloadAllUnits(Unit unit) {
-        Iterator<Unit> unitIterator = unit.getUnitIterator();
-        while (unitIterator.hasNext()) {
-            Unit newUnit = unitIterator.next();
-            getFreeColClient().getInGameController().leaveShip(newUnit);
+    /**
+     * Unload all units on a carrier.
+     *
+     * @param carrier A <code>Unit</code> to unload units off.
+     */
+    private void unloadAllUnits(Unit carrier) {
+        for (Unit unit : new ArrayList<Unit>(carrier.getUnitList())) {
+            getFreeColClient().getInGameController().leaveShip(unit);
         }
     }
 
-    private void unloadAllCargo(Unit unit) {
-        Iterator<Goods> goodsIterator = unit.getGoodsIterator();
-        while (goodsIterator.hasNext()) {
-            Goods goods = goodsIterator.next();
-            Boolean dump = unit.getColony() == null;
+    /**
+     * Unload all goods on a carrier.
+     *
+     * @param carrier A <code>Unit</code> to unload goods off.
+     */
+    private void unloadAllCargo(Unit carrier) {
+        Boolean dump = carrier.getColony() == null;
+        for (Goods goods : new ArrayList<Goods>(carrier.getGoodsList())) {
             getFreeColClient().getInGameController().unloadCargo(goods, dump);
         }
     }
