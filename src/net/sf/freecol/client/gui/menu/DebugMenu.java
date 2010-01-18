@@ -26,6 +26,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -55,6 +56,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.server.ai.AIUnit;
 
 public class DebugMenu extends JMenu {
@@ -326,19 +328,45 @@ public class DebugMenu extends JMenu {
                     net.sf.freecol.server.ai.AIMain aiMain = freeColClient.getFreeColServer().getAIMain();
                     StringBuilder sb = new StringBuilder();
                     for (Player tp : freeColClient.getGame().getPlayers()) {
-                        final Player p = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(tp.getId());
-                        if (p.getEurope() != null) {
-                            sb.append("\n==");
-                            sb.append(p.getNationAsString());
-                            sb.append("==\n");
-                            Iterator<Unit> it = p.getEurope().getUnitIterator();
-                            while (it.hasNext()) {
-                                Unit u = it.next();
-                                sb.append('\n');
-                                sb.append(u.getName());
-                                sb.append('\n');
-                                sb.append("    " + ((AIUnit) aiMain.getAIObject(u)).getMission().toString().replaceAll("\n", "    \n"));
-                            }
+                        final Player p = (Player) freeColClient.getFreeColServer().getGame().getFreeColGameObject(tp.getId());                        
+                        if (p.getEurope() == null) {
+                        	continue;
+                        }
+                        List<Unit> inEurope = new ArrayList<Unit>();
+                        List<Unit> toEurope = new ArrayList<Unit>();
+                        List<Unit> toAmerica = new ArrayList<Unit>();
+                        LinkedHashMap<String,List<Unit>> units = new LinkedHashMap<String, List<Unit>>();
+                        units.put("To Europe", toEurope);
+                        units.put("In Europe", inEurope);
+                        units.put("To America", toAmerica);
+                        
+                        sb.append("\n==");
+                        sb.append(p.getNationAsString());
+                        sb.append("==\n");
+
+                        for(Unit u : p.getEurope().getUnitList()){
+                        	if(u.getState() == UnitState.TO_AMERICA){
+                        		toAmerica.add(u);
+                        		continue;
+                        	}
+                        	if(u.getState() == UnitState.TO_EUROPE){
+                        		toEurope.add(u);
+                        		continue;
+                        	}
+                        	inEurope.add(u);
+                        }
+                        
+                        for(String label : units.keySet()){
+                        	List<Unit> list = units.get(label);
+                        	if(list.size() > 0){
+                        		sb.append("\n->" + label + "\n");
+                            	for(Unit u : list){
+                            		sb.append('\n');
+                                    sb.append(u.getName());
+                                    sb.append("    " + ((AIUnit) aiMain.getAIObject(u)).getMission().toString().replaceAll("\n", "    \n"));
+                            	}
+                            	sb.append('\n');
+                        	}
                         }
                     }
                     canvas.showInformationMessage(sb.toString());
