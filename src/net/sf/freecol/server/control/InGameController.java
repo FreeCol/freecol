@@ -70,6 +70,7 @@ import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.UnitTypeChange;
@@ -1768,9 +1769,11 @@ public final class InGameController extends Controller {
                                           IndianSettlement settlement) {
         Player player = unit.getOwner();
         // Sanity checks.
-        if (!settlement.allowContact(unit)) {
-            throw new IllegalStateException("Contact denied at "
-                                            + settlement.getName());
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST) {
+            throw new IllegalStateException("Unable to enter "
+                                            + settlement.getName()
+                                            + ": " + type.whyIllegal());
         }
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
@@ -1790,9 +1793,7 @@ public final class InGameController extends Controller {
             settlement.setLearnableSkill(null);
         }
 
-        // Consider this a visit, and do a full information update as
-        // the unit is in close contact.
-        settlement.setVisited(player);
+        // Do a full information update as the unit is in the settlement.
         settlement.getTile().updateIndianSettlementInformation(player);
     }
 
@@ -1805,9 +1806,11 @@ public final class InGameController extends Controller {
      */
     public String scoutIndianSettlement(Unit unit,
                                         IndianSettlement settlement) {
-        if (!settlement.allowContact(unit)) {
-            throw new IllegalStateException("Contact denied at "
-                                            + settlement.getName());
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT) {
+            throw new IllegalStateException("Unable to enter "
+                                            + settlement.getName()
+                                            + ": " + type.whyIllegal());
         }
 
         // Hateful natives kill the scout right away.
@@ -1871,10 +1874,11 @@ public final class InGameController extends Controller {
      * @return A <code>ModelMessage</code> describing the result.
      */
     public ModelMessage denounceMission(IndianSettlement settlement, Unit unit) {
-        // Do not allow contact from water
-        if (!settlement.allowContact(unit)) {
-            throw new IllegalArgumentException("Contact denied at "
-                                               + settlement.getName());
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
+            throw new IllegalStateException("Unable to enter "
+                                            + settlement.getName()
+                                            + ": " + type.whyIllegal());
         }
 
         // Determine result
@@ -1912,10 +1916,11 @@ public final class InGameController extends Controller {
      */
     public ModelMessage establishMission(IndianSettlement settlement,
                                          Unit unit) {
-        // Do not allow contact from water
-        if (!settlement.allowContact(unit)) {
-            throw new IllegalArgumentException("Contact denied at "
-                                               + settlement.getName());
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
+            throw new IllegalStateException("Unable to enter "
+                                            + settlement.getName()
+                                            + ": " + type.whyIllegal());
         }
 
         // Result depends on tension wrt this settlement.

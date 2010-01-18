@@ -31,6 +31,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -128,11 +129,6 @@ public class InciteMessage extends Message {
                                        + tile.getId());
         }
         IndianSettlement indianSettlement = (IndianSettlement) settlement;
-        if (!indianSettlement.allowContact(unit)) {
-            // Do not allow contact from water
-            return Message.clientError("Contact denied at "
-                                       + settlement.getName());
-        }
         Player settlementPlayer = indianSettlement.getOwner();
         Player enemy;
         if (enemyId == null || enemyId.length() == 0) {
@@ -149,18 +145,28 @@ public class InciteMessage extends Message {
         if (!enemy.isEuropean()) {
             return Message.clientError("Inciting against non-European!");
         }
-        int gold = Integer.parseInt(goldString);
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY) {
+            return Message.clientError("Unable to enter "
+                                       + settlement.getName()
+                                       + ": " + type.whyIllegal());
+        }
 
         // Valid, proceed to incite.
         InGameController igc = server.getInGameController();
+        int gold = Integer.parseInt(goldString);
         int goldToPay;
-        if (gold < 0) { // Initial inquiry.
-            goldToPay = igc.getInciteAmount(player, enemy, settlementPlayer);
-        } else if (igc.inciteIndianSettlement(indianSettlement, player,
-                                              enemy, gold)) {
-            goldToPay = gold; // Pay this amount.
-        } else {
-            goldToPay = 0;
+        try {
+            if (gold < 0) { // Initial inquiry.
+                goldToPay = igc.getInciteAmount(player, enemy, settlementPlayer);
+            } else if (igc.inciteIndianSettlement(indianSettlement, player,
+                                                  enemy, gold)) {
+                goldToPay = gold; // Pay this amount.
+            } else {
+                goldToPay = 0;
+            }
+        } catch (Exception e) {
+            return Message.clientError(e.getMessage());
         }
         unit.setMovesLeft(0);
 

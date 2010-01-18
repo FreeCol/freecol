@@ -121,7 +121,6 @@ public class LearnSkillMessage extends Message {
         Document doc = reply.getOwnerDocument();
         IndianSettlement indianSettlement = (IndianSettlement) settlement;
         Tension tension = indianSettlement.getAlarm(player);
-        if (tension == null) tension = new Tension(0);
         switch (tension.getLevel()) {
         case HATEFUL: // Killed
             unit.dispose();
@@ -147,7 +146,7 @@ public class LearnSkillMessage extends Message {
             Element updateSuccess = doc.createElement("update");
             reply.appendChild(updateSuccess);
             updateSuccess.appendChild(unit.toXMLElement(player, doc));
-            updateSuccess.appendChild(indianSettlement.toXMLElement(player, doc));
+            updateSuccess.appendChild(tile.toXMLElement(player, doc));
             break;
         }
         return reply;

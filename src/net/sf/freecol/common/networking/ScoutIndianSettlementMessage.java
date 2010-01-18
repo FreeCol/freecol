@@ -134,8 +134,8 @@ public class ScoutIndianSettlementMessage extends Message {
         } else {
             Element update = doc.createElement("update");
             reply.appendChild(update);
-            // Always update the settlement, as it is now visited.
-            update.appendChild(indianSettlement.toXMLElement(player, doc));
+            // Always update the tile, as the settlement is now visited.
+            update.appendChild(tile.toXMLElement(player, doc));
             // Update any new tiles the unit can see from the settlement,
             // which can include an enhanced radius from tales.
             int radius = unit.getLineOfSight();

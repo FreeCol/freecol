@@ -29,6 +29,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
@@ -95,11 +96,13 @@ public class GetTransactionMessage extends Message {
             return Message.clientError(e.getMessage());
         }
 
-        // Do not allow contact from water
-        if (!settlement.allowContact(unit)) {
-            return Message.clientError("Contact denied at "
-                                       + settlement.getName());
+        MoveType type = unit.getSimpleMoveType(settlement.getTile());
+        if (type != MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS) {
+            return Message.clientError("Unable to enter "
+                                       + settlement.getName()
+                                       + ": " + type.whyIllegal());
         }
+
         // If starting a transaction session, the unit needs movement points
         InGameController igc = server.getInGameController();
         if (!igc.isTransactionSessionOpen(unit, settlement)

@@ -112,17 +112,22 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY(null, false),
         ENTER_FOREIGN_COLONY_WITH_SCOUT(null, false),
         ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS(null, false),
-        MOVE_ILLEGAL("Unspecified illegal move"),
         MOVE_NO_MOVES("Attempt to move without moves left"),
         MOVE_NO_ACCESS_LAND("Attempt to move a naval unit onto land"),
         MOVE_NO_ACCESS_BEACHED("Attempt to move onto foreign beached ship"),
         MOVE_NO_ACCESS_EMBARK("Attempt to embark onto absent or foreign carrier"),
         MOVE_NO_ACCESS_FULL("Attempt to embark onto full carrier"),
+        MOVE_NO_ACCESS_CONTACT("Attempt to interact with natives before contact"),
         MOVE_NO_ACCESS_SETTLEMENT("Attempt to move into foreign settlement"),
-        MOVE_NO_ATTACK_MARINE("Attempt to attack non-settlement from on board ship"),
+        MOVE_NO_ACCESS_SKILL("Attempt to learn skill with incapable unit"),
+        MOVE_NO_ACCESS_TRADE("Attempt to trade without authority"),
+        MOVE_NO_ACCESS_WAR("Attempt to trade while at war"),
+        MOVE_NO_ACCESS_WATER("Attempt to move into a settlement by water"),
         MOVE_NO_ATTACK_CIVILIAN("Attempt to attack with civilian unit"),
+        MOVE_NO_ATTACK_MARINE("Attempt to attack from on board ship"),
         MOVE_NO_EUROPE("Attempt to move to Europe by incapable unit"),
-        MOVE_NO_REPAIR("Attempt to move a unit that is under repair");
+        MOVE_NO_REPAIR("Attempt to move a unit that is under repair"),
+        MOVE_ILLEGAL("Unspecified illegal move");
 
         /**
          * The reason why this move type is illegal.
@@ -149,7 +154,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
 
         public String whyIllegal() {
-            return reason;
+            return (reason == null) ? "(none)" : reason;
         }
 
         public boolean isProgress() {
@@ -586,8 +591,18 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Checks if this <code>Unit</code> is a colonist. A <code>Unit</code>
-     * is a colonist if it can build a new <code>Colony</code>.
+     * Checks if this is a trading <code>Unit</code>, meaning that it
+     * can trade with settlements, and that it has something to trade.
+     *
+     * @return True if this is a trading unit.
+     */
+    public boolean isTradingUnit() {
+        return canCarryGoods() && goodsContainer.getGoodsCount() > 0;
+    }
+
+    /**
+     * Checks if this <code>Unit</code> is a `colonist'.  A unit is a
+     * colonist if it is European and can build a new <code>Colony</code>.
      * 
      * @return <i>true</i> if this unit is a colonist and <i>false</i>
      *         otherwise.
@@ -595,6 +610,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public boolean isColonist() {
         return unitType.hasAbility("model.ability.foundColony")
             && owner.isEuropean();
+    }
+
+    /**
+     * Checks if this is an offensive unit.  That is, one that can
+     * attack other units.
+     *
+     * @return <code>true</code> if this is an offensive unit.
+     */
+    public boolean isOffensiveUnit() {
+        return unitType.getOffence() > UnitType.DEFAULT_OFFENCE
+            || isArmed() || isMounted();
     }
 
     /**
@@ -1180,22 +1206,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Returns true if this unit can enter a settlement in order to trade.
-     * 
-     * @param settlement The settlement to enter.
-     * @return <code>true</code> if this <code>Player</code> can trade with
-     *         the given <code>Settlement</code>. The unit will for instance
-     *         need to be a {@link #isCarrier() carrier} and have goods onboard.
-     */
-    public boolean canTradeWith(Settlement settlement) {
-        return canCarryGoods()
-            && goodsContainer.getGoodsCount() > 0
-            && getOwner().getStance(settlement.getOwner()) != Stance.WAR
-            && (settlement instanceof IndianSettlement
-                || hasAbility("model.ability.tradeWithForeignColonies"));
-    }
-
-    /**
      * Gets the type of a move made in a specified direction.
      * 
      * @param direction The direction of the move.
@@ -1310,7 +1320,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
 
         Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
-
         return getSimpleMoveType(target);
     }
 
@@ -1324,7 +1333,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *      units should be ignored when determining the move type.
      * @return The move type.
      */
-    private MoveType getNavalMoveType(Tile from, Tile target, boolean ignoreEnemyUnits) {
+    private MoveType getNavalMoveType(Tile from, Tile target,
+                                      boolean ignoreEnemyUnits) {
         if (target == null) {
             return (getOwner().canMoveToEurope()) ? MoveType.MOVE_HIGH_SEAS
                 : MoveType.MOVE_NO_EUROPE;
@@ -1338,8 +1348,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 return MoveType.MOVE_NO_ACCESS_LAND;
             } else if (settlement.getOwner() == getOwner()) {
                 return MoveType.MOVE;
-            } else if (canTradeWith(settlement)) {
-                return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
+            } else if (isTradingUnit()) {
+                return getTradeMoveType(settlement);
             } else {
                 return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
             }
@@ -1358,27 +1368,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Can we perhaps learn a skill in this settlement?
-     *
-     * @param settlement The <code>IndianSettlement<code> to test.
-     * @return True/false if there is possibly a skill to learn.
-     */
-    private boolean perhapsLearnFromSettlement(IndianSettlement settlement) {
-        // If we know the skill is gone, fail.
-        if (settlement.getLearnableSkill() == null
-            && settlement.hasBeenVisited(getOwner())) {
-            return false;
-        }
-        // Generic way of saying: is this unit upgradable with one of the
-        // standard native skills?  We can not use the settlement's true
-        // skill because another nation might have consumed it without our
-        // knowing.
-        return getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES);
-    }
-    private static UnitType scoutSkill
-        = FreeCol.getSpecification().getUnitType("model.unit.seasonedScout");
-
-    /**
      * Gets the type of a move that is made when moving a land unit to
      * from one tile to another.
      * 
@@ -1388,70 +1377,58 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *      units should be ignored when determining the move type.
      * @return The move type.
      */
-    private MoveType getLandMoveType(Tile from, Tile target, boolean ignoreEnemyUnits) {
+    private MoveType getLandMoveType(Tile from, Tile target,
+                                     boolean ignoreEnemyUnits) {
         if (target == null) {
             return MoveType.MOVE_ILLEGAL;
         }
 
+        Player owner = getOwner();
         Unit defender = target.getFirstUnit();
-        Settlement settlement = target.getSettlement();
 
         if (target.isLand()) {
-            if (settlement != null) {
-                if (settlement.getOwner() == getOwner()) {
-                    return MoveType.MOVE;
-                } else if (canTradeWith(settlement)) {
-                    return MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS;
-                } else {
-                    if (isColonist()) {
-                        if (settlement instanceof Colony) {
-                            switch (getRole()) {
-                            case DEFAULT: case PIONEER: case MISSIONARY:
-                                break;
-                            case SCOUT:
-                                return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
-                            case SOLDIER: case DRAGOON:
-                                break;
-                            }
-                        } else if (settlement instanceof IndianSettlement) {
-                            switch (getRole()) {
-                            case DEFAULT: case PIONEER:
-                                if (perhapsLearnFromSettlement((IndianSettlement) settlement)) {
-                                    return MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST;
-                                }
-                                break;
-                            case MISSIONARY:
-                                if (((IndianSettlement) settlement).getAlarm(getOwner()) == null) {
-                                    return MoveType.MOVE_ILLEGAL;
-                                } else {
-                                    return MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY;
-                                }
-                            case SCOUT:
-                                return MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT;
-                            case SOLDIER: case DRAGOON:
-                                break;
-                            }
-                        }
-                    }
-                    return (isOffensiveUnit()) ? MoveType.ATTACK
-                        : MoveType.MOVE_NO_ACCESS_SETTLEMENT;
-                }
-            } else if (defender != null
-                    && defender.getOwner() != getOwner() 
+            Settlement settlement = target.getSettlement();
+            if (settlement == null) {
+                if (defender != null && owner != defender.getOwner()
                     && !ignoreEnemyUnits) {
-                if (defender.isNaval()) {
-                    return MoveType.MOVE_NO_ACCESS_BEACHED;
-                } else if (from != null && !from.isLand()) {
-                    return MoveType.MOVE_NO_ATTACK_MARINE;
+                    if (defender.isNaval()) {
+                        return MoveType.MOVE_NO_ACCESS_BEACHED;
+                    } else if (!isOffensiveUnit()) {
+                        return MoveType.MOVE_NO_ATTACK_CIVILIAN;
+                    } else {
+                        return (allowMoveFrom(from))
+                            ? MoveType.ATTACK
+                            : MoveType.MOVE_NO_ATTACK_MARINE;
+                    }
+                } else if (target.hasLostCityRumour() && owner.isEuropean()) {
+                    // Natives do not explore rumours, see:
+                    // server/control/InGameInputHandler.java:move()
+                    return MoveType.EXPLORE_LOST_CITY_RUMOUR;
+                } else {
+                    return MoveType.MOVE;
                 }
-                return (isOffensiveUnit()) ? MoveType.ATTACK
-                    : MoveType.MOVE_NO_ATTACK_CIVILIAN;
-            } else if (target.hasLostCityRumour() && getOwner().isEuropean()) {
-                //natives do not explore rumours, see:
-                //  server/control/InGameInputHandler.java:move()
-                return MoveType.EXPLORE_LOST_CITY_RUMOUR;
-            } else {
+            } else if (owner == settlement.getOwner()) {
                 return MoveType.MOVE;
+            } else if (isTradingUnit()) {
+                return getTradeMoveType(settlement);
+            } else if (isColonist()) {
+                switch (getRole()) {
+                case DEFAULT: case PIONEER:
+                    return getLearnMoveType(from, settlement);
+                case MISSIONARY:
+                    return getMissionaryMoveType(from, settlement);
+                case SCOUT:
+                    return getScoutMoveType(from, settlement);
+                case SOLDIER: case DRAGOON:
+                    return (allowMoveFrom(from))
+                        ? MoveType.ATTACK
+                        : MoveType.MOVE_NO_ATTACK_MARINE;
+                }
+                return MoveType.MOVE_ILLEGAL; // should not happen
+            } else if (isOffensiveUnit()) {
+                return MoveType.ATTACK;
+            } else {
+                return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
             }
         } else { // moving to sea, check for embarkation
             if (defender == null || defender.getOwner() != getOwner()) {
@@ -1464,6 +1441,117 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
             return MoveType.MOVE_NO_ACCESS_FULL;
         }
+    }
+
+    /**
+     * Get the <code>MoveType</code> when moving a trading unit to a
+     * settlement.
+     *
+     * @param settlement The <code>Settlement</code> to move to.
+     * @return The appropriate <code>MoveType</code>.
+     */
+    private MoveType getTradeMoveType(Settlement settlement) {
+        if (getOwner().getStance(settlement.getOwner()) == Stance.WAR) {
+            return MoveType.MOVE_NO_ACCESS_WAR;
+        } else if (settlement instanceof Colony) {
+            return (hasAbility("model.ability.tradeWithForeignColonies"))
+                ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
+                : MoveType.MOVE_NO_ACCESS_TRADE;
+        } else if (settlement instanceof IndianSettlement) {
+            return (allowContact(settlement))
+                ? MoveType.ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS
+                : MoveType.MOVE_NO_ACCESS_CONTACT;
+        } else {
+            return MoveType.MOVE_ILLEGAL; // should not happen
+        }
+    }
+
+    /**
+     * Get the <code>MoveType</code> when moving a colonist to a settlement.
+     *
+     * @param from The <code>Tile</code> to move from.
+     * @param settlement The <code>Settlement</code> to move to.
+     * @return The appropriate <code>MoveType</code>.
+     */
+    private MoveType getLearnMoveType(Tile from, Settlement settlement) {
+        if (settlement instanceof Colony) {
+            return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
+        } else if (settlement instanceof IndianSettlement) {
+            if (getType().canBeUpgraded(scoutSkill, ChangeType.NATIVES)) {
+                return (allowMoveFrom(from))
+                    ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST
+                    : MoveType.MOVE_NO_ACCESS_WATER;
+            } else {
+                return MoveType.MOVE_NO_ACCESS_SKILL;
+            }
+        } else {
+            return MoveType.MOVE_ILLEGAL; // should not happen
+        }
+    }
+    private static UnitType scoutSkill
+        = FreeCol.getSpecification().getUnitType("model.unit.seasonedScout");
+
+    /**
+     * Get the <code>MoveType</code> when moving a missionary to a settlement.
+     *
+     * @param from The <code>Tile</code> to move from.
+     * @param settlement The <code>Settlement</code> to move to.
+     * @return The appropriate <code>MoveType</code>.
+     */
+    private MoveType getMissionaryMoveType(Tile from, Settlement settlement) {
+        if (settlement instanceof Colony) {
+            return MoveType.MOVE_NO_ACCESS_SETTLEMENT;
+        } else if (settlement instanceof IndianSettlement) {
+            if (allowContact(settlement)) {
+                return (allowMoveFrom(from))
+                    ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY
+                    : MoveType.MOVE_NO_ACCESS_WATER;
+            } else {
+                return MoveType.MOVE_NO_ACCESS_CONTACT;
+            }
+        } else {
+            return MoveType.MOVE_ILLEGAL; // should not happen
+        }
+    }
+
+    /**
+     * Get the <code>MoveType</code> when moving a scout to a settlement.
+     *
+     * @param from The <code>Tile</code> to move from.
+     * @param settlement The <code>Settlement</code> to move to.
+     * @return The appropriate <code>MoveType</code>.
+     */
+    private MoveType getScoutMoveType(Tile from, Settlement settlement) {
+        if (settlement instanceof Colony) {
+            return MoveType.ENTER_FOREIGN_COLONY_WITH_SCOUT;
+        } else if (settlement instanceof IndianSettlement) {
+            return (allowMoveFrom(from))
+                ? MoveType.ENTER_INDIAN_SETTLEMENT_WITH_SCOUT
+                : MoveType.MOVE_NO_ACCESS_WATER;
+        } else {
+            return MoveType.MOVE_ILLEGAL; // should not happen
+        }
+    }
+
+    /**
+     * Is this unit allowed to move from a source tile?
+     * Implements the restrictions on moving from water.
+     *
+     * @param from The <code>Tile</code> to consider.
+     * @return True if the move is allowed.
+     */
+    private boolean allowMoveFrom(Tile from) {
+        return from.isLand();
+    }
+
+    /**
+     * Is this unit allowed to contact a settlement?
+     *
+     * @param settlement The <code>Settlement</code> to consider.
+     * @return True if the contact is allowed.
+     */
+    private boolean allowContact(Settlement settlement) {
+        return getOwner().hasContacted(settlement.getOwner());
     }
 
     /**
@@ -3282,16 +3370,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
 
         return l;
-    }
-
-    /**
-     * Checks if this is an offensive unit.
-     * 
-     * @return <code>true</code> if this is an offensive unit meaning it can
-     *         attack other units.
-     */
-    public boolean isOffensiveUnit() {
-        return unitType.getOffence() > UnitType.DEFAULT_OFFENCE || isArmed() || isMounted();
     }
 
     /**

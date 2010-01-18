@@ -1386,13 +1386,15 @@ public final class InGameController implements NetworkConstants {
      * @todo Unify trade and negotiation.
      */
     public void move(Unit unit, Direction direction) {
-        Game game = freeColClient.getGame();
-        if (game.getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
         // Consider all the move types
+        Tile tile = unit.getTile();
         MoveType move = unit.getMoveType(direction);
         switch (move) {
         case MOVE:
@@ -1425,11 +1427,48 @@ public final class InGameController implements NetworkConstants {
         case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
             moveTrade(unit, direction);
             break;
+
+        case MOVE_NO_ACCESS_BEACHED:
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            canvas.showInformationMessage("move.noAccessBeached",
+                                          "%nation%", getNationAt(tile, direction));
+            break;
+        case MOVE_NO_ACCESS_CONTACT:
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            canvas.showInformationMessage("move.noAccessContact",
+                                          "%nation%", getNationAt(tile, direction));
+            break;
         case MOVE_NO_ACCESS_LAND:
-            if (moveDisembark(unit, direction)) {
-                break;
+            if (!moveDisembark(unit, direction)) {
+                freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
             }
-            // Fall through to failure if disembark failed
+            break;
+        case MOVE_NO_ACCESS_SETTLEMENT:
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            canvas.showInformationMessage("move.noAccessSettlement",
+                                          "%unit%", unit.getName(),
+                                          "%nation%", getNationAt(tile, direction));
+            break;
+        case MOVE_NO_ACCESS_SKILL:
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            canvas.showInformationMessage("move.noAccessSkill",
+                                          "%unit%", unit.getName());
+            break;
+        case MOVE_NO_ACCESS_TRADE:
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            canvas.showInformationMessage("move.noAccessTrade",
+                                          "%nation%", getNationAt(tile, direction));
+            break;
+        case MOVE_NO_ACCESS_WAR:
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            canvas.showInformationMessage("move.noAccessWar",
+                                          "%nation%", getNationAt(tile, direction));
+            break;
+        case MOVE_NO_ACCESS_WATER:
+            freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
+            canvas.showInformationMessage("move.noAccessWater",
+                                          "%unit%", unit.getName());
+            break;
         default:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
             break;
@@ -1442,6 +1481,45 @@ public final class InGameController implements NetworkConstants {
                     freeColClient.updateMenuBar();
                 }
             });
+    }
+
+    /**
+     * Convenience function to find an adjacent settlement.  Intended
+     * to be called in contexts where we are expecting a settlement to
+     * be there, such as when handling a particular move type.
+     *
+     * @param tile The <code>Tile</code> to start at.
+     * @param direction The <code>Direction</code> to step.
+     * @return A settlement on the adjacent tile if any.
+     */
+    private Settlement getSettlementAt(Tile tile, Direction direction) {
+        Map map = freeColClient.getGame().getMap();
+        return map.getNeighbourOrNull(direction, tile).getSettlement();
+    }
+
+    /**
+     * Convenience function to find the nation controlling an adjacent
+     * settlement.  Intended to be called in contexts where we are
+     * expecting a settlement or unit to be there, such as when
+     * handling a particular move type.
+     *
+     * @param tile The <code>Tile</code> to start at.
+     * @param direction The <code>Direction</code> to step.
+     * @return The name of the nation controlling a settlement on the
+     *         adjacent tile if any.
+     */
+    private String getNationAt(Tile tile, Direction direction) {
+        Map map = freeColClient.getGame().getMap();
+        Tile newTile = map.getNeighbourOrNull(direction, tile);
+        Player player = null;
+        if (newTile.getSettlement() != null) {
+            player = newTile.getSettlement().getOwner();
+        } else if (newTile.getFirstUnit() != null) {
+            player = newTile.getFirstUnit().getOwner();
+        } else { // should not happen
+            player = freeColClient.getGame().getUnknownEnemy();
+        }
+        return player.getNationAsString();
     }
 
     /**
@@ -1545,11 +1623,13 @@ public final class InGameController implements NetworkConstants {
                        || unit.getDestination().getTile() == unit.getTile())) {
             canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
         } else if (unit.getMovesLeft() <= 0) {	
-            //Perform a short pause on an active unit's last move, if the option is enabled.
+            // Perform a short pause on an active unit's last move, if
+            // the option is enabled.
             if (freeColClient.getClientOptions().getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
                 canvas.paintImmediately(canvas.getBounds());
                 try {
-                    //UNIT_LAST_MOVE_DELAY is an instance variable located at the top of this class.
+                    // UNIT_LAST_MOVE_DELAY is an instance variable
+                    // located at the top of this class.
                     Thread.sleep(UNIT_LAST_MOVE_DELAY);
                 } catch (InterruptedException e) {
                     //Ignore
@@ -1630,8 +1710,8 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveHighSeas(Unit unit, Direction direction) {
         // Confirm moving to Europe if told to move to a null tile
-        // (can this still happen?), or if crossing the boundary between
-        // coastal and high sea.  Otherwise just move.
+        // (TODO: can this still happen?), or if crossing the boundary
+        // between coastal and high sea.  Otherwise just move.
         Map map = freeColClient.getGame().getMap();
         Tile oldTile = unit.getTile();
         Tile newTile = map.getNeighbourOrNull(direction, oldTile);
@@ -2078,24 +2158,15 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction in which the Indian settlement lies.
      */
     private void moveLearnSkill(Unit unit, Direction direction) {
-        Client client = freeColClient.getClient();
-        Canvas canvas = freeColClient.getCanvas();
-        Map map = freeColClient.getGame().getMap();
-
-        // Must arrive by land if not previously visited.
-        IndianSettlement settlement = (IndianSettlement) map.getNeighbourOrNull(direction, unit.getTile()).getSettlement();
-        if (!settlement.allowContact(unit)) {
-            canvas.showInformationMessage("indianSettlement.noContact",
-                                          settlement);
-            return;
-        }
-
         // Refresh knowledge of settlement skill.  It may have been
         // learned by another player.
         if (!askSkill(unit, direction)) {
             return;
         }
 
+        Canvas canvas = freeColClient.getCanvas();
+        IndianSettlement settlement
+            = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
         UnitType skill = settlement.getLearnableSkill();
         if (skill == null) {
             canvas.showInformationMessage("indianSettlement.noMoreSkill",
@@ -2176,13 +2247,6 @@ public final class InGameController implements NetworkConstants {
         Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
 
-        // Do not allow contact from water
-        if (!settlement.allowContact(unit)) {
-            canvas.showInformationMessage("indianSettlement.noContact",
-                                          settlement);
-            return;
-        }
-
         // Offer the choices.
         switch (canvas.showScoutIndianSettlementDialog(settlement)) {
         case CANCEL:
@@ -2261,15 +2325,8 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
-        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
-        IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
-
-        // Do not allow contact from water
-        if (!settlement.allowContact(unit)) {
-            canvas.showInformationMessage("indianSettlement.noContact",
-                                          settlement);
-            return;
-        }
+        IndianSettlement settlement
+            = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
 
         // Offer the choices.
         List<Object> response = canvas.showUseMissionaryDialog(settlement);
@@ -2375,14 +2432,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveScoutColony(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
-        Map map = freeColClient.getGame().getMap();
-        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
-        Colony colony = tile.getColony();
-        Player player = unit.getOwner();
-        if (colony != null && !player.hasContacted(colony.getOwner())) {
-            player.setContacted(colony.getOwner());
-        }
-
+        Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
         ScoutAction userAction = canvas.showScoutForeignColonyDialog(colony, unit);
         switch (userAction) {
         case CANCEL:
@@ -2397,7 +2447,7 @@ public final class InGameController implements NetworkConstants {
             moveSpy(unit, direction);
             break;
         default:
-            logger.warning("Incorrect response returned from Canvas.showScoutForeignColonyDialog()");
+            logger.warning("Bad response from showScoutForeignColonyDialog()");
             return;
         }
     }
@@ -2414,10 +2464,7 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction of a settlement to negotiate with.
      */
     private void moveTradeColony(Unit unit, Direction direction) {
-        Game game = freeColClient.getGame();
-        Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
-        if (tile == null) return;
-        Settlement settlement = tile.getSettlement();
+        Settlement settlement = getSettlementAt(unit.getTile(), direction);
         if (settlement == null) return;
 
         // Can not negotiate with the REF.
@@ -2509,18 +2556,16 @@ public final class InGameController implements NetworkConstants {
      * @param direction The <code>Direction</code> of a colony to spy on.
      */
     private void moveSpy(Unit unit, Direction direction) {
-        Game game = freeColClient.getGame();
-        Tile tile = game.getMap().getNeighbourOrNull(direction, unit.getTile());
+        Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
         Element reply;
-        if (tile != null && tile.getColony() != null
-            && (reply = askSpy(unit, direction)) != null) {
+        if (colony != null && (reply = askSpy(unit, direction)) != null) {
             // Sleight of hand here.  The update contains two versions
             // of the colony tile.  The first child node is a detailed
             // view, which is read explicitly, displayed, removed, then
             // superseded as the update is processed normally.
             Element tileElement = (Element) reply.getFirstChild();
-            tile.readFromXMLElement(tileElement);
-            freeColClient.getCanvas().showColonyPanel(tile.getColony());
+            colony.getTile().readFromXMLElement(tileElement);
+            freeColClient.getCanvas().showColonyPanel(colony);
             reply.removeChild(tileElement);
             freeColClient.getInGameInputHandler().update(reply);
         }
@@ -2548,20 +2593,11 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction to the settlement.
      */
     private void moveTrade(Unit unit, Direction direction) {
-        Map map = freeColClient.getGame().getMap();
-        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
-        Settlement settlement = tile.getSettlement();
-        Player player = unit.getOwner();
+        Settlement settlement = getSettlementAt(unit.getTile(), direction);
         if (settlement instanceof Colony) {
             moveTradeColony(unit, direction);
         } else if (settlement instanceof IndianSettlement) {
-            if (((IndianSettlement) settlement).hasBeenVisited(player)) {
-                moveTradeIndianSettlement(unit, direction);
-            } else {
-                Canvas canvas = freeColClient.getCanvas();
-                canvas.showInformationMessage("indianSettlement.noTradeContact",
-                                              settlement);
-            }
+            moveTradeIndianSettlement(unit, direction);
         } else {
             logger.warning("Bogus settlement: " + settlement.getId());
         }
@@ -2584,35 +2620,7 @@ public final class InGameController implements NetworkConstants {
      */
     private void moveTradeIndianSettlement(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer()
-            != freeColClient.getMyPlayer()) {
-            canvas.showInformationMessage("notYourTurn");
-            return;
-        }
-
-        // Sanity check
-        if (!unit.canCarryGoods()) {
-            throw new IllegalArgumentException("Unit " + unit.getId()
-                                               + " can not carry goods.");
-        }
-        Map map = freeColClient.getGame().getMap();
-        Tile tile = unit.getTile();
-        if (tile == null) {
-            throw new IllegalArgumentException("Unit " + unit.getId()
-                                               + " is not on the map!");
-        }
-        if ((tile = map.getNeighbourOrNull(direction, tile)) == null) {
-            throw new IllegalArgumentException("No tile in " + direction);
-        }
-        Settlement settlement = tile.getSettlement();
-        if (settlement == null) {
-            throw new IllegalArgumentException("No settlement in given direction!");
-        }
-        if (unit.getGoodsCount() == 0) {
-            canvas.errorMessage("trade.noGoodsOnboard");
-            return;
-        }
-
+        Settlement settlement = getSettlementAt(unit.getTile(), direction);
         java.util.Map<String, Boolean> session;
         while ((session = askOpenTransactionSession(unit, settlement)) != null) {
             // The session tracks buy/sell/gift events and disables
