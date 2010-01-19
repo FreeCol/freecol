@@ -58,6 +58,13 @@ public final class CostDeciders {
 
 
     /**
+     * A <code>CostDecider</code> that costs unit moves normally.
+     */
+    private static final CostDecider
+        avoidIllegalCostDecider = new BaseCostDecider();
+
+
+    /**
      * A <code>CostDecider</code> that costs unit moves normally while
      * avoiding other player settlements.
      */
@@ -147,6 +154,16 @@ public final class CostDeciders {
      */
     public static CostDecider numberOfTiles() {
         return tileCostDecider;
+    }
+
+    /**
+     * A <code>CostDecider</code> that returns the cost of moving
+     * across the terrain, excluding only illegal moves.
+     *
+     * @return The <code>CostDecider</code>.
+     */
+    public static CostDecider avoidIllegal() {
+        return avoidIllegalCostDecider;
     }
 
     /**

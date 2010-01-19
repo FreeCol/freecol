@@ -59,6 +59,8 @@ import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.pathfinding.CostDecider;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 
 import net.miginfocom.swing.MigLayout;
@@ -94,7 +96,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
         final Settlement inSettlement = (unit.getTile() != null) ? unit.getTile().getSettlement() : null;
 
         // Search for destinations we can reach:
-        getGame().getMap().search(unit, new GoalDecider() {
+        getGame().getMap().search(unit, unit.getTile(), new GoalDecider() {
                 public PathNode getGoal() {
                     return null;
                 }
@@ -110,7 +112,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
                 public boolean hasSubGoals() {
                     return false;
                 }
-            }, Integer.MAX_VALUE);
+            }, CostDeciders.avoidIllegal(), Integer.MAX_VALUE);
 
 
         if (destinationComparator == null) {
