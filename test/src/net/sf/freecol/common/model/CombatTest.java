@@ -696,7 +696,7 @@ public class CombatTest extends FreeColTestCase {
 
         assertEquals(Unit.MoveType.ATTACK, soldier.getMoveType(tile2, tile1, 9, false));
         assertEquals(Unit.MoveType.ATTACK, soldier.getMoveType(tile2, tile1, 1, false));
-
+        assertEquals(Unit.MoveType.MOVE_NO_MOVES, soldier.getMoveType(tile2, tile1, 0, false));
 
     }
 

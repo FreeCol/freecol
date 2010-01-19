@@ -1261,10 +1261,15 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         if (move.isLegal()) {
             switch(move) {
-                // these move types don't really move and may ignore
-                // movement points
-            case ATTACK:
                 //case DISEMBARK:
+                // doesn't really move and may ignore movement points
+                // break;
+            case ATTACK:
+                // needs only a single movement point, regardless of
+                // terrain, but suffers penalty
+                if (ml <= 0) {
+                    move = MoveType.MOVE_NO_MOVES;
+                }
                 break;
             default:
                 if (ml <= 0
