@@ -448,11 +448,11 @@ public class TransportMission extends Mission {
         if (!canAttackEnemyShips()) {
             return;
         }
-        if (hasCargo()) {
+        final Unit carrier = getUnit();
+        if (hasCargo() && !carrier.getOwner().isREF()) {
             // Do not search for a target if we have cargo onboard.
             return;
         }
-        final Unit carrier = getUnit();
         final PathNode pathToTarget = findNavalTarget(0);
         if (pathToTarget != null) {
             final Direction direction = moveTowards(connection, pathToTarget);
