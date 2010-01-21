@@ -2114,6 +2114,16 @@
         <selectValue label="clientOptions.labourReport.classic" value="0"/>
         <selectValue label="clientOptions.labourReport.compact" value="1"/>
       </selectOption>
+      <selectOption id="model.option.indianDemandResponse" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.indianDemandResponse.ask" value="0"/>
+        <selectValue label="clientOptions.indianDemandResponse.accept" value="1"/>
+        <selectValue label="clientOptions.indianDemandResponse.reject" value="2"/>
+      </selectOption>
+      <selectOption id="model.option.unloadOverflowResponse" defaultValue="0" localizedLabels="true">
+        <selectValue label="clientOptions.unloadOverflowResponse.ask" value="0"/>
+        <selectValue label="clientOptions.unloadOverflowResponse.never" value="1"/>
+        <selectValue label="clientOptions.unloadOverflowResponse.always" value="2"/>
+      </selectOption>
     </optionGroup>
     <optionGroup id="mapGeneratorOptions.import" >
       <!-- Option for setting a file to be imported (map etc). -->
