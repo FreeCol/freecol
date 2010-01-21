@@ -199,6 +199,17 @@ public final class Market extends FreeColGameObject implements Ownable {
     }
 
     /**
+     * Has a type of goods been traded in this market?
+     *
+     * @param type The type of goods to consider.
+     * @return True if the goods type has been traded.
+     */
+    public boolean hasBeenTraded(GoodsType type) {
+        MarketData data = marketData.get(type);
+        return data != null && data.getTraded();
+    }
+
+    /**
      * Determines the cost to buy a single unit of a particular type of good.
      *
      * @param type A <code>GoodsType</code> value.

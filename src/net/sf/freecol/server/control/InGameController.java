@@ -68,6 +68,7 @@ import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute.Stop;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Monarch.MonarchAction;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.MoveType;
@@ -266,41 +267,39 @@ public final class InGameController extends Controller {
         // Pick a random type of goods to remove an extra amount of.
         GoodsType removeType;
         do {
-            removeType = goodsTypes.get(getPseudoRandom().nextInt(goodsTypes.size()));
+            int randomGoods = getPseudoRandom().nextInt(goodsTypes.size());
+            removeType = goodsTypes.get(randomGoods);
         } while (!removeType.isStorable());
 
         // Remove standard amount, and the extra amount.
         for (GoodsType type : goodsTypes) {
-            if (type.isStorable()) {
-                int amount = 10;
-                if (type == removeType) {
-                    amount += getPseudoRandom().nextInt(21);
+            if (type.isStorable() && market.hasBeenTraded(type)) {
+                int amount = getGame().getTurn().getNumber() / 10;
+                if (type == removeType && amount > 0) {
+                    amount += getPseudoRandom().nextInt(2 * amount + 1);
                 }
-                market.addGoodsToMarket(type, -amount);
-                if (market.hasPriceChanged(type)) {
-                    messages.add(market.makePriceChangeMessage(type));
-                    market.flushPriceChange(type);
+                if (amount > 0) {
+                    market.addGoodsToMarket(type, -amount);
                 }
+            }
+            if (market.hasPriceChanged(type)) {
+                messages.add(market.makePriceChangeMessage(type));
+                market.flushPriceChange(type);
             }
         }
 
         // Update the client
-        Element element;
-        if (messages.isEmpty()) {
-            element = Message.createNewRootElement("update");
-            Document doc = element.getOwnerDocument();
-            element.appendChild(market.toXMLElement(player, doc));
-        } else {
-            element = Message.createNewRootElement("multiple");
-            Document doc = element.getOwnerDocument();
-            Element update = doc.createElement("update");
-            element.appendChild(update);
-            update.appendChild(market.toXMLElement(player, doc));
-            Element mess = doc.createElement("addMessages");
+        Element element = Message.createNewRootElement("multiple");
+        Document doc = element.getOwnerDocument();
+        Element update = doc.createElement("update");
+        element.appendChild(update);
+        update.appendChild(market.toXMLElement(player, doc));
+        Element mess = doc.createElement("addMessages");
+        for (ModelMessage m : messages) {
+            mess.appendChild(m.toXMLElement(player, doc));
+        }
+        if (mess.hasChildNodes()) {
             element.appendChild(mess);
-            for (ModelMessage m : messages) {
-                mess.appendChild(m.toXMLElement(player, doc));
-            }
         }
         try {
             player.getConnection().send(element);

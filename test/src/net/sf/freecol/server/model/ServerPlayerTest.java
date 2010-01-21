@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -106,9 +107,15 @@ public class ServerPlayerTest extends FreeColTestCase {
         GoodsType silver = s.getGoodsType("model.goods.silver");
         int silverPrice = silver.getInitialSellPrice();
 
-        // Sell in the French market, price should drop
+        // Sell lightly in the English market to check that the good
+        // is now considered "traded".
+        englishMarket.sell(silver, 1, english);
+        assertTrue(englishMarket.hasBeenTraded(silver));
+
+        // Sell heavily in the French market, price should drop.
         frenchMarket.sell(silver, 200, french);
         assertEquals(frenchGold + silverPrice * 200, french.getGold());
+        assertTrue(frenchMarket.hasBeenTraded(silver));
         assertTrue(frenchMarket.getSalePrice(silver, 1) < silverPrice);
 
         // Price should have dropped in the English market too, but
@@ -121,7 +128,9 @@ public class ServerPlayerTest extends FreeColTestCase {
         // conversion of sales is complete.
 
         // Pretend time is passing.
+        // Have to advance time as yearly goods removal is initially low.
         InGameController igc = server.getInGameController();
+        game.getTurn().setNumber(200);
         for (int i = 0; i < 100; i++) {
             igc.yearlyGoodsRemoval((ServerPlayer) french);
             igc.yearlyGoodsRemoval((ServerPlayer) english);
