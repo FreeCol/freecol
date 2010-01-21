@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>
+      Copyright (C) 2002-2007 The FreeCol Team
+
+      This file is part of FreeCol.
+
+      FreeCol is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 2 of the License, or
+      (at your option) any later version.
+
+      FreeCol is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with FreeCol. If not, see http://www.gnu.org/licenses
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:include schemaLocation="data-common.xsd" />
+
+  <xs:element name="modelMessage">
+    <xs:annotation>
+      <xs:documentation>
+	This class contains model messages.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+	<xs:element name="data" />
+      </xs:choice>
+
+      <xs:attribute name="ID" type="object-id" use="required" />
+      <xs:attribute name="owner" type="object-id" use="required" />
+      <xs:attribute name="source" type="object-id" use="optional" />
+      <xs:attribute name="display" type="object-id" use="optional" />
+      <xs:attribute name="hasBeenDisplayed" type="xs:boolean" use="optional"
+		    default="false" />
+      <xs:attribute name="type" type="ModelMessageType" use="required" />
+
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="ModelMessageType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="DEFAULT" />
+      <xs:enumeration value="WARNING" />
+      <xs:enumeration value="SONS_OF_LIBERTY" />
+      <xs:enumeration value="GOVERNMENT_EFFICIENCY" />
+      <xs:enumeration value="WAREHOUSE_CAPACITY" />
+      <xs:enumeration value="UNIT_IMPROVED" />
+      <xs:enumeration value="UNIT_DEMOTED" />
+      <xs:enumeration value="UNIT_LOST" />
+      <xs:enumeration value="UNIT_ADDED" />
+      <xs:enumeration value="BUILDING_COMPLETED" />
+      <xs:enumeration value="FOREIGN_DIPLOMACY" />
+      <xs:enumeration value="MARKET_PRICES" />
+      <xs:enumeration value="LOST_CITY_RUMOUR" />
+      <xs:enumeration value="GIFT_GOODS" />
+      <xs:enumeration value="MISSING_GOODS" />
+      <xs:enumeration value="TUTORIAL" />
+      <xs:enumeration value="COMBAT_RESULT" />
+      <xs:enumeration value="ACCEPTED_DEMANDS" />
+      <xs:enumeration value="REJECTED_DEMANDS" />
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

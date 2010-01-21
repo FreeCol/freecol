@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.NationOptions;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
@@ -365,11 +366,13 @@ public class FreeColTestCase extends TestCase {
         public Map build(){
             completeWorkingGrid();
             Tile[][] mapTiles = new Tile[width][height];
+            Region region = new Region(game, "myRegion");
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
                     TileType tileType = tiles[x][y];
                     mapTiles[x][y] = new Tile(game, tileType, x, y);
+                    mapTiles[x][y].setRegion(region);
                 }
             }
             

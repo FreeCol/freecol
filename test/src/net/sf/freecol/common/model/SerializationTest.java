@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -31,6 +32,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 import org.xml.sax.SAXException;
@@ -56,19 +58,66 @@ public class SerializationTest extends FreeColTestCase {
         return new StreamSource(new StringReader(sw.toString()));
     }
 
-    public void testColony() throws Exception {
+    public void testValidation() throws Exception {
 
         Validator validator = buildValidator("schema/data/data-player.xsd");
 
         Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+        Map map = getTestMap(plainsType,true);
+    	game.setMap(map);
 
         Colony colony = getStandardColony(6);
         Player player = game.getPlayer("model.nation.dutch");
         colony.newTurn();
         colony.newTurn();
 
-        validator.validate(buildSource(player, player, true, true));
+        validator = buildValidator("schema/data/data-game.xsd");
+        validator.validate(buildSource(game, player, true, true));
+
+    }
+
+    public void testMapAfrica() throws Exception {
+
+        Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
+
+        FreeColSavegameFile mapFile =
+            new FreeColSavegameFile(new File("data/maps/Africa.fsg"));
+
+        mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
+
+    }
+
+    public void testMapAustralia() throws Exception {
+
+        Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
+
+        FreeColSavegameFile mapFile =
+            new FreeColSavegameFile(new File("data/maps/Australia.fsg"));
+
+        mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
+
+    }
+
+    public void testMapAmerica() throws Exception {
+
+        Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
+
+        FreeColSavegameFile mapFile =
+            new FreeColSavegameFile(new File("data/maps/america-large.fsg"));
+
+        mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
+
+    }
+
+    public void testMapCaribbean() throws Exception {
+
+        Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
+
+        FreeColSavegameFile mapFile =
+            new FreeColSavegameFile(new File("data/maps/caribbean-basin.fsg"));
+
+        mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
+
     }
 
 }

@@ -1,71 +1,72 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified">
-	<xs:annotation>
-		<xs:documentation>
-        
-Copyright (C) 2002-2007 The FreeCol Team
+	   elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>
+      
+      Copyright (C) 2002-2007 The FreeCol Team
 
-This file is part of FreeCol.
+      This file is part of FreeCol.
 
-FreeCol is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
+      FreeCol is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 2 of the License, or
+      (at your option) any later version.
 
-FreeCol is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+      FreeCol is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+      GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with FreeCol. If not, see http://www.gnu.org/licenses
- 		</xs:documentation>
-	</xs:annotation>
+      You should have received a copy of the GNU General Public License
+      along with FreeCol. If not, see http://www.gnu.org/licenses
+    </xs:documentation>
+  </xs:annotation>
 
-	<xs:include schemaLocation="data-common.xsd" />
-    <xs:include schemaLocation="data-colony.xsd" />
-    <xs:include schemaLocation="data-indianSettlement.xsd" />
-    <xs:include schemaLocation="data-tileitemcontainer.xsd" />
-    <xs:include schemaLocation="data-playerExploredTile.xsd" />
+  <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-colony.xsd" />
+  <xs:include schemaLocation="data-indianSettlement.xsd" />
+  <xs:include schemaLocation="data-tileitemcontainer.xsd" />
+  <xs:include schemaLocation="data-playerExploredTile.xsd" />
 
 
-    <xs:element name="tile">
-        <xs:complexType>
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="colony"></xs:element>
-                <xs:element ref="indianSettlement"></xs:element>
-                <xs:element ref="tileitemcontainer" />
-                <xs:element ref="playerExploredTile" />
-            </xs:choice>
+  <xs:element name="tile">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="colony" />
+        <xs:element ref="indianSettlement" />
+        <xs:element ref="tileitemcontainer" />
+        <xs:element ref="playerExploredTile" />
+      </xs:choice>
 
-            <xs:attribute name="ID" type="object-id" use="required"></xs:attribute>
-            <xs:attribute name="x" type="xs:int" use="required"></xs:attribute>
-            <xs:attribute name="y" type="xs:int" use="required"></xs:attribute>
-            <xs:attribute name="type" type="xs:string" use="required">
-                <xs:annotation>
-                    <xs:documentation>
-                        Tile type
-                </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
+      <xs:attribute name="ID" type="object-id" use="required" />
+      <xs:attribute name="x" type="xs:int" use="required" />
+      <xs:attribute name="y" type="xs:int" use="required" />
+      <xs:attribute name="type" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Tile type
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
 
-            <xs:attribute name="region" type="xs:string" use="required">
-                <xs:annotation>
-                    <xs:documentation>
-                        Owner region
-                    </xs:documentation>
-                </xs:annotation>
-            </xs:attribute>
-            <xs:attribute name="fishBonus" type="xs:int" default="0"
-                use="optional"></xs:attribute>
-            <xs:attribute name="lostCityRumor" type="xs:boolean"
-                default="false" use="optional"></xs:attribute>
-            <xs:attribute name="connected" type="xs:boolean" use="optional"></xs:attribute>
-            <xs:attribute name="owner" type="xs:string" use="optional"></xs:attribute>
-            <xs:attribute name="owningSettlement" type="xs:string"
-                use="optional"></xs:attribute>
-        </xs:complexType>
-    </xs:element>
+      <xs:attribute name="region" type="object-id" use="optional">
+        <xs:annotation>
+          <xs:documentation>
+            Owner region, may be absent in map files.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="fishBonus" type="xs:int" default="0"
+                    use="optional" />
+      <xs:attribute name="lostCityRumour" type="xs:boolean"
+                    default="false" use="optional" />
+      <xs:attribute name="connected" type="xs:boolean" use="optional" />
+      <xs:attribute name="owner" type="xs:string" use="optional" />
+      <xs:attribute name="owningSettlement" type="xs:string"
+                    use="optional" />
+      <xs:attribute name="style" type="xs:int" use="optional" />
+    </xs:complexType>
+  </xs:element>
 
 </xs:schema>
