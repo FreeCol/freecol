@@ -36,6 +36,7 @@ import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 
 
@@ -58,66 +59,62 @@ public class SerializationTest extends FreeColTestCase {
         return new StreamSource(new StringReader(sw.toString()));
     }
 
-    public void testValidation() throws Exception {
 
-        Validator validator = buildValidator("schema/data/data-player.xsd");
+    private void validateMap(String name) throws Exception {
+        try{
+            Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
+
+            FreeColSavegameFile mapFile = new FreeColSavegameFile(new File(name));
+
+            mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
+        }
+        catch(SAXParseException e){
+            String errMsg = e.getMessage() 
+                + " at line=" + e.getLineNumber() 
+                + " column=" + e.getColumnNumber();
+            fail(errMsg);
+        }
+    }
+
+    public void testValidation() throws Exception {
 
         Game game = getGame();
         Map map = getTestMap(plainsType,true);
-    	game.setMap(map);
+        game.setMap(map);
 
         Colony colony = getStandardColony(6);
         Player player = game.getPlayer("model.nation.dutch");
         colony.newTurn();
         colony.newTurn();
 
-        validator = buildValidator("schema/data/data-game.xsd");
-        validator.validate(buildSource(game, player, true, true));
+        try {
+            Validator validator = buildValidator("schema/data/data-player.xsd");
+
+            validator = buildValidator("schema/data/data-game.xsd");
+            validator.validate(buildSource(game, player, true, true));
+        } catch(SAXParseException e){
+            String errMsg = e.getMessage() 
+                + " at line=" + e.getLineNumber() 
+                + " column=" + e.getColumnNumber();
+            fail(errMsg);
+        }
 
     }
 
     public void testMapAfrica() throws Exception {
-
-        Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
-
-        FreeColSavegameFile mapFile =
-            new FreeColSavegameFile(new File("data/maps/Africa.fsg"));
-
-        mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
-
+        validateMap("data/maps/Africa.fsg");
     }
 
     public void testMapAustralia() throws Exception {
-
-        Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
-
-        FreeColSavegameFile mapFile =
-            new FreeColSavegameFile(new File("data/maps/Australia.fsg"));
-
-        mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
-
+        validateMap("data/maps/Australia.fsg");
     }
 
     public void testMapAmerica() throws Exception {
-
-        Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
-
-        FreeColSavegameFile mapFile =
-            new FreeColSavegameFile(new File("data/maps/america-large.fsg"));
-
-        mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
-
+        validateMap("data/maps/america-large.fsg");
     }
 
     public void testMapCaribbean() throws Exception {
-
-        Validator mapValidator = buildValidator("schema/data/data-savedGame.xsd");
-
-        FreeColSavegameFile mapFile =
-            new FreeColSavegameFile(new File("data/maps/caribbean-basin.fsg"));
-
-        mapValidator.validate(new StreamSource(mapFile.getSavegameInputStream()));
-
+        validateMap("data/maps/caribbean-basin.fsg");
     }
 
 }
