@@ -212,7 +212,6 @@ public class ServerPlayerTest extends FreeColTestCase {
         if (server == null) {
             server = ServerTestHelper.startServer(false, true);
         }
-        Map map = getTestMap(plains);
         server.setMapGenerator(new MockMapGenerator(getTestMap()));
         PreGameController pgc = (PreGameController) server.getController();
         try {
@@ -222,7 +221,9 @@ public class ServerPlayerTest extends FreeColTestCase {
         }
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
-
+        // we need to update the reference
+        Map map = game.getMap();
+        
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         ServerPlayer french = (ServerPlayer) game.getPlayer("model.nation.french");
         Tile tile1 = map.getTile(6, 8);
@@ -245,7 +246,7 @@ public class ServerPlayerTest extends FreeColTestCase {
             server = ServerTestHelper.startServer(false, true);
         }
         Map map = getCoastTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(getTestMap()));
+        server.setMapGenerator(new MockMapGenerator(map));
         PreGameController pgc = (PreGameController) server.getController();
         try {
             pgc.startGame();
@@ -254,6 +255,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         }
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
+        // we need to update the reference
+        map = game.getMap();
 
         //Game game = getStandardGame();
         //Map map = getTestMap();
@@ -291,7 +294,6 @@ public class ServerPlayerTest extends FreeColTestCase {
         if (server == null) {
             server = ServerTestHelper.startServer(false, true);
         }
-        Map map = getCoastTestMap(plains);
         server.setMapGenerator(new MockMapGenerator(getTestMap()));
         PreGameController pgc = (PreGameController) server.getController();
         try {
@@ -301,7 +303,9 @@ public class ServerPlayerTest extends FreeColTestCase {
         }
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
-
+        // we need to update the reference
+        Map map = game.getMap();
+        
         Colony colony = getStandardColony();
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Unit wagonInColony = new Unit(game, colony.getTile(), dutch,
@@ -362,7 +366,7 @@ public class ServerPlayerTest extends FreeColTestCase {
             server = ServerTestHelper.startServer(false, true);
         }
         Map map = getCoastTestMap(plains);
-        server.setMapGenerator(new MockMapGenerator(getTestMap()));
+        server.setMapGenerator(new MockMapGenerator(map));
         PreGameController pgc = (PreGameController) server.getController();
         try {
             pgc.startGame();
@@ -371,6 +375,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         }
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
+        // we need to update the reference
+        map = game.getMap();
 
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Goods cotton = new Goods(game, null, cottonType, 75);
@@ -474,7 +480,7 @@ public class ServerPlayerTest extends FreeColTestCase {
         if (server == null) {
             server = ServerTestHelper.startServer(false, true);
         }
-        Map map = getTestMap(plains);
+
         server.setMapGenerator(new MockMapGenerator(getTestMap()));
         PreGameController pgc = (PreGameController) server.getController();
         try {
@@ -484,7 +490,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         }
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
-
+        Map map = game.getMap();
+        
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Unit unit = new Unit(game, map.getTile(5, 8), dutch, hardyPioneerType,
                              UnitState.ACTIVE);
