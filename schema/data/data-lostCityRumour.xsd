@@ -24,26 +24,33 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
-  <xs:include schemaLocation="data-resource.xsd" />
-  <xs:include schemaLocation="data-tileimprovement.xsd" />
-  <xs:include schemaLocation="data-lostCityRumour.xsd" />
 
-  <xs:element name="tileitemcontainer">
+  <xs:element name="lostCityRumour">
     <xs:annotation>
       <xs:documentation>
-        Contains TileItems and can be used by a Tile to
-        make certain tasks easier.
+        Represents a LostCityRumour.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="resource" />
-        <xs:element ref="tileimprovement" />
-        <xs:element ref="lostCityRumour" />
-      </xs:choice>
-      <xs:attribute name="ID" type="xs:string" use="required" />
-      <xs:attribute name="tile" type="xs:string" use="required" />
+      <xs:attribute name="ID" type="object-id" use="required"/>
+      <xs:attribute name="tile" type="object-id" use="required"/>
+      <xs:attribute name="type" type="LostCityRumourType" use="optional"/>
+      <xs:attribute name="name" type="xs:string" use="optional"/>
     </xs:complexType>
   </xs:element>
+
+  <xs:simpleType name="LostCityRumourType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="NO_SUCH_RUMOUR" />
+      <xs:enumeration value="BURIAL_GROUND" />
+      <xs:enumeration value="EXPEDITION_VANISHES" /> 
+      <xs:enumeration value="NOTHING" />
+      <xs:enumeration value="LEARN" />
+      <xs:enumeration value="TRIBAL_CHIEF" />
+      <xs:enumeration value="COLONIST" />
+      <xs:enumeration value="TREASURE" />
+      <xs:enumeration value="FOUNTAIN_OF_YOUTH" />
+    </xs:restriction>
+  </xs:simpleType>
 
 </xs:schema>
