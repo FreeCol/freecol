@@ -166,6 +166,8 @@ public class ServerPlayerTest extends FreeColTestCase {
         }
         Game game = server.getGame();
         FreeColTestCase.setGame(game);
+        // we need to update the reference
+        map = game.getMap();
      
         ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile = map.getTile(10, 4);
