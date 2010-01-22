@@ -38,8 +38,6 @@ public class BaseCostDeciderTest extends FreeColTestCase {
     @Override
     public void setUp() {
         game = getStandardGame();
-        Map map = getTestMap(plainsType);
-        game.setMap(map);
     }
 
     @Override
@@ -51,6 +49,9 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * Checks that the decider returns the right cost for a plain to plain move.
      */
     public void testGetCostLandLand() {
+        Map map = getTestMap(plainsType);
+        game.setMap(map);
+    	
         final CostDecider decider = CostDeciders.avoidSettlements();
         Tile start = game.getMap().getTile(5, 5);
         Unit unit = new Unit(game, start, game.getCurrentPlayer(), spec().getUnitType(
@@ -70,6 +71,9 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * a move.
      */
     public void testGetRemainingMovesAndNewTurn() {
+        Map map = getTestMap(plainsType);
+        game.setMap(map);
+        
         final CostDecider decider = CostDeciders.avoidSettlements();
         Unit unit = new Unit(game, game.getMap().getTile(1, 1), game.getCurrentPlayer(),
                 spec().getUnitType("model.unit.hardyPioneer"),
@@ -131,7 +135,9 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * Verifies that is invalid
      */
     public void testInvalidMoveThroughTileWithSettlement() {
-        Map map = game.getMap();
+        Map map = getTestMap(plainsType);
+        game.setMap(map);
+
         //Setup
         Tile settlementTile = map.getTile(2,1);
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
