@@ -712,8 +712,9 @@
         <condition property="savegame" else="">
             <isset property="savegame" />
         </condition>
-        <java classname="net.sf.freecol.tools.SaveGameValidator" classpath="build/" >
-            <arg value="${savegame}" />
+        <java classname="net.sf.freecol.tools.SaveGameValidator">
+            <classpath refid="test.run.classpath"/>
+			<arg value="${savegame}" />
         </java>
     </target>
 
