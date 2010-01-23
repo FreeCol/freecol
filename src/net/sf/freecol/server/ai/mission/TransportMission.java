@@ -648,7 +648,7 @@ public class TransportMission extends Mission {
         }
     }
 
-	private Destination getNextStop() {
+	Destination getNextStop() {
 		Unit unit = getUnit();
 		if(transportList.size() == 0){
 			logger.finest(unit + "(" + unit.getId() + ") has nothing to transport, moving to default destination");
