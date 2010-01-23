@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>
+
+      Copyright (C) 2002-2010 The FreeCol Team
+
+      This file is part of FreeCol.
+
+      FreeCol is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 2 of the License, or
+      (at your option) any later version.
+
+      FreeCol is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with FreeCol. If not, see http://www.gnu.org/licenses
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:include schemaLocation="data-common.xsd">
+    <xs:annotation>
+      <xs:documentation>
+	Include common data model type definitions.
+      </xs:documentation>
+    </xs:annotation>
+  </xs:include>
+
+  <xs:element name="aiMain">
+
+    <xs:annotation>
+      <xs:documentation>
+        Data used by the AI.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="aiUnit">
+          <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="1">
+              <xs:element name="buildColonyMission" >
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="doNotGiveUp" type="xs:boolean" use="required" />
+                  <xs:attribute name="colonyBuilt" type="xs:boolean" use="required" />
+                  <xs:attribute name="target" type="object-id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="cashInTreasureTrainMission" type="SimpleMissionType" />
+              <xs:element name="defendSettlementMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="settlement" type="object-id" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="idleAtColonyMission" type="SimpleMissionType" />
+              <xs:element name="indianBringGiftMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="target" type="object-id" use="optional" />
+                  <xs:attribute name="giftDelivered" type="xs:boolean" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="indianDemandMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="target" type="object-id" use="optional" />
+                  <xs:attribute name="completed" type="xs:boolean" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="pioneeringMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="tileImprovementPlan" type="object-id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="privateerMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="state" type="PrivateerState" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="scoutingMission" type="SimpleMissionType" />
+              <xs:element name="transportMission">
+                <xs:complexType>
+                  <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="transportable">
+                      <xs:complexType>
+                        <xs:attribute name="ID" type="object-id" />
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="unitSeekAndDestroyMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="target" type="object-id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="unitWanderHostileMission" type="SimpleMissionType" />
+              <xs:element name="unitWanderMission" type="SimpleMissionType" />
+              <xs:element name="wishRealizationMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="wish" type="object-id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="workInsideColonyMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="colony" type="object-id" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+            <xs:attribute name="ID" type="object-id" />
+            <xs:attribute name="transport" type="object-id" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="aiColony">
+          <xs:complexType>
+            <xs:attribute name="ID" type="object-id" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="aiPlayer">
+          <xs:complexType>
+            <xs:attribute name="ID" type="object-id" />
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="nextID" type="xs:int" />
+    </xs:complexType>
+
+  </xs:element>
+
+  <xs:complexType name="SimpleMissionType">
+    <xs:attribute name="unit" type="object-id" />
+  </xs:complexType>
+
+  <xs:simpleType name="PrivateerState">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="HUNTING" />
+      <xs:enumeration value="TRANSPORTING" />
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

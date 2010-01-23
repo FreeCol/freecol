@@ -3,7 +3,7 @@
 	   elementFormDefault="qualified">
   <xs:annotation>
     <xs:documentation>
-      Copyright (C) 2002-2007 The FreeCol Team
+      Copyright (C) 2002-2010 The FreeCol Team
 
       This file is part of FreeCol.
 
@@ -24,6 +24,7 @@
 
   <xs:include schemaLocation="data-serverObjects.xsd" />
   <xs:include schemaLocation="data-game.xsd" />
+  <xs:include schemaLocation="data-aiMain.xsd" />
 
   <xs:element name="savedGame">
     <xs:annotation>
@@ -36,7 +37,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
 	<xs:element ref="serverObjects" />
 	<xs:element ref="game" />
-	<xs:element name="aiMain" />
+	<xs:element ref="aiMain" />
       </xs:choice>
 
       <xs:attribute name="owner" type="xs:string" use="required" />
