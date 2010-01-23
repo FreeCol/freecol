@@ -524,15 +524,17 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     public void updateProductionPanel() {
         rightProductionPanel.removeAll();
 
+        GoodsType grain = Specification.getSpecification().getGoodsType("model.goods.food");
+        int food = 0;
+
         List<AbstractGoods> foodProduction = new ArrayList<AbstractGoods>();
         List<AbstractGoods> surplusProduction = new ArrayList<AbstractGoods>();
         for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
             int production = colony.getProductionOf(goodsType);
             if (production != 0) {
                 if (goodsType.isFoodType()) {
-                    int surplus = production - colony.getFoodConsumptionByType(goodsType);
                     foodProduction.add(new AbstractGoods(goodsType, production));
-                    surplusProduction.add(new AbstractGoods(goodsType, surplus));
+                    food += production;
                 } else if (goodsType.isBreedable()) {
                     ProductionLabel horseLabel = new ProductionLabel(goodsType, production, getCanvas());
                     horseLabel.setMaxGoodsIcons(1);
@@ -555,11 +557,14 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             } 
         }
 
+        /*
         ProductionMultiplesLabel surplusLabel =
             new ProductionMultiplesLabel(surplusProduction, getCanvas());
         surplusLabel.setDrawPlus(true);
         surplusLabel.setToolTipPrefix(Messages.message("surplusProduction"));
         rightProductionPanel.add(surplusLabel, 0);
+        */
+        rightProductionPanel.add(new ProductionLabel(grain, food - colony.getFoodConsumption(), getCanvas()), 0);
 
         ProductionMultiplesLabel label = new ProductionMultiplesLabel(foodProduction, getCanvas());
         label.setToolTipPrefix(Messages.message("totalProduction"));
