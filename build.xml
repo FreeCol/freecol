@@ -704,10 +704,23 @@
         </java>
     </target>
 
+    <!-- Validates a savegame files specified as property file
+        ("-Dsavegame=whatever.fsg", for example).  If file is a directory,
+        all savegame files in that directory will be validated. -->
+    <target name="validate-savegame" depends="build"
+            description="Validates a savegame, or directory of savegames.">
+        <condition property="savegame" else="">
+            <isset property="savegame" />
+        </condition>
+        <java classname="net.sf.freecol.tools.SaveGameValidator" classpath="build/" >
+            <arg value="${savegame}" />
+        </java>
+    </target>
+
     <!-- Creates installer strings. -->
     <target name="installer-translations" depends="build"
             description="Creates properties files for installer translations.">
-        <java classname="net.sf.freecol.tools.InstallerTranslations" classpath="build/" />
+        <java classname="net.sf.freecol.tools.InstallerTranslations" classpathref="test.run.classpath" />
     </target>
 
     <target name="pmd">

@@ -48,7 +48,7 @@
 	      </xs:annotation>
 	    </xs:attribute>
 
-	    <xs:anyAttribute namespace="##local">
+	    <xs:anyAttribute namespace="##local" processContents="skip">
 	      <xs:annotation>
 		<xs:documentation>
 		  ID of father with the names "x0", "x1", "x2"
@@ -112,7 +112,7 @@
       <xs:attribute name="attackedByPrivateers" type="xs:boolean"
 		    use="optional" default="false"/>
       <xs:attribute name="entryLocation" type="xs:string" use="optional"/>
-
+      <xs:attribute name="currentFather" type="xs:string" use="optional"/>
 
     </xs:complexType>
   </xs:element>

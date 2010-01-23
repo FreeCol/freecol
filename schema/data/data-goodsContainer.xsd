@@ -36,23 +36,23 @@
   <xs:element name="goodsContainer">
     <xs:complexType>
       <xs:sequence>
-	<xs:element name="storedGoods">
+	<xs:element name="storedGoods" minOccurs="0" maxOccurs="1">
 	  <xs:complexType>
 	    <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element ref="goods"></xs:element>
+	      <xs:element ref="goods"/>
 	    </xs:choice>
 	  </xs:complexType>
 	</xs:element>
 
-	<xs:element name="oldStoredGoods">
+	<xs:element name="oldStoredGoods" minOccurs="0" maxOccurs="1">
 	  <xs:complexType>
 	    <xs:choice minOccurs="0" maxOccurs="unbounded">
-	      <xs:element ref="goods"></xs:element>
+	      <xs:element ref="goods"/>
 	    </xs:choice>
 	  </xs:complexType>
 	</xs:element>
       </xs:sequence>
-      <xs:attribute name="ID" type="xs:string" use="required"></xs:attribute>
+      <xs:attribute name="ID" type="xs:string" use="required"/>
     </xs:complexType>
   </xs:element>
 
