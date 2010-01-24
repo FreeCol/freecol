@@ -1533,6 +1533,11 @@ public class StandardAIPlayer extends AIPlayer {
                 logger.warning("Trying to assign a mission to an uninitialized object: " + unit.getId());
                 continue;
             }
+            
+            // only processing naval units
+            if(unit.isNaval()){
+            	continue;
+            }
 
             if (unit.canCarryTreasure()) {
                 aiUnit.setMission(new CashInTreasureTrainMission(getAIMain(), aiUnit));
@@ -1545,11 +1550,18 @@ public class StandardAIPlayer extends AIPlayer {
                 continue;
             }
 
-            if ((unit.isOffensiveUnit() || unit.isDefensiveUnit())
-                       && (!unit.isColonist() || unit.hasAbility("model.ability.expertSoldier") ||
-                        getGame().getTurn().getNumber() > 5)) {
-                giveMilitaryMission(aiUnit);
-                continue;
+            if (unit.isOffensiveUnit() || unit.isDefensiveUnit()){
+            	Player owner = unit.getOwner();
+            	boolean isPastStart = getGame().getTurn().getNumber() > 5
+            			&& !owner.getSettlements().isEmpty();
+            
+            	if(!unit.isColonist() 
+            			|| isPastStart
+            			|| owner.isIndian()
+            			|| owner.isREF()){
+            		giveMilitaryMission(aiUnit);
+            		continue;
+            	}
             }
 
             // Setup as a pioneer if unit is:
@@ -1565,7 +1577,7 @@ public class StandardAIPlayer extends AIPlayer {
                 continue;
             }
 
-            if (unit.isColonist()) {
+            if (unit.isColonist() & unit.getOwner().isEuropean()) {
                 /*
                  * Motivated by (speed) performance: This map stores the
                  * distance between the unit and the destination of a Wish:
