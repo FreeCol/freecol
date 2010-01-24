@@ -977,8 +977,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 workType = type;
                 if (getLocation() instanceof ColonyTile) {
                     ColonyTile colonyTile = (ColonyTile) getLocation();
-                    colonyTile.firePropertyChange(oldWorkType.getId(), 
-                                                  colonyTile.getProductionOf(this, oldWorkType), null);
+                    if (oldWorkType != null) {
+                        colonyTile.firePropertyChange(oldWorkType.getId(), 
+                                                      colonyTile.getProductionOf(this, oldWorkType), null);
+                    }
                     colonyTile.firePropertyChange(type.getId(), 
                                                   null, colonyTile.getProductionOf(this, type));
                 }

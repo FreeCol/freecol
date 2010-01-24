@@ -186,6 +186,55 @@ public class ColonyTest extends FreeColTestCase {
         assertEquals(crosses, colony.getGoodsCount(Goods.CROSSES));
         assertEquals(crosses, colony.getImmigration());
 
+    }
+
+    public void testOccupationWithFood() {
+
+        int population = 3;
+        GoodsType food = spec().getGoodsType("model.goods.food");
+        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
+        GoodsType cloth = spec().getGoodsType("model.goods.cloth");
+        UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
+        UnitType cottonPlanter = spec().getUnitType("model.unit.masterCottonPlanter");
+        UnitType statesman = spec().getUnitType("model.unit.elderStatesman");
+        BuildingType townHall = spec().getBuildingType("model.building.TownHall");
+
+        Game game = getGame();
+        game.setMap(getTestMap(plainsType, true));
+        Colony colony = getStandardColony(population);
+
+        assertTrue("colony produces less food than it consumes",
+                   colony.getFoodProduction() > colony.getFoodConsumption() +
+                   freeColonist.getFoodConsumed());
+
+        // colonist with no skill or experience will produce food
+        Unit colonist = new Unit(game, colony.getOwner(), freeColonist);
+        colonist.joinColony(colony);
+        assertTrue(colonist.getLocation() instanceof ColonyTile);
+        assertEquals(food, colonist.getWorkType());
+
+        // colonist with experience in producing farmed goods will
+        // produce that type of goods
+        colonist.putOutsideColony();
+        colonist.setWorkType(cotton);
+        colonist.modifyExperience(100);
+        colonist.joinColony(colony);
+        assertTrue(colonist.getLocation() instanceof ColonyTile);
+        assertEquals(cotton, colonist.getWorkType());
+        
+        // expert will produce expert goods
+        colonist.putOutsideColony();
+        colonist.setType(cottonPlanter);
+        colonist.joinColony(colony);
+        assertTrue(colonist.getLocation() instanceof ColonyTile);
+        assertEquals(cotton, colonist.getWorkType());
+        
+        // expert will produce expert goods
+        colonist.putOutsideColony();
+        colonist.setType(statesman);
+        colonist.joinColony(colony);
+        assertTrue(colonist.getLocation() instanceof Building);
+        assertEquals(townHall, ((Building) colonist.getLocation()).getType());
 
     }
 
@@ -216,6 +265,59 @@ public class ColonyTest extends FreeColTestCase {
             }
         }
         assertEquals(2, modifierCount);
+
+    }
+
+    public void testOccupationWithoutFood() {
+
+        int population = 1;
+        GoodsType bells = spec().getGoodsType("model.goods.bells");
+        GoodsType cotton = spec().getGoodsType("model.goods.cotton");
+        GoodsType cloth = spec().getGoodsType("model.goods.cloth");
+        BuildingType townHall = spec().getBuildingType("model.building.TownHall");
+        BuildingType weaversHouse = spec().getBuildingType("model.building.WeaverHouse");
+
+        UnitType freeColonist = spec().getUnitType("model.unit.freeColonist");
+        UnitType weaver = spec().getUnitType("model.unit.masterWeaver");
+
+        Game game = getGame();
+        game.setMap(getTestMap(spec().getTileType("model.tile.arctic"), true));
+        Colony colony = getStandardColony(population);
+
+        assertTrue("colony produces more food than it consumes",
+                   colony.getFoodProduction() < colony.getFoodConsumption() +
+                   freeColonist.getFoodConsumed());
+
+        // colonist produces bells because they require no input
+        Unit colonist = new Unit(game, colony.getOwner(), spec().getUnitType("model.unit.freeColonist"));
+        colonist.joinColony(colony);
+        assertTrue(colonist.getLocation() instanceof Building);
+        assertEquals(townHall, ((Building) colonist.getLocation()).getType());
+        assertEquals(bells, colonist.getWorkType());
+
+        colonist.putOutsideColony();
+        colonist.setWorkType(cotton);
+        colonist.modifyExperience(100);
+        colonist.joinColony(colony);
+        assertEquals(townHall, ((Building) colonist.getLocation()).getType());
+        assertEquals(bells, colonist.getWorkType());
+
+        colonist.putOutsideColony();
+        colonist.setType(spec().getUnitType("model.unit.masterCottonPlanter"));
+        colonist.joinColony(colony);
+        assertEquals(townHall, ((Building) colonist.getLocation()).getType());
+        assertEquals(bells, colonist.getWorkType());
+
+        // colonist produces cloth, because there is cotton now
+        colonist.putOutsideColony();
+        colonist.setType(weaver);
+        colony.addGoods(cotton, 100);
+        colonist.joinColony(colony);
+        assertTrue(colonist.getLocation() instanceof Building);
+        assertEquals(weaversHouse,
+                     ((Building) colonist.getLocation()).getType());
+        assertEquals(cloth, colonist.getWorkType());
+        
 
     }
 

@@ -1453,7 +1453,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             oldParent.remove(comp);
 
                             GoodsType workType = colonyTile.getWorkType(unit);
-                            ColonyTile bestTile = colony.getVacantColonyTileFor(unit, workType, false);
+                            ColonyTile bestTile = colony.getVacantColonyTileFor(unit, false, workType);
 
                             getController().work(unit, colonyTile);
                             // check whether worktype is suitable

@@ -768,7 +768,7 @@ public class AIColony extends AIObject {
      */
     private ColonyTile getBestVacantTile(Connection connection,
                                          Unit unit, GoodsType goodsType) {
-        ColonyTile colonyTile = colony.getVacantColonyTileFor(unit, goodsType, true);
+        ColonyTile colonyTile = colony.getVacantColonyTileFor(unit, true, goodsType);
         if (colonyTile == null) return null;
 
         // Check if the tile needs to be claimed from another settlement.

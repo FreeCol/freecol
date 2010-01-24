@@ -82,6 +82,16 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         WRONG_UPGRADE
     }
 
+    private class Occupation {
+        public WorkLocation workLocation;
+        public GoodsType workType;
+
+        public Occupation(WorkLocation workLocation, GoodsType workType) {
+            this.workLocation = workLocation;
+            this.workType = workType;
+        }
+    }
+
 
     /** A list of ColonyTiles. */
     private final List<ColonyTile> colonyTiles = new ArrayList<ColonyTile>();
@@ -598,14 +608,17 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (locatable instanceof Unit) {
             Unit newUnit = (Unit) locatable;
             if (newUnit.isColonist()) {
-                WorkLocation w = getVacantWorkLocationFor(newUnit);
-                if (w == null) {
+                Occupation occupation = getOccupationFor(newUnit);
+                if (occupation == null) {
                     logger.warning("Could not find a 'WorkLocation' for " + newUnit.getName()
                                    + " in " + getName());
                     newUnit.putOutsideColony();
                 } else {
                     int oldPopulation = getUnitCount();
-                    newUnit.work(w);
+                    newUnit.work(occupation.workLocation);
+                    if (occupation.workType != null) {
+                        newUnit.setWorkType(occupation.workType);
+                    }
                     updatePopulation(1);
                 }
             } else {
@@ -1155,15 +1168,72 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      *         location.
      */
     public WorkLocation getVacantWorkLocationFor(Unit unit) {
-        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
-            WorkLocation colonyTile = getVacantColonyTileFor(unit, foodType, false);
-            if (colonyTile != null) {
-                return colonyTile;
+        Occupation occupation = getOccupationFor(unit);
+        if (occupation == null) {
+            return null;
+        } else {
+            return occupation.workLocation;
+        }
+    }
+
+    /**
+     * Returns an <code>Occupation</code> for the given <code>Unit</code>.
+     * 
+     * @param unit The <code>Unit</code>
+     * @return An <code>Occupation</code> for the given
+     *         <code>Unit</code> or <code>null</code> if there is none.
+     */
+    private Occupation getOccupationFor(Unit unit) {
+        if (getFoodProduction() > getFoodConsumption() + unit.getType().getFoodConsumed()) {
+            GoodsType expertProduction = unit.getType().getExpertProduction();
+            if (expertProduction == null) {
+                if (unit.getExperience() > 0) {
+                    expertProduction = unit.getWorkType();
+                    if (expertProduction != null && expertProduction.isFarmed()) {
+                        ColonyTile colonyTile = getVacantColonyTileFor(unit, true, expertProduction);
+                        if (colonyTile != null) {
+                            return new Occupation(colonyTile, expertProduction);
+                        }
+                    }
+                }
+            } else if (expertProduction.isFarmed()) {
+                ColonyTile colonyTile = getVacantColonyTileFor(unit, true, expertProduction);
+                if (colonyTile != null) {
+                    return new Occupation(colonyTile, expertProduction);
+                }
+            } else {
+                for (Building building : getBuildingsForProducing(expertProduction)) {
+                    if (building.canAdd(unit)
+                        && (building.getGoodsInputType() == null
+                            || getGoodsCount(building.getGoodsInputType()) > 0)) {
+                        return new Occupation(building, expertProduction);
+                    }
+                }
             }
         }
+
+        ColonyTile bestTile = null;
+        GoodsType bestType = null;
+        int bestProduction = 0;
+        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+            ColonyTile colonyTile = getVacantColonyTileFor(unit, false, foodType);
+            if (colonyTile != null) {
+                int production = colonyTile.getProductionOf(unit, foodType);
+                if (production > bestProduction) {
+                    bestProduction = production;
+                    bestTile = colonyTile;
+                    bestType = foodType;
+                }
+            }
+        }
+        if (bestTile != null) {
+            return new Occupation(bestTile, bestType);
+        }
         for (Building building : buildingMap.values()) {
-            if (building.canAdd(unit)) {
-                return building;
+            if (building.canAdd(unit)
+                && (building.getGoodsInputType() == null
+                    || getGoodsCount(building.getGoodsInputType()) > 0)) {
+                return new Occupation(building, building.getGoodsOutputType());
             }
         }
         return null;
@@ -1176,33 +1246,34 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * 
      * @param unit The <code>Unit</code> to find a vacant
      *            <code>ColonyTile</code> for.
-     * @param goodsType The type of goods that should be produced.
      * @param allowClaim Allow claiming free tiles from other settlements.
+     * @param goodsTypes The types of goods that should be produced.
      * @return The <code>ColonyTile</code> giving the highest production of
      *         the given goods for the given unit or <code>null</code> if
      *         there is no available <code>ColonyTile</code> for producing
      *         that goods.
      */
-    public ColonyTile getVacantColonyTileFor(Unit unit, GoodsType goodsType,
-                                             boolean allowClaim) {
+    public ColonyTile getVacantColonyTileFor(Unit unit, boolean allowClaim, GoodsType... goodsTypes) {
         ColonyTile bestPick = null;
         int highestProduction = 0;
         for (ColonyTile colonyTile : colonyTiles) {
             if (colonyTile.canAdd(unit)) {
-                Tile workTile = colonyTile.getWorkTile();
-                if (workTile.getOwningSettlement() != this && !allowClaim) {
-                    continue;
-                }
-                /*
-                 * canAdd ensures workTile it's empty or unit it's working in it
-                 * so unit can work in it if it's owned by none, by europeans or
-                 * unit's owner has the founding father Peter Minuit
-                 */
-                if (owner.getLandPrice(workTile) == 0) {
-                    int potential = colonyTile.getProductionOf(unit, goodsType);
-                    if (potential > highestProduction) {
-                        highestProduction = potential;
-                        bestPick = colonyTile;
+                for (GoodsType goodsType : goodsTypes) {
+                    Tile workTile = colonyTile.getWorkTile();
+                    if (workTile.getOwningSettlement() != this && !allowClaim) {
+                        continue;
+                    }
+                    /*
+                     * canAdd ensures workTile it's empty or unit it's working in it
+                     * so unit can work in it if it's owned by none, by europeans or
+                     * unit's owner has the founding father Peter Minuit
+                     */
+                    if (owner.getLandPrice(workTile) == 0) {
+                        int potential = colonyTile.getProductionOf(unit, goodsType);
+                        if (potential > highestProduction) {
+                            highestProduction = potential;
+                            bestPick = colonyTile;
+                        }
                     }
                 }
             }

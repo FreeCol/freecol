@@ -174,22 +174,28 @@ public class SchoolTest extends FreeColTestCase {
     	game.setMap(getTestMap(plainsType,true));
     	
         Colony colony = getStandardColony(10);
+        assertEquals(10, colony.getUnitCount());
 
         Iterator<Unit> units = colony.getUnitIterator();
 
         Unit colonist = units.next();
+        assertTrue("unit is not in a WorkLocation",
+                   colonist.getLocation() instanceof WorkLocation);
         colonist.setType(freeColonistType);
 
         Unit elder = units.next();
+        assertTrue("unit is not in a WorkLocation",
+                   colonist.getLocation() instanceof WorkLocation);
         elder.setType(elderStatesmanType);
 
         BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
-        colony.addBuilding(new Building(game, colony, schoolType));
-        Building school = colony.getBuilding(spec().getBuildingType("model.building.Schoolhouse"));
+        Building school = new Building(game, colony, schoolType);
+        colony.addBuilding(school);
         school.upgrade();
         school.upgrade();
 
         elder.setLocation(school);
+        elder.setStudent(colonist);
         trainForTurns(colony, elder.getNeededTurnsOfTraining());
         assertEquals(elderStatesmanType, colonist.getType());
         colony.dispose();
@@ -273,7 +279,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
 
-        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, Goods.FOOD, true));
+        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, Goods.FOOD));
         ore.setLocation(school);
 
         while (3 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
@@ -282,7 +288,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(2, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, masterBlacksmithType).size());
 
-        blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith, Goods.FOOD, true));
+        blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith, true, Goods.FOOD));
         veteran.setLocation(school);
 
         while (2 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
@@ -291,7 +297,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, expertOreMinerType).size());
 
-        ore.setLocation(colony.getVacantColonyTileFor(ore, Goods.FOOD, true));
+        ore.setLocation(colony.getVacantColonyTileFor(ore, true, Goods.FOOD));
 
         while (1 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
             school.newTurn();
@@ -686,7 +692,7 @@ public class SchoolTest extends FreeColTestCase {
 
         // Now we want the colonist to be a carpenter. We just want to 
         // shuffle the teachers.
-        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, Goods.FOOD, true));
+        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, true, Goods.FOOD));
         // outside the colony is still considered OK (same Tile)
         teacher1.putOutsideColony();
 
@@ -768,7 +774,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(3, teacher1.getTurnsOfTraining());
         
         // Then teacher2 for 1 turn
-        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1, Goods.FOOD, true));
+        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1, true, Goods.FOOD));
         teacher2.setLocation(school);
         school.newTurn();
         assertEquals(3, teacher1.getTurnsOfTraining());
@@ -831,7 +837,7 @@ public class SchoolTest extends FreeColTestCase {
         
         // Now we move the teachers somewhere else
         teacher1.setLocation(getGame().getMap().getTile(6, 8));
-        teacher2.setLocation(outsideColony.getVacantColonyTileFor(teacher2, Goods.FOOD, true));
+        teacher2.setLocation(outsideColony.getVacantColonyTileFor(teacher2, true, Goods.FOOD));
         assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(0, teacher2.getTurnsOfTraining());
         assertEquals(1, getUnitList(colony, freeColonistType).size());
@@ -931,7 +937,7 @@ public class SchoolTest extends FreeColTestCase {
         trainForTurns(colony, 2);
 
         // After 2 turns replace by miner. Progress starts from scratch.
-        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, Goods.FOOD, true));
+        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, Goods.FOOD));
         assertTrue(lumberjack.getStudent() == null);
         assertTrue(colonist.getTeacher() == null);
 
