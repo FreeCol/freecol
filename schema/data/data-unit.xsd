@@ -79,14 +79,13 @@
       </xs:element>
     </xs:choice>
 
-    <xs:attribute name="ID" type="object-id" use="required">
-    </xs:attribute>
+    <xs:attribute name="ID" type="UnitId" use="required" />
     <xs:attribute name="name" type="xs:string" use="optional"/>
     <xs:attribute name="unitType" type="xs:string" use="required"/>
     <xs:attribute name="movesLeft" type="xs:int" use="required"/>
     <xs:attribute name="state" type="UnitState" use="required"/>
     <xs:attribute name="role" type="UnitRole" use="required"/>
-    <xs:attribute name="owner" type="object-id" use="required"/>
+    <xs:attribute name="owner" type="PlayerId" use="required"/>
     <xs:attribute name="turnsOfTraining" type="xs:int" use="required"/>
     <xs:attribute name="workType" type="xs:string" use="required"/>
     <xs:attribute name="experience" type="xs:int" use="required"/>
@@ -100,11 +99,11 @@
 		  use="optional"/>
     <xs:attribute name="workLeft" type="xs:integer" use="required"/>
 
-    <xs:attribute name="entryLocation" type="object-id" use="optional"/>
-    <xs:attribute name="location" type="object-id" use="optional"/>
-    <xs:attribute name="destination" type="object-id" use="optional"/>
+    <xs:attribute name="entryLocation" type="TileId" use="optional"/>
+    <xs:attribute name="location" type="LocationId" use="optional"/>
+    <xs:attribute name="destination" type="LocationId" use="optional"/>
 
-    <xs:attribute name="tradeRoute" type="object-id" use="optional"/>
+    <xs:attribute name="tradeRoute" type="TradeRouteId" use="optional"/>
     <xs:attribute name="currentStop" type="xs:int" use="optional"/>
 
     <xs:attribute name="visibleGoodsCount" type="xs:int" use="optional"/>

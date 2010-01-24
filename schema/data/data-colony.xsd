@@ -42,10 +42,10 @@
 	<xs:element ref="modifier" />
       </xs:choice>
 
-      <xs:attribute name="ID" type="object-id" use="required"></xs:attribute>
+      <xs:attribute name="ID" type="ColonyId" use="required"></xs:attribute>
       <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
-      <xs:attribute name="owner" type="object-id" use="required"></xs:attribute>
-      <xs:attribute name="tile" type="object-id" use="required"></xs:attribute>
+      <xs:attribute name="owner" type="PlayerId" use="required"></xs:attribute>
+      <xs:attribute name="tile" type="TileId" use="required"></xs:attribute>
       <xs:attribute name="liberty" type="xs:int" use="optional" default="0" />
       <xs:attribute name="immigration" type="xs:int" use="optional" default="0" />
 

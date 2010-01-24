@@ -32,8 +32,8 @@
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
-      <xs:attribute name="ID" type="object-id" use="required"/>
-      <xs:attribute name="tile" type="object-id" use="required"/>
+      <xs:attribute name="ID" type="LostCityRumourId" use="required"/>
+      <xs:attribute name="tile" type="TileId" use="required"/>
       <xs:attribute name="type" type="LostCityRumourType" use="optional"/>
       <xs:attribute name="name" type="xs:string" use="optional"/>
     </xs:complexType>

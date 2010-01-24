@@ -36,10 +36,10 @@
 	<xs:element name="data" />
       </xs:choice>
 
-      <xs:attribute name="ID" type="object-id" use="required" />
-      <xs:attribute name="owner" type="object-id" use="required" />
-      <xs:attribute name="source" type="object-id" use="optional" />
-      <xs:attribute name="display" type="object-id" use="optional" />
+      <xs:attribute name="ID" type="xs:string" use="required" />
+      <xs:attribute name="owner" type="PlayerId" use="required" />
+      <xs:attribute name="source" type="SourceId" use="optional" />
+      <xs:attribute name="display" type="xs:string" use="optional" />
       <xs:attribute name="hasBeenDisplayed" type="xs:boolean" use="optional"
 		    default="false" />
       <xs:attribute name="type" type="ModelMessageType" use="required" />

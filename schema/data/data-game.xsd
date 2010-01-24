@@ -45,11 +45,11 @@
 	<xs:element ref="modelMessage" />
       </xs:choice>
 
-      <xs:attribute name="ID" type="object-id" use="required" />
+      <xs:attribute name="ID" type="GameId" use="required" />
       <xs:attribute name="turn" type="xs:int" use="required" />
       <xs:attribute name="spanishSuccession" type="xs:boolean" use="optional"
 		    default="false" />
-      <xs:attribute name="currentPlayer" type="object-id" use="optional" >
+      <xs:attribute name="currentPlayer" type="PlayerId" use="optional" >
         <xs:annotation>
           <xs:documentation>
 	    May be absent in map files.

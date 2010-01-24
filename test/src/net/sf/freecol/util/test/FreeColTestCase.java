@@ -366,7 +366,7 @@ public class FreeColTestCase extends TestCase {
         public Map build(){
             completeWorkingGrid();
             Tile[][] mapTiles = new Tile[width][height];
-            Region region = new Region(game, "myRegion");
+            Region region = new Region(game);
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {

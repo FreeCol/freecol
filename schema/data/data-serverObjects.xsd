@@ -40,7 +40,7 @@
 
   <xs:element name="serverPlayer">
     <xs:complexType>
-      <xs:attribute name="ID" type="object-id" use="required" />
+      <xs:attribute name="ID" type="PlayerId" use="required" />
     </xs:complexType>
   </xs:element>
 

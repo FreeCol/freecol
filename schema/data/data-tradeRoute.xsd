@@ -43,16 +43,16 @@
 		</xs:complexType>
 	      </xs:element>
 	    </xs:choice>
-	    <xs:attribute name="location" type="object-id" use="required"/>
+	    <xs:attribute name="location" type="LocationId" use="required"/>
 	  </xs:complexType>
 	</xs:element>
       </xs:choice>
-      <xs:attribute name="ID" type="object-id" use="required">
+      <xs:attribute name="ID" type="TradeRouteId" use="required">
 	<xs:annotation>
 	  <xs:documentation>Object ID</xs:documentation>
 	</xs:annotation>
       </xs:attribute>
-      <xs:attribute name="owner" type="object-id" use="required">
+      <xs:attribute name="owner" type="PlayerId" use="required">
 	<xs:annotation>
 	  <xs:documentation>
 	    ID of the player

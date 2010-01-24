@@ -43,21 +43,21 @@
 
   <xs:element name="booleanOption">
     <xs:complexType>
-      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="id" type="OptionId" use="required" />
       <xs:attribute name="value" type="xs:boolean" use="required" />
     </xs:complexType>
   </xs:element>
 
   <xs:element name="integerOption">
     <xs:complexType>
-      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="id" type="OptionId" use="required" />
       <xs:attribute name="value" type="xs:int" use="required" />
     </xs:complexType>
   </xs:element>
 
   <xs:element name="selectOption">
     <xs:complexType>
-      <xs:attribute name="id" type="xs:string" use="required" />
+      <xs:attribute name="id" type="OptionId" use="required" />
       <xs:attribute name="value" type="xs:int" use="required" />
     </xs:complexType>
   </xs:element>

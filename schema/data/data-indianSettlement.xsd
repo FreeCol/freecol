@@ -50,15 +50,15 @@
 	</xs:element>
 	<xs:element name="ownedUnits">
           <xs:complexType>
-            <xs:attribute name="ID" type="object-id"/>
+            <xs:attribute name="ID" type="UnitId"/>
           </xs:complexType>
 	</xs:element>
 	<xs:element ref="goodsContainer"/>
       </xs:choice>
 
-      <xs:attribute name="ID" type="object-id" use="required"/>
-      <xs:attribute name="tile" type="object-id" use="required"/>
-      <xs:attribute name="owner" type="object-id" use="required"/>
+      <xs:attribute name="ID" type="IndianSettlementId" use="required"/>
+      <xs:attribute name="tile" type="TileId" use="required"/>
+      <xs:attribute name="owner" type="PlayerId" use="required"/>
       <xs:attribute name="convertProgress" type="xs:int" use="optional"
 		    default="0"/>
       <xs:attribute name="lastTribute" type="xs:int" use="optional"
@@ -66,12 +66,12 @@
       <xs:attribute name="isCapital" type="xs:boolean" use="optional"
 		    default="false"/>
 
-      <xs:attribute name="learnableSkill" type="xs:string"
+      <xs:attribute name="learnableSkill" type="UnitTypeId"
 		    use="optional"/>
 
-      <xs:attribute name="wantedGoods0" type="xs:string" use="optional"/>
-      <xs:attribute name="wantedGoods1" type="xs:string" use="optional"/>
-      <xs:attribute name="wantedGoods2" type="xs:string" use="optional"/>
+      <xs:attribute name="wantedGoods0" type="GoodsTypeId" use="optional"/>
+      <xs:attribute name="wantedGoods1" type="GoodsTypeId" use="optional"/>
+      <xs:attribute name="wantedGoods2" type="GoodsTypeId" use="optional"/>
       <xs:attribute name="name" type="xs:string" use="optional"/>
 
     </xs:complexType>

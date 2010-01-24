@@ -45,8 +45,8 @@
         </xs:element>
       </xs:choice>
 
-      <xs:attribute name="ID" type="object-id" use="required"/>
-      <xs:attribute name="player" type="object-id" use="required"/>
+      <xs:attribute name="ID" type="MonarchId" use="required"/>
+      <xs:attribute name="player" type="PlayerId" use="required"/>
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="supportSea" type="xs:boolean"
                     use="optional" default="false"/>
@@ -57,7 +57,7 @@
   
   <xs:element name="abstractUnit">
     <xs:complexType>
-      <xs:attribute name="id" type="object-id" use="required"/>
+      <xs:attribute name="id" type="UnitTypeId" use="required"/>
       <xs:attribute name="role" type="UnitRole" use="required"/>
       <xs:attribute name="number" type="xs:int" use="optional"
                     default="1"/>

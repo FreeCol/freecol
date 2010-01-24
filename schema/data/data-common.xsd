@@ -1,36 +1,240 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	elementFormDefault="qualified">
-	<xs:annotation>
-		<xs:documentation>
-Copyright (C) 2002-2007 The FreeCol Team
+	   elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>
+      Copyright (C) 2002-2007 The FreeCol Team
 
-This file is part of FreeCol.
+      This file is part of FreeCol.
 
-FreeCol is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
+      FreeCol is free software: you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation, either version 2 of the License, or
+      (at your option) any later version.
 
-FreeCol is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+      FreeCol is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+      GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with FreeCol. If not, see http://www.gnu.org/licenses
-		</xs:documentation>
-	</xs:annotation>
+      You should have received a copy of the GNU General Public License
+      along with FreeCol. If not, see http://www.gnu.org/licenses
+    </xs:documentation>
+  </xs:annotation>
 
-	<xs:simpleType name="object-id">
-		<xs:annotation>
-			<xs:documentation>
-				Generic Object Identifier format
-            </xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<!-- <xs:pattern value=".*:.*"/> -->
-		</xs:restriction>
-	</xs:simpleType>
+  <xs:simpleType name="BuildingId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="building:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ColonyId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="colony:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ColonyTileId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="colonyTile:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EuropeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="europe:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="GameId">
+    <xs:restriction base="xs:int">
+      <xs:pattern value="([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="GoodsId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="goods:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="GoodsContainerId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="goodsContainer:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="IndianSettlementId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="indianSettlement:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LocationId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(tile|unit|colony|europe|colonyTile|building|indianSettlement):([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LostCityRumourId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="lostCityRumour:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MapId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="map:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MarketId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="market:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MonarchId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="monarch:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PlayerId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="player:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PlayerExploredTileId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="playerExploredTile:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RegionId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="region:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResourceId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="resource:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SettlementId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(indianSettlement|colony):([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SourceId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(colony|europe|market|player|tile|unit):([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TileId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="tile:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TileImprovementId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="tileimprovement:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TileImprovementPlanId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="tileimprovementplan:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TileItemContainerId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="tileitemcontainer:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TradeRouteId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="tradeRoute:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TransportableId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(goods|unit):([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="UnitId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="unit:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="WishId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="wish:([0-9])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Game Object Types -->
+
+  <xs:simpleType name="GoodsTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.goods\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NationId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.nation\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NationTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.nationType\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OptionId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.option\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResourceTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.resource\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TileImprovementTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.improvement\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TileTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.tile\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="UnitTypeId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.unit\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
+
+
 </xs:schema>
 

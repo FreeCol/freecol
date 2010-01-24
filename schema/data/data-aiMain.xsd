@@ -46,43 +46,43 @@
             <xs:choice minOccurs="0" maxOccurs="1">
               <xs:element name="buildColonyMission" >
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
                   <xs:attribute name="doNotGiveUp" type="xs:boolean" use="required" />
                   <xs:attribute name="colonyBuilt" type="xs:boolean" use="required" />
-                  <xs:attribute name="target" type="object-id" use="optional" />
+                  <xs:attribute name="target" type="LocationId" use="optional" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="cashInTreasureTrainMission" type="SimpleMissionType" />
               <xs:element name="defendSettlementMission">
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
-                  <xs:attribute name="settlement" type="object-id" use="required" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
+                  <xs:attribute name="settlement" type="SettlementId" use="required" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="idleAtColonyMission" type="SimpleMissionType" />
               <xs:element name="indianBringGiftMission">
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
-                  <xs:attribute name="target" type="object-id" use="optional" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
+                  <xs:attribute name="target" type="LocationId" use="optional" />
                   <xs:attribute name="giftDelivered" type="xs:boolean" use="required" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="indianDemandMission">
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
-                  <xs:attribute name="target" type="object-id" use="optional" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
+                  <xs:attribute name="target" type="LocationId" use="optional" />
                   <xs:attribute name="completed" type="xs:boolean" use="required" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="pioneeringMission">
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
-                  <xs:attribute name="tileImprovementPlan" type="object-id" use="optional" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
+                  <xs:attribute name="tileImprovementPlan" type="TileImprovementPlanId" use="optional" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="privateerMission">
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
                   <xs:attribute name="state" type="PrivateerState" use="optional" />
                 </xs:complexType>
               </xs:element>
@@ -92,46 +92,46 @@
                   <xs:sequence minOccurs="0" maxOccurs="unbounded">
                     <xs:element name="transportable">
                       <xs:complexType>
-                        <xs:attribute name="ID" type="object-id" />
+                        <xs:attribute name="ID" type="TransportableId" />
                       </xs:complexType>
                     </xs:element>
                   </xs:sequence>
-                  <xs:attribute name="unit" type="object-id" use="required" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="unitSeekAndDestroyMission">
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
-                  <xs:attribute name="target" type="object-id" use="optional" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
+                  <xs:attribute name="target" type="LocationId" use="optional" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="unitWanderHostileMission" type="SimpleMissionType" />
               <xs:element name="unitWanderMission" type="SimpleMissionType" />
               <xs:element name="wishRealizationMission">
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
-                  <xs:attribute name="wish" type="object-id" use="optional" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
+                  <xs:attribute name="wish" type="WishId" use="optional" />
                 </xs:complexType>
               </xs:element>
               <xs:element name="workInsideColonyMission">
                 <xs:complexType>
-                  <xs:attribute name="unit" type="object-id" use="required" />
-                  <xs:attribute name="colony" type="object-id" use="optional" />
+                  <xs:attribute name="unit" type="UnitId" use="required" />
+                  <xs:attribute name="colony" type="ColonyId" use="optional" />
                 </xs:complexType>
               </xs:element>
             </xs:choice>
-            <xs:attribute name="ID" type="object-id" />
-            <xs:attribute name="transport" type="object-id" />
+            <xs:attribute name="ID" type="UnitId" />
+            <xs:attribute name="transport" type="UnitId" />
           </xs:complexType>
         </xs:element>
         <xs:element name="aiColony">
           <xs:complexType>
-            <xs:attribute name="ID" type="object-id" />
+            <xs:attribute name="ID" type="ColonyId" />
           </xs:complexType>
         </xs:element>
         <xs:element name="aiPlayer">
           <xs:complexType>
-            <xs:attribute name="ID" type="object-id" />
+            <xs:attribute name="ID" type="PlayerId" />
           </xs:complexType>
         </xs:element>
       </xs:choice>
@@ -141,7 +141,7 @@
   </xs:element>
 
   <xs:complexType name="SimpleMissionType">
-    <xs:attribute name="unit" type="object-id" />
+    <xs:attribute name="unit" type="UnitId" />
   </xs:complexType>
 
   <xs:simpleType name="PrivateerState">

@@ -52,7 +52,7 @@
 	  </xs:complexType>
 	</xs:element>
       </xs:sequence>
-      <xs:attribute name="ID" type="xs:string" use="required"/>
+      <xs:attribute name="ID" type="GoodsContainerId" use="required"/>
     </xs:complexType>
   </xs:element>
 

@@ -40,10 +40,10 @@
         <xs:element ref="units" />
       </xs:choice>
 
-      <xs:attribute name="ID" type="object-id" use="required" />
+      <xs:attribute name="ID" type="TileId" use="required" />
       <xs:attribute name="x" type="xs:int" use="required" />
       <xs:attribute name="y" type="xs:int" use="required" />
-      <xs:attribute name="type" type="xs:string" use="required">
+      <xs:attribute name="type" type="TileTypeId" use="required">
         <xs:annotation>
           <xs:documentation>
             Tile type
@@ -51,7 +51,7 @@
         </xs:annotation>
       </xs:attribute>
 
-      <xs:attribute name="region" type="object-id" use="optional">
+      <xs:attribute name="region" type="RegionId" use="optional">
         <xs:annotation>
           <xs:documentation>
             Owner region, may be absent in map files.

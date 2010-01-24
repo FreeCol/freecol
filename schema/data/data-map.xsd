@@ -39,7 +39,7 @@
         <xs:element ref="region"/>
         <xs:element ref="tile"/>
       </xs:choice>
-      <xs:attribute name="ID" type="object-id" use="required" />
+      <xs:attribute name="ID" type="MapId" use="required" />
       <xs:attribute name="width" type="xs:int" use="required" />
       <xs:attribute name="height" type="xs:int" use="required" />
      </xs:complexType>

@@ -43,11 +43,11 @@
 	</xs:element>
 
       </xs:choice>
-      <xs:attribute name="ID" type="object-id" use="required"/>
-      <xs:attribute name="recruit0" type="xs:string" use="optional"/>
-      <xs:attribute name="recruit1" type="xs:string" use="optional"/>
-      <xs:attribute name="recruit2" type="xs:string" use="optional"/>
-      <xs:attribute name="owner" type="xs:string" use="required"/>
+      <xs:attribute name="ID" type="EuropeId" use="required"/>
+      <xs:attribute name="recruit0" type="UnitTypeId" use="optional"/>
+      <xs:attribute name="recruit1" type="UnitTypeId" use="optional"/>
+      <xs:attribute name="recruit2" type="UnitTypeId" use="optional"/>
+      <xs:attribute name="owner" type="PlayerId" use="required"/>
 
       <xs:attribute name="recruitPrice" type="xs:int" use="optional"
 		    default="200"/>

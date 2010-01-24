@@ -33,10 +33,10 @@ along with FreeCol. If not, see http://www.gnu.org/licenses
             </xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:attribute name="ID" type="object-id" use="required"></xs:attribute>
-            <xs:attribute name="tile" type="object-id" use="required"></xs:attribute>
-            <xs:attribute name="type" type="xs:string" use="required"></xs:attribute>
-            <xs:attribute name="quantity" type="xs:int" use="required"></xs:attribute>
+            <xs:attribute name="ID" type="ResourceId" use="required" />
+            <xs:attribute name="tile" type="TileId" use="required" />
+            <xs:attribute name="type" type="ResourceTypeId" use="required" />
+            <xs:attribute name="quantity" type="xs:int" use="required" />
         </xs:complexType>
     </xs:element>
 

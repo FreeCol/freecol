@@ -41,8 +41,8 @@
         <xs:element ref="tileimprovement" />
         <xs:element ref="lostCityRumour" />
       </xs:choice>
-      <xs:attribute name="ID" type="xs:string" use="required" />
-      <xs:attribute name="tile" type="xs:string" use="required" />
+      <xs:attribute name="ID" type="TileItemContainerId" use="required" />
+      <xs:attribute name="tile" type="TileId" use="required" />
     </xs:complexType>
   </xs:element>
 
