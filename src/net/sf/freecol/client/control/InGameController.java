@@ -1715,14 +1715,13 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         Tile oldTile = unit.getTile();
         Tile newTile = map.getNeighbourOrNull(direction, oldTile);
-        if (newTile == null
-            || (!oldTile.canMoveToEurope() && newTile.canMoveToEurope())) {
-            Canvas canvas = freeColClient.getCanvas();
-            if (canvas.showConfirmDialog("highseas.text",
-                                         "highseas.yes", "highseas.no")) {
-                moveToEurope(unit);
-                nextActiveUnit();
-            }
+        Canvas canvas = freeColClient.getCanvas();
+        if ((newTile == null
+             || (!oldTile.canMoveToEurope() && newTile.canMoveToEurope()))
+            && canvas.showConfirmDialog("highseas.text",
+                                        "highseas.yes", "highseas.no")) {
+            moveToEurope(unit);
+            nextActiveUnit();
         } else {
             moveMove(unit, direction);
         }
