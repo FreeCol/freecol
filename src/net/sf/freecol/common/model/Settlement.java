@@ -270,7 +270,7 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      *
      * @param tile The <code>Tile</code> to claim.
      */
-    private void claimTile(Tile tile) {
+    public void claimTile(Tile tile) {
         tile.setOwningSettlement(this);
         tile.setOwner(owner);
         tile.updatePlayerExploredTiles();
@@ -447,7 +447,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @return Settlement radius
      */
     public int getRadius() {
-        return Settlement.RADIUS;
+        if (isCapital) {
+            return owner.getNationType().getCapitalRadius();
+        } else {
+            return owner.getNationType().getSettlementRadius();
+        }
     }
 
     public abstract void newTurn();

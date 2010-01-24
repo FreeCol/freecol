@@ -573,6 +573,21 @@ public class MapGenerator implements IMapGenerator {
         }
         settlement.placeSettlement();
         player.setNumberOfSettlements(player.getNumberOfSettlements() + 1);
+        Map.CircleIterator iterator = map.getCircleIterator(position, false, settlement.getRadius() + 1);
+        while (iterator.hasNext()) {
+            Position p = iterator.next();
+            if (random.nextInt(2) == 0) {
+                settlement.claimTile(map.getTile(p));
+            }
+        }
+
+        iterator = map.getCircleIterator(position, false, settlement.getRadius() + 2);
+        while (iterator.hasNext()) {
+            Position p = iterator.next();
+            if (random.nextInt(4) == 0) {
+                settlement.claimTile(map.getTile(p));
+            }
+        }
 
         // START DEBUG:
         if (FreeCol.isInDebugMode()) {

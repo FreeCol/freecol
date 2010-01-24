@@ -497,22 +497,6 @@ public class IndianSettlement extends Settlement {
     }
 
     /**
-     * Gets the radius of what the <code>Settlement</code> considers
-     * as it's own land.  Cities dominate 2 tiles, other settlements 1 tile.
-     *
-     * @return Settlement radius
-     */
-    @Override
-    public int getRadius() {
-        if (getTypeOfSettlement() == SettlementType.INCA_CITY ||
-            getTypeOfSettlement() == SettlementType.AZTEC_CITY) {
-            return 2;
-        } else {
-            return 1;
-        }
-    }
-
-    /**
      * Adds a <code>Locatable</code> to this Location.
      *
      * @param locatable The <code>Locatable</code> to add to this Location.

@@ -19,7 +19,7 @@
     *
   -->
 <!-- $Revision$ -->
-<!-- specification version 0.23 -->
+<!-- specification version 0.24 -->
 <!-- in case of incompatible changes, please update version number and 
      XSD schema for validation. -->
 <freecol-specification>
@@ -1753,7 +1753,8 @@
                 type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.inca" number-of-settlements="high"
-                        aggression="low" type-of-settlement="inca_city">
+                        aggression="low" type-of-settlement="inca_city"
+                        settlementRadius="2" capitalRadius="3">
       <skill id="model.unit.expertSilverMiner" probability="20"/>
       <skill id="model.unit.expertOreMiner" probability="10"/>
       <skill id="model.unit.expertFisherman" probability="10"/>
@@ -1774,7 +1775,8 @@
                 type="percentage" value="50" />
     </indian-nation-type>
     <indian-nation-type id="model.nationType.aztec" number-of-settlements="high"
-                        aggression="high" type-of-settlement="aztec_city">
+                        aggression="high" type-of-settlement="aztec_city"
+                        settlementRadius="2" capitalRadius="3">
       <skill id="model.unit.expertSilverMiner" probability="20"/>
       <skill id="model.unit.expertFarmer" probability="10"/>
       <skill id="model.unit.expertFisherman" probability="10"/>

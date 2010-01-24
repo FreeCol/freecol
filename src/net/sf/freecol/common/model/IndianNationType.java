@@ -207,6 +207,8 @@ public class IndianNationType extends NationType {
 
         valueString = in.getAttributeValue(null, "type-of-settlement").toUpperCase();
         setTypeOfSettlement(Enum.valueOf(SettlementType.class, valueString));
+        setSettlementRadius(getAttribute(in, "settlementRadius", getSettlementRadius()));
+        setCapitalRadius(getAttribute(in, "capitalRadius", getCapitalRadius()));
     }
 
     public void readChildren(XMLStreamReader in, Specification specification)

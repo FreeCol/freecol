@@ -35,9 +35,9 @@
     </xs:annotation>
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="missionary"></xs:element>
-	<xs:element ref="resource"></xs:element>
-	<xs:element ref="tileimprovement"></xs:element>
+	<xs:element ref="missionary" />
+	<xs:element ref="resource" />
+	<xs:element ref="tileimprovement" />
       </xs:choice>
       <xs:attribute name="ID" type="PlayerExploredTileId" use="required" />
       <xs:attribute name="tile" type="TileId" use="required" />

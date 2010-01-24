@@ -33,6 +33,16 @@ public abstract class NationType extends FreeColGameObjectType {
     private SettlementType typeOfSettlement;
 
     /**
+     * The radius of this nation type's settlements.
+     */
+    private int settlementRadius = 1;
+
+    /**
+     * The radius of this nation type's capital.
+     */
+    private int capitalRadius = 2;
+
+    /**
      * Sole constructor.
      */
     public NationType(int index) {
@@ -68,6 +78,42 @@ public abstract class NationType extends FreeColGameObjectType {
      *
      */
     public abstract boolean isREF();
+
+    /**
+     * Get the <code>SettlementRadius</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getSettlementRadius() {
+        return settlementRadius;
+    }
+
+    /**
+     * Set the <code>SettlementRadius</code> value.
+     *
+     * @param newSettlementRadius The new SettlementRadius value.
+     */
+    public final void setSettlementRadius(final int newSettlementRadius) {
+        this.settlementRadius = newSettlementRadius;
+    }
+
+    /**
+     * Get the <code>CapitalRadius</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getCapitalRadius() {
+        return capitalRadius;
+    }
+
+    /**
+     * Set the <code>CapitalRadius</code> value.
+     *
+     * @param newCapitalRadius The new CapitalRadius value.
+     */
+    public final void setCapitalRadius(final int newCapitalRadius) {
+        this.capitalRadius = newCapitalRadius;
+    }
 
     public String toString() {
         return getName();
