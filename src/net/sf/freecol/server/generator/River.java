@@ -350,10 +350,12 @@ public class River {
                         
                         if (tile.hasRiver() && tile.isLand()) {
                             logger.fine("Point " + newPosition + " is next to another river.");
-                            drawToMap();
-                            // increase the size of another river
+                            // increase the size of the other river
                             nextRiver = riverMap.get(px);
                             nextRiver.grow(lastSection, px);
+                            // if the other river is connected, so is this one
+                            connected = nextRiver.connected;
+                            drawToMap();
                         } else {
                             // flow into the sea (or a lake)
                             logger.fine("Point " + newPosition + " is next to water.");
@@ -395,19 +397,19 @@ public class River {
             }
             Tile tile = map.getTile(section.getPosition());
             if (tile.isLand()) {
-                TileItemContainer container = tile.getTileItemContainer();
-                if (container == null) {
-                    container = new TileItemContainer(tile.getGame(), tile);
-                    tile.setTileItemContainer(container);
-                }
                 if (section.getSize() == TileImprovement.SMALL_RIVER || 
                     section.getSize() == TileImprovement.LARGE_RIVER) {
+                    TileItemContainer container = tile.getTileItemContainer();
+                    if (container == null) {
+                        container = new TileItemContainer(tile.getGame(), tile);
+                        tile.setTileItemContainer(container);
+                    }
                     container.addRiver(section.getSize(), section.encodeStyle());
                     logger.fine("Added river (magnitude: " + section.getSize() +
                                 ") to tile at " + section.getPosition());
                 } else if (section.getSize() >= TileImprovement.FJORD_RIVER) {
                     tile.setType(greatRiver);   // changing the type resets the improvements
-                    container.addRiver(section.getSize(), section.encodeStyle());
+                    //container.addRiver(section.getSize(), section.encodeStyle());
                     if (connected) {
                         tile.setConnected(true);
                     }
