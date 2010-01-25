@@ -2511,7 +2511,14 @@ public final class GUI {
 
         if (displayCoordinates) {
             String posString = tile.getX() + ", " + tile.getY();
-            g.drawString(posString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(posString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
+            if (tile.isConnected()) {
+                posString += "C";
+            }
+            g.drawString(posString,
+                         x + (lib.getTerrainImageWidth(tile.getType())
+                              - g.getFontMetrics().stringWidth(posString))/2,
+                         y + (lib.getTerrainImageHeight(tile.getType())
+                              - g.getFontMetrics().getAscent())/2);
         }
         if (displayColonyValue && tile.isExplored() && tile.isLand()) {
             String valueString;
@@ -2520,7 +2527,11 @@ public final class GUI {
             } else {
                 valueString = Integer.toString(displayColonyValuePlayer.getColonyValue(tile));
             }
-            g.drawString(valueString, x + (lib.getTerrainImageWidth(tile.getType()) - g.getFontMetrics().stringWidth(valueString))/2, y + (lib.getTerrainImageHeight(tile.getType()) - g.getFontMetrics().getAscent())/2);
+            g.drawString(valueString,
+                         x + (lib.getTerrainImageWidth(tile.getType())
+                              - g.getFontMetrics().stringWidth(valueString))/2,
+                         y + (lib.getTerrainImageHeight(tile.getType())
+                              - g.getFontMetrics().getAscent())/2);
         }
     }
 
