@@ -74,6 +74,8 @@ public class SaveGameValidator {
                 System.out.println(e.getMessage() 
                                    + " at line=" + e.getLineNumber() 
                                    + " column=" + e.getColumnNumber());
+            } catch(Exception e) {
+                System.out.println("Failed to read " + file.getName());
             }
         }
     }
