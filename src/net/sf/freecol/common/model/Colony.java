@@ -1202,12 +1202,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     return new Occupation(colonyTile, expertProduction);
                 }
             } else {
-                for (Building building : getBuildingsForProducing(expertProduction)) {
-                    if (building.canAdd(unit)
-                        && (building.getGoodsInputType() == null
-                            || getGoodsCount(building.getGoodsInputType()) > 0)) {
-                        return new Occupation(building, expertProduction);
-                    }
+                Building building = getBuildingFor(unit);
+                if (building != null) {
+                    return new Occupation(building, building.getGoodsOutputType());
                 }
             }
         }
@@ -1229,11 +1226,31 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (bestTile != null) {
             return new Occupation(bestTile, bestType);
         }
-        for (Building building : buildingMap.values()) {
+        Building building = getBuildingFor(unit);
+        if (building != null) {
+            return new Occupation(building, building.getGoodsOutputType());
+        }
+        return null;
+    }
+
+    /**
+     * Return the Building best suited for the given Unit.
+     *
+     * @param unit an <code>Unit</code> value
+     * @return a <code>Building</code> value
+     */
+    public Building getBuildingFor(Unit unit) {
+        List<Building> buildings = new ArrayList<Building>();
+        GoodsType expertProduction = unit.getType().getExpertProduction();
+        if (expertProduction != null && !expertProduction.isFarmed()) {
+            buildings.addAll(getBuildingsForProducing(expertProduction));
+        }
+        buildings.addAll(getBuildings());
+        for (Building building : buildings) {
             if (building.canAdd(unit)
                 && (building.getGoodsInputType() == null
                     || getGoodsCount(building.getGoodsInputType()) > 0)) {
-                return new Occupation(building, building.getGoodsOutputType());
+                return building;
             }
         }
         return null;
