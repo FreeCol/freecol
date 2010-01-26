@@ -23,17 +23,18 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 public class AllTests {
-	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for net.sf.freecol.server.ai");
-		//$JUnit-BEGIN$
-		suite.addTestSuite(AIColonyTest.class);
-	    suite.addTestSuite(ColonyPlanTest.class);
-		suite.addTestSuite(MissionAssignmentTest.class);
-		suite.addTestSuite(REFTest.class);
-		suite.addTestSuite(StandardAIPlayerTest.class);
-		suite.addTestSuite(TensionTest.class);
-		//$JUnit-END$
-		suite.addTest(net.sf.freecol.server.ai.mission.AllTests.suite());
-		return suite;
-	}
+    public static Test suite() {
+        TestSuite suite = new TestSuite("Test for net.sf.freecol.server.ai");
+        //$JUnit-BEGIN$
+        suite.addTestSuite(AIColonyTest.class);
+        suite.addTestSuite(ContactTest.class);
+        suite.addTestSuite(ColonyPlanTest.class);
+        suite.addTestSuite(MissionAssignmentTest.class);
+        suite.addTestSuite(REFTest.class);
+        suite.addTestSuite(StandardAIPlayerTest.class);
+        suite.addTestSuite(TensionTest.class);
+        //$JUnit-END$
+        suite.addTest(net.sf.freecol.server.ai.mission.AllTests.suite());
+        return suite;
+    }
 }

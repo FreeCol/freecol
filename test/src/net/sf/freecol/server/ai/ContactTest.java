@@ -17,12 +17,20 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.common.model;
+package net.sf.freecol.server.ai;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TileType;
+import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ServerTestHelper;
 import net.sf.freecol.server.control.Controller;
