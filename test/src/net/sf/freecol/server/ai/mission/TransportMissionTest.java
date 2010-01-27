@@ -49,6 +49,7 @@ import net.sf.freecol.server.control.Controller;
 import net.sf.freecol.server.control.PreGameController;
 import net.sf.freecol.server.generator.MapGeneratorOptions;
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.util.test.FreeColTestUtils;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class TransportMissionTest extends FreeColTestCase {
@@ -254,6 +255,59 @@ public class TransportMissionTest extends FreeColTestCase {
 
         // Exercise
         Destination dest = mission.getNextStop();
+        
+        // Test
+        assertNotNull("Unit should have a destination",dest);
+        assertFalse("Destination should not be Europe", dest.moveToEurope());
+        PathNode destPath = dest.getPath();
+        assertNotNull("Unit should have a path", destPath);
+        assertEquals("Unit destiny should be the colony", destPath.getLastNode().getTile(),colonyTile);
+    }
+    
+    public void testGetDefaultDestination(){
+    	final TileType plainsType = spec().getTileType("model.tile.plains");
+    	
+    	Map map = getCoastTestMap(plainsType);
+    	
+    	Game game = startServerGame(map);
+    	map = game.getMap();  // update reference
+    	
+        AIMain aiMain = server.getAIMain();
+        assertNotNull(aiMain);
+        
+        ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Europe europe = player1.getEurope();
+        assertNotNull("Setup error, europe is null", europe);
+        
+        // create a ship
+
+        Tile galleonTile = map.getTile(9, 10);
+        UnitType galleonType = spec().getUnitType("model.unit.galleon");
+        Unit galleon = new Unit(game, galleonTile, player1, galleonType, UnitState.ACTIVE);
+        AIUnit aiUnit = (AIUnit) aiMain.getAIObject(galleon);
+        assertNotNull(aiUnit);
+        
+        // assign transport mission to the ship
+        TransportMission mission = new TransportMission(aiMain, aiUnit); 
+        aiUnit.setMission(mission);
+
+        assertTrue("Setup error, player should not have colonies", player1.getColonies().isEmpty());
+        
+        // Exercise
+        Destination dest = mission.getDefaultDestination();
+        
+        // Test
+        assertNotNull("Unit should have a destination",dest);
+        assertTrue("Destination should be Europe", dest.moveToEurope());
+        
+        // add colony
+        Tile colonyTile = map.getTile(9, 9);
+        FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
+        builder.colonyTile(colonyTile).initialColonists(1).player(player1).build();
+        assertFalse("Player should now have a colony", player1.getColonies().isEmpty());
+        
+        // Exercise
+        dest = mission.getDefaultDestination();
         
         // Test
         assertNotNull("Unit should have a destination",dest);

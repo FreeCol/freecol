@@ -602,19 +602,34 @@ public class TransportMission extends Mission {
 
             Destination destination = getNextStop();
             
+            // Special case, already on a tile which gives direct access to Europe
+            //path will be null
+            boolean canMoveToEurope = destination != null 
+            			&& destination.moveToEurope() 
+            			&& carrier.canMoveToEurope();
+
+            if(destination == null || (destination.getPath() == null && !canMoveToEurope)){
+            	String carrierLoc = "";
+            	if(carrier.getLocation() instanceof Europe){
+            		carrierLoc = "Europe";
+            	}
+            	else{
+            		Tile carrierTile = carrier.getTile();
+            		carrierLoc = carrierTile.toString();
+            		if(carrierTile.getColony() != null){
+            			carrierLoc += " (" + carrierTile.getColony().getName() + ")";
+            		}
+            	}
+            	
+            	logger.info("Could not get a next move for unit " + carrier 
+            			+ "(" + carrier.getId() + "), staying put at " + carrierLoc);
+            	//carrier.setMovesLeft(0);
+            	return;
+            }
+            
             if(destination.isAtDestination()){
                 transportListChanged = restockCargoAtDestination(connection);
                 continue;
-            }
-            
-            // Special case, already on a tile which gives direct access to Europe
-            //path will be null
-            boolean canMoveToEurope = destination.moveToEurope() && carrier.canMoveToEurope();
-
-            if(destination == null || (destination.getPath() == null && !canMoveToEurope)){
-            	logger.warning("Could not get a next move for unit " + carrier);
-            	carrier.setMovesLeft(0);
-            	return;
             }
 
             //Already on a tile which gives direct access to Europe, just make the move
@@ -650,8 +665,8 @@ public class TransportMission extends Mission {
 
 	Destination getNextStop() {
 		Unit unit = getUnit();
-		if(transportList.size() == 0){
-			logger.finest(unit + "(" + unit.getId() + ") has nothing to transport, moving to default destination");
+		if(transportList.size() == 0 && !hasCargo()){
+			logger.info(unit + "(" + unit.getId() + ") has nothing to transport, moving to default destination");
 			return getDefaultDestination();
 		}
 
@@ -694,21 +709,41 @@ public class TransportMission extends Mission {
 			return new Destination(moveToEurope,path);
 		}
 	
-		// none of the destinations is available, move to default
-		logger.warning("None of the destinations is available moving to default destination");
-		return getDefaultDestination();
+		logger.warning("No destination available, stay put");
+		return null;
 	}
 
 	/**
 	 * Gets the default destination for the unit of this mission
-	 * For naval units its Europe
-	 * For other units, or if Europe is unavailable, check the nearest colony
+	 * First check the nearest colony
+	 * if no colony is available, try Europe
 	 * @return
 	 */
-	private Destination getDefaultDestination() {
+	Destination getDefaultDestination() {
 		Unit unit = getUnit();
 		PathNode path = null;
-		// Should try Europe first
+		
+		// If in Europe, stay in Europe
+		if(unit.getLocation() instanceof Europe){
+			return new Destination();
+		}
+		
+		// sanitation
+		if(unit.getTile() == null){
+			throw new IllegalStateException("Cannot find unit " + unit.getId() + " location");
+		}
+		
+		//Already at a settlement
+		if(unit.getTile().getSettlement() != null){
+			return new Destination();
+		}
+		
+		path = findNearestColony(unit);
+		if(path != null){
+			return new Destination(false,path);
+		}
+		
+		// Should try Europe second
 		if(unit.isNaval() && unit.getOwner().getEurope() != null){
 			//Already at Europe
 			if(unit.getLocation() instanceof Europe){
@@ -727,15 +762,6 @@ public class TransportMission extends Mission {
 			}
 		}
 		
-		//Already at a settlement
-		if(unit.getTile().getSettlement() != null){
-			return new Destination();
-		}
-		
-		path = findNearestColony(unit);
-		if(path != null){
-			return new Destination(false,path);
-		}
 		logger.warning("Could not get default destination for " + unit);
 		return null;
 	}
@@ -1169,6 +1195,16 @@ public class TransportMission extends Mission {
         	return false;
         }
         
+        // START Debug code
+        String locStr = carrier.getLocation().toString();
+        if(carrier.getLocation() instanceof Europe){
+        	locStr = "Europe";
+        }
+        if(carrier.getLocation().getColony() != null){
+        	locStr = carrier.getLocation().getColony().getName();
+        }
+        // END Debug code
+        
         // Make a copy for iteration, the main list may change inside the loop
         for (Transportable t : new ArrayList<Transportable>(transportList)) {
             // to pickup, ignore
@@ -1179,19 +1215,6 @@ public class TransportMission extends Mission {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
                 Mission mission = au.getMission();
-                
-                // START Debug code
-                /*
-                String locStr = carrier.getLocation().toString();
-                if(carrier.getLocation() instanceof Europe){
-                	locStr = "Europe";
-                }
-                if(carrier.getLocation().getColony() != null){
-                	locStr = carrier.getLocation().getColony().getName();
-                }
-                logger.warning("Unloading unit at " + locStr);
-                */
-                // END Debug code
                 
                 // Sanitation, to force game to reset
                 if(mission == null || au.getTransportDestination() == null){
@@ -1206,7 +1229,9 @@ public class TransportMission extends Mission {
                 if (mission != null && mission.isValid()) {
                     if (au.getTransportDestination() != null
                             && au.getTransportDestination().getTile() == carrier.getTile()) {
-                        if (carrier.getLocation() instanceof Europe || u.getColony() != null) {
+                    	logger.finest(carrier + "(" 
+                        		+ carrier.getId() + ") unloading " + u + " at " + locStr);
+                    	if (carrier.getLocation() instanceof Europe || u.getColony() != null) {
                             unitLeavesShip(connection, u);
                         }
                         mission.doMission(connection);
@@ -1219,6 +1244,8 @@ public class TransportMission extends Mission {
                         PathNode p = getGame().getMap().findPath(u, carrier.getTile(),
                                 au.getTransportDestination().getTile(), carrier);
                         if (p != null) {
+                        	logger.finest(carrier + "(" 
+                            		+ carrier.getId() + ") unloading " + u + " at " + locStr);
                             final PathNode dropNode = p.getTransportDropNode();
                             int distToCarrier = dropNode.getTile().getDistanceTo(carrier.getTile());
                             if (dropNode != null &&
@@ -1264,7 +1291,8 @@ public class TransportMission extends Mission {
                 if (ag.getTransportDestination() == null ||
                 		(ag.getTransportDestination() != null
                 				&& ag.getTransportDestination().getTile() == carrier.getLocation().getTile())) {
-                	logger.finest("Unloading goods at " + carrier.getLocationName());
+                    logger.finest(carrier + "(" 
+                    		+ carrier.getId() + ") unloading " + ag + " at " + locStr);
                     if (carrier.getLocation() instanceof Europe) {
                         boolean success = sellCargoInEurope(connection, carrier, ag.getGoods());
                         if(success){
