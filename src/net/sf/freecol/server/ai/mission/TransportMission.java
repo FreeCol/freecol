@@ -1191,7 +1191,7 @@ public class TransportMission extends Mission {
         //Sanitation
         if(carrier.getLocation() instanceof Europe &&
         		(carrier.getState() == UnitState.TO_EUROPE 
-        				|| carrier.getState() != UnitState.TO_AMERICA)){
+        				|| carrier.getState() == UnitState.TO_AMERICA)){
         	return false;
         }
         
