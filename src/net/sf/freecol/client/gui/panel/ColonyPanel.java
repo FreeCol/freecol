@@ -674,8 +674,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             if (getCanvas().showConfirmDialog("abandonColony.text",
                                               "abandonColony.yes",
                                               "abandonColony.no")) {
-                getController().abandonColony(getColony());
                 getCanvas().remove(this);
+                getController().abandonColony(getColony());
             }
         } else {
             BuildableType buildable = colony.getCurrentlyBuilding();
