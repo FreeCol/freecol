@@ -101,9 +101,10 @@ public final class TilePopup extends JPopupMenu {
 
         final Unit activeUnit = gui.getActiveUnit();
         if (activeUnit != null) {
+            Tile unitTile = activeUnit.getTile();
             JMenuItem gotoMenuItem = null;
             if (activeUnit.isOffensiveUnit() &&
-                activeUnit.getTile().isAdjacent(tile) && 
+                unitTile.isAdjacent(tile) &&
                 activeUnit.getMoveType(tile) == MoveType.ATTACK) {
                 CombatOdds combatOdds = activeUnit.getGame().getCombatModel()
                     .calculateCombatOdds(activeUnit, tile.getDefendingUnit(activeUnit));
@@ -116,7 +117,7 @@ public final class TilePopup extends JPopupMenu {
                     victoryPercent = Integer.toString((int)(combatOdds.win * 100));
                 }
                 gotoMenuItem = new JMenuItem(Messages.message("attackTileOdds", "%chance%", victoryPercent));
-            } else if (activeUnit.getSimpleMoveType(null, tile, false).isLegal()) {
+            } else if (activeUnit.getSimpleMoveType(unitTile, tile, false).isLegal()) {
                 //final Image gotoImage = (Image) UIManager.get("cursor.go.image");
                 //JMenuItem gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"), new ImageIcon(gotoImage));
                 gotoMenuItem = new JMenuItem(Messages.message("gotoThisTile"));

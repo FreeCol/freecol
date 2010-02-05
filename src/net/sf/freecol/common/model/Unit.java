@@ -1311,7 +1311,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *         types on failure.
      */
     public MoveType getSimpleMoveType(Tile target) {
-        return getSimpleMoveType(getTile(), target, false);
+        Tile tile = getTile();
+        if (tile == null) {
+            throw new IllegalStateException("Null tile");
+        }
+        return getSimpleMoveType(tile, target, false);
     }
 
     /**
@@ -1322,12 +1326,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return The move type.
      */
     public MoveType getSimpleMoveType(Direction direction) {
-        if (getTile() == null) {
-            throw new IllegalStateException("getTile() == null");
+        Tile tile = getTile();
+        if (tile == null) {
+            throw new IllegalStateException("Null tile");
         }
 
-        Tile target = getGame().getMap().getNeighbourOrNull(direction, getTile());
-        return getSimpleMoveType(target);
+        Tile target = getGame().getMap().getNeighbourOrNull(direction, tile);
+        return getSimpleMoveType(tile, target, false);
     }
 
     /**
