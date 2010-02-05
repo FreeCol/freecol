@@ -2907,7 +2907,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         switch (state) {
         case IMPROVING: 
             if (workLeft > 0) {
-                workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
+                if (!workImprovement.isComplete()) {
+                    workImprovement.getTile().getTileItemContainer().removeTileItem(workImprovement);
+                }
                 workImprovement = null;
             }
             break;
