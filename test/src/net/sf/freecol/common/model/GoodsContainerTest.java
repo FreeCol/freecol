@@ -100,5 +100,37 @@ public class GoodsContainerTest extends FreeColTestCase {
         container.removeGoods(fish, difference);
         assertEquals(39 + totalDifference, container.getGoodsCount(fish));
     }
+    
+    public void testLimitsMessageDelivery(){
+    	final int lowLevel = 10;
+    	final int highLevel = 90;
+    	final int exportLevel = 50;
+    	final boolean canExport = true;
+    	int foodStart= lowLevel;
+    	
+        Game game = getStandardGame();
+    	game.setMap(getTestMap());
+    	
+    	Colony colony = getStandardColony(1);
+    	
+    	//Setup
+    	colony.addGoods(new AbstractGoods(food,foodStart));
+    	assertEquals("Setup error, wrong food count", foodStart, colony.getGoodsCount(food));
+    	colony.setExportData(new ExportData(food,canExport,lowLevel,highLevel,exportLevel));
+    	assertEquals("Setup error, wrong food low level",lowLevel,colony.getExportData(food).getLowLevel()); 
+    	colony.getGoodsContainer().saveState();
+    	
+    	// Test current condition, no warnings
+    	assertTrue("Setup error, no messages should have bee received yet", colony.getOwner().getModelMessages().isEmpty());
+    	colony.getGoodsContainer().cleanAndReport();
+    	assertTrue("Player should not have received any messages", colony.getOwner().getModelMessages().isEmpty());
+    	
+    	// Simulate consumption of food
+    	colony.getGoodsContainer().removeGoods(food, 1);
+    	
+    	// Test new condition food below limits
+    	colony.getGoodsContainer().cleanAndReport();
+    	assertTrue("Player should have received one message", colony.getOwner().getModelMessages().size() == 1);
+    }
 
 }

@@ -386,7 +386,8 @@ public class GoodsContainer extends FreeColGameObject {
         int adjustment = limit / CARGO_SIZE;
 
         for (GoodsType goodsType : storedGoods.keySet()) {
-            if (goodsType.limitIgnored() || !goodsType.isStorable()) {
+        	boolean ignoreLimits = !goodsType.isFoodType() && goodsType.limitIgnored(); 
+            if (ignoreLimits || !goodsType.isStorable()) {
                 continue;
             }
             ExportData exportData = colony.getExportData(goodsType);
