@@ -1601,6 +1601,9 @@ public final class InGameInputHandler extends InputHandler {
      */
     class ShowInformationMessageSwingTask extends ShowMessageSwingTask {
 
+        private String messageId;
+        private String[] replace;
+
         /**
          * Constructor.
          * 
@@ -1608,19 +1611,15 @@ public final class InGameInputHandler extends InputHandler {
          * @param replace The values to replace text with.
          */
         public ShowInformationMessageSwingTask(String messageId, String... replace) {
-            _messageId = messageId;
-            _replace = replace;
+            this.messageId = messageId;
+            this.replace = replace;
         }
 
         protected Object doWork() {
-            getFreeColClient().getCanvas().showInformationMessage(_messageId, _replace);
+            Canvas canvas = getFreeColClient().getCanvas();
+            canvas.showInformationMessage(messageId, null, replace);
             return null;
         }
-
-
-        private String _messageId;
-
-        private String[] _replace;
     }
 
     /**

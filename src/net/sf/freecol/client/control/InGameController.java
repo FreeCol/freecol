@@ -446,7 +446,7 @@ public final class InGameController implements NetworkConstants {
         Stop stop = unit.getStop();
         if (!TradeRoute.isStopValid(unit, stop)) {
             String name = unit.getTradeRoute().getName();
-            canvas.showInformationMessage("traderoute.broken",
+            canvas.showInformationMessage("traderoute.broken", unit,
                                           "%name%", name);
             return;
         }
@@ -2362,7 +2362,7 @@ public final class InGameController implements NetworkConstants {
                 if (goldOut < 0) {
                     ; // protocol fail
                 } else if (goldOut == 0) {
-                    canvas.showInformationMessage("notEnoughGold");
+                    canvas.showInformationMessage("notEnoughGold", settlement);
                 } else {
                     // model messages from setStance are asynchronous
                     // at present
@@ -2501,11 +2501,13 @@ public final class InGameController implements NetworkConstants {
             if (message == null || message.isReject()) {
                 String nation = message.getOtherNationName(player);
                 canvas.showInformationMessage("negotiationDialog.offerRejected",
+                                              settlement,
                                               "%nation%", nation);
                 break;
             } else if (message.isAccept()) {
                 String nation = message.getOtherNationName(player);
                 canvas.showInformationMessage("negotiationDialog.offerAccepted",
+                                              settlement,
                                               "%nation%", nation);
                 break;
             } else { // Loop with this proposal
@@ -2722,9 +2724,10 @@ public final class InGameController implements NetworkConstants {
             }
 
             // there is nothing to sell to the player
-            if(goodsOffered.isEmpty()){
-            	canvas.showInformationMessage(Messages.message("trade.nothingToSell"));
-            	return;
+            if (goodsOffered.isEmpty()) {
+                canvas.showInformationMessage("trade.nothingToSell",
+                                              settlement);
+                return;
             }
             
             // Choose goods to buy

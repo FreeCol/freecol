@@ -1850,12 +1850,10 @@ public final class Canvas extends JDesktopPane {
     
     /**
      * Shows a message with some information and an "OK"-button.
-     * 
-     * <br>
-     * <br>
+     *
      * <b>Example:</b> <br>
      * <code>canvas.showInformationMessage("noNeedForTheGoods", "%goods%", goods.getName());</code>
-     * 
+     *
      * @param messageId The messageId of the message to display.
      * @param replace All occurrences of <code>replace[2x]</code> in the
      *            message gets replaced by <code>replace[2x+1]</code>.
@@ -1873,7 +1871,16 @@ public final class Canvas extends JDesktopPane {
         if (displayObject != null) {
             icon = getImageIcon(displayObject, false);
         }
-        showFreeColDialog(new InformationDialog(this, text, icon));
+        Tile tile = null;
+        if (displayObject instanceof Tile) {
+            tile = (Tile) displayObject;
+        } else {
+            try { // If the displayObject has a "getTile" method, invoke it.
+                tile = (Tile) displayObject.getClass().getMethod("getTile")
+                    .invoke(displayObject);
+            } catch (Exception e) { /* Ignore failure */ }
+        }
+        showFreeColDialog(new InformationDialog(this, text, icon), tile);
     }
 
     /**
