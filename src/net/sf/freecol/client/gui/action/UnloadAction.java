@@ -82,7 +82,7 @@ public class UnloadAction extends MapboardAction {
         Unit unit = getFreeColClient().getGUI().getActiveUnit();
         if (unit != null) {
             if (!unit.isInEurope() && unit.getColony() == null) {
-                if (getFreeColClient().getCanvas().showConfirmDialog("dumpAllCargo", "yes", "no")) {
+                if (getFreeColClient().getCanvas().showConfirmDialog(unit.getTile(), "dumpAllCargo", "yes", "no")) {
                     unloadAllCargo(unit);
                     MapControls controls = ((MapControlsAction) getFreeColClient().getActionManager().getFreeColAction(MapControlsAction.id)).getMapControls();
                     if (controls != null) {

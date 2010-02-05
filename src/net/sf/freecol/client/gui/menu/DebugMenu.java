@@ -91,7 +91,8 @@ public class DebugMenu extends JMenu {
             int cVal = clientRnd.nextInt(100);
             int sVal = serverRnd.nextInt(100);
             String value = Integer.toString(cVal) + ":" + Integer.toString(sVal);
-            more = canvas.showConfirmDialog("menuBar.debug.stepRandomNumberGenerator",
+            more = canvas.showConfirmDialog(null,
+                                            "menuBar.debug.stepRandomNumberGenerator",
                                             "more", "ok",
                                             "%value%", value);
         } while (more);

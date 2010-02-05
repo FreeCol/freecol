@@ -670,25 +670,27 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * Closes the <code>ColonyPanel</code>.
      */
     public void closeColonyPanel() {
+        Canvas canvas = getCanvas();
         if (getColony().getUnitCount() == 0) {
-            if (getCanvas().showConfirmDialog("abandonColony.text",
-                                              "abandonColony.yes",
-                                              "abandonColony.no")) {
-                getCanvas().remove(this);
+            if (canvas.showConfirmDialog("abandonColony.text",
+                                         "abandonColony.yes",
+                                         "abandonColony.no")) {
+                canvas.remove(this);
                 getController().abandonColony(getColony());
             }
         } else {
             BuildableType buildable = colony.getCurrentlyBuilding();
             if (buildable != null
                 && buildable.getPopulationRequired() > colony.getUnitCount()
-                && !getCanvas().showConfirmDialog("colonyPanel.reducePopulation",
-                                                  "ok", "cancel",
-                                                  "%colony%", colony.getName(),
-                                                  "%number%", String.valueOf(buildable.getPopulationRequired()),
-                                                  "%buildable%", buildable.getName())) {
+                && !canvas.showConfirmDialog(null,
+                                             "colonyPanel.reducePopulation",
+                                             "ok", "cancel",
+                                             "%colony%", colony.getName(),
+                                             "%number%", String.valueOf(buildable.getPopulationRequired()),
+                                             "%buildable%", buildable.getName())) {
                 return;
             }
-            getCanvas().remove(this);
+            canvas.remove(this);
             // remove property listeners
             if (colony != null) {
                 colony.removePropertyChangeListener(this);
@@ -703,10 +705,10 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
             if (getGame().getCurrentPlayer() == getMyPlayer()) {
                 getController().nextModelMessage();
-                Unit activeUnit = getCanvas().getGUI().getActiveUnit();
+                Unit activeUnit = canvas.getGUI().getActiveUnit();
                 if (activeUnit == null || activeUnit.getTile() == null || activeUnit.getMovesLeft() <= 0
                     || (!(activeUnit.getLocation() instanceof Tile) && !(activeUnit.isOnCarrier()))) {
-                    getCanvas().getGUI().setActiveUnit(null);
+                    canvas.getGUI().setActiveUnit(null);
                     getController().nextActiveUnit();
                 }
             }

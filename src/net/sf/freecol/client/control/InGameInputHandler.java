@@ -182,7 +182,7 @@ public final class InGameInputHandler extends InputHandler {
      */
     private Element reconnect(Element element) {
         logger.finest("Entered reconnect...");
-        if (new ShowConfirmDialogSwingTask("reconnect.text", "reconnect.yes", "reconnect.no").confirm()) {
+        if (new ShowConfirmDialogSwingTask(null, "reconnect.text", "reconnect.yes", "reconnect.no").confirm()) {
             logger.finest("User wants to reconnect, do it!");
             new ReconnectSwingTask().invokeLater();
         } else {
@@ -471,14 +471,14 @@ public final class InGameInputHandler extends InputHandler {
 
         if (player == freeColClient.getMyPlayer()) {
             if (freeColClient.isSingleplayer()) {
-                if (!new ShowConfirmDialogSwingTask("defeatedSingleplayer.text", "defeatedSingleplayer.yes",
+                if (!new ShowConfirmDialogSwingTask(null, "defeatedSingleplayer.text", "defeatedSingleplayer.yes",
                         "defeatedSingleplayer.no").confirm()) {
                     freeColClient.quit();
                 } else {
                     freeColClient.getFreeColServer().enterRevengeMode(player.getName());
                 }
             } else {
-                if (!new ShowConfirmDialogSwingTask("defeated.text", "defeated.yes", "defeated.no").confirm()) {
+                if (!new ShowConfirmDialogSwingTask(null, "defeated.text", "defeated.yes", "defeated.no").confirm()) {
                     freeColClient.quit();
                 }
             }
@@ -667,7 +667,8 @@ public final class InGameInputHandler extends InputHandler {
             gold = Integer.parseInt(element.getAttribute("gold"));
             switch (getFreeColClient().getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE)) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                accepted = new ShowConfirmDialogSwingTask("indianDemand.gold.text", "indianDemand.gold.yes",
+                accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
+                                                          "indianDemand.gold.text", "indianDemand.gold.yes",
                                                           "indianDemand.gold.no",
                                                           "%nation%", unit.getOwner().getNationAsString(),
                                                           "%colony%", colony.getName(),
@@ -703,13 +704,15 @@ public final class InGameInputHandler extends InputHandler {
             switch (getFreeColClient().getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE)) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
                 if (goods.getType() == Goods.FOOD) {
-                    accepted = new ShowConfirmDialogSwingTask("indianDemand.food.text", "indianDemand.food.yes",
+                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
+                                                              "indianDemand.food.text", "indianDemand.food.yes",
                                                               "indianDemand.food.no",
                                                               "%nation%", unit.getOwner().getNationAsString(),
                                                               "%colony%", colony.getName(),
                                                               "%amount%", String.valueOf(goods.getAmount())).confirm();
                 } else {
-                    accepted = new ShowConfirmDialogSwingTask("indianDemand.other.text", "indianDemand.other.yes",
+                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
+                                                              "indianDemand.other.text", "indianDemand.other.yes",
                                                               "indianDemand.other.no",
                                                               "%nation%", unit.getOwner().getNationAsString(),
                                                               "%colony%", colony.getName(),
@@ -1498,19 +1501,29 @@ public final class InGameInputHandler extends InputHandler {
      */
     class ShowConfirmDialogSwingTask extends SwingTask {
 
+        private Tile tile;
+        private String text;
+        private String okText;
+        private String cancelText;
+        private String[] replace;
+
         /**
          * Constructor.
          * 
+         * @param tile An optional tile to make visible.
          * @param text The key for the question.
          * @param okText The key for the OK button.
          * @param cancelText The key for the Cancel button.
          * @param replace The replacement values.
          */
-        public ShowConfirmDialogSwingTask(String text, String okText, String cancelText, String... replace) {
-            _text = text;
-            _okText = okText;
-            _cancelText = cancelText;
-            _replace = replace;
+        public ShowConfirmDialogSwingTask(Tile tile, String text,
+                                          String okText, String cancelText,
+                                          String... replace) {
+            this.tile = tile;
+            this.text = text;
+            this.okText = okText;
+            this.cancelText = cancelText;
+            this.replace = replace;
         }
 
         /**
@@ -1532,18 +1545,12 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         protected Object doWork() {
-            boolean choice = getFreeColClient().getCanvas().showConfirmDialog(_text, _okText, _cancelText, _replace);
+            Canvas canvas = getFreeColClient().getCanvas();
+            boolean choice = canvas.showConfirmDialog(tile, text,
+                                                      okText, cancelText,
+                                                      replace);
             return Boolean.valueOf(choice);
         }
-
-
-        private String _text;
-
-        private String _okText;
-
-        private String _cancelText;
-
-        private String[] _replace;
     }
 
     /**

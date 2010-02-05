@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.KeyStroke;
 
 import net.sf.freecol.client.FreeColClient;
+import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
 
@@ -73,20 +74,15 @@ public class SaveAndQuitAction extends MapboardAction {
      * @param e The <code>ActionEvent</code>.
      */
     public void actionPerformed(ActionEvent e) {
-        
-        if (getFreeColClient().getCanvas()
-            .showConfirmDialog(Messages.message("quitDialog.areYouSure.text"),
-                               Messages.message("ok"), Messages.message("cancel"))) {
-            if(getFreeColClient().getCanvas()
-               .showConfirmDialog(Messages.message("quitDialog.save.text"),
-                                  Messages.message("yes"), Messages.message("no")))
-                {
-                    if (!freeColClient.isMapEditor()) {
-                        freeColClient.getInGameController().saveGame();
-                    } else {
-                        freeColClient.getMapEditorController().saveGame();
-                    }
+        Canvas canvas = getFreeColClient().getCanvas();
+        if (canvas.showConfirmDialog("quitDialog.areYouSure.text", "ok", "cancel")) {
+            if (canvas.showConfirmDialog("quitDialog.save.text", "yes", "no")) {
+                if (!freeColClient.isMapEditor()) {
+                    freeColClient.getInGameController().saveGame();
+                } else {
+                    freeColClient.getMapEditorController().saveGame();
                 }
+            }
             freeColClient.quit();
         }
     }

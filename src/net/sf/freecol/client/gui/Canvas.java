@@ -627,13 +627,29 @@ public final class Canvas extends JDesktopPane {
      * @param text The text that explains the choice for the user.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
+     * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
+     *         otherwise.
+     * @see FreeColDialog
+     */
+    public boolean showConfirmDialog(String text,
+                                     String okText, String cancelText) {
+        return showConfirmDialog(null, text, okText, cancelText);
+    }
+
+    /**
+     * Displays a dialog with a text and a ok/cancel option.
+     *
+     * @param tile A <code>Tile</code> to make visible (not under the dialog!)
+     * @param text The text that explains the choice for the user.
+     * @param okText The text displayed on the "ok"-button.
+     * @param cancelText The text displayed on the "cancel"-button.
      * @param replace An array of strings that will be inserted somewhere in the
      *            text.
      * @return <i>true</i> if the user clicked the "ok"-button and <i>false</i>
      *         otherwise.
      * @see FreeColDialog
      */
-    public boolean showConfirmDialog(String text,
+    public boolean showConfirmDialog(Tile tile, String text,
                                      String okText, String cancelText,
                                      String... replace) {
         try {
@@ -646,7 +662,8 @@ public final class Canvas extends JDesktopPane {
         }
         return showFreeColDialog(FreeColDialog.createConfirmDialog(text,
                                                                    okText,
-                                                                   cancelText));
+                                                                   cancelText),
+                                 tile);
     }
 
     /**
@@ -1099,17 +1116,19 @@ public final class Canvas extends JDesktopPane {
      * 
      * @param enemy The european player to attack.
      * @param amount The amount of gold to pay.
+     * @param tile A tile to make visible (not under the dialog).
      * 
      * @return true if the players wants to pay, false otherwise.
      */
-    public boolean showInciteDialog(Player enemy, int amount) {
-        String message = Messages.message("missionarySettlement.inciteConfirm");
-        message = message.replaceAll("%player%", enemy.getName());
-        message = message.replaceAll("%amount%", String.valueOf(amount));
-
-        FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(message, Messages.message("yes"), Messages
-                .message("no"));
-        return showFreeColDialog(confirmDialog);
+    public boolean showInciteDialog(Player enemy, int amount, Tile tile) {
+        String text = Messages.message("missionarySettlement.inciteConfirm",
+                                       "%player%", enemy.getName(),
+                                       "%amount%", String.valueOf(amount));
+        FreeColDialog<Boolean> confirmDialog
+            = FreeColDialog.createConfirmDialog(text,
+                                                Messages.message("yes"),
+                                                Messages.message("no"));
+        return showFreeColDialog(confirmDialog, tile);
     }
 
     /**

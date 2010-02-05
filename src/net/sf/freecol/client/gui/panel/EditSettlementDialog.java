@@ -198,8 +198,8 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             } 
         }
         else if(REMOVE.equals(command)) {
-        	boolean confirm = getCanvas().showConfirmDialog(Messages.message("editor.removeSettlement.text"),
-        			Messages.message("ok"), Messages.message("cancel"));
+        	boolean confirm = getCanvas().showConfirmDialog("editor.removeSettlement.text",
+                                                          "ok", "cancel");
         	if(!confirm){
         		return;
         	}

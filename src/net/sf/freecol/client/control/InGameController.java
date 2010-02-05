@@ -646,12 +646,13 @@ public final class InGameController implements NetworkConstants {
                     .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
                 switch (option) {
                 case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK:
-                    String msg = Messages.message("traderoute.warehouseCapacity",
+                    if (!canvas.showConfirmDialog(colony.getTile(),
+                                                  "traderoute.warehouseCapacity",
+                                                  "yes", "no",
                                                   "%unit%", unit.getName(),
                                                   "%colony%", locName,
                                                   "%amount%", overflow,
-                                                  "%goods%", goods.getName());
-                    if (!canvas.showConfirmDialog(msg, "yes", "no")) {
+                                                  "%goods%", goods.getName())) {
                         toUnload = atStop;
                     }
                     break;
@@ -1718,7 +1719,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         if ((newTile == null
              || (!oldTile.canMoveToEurope() && newTile.canMoveToEurope()))
-            && canvas.showConfirmDialog("highseas.text",
+            && canvas.showConfirmDialog(oldTile, "highseas.text",
                                         "highseas.yes", "highseas.no")) {
             moveToEurope(unit);
             nextActiveUnit();
@@ -1735,12 +1736,10 @@ public final class InGameController implements NetworkConstants {
      * @param direction The direction of a rumour.
      */
     private void moveExplore(Unit unit, Direction direction) {
-        // Center on the explorer (TODO: check if this is not done already)
-        freeColClient.getGUI().setFocusImmediately(unit.getTile().getPosition());
-
         // Confirm exploration.
         Canvas canvas = freeColClient.getCanvas();
-        if (canvas.showConfirmDialog("exploreLostCityRumour.text",
+        if (canvas.showConfirmDialog(unit.getTile(),
+                                     "exploreLostCityRumour.text",
                                      "exploreLostCityRumour.yes",
                                      "exploreLostCityRumour.no")) {
             moveMove(unit, direction);
@@ -1858,7 +1857,8 @@ public final class InGameController implements NetworkConstants {
         String enemyNation = enemy.getNationAsString();
         switch (attacker.getOwner().getStance(enemy)) {
         case UNCONTACTED: case PEACE:
-            return canvas.showConfirmDialog("model.diplomacy.attack.peace",
+            return canvas.showConfirmDialog(attacker.getTile(),
+                                            "model.diplomacy.attack.peace",
                                             "model.diplomacy.attack.confirm",
                                             "cancel",
                                             "%nation%", enemyNation);
@@ -1866,12 +1866,14 @@ public final class InGameController implements NetworkConstants {
             logger.finest("Player at war, no confirmation needed");
             break;
         case CEASE_FIRE:
-            return canvas.showConfirmDialog("model.diplomacy.attack.ceaseFire",
+            return canvas.showConfirmDialog(attacker.getTile(),
+                                            "model.diplomacy.attack.ceaseFire",
                                             "model.diplomacy.attack.confirm",
                                             "cancel",
                                             "%nation%", enemyNation);
         case ALLIANCE:
-            return canvas.showConfirmDialog("model.diplomacy.attack.alliance",
+            return canvas.showConfirmDialog(attacker.getTile(),
+                                            "model.diplomacy.attack.alliance",
                                             "model.diplomacy.attack.confirm",
                                             "cancel",
                                             "%nation%", enemyNation);
@@ -1898,7 +1900,7 @@ public final class InGameController implements NetworkConstants {
                                                          defenderOrNull,
                                                          settlementOrNull,
                                                          canvas);
-            return canvas.showFreeColDialog(dialog);
+            return canvas.showFreeColDialog(dialog, attacker.getTile());
         }
         return true;
     }
@@ -2175,7 +2177,7 @@ public final class InGameController implements NetworkConstants {
                                           settlement,
                                           "%unit%", unit.getName(),
                                           "%skill%", skill.getName());
-        } else if (canvas.showConfirmDialog("learnSkill.text",
+        } else if (canvas.showConfirmDialog(unit.getTile(), "learnSkill.text",
                                             "learnSkill.yes", "learnSkill.no",
                                             "%skill%", skill.getName())) {
             if (askLearnSkill(unit, direction)) {
@@ -2355,7 +2357,7 @@ public final class InGameController implements NetworkConstants {
             Player enemy = (Player) response.get(1);
             int gold = askIncite(unit, direction, enemy, -1);
             if (gold < 0) return;
-            if (canvas.showInciteDialog(enemy, gold)) {
+            if (canvas.showInciteDialog(enemy, gold, unit.getTile())) {
                 int goldOut = askIncite(unit, direction, enemy, gold);
                 if (goldOut < 0) {
                     ; // protocol fail
@@ -2432,8 +2434,8 @@ public final class InGameController implements NetworkConstants {
     private void moveScoutColony(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
         Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
-        ScoutAction userAction = canvas.showScoutForeignColonyDialog(colony, unit);
-        switch (userAction) {
+
+        switch (canvas.showScoutForeignColonyDialog(colony, unit)) {
         case CANCEL:
             break;
         case FOREIGN_COLONY_ATTACK:
@@ -3551,7 +3553,10 @@ public final class InGameController implements NetworkConstants {
                                           "%unit%", unit.getName());
             return;
         }
-        if (!canvas.showConfirmDialog("clearSpeciality.areYouSure",
+
+        Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
+        if (!canvas.showConfirmDialog(tile,
+                                      "clearSpeciality.areYouSure",
                                       "yes", "no",
                                       "%oldUnit%", unit.getName(),
                                       "%unit%", newType.getName())) {
@@ -4104,14 +4109,15 @@ public final class InGameController implements NetworkConstants {
      * @param colony The {@link Colony} where the building should be bought.
      */
     public void payForBuilding(Colony colony) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
-        if (!freeColClient.getCanvas()
-            .showConfirmDialog("payForBuilding.text", "payForBuilding.yes", "payForBuilding.no",
-                               "%replace%", Integer.toString(colony.getPriceForBuilding()))) {
+        if (!canvas.showConfirmDialog(null, "payForBuilding.text",
+                                      "payForBuilding.yes", "payForBuilding.no",
+                                      "%replace%", Integer.toString(colony.getPriceForBuilding()))) {
             return;
         }
 
@@ -4266,8 +4272,9 @@ public final class InGameController implements NetworkConstants {
      * @param type The type of goods for which to pay arrears.
      */
     public void payArrears(GoodsType type) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
@@ -4276,8 +4283,9 @@ public final class InGameController implements NetworkConstants {
 
         int arrears = player.getArrears(type);
         if (player.getGold() >= arrears) {
-            if (freeColClient.getCanvas().showConfirmDialog("model.europe.payArrears", "ok", "cancel",
-                                                            "%replace%", String.valueOf(arrears))) {
+            if (canvas.showConfirmDialog(null, "model.europe.payArrears",
+                                         "ok", "cancel",
+                                         "%replace%", String.valueOf(arrears))) {
                 player.modifyGold(-arrears);
                 freeColClient.getCanvas().updateGoldLabel();
                 player.resetArrears(type);
@@ -4344,8 +4352,9 @@ public final class InGameController implements NetworkConstants {
      * Disbands the active unit.
      */
     public void disbandActiveUnit() {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
@@ -4357,7 +4366,9 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (!freeColClient.getCanvas().showConfirmDialog("disbandUnit.text", "disbandUnit.yes", "disbandUnit.no")) {
+        Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
+        if (!canvas.showConfirmDialog(tile, "disbandUnit.text",
+                                      "disbandUnit.yes", "disbandUnit.no")) {
             return;
         }
 
