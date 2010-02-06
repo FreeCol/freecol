@@ -52,7 +52,7 @@ public class IndianSettlement extends Settlement {
 
     private static final Logger logger = Logger.getLogger(IndianSettlement.class.getName());
 
-    public static final int MISSIONARY_TENSION = -3;
+    public static final int MISSIONARY_TENSION = -10;
     public static final int MAX_CONVERT_DISTANCE = 10;
     public static final int ALARM_RADIUS = 2;
     public static final int ALARM_TILE_IN_USE = 2;
