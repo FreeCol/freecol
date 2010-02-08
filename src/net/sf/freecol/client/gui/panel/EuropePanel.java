@@ -481,12 +481,8 @@ public final class EuropePanel extends FreeColPanel {
             case SAIL:
                 Unit unit = getSelectedUnit();
                 if (unit != null && unit.isNaval()) {
-                    getController().moveToAmerica(unit);
                     UnitLabel unitLabel = getSelectedUnitLabel();
-                    setSelectedUnitLabel(null);
-                    inPortPanel.remove(unitLabel);
-                    toAmericaPanel.add(unitLabel, false);
-                    revalidate();
+                    toAmericaPanel.add(unitLabel, true);
                 }
                 requestFocus();
                 break;
@@ -574,6 +570,8 @@ public final class EuropePanel extends FreeColPanel {
                     comp.getParent().remove(comp);
 
                     getController().moveToAmerica(unit);
+                    
+                    inPortPanel.update();
                     docksPanel.update();
                 } else {
                     logger.warning("An invalid component got dropped on this ToAmericaPanel.");
@@ -658,8 +656,10 @@ public final class EuropePanel extends FreeColPanel {
             List<Unit> units = europe.getUnitList();
             UnitLabel lastCarrier = null;
             for (Unit unit : units) {
-                if ((unit.getState() == UnitState.ACTIVE || unit.getState() == UnitState.SENTRY)
-                        && (unit.isNaval())) {
+            	if(!unit.isNaval()){
+            		continue;
+            	}
+                if ((unit.getState() == UnitState.ACTIVE || unit.getState() == UnitState.SENTRY)) {
                     UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                     unitLabel.setTransferHandler(defaultTransferHandler);
                     unitLabel.addMouseListener(pressListener);
@@ -677,6 +677,12 @@ public final class EuropePanel extends FreeColPanel {
             // Default on the last carrier
             if (selectedUnit == null && lastCarrier != null) {
                 setSelectedUnitLabel(lastCarrier);
+            }
+            // unselect units bound to America
+            boolean isSelectedUnitBoundToAmerica = selectedUnit != null 
+    				&& selectedUnit.getUnit().getState() == UnitState.TO_AMERICA;
+            if(isSelectedUnitBoundToAmerica){
+            	setSelectedUnitLabel(lastCarrier);
             }
             revalidate();
             repaint();

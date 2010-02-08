@@ -314,11 +314,9 @@ public final class DefaultTransferHandler extends TransferHandler {
 
                     // Update unit selection
                     
-                    // moved unit to ToAmericaPanel, de-select it
-                    if (comp instanceof EuropePanel.ToAmericaPanel) {
-                    	((EuropePanel) parentPanel).setSelectedUnitLabel(null);
-                    	
-                    }
+                    // new unit selection has already been taken cared of
+                    //if this unit was moved to ToAmericaPanel
+                    
                     if (oldSelectedUnit != null) {
                     	if ((oldSelectedUnit).getParent() instanceof EuropePanel.InPortPanel) {
                             ((EuropePanel) parentPanel).setSelectedUnit(oldSelectedUnit.getUnit());
