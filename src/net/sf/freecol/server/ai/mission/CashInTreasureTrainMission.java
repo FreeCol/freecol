@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
@@ -130,8 +131,10 @@ public class CashInTreasureTrainMission extends Mission {
                     return false;
                 }
             };
-            PathNode bestPath = map.search(getUnit(), destinationDecider, Integer.MAX_VALUE);        
-            
+            PathNode bestPath = map.search(getUnit(), getUnit().getTile(),
+                    destinationDecider,
+                    CostDeciders.avoidSettlementsAndBlockingUnits(),
+                    Integer.MAX_VALUE);
             if (bestPath != null) {
                 Direction direction = moveTowards(connection, bestPath);
                 moveButDontAttack(connection, direction);

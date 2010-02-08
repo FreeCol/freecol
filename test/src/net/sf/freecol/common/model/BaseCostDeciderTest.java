@@ -178,16 +178,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         // unit is trying go to settlement
         unit.setDestination(settlementTile);
         
-        // Execute
-        final CostDecider decider = CostDeciders.avoidSettlements();
-        /*
-         * The CostDecider.getCost() returns ILLEGAL_MOVE because it
-         * is supposed to avoid settlements.  findPath correctly
-         * handles the end tile to make this work.
-         */
-        int cost = decider.getCost(unit, unitTile, settlementTile, 4,4);
-        assertTrue("Move should be invalid, decider avoids settlements",
-                   cost == CostDecider.ILLEGAL_MOVE);
+        // Try to find a path
         assertNull("Move should be invalid, no contact or goods to trade",
                    map.findPath(unit, unitTile, settlementTile));
 

@@ -28,9 +28,11 @@ import java.util.Set;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
+import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
+import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
@@ -385,5 +387,81 @@ public class MapTest extends FreeColTestCase {
         
         PathNode path = map.findPath(colonist, colonist.getTile(), destinationTile);
         assertNotNull("A path should be available",path);
+    }
+
+    public void testSearchForColony() {
+        Game game = getStandardGame();
+        Map map = getCoastTestMap(plainsType, true);
+        game.setMap(map);
+
+        Player dutchPlayer = game.getPlayer("model.nation.dutch");
+        Player frenchPlayer = game.getPlayer("model.nation.french");
+        UnitType artilleryType = spec().getUnitType("model.unit.artillery");
+        UnitType galleonType = spec().getUnitType("model.unit.galleon");
+        Tile unitTile = map.getTile(15, 5);
+        Tile colonyTile = map.getTile(9, 9); // should be on coast
+        Unit galleon = new Unit(game, unitTile, dutchPlayer, galleonType,
+                                UnitState.ACTIVE);
+        Unit artillery = new Unit(game, galleon, dutchPlayer, artilleryType, UnitState.ACTIVE);
+        Colony frenchColony = FreeColTestUtils.getColonyBuilder()
+            .player(frenchPlayer)
+            .colonyTile(colonyTile)
+            .build();
+        assertTrue("French colony not on the map",
+                   colonyTile.getSettlement() != null);
+        dutchPlayer.changeRelationWithPlayer(frenchPlayer, Stance.WAR);
+
+        // Test a GoalDecider with subgoals.
+        // The scoring function is deliberately simple.
+        GoalDecider gd = new GoalDecider() {
+                private PathNode found = null;
+                private int score = -1;
+
+                private int scoreTile(Tile tile) {
+                    return tile.getX() + tile.getY();
+                }
+
+                public PathNode getGoal() {
+                    return found;
+                }
+
+                public boolean hasSubGoals() {
+                    return true;
+                }
+
+                public boolean check(Unit u, PathNode pathNode) {
+                    Tile newTile = pathNode.getTile();
+                    boolean result = newTile.getSettlement() != null;
+                    if (result) {
+                        if (scoreTile(newTile) > score) {
+                            score = scoreTile(newTile);
+                            found = pathNode;
+                        }
+                    }
+                    return result;
+                }
+            };
+
+        PathNode path = map.search(artillery, unitTile,
+                                   gd, CostDeciders.avoidIllegal(),
+                                   Integer.MAX_VALUE, galleon);
+        assertTrue("Should find the French colony via a drop off",
+                   path != null && path.getTransportDropNode() != null
+                   && path.getLastNode().getTile() == colonyTile);
+
+        // Add another colony
+        Tile colonyTile2 = map.getTile(5, 5); // should score less
+        Colony frenchColony2 = FreeColTestUtils.getColonyBuilder()
+            .player(frenchPlayer)
+            .colonyTile(colonyTile2)
+            .build();
+        assertTrue("French colony not on the map",
+                   colonyTile2.getSettlement() != null);
+        path = map.search(artillery, unitTile,
+                          gd, CostDeciders.avoidIllegal(),
+                          Integer.MAX_VALUE, galleon);
+        assertTrue("Should still find the first French colony via a drop off",
+                   path != null && path.getTransportDropNode() != null
+                   && path.getLastNode().getTile() == colonyTile);
     }
 }

@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -175,7 +176,9 @@ public class ScoutingMission extends Mission {
                     return target;
                 }
             };
-            PathNode bestPath = map.search(getUnit(), destinationDecider, Integer.MAX_VALUE);
+            PathNode bestPath = map.search(getUnit(), getUnit().getTile(),
+                    destinationDecider, CostDeciders.avoidIllegal(),
+                    Integer.MAX_VALUE);
 
             if (bestPath != null) {
                 transportDestination = null;
@@ -258,7 +261,10 @@ public class ScoutingMission extends Mission {
                     return target;
                 }
             };
-            PathNode bestPath = getGame().getMap().search(getUnit(), destinationDecider, Integer.MAX_VALUE, (Unit) getUnit().getLocation());
+            Unit carrier = (Unit) getUnit().getLocation();
+            PathNode bestPath = getGame().getMap().search(getUnit(),
+                    carrier.getTile(), destinationDecider,
+                    CostDeciders.avoidIllegal(), Integer.MAX_VALUE, carrier);
             if (bestPath != null) {
                 transportDestination = bestPath.getLastNode().getTile();
                 debugAction = "Transport to: " + transportDestination.getPosition();                

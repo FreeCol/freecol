@@ -77,6 +77,7 @@ import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.UnitState;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.common.networking.ClearSpecialityMessage;
@@ -2098,6 +2099,7 @@ public class StandardAIPlayer extends AIPlayer {
         final int MAXIMUM_DISTANCE_TO_SETTLEMENT = 10; // Given in number of
         // turns.
         PathNode bestPath = map.search(unit, startTile, gd,
+                CostDeciders.avoidIllegal(),
                 MAXIMUM_DISTANCE_TO_SETTLEMENT, carrier);
         if (bestPath != null) {
             PathNode ln = bestPath.getLastNode();
@@ -2164,8 +2166,8 @@ public class StandardAIPlayer extends AIPlayer {
                 return false;
             }
         };
-        PathNode newTarget = map.search(unit, startTile, targetDecider, Integer.MAX_VALUE,
-                carrier);
+        PathNode newTarget = map.search(unit, startTile, targetDecider,
+                CostDeciders.avoidIllegal(), Integer.MAX_VALUE, carrier);
         if (newTarget != null) {
             Tile targetTile = newTarget.getLastNode().getTile();
             int value = getUnitSeekAndDestroyMissionValue(unit, targetTile, newTarget.getTotalTurns());

@@ -495,9 +495,6 @@ public class Map extends FreeColGameObject {
             throw new IllegalArgumentException("Argument 'unit' must not be 'null'.");
         }
 
-        // Short circuit if the final goal is unattainable.
-        if (unit != null && !unit.getSimpleMoveType(end).isLegal()) return null;
-
         // What unit starts the path?
         Unit currentUnit = (carrier != null) ? carrier : unit;
 
@@ -514,8 +511,10 @@ public class Map extends FreeColGameObject {
         }
 
         final HashMap<String, PathNode> openList = new HashMap<String, PathNode>();
-        final PriorityQueue<PathNode> openListQueue = new PriorityQueue<PathNode>(
-                1024, new Comparator<PathNode>() {
+        final HashMap<String, PathNode> closedList = new HashMap<String, PathNode>();
+        final PriorityQueue<PathNode> openListQueue
+            = new PriorityQueue<PathNode>(1024,
+                new Comparator<PathNode>() {
                     public int compare(PathNode o, PathNode p) {
                         int i = o.getF() - p.getF();
                         if (i != 0) {
@@ -530,19 +529,19 @@ public class Map extends FreeColGameObject {
                         }
                     }
                 });
-        final HashMap<String, PathNode> closedList = new HashMap<String, PathNode>();
 
         openList.put(firstNode.getTile().getId(), firstNode);
         openListQueue.offer(firstNode);
 
         while (!openList.isEmpty()) {
-            // Choosing the node with the lowest f:
+            // Choose the node with the lowest f.
             PathNode currentNode = openListQueue.poll();
-            openList.remove(currentNode.getTile().getId());
-            closedList.put(currentNode.getTile().getId(), currentNode);
+            final Tile currentTile = currentNode.getTile();
+            openList.remove(currentTile.getId());
+            closedList.put(currentTile.getId(), currentNode);
 
-            // Found our goal:
-            if (currentNode.getTile() == end) {
+            // Found the goal?
+            if (currentTile == end) {
                 while (currentNode.previous != null) {
                     currentNode.previous.next = currentNode;
                     currentNode = currentNode.previous;
@@ -550,19 +549,24 @@ public class Map extends FreeColGameObject {
                 return currentNode.next;
             }
 
-            // Only check further along a path if it is possible to
-            // transit *through* it (isProgress()), but not if the
-            // unit is already there, as is the case for firstNode.
-            if (currentUnit != null
-                && currentUnit.getTile() != currentNode.getTile()
-                && !currentUnit.getSimpleMoveType(currentNode.getTile()).isProgress()) {
-                continue;
-            }
+            // Reset current unit to that of this node.
+            currentUnit = (currentNode.isOnCarrier()) ? carrier : unit;
 
+            // Only check further along a path (i.e. ignore initial
+            // node) if it is possible to transit *through* it
+            // (isProgress()).
+            if (currentUnit != null
+                && currentNode.previous != null) {
+                Tile previousTile = currentNode.previous.getTile();
+                if (!currentUnit.getSimpleMoveType(previousTile, currentTile,
+                                                   false).isProgress()) {
+                    continue;
+                }
+            }
             
-            // Try every direction:
+            // Try the tiles in each direction
             for (Direction direction : Direction.values()) {
-                final Tile newTile = getNeighbourOrNull(direction, currentNode.getTile());
+                final Tile newTile = getNeighbourOrNull(direction, currentTile);
                 if (newTile == null) {
                     continue;
                 }
@@ -575,85 +579,82 @@ public class Map extends FreeColGameObject {
                     && currentNode.previous.getTile() == newTile) {
                     continue;
                 }
-                
                 if (closedList.containsKey(newTile.getId())) {
                     continue;
                 }
 
+                // Collect the parameters for the current node.
                 int cost = currentNode.getCost();
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
                 boolean onCarrier = currentNode.isOnCarrier();
                 Unit moveUnit;
 
-                // Check for disembark:
+                // Check for disembarkation on new tile, setting
+                // moveUnit to the unit that would actually move.
                 if (carrier != null
                     && onCarrier
                     && newTile.isLand()
                     && (newTile.getSettlement() == null
-                        || newTile.getSettlement().getOwner() == carrier.getOwner())) {
-                    onCarrier = false;
+                        || newTile.getSettlement().getOwner() == currentUnit.getOwner())) {
                     moveUnit = unit;
-                    movesLeft = moveUnit.getInitialMovesLeft();
+                    movesLeft = unit.getInitialMovesLeft();
                 } else {
-                    moveUnit = (currentNode.isOnCarrier()) ? carrier : unit;
+                    moveUnit = (onCarrier) ? carrier : unit;
                 }
 
-                if (moveUnit != null) {
-                    int extraCost = costDecider.getCost(moveUnit,
-                        currentNode.getTile(), newTile, movesLeft, turns);
-                    if (extraCost == CostDecider.ILLEGAL_MOVE && !newTile.equals(end)) {
+                // Update parameters for the new tile.
+                if (moveUnit == null) {
+                    if (((type == PathType.ONLY_SEA && newTile.isLand())
+                         || (type == PathType.ONLY_LAND && !newTile.isLand()))
+                        && newTile != end) {
                         continue;
                     }
+                    cost += newTile.getMoveCost(currentTile);
+                } else {
+                    int extraCost = costDecider.getCost(moveUnit,
+                            currentTile, newTile, movesLeft, turns);
                     if (extraCost == CostDecider.ILLEGAL_MOVE) {
-                        if (newTile.equals(end)) {
+                        // Do not let the CostDecider (which may be
+                        // conservative) block the final destination
+                        // if it is still a legal move.
+                        if (newTile == end
+                            && moveUnit.getSimpleMoveType(currentTile, newTile,
+                                                          false).isLegal()) {
                             cost += moveUnit.getInitialMovesLeft();
                             movesLeft = 0;
+                        } else {
+                            continue;
                         }
+                    //} else if (onCarrier && moveUnit == unit) {
+                    //    cost += extraCost * (1 + (carrier.getInitialMovesLeft()
+                    //            / ((double) unit.getInitialMovesLeft())));
                     } else {
-                        if (carrier != null) {
-                            if (moveUnit.equals(carrier)) {
-                                extraCost *= unit.getInitialMovesLeft();    
-                            } else {
-                                extraCost *= carrier.getInitialMovesLeft();
-                            }
-                        }
                         cost += extraCost;
-                        movesLeft = costDecider.getMovesLeft();
-                        if (costDecider.isNewTurn()) {
-                            turns++;
-                        }
                     }
-                } else {
-                    if ((type == PathType.ONLY_SEA && newTile.isLand() || 
-                         type == PathType.ONLY_LAND && !newTile.isLand()) &&
-                        !newTile.equals(end)) {
-                        continue;
-                    } else {
-                        cost += newTile.getMoveCost(currentNode.getTile());
+                    movesLeft = costDecider.getMovesLeft();
+                    if (costDecider.isNewTurn()) {
+                        turns++;
                     }
                 }
 
+                // Is this an improvement?  If not, ignore.
                 final int f = cost + getDistance(newTile.getPosition(), end.getPosition());
-
-                // Finding the node on the open list:
                 PathNode successor = openList.get(newTile.getId());
                 if (successor != null) {
                     if (successor.getF() <= f) {
                         continue;
-                    } else {
-                        openList.remove(successor.getTile().getId());
-                        openListQueue.remove(successor);
                     }
+                    openList.remove(successor.getTile().getId());
+                    openListQueue.remove(successor);
                 }
 
+                // Queue new node with updated parameters.
                 successor = new PathNode(newTile, cost, f, direction,
                         movesLeft, turns);
                 successor.previous = currentNode;
-                successor.setOnCarrier(onCarrier);
-
-                // Adding the new node to the open list:
-                openList.put(successor.getTile().getId(), successor);
+                successor.setOnCarrier(carrier != null && moveUnit == carrier);
+                openList.put(newTile.getId(), successor);
                 openListQueue.offer(successor);
             }
         }
@@ -878,72 +879,60 @@ public class Map extends FreeColGameObject {
         // What unit starts the path?
         Unit currentUnit = (carrier != null) ? carrier : unit;
 
-        final int ml = (currentUnit != null) ? currentUnit.getMovesLeft() : -1;
-        final PathNode firstNode = new PathNode(startTile, 0, 0, Direction.N, ml, 0);
-        firstNode.setOnCarrier(carrier != null);
-
-        final HashMap<String, PathNode> openList = new HashMap<String, PathNode>();
-        final PriorityQueue<PathNode> openListQueue = new PriorityQueue<PathNode>(
-                1024, new Comparator<PathNode>() {
+        final HashMap<String, PathNode> openList
+            = new HashMap<String, PathNode>();
+        final HashMap<String, PathNode> closedList
+            = new HashMap<String, PathNode>();
+        final PriorityQueue<PathNode> openListQueue
+            = new PriorityQueue<PathNode>(1024,
+                new Comparator<PathNode>() {
                     public int compare(PathNode o, PathNode p) {
-                        int i = o.getCost() - p.getCost();
-                        if (i != 0) {
-                            return i;
-                        } else {
-                            i = o.getTile().getX() - p.getTile().getX();
-                            if (i != 0) {
-                                return i;
-                            } else {
-                                return o.getTile().getY() - p.getTile().getY();
-                            }
-                        }
+                        return o.getCost() - p.getCost();
                     }
                 });
-        final HashMap<String, PathNode> closedList = new HashMap<String, PathNode>();
-
+        final PathNode firstNode
+            = new PathNode(startTile, 0, 0, Direction.N,
+                           (currentUnit != null) ? currentUnit.getMovesLeft() : -1,
+                           0);
+        firstNode.setOnCarrier(carrier != null);
         openList.put(startTile.getId(), firstNode);
         openListQueue.offer(firstNode);
 
         while (!openList.isEmpty()) {
-            // Choosing the node with the lowest cost:
+            // Choose the node with the lowest cost.
             final PathNode currentNode = openListQueue.poll();
-            openList.remove(currentNode.getTile().getId());
-            closedList.put(currentNode.getTile().getId(), currentNode);
+            final Tile currentTile = currentNode.getTile();
+            openList.remove(currentTile.getId());
+            closedList.put(currentTile.getId(), currentNode);
 
-            // Reached the end
+            // Reset current unit to that of this node.
+            currentUnit = (currentNode.isOnCarrier()) ? carrier : unit;
+
+            // Check for simple success.
+            if (gd.check(currentUnit, currentNode) && !gd.hasSubGoals()) {
+                break;
+            }
+
+            // Stop if reached the turn limit.
             if (currentNode.getTurns() > maxTurns) {
                 break;
-            }            
+            }
 
-            if (gd.check(currentUnit, currentNode) && !gd.hasSubGoals()) {
-                PathNode bestTarget = gd.getGoal();
-                if (bestTarget != null) {
-                    while (bestTarget.previous != null) {
-                        bestTarget.previous.next = bestTarget;
-                        bestTarget = bestTarget.previous;
-                    }
-                    return bestTarget.next;
-                } else {
-                    logger.warning("The returned goal is null.");
-                    return null;
+            // Only check further along a path (i.e. ignore initial
+            // node) if it is possible to transit *through* it
+            // (isProgress()).
+            if (currentUnit != null
+                && currentNode.previous != null) {
+                Tile previousTile = currentNode.previous.getTile();
+                if (!currentUnit.getSimpleMoveType(previousTile, currentTile,
+                                                   false).isProgress()) {
+                    continue;
                 }
             }
 
-            // Only check further along a path if it is possible to
-            // transit *through* it (isProgress()), but not if the
-            // unit is already there, as is the case for firstNode.
-            if (currentUnit != null
-                && currentUnit.getTile() != currentNode.getTile()
-                && !currentUnit.getSimpleMoveType(currentNode.getTile()).isProgress()) {
-                continue;
-            }
-
-            // Try every direction:
+            // Try the tiles in each direction
             for (Direction direction : Direction.values()) {
-
-                final Tile newTile = getNeighbourOrNull(direction, currentNode
-                        .getTile());
-
+                final Tile newTile = getNeighbourOrNull(direction, currentTile);
                 if (newTile == null) {
                     continue;
                 }
@@ -956,39 +945,38 @@ public class Map extends FreeColGameObject {
                     && currentNode.previous.getTile() == newTile) {
                     continue;
                 }
-                
                 if (closedList.containsKey(newTile.getId())) {
                     continue;
                 }
 
+                // Collect the parameters for the current node.
                 int cost = currentNode.getCost();
                 int movesLeft = currentNode.getMovesLeft();
                 int turns = currentNode.getTurns();
                 boolean onCarrier = currentNode.isOnCarrier();
                 Unit moveUnit;
 
-                // Check for disembark:
+                // Check for disembarkation on new tile, setting
+                // moveUnit to the unit that would actually move.
                 if (carrier != null
                     && onCarrier
                     && newTile.isLand()
                     && (newTile.getSettlement() == null
                         || newTile.getSettlement().getOwner() == currentUnit.getOwner())) {
-                    onCarrier = false;
                     moveUnit = unit;
                     movesLeft = moveUnit.getInitialMovesLeft();
                 } else {
-                    moveUnit = (currentNode.isOnCarrier()) ? carrier : unit;
+                    moveUnit = (onCarrier) ? carrier : unit;
                 }
 
+                // Update parameters for the new tile.
                 int extraCost = costDecider.getCost(moveUnit,
-                        currentNode.getTile(), newTile, movesLeft, turns);
+                        currentTile, newTile, movesLeft, turns);
                 if (extraCost == CostDecider.ILLEGAL_MOVE) {
                     continue;
-                }
-                if (carrier != null && moveUnit.equals(unit)) {
-                    cost += extraCost
-                        * (1 + (carrier.getInitialMovesLeft()
-                                / ((double) unit.getInitialMovesLeft())));
+                //} else if (onCarrier && moveUnit == unit) {
+                //    cost += extraCost * (1 + (carrier.getInitialMovesLeft()
+                //            / ((double) unit.getInitialMovesLeft())));
                 } else {
                     cost += extraCost;
                 }
@@ -997,20 +985,22 @@ public class Map extends FreeColGameObject {
                     turns++;
                 }
 
+                // Is this an improvement?  If not, ignore.
                 PathNode successor = openList.get(newTile.getId());
                 if (successor != null) {
                     if (successor.getCost() <= cost) {
                         continue;
-                    } else {
-                        openList.remove(successor.getTile().getId());
-                        openListQueue.remove(successor);
                     }
+                    openList.remove(successor.getTile().getId());
+                    openListQueue.remove(successor);
                 }
+
+                // Queue new node with updated parameters.
                 successor = new PathNode(newTile, cost, cost, direction,
-                        movesLeft, turns);
+                                         movesLeft, turns);
                 successor.previous = currentNode;
-                successor.setOnCarrier(onCarrier);
-                openList.put(successor.getTile().getId(), successor);
+                successor.setOnCarrier(carrier != null && moveUnit == carrier);
+                openList.put(newTile.getId(), successor);
                 openListQueue.offer(successor);
             }
         }
@@ -1022,9 +1012,8 @@ public class Map extends FreeColGameObject {
                 bestTarget = bestTarget.previous;
             }
             return bestTarget.next;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

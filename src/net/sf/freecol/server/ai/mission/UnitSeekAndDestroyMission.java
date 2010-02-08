@@ -40,6 +40,7 @@ import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.MoveType;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
@@ -195,8 +196,8 @@ public class UnitSeekAndDestroyMission extends Mission {
                 return pathNode.getTile() == end;
             }
         };
-        return getGame().getMap().search(unit, start, gd, 
-                Integer.MAX_VALUE, carrier);    
+        return getGame().getMap().search(unit, start, gd,
+                CostDeciders.avoidIllegal(), Integer.MAX_VALUE, carrier);
     }
     
     /**

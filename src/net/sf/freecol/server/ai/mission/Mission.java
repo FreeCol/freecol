@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.sf.freecol.common.model.CombatModel;
+import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -328,7 +329,8 @@ public abstract class Mission extends AIObject {
                 return false;
             }
         };
-        return getGame().getMap().search(getUnit(), gd, maxTurns);
+        return getGame().getMap().search(getUnit(), getUnit().getTile(), gd,
+                CostDeciders.avoidIllegal(), maxTurns);
     }
     
    
@@ -375,7 +377,9 @@ public abstract class Mission extends AIObject {
                 return hasOurSettlement;
             }
         };
-        PathNode path = getGame().getMap().search(carrier, gd, Integer.MAX_VALUE);                             
+        PathNode path = getGame().getMap().search(carrier, carrier.getTile(),
+                gd, CostDeciders.avoidSettlementsAndBlockingUnits(),
+                Integer.MAX_VALUE);
         if (path != null) {
             return path.getLastNode().getTile();
         } else {
