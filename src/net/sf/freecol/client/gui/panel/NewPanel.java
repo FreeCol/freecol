@@ -241,6 +241,8 @@ public final class NewPanel extends FreeColPanel implements ActionListener {
             switch (Enum.valueOf(NewPanelAction.class, command)) {
             case OK:
                 if (single.isSelected()) {
+                    // TODO: select specification
+                    // getCanvas().showFreeColDialog(new SpecificationDialog(getCanvas()));
                     NationOptions nationOptions = NationOptions.getDefaults();
                     nationOptions.setNationalAdvantages((Advantages) nationalAdvantages.getSelectedItem());
                     nationOptions.setSelectColors(selectColors.isSelected());
