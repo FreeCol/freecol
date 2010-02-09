@@ -19,8 +19,8 @@
 
 package net.sf.freecol.util.test;
 
+import java.io.FileInputStream;
 import java.lang.reflect.Field;
-
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Locale;
@@ -48,14 +48,10 @@ import net.sf.freecol.server.model.ServerGame;
 /**
  * The base class for all FreeCol tests. Contains useful methods used by the
  * individual tests.
- * 
- * @author $Author$
- * @version $Revision$ ($Date$)
- * 
  */
 public class FreeColTestCase extends TestCase {
 
-    public static final TileType plainsType = FreeCol.getSpecification().getTileType("model.tile.plains");
+    public static final TileType plainsType = spec().getTileType("model.tile.plains");
 
     /**
      * use getGame to access this.
@@ -105,8 +101,20 @@ public class FreeColTestCase extends TestCase {
         game = newGame;
     }
     
-    public static Specification spec(){
-    	return FreeCol.getSpecification();
+    public static Specification spec() {
+        Specification result = Specification.getSpecification();
+        if (result == null) {
+            try {
+                Specification.createSpecification(new FileInputStream("data/freecol/specification.xml"));
+                return Specification.getSpecification();
+            } catch(Exception e) {
+                System.out.println(e);
+                return null;
+            }
+        } else {
+            return result;
+        }
+
     }
 
     /**

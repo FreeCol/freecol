@@ -79,6 +79,13 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         FreeColTestCase.setGame(game);
         
         AIMain aiMain = server.getAIMain();
+        final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+        final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
+        final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
+        final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
+        final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
         
         FreeColTestUtils.ColonyBuilder builder = FreeColTestUtils.getColonyBuilder();
         builder.initialColonists(1).addColonist(indenturedServantType);
@@ -126,6 +133,15 @@ public class StandardAIPlayerTest extends FreeColTestCase {
         AIMain aiMain = server.getAIMain();
         
         Colony colony = getStandardColony(1);
+
+        final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+        final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
+        final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
+        final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
+        final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+
         colony.addGoods(horsesType, 10);
         
         Unit expertSoldier = new Unit(game, colony.getTile(), colony.getOwner(), expertSoldierType, UnitState.ACTIVE, new EquipmentType[0]);
@@ -175,11 +191,20 @@ public class StandardAIPlayerTest extends FreeColTestCase {
 
         Colony colony = getStandardColony(1);
 
+        final GoodsType musketsType = spec().getGoodsType("model.goods.muskets");
+        final GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+        final UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
+        final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
+        final UnitType expertSoldierType = spec().getUnitType("model.unit.veteranSoldier");
+        final EquipmentType musketsEqType = spec().getEquipmentType("model.equipment.muskets");
+        final EquipmentType horsesEqType = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
+
         colony.addGoods(musketsType, 100);
         colony.addGoods(horsesType, 100);
         assertTrue("Colony should be hable to equip units with horses",colony.canBuildEquipment(horsesEqType));
         
-        Unit expertSoldier = new Unit(game, colony.getTile(), colony.getOwner(), expertSoldierType, UnitState.ACTIVE, new EquipmentType[0]);
+        Unit expertSoldier = new Unit(game, colony.getTile(), colony.getOwner(), expertSoldierType,
+                                      UnitState.ACTIVE, new EquipmentType[0]);
 
         StandardAIPlayer player = (StandardAIPlayer) aiMain.getAIObject(colony.getOwner());
 

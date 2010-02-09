@@ -43,11 +43,11 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class ScoutingMissionTest extends FreeColTestCase {
-    UnitType scoutType = spec().getUnitType("model.unit.seasonedScout");
-    EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
     
     public void testHorsesLost() {
         
+        UnitType scoutType = spec().getUnitType("model.unit.seasonedScout");
+        EquipmentType horsesEqType = spec().getEquipmentType("model.equipment.horses");
         
         // start a server
         FreeColServer server = ServerTestHelper.startServer(false, true);

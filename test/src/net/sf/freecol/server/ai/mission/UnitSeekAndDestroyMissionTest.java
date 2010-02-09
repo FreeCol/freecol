@@ -39,22 +39,20 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
-	UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
-    EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
 	
-	FreeColServer server = null;
+    FreeColServer server = null;
 	
-	public void tearDown(){
-		if(server != null){
-			// must make sure that the server is stopped
+    public void tearDown(){
+        if(server != null){
+            // must make sure that the server is stopped
             ServerTestHelper.stopServer(server);
             setGame(null);
             server = null;
-		}
-	}
+        }
+    }
 	
-	private void setupServer(){
-		// start a server
+    private void setupServer(){
+        // start a server
         server = ServerTestHelper.startServer(false, true);
                 
         server.setMapGenerator(new MockMapGenerator(getTestMap()));
@@ -68,15 +66,18 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         } catch (FreeColException e) {
             fail("Failed to start game");
         }
-	}
+    }
 	
-	public void testCapturedUnitsLoseMission() {
-		setupServer();
+    public void testCapturedUnitsLoseMission() {
+        setupServer();
         
         Game game = server.getGame();
         Map map = game.getMap();
         AIMain aiMain = server.getAIMain();
         
+        UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
+        EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
+
         // Create attacking player and unit
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
@@ -105,15 +106,18 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         aiUnit = (AIUnit) aiMain.getAIObject(attacker);
         assertFalse("Captured unit should lose previous mission", aiUnit.getMission() == null);
         
-	}
+    }
 	
-	public void testDoNotPursueUnitsInColonies(){
-		setupServer();
+    public void testDoNotPursueUnitsInColonies(){
+        setupServer();
 		
         Game game = server.getGame();
         Map map = game.getMap();
         AIMain aiMain = server.getAIMain();
 		
+        UnitType veteranType = spec().getUnitType("model.unit.veteranSoldier");
+        EquipmentType muskets = spec().getEquipmentType("model.equipment.muskets");
+
         // Create attacking player and unit
         ServerPlayer player1 = (ServerPlayer) game.getPlayer("model.nation.dutch");
         Tile tile1 = map.getTile(2, 2);
@@ -139,5 +143,5 @@ public class UnitSeekAndDestroyMissionTest extends FreeColTestCase {
         getStandardColony(1, defenderTile.getX(),defenderTile.getY());
         String errMsg = "UnitSeekAndDestroyMission should NOT be valid anymore, defender in colony";
         assertFalse(errMsg, aiUnit.getMission().isValid());
-	}
+    }
 }

@@ -41,46 +41,36 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class ColonyPlanTest extends FreeColTestCase {	
-	final UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
-	final TileType prairieType = spec().getTileType("model.tile.prairie");
-	final TileType forestType = spec().getTileType("model.tile.coniferForest");
-	final TileType mountainType = spec().getTileType("model.tile.mountains");
-	final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
-    final GoodsType oreType = spec().getGoodsType("model.goods.ore");
-    final GoodsType foodType = spec().getGoodsType("model.goods.food");
-    final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
-    final GoodsType clothType = spec().getGoodsType("model.goods.cloth");
-    final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
-    final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
-    final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
     
-	FreeColServer server = null;
+    FreeColServer server = null;
 	
-	public void tearDown() throws Exception {
-		if(server != null){
-			// must make sure that the server is stopped
+    public void tearDown() throws Exception {
+        if(server != null){
+            // must make sure that the server is stopped
             ServerTestHelper.stopServer(server);
             server = null;
-		}
-		super.tearDown();
-	}
+        }
+        super.tearDown();
+    }
 	
-	// creates the special map for the tests
-	// map will have: 
+    // creates the special map for the tests
+    // map will have: 
     //    - a colony in (5,8) (built after)
-	//    - a forest in (4,8) for lumber
-	//    - a mountain in (6,8) for ore
-	private Map buildMap(boolean withBuildRawMat){
-	    MapBuilder builder = new MapBuilder(getGame());
-	    if(withBuildRawMat){
-	        builder.setTile(4, 8, forestType);
-	        builder.setTile(6, 8, mountainType);
-	    }
-	    return builder.build();
-	}
+    //    - a forest in (4,8) for lumber
+    //    - a mountain in (6,8) for ore
+    private Map buildMap(boolean withBuildRawMat){
+        MapBuilder builder = new MapBuilder(getGame());
+        final TileType forestType = spec().getTileType("model.tile.coniferForest");
+        final TileType mountainType = spec().getTileType("model.tile.mountains");
+        if(withBuildRawMat){
+            builder.setTile(4, 8, forestType);
+            builder.setTile(6, 8, mountainType);
+        }
+        return builder.build();
+    }
 	
-	public void testPlanFoodProductionBeforeWorkerAllocation() {
-		// start a server
+    public void testPlanFoodProductionBeforeWorkerAllocation() {
+        // start a server
         server = ServerTestHelper.startServer(false, true);
         
         Map map = getTestMap();
@@ -104,21 +94,21 @@ public class ColonyPlanTest extends FreeColTestCase {
         	
         Colony colony = getStandardColony();
         
-        ColonyPlan plan = new ColonyPlan(aiMain,colony);
-        
         // get food production of central colony tile
         int expAmount = 0;
-        for (GoodsType foodType : FreeCol.getSpecification().getGoodsFood()) {
+        for (GoodsType foodType : spec().getGoodsFood()) {
             expAmount += colony.getTile().getMaximumPotential(foodType, null);
         }
         
+        ColonyPlan plan = new ColonyPlan(aiMain,colony);
+        plan.create();
         int amount = plan.getFoodProduction();
-        
-        assertEquals("Wrong initial food ammount",expAmount,amount);
-	}
+        //assertEquals(expAmount, plan.getProductionOf(spec().getGoodsType("model.goods.food")));
+        assertEquals("Wrong initial food amount",expAmount,amount);
+    }
 	
-	public void testReqLumberAndHammersForBuild(){
-	       // start a server
+    public void testReqLumberAndHammersForBuild(){
+        // start a server
         server = ServerTestHelper.startServer(false, true);
         
         Map map = buildMap(true);
@@ -141,20 +131,23 @@ public class ColonyPlanTest extends FreeColTestCase {
         AIMain aiMain = server.getAIMain();
             
         Colony colony = getStandardColony();
+        final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
         colony.setCurrentlyBuilding(warehouse);
         
         ColonyPlan plan = new ColonyPlan(aiMain,colony);
         
         plan.create();
         
+        final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
         int lumber = plan.getProductionOf(lumberType);
         assertTrue("The colony should plan to produce lumber", lumber > 0);
         
+        final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
         int hammers = plan.getProductionOf(hammersType);
         assertTrue("The colony should plan to produce hammers", hammers > 0);
-	}
+    }
 	
-	public void testReqOreAndToolsWithEnoughHammersForBuild(){
+    public void testReqOreAndToolsWithEnoughHammersForBuild(){
         // start a server
         server = ServerTestHelper.startServer(false, true);
         
@@ -180,13 +173,18 @@ public class ColonyPlanTest extends FreeColTestCase {
         Colony colony = getStandardColony();
         
         // colony has enough hammers, requires tools
+        final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
+        final GoodsType oreType = spec().getGoodsType("model.goods.ore");
+        final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
+        final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
+        
         colony.setCurrentlyBuilding(warehouse);
         colony.addGoods(hammersType, warehouse.getAmountRequiredOf(hammersType));
         
         ColonyPlan plan = new ColonyPlan(aiMain,colony);
         
         plan.create();
-        
+
         int ore = plan.getProductionOf(oreType);
         assertTrue("The colony should plan to produce ore", ore > 0);
      
@@ -197,10 +195,10 @@ public class ColonyPlanTest extends FreeColTestCase {
         assertFalse("The colony should not produce hammers, has enough", hammers > 0);
     }
 	
-	/*
-	 * This test verifies behavior when the colony isnt building anything
-	 */
-	public void testNoBuildNoHammers(){
+    /*
+     * This test verifies behavior when the colony isnt building anything
+     */
+    public void testNoBuildNoHammers(){
         // start a server
         server = ServerTestHelper.startServer(false, true);
         
@@ -232,17 +230,18 @@ public class ColonyPlanTest extends FreeColTestCase {
         
         plan.create();
         
+        final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
         int hammers = plan.getProductionOf(hammersType);
         assertFalse("The colony should not produce hammers, building nothing", hammers > 0);
     }
 	
-	/*
-	 * This test verifies behavior when the colony has no tiles that provide 
-	 *the raw materials for the build, but has them in stock
-	 */
-	public void testNoBuildRawMatTiles(){
+    /*
+     * This test verifies behavior when the colony has no tiles that provide 
+     *the raw materials for the build, but has them in stock
+     */
+    public void testNoBuildRawMatTiles(){
         final int fullStock = 100;
-	    // start a server
+        // start a server
         server = ServerTestHelper.startServer(false, true);
         
         Map map = buildMap(false);
@@ -265,10 +264,16 @@ public class ColonyPlanTest extends FreeColTestCase {
         AIMain aiMain = server.getAIMain();
             
         Colony colony = getStandardColony();
+        final GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
+        final GoodsType oreType = spec().getGoodsType("model.goods.ore");
+        final GoodsType hammersType = spec().getGoodsType("model.goods.hammers");
+        final GoodsType toolsType = spec().getGoodsType("model.goods.tools");
+
         // Add enough raw materials for build
         colony.addGoods(lumberType, fullStock);
         colony.addGoods(oreType, fullStock);
         
+        final BuildingType warehouse = spec().getBuildingType("model.building.Warehouse");
         colony.setCurrentlyBuilding(warehouse);
 
         ColonyPlan plan = new ColonyPlan(aiMain,colony);        
@@ -289,9 +294,9 @@ public class ColonyPlanTest extends FreeColTestCase {
         assertFalse("The colony should not produce hammers, has enough", hammers > 0);
         assertFalse("The colony cannot produce ore, none available", ore > 0);
         assertTrue("The colony should produce tools, has ore in stock", tools > 0);
-	}
+    }
 	
-	/*
+    /*
      * This test verifies adjustments to manufactured goods production
      */
     public void testAdjustProductionAndManufacture(){
@@ -299,6 +304,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         // start a server
         server = ServerTestHelper.startServer(false, true);
         
+        final TileType prairieType = spec().getTileType("model.tile.prairie");
         Map map = getTestMap(prairieType);
         
         server.setMapGenerator(new MockMapGenerator(map));
@@ -322,6 +328,11 @@ public class ColonyPlanTest extends FreeColTestCase {
         Tile t = map.getAdjacentTile(colony.getTile().getPosition(), Direction.N);
         Unit u = colony.getUnitList().get(0);
         ColonyTile colTile = colony.getColonyTile(t);
+
+        final GoodsType cottonType = spec().getGoodsType("model.goods.cotton");
+        final GoodsType clothType = spec().getGoodsType("model.goods.cloth");
+        final GoodsType foodType = spec().getGoodsType("model.goods.food");
+
         u.work(colTile);
         u.setWorkType(cottonType);
         
