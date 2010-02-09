@@ -328,7 +328,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         tree.setOpaque(false);
         tree.addTreeSelectionListener(this);
         
-        listPanel.setLayout(new GridLayout(0, 1));
         listPanel.add(tree);
 
         return tree;
@@ -842,12 +841,6 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (bonusNumber > 0) {
             detailPanel.add(new JLabel(Messages.message("colopedia.unit.productionBonus")),
                             "newline 20, top");
-            /*
-            int rows = bonusNumber / MODIFIERS_PER_ROW;
-            if (bonusNumber % MODIFIERS_PER_ROW != 0) {
-                rows++;
-            }
-            */
             JPanel productionPanel = new JPanel(new GridLayout(0, MODIFIERS_PER_ROW));
             productionPanel.setOpaque(false);
             for (Modifier productionBonus : bonusList) {
