@@ -703,7 +703,7 @@ public final class InGameInputHandler extends InputHandler {
 
             switch (getFreeColClient().getClientOptions().getInteger(ClientOptions.INDIAN_DEMAND_RESPONSE)) {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ASK:
-                if (goods.getType() == Goods.FOOD) {
+                if (goods.getType().isFoodType()) {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                                                               "indianDemand.food.text", "indianDemand.food.yes",
                                                               "indianDemand.food.no",
@@ -721,7 +721,7 @@ public final class InGameInputHandler extends InputHandler {
                 }
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                if (goods.getType() == Goods.FOOD) {
+                if (goods.getType().isFoodType()) {
                     m = new ModelMessage(colony, ModelMessage.MessageType.ACCEPTED_DEMANDS,
                                          unit,
                                          "indianDemand.food.text",
@@ -740,7 +740,7 @@ public final class InGameInputHandler extends InputHandler {
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                if (goods.getType() == Goods.FOOD) {
+                if (goods.getType().isFoodType()) {
                     m = new ModelMessage(colony, ModelMessage.MessageType.REJECTED_DEMANDS,
                                          unit,
                                          "indianDemand.food.text",

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
@@ -234,8 +235,9 @@ public class FoundingFatherTest extends FreeColTestCase {
         Unit unit = new Unit(getGame(), colony.getTile(), player, pioneerType, UnitState.ACTIVE, 
                              pioneerType.getDefaultEquipment());
         // set the unit as a farmer in the colony
-        unit.setWorkType(Goods.FOOD);
-        ColonyTile farmLand = colony.getVacantColonyTileFor(unit, true, Goods.FOOD);
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        unit.setWorkType(foodType);
+        ColonyTile farmLand = colony.getVacantColonyTileFor(unit, true, foodType);
         unit.setLocation(farmLand);
         b = colony.getBuilding(stockadeType);
         assertNotNull(b);

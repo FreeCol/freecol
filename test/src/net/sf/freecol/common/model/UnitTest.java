@@ -143,14 +143,16 @@ public class UnitTest extends FreeColTestCase {
 
         assertEquals(2, dutch.getDifficulty().getIndex());
         assertEquals("model.difficulty.medium", dutch.getDifficulty().getId());
-        assertEquals(6, Specification.getSpecification().getIntegerOption("model.option.badGovernmentLimit").getValue());
-        assertEquals(10, Specification.getSpecification().getIntegerOption("model.option.veryBadGovernmentLimit").getValue());
+        assertEquals(6, spec().getIntegerOption("model.option.badGovernmentLimit").getValue());
+        assertEquals(10, spec().getIntegerOption("model.option.veryBadGovernmentLimit").getValue());
 
         // Found colony on 6,8
         Unit soldier = new Unit(game, map.getTile(6, 8), dutch, soldierType, UnitState.ACTIVE);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
-        soldier.setWorkType(Goods.FOOD);
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+
+        soldier.setWorkType(foodType);
         soldier.buildColony(colony);
 
         soldier.setLocation(colony.getColonyTile(plain58));
@@ -159,7 +161,7 @@ public class UnitTest extends FreeColTestCase {
                                      UnitState.ACTIVE);
 
         // Before
-        assertEquals(0, colony.getGoodsCount(Goods.FOOD));
+        assertEquals(0, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(5 + 5, colony.getFoodProduction());
         assertEquals(false, plain58.hasImprovement(plow));
@@ -170,7 +172,7 @@ public class UnitTest extends FreeColTestCase {
         dutch.newTurn();
 
         assertEquals(false, plain58.hasImprovement(plow));
-        assertEquals(8, colony.getGoodsCount(Goods.FOOD));
+        assertEquals(8, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(0, colony.getProductionBonus());
         assertEquals(5 + 5, colony.getFoodProduction());
@@ -186,13 +188,13 @@ public class UnitTest extends FreeColTestCase {
         // Production for next turn is updated
         assertEquals(5 + 6, colony.getFoodProduction());
         // But in only 10 - 2 == 8 are added from last turn
-        assertEquals(8 + 8, colony.getGoodsCount(Goods.FOOD));
+        assertEquals(8 + 8, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
 
         // Advance last turn
         dutch.newTurn();
 
-        assertEquals(16 + 9, colony.getGoodsCount(Goods.FOOD));
+        assertEquals(16 + 9, colony.getGoodsCount(foodType));
         assertEquals(2, colony.getFoodConsumption());
         assertEquals(5 + 6, colony.getFoodProduction());
         assertEquals(true, plain58.hasImprovement(plow));
@@ -400,7 +402,7 @@ public class UnitTest extends FreeColTestCase {
                                 UnitState.ACTIVE);
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(6, 9));
-        soldier.setWorkType(Goods.FOOD);
+        soldier.setWorkType(foodType);
 
         try {
             soldier.buildColony(colony);

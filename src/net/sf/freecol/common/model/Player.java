@@ -1851,6 +1851,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 exploreAllColonies();
             } else if (event.equals("model.event.increaseSonsOfLiberty")) {
                 int value = Integer.parseInt(father.getEvents().get(event));
+                GoodsType bells = Specification.getSpecification().getLibertyGoodsTypeList().get(0);
                 for (Colony colony : getColonies()) {
                     /*
                      * The number of liberty to be generated in order to get the
@@ -1859,7 +1860,7 @@ public class Player extends FreeColGameObject implements Nameable {
                      */
                     int requiredLiberty = ((colony.getSoL() + value) * Colony.LIBERTY_PER_REBEL *
                                            colony.getUnitCount()) / 100;
-                    colony.addGoods(Goods.BELLS, requiredLiberty - colony.getGoodsCount(Goods.BELLS));
+                    colony.addGoods(bells, requiredLiberty - colony.getGoodsCount(bells));
                 }
             } else if (event.equals("model.event.newRecruits")) {
                 for (int index = 0; index < Europe.RECRUIT_COUNT; index++) {
@@ -2984,7 +2985,10 @@ public class Player extends FreeColGameObject implements Nameable {
     public int getLibertyProductionNextTurn() {
         int libertyNextTurn = 0;
         for (Colony colony : getColonies()) {
-            libertyNextTurn += colony.getProductionOf(Goods.BELLS);
+            for (GoodsType libertyGoods : Specification.getSpecification()
+                     .getLibertyGoodsTypeList()) {
+                libertyNextTurn += colony.getProductionOf(libertyGoods);
+            }
         }
         return libertyNextTurn;
     }

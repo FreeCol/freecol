@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyTest extends FreeColTestCase {
@@ -151,39 +152,42 @@ public class ColonyTest extends FreeColTestCase {
         preacher.setLocation(null);
         church.add(preacher);
 
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+        GoodsType crossType = spec().getGoodsType("model.goods.crosses");
+
         colony.newTurn();
         assertEquals(population, colony.getUnitCount());
-        assertEquals(4, colony.getProductionOf(Goods.BELLS));
-        assertEquals(population - 2, colony.getConsumption(Goods.BELLS));
+        assertEquals(4, colony.getProductionOf(bellsType));
+        assertEquals(population - 2, colony.getConsumption(bellsType));
 
-        int bells = colony.getProductionOf(Goods.BELLS) - colony.getConsumption(Goods.BELLS);
-        assertEquals(bells, colony.getProductionNetOf(Goods.BELLS));
-        assertEquals(bells, colony.getGoodsCount(Goods.BELLS));
+        int bells = colony.getProductionOf(bellsType) - colony.getConsumption(bellsType);
+        assertEquals(bells, colony.getProductionNetOf(bellsType));
+        assertEquals(bells, colony.getGoodsCount(bellsType));
         assertEquals(bells, colony.getLiberty());
 
-        colony.addGoods(Goods.BELLS, 7);
+        colony.addGoods(bellsType, 7);
         bells += 7;
-        assertEquals(bells, colony.getGoodsCount(Goods.BELLS));
+        assertEquals(bells, colony.getGoodsCount(bellsType));
         assertEquals(bells, colony.getLiberty());
 
-        colony.removeGoods(Goods.BELLS, 5);
+        colony.removeGoods(bellsType, 5);
         bells -= 5;
-        assertEquals(bells, colony.getGoodsCount(Goods.BELLS));
+        assertEquals(bells, colony.getGoodsCount(bellsType));
         assertEquals(bells, colony.getLiberty());
 
-        int crosses = colony.getProductionOf(Goods.CROSSES) - colony.getConsumption(Goods.CROSSES);
-        assertEquals(crosses, colony.getProductionNetOf(Goods.CROSSES));
-        assertEquals(crosses, colony.getGoodsCount(Goods.CROSSES));
+        int crosses = colony.getProductionOf(crossType) - colony.getConsumption(crossType);
+        assertEquals(crosses, colony.getProductionNetOf(crossType));
+        assertEquals(crosses, colony.getGoodsCount(crossType));
         assertEquals(crosses, colony.getImmigration());
 
-        colony.addGoods(Goods.CROSSES, 7);
+        colony.addGoods(crossType, 7);
         crosses += 7;
-        assertEquals(crosses, colony.getGoodsCount(Goods.CROSSES));
+        assertEquals(crosses, colony.getGoodsCount(crossType));
         assertEquals(crosses, colony.getImmigration());
 
-        colony.removeGoods(Goods.CROSSES, 5);
+        colony.removeGoods(crossType, 5);
         crosses -= 5;
-        assertEquals(crosses, colony.getGoodsCount(Goods.CROSSES));
+        assertEquals(crosses, colony.getGoodsCount(crossType));
         assertEquals(crosses, colony.getImmigration());
 
     }

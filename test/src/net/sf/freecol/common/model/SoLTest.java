@@ -27,12 +27,13 @@ public class SoLTest extends FreeColTestCase {
     public void testSoL() {
     	Game game = getGame();
     	game.setMap(getTestMap(plainsType,true));
-        
+
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
         Colony colony = getStandardColony(7);
         for (int i = 1; i <= 100; i++) {
             int requiredBells = ((colony.getSoL() + 1) * Colony.LIBERTY_PER_REBEL *
                                  colony.getUnitCount()) / 100;
-            colony.addGoods(Goods.BELLS, requiredBells - colony.getGoodsCount(Goods.BELLS));
+            colony.addGoods(bellsType, requiredBells - colony.getGoodsCount(bellsType));
             colony.updatePopulation(0);
             assertEquals(colony.getSoL(), i);
             assertEquals(colony.getTory(), 100 - i);

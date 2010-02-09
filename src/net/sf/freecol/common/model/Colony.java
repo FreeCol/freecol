@@ -1026,9 +1026,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public int getConsumption(GoodsType goodsType) {
         // TODO: make this more generic
-        if (Goods.BELLS.equals(goodsType)) {
+        if (Specification.getSpecification().getGoodsType("model.goods.bells").equals(goodsType)) {
             return Math.max(0, getUnitCount() - 2);
-        } else if (Goods.FOOD.equals(goodsType)) {
+        } else if (Specification.getSpecification().getGoodsType("model.goods.food").equals(goodsType)) {
             return getFoodConsumption();
         } else {
             return 0;

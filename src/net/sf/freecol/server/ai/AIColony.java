@@ -35,6 +35,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;
@@ -454,7 +455,7 @@ public class AIColony extends AIObject {
         int toolsRequiredForBuilding = 0;
         if (buildableType != null) {
             for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-                if (goodsRequired.getType() == Goods.TOOLS) {
+                if (goodsRequired.getType() == Specification.getSpecification().getGoodsType("model.goods.tools")) {
                     toolsRequiredForBuilding = goodsRequired.getAmount();
                     break;
                 }
@@ -468,7 +469,7 @@ public class AIColony extends AIObject {
         int hammersRequiredForBuilding = 0;
         if (buildableType != null) {
             for (AbstractGoods goodsRequired : buildableType.getGoodsRequired()) {
-                if (goodsRequired.getType() == Goods.HAMMERS) {
+                if (goodsRequired.getType() == Specification.getSpecification().getGoodsType("model.goods.hammers")) {
                     hammersRequiredForBuilding = goodsRequired.getAmount();
                     break;
                 }
@@ -561,7 +562,8 @@ public class AIColony extends AIObject {
             List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
             loop: for (GoodsType goodsType : goodsList) {
                 // Never export food and lumber
-                if (goodsType.isFoodType() || goodsType == Goods.LUMBER) {
+                if (goodsType.isFoodType()
+                    || goodsType == Specification.getSpecification().getGoodsType("model.goods.lumber")) {
                     continue;
                 }
                 // Never export unstorable goods
@@ -594,23 +596,23 @@ public class AIColony extends AIObject {
                  * sufficient amounts in warehouse:
                  */
                 // TODO: make this more generic
-                if (goodsType == Goods.TOOLS && colony.getGoodsCount(Goods.TOOLS) > 0) {
-                    if (colony.getProductionNetOf(Goods.TOOLS) > 0) {
+                if (goodsType == Specification.getSpecification().getGoodsType("model.goods.tools") && colony.getGoodsCount(Specification.getSpecification().getGoodsType("model.goods.tools")) > 0) {
+                    if (colony.getProductionNetOf(Specification.getSpecification().getGoodsType("model.goods.tools")) > 0) {
                         final BuildableType currentlyBuilding = colony.getCurrentlyBuilding();
                         int requiredTools = getToolsRequired(currentlyBuilding);
                         int requiredHammers = getHammersRequired(currentlyBuilding);
-                        int buildTurns = (requiredHammers - colony.getGoodsCount(Goods.HAMMERS)) /
-                            (colony.getProductionOf(Goods.HAMMERS) + 1);
+                        int buildTurns = (requiredHammers - colony.getGoodsCount(Specification.getSpecification().getGoodsType("model.goods.hammers"))) /
+                            (colony.getProductionOf(Specification.getSpecification().getGoodsType("model.goods.hammers")) + 1);
                         if (requiredTools > 0) {
                             if (colony.getWarehouseCapacity() > 100) {
                                 requiredTools += 100;
                             }
-                            int toolsProductionTurns = requiredTools / colony.getProductionNetOf(Goods.TOOLS);
+                            int toolsProductionTurns = requiredTools / colony.getProductionNetOf(Specification.getSpecification().getGoodsType("model.goods.tools"));
                             if (buildTurns <= toolsProductionTurns + 1) {
                                 continue;
                             }
                         } else if (colony.getWarehouseCapacity() > 100
-                                   && colony.getGoodsCount(Goods.TOOLS) <= 100) {
+                                   && colony.getGoodsCount(Specification.getSpecification().getGoodsType("model.goods.tools")) <= 100) {
                             continue;
                         }
                     } else {
@@ -825,6 +827,7 @@ public class AIColony extends AIObject {
         placeExpertsInWorkPlaces(units, workLocationPlans);
 
         boolean workerAdded = true;
+        GoodsType foodType = Specification.getSpecification().getGoodsType("model.goods.food");
         while (workerAdded) {
             workerAdded = false;
             // Use a food production plan if necessary:
@@ -832,7 +835,7 @@ public class AIColony extends AIObject {
             for (int i = 0; i < workLocationPlans.size() && food < 2; i++) {
                 WorkLocationPlan wlp = workLocationPlans.get(i);
                 WorkLocation wl = wlp.getWorkLocation();
-                if (wlp.getGoodsType() == Goods.FOOD
+                if (wlp.getGoodsType() == foodType
                     && (((ColonyTile) wl).getWorkTile().isLand()
                         || colony.hasAbility("model.ability.produceInWater"))) {
                     Unit bestUnit = null;
@@ -841,7 +844,7 @@ public class AIColony extends AIObject {
                     while (unitIterator.hasNext()) {
                         Unit unit = unitIterator.next();
                         int production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
-                                                                                              Goods.FOOD);
+                                                                                              foodType);
                         if (production > 1
                             && (bestUnit == null || production > bestProduction || production == bestProduction
                                 && unit.getSkillLevel() < bestUnit.getSkillLevel())) {
@@ -865,7 +868,7 @@ public class AIColony extends AIObject {
             if (food >= 2) {
                 for (int i = 0; i < workLocationPlans.size(); i++) {
                     WorkLocationPlan wlp = workLocationPlans.get(i);
-                    if (wlp.getGoodsType() != Goods.FOOD) {
+                    if (wlp.getGoodsType() != foodType) {
                         Unit bestUnit = null;
                         int bestProduction = 0;
                         Iterator<Unit> unitIterator = units.iterator();
@@ -902,21 +905,21 @@ public class AIColony extends AIObject {
 
         // Ensure that we have enough food:
         int food = colony.getFoodProduction() - colony.getFoodConsumption();
-        while (food < 0 && colony.getGoodsCount(Goods.FOOD) + food * 3 < 0) {
+        while (food < 0 && colony.getGoodsCount(foodType) + food * 3 < 0) {
             WorkLocation bestPick = null;
             for (WorkLocation wl : colony.getWorkLocations()) {
                 if (wl.getUnitCount() > 0) {
                     if (wl instanceof ColonyTile) {
                         ColonyTile ct = (ColonyTile) wl;
                         Unit u = ct.getUnit();
-                        if (ct.getUnit().getWorkType() != Goods.FOOD) {
-                            int uProduction = ct.getProductionOf(u, Goods.FOOD);
+                        if (ct.getUnit().getWorkType() != foodType) {
+                            int uProduction = ct.getProductionOf(u, foodType);
                             if (uProduction > 1) {
                                 if (bestPick == null || bestPick instanceof Building) {
                                     bestPick = wl;
                                 } else {
                                     ColonyTile bpct = (ColonyTile) bestPick;
-                                    int bestPickProduction = bpct.getProductionOf(bpct.getUnit(), Goods.FOOD);
+                                    int bestPickProduction = bpct.getProductionOf(bpct.getUnit(), foodType);
                                     if (uProduction > bestPickProduction
                                         || (uProduction == bestPickProduction && u.getSkillLevel() < bpct.getUnit()
                                             .getSkillLevel())) {
@@ -945,8 +948,8 @@ public class AIColony extends AIObject {
             if (bestPick instanceof ColonyTile) {
                 ColonyTile ct = (ColonyTile) bestPick;
                 Unit u = ct.getUnit();
-                if (ct.getProductionOf(u, Goods.FOOD) > 1) {
-                    u.setWorkType(Goods.FOOD);
+                if (ct.getProductionOf(u, foodType) > 1) {
+                    u.setWorkType(foodType);
                 } else {
                     u.putOutsideColony();
                     AIUnit au = (AIUnit) getAIMain().getAIObject(u);
@@ -994,14 +997,15 @@ public class AIColony extends AIObject {
                     bestPick.work(ct);
                     bestPick.setWorkType(rawMaterial);
                 } else {
-                    Building th = colony.getBuildingForProducing(Goods.BELLS);
+                    Building th = colony.getBuildingForProducing(Specification.getSpecification()
+                                                                 .getGoodsType("model.goods.bells"));
                     if (th.canAdd(bestPick)) {
                         bestPick.work(th);
                     } else {
-                        ct = getBestVacantTile(connection, bestPick, Goods.FOOD);
+                        ct = getBestVacantTile(connection, bestPick, foodType);
                         if (ct != null) {
                             bestPick.work(ct);
-                            bestPick.setWorkType(Goods.FOOD);
+                            bestPick.setWorkType(foodType);
                         } else {
                             bestPick.putOutsideColony();
                             if (bestPick.getLocation() == wl) {
@@ -1021,7 +1025,7 @@ public class AIColony extends AIObject {
         for (GoodsType goodsType : goodsList) {
             int production = colony.getProductionNetOf(goodsType);
             int in_stock = colony.getGoodsCount(goodsType);
-            if (Goods.FOOD != goodsType
+            if (foodType != goodsType
                 && goodsType.isStorable()
                 && production + in_stock > colony.getWarehouseCapacity()) {
                 Iterator<Unit> unitIterator = colony.getUnitIterator();
@@ -1074,7 +1078,7 @@ public class AIColony extends AIObject {
         for (int i = 0; i < workLocationPlans.size(); i++) {
             WorkLocationPlan wlp = workLocationPlans.get(i);
             WorkLocation wl = wlp.getWorkLocation();
-            if (wlp.getGoodsType() == Goods.FOOD
+            if (wlp.getGoodsType() == foodType
                 && (((ColonyTile) wl).getWorkTile().isLand()
                     || colony.hasAbility("model.ability.produceInWater"))) {
                 Unit bestUnit = null;
@@ -1083,7 +1087,7 @@ public class AIColony extends AIObject {
                 while (unitIterator.hasNext()) {
                     Unit unit = unitIterator.next();
                     int production = ((ColonyTile) wlp.getWorkLocation()).getProductionOf(unit,
-                                                                                          Goods.FOOD);
+                                                                                          foodType);
                     if (production > 1
                         && (bestUnit == null || production > bestProduction || production == bestProduction
                             && unit.getSkillLevel() < bestUnit.getSkillLevel())) {

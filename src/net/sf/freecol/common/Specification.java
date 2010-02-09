@@ -475,11 +475,6 @@ public final class Specification {
                 }
             }
 
-            // TODO: get rid of this stuff, which is only used by AI
-            // Post specification actions
-            // Get Food, Bells, Crosses and Hammers
-            Goods.initialize(getGoodsTypeList(), numberOfGoodsTypes());
-
             initialized = true;
             logger.info("Specification initialization complete");
         } catch (XMLStreamException e) {

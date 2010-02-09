@@ -23,6 +23,7 @@ package net.sf.freecol.server.ai;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Game;
@@ -190,11 +191,11 @@ public class WorkLocationPlan extends ValuedAIObject {
                    being used while sorting the WorkLocationPlans:
                 */
 
-                if (goodsType == Goods.HAMMERS) {
+                if (goodsType == Specification.getSpecification().getGoodsType("model.goods.hammers")) {
                     return 16;
-                } else if (goodsType == Goods.BELLS) {
+                } else if (goodsType == Specification.getSpecification().getGoodsType("model.goods.bells")) {
                     return 12;
-                } else if (goodsType == Goods.CROSSES) {
+                } else if (goodsType == Specification.getSpecification().getGoodsType("model.goods.crosses")) {
                     return 10;
                 } else {
                     return workLocation.getColony().getOwner().getMarket().getSalePrice(goodsType, 1);

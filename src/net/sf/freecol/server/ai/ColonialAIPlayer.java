@@ -45,6 +45,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -615,8 +616,10 @@ public class ColonialAIPlayer extends AIPlayer {
                 }
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
-                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.MUSKETS, 50));
-                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.HORSES, 50));
+                    GoodsType muskets = Specification.getSpecification().getGoodsType("model.goods.muskets");
+                    GoodsType horses = Specification.getSpecification().getGoodsType("model.goods.horses");
+                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
+                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
                     
                     sendAndWaitSafely(new ClearSpecialityMessage(unit).toXMLElement());
                     Element equipMusketsElement = Message.createNewRootElement("equipUnit");

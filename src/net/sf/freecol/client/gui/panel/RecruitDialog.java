@@ -29,6 +29,7 @@ import javax.swing.JTextArea;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Player;
@@ -101,7 +102,8 @@ public final class RecruitDialog extends FreeColDialog<Integer> implements Actio
 
             int production = 0;
             for (Colony colony : player.getColonies()) {
-                production += colony.getProductionOf(Goods.CROSSES);
+                production += colony.getProductionOf(Specification.getSpecification()
+                                                     .getGoodsType("model.goods.crosses"));
             }
             int turns = 100;
             if (production > 0) {

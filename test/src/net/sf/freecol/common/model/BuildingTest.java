@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class BuildingTest extends FreeColTestCase {
@@ -400,6 +401,7 @@ public class BuildingTest extends FreeColTestCase {
         Unit unit2 = colony.getUnitList().get(1);
         BuildingType townHall = spec().getBuildingType("model.building.TownHall");
         Building building = colony.getBuilding(townHall);
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
 
         Set<Modifier> modifiers = colony.getModifierSet("model.goods.bells");
         assertEquals(1, modifiers.size());
@@ -412,32 +414,32 @@ public class BuildingTest extends FreeColTestCase {
 
         building.add(unit1);
         // 3 from the colonist
-        assertEquals(3, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(3, unit1.getProductionOf(bellsType, townHall.getBasicProduction()));
         assertEquals(3, building.getUnitProductivity(unit1));
         // 3 from the colonist + 1
         assertEquals("Wrong bell production", 4, building.getProduction());
 
         owner.addFather(spec().getFoundingFather("model.foundingFather.thomasJefferson"));
         // 3 from the colonist + 50% = 5
-        assertEquals(5, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, unit1.getProductionOf(bellsType, townHall.getBasicProduction()));
         assertEquals(5, building.getUnitProductivity(unit1));
         // 3 from the colonist + 50% + 1 = 6
         assertEquals("Wrong bell production with Jefferson", 6, building.getProduction());
 
         building.add(unit2);
         // 3 from each colonist + 50% = 5
-        assertEquals(5, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, unit1.getProductionOf(bellsType, townHall.getBasicProduction()));
         assertEquals(5, building.getUnitProductivity(unit1));
-        assertEquals(5, unit2.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, unit2.getProductionOf(bellsType, townHall.getBasicProduction()));
         assertEquals(5, building.getUnitProductivity(unit2));
         // 5 + 5 + 1 = 11
         assertEquals("Wrong bell production with Jefferson", 11, building.getProduction());
 
         setProductionBonus(colony, 2);
         // 3 from each colonist + 50% + 2 = 7
-        assertEquals(5, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, unit1.getProductionOf(bellsType, townHall.getBasicProduction()));
         assertEquals(7, building.getUnitProductivity(unit1));
-        assertEquals(5, unit2.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, unit2.getProductionOf(bellsType, townHall.getBasicProduction()));
         assertEquals(7, building.getUnitProductivity(unit2));
         // 7 + 7 + 1 = 15
         assertEquals("Wrong bell production with Jefferson and +2 production bonus",
@@ -456,9 +458,9 @@ public class BuildingTest extends FreeColTestCase {
         }
 
         // 3 from each colonist + 50% + 2 = 7
-        assertEquals(5, unit1.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, unit1.getProductionOf(bellsType, townHall.getBasicProduction()));
         assertEquals(7, building.getUnitProductivity(unit1));
-        assertEquals(5, unit2.getProductionOf(Goods.BELLS, townHall.getBasicProduction()));
+        assertEquals(5, unit2.getProductionOf(bellsType, townHall.getBasicProduction()));
         assertEquals(7, building.getUnitProductivity(unit2));
         // 7 + 7 + 1 + 150% = 38
         assertEquals("Wrong bell production with Jefferson, newspaper and +2 production bonus",

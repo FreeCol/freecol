@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.CombatModel.CombatResult;
 import net.sf.freecol.common.model.CombatModel.CombatResultType;
 import net.sf.freecol.common.model.Player.Stance;
@@ -178,7 +179,8 @@ public class CombatTest extends FreeColTestCase {
         /**
          * Penalties due to cargo.
          */
-        Goods goods1 = new Goods(game, null, Goods.LUMBER, 50);
+        GoodsType lumberType = spec().getGoodsType("model.goods.lumber");
+        Goods goods1 = new Goods(game, null, lumberType, 50);
         privateer.add(goods1);
         offenceModifiers = combatModel.getOffensiveModifiers(privateer, galleon);
         Iterator<Modifier> privIt = offenceModifiers.iterator();
@@ -188,7 +190,7 @@ public class CombatTest extends FreeColTestCase {
         assertEquals(spec().CARGO_PENALTY_SOURCE, goodsPenalty1.getSource());
         assertEquals(-12.5f, goodsPenalty1.getValue());
 
-        Goods goods2 = new Goods(game, null, Goods.LUMBER, 150);
+        Goods goods2 = new Goods(game, null, lumberType, 150);
         galleon.add(goods2);
         assertEquals(2, galleon.getVisibleGoodsCount());
         defenceModifiers = combatModel.getDefensiveModifiers(privateer, galleon);
@@ -256,8 +258,9 @@ public class CombatTest extends FreeColTestCase {
         
         String errMsg = "Galleon should be empty";
         assertEquals(errMsg,galleon.getGoodsCount(),0);
-        
-        Goods cargo = new Goods(game,galleon,Goods.MUSKETS,100);
+
+        GoodsType musketType = spec().getGoodsType("model.goods.muskets");
+        Goods cargo = new Goods(game,galleon,musketType,100);
         galleon.add(cargo);
         
         errMsg = "Galleon should be loaded";

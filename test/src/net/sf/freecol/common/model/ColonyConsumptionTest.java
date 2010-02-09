@@ -3,14 +3,15 @@ package net.sf.freecol.common.model;
 import java.util.List;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class ColonyConsumptionTest extends FreeColTestCase {
 
-	public void testFoodConsumption(){
-		Game game = getStandardGame();
+    public void testFoodConsumption(){
+        Game game = getStandardGame();
 
         Player dutch = game.getPlayer("model.nation.dutch");
 
@@ -28,13 +29,15 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         //////////////////////
         // Setting test colony and colonist
         Colony colony = FreeColTestUtils.getColonyBuilder().colonyTile(map.getTile(5, 8)).build();
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
         UnitType colonistType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-        new Unit(game, colony.getBuildingForProducing(Goods.BELLS), dutch, colonistType, UnitState.ACTIVE,
-                colonistType.getDefaultEquipment());
+        new Unit(game, colony.getBuildingForProducing(bellsType), dutch, colonistType, UnitState.ACTIVE,
+                 colonistType.getDefaultEquipment());
         assertEquals(0, colony.getFoodCount());
-        
+
         int quantity = colony.getFoodConsumption() * 2;
-        colony.addGoods(Goods.FOOD, quantity);
+        colony.addGoods(foodType, quantity);
         int foodStored = colony.getFoodCount();
         assertEquals(quantity, foodStored);
         
@@ -42,11 +45,12 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         int foodRemaining = foodStored - colony.getFoodConsumption();
         
         assertEquals("Unexpected value for remaining food, ", foodRemaining,colony.getFoodCount());        
-	}
+    }
 	
-	public void testEqualFoodProductionConsumptionCase() {
+    public void testEqualFoodProductionConsumptionCase() {
 		
         Game game = getStandardGame();
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
 
         Player dutch = game.getPlayer("model.nation.dutch");
 
@@ -76,22 +80,23 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         // This will be the only food production of the colony
         List<AbstractGoods> colonyTileProduction = colonyTile.getType().getProduction();
         for(int i=0; i< colonyTileProduction.size(); i++ ){
-        	AbstractGoods production = colonyTileProduction.get(i);
+            AbstractGoods production = colonyTileProduction.get(i);
         	
-        	if(production.getType() == Goods.FOOD){
-        		colonyTile.getType().getProduction().get(i).setAmount(2);
-        		break;
-        	}
+            if(production.getType() == foodType){
+                colonyTile.getType().getProduction().get(i).setAmount(2);
+                break;
+            }
         }
 
         UnitType colonistType = FreeCol.getSpecification().getUnitType("model.unit.freeColonist");
-        
-        new Unit(game, colony.getBuildingForProducing(Goods.BELLS), dutch, colonistType, UnitState.ACTIVE,
-                colonistType.getDefaultEquipment());
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+
+        new Unit(game, colony.getBuildingForProducing(bellsType), dutch, colonistType, UnitState.ACTIVE,
+                 colonistType.getDefaultEquipment());
 
         
         // Verify that there is enough food stored
-        colony.addGoods(Goods.FOOD, colony.getFoodConsumption()*2);
+        colony.addGoods(foodType, colony.getFoodConsumption()*2);
         
         int colonists = colony.getUnitCount();
         
@@ -101,9 +106,9 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         assertEquals("Unexpected change of colonists in colony",colonists,colony.getUnitCount());
         
         assertEquals("Unexpected change of production/consumption ratio",colony.getFoodProduction(),colony.getFoodConsumption());
-	}
+    }
 	
-	public void testDeathByStarvation() {
+    public void testDeathByStarvation() {
 
         Game game = getStandardGame();
 
@@ -125,23 +130,25 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         Colony colony = new Colony(game, dutch, "New Amsterdam", map.getTile(5, 8));
         
         UnitType pioneerType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
-        
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+
         int unitsBeforeNewTurn = 3;
         
         for(int i=0; i<unitsBeforeNewTurn;i++){
-        	new Unit(game, colony.getBuildingForProducing(Goods.BELLS), dutch, pioneerType, UnitState.ACTIVE,
-                                pioneerType.getDefaultEquipment());
+            new Unit(game, colony.getBuildingForProducing(bellsType), dutch, pioneerType, UnitState.ACTIVE,
+                     pioneerType.getDefaultEquipment());
         };
         
         int consumption = colony.getFoodConsumption();
         int production = colony.getFoodProduction();
         String errMsg = "Food consumption (" + String.valueOf(consumption) 
-                        + ") should be higher than food production ("
-                        + String.valueOf(production) + ")"; 
+            + ") should be higher than food production ("
+            + String.valueOf(production) + ")"; 
         assertTrue( errMsg, consumption  > production);
-         
+
+        GoodsType foodType = spec().getGoodsType("model.goods.food"); 
         int foodStored = colony.getFoodCount();
-        colony.removeGoods(Goods.FOOD);
+        colony.removeGoods(foodType);
         errMsg = "No food should be stored, colony has (" + String.valueOf(foodStored) + ")"; 
         
         assertTrue(errMsg,foodStored == 0);
@@ -155,13 +162,13 @@ public class ColonyConsumptionTest extends FreeColTestCase {
         consumption = colony.getFoodConsumption();
         production = colony.getFoodProduction();
         errMsg = "Food consumption (" + String.valueOf(consumption) 
-                        + ") should be higher than food production ("
-                        + String.valueOf(production) + ")"; 
+            + ") should be higher than food production ("
+            + String.valueOf(production) + ")"; 
         assertTrue( errMsg, consumption  > production);
          
         
         foodStored = colony.getFoodCount();
         errMsg = "No food should be stored, colony has (" + String.valueOf(foodStored) + ")";
         assertTrue(errMsg,foodStored == 0);
-	}
+    }
 }

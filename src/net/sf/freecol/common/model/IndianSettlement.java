@@ -900,7 +900,9 @@ public class IndianSettlement extends Settlement {
         }
 
         /* Use tools (if available) to produce manufactured goods: */
-        if (getGoodsCount(Goods.TOOLS) > 0) {
+        // TODO: what on Earth is this supposed to simulate?
+        GoodsType tools = FreeCol.getSpecification().getGoodsType("model.goods.tools");
+        if (getGoodsCount(tools) > 0) {
             GoodsType typeWithSmallestAmount = null;
             for (GoodsType g : goodsList) {
                 if (g.isFoodType() || g.isBuildingMaterial() || g.isRawBuildingMaterial()) {
@@ -915,28 +917,31 @@ public class IndianSettlement extends Settlement {
             }
             if (typeWithSmallestAmount != null) {
                 int production = Math.min(getGoodsCount(typeWithSmallestAmount.getRawMaterial()),
-                                          Math.min(10, getGoodsCount(Goods.TOOLS)));
-                removeGoods(Goods.TOOLS, production);
+                                          Math.min(10, getGoodsCount(tools)));
+                removeGoods(tools, production);
                 removeGoods(typeWithSmallestAmount.getRawMaterial(), production);
                 addGoods(typeWithSmallestAmount, production * 5);
             }
         }
 
         /* Consume goods: TODO: make this more generic */
-        consumeGoods(Goods.FOOD, getFoodConsumption());
-        consumeGoods(Goods.RUM, 2 * workers);
-        consumeGoods(Goods.TRADEGOODS, 2 * workers);
+        consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.food"),
+                     getFoodConsumption());
+        consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.rum"),
+                     2 * workers);
+        consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.tradeGoods"),
+                     2 * workers);
         /* TODO: do we need this at all? At the moment, most Indian Settlements
            consume more than they produce.
         for (GoodsType goodsType : FreeCol.getSpecification().getNewWorldGoodsTypeList()) {
             consumeGoods(goodsType, workers);
         }
         */
-        consumeGoods(Goods.ORE, workers);
-        consumeGoods(Goods.SILVER, workers);
-        consumeGoods(Goods.CIGARS, workers);
-        consumeGoods(Goods.COATS, workers);
-        consumeGoods(Goods.CLOTH, workers);
+        consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.ore"), workers);
+        consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.silver"), workers);
+        consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.cigars"), workers);
+        consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.coats"), workers);
+        consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.cloth"), workers);
         goodsContainer.removeAbove(500);
 
         checkForNewIndian();
@@ -977,7 +982,8 @@ public class IndianSettlement extends Settlement {
     // Create a new colonist if there is enough food:
     private void checkForNewIndian() {
         // Alcohol also contributes to create children. 
-        if (getFoodCount() + 4*getGoodsCount(Goods.RUM) > 200+KEEP_RAW_MATERIAL ) {
+        if (getFoodCount() + 4*getGoodsCount(FreeCol.getSpecification().getGoodsType("model.goods.rum"))
+                                             > 200+KEEP_RAW_MATERIAL ) {
             /*
              * Allow one more brave than the initially generated number.
              * This is more than sufficient. Do not increase the amount
@@ -996,8 +1002,10 @@ public class IndianSettlement extends Settlement {
                 }
             }
             // Always consume goods in order to avoid stockpiling.
-            consumeGoods(Goods.FOOD, 200);  // All food will be consumed, even if RUM helped
-            consumeGoods(Goods.RUM, 200/4); // Also, some available RUM is consumed
+            consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.food"), 200);
+            // All food will be consumed, even if RUM helped
+            consumeGoods(FreeCol.getSpecification().getGoodsType("model.goods.rum"), 200/4);
+            // Also, some available RUM is consumed
         }
     }
 

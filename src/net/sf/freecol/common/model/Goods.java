@@ -42,17 +42,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
 
     private static Logger logger = Logger.getLogger(Goods.class.getName());
 
-    /**
-     * Need to change various classes to use the specification in
-     * order to remove reliance on these static quick links.  Only the
-     * essential should have a quick link.
-     */
-    public static GoodsType FOOD, LUMBER, ORE, SILVER, HORSES,
-        RUM, CIGARS, CLOTH, COATS, TRADEGOODS, TOOLS, MUSKETS, 
-        FISH, BELLS, CROSSES, HAMMERS,
-    // these goods are no longer used; define them only to avoid warnings
-        SUGAR, TOBACCO, FURS, COTTON;
-
     private Game game;
     private Location location;
 
@@ -116,26 +105,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
         readFromXMLElement(e);
     }
 
-
-    // ------------------------------------------------------------ static methods
-
-    /**
-     * Initializes the important Types for quick reference - performed by Specification.java
-     * Should be softcoded as much as possible, and this should be amended later
-     * @param numberOfTypes Initializer for NUMBER_OF_TYPES
-     */
-    public static void initialize(List<GoodsType> goodsList, int numberOfTypes) {
-        for (GoodsType g : goodsList) {
-            try {
-                String fieldName = g.getId().substring(g.getId().lastIndexOf('.') + 1).toUpperCase();
-                Goods.class.getDeclaredField(fieldName).set(null, g);
-            } catch (Exception e) {
-                logger.warning("Error assigning a GoodsType to Goods." +
-                        g.getId().toUpperCase() + "\n" + e.toString());
-            }
-        }
-        //NUMBER_OF_TYPES = numberOfTypes;
-    }
 
     // ------------------------------------------------------------ retrieval methods
 

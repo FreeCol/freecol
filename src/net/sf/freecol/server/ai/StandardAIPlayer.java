@@ -44,6 +44,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -713,8 +714,10 @@ public class StandardAIPlayer extends AIPlayer {
                 if (unit != null && unit.isColonist()) {
                     // no need to equip artillery units with muskets or horses
                     // TODO: cleanup magic numbers 50 and 1
-                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.MUSKETS, 50));
-                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(Goods.HORSES, 50));
+                    GoodsType muskets = Specification.getSpecification().getGoodsType("model.goods.muskets");
+                    GoodsType horses = Specification.getSpecification().getGoodsType("model.goods.horses");
+                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(muskets, 50));
+                    getPlayer().modifyGold(getPlayer().getMarket().getBidPrice(horses, 50));
 
                     sendAndWaitSafely(new ClearSpecialityMessage(unit).toXMLElement());
                     Element equipMusketsElement = Message.createNewRootElement("equipUnit");
@@ -1276,6 +1279,8 @@ public class StandardAIPlayer extends AIPlayer {
      * Takes the necessary actions to secure a european colony
      */
     private void secureColony(Colony colony) {
+        GoodsType musketType = Specification.getSpecification().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
         final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType("model.equipment.muskets");
         final EquipmentType horses = FreeCol.getSpecification().getEquipmentType("model.equipment.horses");
 
@@ -1432,7 +1437,7 @@ public class StandardAIPlayer extends AIPlayer {
                         continue;
                     }
                     GoodsWish gw = (GoodsWish) w;
-                    if (gw.getGoodsType() == Goods.MUSKETS) {
+                    if (gw.getGoodsType() == musketType) {
                         made = true;
                     }
                 }
@@ -1440,7 +1445,7 @@ public class StandardAIPlayer extends AIPlayer {
                     // Add a new GoodsWish onto the stack.
                     ac
                             .addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - olddefenders) * 50,
-                                    Goods.MUSKETS));
+                                    musketType));
                 }
             }
             if (needHorses && ac != null) {
@@ -1454,13 +1459,13 @@ public class StandardAIPlayer extends AIPlayer {
                         continue;
                     }
                     GoodsWish gw = (GoodsWish) w;
-                    if (gw.getGoodsType() == Goods.HORSES) {
+                    if (gw.getGoodsType() == horsesType) {
                         made = true;
                     }
                 }
                 if (made == false) {
                     // Add a new GoodsWish onto the stack.
-                    ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - defenders) * 50, Goods.HORSES));
+                    ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - defenders) * 50, horsesType));
                 }
             }
             defenders = olddefenders;

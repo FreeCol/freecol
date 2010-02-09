@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.option.BooleanOption;
 import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.FreeColTestUtils;
@@ -30,7 +31,7 @@ import net.sf.freecol.util.test.FreeColTestUtils.ColonyBuilder;
 
 public class SchoolTest extends FreeColTestCase {
 	
-	private enum SchoolLevel { SCHOOLHOUSE, COLLEGE, UNIVERSITY };
+    private enum SchoolLevel { SCHOOLHOUSE, COLLEGE, UNIVERSITY };
 
     private UnitType freeColonistType = spec().getUnitType("model.unit.freeColonist");
     private UnitType indenturedServantType = spec().getUnitType("model.unit.indenturedServant");
@@ -279,7 +280,8 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, masterBlacksmithType).size());
         assertEquals(2, getUnitList(colony, expertLumberJackType).size());
 
-        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, Goods.FOOD));
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, foodType));
         ore.setLocation(school);
 
         while (3 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
@@ -288,7 +290,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(2, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, masterBlacksmithType).size());
 
-        blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith, true, Goods.FOOD));
+        blacksmith.setLocation(colony.getVacantColonyTileFor(blacksmith, true, foodType));
         veteran.setLocation(school);
 
         while (2 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
@@ -297,7 +299,7 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(1, getUnitList(colony, freeColonistType).size());
         assertEquals(2, getUnitList(colony, expertOreMinerType).size());
 
-        ore.setLocation(colony.getVacantColonyTileFor(ore, true, Goods.FOOD));
+        ore.setLocation(colony.getVacantColonyTileFor(ore, true, foodType));
 
         while (1 == getUnitList(colony, freeColonistType).size() && maxTurns-- > 0) {
             school.newTurn();
@@ -692,7 +694,8 @@ public class SchoolTest extends FreeColTestCase {
 
         // Now we want the colonist to be a carpenter. We just want to 
         // shuffle the teachers.
-        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, true, Goods.FOOD));
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        teacher2.setLocation(colony.getVacantColonyTileFor(teacher2, true, foodType));
         // outside the colony is still considered OK (same Tile)
         teacher1.putOutsideColony();
 
@@ -774,7 +777,8 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(3, teacher1.getTurnsOfTraining());
         
         // Then teacher2 for 1 turn
-        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1, true, Goods.FOOD));
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        teacher1.setLocation(colony.getVacantColonyTileFor(teacher1, true, foodType));
         teacher2.setLocation(school);
         school.newTurn();
         assertEquals(3, teacher1.getTurnsOfTraining());
@@ -836,8 +840,9 @@ public class SchoolTest extends FreeColTestCase {
         assertEquals(2, teacher2.getTurnsOfTraining());
         
         // Now we move the teachers somewhere else
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
         teacher1.setLocation(getGame().getMap().getTile(6, 8));
-        teacher2.setLocation(outsideColony.getVacantColonyTileFor(teacher2, true, Goods.FOOD));
+        teacher2.setLocation(outsideColony.getVacantColonyTileFor(teacher2, true, foodType));
         assertEquals(0, teacher1.getTurnsOfTraining());
         assertEquals(0, teacher2.getTurnsOfTraining());
         assertEquals(1, getUnitList(colony, freeColonistType).size());
@@ -889,8 +894,8 @@ public class SchoolTest extends FreeColTestCase {
         
         Colony colony = getUniversityColony();
         Building school = colony.getBuilding(schoolType);
-        
-        colony.addGoods(Goods.BELLS, 10000);
+        GoodsType bellsType = spec().getGoodsType("model.goods.bells");
+        colony.addGoods(bellsType, 10000);
         colony.newTurn();
 
         Iterator<Unit> units = colony.getUnitIterator();
@@ -937,7 +942,8 @@ public class SchoolTest extends FreeColTestCase {
         trainForTurns(colony, 2);
 
         // After 2 turns replace by miner. Progress starts from scratch.
-        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, Goods.FOOD));
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        lumberjack.setLocation(colony.getVacantColonyTileFor(lumberjack, true, foodType));
         assertTrue(lumberjack.getStudent() == null);
         assertTrue(colonist.getTeacher() == null);
 

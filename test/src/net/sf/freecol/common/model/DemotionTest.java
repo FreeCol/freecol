@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.lang.reflect.Method;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
@@ -189,6 +190,9 @@ public class DemotionTest extends FreeColTestCase {
         Unit brave = new Unit(game, tile2, inca, braveType, UnitState.ACTIVE);
         brave.setIndianSettlement(settlement1);
 
+        GoodsType musketType = spec().getGoodsType("model.goods.muskets");
+        GoodsType horsesType = spec().getGoodsType("model.goods.horses");
+
         method.invoke(combatModel, dragoon, brave);
         assertEquals(colonistType, dragoon.getType());
         assertEquals(dutch, dragoon.getOwner());
@@ -197,8 +201,8 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(1, dragoon.getEquipment().getCount(muskets));
         assertEquals(1, brave.getEquipment().size());
         assertEquals(1, brave.getEquipment().getCount(indianHorses));
-        assertEquals(50, settlement1.getGoodsCount(Goods.HORSES));
-        assertEquals(0, settlement2.getGoodsCount(Goods.HORSES));
+        assertEquals(50, settlement1.getGoodsCount(horsesType));
+        assertEquals(0, settlement2.getGoodsCount(horsesType));
 
         method.invoke(combatModel, dragoon, brave);
         assertEquals(colonistType, dragoon.getType());
@@ -208,8 +212,8 @@ public class DemotionTest extends FreeColTestCase {
         assertEquals(2, brave.getEquipment().size());
         assertEquals(1, brave.getEquipment().getCount(indianHorses));
         assertEquals(1, brave.getEquipment().getCount(indianMuskets));
-        assertEquals(50, settlement1.getGoodsCount(Goods.MUSKETS));
-        assertEquals(0, settlement2.getGoodsCount(Goods.MUSKETS));
+        assertEquals(50, settlement1.getGoodsCount(musketType));
+        assertEquals(0, settlement2.getGoodsCount(musketType));
 
         method.invoke(combatModel, dragoon, brave);
         assertTrue(dragoon.isDisposed());

@@ -543,7 +543,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildFatherItem(FoundingFather foundingFather, DefaultMutableTreeNode parent) {
         String name = foundingFather.getName();
-        ImageIcon icon = getLibrary().getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
+        ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather,
                                                                                        name, icon));
         parent.add(item);
@@ -572,7 +572,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
     private void buildNationTypeItem(NationType nationType, DefaultMutableTreeNode parent) {
         String name = nationType.getName();
         //ImageIcon icon = getLibrary().getCoatOfArmsImageIcon(nation);
-        ImageIcon icon = getLibrary().getScaledGoodsImageIcon(Goods.BELLS, 0.75f);
+        ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
         DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(nationType,
                                                                                        name, icon));
         parent.add(item);

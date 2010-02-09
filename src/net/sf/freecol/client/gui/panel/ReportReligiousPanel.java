@@ -29,8 +29,10 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
 
 import net.miginfocom.swing.MigLayout;
@@ -52,7 +54,8 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         Player player = getMyPlayer();
 
         reportPanel.add(new JLabel(Messages.message("crosses")));
-        FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), Goods.CROSSES);
+        GoodsType crosses = Specification.getSpecification().getGoodsType("model.goods.crosses");
+        FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), crosses);
         reportPanel.add(progressBar, "span");
 
         List<Colony> colonies = player.getColonies();
@@ -61,8 +64,8 @@ public final class ReportReligiousPanel extends ReportPanel implements ActionLis
         int production = 0;
         for (Colony colony : colonies) {
             reportPanel.add(createColonyButton(colony), "split 2, flowy, align center");
-            reportPanel.add(new BuildingPanel(colony.getBuildingForProducing(Goods.CROSSES), getCanvas()));
-            production += colony.getProductionOf(Goods.CROSSES);
+            reportPanel.add(new BuildingPanel(colony.getBuildingForProducing(crosses), getCanvas()));
+            production += colony.getProductionOf(crosses);
         }
 
         progressBar.update(0, player.getImmigrationRequired(), player.getImmigration(), production);

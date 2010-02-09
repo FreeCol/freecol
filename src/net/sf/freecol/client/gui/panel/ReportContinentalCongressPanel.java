@@ -56,8 +56,6 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
 
     static final String none = Messages.message("report.continentalCongress.none");
 
-    private final static GoodsType goodsType = Goods.BELLS;
-
     /**
      * The constructor that will add the items to this panel.
      * 
@@ -84,10 +82,11 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             currentFatherLabel.setVerticalTextPosition(JLabel.TOP);
             currentFatherLabel.setHorizontalTextPosition(JLabel.CENTER);
             reportPanel.add(currentFatherLabel);
-            FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), goodsType);
+            GoodsType bellsType = FreeCol.getSpecification().getGoodsType("model.goods.bells");
+            FreeColProgressBar progressBar = new FreeColProgressBar(getCanvas(), bellsType);
             int total = 0;
             for (Colony colony : player.getColonies()) {
-                total += colony.getProductionNetOf(goodsType);
+                total += colony.getProductionNetOf(bellsType);
             }
             int bells = player.getLiberty();
             int required = player.getTotalFoundingFatherCost();

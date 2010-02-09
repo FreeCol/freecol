@@ -319,7 +319,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         setLocation(location);
 
         workLeft = -1;
-        workType = Goods.FOOD;
+        workType = Specification.getSpecification().getGoodsFood().get(0);
 
         this.movesLeft = getInitialMovesLeft();
         hitpoints = unitType.getHitPoints();

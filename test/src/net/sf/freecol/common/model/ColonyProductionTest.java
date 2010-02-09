@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.List;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -54,7 +55,8 @@ public class ColonyProductionTest extends FreeColTestCase {
         Unit soldier = new Unit(game, map.getTile(6, 8), dutch, veteran, UnitState.ACTIVE, veteran.getDefaultEquipment());
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", soldier.getTile());
-        soldier.setWorkType(Goods.FOOD);
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
+        soldier.setWorkType(foodType);
         soldier.buildColony(colony);
 
         // Test the colony
@@ -79,7 +81,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         // Test the state of the soldier
         // Soldier should be working on the field with the bonus
-        assertEquals(Goods.FOOD, soldier.getWorkType());
+        assertEquals(foodType, soldier.getWorkType());
         
         assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), soldier.getLocation().getTile());
         
@@ -112,11 +114,12 @@ public class ColonyProductionTest extends FreeColTestCase {
                 
         game.setMap(map);
         UnitType pioneerType = FreeCol.getSpecification().getUnitType("model.unit.hardyPioneer");
+        GoodsType foodType = spec().getGoodsType("model.goods.food");
         Unit pioneer = new Unit(game, map.getTile(6, 8), dutch, pioneerType, UnitState.ACTIVE,
                                 pioneerType.getDefaultEquipment());
 
         Colony colony = new Colony(game, dutch, "New Amsterdam", pioneer.getTile());
-        pioneer.setWorkType(Goods.FOOD);
+        pioneer.setWorkType(foodType);
         pioneer.buildColony(colony);
 
         // Test the colony
@@ -141,7 +144,7 @@ public class ColonyProductionTest extends FreeColTestCase {
 
         // Test the state of the pioneer
         // Pioneer should be working on the field with the bonus
-        assertEquals(Goods.FOOD, pioneer.getWorkType());
+        assertEquals(foodType, pioneer.getWorkType());
         
         assertEquals(colony.getColonyTile(map.getTile(5,8)).getTile(), pioneer.getLocation().getTile());
         
@@ -163,7 +166,7 @@ public class ColonyProductionTest extends FreeColTestCase {
     	int expectedBellCount = 0;
     	int bellsProdPerTurn = colony.getProductionOf(bellsType);
     	int expectedBellProd = 1;
-    	int bellsUpkeep = colony.getConsumption(Goods.BELLS);
+    	int bellsUpkeep = colony.getConsumption(bellsType);
     	int expectedBellUpkeep =  colony.getUnitCount() - 2;
     	int bellsNetProdPerTurn = colony.getProductionNetOf(bellsType);
     	int expectedBellNetProd = expectedBellProd - expectedBellUpkeep;

@@ -45,7 +45,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         Player inca = game.getPlayer("model.nation.inca");
 
         UnitType gardener = new UnitType(1234);
-        UnitType farmer = Specification.getSpecification().getUnitType("model.unit.expertFarmer");
+        UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
 
         Scope scope = new Scope();
         scope.setAbilityID("model.ability.native");
@@ -78,7 +78,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         Player dutch = game.getPlayer("model.nation.dutch");
 
         UnitType gardener = new UnitType(1234);
-        UnitType farmer = Specification.getSpecification().getUnitType("model.unit.expertFarmer");
+        UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
 
         UnitTypeChange.ChangeType creation = UnitTypeChange.ChangeType.CREATION;
         UnitTypeChange change = new UnitTypeChange();
@@ -104,7 +104,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
         Colony colony = getStandardColony();
 
         UnitType gardener = new UnitType(1234);
-        UnitType farmer = Specification.getSpecification().getUnitType("model.unit.expertFarmer");
+        UnitType farmer = spec().getUnitType("model.unit.expertFarmer");
 
         UnitTypeChange.ChangeType enterColony = UnitTypeChange.ChangeType.ENTER_COLONY;
         UnitTypeChange change = new UnitTypeChange();

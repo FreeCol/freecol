@@ -26,12 +26,14 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Ownable;
@@ -378,6 +380,8 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                     }
                 }
             }
+            GoodsType musketType = Specification.getSpecification().getGoodsType("model.goods.muskets");
+            GoodsType horsesType = Specification.getSpecification().getGoodsType("model.goods.horses");
             if (needMuskets && ac != null) {
                 // Check and see if we have already made a GoodsWish for
                 // here.
@@ -389,15 +393,14 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                         continue;
                     }
                     GoodsWish gw = (GoodsWish) w;
-                    if (gw.getGoodsType() == Goods.MUSKETS) {
+                    if (gw.getGoodsType() == musketType) {
                         made = true;
                     }
                 }
                 if (made == false) {
                     // Add a new GoodsWish onto the stack.
-                    ac
-                        .addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - olddefenders) * 50,
-                                                    Goods.MUSKETS));
+                    ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - olddefenders) * 50,
+                                                  musketType));
                 }
             }
             if (needHorses && ac != null) {
@@ -411,13 +414,13 @@ public abstract class EuropeanAIPlayer extends NewAIPlayer {
                         continue;
                     }
                     GoodsWish gw = (GoodsWish) w;
-                    if (gw.getGoodsType() == Goods.HORSES) {
+                    if (gw.getGoodsType() == horsesType) {
                         made = true;
                     }
                 }
                 if (made == false) {
                     // Add a new GoodsWish onto the stack.
-                    ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - defenders) * 50, Goods.HORSES));
+                    ac.addGoodsWish(new GoodsWish(getAIMain(), colony, (threat - defenders) * 50, horsesType));
                 }
             }
             defenders = olddefenders;
