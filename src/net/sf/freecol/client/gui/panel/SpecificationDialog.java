@@ -38,7 +38,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public final class SpecificationDialog extends FreeColDialog<Boolean> implements ActionListener {
 
-    private static final Logger logger = Logger.getLogger(SpecificationPanel.class.getName());
+    private static final Logger logger = Logger.getLogger(SpecificationDialog.class.getName());
 
     private final String[] files =
         new String[] {
