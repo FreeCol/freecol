@@ -93,6 +93,7 @@ public class ColonyPlanTest extends FreeColTestCase {
         AIMain aiMain = server.getAIMain();
         	
         Colony colony = getStandardColony();
+        assertEquals(1, colony.getUnitCount());
         
         // get food production of central colony tile
         int expAmount = 0;
@@ -101,9 +102,9 @@ public class ColonyPlanTest extends FreeColTestCase {
         }
         
         ColonyPlan plan = new ColonyPlan(aiMain,colony);
-        plan.create();
+        //plan.create();
         int amount = plan.getFoodProduction();
-        //assertEquals(expAmount, plan.getProductionOf(spec().getGoodsType("model.goods.food")));
+        assertEquals(expAmount, plan.getProductionOf(spec().getGoodsType("model.goods.food")));
         assertEquals("Wrong initial food amount",expAmount,amount);
     }
 	
