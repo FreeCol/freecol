@@ -34,6 +34,8 @@ import net.sf.freecol.common.resources.ResourceManager;
  */
 public final class BuildingType extends BuildableType implements Comparable<BuildingType> {
     
+    private static int nextIndex = 0;
+
     private int level;
   
     private int workPlaces, basicProduction, minSkill, maxSkill;
@@ -44,9 +46,8 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     private BuildingType upgradesTo;
     private int sequence;
     
-    public BuildingType(int index) {
-        setIndex(index);
-        setPopulationRequired(1);
+    public BuildingType() {
+        setIndex(nextIndex++);
     }
     
     public BuildingType getUpgradesFrom() {

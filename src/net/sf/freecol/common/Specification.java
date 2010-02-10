@@ -253,9 +253,8 @@ public final class Specification {
 
                 } else if ("goods-types".equals(childName)) {
 
-                    int goodsIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        GoodsType goodsType = new GoodsType(goodsIndex++);
+                        GoodsType goodsType = new GoodsType();
                         goodsType.readFromXML(xsr, this);
                         goodsTypeList.add(goodsType);
                         allTypes.put(goodsType.getId(), goodsType);
@@ -281,9 +280,8 @@ public final class Specification {
 
                 } else if ("building-types".equals(childName)) {
 
-                    int buildingIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        BuildingType buildingType = new BuildingType(buildingIndex++);
+                        BuildingType buildingType = new BuildingType();
                         buildingType.readFromXML(xsr, this);
                         allTypes.put(buildingType.getId(), buildingType);
                         buildingTypeList.add(buildingType);
@@ -291,9 +289,8 @@ public final class Specification {
 
                 } else if ("resource-types".equals(childName)) {
 
-                    int resIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        ResourceType resourceType = new ResourceType(resIndex++);
+                        ResourceType resourceType = new ResourceType();
                         resourceType.readFromXML(xsr, this);
                         allTypes.put(resourceType.getId(), resourceType);
                         resourceTypeList.add(resourceType);
@@ -301,9 +298,8 @@ public final class Specification {
 
                 } else if ("tile-types".equals(childName)) {
 
-                    int tileIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        TileType tileType = new TileType(tileIndex++);
+                        TileType tileType = new TileType();
                         tileType.readFromXML(xsr, this);
                         allTypes.put(tileType.getId(), tileType);
                         tileTypeList.add(tileType);
@@ -311,9 +307,8 @@ public final class Specification {
 
                 } else if ("tileimprovement-types".equals(childName)) {
 
-                    int impIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        TileImprovementType tileImprovementType = new TileImprovementType(impIndex++);
+                        TileImprovementType tileImprovementType = new TileImprovementType();
                         tileImprovementType.readFromXML(xsr, this);
                         allTypes.put(tileImprovementType.getId(), tileImprovementType);
                         tileImprovementTypeList.add(tileImprovementType);
@@ -330,13 +325,9 @@ public final class Specification {
 
                 } else if ("unit-types".equals(childName)) {
 
-                    int unitIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         UnitType unitType = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG),
                                                     UnitType.class);
-                        if (unitType.getIndex() < 0) {
-                            unitType.setIndex(unitIndex++);
-                        }
                         unitType.readFromXML(xsr, this);
                         unitTypeList.add(unitType);
                         if (unitType.getExpertProduction() != null) {
@@ -353,9 +344,8 @@ public final class Specification {
 
                 } else if ("founding-fathers".equals(childName)) {
 
-                    int fatherIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        FoundingFather foundingFather = new FoundingFather(fatherIndex++);
+                        FoundingFather foundingFather = new FoundingFather();
                         foundingFather.readFromXML(xsr, this);
                         allTypes.put(foundingFather.getId(), foundingFather);
                         foundingFathers.add(foundingFather);
@@ -363,11 +353,10 @@ public final class Specification {
 
                 } else if ("nation-types".equals(childName)) {
 
-                    int nationIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         NationType nationType;
                         if ("european-nation-type".equals(xsr.getLocalName())) {
-                            nationType = new EuropeanNationType(nationIndex++);
+                            nationType = new EuropeanNationType();
                             nationType.readFromXML(xsr, this);
                             if (nationType.isREF()) {
                                 REFNationTypes.add((EuropeanNationType) nationType);
@@ -375,7 +364,7 @@ public final class Specification {
                                 europeanNationTypes.add((EuropeanNationType) nationType);
                             }
                         } else {
-                            nationType = new IndianNationType(nationIndex++);
+                            nationType = new IndianNationType();
                             nationType.readFromXML(xsr, this);
                             indianNationTypes.add((IndianNationType) nationType);
                         }
@@ -386,13 +375,9 @@ public final class Specification {
 
                 } else if ("nations".equals(childName)) {
 
-                    int nationIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
                         Nation nation = getType(xsr.getAttributeValue(null, FreeColObject.ID_ATTRIBUTE_TAG),
                                                 Nation.class);
-                        if (nation.getIndex() < 0) {
-                            nation.setIndex(nationIndex++);
-                        }
                         nation.readFromXML(xsr, this);
                         nations.add(nation);
 
@@ -409,9 +394,8 @@ public final class Specification {
 
                 } else if ("equipment-types".equals(childName)) {
 
-                    int equipmentIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        EquipmentType equipmentType = new EquipmentType(equipmentIndex++);
+                        EquipmentType equipmentType = new EquipmentType();
                         equipmentType.readFromXML(xsr, this);
                         allTypes.put(equipmentType.getId(), equipmentType);
                         equipmentTypes.add(equipmentType);
@@ -419,9 +403,8 @@ public final class Specification {
 
                 } else if ("difficultyLevels".equals(childName)) {
 
-                    int levelIndex = 0;
                     while (xsr.nextTag() != XMLStreamConstants.END_ELEMENT) {
-                        DifficultyLevel level = new DifficultyLevel(levelIndex++);
+                        DifficultyLevel level = new DifficultyLevel();
                         level.readFromXML(xsr, this);
                         allTypes.put(level.getId(), level);
                         difficultyLevels.add(level);

@@ -32,6 +32,7 @@ import net.sf.freecol.common.Specification;
  */
 public class Nation extends FreeColGameObjectType {
 
+    private static int nextIndex = 0;
 
     /**
      * The default color to use for this nation. Can be changed by the
@@ -59,6 +60,12 @@ public class Nation extends FreeColGameObjectType {
      */
     private Nation refNation;
 
+    /**
+     * Creates a new Nation instance.
+     */
+    public Nation() {
+        setIndex(nextIndex++);
+    }
 
     /**
      * Get the <code>Color</code> value.

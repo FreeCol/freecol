@@ -61,8 +61,7 @@ public class EuropeanNationType extends NationType {
     /**
      * Constructor.
      */
-    public EuropeanNationType(int index) {
-        super(index);
+    public EuropeanNationType() {
         setTypeOfSettlement(SettlementType.SMALL_COLONY);
     }
 

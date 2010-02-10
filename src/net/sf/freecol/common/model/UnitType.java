@@ -35,6 +35,8 @@ import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 public final class UnitType extends BuildableType implements Comparable<UnitType> {
 
+    public static int nextIndex = 0;
+
     public static final int DEFAULT_OFFENCE = 0;
     public static final int DEFAULT_DEFENCE = 1;
     public static final int FOOD_CONSUMPTION = 2;
@@ -130,17 +132,12 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
     private List<UnitTypeChange> typeChanges = new ArrayList<UnitTypeChange>();
     
 
-    public UnitType() {
-        // empty constructor
-    }
-    
     /**
      * Creates a new <code>UnitType</code> instance.
      *
-     * @param index an <code>int</code> value
      */
-    public UnitType(int index) {
-        setIndex(index);
+    public UnitType() {
+        setIndex(nextIndex++);
     }
 
     /**

@@ -34,8 +34,9 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.client.gui.i18n.Messages;
 
-public final class TileImprovementType extends FreeColGameObjectType
-{
+public final class TileImprovementType extends FreeColGameObjectType {
+
+    private static int nextIndex = 0;
 
     private boolean natural;
     private String typeId;
@@ -59,16 +60,16 @@ public final class TileImprovementType extends FreeColGameObjectType
     private float movementCostFactor;
 
     /**
-     * The layer a TileItem belongs to. Items with higher index
-     * will be displayed above items with a lower index. E.g. the
+     * The layer a TileItem belongs to. Items with higher zIndex
+     * will be displayed above items with a lower zIndex. E.g. the
      * LostCityRumour will be displayed above the Plow improvement.
      */
     private int zIndex;
 
     // ------------------------------------------------------------ constructors
 
-    public TileImprovementType(int index) {
-        setIndex(index);
+    public TileImprovementType() {
+        setIndex(nextIndex++);
     }
 
     // ------------------------------------------------------------ retrieval methods

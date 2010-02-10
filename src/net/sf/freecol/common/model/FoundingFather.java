@@ -40,6 +40,8 @@ import net.sf.freecol.common.Specification;
  * player, or to cause certain events.
  */
 public class FoundingFather extends FreeColGameObjectType {
+
+    private static int nextIndex = 0;
     
     /**
      * The probability of this FoundingFather being offered for selection.
@@ -78,10 +80,9 @@ public class FoundingFather extends FreeColGameObjectType {
     /**
      * Creates a new <code>FoundingFather</code> instance.
      *
-     * @param newIndex an <code>int</code> value
      */
-    public FoundingFather(int newIndex) {
-        setIndex(newIndex);
+    public FoundingFather() {
+        setIndex(nextIndex++);
     }
 
     /**

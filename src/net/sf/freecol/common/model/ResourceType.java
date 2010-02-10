@@ -27,16 +27,17 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.Specification;
 
-public final class ResourceType extends FreeColGameObjectType
-{
+public final class ResourceType extends FreeColGameObjectType {
+
+    private static int nextIndex = 0;
 
     private int minValue;
     private int maxValue;
 
     // ------------------------------------------------------------ constructors
 
-    public ResourceType(int index) {
-        setIndex(index);
+    public ResourceType() {
+        setIndex(nextIndex++);
     }
 
     // ------------------------------------------------------------ retrieval methods

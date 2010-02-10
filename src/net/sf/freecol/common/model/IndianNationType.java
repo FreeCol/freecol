@@ -65,14 +65,6 @@ public class IndianNationType extends NationType {
     private List<String> regions = new ArrayList<String>();
 
     /**
-     * Sole constructor.
-     */
-    public IndianNationType(int index) {
-        super(index);
-    }
-
-
-    /**
      * Returns false.
      *
      * @return a <code>boolean</code> value

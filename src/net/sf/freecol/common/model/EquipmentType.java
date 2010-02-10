@@ -35,6 +35,8 @@ public class EquipmentType extends BuildableType {
 
     public static final EquipmentType[] NO_EQUIPMENT = new EquipmentType[0];
 
+    private static int nextIndex = 0;
+
     /**
      * The maximum number of equipment items that can be combined.
      */
@@ -69,10 +71,8 @@ public class EquipmentType extends BuildableType {
     private List<String> compatibleEquipment = new ArrayList<String>();
 
 
-    public EquipmentType() {}
-
-    public EquipmentType(int index) {
-        setIndex(index);
+    public EquipmentType() {
+        setIndex(nextIndex++);
     }
 
     /**

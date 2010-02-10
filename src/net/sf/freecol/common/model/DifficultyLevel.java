@@ -37,10 +37,13 @@ import net.sf.freecol.common.option.StringOption;
  */
 public class DifficultyLevel extends FreeColGameObjectType {
 
+    private static int nextIndex = 0;
+
     private final Map<String, AbstractOption> levelOptions = new HashMap<String, AbstractOption>();
-    
-    public DifficultyLevel(int index) {
-        setIndex(index);
+
+
+    public DifficultyLevel() {
+        setIndex(nextIndex++);
     }
 
     public AbstractOption getOption(String Id) throws IllegalArgumentException {

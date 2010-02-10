@@ -34,6 +34,8 @@ public final class GoodsType extends FreeColGameObjectType {
     public static final int NO_BREEDING = Integer.MAX_VALUE;
     public static final int NO_PRICE = Integer.MAX_VALUE;
 
+    private static int nextIndex = 0;
+
     private boolean isFarmed;
     private boolean isFood;
     private boolean ignoreLimit;
@@ -84,8 +86,8 @@ public final class GoodsType extends FreeColGameObjectType {
 
     // ----------------------------------------------------------- constructors
 
-    public GoodsType(int index) {
-        setIndex(index);
+    public GoodsType() {
+        setIndex(nextIndex++);
     }
 
     // ----------------------------------------------------------- retriveal methods
