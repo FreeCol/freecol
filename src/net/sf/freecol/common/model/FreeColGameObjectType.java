@@ -70,10 +70,25 @@ public class FreeColGameObjectType extends FreeColObject {
         this.featureContainer = newFeatureContainer;
     }
 
-    public final void setIndex(final int index) {
+    /**
+     * Describe <code>setIndex</code> method here.
+     *
+     * @param index an <code>int</code> value
+     */
+    protected final void setIndex(final int index) {
         this.index = index;
     }
 
+    /**
+     * Returns the index of this FreeColGameObjectType. The index
+     * imposes a total ordering consistent with equals on each class
+     * extending FreeColGameObjectType, but this ordering is nothing
+     * but the order in which the objects of the respective class were
+     * defined. It is guaranteed to remain stable only for a
+     * particular revision of a particular specification.
+     *
+     * @return an <code>int</code> value
+     */
     public final int getIndex() {
         return index;
     }
@@ -147,6 +162,14 @@ public class FreeColGameObjectType extends FreeColObject {
         }
     }
     
+    /**
+     * Reads a common child object, i.e. an Ability or Modifier.
+     *
+     * @param in a <code>XMLStreamReader</code> value
+     * @param specification a <code>Specification</code> value
+     * @return a <code>FreeColObject</code> value
+     * @exception XMLStreamException if an error occurs
+     */
     protected FreeColObject readChild(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         String childName = in.getLocalName();
