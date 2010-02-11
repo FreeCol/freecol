@@ -211,40 +211,72 @@ public class UnitTest extends FreeColTestCase {
 
         Game game = getStandardGame();
         Player dutch = game.getPlayer("model.nation.dutch");
-        Map map = getTestMap(plains);
+        Map map = getTestMap(savannahForest);
         game.setMap(map);
         Tile plain = map.getTile(5, 8);
         map.getTile(5, 8).setExploredBy(dutch, true);
 
-        Unit hardyPioneer = new Unit(game, plain, dutch, hardyPioneerType, UnitState.ACTIVE);
+        Unit hardyPioneer1 = new Unit(game, plain, dutch, hardyPioneerType, UnitState.ACTIVE);
+        Unit hardyPioneer2 = new Unit(game, plain, dutch, hardyPioneerType, UnitState.ACTIVE);
+        Unit hardyPioneer3 = new Unit(game, plain, dutch, hardyPioneerType, UnitState.ACTIVE);
 
         // Before
-        assertEquals(3, hardyPioneer.getMovesLeft());
-        assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(100, hardyPioneer.getEquipmentCount(toolsType) * 20);
         assertEquals(false, plain.hasRoad());
-        assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
+
+        assertEquals(3, hardyPioneer1.getMovesLeft());
+        assertEquals(-1, hardyPioneer1.getWorkLeft());
+        assertEquals(100, hardyPioneer1.getEquipmentCount(toolsType) * 20);
+        assertEquals(UnitState.ACTIVE, hardyPioneer1.getState());
+
+        assertEquals(3, hardyPioneer2.getMovesLeft());
+        assertEquals(-1, hardyPioneer2.getWorkLeft());
+        assertEquals(100, hardyPioneer2.getEquipmentCount(toolsType) * 20);
+        assertEquals(UnitState.ACTIVE, hardyPioneer2.getState());
 
         // Now do it
         plain.setOwner(dutch);
         TileImprovement roadImprovement = new TileImprovement(game, plain, road);
+        TileImprovement clearImprovement = new TileImprovement(game, plain, clear);
         plain.add(roadImprovement);
-        hardyPioneer.work(roadImprovement);
+        plain.add(clearImprovement);
+        hardyPioneer1.work(roadImprovement);
+        hardyPioneer2.work(roadImprovement);
+        hardyPioneer3.work(clearImprovement);
+        assertEquals(2, hardyPioneer1.getWorkLeft());
+        assertEquals(1, hardyPioneer2.getWorkLeft());
+        assertEquals(3, hardyPioneer3.getWorkLeft());
 
-        // After
-        assertEquals(0, hardyPioneer.getMovesLeft());
-        assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
-        assertEquals(true, plain.hasRoad());
-        assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
+        dutch.newTurn();
+
+        // After: both pioneers building road have used up their tools
+        assertTrue(plain.hasRoad());
+        assertTrue(roadImprovement.isComplete());
+        assertFalse(clearImprovement.isComplete());
+
+        assertEquals(0, hardyPioneer1.getMovesLeft());
+        assertEquals(-1, hardyPioneer1.getWorkLeft());
+        assertEquals(80, hardyPioneer1.getEquipmentCount(toolsType) * 20);
+        assertEquals(UnitState.ACTIVE, hardyPioneer1.getState());
+
+        // should be zero, but that doesn't work yet
+        assertEquals(3, hardyPioneer2.getMovesLeft());
+        assertEquals(-1, hardyPioneer2.getWorkLeft());
+        assertEquals(80, hardyPioneer2.getEquipmentCount(toolsType) * 20);
+        assertEquals(UnitState.ACTIVE, hardyPioneer2.getState());
+
+        // Pioneer clearing forest is not affected
+        assertEquals(3, hardyPioneer3.getMovesLeft());
+        assertEquals(2, hardyPioneer3.getWorkLeft());
+        assertEquals(100, hardyPioneer3.getEquipmentCount(toolsType) * 20);
+        assertEquals(UnitState.IMPROVING, hardyPioneer3.getState());
 
         // Advance 1 turn
         dutch.newTurn();
 
-        assertEquals(3, hardyPioneer.getMovesLeft());
-        assertEquals(UnitState.ACTIVE, hardyPioneer.getState());
-        assertEquals(-1, hardyPioneer.getWorkLeft());
-        assertEquals(80, hardyPioneer.getEquipmentCount(toolsType) * 20);
+        assertEquals(3, hardyPioneer1.getMovesLeft());
+        assertEquals(-1, hardyPioneer1.getWorkLeft());
+        assertEquals(80, hardyPioneer1.getEquipmentCount(toolsType) * 20);
+        assertEquals(UnitState.ACTIVE, hardyPioneer1.getState());
     }
 
     public static int getWorkLeftForPioneerWork(UnitType unitType, TileType tileType, TileImprovementType whichWork) {

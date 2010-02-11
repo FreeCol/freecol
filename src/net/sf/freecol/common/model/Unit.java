@@ -3194,7 +3194,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (workLeft > 0) {
             if (state == UnitState.IMPROVING) {
                 // Has the improvement been completed already? Do nothing.
-                // TODO: this is an invitation to cheat!
                 if (getWorkImprovement().isComplete()) {
                     setState(UnitState.ACTIVE);
                     return;
@@ -3226,13 +3225,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
                 switch (state) {
                 case TO_EUROPE:
-                	logger.info(getOwner().getNationAsString() + " " + getType().getName() + "(" + this.getId() + ") arrives in Europe");
-                        // trade unit arrives in Europe
-                        if(this.getTradeRoute() != null){
-                                setMovesLeft(0);
-                                setState(UnitState.ACTIVE);
-                                return;
-                        }
+                    logger.info(getOwner().getNationAsString() + " " + getType().getName() + "("
+                                + this.getId() + ") arrives in Europe");
+                    // trade unit arrives in Europe
+                    if (this.getTradeRoute() != null){
+                        setMovesLeft(0);
+                        setState(UnitState.ACTIVE);
+                        return;
+                    }
                         
                     addModelMessage(getOwner().getEurope(), ModelMessage.MessageType.DEFAULT, this,
                                     "model.unit.arriveInEurope",
@@ -3248,8 +3248,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     setState(UnitState.FORTIFIED);
                     break;
                 case IMPROVING:
-                    expendEquipment(getWorkImprovement().getExpendedEquipmentType(), 
-                                    getWorkImprovement().getExpendedAmount());
                     // Deliver Goods if any
                     GoodsType deliverType = getWorkImprovement().getDeliverGoodsType();
                     if (deliverType != null) {
@@ -3287,9 +3285,20 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     }
                     // Finish up
                     TileImprovement improvement = getWorkImprovement();
-                    setWorkImprovement(null);
-                    setState(UnitState.ACTIVE);
-                    setMovesLeft(0);
+                    for (Unit unit : getTile().getUnitList()) {
+                        if (unit.getState() == UnitState.IMPROVING
+                            && unit.getWorkImprovement().getType() == improvement.getType()) {
+                            unit.expendEquipment(improvement.getExpendedEquipmentType(), 
+                                                 improvement.getExpendedAmount());
+                            unit.workLeft = -1;
+                            unit.setWorkImprovement(null);
+                            unit.setState(UnitState.ACTIVE);
+                            // this only works for the current unit,
+                            // all others will already have spent
+                            // their moves, or will reset their moves
+                            unit.setMovesLeft(0);
+                        }
+                    }
                     // This should be run at the end, so that the info sent to the other players
                     //is up to date.
                     getGame().getModelController().tileImprovementFinished(this, improvement);
