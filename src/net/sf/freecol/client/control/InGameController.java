@@ -101,6 +101,7 @@ import net.sf.freecol.common.model.TradeRoute.Stop;
 import net.sf.freecol.common.model.Unit.MoveType;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
@@ -1330,6 +1331,57 @@ public final class InGameController implements NetworkConstants {
     private boolean askJoinColony(Unit unit, Colony colony) {
         Client client = freeColClient.getClient();
         JoinColonyMessage message = new JoinColonyMessage(colony, unit);
+        Element reply = askExpecting(client, message.toXMLElement(),
+                                     "multiple");
+        if (reply == null) return false;
+
+        Connection conn = client.getConnection();
+        freeColClient.getInGameInputHandler().handle(conn, reply);
+        return true;
+    }
+
+    /**
+     * Abandon a colony with no units.
+     *
+     * @param colony The <code>Colony</code> to be abandoned.
+     */
+    public void abandonColony(Colony colony) {
+        Player player = freeColClient.getMyPlayer();
+        Canvas canvas = freeColClient.getCanvas();
+        if (freeColClient.getGame().getCurrentPlayer() != player) {
+            canvas.showInformationMessage("notYourTurn");
+            return;
+        }
+
+        // Sanity check
+        if (colony == null || colony.getOwner() != player
+            || colony.getUnitCount() > 0) {
+            throw new IllegalStateException("Abandon bogus colony");
+        }
+
+        // Proceed to abandon
+        Tile tile = colony.getTile();
+        if (askAbandonColony(colony) && tile.getSettlement() == null) {
+            // TODO: move to server, Player.settlements is *not* currently
+            // communicated between client and server.
+            player.removeSettlement(colony);
+
+            player.invalidateCanSeeTiles();
+            GUI gui = freeColClient.getGUI();
+            gui.setActiveUnit(null);
+            gui.setSelectedTile(tile.getPosition());
+        }
+    }
+
+    /**
+     * Server query-response to abandon a colony.
+     *
+     * @param colony The <code>Colony</code> to abandon.
+     * @return True if the server interaction succeeded.
+     */
+    private boolean askAbandonColony(Colony colony) {
+        AbandonColonyMessage message = new AbandonColonyMessage(colony);
+        Client client = freeColClient.getClient();
         Element reply = askExpecting(client, message.toXMLElement(),
                                      "multiple");
         if (reply == null) return false;
@@ -4719,29 +4771,6 @@ public final class InGameController implements NetworkConstants {
         return null;
     }
 
-    /**
-     * Abandon a colony with no units
-     *
-     * @param colony The colony to be abandoned
-     */
-    public void abandonColony(Colony colony) {
-        if (colony == null) {
-            return;
-        }
-
-        Client client = freeColClient.getClient();
-
-        Element abandonColony = Message.createNewRootElement("abandonColony");
-        abandonColony.setAttribute("colony", colony.getId());
-        colony.getOwner().getHistory()
-            .add(new HistoryEvent(colony.getGame().getTurn().getNumber(),
-                                  HistoryEvent.Type.ABANDON_COLONY,
-                                  "%colony%", colony.getName()));
-
-        colony.dispose();
-        client.sendAndWait(abandonColony);
-    }
-    
     /**
      * Retrieves server statistics
      */

@@ -71,6 +71,7 @@ import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
+import net.sf.freecol.common.networking.AbandonColonyMessage;
 import net.sf.freecol.common.networking.AskSkillMessage;
 import net.sf.freecol.common.networking.BuildColonyMessage;
 import net.sf.freecol.common.networking.BuyGoodsMessage;
@@ -257,6 +258,11 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             @Override
             public Element handle(Player player, Connection connection, Element element) {
                 return moveToAmerica(connection, element);
+            }
+        });
+        register(AbandonColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
+            public Element handle(Player player, Connection connection, Element element) {
+                return new AbandonColonyMessage(getGame(), element).handle(freeColServer, player, connection);
             }
         });
         register(BuildColonyMessage.getXMLElementTagName(), new CurrentPlayerNetworkRequestHandler() {
@@ -517,11 +523,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         register(DebugForeignColonyMessage.getXMLElementTagName(), new NetworkRequestHandler() {
             public Element handle(Connection connection, Element element) {
                 return new DebugForeignColonyMessage(getGame(), element).handle(freeColServer, connection);
-            }
-        });
-        register("abandonColony", new NetworkRequestHandler() {
-            public Element handle(Connection connection, Element element) {
-                return abandonColony(connection, element);
             }
         });
         register("continuePlaying", new NetworkRequestHandler() {
@@ -802,42 +803,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             }
             unit.setTradeRoute(tradeRoute);
         }
-        return null;
-    }
-
-    /**
-     * Handles an "abandonColony"-message from a client.
-     * 
-     * @param connection The connection the message came from.
-     * @param abandonElement The element containing the request.
-     * @exception IllegalArgumentException If the data format of the message is
-     *                invalid.
-     * @exception IllegalStateException If the request is not accepted by the
-     *                model.
-     */
-    private Element abandonColony(Connection connection, Element abandonElement) {
-        FreeColServer freeColServer = getFreeColServer();
-        ServerPlayer player = freeColServer.getPlayer(connection);
-        // Get parameters:
-        Colony colony = (Colony) getGame().getFreeColGameObject(abandonElement.getAttribute("colony"));
-        // Test the parameters:
-        if (colony == null) {
-            throw new IllegalArgumentException("Could not find 'Colony' with specified ID: "
-                    + abandonElement.getAttribute("colony"));
-        }
-        if (colony.getOwner() != player) {
-            throw new IllegalStateException("Not your colony!");
-        }
-
-        colony.getOwner().getHistory()
-            .add(new HistoryEvent(colony.getGame().getTurn().getNumber(),
-                                  HistoryEvent.Type.ABANDON_COLONY,
-                                  "%colony%", colony.getName()));
-
-        Tile tile = colony.getTile();
-        // TODO: modify/abort trade routes?
-        colony.dispose();
-        sendUpdatedTileToAll(tile, player);
         return null;
     }
 

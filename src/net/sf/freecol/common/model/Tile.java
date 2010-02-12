@@ -1810,15 +1810,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             owningSettlement = null;
         }
 
-        boolean settlementSent = false;
+        settlement = null;
         units.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(Colony.getXMLElementTagName())) {
                 settlement = updateFreeColGameObject(in, Colony.class);
-                settlementSent = true;
             } else if (in.getLocalName().equals(IndianSettlement.getXMLElementTagName())) {
                 settlement = updateFreeColGameObject(in, IndianSettlement.class);
-                settlementSent = true;
             } else if (in.getLocalName().equals(UNITS_TAG_NAME)) {
                 while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
                     if (in.getLocalName().equals(Unit.getXMLElementTagName())) {
@@ -1851,9 +1849,6 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                getId());
                 in.nextTag();
             }
-        }
-        if (!settlementSent && settlement != null) {
-            settlement.dispose();
         }
 
         // compatibility mode
