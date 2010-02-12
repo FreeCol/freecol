@@ -99,7 +99,6 @@ public class DeclareIndependenceMessage extends Message {
         // Create and arm the REF player
         ServerPlayer serverPlayer = server.getPlayer(connection);
         ServerPlayer refPlayer = server.getInGameController().createREFPlayer(serverPlayer);
-        server.getInGameController().createREFUnits(serverPlayer, refPlayer);
 
         // Liberty or else
         List<FreeColObject> changes = serverPlayer.declareIndependence(nationName, countryName);

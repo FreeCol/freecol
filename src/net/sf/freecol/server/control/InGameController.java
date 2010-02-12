@@ -832,7 +832,14 @@ public final class InGameController extends Controller {
         t.start();
     }
 
-    public ServerPlayer createREFPlayer(ServerPlayer player){
+    /**
+     * Create the Royal Expeditionary Force player corresponding to
+     * a given player that is about to rebel.
+     *
+     * @param player The <code>ServerPlayer</code> about to rebel.
+     * @return The REF player.
+     */
+    public ServerPlayer createREFPlayer(ServerPlayer player) {
         Nation refNation = player.getNation().getRefNation();
         ServerPlayer refPlayer = getFreeColServer().addAIPlayer(refNation);
         refPlayer.setEntryLocation(player.getEntryLocation());
@@ -840,46 +847,8 @@ public final class InGameController extends Controller {
         player.setStance(refPlayer, Stance.PEACE);
         refPlayer.setTension(player, new Tension(Tension.Level.CONTENT.getLimit()));
         player.setTension(refPlayer, new Tension(Tension.Level.CONTENT.getLimit()));
-        
+        createREFUnits(player, refPlayer);
         return refPlayer;
-    }
-    
-    private void createUnits(List<AbstractUnit> units, Element element, ServerPlayer nextPlayer) {
-        String musketsTypeStr = null;
-        String horsesTypeStr = null;
-        if(nextPlayer.isIndian()){
-                musketsTypeStr = "model.equipment.indian.muskets";
-            horsesTypeStr = "model.equipment.indian.horses";
-        } else {
-                musketsTypeStr = "model.equipment.muskets";
-            horsesTypeStr = "model.equipment.horses";
-        }
-        
-        final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType(musketsTypeStr);
-        final EquipmentType horses = FreeCol.getSpecification().getEquipmentType(horsesTypeStr);
-        
-        EquipmentType[] soldier = new EquipmentType[] { muskets };
-        EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
-        for (AbstractUnit unit : units) {
-            EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
-            for (int count = 0; count < unit.getNumber(); count++) {
-                switch(unit.getRole()) {
-                case SOLDIER:
-                    equipment = soldier;
-                    break;
-                case DRAGOON:
-                    equipment = dragoon;
-                    break;
-                default:
-                }
-                Unit newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer,
-                                        unit.getUnitType(), UnitState.ACTIVE, equipment);
-                //nextPlayer.getEurope().add(newUnit);
-                if (element != null) {
-                    element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
-                }
-            }
-        }
     }
     
     public List<Unit> createREFUnits(ServerPlayer player, ServerPlayer refPlayer){
@@ -955,6 +924,44 @@ public final class InGameController extends Controller {
             //unitsList.add(unit);
         }
         return unitsList;
+    }
+
+    private void createUnits(List<AbstractUnit> units, Element element, ServerPlayer nextPlayer) {
+        String musketsTypeStr = null;
+        String horsesTypeStr = null;
+        if(nextPlayer.isIndian()){
+                musketsTypeStr = "model.equipment.indian.muskets";
+            horsesTypeStr = "model.equipment.indian.horses";
+        } else {
+                musketsTypeStr = "model.equipment.muskets";
+            horsesTypeStr = "model.equipment.horses";
+        }
+
+        final EquipmentType muskets = FreeCol.getSpecification().getEquipmentType(musketsTypeStr);
+        final EquipmentType horses = FreeCol.getSpecification().getEquipmentType(horsesTypeStr);
+
+        EquipmentType[] soldier = new EquipmentType[] { muskets };
+        EquipmentType[] dragoon = new EquipmentType[] { horses, muskets };
+        for (AbstractUnit unit : units) {
+            EquipmentType[] equipment = EquipmentType.NO_EQUIPMENT;
+            for (int count = 0; count < unit.getNumber(); count++) {
+                switch(unit.getRole()) {
+                case SOLDIER:
+                    equipment = soldier;
+                    break;
+                case DRAGOON:
+                    equipment = dragoon;
+                    break;
+                default:
+                }
+                Unit newUnit = new Unit(getGame(), nextPlayer.getEurope(), nextPlayer,
+                                        unit.getUnitType(), UnitState.ACTIVE, equipment);
+                //nextPlayer.getEurope().add(newUnit);
+                if (element != null) {
+                    element.appendChild(newUnit.toXMLElement(nextPlayer, element.getOwnerDocument()));
+                }
+            }
+        }
     }
 
     private void bombardEnemyShips(ServerPlayer currentPlayer) {

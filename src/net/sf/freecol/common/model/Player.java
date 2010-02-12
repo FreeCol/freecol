@@ -274,7 +274,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if (player2.isEuropean()) {
                 counter2 += 2;
             }
-            
+
             return counter2 - counter1;
         }
     };
@@ -549,7 +549,7 @@ public class Player extends FreeColGameObject implements Nameable {
         // to iterate through it
         List<ModelMessage> modelMessagesList = new ArrayList<ModelMessage>();
         modelMessagesList.addAll(modelMessages);
-        
+
         for (ModelMessage modelMessage : modelMessagesList) {
             if (modelMessage.getSource() == source) {
                 if (newSource == null) {
@@ -853,8 +853,21 @@ public class Player extends FreeColGameObject implements Nameable {
     public boolean isAdmin() {
         return admin;
     }
-    
-    
+
+
+    /**
+     * Check is the player has a coastal colony connected to Europe,
+     * as required post-independence.
+     *
+     * @return True if the player has a coastal colony.
+     */
+    public boolean hasCoastalColony() {
+        for (Colony colony : getColonies()) {
+            if (colony.isConnected()) return true;
+        }
+        return false;
+    }
+
     /**
      * Checks if the given player has died.
      * 
@@ -863,12 +876,27 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public static boolean checkForDeath(Player player) {
         /*
-         * Die if: (isREF && (no rebel nation to fight) && (units all in Europe))
-         *         || ((No colonies or units on map)
-         *             && ((After year 1600) || (Cannot get a unit from Europe)))
+         * Die if: (isNative && (no colonies or units))
+         *      || ((rebel or independent) && !(has coastal colony))
+         *      || (isREF && !(rebel nation left) && (all units in Europe))
+         *      || ((no units in New World)
+         *         && ((year > 1600) || (cannot get a unit from Europe)))
          */
-        
-        if (player.isREF()) {
+
+        switch (player.getPlayerType()) {
+        case NATIVE:
+            // All natives units are viable
+            return player.getUnits().isEmpty();
+
+        case COLONIAL:
+            break; // Handle the hard case below
+
+        case REBEL: case INDEPENDENT:
+            // Post-declaration European player needs a coastal colony
+            // and can not hope for resupply from Europe.
+            return !player.hasCoastalColony();
+
+        case ROYAL:
             // Still alive if there are rebels to quell
             Iterator<Player> players = player.getGame().getPlayerIterator();
             while (players.hasNext()) {
@@ -889,25 +917,31 @@ public class Player extends FreeColGameObject implements Nameable {
 
             // Otherwise, the REF has been defeated and gone home.
             return true;
+
+        case UNDEAD:
+            return player.getUnits().isEmpty();
+
+        default:
+            throw new IllegalStateException("Bogus player type");
         }
 
-        // Quick check to avoid long processing time:
-        if (!player.getSettlements().isEmpty()) {
+        // Quick check for a colony
+        if (!player.getColonies().isEmpty()) {
             return false;
         }
-        
+
         // Verify player units
         boolean hasCarrier = false;
         List<Unit> unitList = player.getUnits();
         for(Unit unit : unitList){
             boolean isValidUnit = false;
-            
+
             if(unit.isCarrier()){
                 hasCarrier = true;
                 logger.info("Still has carrier");
                 continue;
             }
-            
+
             // Can found new colony
             if(unit.isColonist()){
                 isValidUnit = true;
@@ -917,7 +951,7 @@ public class Player extends FreeColGameObject implements Nameable {
             if(unit.isOffensiveUnit()){
                 isValidUnit = true;
             }
-             
+
             if(!isValidUnit){
                 continue;
             }
@@ -939,26 +973,17 @@ public class Player extends FreeColGameObject implements Nameable {
                 }   
             }
         }
-
-        
         /*
          * At this point we know the player does not have any valid units or
          * settlements on the map.
          */
-        
-        /*
-         *  No Europe, no reenforcements
-         */
-        if (!player.isEuropean() || player.getEurope() == null) {
-            return true;
-        }
-        
+
         // After the year 1600, no presence in New World means endgame
         if (player.getGame().getTurn().getYear() >= 1600) {
             logger.info("No presence in new world after 1600");
             return true;
         }
-        
+
         int goldNeeded = 0;
         /*
          * No carrier, check if has gold to buy one
@@ -967,34 +992,34 @@ public class Player extends FreeColGameObject implements Nameable {
             /*
              * Find the cheapest naval unit
              */
-                
+
             Iterator<UnitType> navalUnits = FreeCol.getSpecification().getUnitTypesWithAbility("model.ability.navalUnit").iterator();
-                
+
             int lowerPrice = Integer.MAX_VALUE;
-                
+
             while(navalUnits.hasNext()){
                 UnitType unit = navalUnits.next();
-                
+
                 int unitPrice = player.getEurope().getUnitPrice(unit);
-                
+
                 // cannot be bought
                 if(unitPrice == UnitType.UNDEFINED){
                     continue;
                 }
-                
+
                 if(unitPrice < lowerPrice){
                     lowerPrice = unitPrice;
                 }
             }
-            
+
             //Sanitation
             if(lowerPrice == Integer.MAX_VALUE){
                 logger.warning("Couldnt find naval unit to buy");
                 return true;
             }
-            
+
             goldNeeded += lowerPrice;
-            
+
             // cannot buy carrier
             if(goldNeeded > player.getGold()){
                 logger.info("Does not have enough money to buy carrier");
@@ -1020,7 +1045,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         return false;
                     }
                 }
-                
+
                 /*
                  * The carrier has units 
                  *or goods that can be sold
@@ -1036,7 +1061,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 return false;
             }
         }
-        
+
         /*
          * No colonists, check if has gold to train 
          *or recruit one
@@ -1059,12 +1084,12 @@ public class Player extends FreeColGameObject implements Nameable {
             }
 
             int unitPrice = player.getEurope().getUnitPrice(unit);
-            
+
             // cannot be bought
             if(unitPrice == UnitType.UNDEFINED){
                 continue;
             }
-            
+
             if(unitPrice < goldToTrain){
                 goldToTrain = unitPrice;
             }
@@ -1079,7 +1104,7 @@ public class Player extends FreeColGameObject implements Nameable {
         }
         return false;
     }
-    
+
 
     /**
      * Checks if this player is dead. A <code>Player</code> dies when it
@@ -2462,7 +2487,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if (player == this || player == null) {
             return;
         }
-        
+
         if (tension.get(player) == null) {
             tension.put(player, new Tension(addToTension));
         } else {
@@ -2473,7 +2498,7 @@ public class Player extends FreeColGameObject implements Nameable {
         if(origin != null && origin.getOwner() != this){
             return;
         }
-        
+
         // For indian players, we also need to set each settlement alarm.
         // If the alarm originated on a settlement, it is propagated to all others.
         // Global effects, like declaration of war, affect all settlements
@@ -2608,7 +2633,7 @@ public class Player extends FreeColGameObject implements Nameable {
                     }
                 }
             }
-            
+
             //add secondary goods being produced by a colony on this tile
             if (t.getType().getSecondaryGoods() != null) {
                 GoodsType secondary = t.getType().getSecondaryGoods().getType();
@@ -2660,7 +2685,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
         final int LONG_PATH_TURNS = 3;
         final int PRIMARY_GOODS_VALUE = 30;
-        
+
         //goods production in excess of this on a tile counts as good/high
         final int GOOD_PRODUCTION = 4;
         final int HIGH_PRODUCTION = 8;
@@ -2669,9 +2694,9 @@ public class Player extends FreeColGameObject implements Nameable {
         //overall food production is considered low/very low if less than...
         final int FOOD_LOW = 4;
         final int FOOD_VERY_LOW = 2;
-        
+
         //----- END MAGIC NUMBERS
-        
+
         //return 0 if a colony can't be built on tile t
         if (!t.getType().canSettle() || t.getSettlement() != null) {
             return 0;
@@ -2731,7 +2756,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 Tile tile = getGame().getMap().getTile(it.next());
                 Settlement set = tile.getSettlement(); //may be null!
                 Colony col = tile.getColony(); //may be null!
-                
+
                 if (radius==1) {
                     //already checked: no colony here - if set!=null, it's indian
                     if (set != null) {
@@ -2744,7 +2769,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         } else {
                             advantage *= MOD_ADJ_SETTLEMENT;
                         }
-                        
+
                     //no settlement on neighbouring tile
                     } else {
                         //apply penalty for owned neighbouring tiles
@@ -2755,7 +2780,7 @@ public class Player extends FreeColGameObject implements Nameable {
                                 advantage *= MOD_OWNED_NATIVE;
                             }
                         }
-                        
+
                         //count production
                         if (tile.getType()!=null) {
                             for (AbstractGoods production : tile.getType().getProduction()) {
@@ -2804,7 +2829,7 @@ public class Player extends FreeColGameObject implements Nameable {
                         }
                     }
                 }
-                
+
                 Iterator<Unit> ui = tile.getUnitIterator();
                 while (ui.hasNext()) {
                     Unit u = ui.next();
@@ -2831,7 +2856,7 @@ public class Player extends FreeColGameObject implements Nameable {
         } else if (foodProduction < FOOD_LOW) {
             advantage *= MOD_FOOD_LOW;
         }
-        
+
         return (int) (value * advantage);
     }
 
@@ -2891,12 +2916,12 @@ public class Player extends FreeColGameObject implements Nameable {
 
     public void changeRelationWithPlayer(Player player,Stance newStance){
         Stance oldStance = getStance(player);
-        
+
         // Sanitation
         if(newStance == oldStance){
             return;
         }
-        
+
         // Set stance
         setStance(player, newStance);
 
@@ -2924,7 +2949,7 @@ public class Player extends FreeColGameObject implements Nameable {
             break;
         }
         modifyTension(player,modifier);
-        
+
         if (player.getStance(this) != newStance) {
             getGame().getModelController().setStance(this, player, newStance);
             player.setStance(this, newStance);

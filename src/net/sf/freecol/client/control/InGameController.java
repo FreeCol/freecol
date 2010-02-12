@@ -1002,6 +1002,10 @@ public final class InGameController implements NetworkConstants {
                 "%percentage%", Integer.toString(player.getSoL()));
             return;
         }
+        if (!player.hasCoastalColony()) {
+            canvas.showInformationMessage("declareIndependence.needCoastalColony");
+            return;
+        }
 
         // Confirm intention, and collect nation+country names.
         List<String> names = canvas.showFreeColDialog(new ConfirmDeclarationDialog(canvas));
