@@ -817,11 +817,9 @@ public final class InGameInputHandler extends InputHandler {
             final int difference = freeColClient.getMyPlayer().getTax() - newTax;
                     
             freeColClient.getMyPlayer().setTax(newTax);
-            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.WARNING, null,
-                                                    "model.monarch.lowerTax",
-                                                    "%difference%",String.valueOf(difference),
-                                                    "%newTax%",
-                                                    String.valueOf(newTax)));
+            new ShowMonarchPanelSwingTask(action,
+                                          "%difference%", String.valueOf(difference),
+                                          "%newTax%", String.valueOf(newTax)).confirm();
             break;
         case ADD_TO_REF:
             Element additionElement = Message.getChildElement(element, "addition");
@@ -835,18 +833,15 @@ public final class InGameInputHandler extends InputHandler {
                 unitNames.add(unit.getNumber() + " " + Unit.getName(unit.getUnitType(), unit.getRole()));
             }
             monarch.addToREF(units);
-            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.WARNING, null,
-                                                    "model.monarch.addToREF",
-                                                    "%addition%", Utils.join(" " + Messages.message("and") + " ",
-                                                                             unitNames)));
+            new ShowMonarchPanelSwingTask(action,
+                                          "%addition%", Utils.join(" " + Messages.message("and") + " ",
+                                                                   unitNames)).confirm();
             break;
         case DECLARE_WAR:
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
             player.changeRelationWithPlayer(enemy, Stance.WAR);
-            player.addModelMessage(new ModelMessage(player, "model.monarch.declareWar",
-                                                    new String[][] {
-                                                        {"%nation%", enemy.getNationAsString()}},
-                                                    ModelMessage.MessageType.WARNING));
+            new ShowMonarchPanelSwingTask(action, "%nation%", enemy.getNationAsString())
+                .confirm();
             break;
         case SUPPORT_LAND:
         case SUPPORT_SEA:
