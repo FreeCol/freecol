@@ -531,8 +531,8 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element error(Element element) {
-        new ShowErrorMessageSwingTask(element.hasAttribute("messageID") ? element.getAttribute("messageID") : null,
-                element.getAttribute("message")).show();
+        new ShowErrorMessageSwingTask(element.getAttribute("messageID"),
+                                      element.getAttribute("message")).show();
         return null;
     }
 

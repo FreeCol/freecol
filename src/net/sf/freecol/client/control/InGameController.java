@@ -308,21 +308,16 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Process explicit errors.
+        // If debugging suppress the bland failure in favour of the
+        // higher detail text.
         if ("error".equals(reply.getTagName())) {
-            String messageID = null;
-            String message = null;
-            if (element.hasAttribute("message")) {
-                message = element.getAttribute("message");
-                logger.warning(message);
-            } else {
-                logger.warning("Received error response to " + element);
+            if (FreeCol.isInDebugMode() && reply.hasAttribute("messageID")
+                && reply.hasAttribute("message")) {
+                reply.removeAttribute("messageID");
             }
-            if (element.hasAttribute("messageID")) {
-                messageID = element.getAttribute("messageID");
-            }
-            if (messageID != null || FreeCol.isInDebugMode()) {
-                freeColClient.getCanvas().errorMessage(messageID, message);
-            }
+            logger.warning("Received error response: " + reply);
+            Connection conn = client.getConnection();
+            freeColClient.getInGameInputHandler().handle(conn, reply);
             return null;
         }
 
