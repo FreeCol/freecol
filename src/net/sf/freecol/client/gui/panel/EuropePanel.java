@@ -557,13 +557,12 @@ public final class EuropePanel extends FreeColPanel {
                     if (!autoload
                             && docksPanel.getComponentCount() > 0
                             && unit.getSpaceLeft() > 0) {
-                        boolean leaveColonists = getCanvas().showConfirmDialog(null,
+                        boolean leave = getCanvas().showConfirmDialog(null,
                                 "europe.leaveColonists",
                                 "yes",
                                 "no",
                                 "%newWorld%", unit.getOwner().getSafeNewLandName());
-                        if (!leaveColonists) {
-                            // Remain in Europe.
+                        if (!leave) { // Colonists remain in Europe.
                             return null;
                         }
                     }

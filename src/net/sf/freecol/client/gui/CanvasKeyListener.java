@@ -117,7 +117,7 @@ public final class CanvasKeyListener implements KeyListener {
             break;
         case KeyEvent.VK_NUMPAD5:
         case KeyEvent.VK_C:
-            inGameController.centerActiveUnit();
+            parent.getGUI().centerActiveUnit();
             break;
         case KeyEvent.VK_NUMPAD6:
         case KeyEvent.VK_KP_RIGHT:
@@ -175,7 +175,7 @@ public final class CanvasKeyListener implements KeyListener {
             break;
         case KeyEvent.VK_NUMPAD5:
         case KeyEvent.VK_C:
-            inGameController.centerActiveUnit();
+            parent.getGUI().centerActiveUnit();
             break;
         case KeyEvent.VK_NUMPAD6:
         case KeyEvent.VK_KP_RIGHT:

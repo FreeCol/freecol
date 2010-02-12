@@ -69,6 +69,7 @@ import net.sf.freecol.client.gui.panel.EventPanel;
 import net.sf.freecol.client.gui.panel.FreeColDialog;
 import net.sf.freecol.client.gui.panel.FreeColImageBorder;
 import net.sf.freecol.client.gui.panel.FreeColPanel;
+import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.InformationDialog;
 import net.sf.freecol.client.gui.panel.LoadingSavegameDialog;
 import net.sf.freecol.client.gui.panel.MainPanel;
@@ -600,6 +601,21 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
+     * Given a tile to be made visible, determine a position to popup
+     * a panel.
+     *
+     * @param tile A <code>Tile</code> to be made visible.
+     * @return A <code>PopupPosition</code> for a panel to be displayed.
+     */
+    private PopupPosition getPopupPosition(Tile tile) {
+        if (tile == null) return PopupPosition.CENTERED;
+        int where = gui.setOffsetFocus(tile.getPosition());
+        return (where > 0) ? PopupPosition.CENTERED_LEFT
+            : (where < 0) ? PopupPosition.CENTERED_RIGHT
+            : PopupPosition.CENTERED;
+    }
+
+    /**
      * Displays the given dialog, making sure a tile is visible.
      *
      * @param freeColDialog The dialog to be displayed
@@ -608,13 +624,7 @@ public final class Canvas extends JDesktopPane {
      *         the dialog.
      */
     public <T> T showFreeColDialog(FreeColDialog<T> freeColDialog, Tile tile) {
-        PopupPosition popupPosition = PopupPosition.CENTERED;
-        if (tile != null) {
-            int where = gui.setOffsetFocus(tile.getPosition());
-            popupPosition = (where > 0) ? PopupPosition.CENTERED_LEFT
-                : (where < 0) ? PopupPosition.CENTERED_RIGHT
-                : PopupPosition.CENTERED;
-        }
+        PopupPosition popupPosition = getPopupPosition(tile);
         showSubPanel(freeColDialog, popupPosition);
         T response = freeColDialog.getResponse();
         remove(freeColDialog);
@@ -732,18 +742,28 @@ public final class Canvas extends JDesktopPane {
      *         internal frame.
      */
     public boolean isShowingSubPanel() {
+        return getShowingSubPanel() != null;
+    }
+
+    /**
+     * The any panel this <code>Canvas</code> is displaying.
+     *
+     * @return A <code>Component</code> the <code>Canvas</code> is
+     *         displaying, or null if none found.
+     */
+    public Component getShowingSubPanel() {
         Component[] components = getComponents();
         for (Component c : components) {
             if (c instanceof ToolBoxFrame) {
                 continue;
             }
             if (c instanceof JInternalFrame) {
-                return true;
+                return c;
             } else if (c instanceof JInternalFrame.JDesktopIcon) {
-                return true;
+                return c;
             }
         }
-        return false;
+        return null;
     }
 
     /**
@@ -1339,9 +1359,19 @@ public final class Canvas extends JDesktopPane {
      * @see ColonyPanel
      */
     public void showColonyPanel(Colony colony) {
-        freeColClient.getGUI().stopBlinking();
-        ColonyPanel colonyPanel = new ColonyPanel(colony, this);
-        showSubPanel(colonyPanel);
+        ColonyPanel panel = new ColonyPanel(this, colony);
+        showSubPanel(panel, getPopupPosition(colony.getTile()));
+    }
+
+    /**
+     * Displays the panel of the given native settlement.
+     *
+     * @param indianSettlement The <code>IndianSettlement</code> to display.
+     */
+    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
+        IndianSettlementPanel panel
+            = new IndianSettlementPanel(this, indianSettlement);
+        showSubPanel(panel, getPopupPosition(indianSettlement.getTile()));
     }
 
     /**

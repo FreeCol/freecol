@@ -62,7 +62,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
@@ -531,14 +530,28 @@ public final class GUI {
         }
     }
 
+
+    /*
+     * Selects a tile, without clearing the orders of the first unit
+     * contained.
+     *
+     * @param tile The <code>Tile</code> to select.
+     * @see #setSelectedTile(Map.Position, boolean)
+     */
+    public void setSelectedTile(Tile tile) {
+        if (tile != null) {
+            setSelectedTile(tile.getPosition());
+        }
+    }
+
     /**
-    * Selects the tile at the specified position, without clearing
-    * the orders of the first unit contained.
-    *
-    * @param selectedTile The <code>Position</code> of the tile
-    *                     to be selected.
-    * @see #setSelectedTile(Map.Position, boolean)
-    */
+     * Selects the tile at the specified position, without clearing
+     * the orders of the first unit contained.
+     *
+     * @param selectedTile The <code>Position</code> of the tile
+     *                     to be selected.
+     * @see #setSelectedTile(Map.Position, boolean)
+     */
     public void setSelectedTile(Position selectedTile) {
         setSelectedTile(selectedTile, false);
     }
@@ -585,23 +598,20 @@ public final class GUI {
                  !activeUnit.getTile().getPosition().equals(selectedTile))) {
                 Tile t = gameData.getMap().getTile(selectedTile);
                 if (t != null && t.getSettlement() != null) {
+                    Canvas canvas = freeColClient.getCanvas();
                     Settlement s = t.getSettlement();
                     if (s instanceof Colony) {
                         if (s.getOwner().equals(freeColClient.getMyPlayer())) {
-                            // show my colony
-                            setFocus(selectedTile);
-                            freeColClient.getCanvas().showColonyPanel((Colony) s);
+                            canvas.showColonyPanel((Colony) s);
                         } else if (FreeCol.isInDebugMode()) {
                             freeColClient.getInGameController().debugForeignColony(t);
                         }
-                        return;
                     } else if (s instanceof IndianSettlement) {
-                        // show the Indian camp
-                        setFocus(selectedTile);
-                        Canvas canvas =freeColClient.getCanvas();
-                        canvas.showPanel(new IndianSettlementPanel(canvas, (IndianSettlement) s));
-                        return;
+                        canvas.showIndianSettlementPanel((IndianSettlement) s);
+                    } else {
+                        throw new IllegalStateException("Bogus settlement");
                     }
+                    return;
                 }
 
                 // else, just select a unit on the selected tile
@@ -634,10 +644,11 @@ public final class GUI {
         freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
 
         // Check if the gui needs to reposition:
-        if ((!onScreen(selectedTile) &&
-             freeColClient.getClientOptions().getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT)) ||
-            freeColClient.getClientOptions().getBoolean(ClientOptions.ALWAYS_CENTER)) {
-                setFocus(selectedTile);
+        ClientOptions options = freeColClient.getClientOptions();
+        if ((!onScreen(selectedTile)
+             && options.getBoolean(ClientOptions.JUMP_TO_ACTIVE_UNIT))
+            || options.getBoolean(ClientOptions.ALWAYS_CENTER)) {
+            setFocus(selectedTile);
         } else {
             if (oldPosition != null) {
                 freeColClient.getCanvas().refreshTile(oldPosition);
@@ -799,6 +810,15 @@ public final class GUI {
                 y = getHeight() - mapControls.getInfoPanelHeight();
             }
             freeColClient.getCanvas().repaint(x, y, getWidth(), getHeight());
+        }
+    }
+
+    /**
+     * Centers the map on the selected unit.
+     */
+    public void centerActiveUnit() {
+        if (activeUnit != null && activeUnit.getTile() != null) {
+            setFocus(activeUnit.getTile().getPosition());
         }
     }
 

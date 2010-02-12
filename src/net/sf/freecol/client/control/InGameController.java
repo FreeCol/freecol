@@ -1560,6 +1560,7 @@ public final class InGameController implements NetworkConstants {
                                           "%enemyNation%", enemy);
         }
 
+        ModelMessage m = null;
         if (reply.hasAttribute("nameNewLand")) {
             String newLandName = reply.getAttribute("nameNewLand");
             newLandName = canvas.showInputDialog("newLand.text",
@@ -1572,12 +1573,12 @@ public final class InGameController implements NetworkConstants {
                     = (BuildColonyAction) freeColClient.getActionManager()
                     .getFreeColAction(BuildColonyAction.id);
                 String key = FreeColActionUI.getHumanKeyStrokeText(bca.getAccelerator());
-                ModelMessage m = new ModelMessage(player, ModelMessage.MessageType.TUTORIAL,
-                                                  player,
-                                                  "tutorial.buildColony",
-                                                  "%build_colony_key%", key,
-                                                  "%build_colony_menu_item%", Messages.message("unit.state.7"),
-                                                  "%orders_menu_item%", Messages.message("menuBar.orders"));
+                m = new ModelMessage(player, ModelMessage.MessageType.TUTORIAL,
+                                     player,
+                                     "tutorial.buildColony",
+                                     "%build_colony_key%", key,
+                                     "%build_colony_menu_item%", Messages.message("unit.state.7"),
+                                     "%orders_menu_item%", Messages.message("menuBar.orders"));
                 player.addModelMessage(m);
             }
         }
@@ -1604,36 +1605,42 @@ public final class InGameController implements NetworkConstants {
             SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         for (int i = 0; i < emigrants; i++) {
-                            askEmigrate(canvas.showEmigrationPanel(true) + 1);
+                            int index = canvas.showEmigrationPanel(true);
+                            askEmigrate(index + 1);
                         }
                     }
                 });
         }
 
-        // Update the active unit and GUI.
-        if (unit.isDisposed() || checkCashInTreasureTrain(unit)) {
-            nextActiveUnit(unit.getTile());
-        } else if (unit.getTile().getSettlement() != null
-                   && unit.isCarrier() && unit.getTradeRoute() == null
-                   && (unit.getDestination() == null
-                       || unit.getDestination().getTile() == unit.getTile())) {
-            canvas.showColonyPanel((Colony) unit.getTile().getSettlement());
-        } else if (unit.getMovesLeft() <= 0) {	
-            // Perform a short pause on an active unit's last move, if
-            // the option is enabled.
-            if (freeColClient.getClientOptions().getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
-                canvas.paintImmediately(canvas.getBounds());
-                try {
-                    // UNIT_LAST_MOVE_DELAY is an instance variable
-                    // located at the top of this class.
-                    Thread.sleep(UNIT_LAST_MOVE_DELAY);
-                } catch (InterruptedException e) {
-                    //Ignore
-                }
-            }
-            nextActiveUnit(unit.getTile());
+        // Perform a short pause on an active unit's last move if
+        // the option is enabled.
+        ClientOptions options = freeColClient.getClientOptions();
+        if (unit.getMovesLeft() <= 0
+            && options.getBoolean(ClientOptions.UNIT_LAST_MOVE_DELAY)) {
+            canvas.paintImmediately(canvas.getBounds());
+            try {
+                // UNIT_LAST_MOVE_DELAY is an instance variable
+                // located at the top of this class.
+                Thread.sleep(UNIT_LAST_MOVE_DELAY);
+            } catch (InterruptedException e) {} // Ignore
         }
-        nextModelMessage();
+
+        // Update the active unit and GUI.
+        Tile tile = unit.getTile();
+        if (unit.isDisposed() || checkCashInTreasureTrain(unit)) {
+            nextActiveUnit(tile);
+        } else {
+            if (tile.getSettlement() instanceof Colony
+                && unit.isCarrier()
+                && unit.getTradeRoute() == null
+                && (unit.getDestination() == null
+                    || unit.getDestination().getTile() == tile.getTile())) {
+                canvas.showColonyPanel((Colony) tile.getSettlement());
+            }
+            if (unit.getMovesLeft() <= 0) {
+                nextActiveUnit();
+            }
+        }
     }
 
     /**
@@ -1791,8 +1798,7 @@ public final class InGameController implements NetworkConstants {
         if (askDemandTribute(unit, direction)) {
             // Assume tribute paid
             freeColClient.getCanvas().updateGoldLabel();
-            nextModelMessage();
-            nextActiveUnit(unit.getTile());
+            nextActiveUnit();
         }
     }
 
@@ -2092,7 +2098,7 @@ public final class InGameController implements NetworkConstants {
             if (carrier.getMovesLeft() > 0) {
                 freeColClient.getGUI().setActiveUnit(carrier);
             } else {
-                nextActiveUnit(destinationTile);
+                nextActiveUnit();
             }
         }
     }
@@ -2179,13 +2185,16 @@ public final class InGameController implements NetworkConstants {
                 if (unit.isDisposed()) {
                     canvas.showInformationMessage("learnSkill.die",
                                                   settlement);
-                } else if (unit.getType() != skill) {
+                    nextActiveUnit(unit.getTile());
+                    return;
+                }
+                if (unit.getType() != skill) {
                     canvas.showInformationMessage("learnSkill.leave",
                                                   settlement);
                 }
             }
         }
-        nextActiveUnit(unit.getTile());
+        nextActiveUnit();
     }
 
     /**
@@ -2240,7 +2249,8 @@ public final class InGameController implements NetworkConstants {
         Client client = freeColClient.getClient();
         Canvas canvas = freeColClient.getCanvas();
         Map map = freeColClient.getGame().getMap();
-        Tile tile = map.getNeighbourOrNull(direction, unit.getTile());
+        Tile unitTile = unit.getTile();
+        Tile tile = map.getNeighbourOrNull(direction, unitTile);
         IndianSettlement settlement = (IndianSettlement) tile.getSettlement();
 
         // Offer the choices.
@@ -2256,10 +2266,13 @@ public final class InGameController implements NetworkConstants {
             Player player = unit.getOwner();
             int gold = player.getGold();
             String result = askScoutSpeak(unit, direction);
-            if (result == null) return;
-            if ("die".equals(result)) {
+            if (result == null) {
+                logger.warning("Null result from askScoutSpeak");
+            } else if ("die".equals(result)) {
                 canvas.showInformationMessage("scoutSettlement.speakDie",
                                               settlement);
+                nextActiveUnit(unitTile);
+                return;
             } else if ("expert".equals(result)) {
                 canvas.showInformationMessage("scoutSettlement.expertScout",
                                               settlement,
@@ -2276,9 +2289,9 @@ public final class InGameController implements NetworkConstants {
                 canvas.showInformationMessage("scoutSettlement.speakNothing",
                                               settlement);
             } else {
-                logger.warning("No valid result attribute from askScoutSpeak.");
+                logger.warning("Invalid result from askScoutSpeak: " + result);
             }
-            nextActiveUnit(unit.getTile());
+            nextActiveUnit();
             break;
         case INDIAN_SETTLEMENT_TRIBUTE:
             moveTribute(unit, direction);
@@ -2335,7 +2348,6 @@ public final class InGameController implements NetworkConstants {
                 if (settlement.getMissionary() == unit) {
                     freeColClient.playSound(SoundEffect.MISSION_ESTABLISHED);
                 }
-                nextModelMessage();
                 nextActiveUnit();
             }
             break;
@@ -2900,8 +2912,7 @@ public final class InGameController implements NetworkConstants {
                 switch (offerReply.intValue()) {
                 case CHOOSE_SELL: // Accepted price, make the sale
                     if (askSellToSettlement(unit, settlement, goods, gold)) {
-                        // Assume success
-                        canvas.updateGoldLabel();
+                        canvas.updateGoldLabel(); // Assume success
                     }
                     return;
                 case CHOOSE_HAGGLE: // Ask for more money
@@ -3122,13 +3133,15 @@ public final class InGameController implements NetworkConstants {
         }
 
         Canvas canvas = freeColClient.getCanvas();
-        if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
+        if (freeColClient.getGame().getCurrentPlayer()
+            != freeColClient.getMyPlayer()) {
             canvas.showInformationMessage("notYourTurn");
             return false;
         }
 
         // Cash in or not?
         boolean cash;
+        Tile tile = unit.getTile();
         Europe europe = unit.getOwner().getEurope();
         if (europe == null || unit.getLocation() == europe) {
             cash = true; // No need to check for transport.
@@ -3136,18 +3149,15 @@ public final class InGameController implements NetworkConstants {
             String confirm = (unit.getTransportFee() == 0)
                 ? "cashInTreasureTrain.free"
                 : "cashInTreasureTrain.pay";
-            cash = canvas.showConfirmDialog(confirm,
+            cash = canvas.showConfirmDialog(unit.getTile(), confirm,
                                             "cashInTreasureTrain.yes",
                                             "cashInTreasureTrain.no");
         }
 
-        // Train might be about to disappear, remember if its active.
-        boolean active = freeColClient.getGUI().getActiveUnit() == unit;
+        // Update if cash in succeeds.
         if (cash && askCashInTreasureTrain(unit) && unit.isDisposed()) {
-            if (active) {
-                nextActiveUnit();
-            }
             canvas.updateGoldLabel();
+            nextActiveUnit(tile);
             return true;
         }
         return false;
@@ -3565,6 +3575,7 @@ public final class InGameController implements NetworkConstants {
         if (askClearSpeciality(unit) && unit.getType() == newType) {
             ;//unit.firePropertyChange(Unit.UNIT_TYPE_CHANGE, oldType, newType);
         }
+        nextActiveUnit();
     }
 
     /**
@@ -4096,8 +4107,7 @@ public final class InGameController implements NetworkConstants {
             logger.warning("Could not train unit in europe.");
             return;
         }
-
-        freeColClient.getCanvas().updateGoldLabel();
+        canvas.updateGoldLabel();
     }
 
     /**
@@ -4120,7 +4130,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (!colony.canPayToFinishBuilding()) {
-            freeColClient.getCanvas().errorMessage("notEnoughGold");
+            canvas.errorMessage("notEnoughGold");
             return;
         }
 
@@ -4138,13 +4148,13 @@ public final class InGameController implements NetworkConstants {
      * @param slot The slot to recruit the unit from. Either 1, 2 or 3.
      */
     public void recruitUnitInEurope(int slot) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
         Client client = freeColClient.getClient();
-        Canvas canvas = freeColClient.getCanvas();
         Game game = freeColClient.getGame();
         Player myPlayer = freeColClient.getMyPlayer();
         Europe europe = myPlayer.getEurope();
@@ -4173,8 +4183,7 @@ public final class InGameController implements NetworkConstants {
             logger.warning("Could not recruit the specified unit in europe.");
             return;
         }
-
-        freeColClient.getCanvas().updateGoldLabel();
+        canvas.updateGoldLabel();
     }
 
     /**
@@ -4285,7 +4294,7 @@ public final class InGameController implements NetworkConstants {
                                          "ok", "cancel",
                                          "%replace%", String.valueOf(arrears))) {
                 player.modifyGold(-arrears);
-                freeColClient.getCanvas().updateGoldLabel();
+                canvas.updateGoldLabel();
                 player.resetArrears(type);
                 // send to server
                 Element payArrearsElement = Message.createNewRootElement("payArrears");
@@ -4293,8 +4302,8 @@ public final class InGameController implements NetworkConstants {
                 client.sendAndWait(payArrearsElement);
             }
         } else {
-            freeColClient.getCanvas().showInformationMessage("model.europe.cantPayArrears",
-                                                             "%amount%", String.valueOf(arrears));
+            canvas.showInformationMessage("model.europe.cantPayArrears",
+                                          "%amount%", String.valueOf(arrears));
         }
     }
 

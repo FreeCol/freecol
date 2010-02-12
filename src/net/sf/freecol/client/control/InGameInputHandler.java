@@ -1409,14 +1409,16 @@ public final class InGameInputHandler extends InputHandler {
      */
     class UnitMoveAnimationCanvasSwingTask extends NoResultCanvasSwingTask {
                 
-        private final Unit _unit;
-        private final Tile _destinationTile;
-        private final Tile _sourceTile;
-        private boolean _focus;
+        private final Unit unit;
+        private final Tile destinationTile;
+        private final Tile sourceTile;
+        private boolean focus;
 
         /**
-         * Constructor - Play the unit movement animation, focusing the unit
-         * @param unit The unit that is moving
+         * Constructor - Play the unit movement animation, always
+         * focusing on the source tile.
+         *
+         * @param unit The unit that is moving.
          * @param sourceTile The Tile from which the unit is moving.
          * @param destinationTile The Tile where the unit will be moving to.
          */
@@ -1426,27 +1428,29 @@ public final class InGameInputHandler extends InputHandler {
         }
 
         /**
-         * Constructor
-         * @param unit The unit that is moving
+         * Constructor - Play the unit movement animation, optionally
+         * focusing on the source tile.
+         *
+         * @param unit The unit that is moving.
          * @param sourceTile The Tile from which the unit is moving.
          * @param destinationTile The Tile where the unit will be moving to.
-         * @param focus If before the animation the screen should focus the unit
+         * @param focus Focus on the source tile before the animation.
          */
         public UnitMoveAnimationCanvasSwingTask(Unit unit, Tile sourceTile,
                                                 Tile destinationTile,
                                                 boolean focus) {
-            _unit = unit;
-            _sourceTile = sourceTile;
-            _destinationTile = destinationTile;
-            _focus = focus;
+            this.unit = unit;
+            this.sourceTile = sourceTile;
+            this.destinationTile = destinationTile;
+            this.focus = focus;
         }
 
         protected void doWork(Canvas canvas) {
             GUI gui = canvas.getGUI();
-            if (_focus || !gui.onScreen(_sourceTile.getPosition())) {
-                gui.setFocusImmediately(_sourceTile.getPosition());
+            if (focus || !gui.onScreen(sourceTile.getPosition())) {
+                gui.setFocusImmediately(sourceTile.getPosition());
             }
-            Animations.unitMove(canvas, _unit, _sourceTile, _destinationTile);
+            Animations.unitMove(canvas, unit, sourceTile, destinationTile);
             canvas.refresh();
         }
 

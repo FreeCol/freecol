@@ -133,14 +133,14 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
 
     private void selectSettlement() {
         Settlement settlement = (Settlement) settlementList.getSelectedValue();
+        Canvas canvas = getCanvas();
         if (settlement instanceof Colony
             && settlement.getOwner() == getMyPlayer()) {
-            getCanvas().remove(FindSettlementDialog.this);
-            getCanvas().showColonyPanel((Colony) settlement);
+            canvas.remove(FindSettlementDialog.this);
+            canvas.showColonyPanel((Colony) settlement);
         } else if (settlement instanceof IndianSettlement) {
-            getCanvas().remove(FindSettlementDialog.this);
-            getCanvas().showPanel(new IndianSettlementPanel(getCanvas(),
-                                                            (IndianSettlement) settlement));
+            canvas.remove(FindSettlementDialog.this);
+            canvas.showIndianSettlementPanel((IndianSettlement) settlement);
         }
     }
 

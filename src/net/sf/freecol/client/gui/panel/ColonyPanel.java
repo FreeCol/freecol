@@ -171,7 +171,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * 
      * @param parent The parent of this panel
      */
-    public ColonyPanel(Colony colony, Canvas parent) {
+    public ColonyPanel(final Canvas parent, Colony colony) {
         super(parent);
 
         setFocusCycleRoot(true);

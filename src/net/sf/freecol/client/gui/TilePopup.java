@@ -40,7 +40,6 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.action.UnloadAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.IndianSettlementPanel;
 import net.sf.freecol.client.gui.panel.ReportPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
 import net.sf.freecol.common.model.Colony;
@@ -431,7 +430,7 @@ public final class TilePopup extends JPopupMenu {
         JMenuItem menuItem = new JMenuItem(settlement.getLocationName());
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    canvas.showPanel(new IndianSettlementPanel(canvas, settlement));
+                    canvas.showIndianSettlementPanel(settlement);
                 }
             });
         add(menuItem);

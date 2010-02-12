@@ -47,7 +47,7 @@ public final class IndianSettlementPanel extends FreeColPanel {
     /**
      * The constructor that will add the items to this panel.
      */
-    public IndianSettlementPanel(Canvas canvas, IndianSettlement settlement) {
+    public IndianSettlementPanel(final Canvas canvas, IndianSettlement settlement) {
         
         super(canvas);
 
