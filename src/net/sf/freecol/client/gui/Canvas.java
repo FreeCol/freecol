@@ -110,6 +110,7 @@ import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
@@ -1334,6 +1335,40 @@ public final class Canvas extends JDesktopPane {
             text = messageId;
             logger.warning("Missing i18n resource: " + messageId);
         }
+        ImageIcon icon = null;
+        if (displayObject != null) {
+            icon = getImageIcon(displayObject, false);
+        }
+        Tile tile = null;
+        if (displayObject instanceof Tile) {
+            tile = (Tile) displayObject;
+        } else {
+            try { // If the displayObject has a "getTile" method, invoke it.
+                tile = (Tile) displayObject.getClass().getMethod("getTile")
+                    .invoke(displayObject);
+            } catch (Exception e) { /* Ignore failure */ }
+        }
+        showFreeColDialog(new InformationDialog(this, text, icon), tile);
+    }
+
+    /**
+     * Shows a message with some information and an "OK"-button.
+     *
+     * @param template the StringTemplate to display
+     */
+    public void showInformationMessage(StringTemplate template) {
+        showInformationMessage(template, null);
+    }
+
+
+    /**
+     * Shows a message with some information and an "OK"-button.
+     *
+     * @param template the StringTemplate to display
+     * @param displayObject Optional object for displaying an icon
+     */
+    public void showInformationMessage(StringTemplate template, FreeColObject displayObject) {
+        String text = Messages.localize(template);
         ImageIcon icon = null;
         if (displayObject != null) {
             icon = getImageIcon(displayObject, false);
