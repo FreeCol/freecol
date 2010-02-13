@@ -261,7 +261,7 @@ public class DebugMenu extends JMenu {
                         }
                     }
                     FoundingFather fatherToAdd = freeColClient.getCanvas()
-                        .showChoiceDialog("Select Founding Father", "cancel", fathers);
+                        .showChoiceDialog(null, "Select Founding Father", "cancel", fathers);
                     player.addFather(fatherToAdd);
                     Player serverPlayer = (Player) freeColClient.getFreeColServer().getGame().
                         getFreeColGameObject(player.getId());

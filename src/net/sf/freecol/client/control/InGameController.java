@@ -37,23 +37,19 @@ import javax.swing.SwingUtilities;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.FreeColClient;
-import net.sf.freecol.client.gui.Canvas;
-import net.sf.freecol.client.gui.GUI;
-import net.sf.freecol.client.gui.Canvas.MissionaryAction;
-import net.sf.freecol.client.gui.Canvas.ScoutAction;
-import net.sf.freecol.client.gui.Canvas.TradeAction;
-import net.sf.freecol.client.gui.action.BuildColonyAction;
 import net.sf.freecol.client.gui.animation.Animations;
+import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.Canvas.BuyAction;
+import net.sf.freecol.client.gui.Canvas.ClaimAction;
+import net.sf.freecol.client.gui.Canvas.EventType;
+import net.sf.freecol.client.gui.Canvas.MissionaryAction;
+import net.sf.freecol.client.gui.Canvas.ScoutColonyAction;
+import net.sf.freecol.client.gui.Canvas.ScoutIndianSettlementAction;
+import net.sf.freecol.client.gui.Canvas.SellAction;
+import net.sf.freecol.client.gui.Canvas.TradeAction;
+import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
-import net.sf.freecol.client.gui.panel.ChoiceItem;
-import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
-import net.sf.freecol.client.gui.panel.DeclarationDialog;
-import net.sf.freecol.client.gui.panel.EventPanel;
-import net.sf.freecol.client.gui.panel.PreCombatDialog;
-import net.sf.freecol.client.gui.panel.ReportTurnPanel;
-import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
-import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -793,10 +789,8 @@ public final class InGameController implements NetworkConstants {
     public void selectDestination(Unit unit) {
         final Player player = freeColClient.getMyPlayer();
         Map map = freeColClient.getGame().getMap();
-
         Canvas canvas = freeColClient.getCanvas();
-        Location destination = canvas.showFreeColDialog(new SelectDestinationDialog(canvas, unit));
-
+        Location destination = canvas.showSelectDestinationDialog(unit);
         if (destination == null) {
             // user aborted
             return;
@@ -1008,7 +1002,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Confirm intention, and collect nation+country names.
-        List<String> names = canvas.showFreeColDialog(new ConfirmDeclarationDialog(canvas));
+        List<String> names = canvas.showConfirmDeclarationDialog();
         if (names == null
             || names.get(0) == null || names.get(0).length() == 0
             || names.get(1) == null || names.get(1).length() == 0) {
@@ -1021,7 +1015,7 @@ public final class InGameController implements NetworkConstants {
         String countryName = names.get(1);
         if (askDeclare(nationName, countryName)
             && player.getPlayerType() == PlayerType.REBEL) {
-            canvas.showFreeColDialog(new DeclarationDialog(canvas));
+            canvas.showDeclarationDialog();
             freeColClient.getActionManager().update();
             nextModelMessage();
         }
@@ -1086,6 +1080,7 @@ public final class InGameController implements NetworkConstants {
             if (player.getSettlement(name) != null) {
                 // Colony name must be unique.
                 canvas.showInformationMessage("nameColony.notUnique",
+                                              (Colony) object,
                                               "%name%", name);
                 return;
             }
@@ -1300,7 +1295,8 @@ public final class InGameController implements NetworkConstants {
 
         if (messages.isEmpty()) return true;
         ModelMessage[] modelMessages = messages.toArray(new ModelMessage[messages.size()]);
-        return freeColClient.getCanvas().showConfirmDialog(modelMessages,
+        return freeColClient.getCanvas().showConfirmDialog(unit.getTile(),
+                                                           modelMessages,
                                                            "buildColony.yes",
                                                            "buildColony.no");
     }
@@ -1482,12 +1478,12 @@ public final class InGameController implements NetworkConstants {
 
         case MOVE_NO_ACCESS_BEACHED:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessBeached",
+            canvas.showInformationMessage("move.noAccessBeached", unit,
                                           "%nation%", getNationAt(tile, direction));
             break;
         case MOVE_NO_ACCESS_CONTACT:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessContact",
+            canvas.showInformationMessage("move.noAccessContact", unit,
                                           "%nation%", getNationAt(tile, direction));
             break;
         case MOVE_NO_ACCESS_LAND:
@@ -1497,28 +1493,28 @@ public final class InGameController implements NetworkConstants {
             break;
         case MOVE_NO_ACCESS_SETTLEMENT:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessSettlement",
+            canvas.showInformationMessage("move.noAccessSettlement", unit,
                                           "%unit%", unit.getName(),
                                           "%nation%", getNationAt(tile, direction));
             break;
         case MOVE_NO_ACCESS_SKILL:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessSkill",
+            canvas.showInformationMessage("move.noAccessSkill", unit,
                                           "%unit%", unit.getName());
             break;
         case MOVE_NO_ACCESS_TRADE:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessTrade",
+            canvas.showInformationMessage("move.noAccessTrade", unit,
                                           "%nation%", getNationAt(tile, direction));
             break;
         case MOVE_NO_ACCESS_WAR:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessWar",
+            canvas.showInformationMessage("move.noAccessWar", unit,
                                           "%nation%", getNationAt(tile, direction));
             break;
         case MOVE_NO_ACCESS_WATER:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessWater",
+            canvas.showInformationMessage("move.noAccessWater", unit,
                                           "%unit%", unit.getName());
             break;
         default:
@@ -1624,11 +1620,8 @@ public final class InGameController implements NetworkConstants {
                                                  "newLand.yes", null);
             if (askNewLandName(newLandName)
                 && newLandName.equals(player.getNewLandName())) {
-                canvas.showFreeColDialog(new EventPanel(canvas, EventPanel.EventType.FIRST_LANDING));
-                BuildColonyAction bca
-                    = (BuildColonyAction) freeColClient.getActionManager()
-                    .getFreeColAction(BuildColonyAction.id);
-                String key = FreeColActionUI.getHumanKeyStrokeText(bca.getAccelerator());
+                canvas.showEventPanel(unit.getTile(), EventType.FIRST_LANDING);
+                String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient.getActionManager().getFreeColAction("buildColonyAction").getAccelerator());
                 m = new ModelMessage(player, ModelMessage.MessageType.TUTORIAL,
                                      player,
                                      "tutorial.buildColony",
@@ -1640,7 +1633,7 @@ public final class InGameController implements NetworkConstants {
         }
 
         if (reply.hasAttribute("discoverPacific")) {
-            canvas.showFreeColDialog(new EventPanel(canvas, EventPanel.EventType.DISCOVER_PACIFIC));
+            canvas.showEventPanel(unit.getTile(), EventType.DISCOVER_PACIFIC);
         }
         if (reply.hasAttribute("discoverRegion")
             && reply.hasAttribute("regionType")) {
@@ -1943,21 +1936,17 @@ public final class InGameController implements NetworkConstants {
      * user to view the odds and possibly cancel the attack.
      *
      * @param attacker The attacking <code>Unit</code>.
-     * @param target The target <code>Tile</code>.
+     * @param tile The target <code>Tile</code>.
      * @return True to attack, false to abort.
      */
-    private boolean confirmPreCombat(Unit attacker, Tile target) {
+    private boolean confirmPreCombat(Unit attacker, Tile tile) {
         if (freeColClient.getClientOptions().getBoolean(ClientOptions.SHOW_PRECOMBAT)) {
-            Settlement settlementOrNull = target.getSettlement();
+            Settlement settlement = tile.getSettlement();
             // Don't tell the player how a settlement is defended!
-            Unit defenderOrNull = (settlementOrNull != null) ? null
-                : target.getDefendingUnit(attacker);
+            Unit defender = (settlement != null) ? null
+                : tile.getDefendingUnit(attacker);
             Canvas canvas = freeColClient.getCanvas();
-            PreCombatDialog dialog = new PreCombatDialog(attacker,
-                                                         defenderOrNull,
-                                                         settlementOrNull,
-                                                         canvas);
-            return canvas.showFreeColDialog(dialog, attacker.getTile());
+            return canvas.showPreCombatDialog(attacker, defender, settlement);
         }
         return true;
     }
@@ -2142,8 +2131,9 @@ public final class InGameController implements NetworkConstants {
         } else if (choices.size() == 1) {
             carrier = choices.get(0);
         } else {
-            carrier = canvas.showSimpleChoiceDialog(Messages.message("embark.text"),
-                                                    Messages.message("embark.cancel"),
+            carrier = canvas.showSimpleChoiceDialog(unit.getTile(),
+                                                    "embark.text",
+                                                    "embark.cancel",
                                                     choices);
             if (carrier == null) return; // User cancelled
         }
@@ -2193,8 +2183,9 @@ public final class InGameController implements NetworkConstants {
         // Pick units the user wants to disembark.
         Canvas canvas = freeColClient.getCanvas();
         while (disembarkable.size() > 0) {
-            Unit u = canvas.showSimpleChoiceDialog(Messages.message("disembark.text"),
-                                                   Messages.message("disembark.cancel"),
+            Unit u = canvas.showSimpleChoiceDialog(unit.getTile(),
+                                                   "disembark.text",
+                                                   "disembark.cancel",
                                                    disembarkable);
             if (u == null) break; // Done
             // Call move() as while the destination tile is known to
@@ -2353,8 +2344,7 @@ public final class InGameController implements NetworkConstants {
             moveTribute(unit, direction);
             break;
         default:
-            logger.warning("Bad return from showScoutIndianSettlementDialog.");
-            break;
+            throw new IllegalArgumentException("showScoutIndianSettlementDialog fail");
         }
     }
 
@@ -2394,9 +2384,7 @@ public final class InGameController implements NetworkConstants {
             = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
 
         // Offer the choices.
-        List<Object> response = canvas.showUseMissionaryDialog(settlement);
-        MissionaryAction action = (MissionaryAction) response.get(0);
-        switch (action) {
+        switch (canvas.showUseMissionaryDialog(unit, settlement)) {
         case CANCEL:
             return;
         case ESTABLISH_MISSION:
@@ -2417,10 +2405,21 @@ public final class InGameController implements NetworkConstants {
             }
             break;
         case INCITE_INDIANS:
-            Player enemy = (Player) response.get(1);
+            List<Player> enemies
+                = new ArrayList<Player>(freeColClient.getGame().getEuropeanPlayers());
+            enemies.remove(freeColClient.getMyPlayer());
+            Player enemy = canvas.showSimpleChoiceDialog(unit.getTile(),
+                                                         "missionarySettlement.inciteQuestion",
+                                                         "missionarySettlement.cancel",
+                                                         enemies);
+            if (enemy == null) return;
             int gold = askIncite(unit, direction, enemy, -1);
             if (gold < 0) return;
-            if (canvas.showInciteDialog(enemy, gold, unit.getTile())) {
+            if (canvas.showConfirmDialog(unit.getTile(),
+                                         "missionarySettlement.inciteConfirm",
+                                         "yes", "no",
+                                         "%player%", enemy.getName(),
+                                         "%amount%", String.valueOf(gold))) {
                 int goldOut = askIncite(unit, direction, enemy, gold);
                 if (goldOut < 0) {
                     ; // protocol fail
@@ -2435,7 +2434,7 @@ public final class InGameController implements NetworkConstants {
             nextActiveUnit();
             break;
         default:
-            logger.warning("Bad return from showUseMissionaryDialog.");
+            logger.warning("showUseMissionaryDialog fail");
             break;
         }
     }
@@ -2511,8 +2510,7 @@ public final class InGameController implements NetworkConstants {
             moveSpy(unit, direction);
             break;
         default:
-            logger.warning("Bad response from showScoutForeignColonyDialog()");
-            return;
+            throw new IllegalArgumentException("showScoutForeignColonyDialog fail");
         }
     }
 
@@ -2688,7 +2686,11 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Settlement settlement = getSettlementAt(unit.getTile(), direction);
         java.util.Map<String, Boolean> session;
-        while ((session = askOpenTransactionSession(unit, settlement)) != null) {
+        boolean done = false;
+
+        while (!done) {
+            session = askOpenTransactionSession(unit, settlement);
+            if (session == null) break;
             // The session tracks buy/sell/gift events and disables
             // canFoo when one happens.  So only offer such options if
             // the session allows it and the carrier is in good shape.
@@ -2697,10 +2699,11 @@ public final class InGameController implements NetworkConstants {
             boolean gif = session.get("canGift") && (unit.getGoodsCount() > 0);
             if (!buy && !sel && !gif) break;
 
-            TradeAction tradeType
-                = canvas.showIndianSettlementTradeDialog(settlement, buy, sel, gif);
-            if (tradeType == null) break; // Aborted
-            switch (tradeType) {
+            switch (canvas.showIndianSettlementTradeDialog(settlement,
+                                                           buy, sel, gif)) {
+            case CANCEL:
+                done = true;
+                break;
             case BUY:
                 attemptBuyFromSettlement(unit, settlement);
                 break;
@@ -2711,7 +2714,7 @@ public final class InGameController implements NetworkConstants {
                 attemptGiftToSettlement(unit, settlement);
                 break;
             default:
-                throw new IllegalArgumentException("Unknown trade type");
+                throw new IllegalArgumentException("showIndianSettlementTradeDialog fail");
             }
         }
 
@@ -2737,11 +2740,11 @@ public final class InGameController implements NetworkConstants {
                                      "getTransactionAnswer");
         if (reply == null) return null;
 
-        java.util.Map<String,Boolean> transactionSession = new HashMap<String,Boolean>();
-        transactionSession.put("canBuy", new Boolean(reply.getAttribute("canBuy")));
-        transactionSession.put("canSell", new Boolean(reply.getAttribute("canSell")));
-        transactionSession.put("canGift", new Boolean(reply.getAttribute("canGift")));
-        return transactionSession;
+        java.util.Map<String,Boolean> session = new HashMap<String,Boolean>();
+        session.put("canBuy", new Boolean(reply.getAttribute("canBuy")));
+        session.put("canSell", new Boolean(reply.getAttribute("canSell")));
+        session.put("canGift", new Boolean(reply.getAttribute("canGift")));
+        return session;
     }
 
     /**
@@ -2779,24 +2782,18 @@ public final class InGameController implements NetworkConstants {
         Goods goods = null;
         
         for (;;) {
-            // Rebuild the choice list
-            List<ChoiceItem<Goods>> goodsOffered
-                = new ArrayList<ChoiceItem<Goods>>();
-            for (Goods sell : forSale) {
-                goodsOffered.add(new ChoiceItem<Goods>(sell));
-            }
-
-            // there is nothing to sell to the player
-            if (goodsOffered.isEmpty()) {
+            if (forSale.isEmpty()) {
+                // There is nothing to sell to the player
                 canvas.showInformationMessage("trade.nothingToSell",
                                               settlement);
                 return;
             }
-            
+
             // Choose goods to buy
-            goods = canvas.showChoiceDialog(Messages.message("buyProposition.text"),
-                Messages.message("buyProposition.nothing"),
-                goodsOffered);
+            goods = canvas.showSimpleChoiceDialog(unit.getTile(),
+                                                  "buyProposition.text",
+                                                  "buyProposition.nothing",
+                                                  forSale);
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -2811,34 +2808,19 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for buy proposal
-                final int CHOOSE_BUY = 1;
-                final int CHOOSE_HAGGLE = 2;
-                String text = Messages.message("buy.text",
-                        "%nation%", settlement.getOwner().getNationAsString(),
-                        "%goods%", goods.toString(),
-                        "%gold%", Integer.toString(gold));
-                List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                if (player.getGold() >= gold) {
-                    choices.add(new ChoiceItem<Integer>(Messages.message("buy.takeOffer"), CHOOSE_BUY));
-                }
-                choices.add(new ChoiceItem<Integer>(Messages.message("buy.moreGold"), CHOOSE_HAGGLE));
-                Integer offerReply = canvas.showChoiceDialog(text,
-                        Messages.message("buyProposition.cancel"), choices);
-                if (offerReply == null) {
-                    // Cancelled, break out to choice-of-goods loop
-                    break;
-                }
-                switch (offerReply.intValue()) {
-                case CHOOSE_BUY: // Accept price, make purchase
+                switch (canvas.showBuyDialog(unit, settlement, goods, gold)) {
+                case CANCEL: // User cancelled
+                    return;
+                case BUY: // Accept price, make purchase
                     if (askBuyFromSettlement(unit, settlement, goods, gold)) {
                         canvas.updateGoldLabel(); // Assume success
                     }
                     return;
-                case CHOOSE_HAGGLE: // Try to negotiate a lower price
+                case HAGGLE: // Try to negotiate a lower price
                     gold = gold * 9 / 10;
                     break;
                 default:
-                    throw new IllegalStateException("Unknown choice.");
+                    throw new IllegalStateException("showBuyDialog fail");
                 }
             }
         }
@@ -2926,9 +2908,10 @@ public final class InGameController implements NetworkConstants {
         Goods goods = null;
         for (;;) {
             // Choose goods to sell
-            goods = canvas.showSimpleChoiceDialog(Messages.message("sellProposition.text"),
-                Messages.message("sellProposition.nothing"),
-                unit.getGoodsList());
+            goods = canvas.showSimpleChoiceDialog(unit.getTile(),
+                                                  "sellProposition.text",
+                                                  "sellProposition.nothing",
+                                                  unit.getGoodsList());
             if (goods == null) break; // Trade aborted by the player
 
             int gold = -1; // Initially ask for a price
@@ -2948,37 +2931,22 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for sale proposal
-                final int CHOOSE_SELL = 1;
-                final int CHOOSE_HAGGLE = 2;
-                final int CHOOSE_GIFT = 3;
-                String text = Messages.message("sell.text",
-                        "%nation%", settlement.getOwner().getNationAsString(),
-                        "%goods%", goods.getName(),
-                        "%gold%", Integer.toString(gold));
-                List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                choices.add(new ChoiceItem<Integer>(Messages.message("sell.takeOffer"), CHOOSE_SELL));
-                choices.add(new ChoiceItem<Integer>(Messages.message("sell.moreGold"), CHOOSE_HAGGLE));
-                choices.add(new ChoiceItem<Integer>(Messages.message("sell.gift", "%goods%",
-                                                                     goods.getName()), CHOOSE_GIFT));
-                Integer offerReply = canvas.showChoiceDialog(text, Messages.message("sellProposition.cancel"), choices);
-                if (offerReply == null) {
-                    // Cancelled, break out to choice-of-goods loop
-                    break;
-                }
-                switch (offerReply.intValue()) {
-                case CHOOSE_SELL: // Accepted price, make the sale
+                switch (canvas.showSellDialog(unit, settlement, goods, gold)) {
+                case CANCEL:
+                    return;
+                case SELL: // Accepted price, make the sale
                     if (askSellToSettlement(unit, settlement, goods, gold)) {
                         canvas.updateGoldLabel(); // Assume success
                     }
                     return;
-                case CHOOSE_HAGGLE: // Ask for more money
+                case HAGGLE: // Ask for more money
                     gold = (gold * 11) / 10;
                     break;
-                case CHOOSE_GIFT: // Decide to make a gift of the goods
+                case GIFT: // Decide to make a gift of the goods
                     askDeliverGiftToSettlement(unit, settlement, goods);
                     return;
                 default:
-                    throw new IllegalStateException("Unknown choice.");
+                    throw new IllegalStateException("showSellDialog fail");
                 }
             }
         }
@@ -3038,8 +3006,8 @@ public final class InGameController implements NetworkConstants {
      */
     private void attemptGiftToSettlement(Unit unit, Settlement settlement) {
         Canvas canvas = freeColClient.getCanvas();
-        Goods goods = canvas.showSimpleChoiceDialog(Messages.message("gift.text"),
-                                                    Messages.message("cancel"),
+        Goods goods = canvas.showSimpleChoiceDialog(unit.getTile(),
+                                                    "gift.text", "cancel",
                                                     unit.getGoodsList());
         if (goods != null) {
             askDeliverGiftToSettlement(unit, settlement, goods);
@@ -3115,34 +3083,21 @@ public final class InGameController implements NetworkConstants {
         if (price < 0) { // not for sale
             return false;
         } else if (price > 0) { // for sale by natives
-            if (offer >= price || offer < 0) {
+            if (offer >= price) { // offered more than enough
                 price = offer;
+            } else if (offer < 0) { // plan to steal
+                price = ClaimLandMessage.STEAL_LAND;
             } else {
-                final int CLAIM_ACCEPT = 1;
-                final int CLAIM_STEAL = 2;
-                List<ChoiceItem<Integer>> choices = new ArrayList<ChoiceItem<Integer>>();
-                
-                boolean canBuyLand = true;
-                if (price > player.getGold()) {
-                	canBuyLand = false;
-                }
-
-                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.pay", "%amount%",
-                                                                         Integer.toString(price)), CLAIM_ACCEPT, canBuyLand));
-                choices.add(new ChoiceItem<Integer>(Messages.message("indianLand.take"), CLAIM_STEAL));
-                Integer ci = canvas.showChoiceDialog(Messages.message("indianLand.text",
-                                                                      "%player%", owner.getNationAsString()),
-                                                     Messages.message("indianLand.cancel"),
-                                                     choices);
-                if (ci == null) { // cancelled
+                switch (canvas.showClaimDialog(tile, player, price, owner)) {
+                case CANCEL:
                     return false;
-                } else if (ci.intValue() == CLAIM_ACCEPT) { // accepted price
-                    ;
-                } else if (ci.intValue() == CLAIM_STEAL) {
-                    price = ClaimLandMessage.STEAL_LAND; // steal
-                } else {
-                    logger.warning("Impossible choice");
-                    return false;
+                case ACCEPT: // accepted price
+                    break;
+                case STEAL:
+                    price = ClaimLandMessage.STEAL_LAND;
+                    break;
+                default:
+                    throw new IllegalStateException("showClaimDialog fail");
                 }
             }
         } // else price == 0 and we can just proceed
@@ -4012,8 +3967,9 @@ public final class InGameController implements NetworkConstants {
      * @param unit The <code>Unit</code>.
      */
     public void clearOrders(Unit unit) {
+        Canvas canvas = freeColClient.getCanvas();
         if (freeColClient.getGame().getCurrentPlayer() != freeColClient.getMyPlayer()) {
-            freeColClient.getCanvas().showInformationMessage("notYourTurn");
+            canvas.showInformationMessage("notYourTurn");
             return;
         }
 
@@ -4021,15 +3977,14 @@ public final class InGameController implements NetworkConstants {
             return;
         }
 
-        if (unit.getState()==UnitState.IMPROVING) {
-            // Ask the user for confirmation, as this is a classic mistake.
-            // Canceling a pioneer terrain improvement is a waste of many turns
-            ModelMessage message = new ModelMessage(unit, ModelMessage.MessageType.WARNING, unit,
-                                                    "model.unit.confirmCancelWork", "%turns%", new Integer(unit.getWorkLeft()).toString());
-            boolean cancelWork = freeColClient.getCanvas().showConfirmDialog(new ModelMessage[] {message}, "yes", "no");
-            if (!cancelWork) {
-                return;
-            }
+        // Ask the user for confirmation, as this is a classic mistake.
+        // Cancelling a pioneer terrain improvement is a waste of many turns.
+        if (unit.getState() == UnitState.IMPROVING
+            && !canvas.showConfirmDialog(unit.getTile(),
+                                         "model.unit.confirmCancelWork",
+                                         "yes", "no",
+                                         "%turns%", Integer.toString(unit.getWorkLeft()))) {
+            return;
         }
 
         /*
@@ -4292,8 +4247,7 @@ public final class InGameController implements NetworkConstants {
      */
     public void assignTradeRoute(Unit unit) {
         Canvas canvas = freeColClient.getCanvas();
-        TradeRoute tradeRoute = canvas.showFreeColDialog(new TradeRouteDialog(canvas, unit.getTradeRoute()));
-        assignTradeRoute(unit, tradeRoute);
+        assignTradeRoute(unit, canvas.showTradeRouteDialog(unit));
     }
 
     public void assignTradeRoute(Unit unit, TradeRoute tradeRoute) {
@@ -4644,9 +4598,7 @@ public final class InGameController implements NetworkConstants {
                     Canvas canvas = freeColClient.getCanvas();
                     if (messageList.size() > 0) {
                         if (allMessages || messageList.size() > 5) {
-                            ReportTurnPanel report = new ReportTurnPanel(canvas, messages);
-                            canvas.addAsFrame(report);
-                            report.requestFocus();
+                            canvas.showReportTurnPanel(messages);
                         } else {
                             canvas.showModelMessages(messages);
                         }

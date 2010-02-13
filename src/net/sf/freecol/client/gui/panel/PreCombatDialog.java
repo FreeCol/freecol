@@ -51,7 +51,8 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
     public static final Modifier BASE_DEFENCE_MODIFIER =
         new Modifier("modifiers.baseDefence", Modifier.UNKNOWN, Modifier.Type.ADDITIVE);
 
-    public PreCombatDialog(Unit attacker, Unit defender, Settlement settlement, Canvas parent) {
+    public PreCombatDialog(final Canvas parent, Unit attacker, Unit defender,
+                           Settlement settlement) {
         super(parent);
 
         CombatModel combatModel = attacker.getGame().getCombatModel();

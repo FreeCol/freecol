@@ -310,7 +310,7 @@ public final class TilePopup extends JPopupMenu {
                             rumours.add(new ChoiceItem<RumourType>(rumour.toString(), rumour));
                         }
                         RumourType rumourChoice = freeColClient.getCanvas()
-                            .showChoiceDialog("Select Lost City Rumour", "Cancel", rumours);
+                            .showChoiceDialog(null, "Select Lost City Rumour", "Cancel", rumours);
                         tile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);
                         final Tile serverTile = (Tile) freeColClient.getFreeColServer().getGame().getFreeColGameObject(tile.getId());
                         serverTile.getTileItemContainer().getLostCityRumour().setType(rumourChoice);

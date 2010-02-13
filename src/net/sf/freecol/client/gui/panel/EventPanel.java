@@ -27,6 +27,7 @@ import javax.swing.JLabel;
 
 import net.miginfocom.swing.MigLayout;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.Canvas.EventType;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -40,15 +41,6 @@ public final class EventPanel extends FreeColDialog<Boolean> {
 
     private static final int OK = 0;
     
-    public static enum EventType {
-        FIRST_LANDING,
-        MEETING_NATIVES,
-        MEETING_EUROPEANS,
-        MEETING_AZTEC,
-        MEETING_INCA,
-        DISCOVER_PACIFIC
-    };
-
     private JLabel header;
 
     private JLabel imageLabel;
@@ -75,13 +67,13 @@ public final class EventPanel extends FreeColDialog<Boolean> {
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.firstLanding")));
             header.setText(Messages.message("event.firstLanding", "%name%", getMyPlayer().getSafeNewLandName()));
             break;
-        case MEETING_NATIVES:
-            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingNatives")));
-            header.setText(Messages.message("event.meetingNatives"));
-            break;
         case MEETING_EUROPEANS:
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingEuropeans")));
             header.setText(Messages.message("event.meetingEuropeans"));
+            break;
+        case MEETING_NATIVES:
+            imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingNatives")));
+            header.setText(Messages.message("event.meetingNatives"));
             break;
         case MEETING_AZTEC:
             imageLabel.setIcon(new ImageIcon(ResourceManager.getImage("EventImage.meetingAztec")));

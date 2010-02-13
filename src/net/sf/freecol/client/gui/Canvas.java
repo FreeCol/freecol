@@ -62,6 +62,8 @@ import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.ClientOptionsDialog;
 import net.sf.freecol.client.gui.panel.ColonyPanel;
 import net.sf.freecol.client.gui.panel.ColopediaPanel;
+import net.sf.freecol.client.gui.panel.ConfirmDeclarationDialog;
+import net.sf.freecol.client.gui.panel.DeclarationDialog;
 import net.sf.freecol.client.gui.panel.EmigrationPanel;
 import net.sf.freecol.client.gui.panel.ErrorPanel;
 import net.sf.freecol.client.gui.panel.EuropePanel;
@@ -77,12 +79,16 @@ import net.sf.freecol.client.gui.panel.MapControls;
 import net.sf.freecol.client.gui.panel.MapGeneratorOptionsDialog;
 import net.sf.freecol.client.gui.panel.NegotiationDialog;
 import net.sf.freecol.client.gui.panel.NewPanel;
+import net.sf.freecol.client.gui.panel.PreCombatDialog;
 import net.sf.freecol.client.gui.panel.RecruitDialog;
 import net.sf.freecol.client.gui.panel.ReportHighScoresPanel;
+import net.sf.freecol.client.gui.panel.ReportTurnPanel;
+import net.sf.freecol.client.gui.panel.SelectDestinationDialog;
 import net.sf.freecol.client.gui.panel.ServerListPanel;
 import net.sf.freecol.client.gui.panel.StartGamePanel;
 import net.sf.freecol.client.gui.panel.StatusPanel;
 import net.sf.freecol.client.gui.panel.TilePanel;
+import net.sf.freecol.client.gui.panel.TradeRouteDialog;
 import net.sf.freecol.client.gui.panel.TrainDialog;
 import net.sf.freecol.client.gui.video.Video;
 import net.sf.freecol.client.gui.video.VideoComponent;
@@ -98,12 +104,14 @@ import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.LostCityRumour;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -120,14 +128,14 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
  * <code>Canvas</code> contains methods to display various panels and dialogs.
  * Most of these methods use {@link net.sf.freecol.client.gui.i18n i18n} to get
  * localized text. Here is an example: <br>
- * 
+ *
  * <PRE>
- * 
+ *
  * if (canvas.showConfirmDialog("choice.text", "choice.yes", "choice.no")) { //
  * DO SOMETHING. }
- * 
+ *
  * </PRE>
- * 
+ *
  * <br>
  * where "choice.text", "choice.yes" and "choice.no" are keys for a localized
  * message. See {@link net.sf.freecol.client.gui.i18n i18n} for more
@@ -142,6 +150,15 @@ public final class Canvas extends JDesktopPane {
 
     private static final Logger logger = Logger.getLogger(Canvas.class.getName());
 
+    public static enum EventType {
+        FIRST_LANDING,
+        MEETING_NATIVES,
+        MEETING_EUROPEANS,
+        MEETING_AZTEC,
+        MEETING_INCA,
+        DISCOVER_PACIFIC
+    }
+
     public static enum PopupPosition {
         ORIGIN,
         CENTERED,
@@ -149,14 +166,18 @@ public final class Canvas extends JDesktopPane {
         CENTERED_RIGHT,
     }
 
-    public static enum ScoutAction {
+    public static enum ScoutColonyAction {
         CANCEL,
-        INDIAN_SETTLEMENT_SPEAK,
-        INDIAN_SETTLEMENT_TRIBUTE,
-        INDIAN_SETTLEMENT_ATTACK,
         FOREIGN_COLONY_NEGOTIATE,
         FOREIGN_COLONY_SPY,
         FOREIGN_COLONY_ATTACK
+    }
+
+    public static enum ScoutIndianSettlementAction {
+        CANCEL,
+        INDIAN_SETTLEMENT_SPEAK,
+        INDIAN_SETTLEMENT_TRIBUTE,
+        INDIAN_SETTLEMENT_ATTACK
     }
 
     public static enum MissionaryAction {
@@ -179,6 +200,24 @@ public final class Canvas extends JDesktopPane {
         GIFT
     }
 
+    public static enum BuyAction {
+        CANCEL,
+        BUY,
+        HAGGLE
+    }
+
+    public static enum SellAction {
+        CANCEL,
+        SELL,
+        HAGGLE,
+        GIFT
+    }
+
+    public static enum ClaimAction {
+        CANCEL,
+        ACCEPT,
+        STEAL
+    }
 
     private static final Integer MAIN_LAYER = JLayeredPane.DEFAULT_LAYER;
 
@@ -201,7 +240,7 @@ public final class Canvas extends JDesktopPane {
     private final StatusPanel statusPanel;
 
     private final ChatPanel chatPanel;
-    
+
     private final GUI gui;
 
     private final ServerListPanel serverListPanel;
@@ -209,7 +248,7 @@ public final class Canvas extends JDesktopPane {
     private final ClientOptionsDialog clientOptionsDialog;
 
     private final LoadingSavegameDialog loadingSavegameDialog;
-    
+
     /**
      * This is the GUI instance used to paint the colony tiles in the
      * ColonyPanel and other panels. It should not be scaled along
@@ -225,12 +264,12 @@ public final class Canvas extends JDesktopPane {
      * Variable used for detecting resizing.
      */
     private Dimension oldSize = null;
-    
+
     private Dimension initialSize = null;
 
     /**
      * The constructor to use.
-     * 
+     *
      * @param client main control class.
      * @param size The bounds of this <code>Canvas</code>.
      * @param gui The object responsible of drawing the map onto this component.
@@ -245,7 +284,7 @@ public final class Canvas extends JDesktopPane {
 
         setLocation(0, 0);
         setSize(size);
-        
+
         setDoubleBuffered(true);
         setOpaque(false);
         setLayout(null);
@@ -287,14 +326,14 @@ public final class Canvas extends JDesktopPane {
     public Dimension getPreferredSize() {
         return initialSize;
     }
-    
+
     public GUI getColonyTileGUI() {
         return colonyTileGUI;
     }
 
     /**
      * Returns the <code>ClientOptionsDialog</code>.
-     * 
+     *
      * @return The <code>ClientOptionsDialog</code>
      * @see net.sf.freecol.client.ClientOptions
      */
@@ -341,11 +380,11 @@ public final class Canvas extends JDesktopPane {
             oldSize = getSize();
         }
     }
-    
+
     /**
      * Paints this component. This method will use {@link GUI#display} to draw
      * the map/background on this component.
-     * 
+     *
      * @param g The Graphics context in which to draw this component.
      * @see GUI#display
      */
@@ -354,53 +393,6 @@ public final class Canvas extends JDesktopPane {
         updateSizes();
         Graphics2D g2d = (Graphics2D) g;
         gui.display(g2d);
-    }
-
-    /**
-     * Displays the <code>StartGamePanel</code>.
-     * 
-     * @param game The <code>Game</code> that is about to start.
-     * @param player The <code>Player</code> using this client.
-     * @param singlePlayerMode 'true' if the user wants to start a single player
-     *            game, 'false' otherwise.
-     * @see StartGamePanel
-     */
-    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
-        closeMenus();
-
-        if (game != null && player != null) {
-            startGamePanel.initialize(singlePlayerMode);
-            showSubPanel(startGamePanel);
-        } else {
-            logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
-        }
-    }
-
-    /**
-     * Displays the <code>ServerListPanel</code>.
-     * 
-     * @param username The username that should be used when connecting to one
-     *            of the servers on the list.
-     * @param serverList The list containing the servers retrieved from the
-     *            metaserver.
-     * @see ServerListPanel
-     */
-    public void showServerListPanel(String username, ArrayList<ServerInfo> serverList) {
-        closeMenus();
-
-        serverListPanel.initialize(username, serverList);
-        showSubPanel(serverListPanel);
-    }
-
-    /**
-     * Displays the <code>NegotiationDialog</code>.
-     * 
-     * @see NegotiationDialog
-     */
-    public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
-        NegotiationDialog negotiationDialog = new NegotiationDialog(this, unit, settlement, agreement);
-        negotiationDialog.initialize();
-        return showFreeColDialog(negotiationDialog, unit.getTile());
     }
 
     /**
@@ -428,7 +420,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays a <code>FreeColPanel</code>.
-     * 
+     *
      */
     public void showSubPanel(FreeColPanel panel) {
         addAsFrame(panel);
@@ -446,37 +438,17 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays the <code>ChatPanel</code>.
-     * 
-     * @see ChatPanel
-     */
-    // TODO: does it have state, or can we create a new one?
-    public void showChatPanel() {
-    	
-        // in single player, no chat available
-        if (freeColClient.isSingleplayer()) {
-            return;
-        }
-    	
-        showPanel(chatPanel);
-    }
-
-    /**
      * Displays a number of ModelMessages.
-     * 
+     *
      * @param modelMessages
      */
     public void showModelMessages(ModelMessage... modelMessages) {
-
         if (modelMessages.length == 1) {
-            String id = modelMessages[0].getId();
-            if (EventPanel.EventType.MEETING_NATIVES.toString().equals(id)) {
-                showFreeColDialog(new EventPanel(this, EventPanel.EventType.MEETING_NATIVES));
+            try { // If this singleton message is an event, use an event panel
+                EventType e = EventType.valueOf(modelMessages[0].getId());
+                showEventPanel(e);
                 return;
-            } else if (EventPanel.EventType.MEETING_AZTEC.toString().equals(id)) {
-                showFreeColDialog(new EventPanel(this, EventPanel.EventType.MEETING_AZTEC));
-                return;
-            }
+            } catch (IllegalArgumentException e) {} // ignore
         }
 
         String okText = "ok";
@@ -534,7 +506,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Returns the appropriate ImageIcon for Object.
-     * 
+     *
      * @param display The Object to display.
      * @return The appropriate ImageIcon.
      */
@@ -579,7 +551,7 @@ public final class Canvas extends JDesktopPane {
             }
         } else if (display instanceof Player) {
             image = imageLibrary.getCoatOfArmsImage(((Player) display).getNation());
-        } 
+        }
         if (image != null && small) {
             return new ImageIcon(image.getScaledInstance((image.getWidth(null) / 3) * 2,
                                                          (image.getHeight(null) / 3) *2,
@@ -591,7 +563,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays the given dialog.
-     * 
+     *
      * @param freeColDialog The dialog to be displayed
      * @return The {@link FreeColDialog#getResponse reponse} returned by
      *         the dialog.
@@ -678,7 +650,9 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
-     * 
+     *
+     * @param tile An optional <code>Tile</code> to make visible (not
+     *        under the dialog!)
      * @param messages The messages that explains the choice for the user.
      * @param okText The text displayed on the "ok"-button.
      * @param cancelText The text displayed on the "cancel"-button.
@@ -686,7 +660,8 @@ public final class Canvas extends JDesktopPane {
      *         otherwise.
      * @see FreeColDialog
      */
-    public boolean showConfirmDialog(ModelMessage[] messages, String okText, String cancelText) {
+    public boolean showConfirmDialog(Tile tile, ModelMessage[] messages,
+                                     String okText, String cancelText) {
         try {
             okText = Messages.message(okText);
         } catch (MissingResourceException e) {
@@ -710,13 +685,60 @@ public final class Canvas extends JDesktopPane {
             images[i] = getImageIcon(messages[i].getDisplay(), false);
         }
 
-        FreeColDialog<Boolean> confirmDialog = FreeColDialog.createConfirmDialog(texts, images, okText, cancelText);
-        return showFreeColDialog(confirmDialog);
+        FreeColDialog<Boolean> confirmDialog
+            = FreeColDialog.createConfirmDialog(texts, images,
+                                                okText, cancelText);
+        return showFreeColDialog(confirmDialog, tile);
+    }
+
+    /**
+     * Displays a dialog with a text and a cancel-button, in addition
+     * to buttons for each of the objects returned for the given list.
+     *
+     * @param tile An optional tile to make visible (not under the dialog).
+     * @param text The text that explains the choice for the user.
+     * @param cancelText The text displayed on the "cancel"-button.
+     * @param choices The <code>List</code> containing the ChoiceItems to
+     *            create buttons for.
+     * @return The chosen object, or <i>null</i> for the cancel-button.
+     */
+    public <T> T showChoiceDialog(Tile tile, String text, String cancelText,
+                                  List<ChoiceItem<T>> choices) {
+        FreeColDialog<ChoiceItem<T>> choiceDialog
+            = FreeColDialog.createChoiceDialog(text, cancelText, choices);
+        if (choiceDialog.getHeight() > getHeight() / 3) {
+            choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
+        }
+        ChoiceItem<T> response = showFreeColDialog(choiceDialog, tile);
+        return (response == null) ? null : response.getObject();
+    }
+
+    /**
+     * Displays a dialog with a text and a cancel-button, in addition
+     * to buttons for each of the objects in the list.
+     *
+     * @param tile An optional tile to make visible (not under the dialog).
+     * @param text The text that explains the choice for the user.
+     * @param cancelText The text displayed on the "cancel"-button.
+     * @param objects The List containing the objects to create buttons for.
+     * @return The chosen object, or <i>null</i> for the cancel-button.
+     */
+    public <T> T showSimpleChoiceDialog(Tile tile,
+                                        String text, String cancelText,
+                                        List<T> objects) {
+        List<ChoiceItem<T>> choices = new ArrayList<ChoiceItem<T>>();
+        for (T object : objects) {
+            choices.add(new ChoiceItem<T>(object));
+        }
+        return showChoiceDialog(tile,
+                                Messages.message(text),
+                                Messages.message(cancelText),
+                                choices);
     }
 
     /**
      * Checks if the <code>ClientOptionsDialog</code> is visible.
-     * 
+     *
      * @return <code>true</code> if no internal frames are open.
      */
     public boolean isClientOptionsDialogShowing() {
@@ -725,7 +747,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Checks if mapboard actions should be enabled.
-     * 
+     *
      * @return <code>true</code> if no internal frames are open.
      */
     public boolean isMapboardActionsEnabled() {
@@ -737,7 +759,7 @@ public final class Canvas extends JDesktopPane {
      * <p>
      * Note that the previous implementation could throw exceptions
      * in some cases, thus the change.
-     * 
+     *
      * @return <code>true</code> if the <code>Canvas</code> is displaying an
      *         internal frame.
      */
@@ -767,393 +789,8 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a dialog for setting game options.
-     * 
-     * @return <code>true</code> if the game options have been modified, and
-     *         <code>false</code> otherwise.
-     */
-
-    /**
-     * Gets the <code>LoadingSavegameDialog</code>.
-     * 
-     * @return The <code>LoadingSavegameDialog</code>.
-     */
-    public LoadingSavegameDialog getLoadingSavegameDialog() {
-        return loadingSavegameDialog;
-    }
-
-    /**
-     * Displays a dialog for setting options when loading a savegame. The
-     * settings can be retrieved directly from {@link LoadingSavegameDialog}
-     * after calling this method.
-     * 
-     * @param publicServer Default value.
-     * @param singleplayer Default value.
-     * @return <code>true</code> if the "ok"-button was pressed and
-     *         <code>false</code> otherwise.
-     */
-    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
-        loadingSavegameDialog.initialize(publicServer, singleplayer);
-        return showFreeColDialog(loadingSavegameDialog);
-    }
-
-    /**
-     * Displays a dialog for setting client options.
-     * 
-     * @return <code>true</code> if the client options have been modified, and
-     *         <code>false</code> otherwise.
-     */
-    public boolean showClientOptionsDialog() {
-        clientOptionsDialog.initialize();
-        clientOptionsDialogShowing = true;
-        boolean r = showFreeColDialog(clientOptionsDialog);
-        clientOptionsDialogShowing = false;
-        freeColClient.getActionManager().update();
-        return r;
-    }
-
-    /**
-     * Displays a dialog for setting the map generator options.
-     * 
-     * @param editable The options are only allowed to be changed if this
-     *            variable is <code>true</code>.
-     * @return <code>true</code> if the options have been modified, and
-     *         <code>false</code> otherwise.
-     */
-    public boolean showMapGeneratorOptionsDialog(boolean editable) {
-        final MapGeneratorOptions mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
-        return showMapGeneratorOptionsDialog(editable, mgo);
-    }
-    
-    /**
-     * Displays a dialog for setting the map generator options.
-     * 
-     * @param editable The options are only allowed to be changed if this
-     *            variable is <code>true</code>.
-     * @return <code>true</code> if the options have been modified, and
-     *         <code>false</code> otherwise.
-     */
-    public boolean showMapGeneratorOptionsDialog(boolean editable, MapGeneratorOptions mgo) {
-        MapGeneratorOptionsDialog mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this);
-        mapGeneratorOptionsDialog.initialize(editable, mgo);
-        return showFreeColDialog(mapGeneratorOptionsDialog);
-    }
-
-    /**
-     * Displays a dialog where the user may choose a file. This is the same as
-     * calling:
-     * 
-     * <br>
-     * <br>
-     * <code>
-     * showLoadDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()});
-     * </code>
-     * 
-     * @param directory The directory containing the files.
-     * @return The <code>File</code>.
-     * @see FreeColDialog
-     */
-    public File showLoadDialog(File directory) {
-        return showLoadDialog(directory, new FileFilter[] { FreeColDialog.getFSGFileFilter() });
-    }
-
-    /**
-     * Displays a dialog where the user may choose a file.
-     * 
-     * @param directory The directory containing the files.
-     * @param fileFilters The file filters which the user can select in the
-     *            dialog.
-     * @return The <code>File</code>.
-     * @see FreeColDialog
-     */
-    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
-        FreeColDialog<File> loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
-
-        File response = null;
-        showSubPanel(loadDialog);
-        for (;;) {
-            response = (File) loadDialog.getResponse();
-            if (response != null && response.isFile()) break;
-            errorMessage("noSuchFile");
-        }
-        remove(loadDialog);
-
-        return response;
-    }
-
-    /**
-     * Displays a dialog where the user may choose a filename. This is the same
-     * as calling:
-     * 
-     * <br>
-     * <br>
-     * <code>
-     * showSaveDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()}, defaultName);
-     * </code>
-     * 
-     * @param directory The directory containing the files in which the user may
-     *            overwrite.
-     * @param defaultName Default filename for the savegame.
-     * @return The <code>File</code>.
-     * @see FreeColDialog
-     */
-    public File showSaveDialog(File directory, String defaultName) {
-        return showSaveDialog(directory, ".fsg", new FileFilter[] { FreeColDialog.getFSGFileFilter() }, defaultName);
-    }
-
-    /**
-     * Displays a dialog where the user may choose a filename.
-     * 
-     * @param directory The directory containing the files in which the user may
-     *            overwrite.
-     * @param standardName This extension will be added to the specified
-     *            filename (if not added by the user).
-     * @param fileFilters The available file filters in the dialog.
-     * @param defaultName Default filename for the savegame.
-     * @return The <code>File</code>.
-     * @see FreeColDialog
-     */
-    public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
-        FreeColDialog<File> saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters, defaultName);
-        return showFreeColDialog(saveDialog);
-    }
-
-    /**
-     * Displays a dialog that asks the user whether to pay arrears for
-     * boycotted goods or to dump them instead.
-     *
-     * @param goods a <code>Goods</code> value
-     * @param europe an <code>Europe</code> value
-     * @return a <code>boolean</code> value
-     */
-    public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
-        int arrears = europe.getOwner().getArrears(goods.getType());
-        List<ChoiceItem<BoycottAction>> choices = new ArrayList<ChoiceItem<BoycottAction>>();
-        choices.add(new ChoiceItem<BoycottAction>(Messages.message("boycottedGoods.payArrears"),
-                                                  BoycottAction.PAY_ARREARS));
-        choices.add(new ChoiceItem<BoycottAction>(Messages.message("boycottedGoods.dumpGoods"),
-                                                  BoycottAction.DUMP_CARGO));
-        choices.add(new ChoiceItem<BoycottAction>(Messages.message("cancel"),
-                                                  BoycottAction.CANCEL));
-        FreeColDialog<ChoiceItem<BoycottAction>> boycottedGoodsDialog = FreeColDialog
-            .createChoiceDialog(Messages.message("boycottedGoods.text", 
-                                                 "%goods%", goods.getName(), 
-                                                 "%europe%", europe.getName(),
-                                                 "%amount%", String.valueOf(arrears)),
-                                null, choices);
-        return showFreeColDialog(boycottedGoodsDialog).getObject();
-    }
-
-    /**
-     * Displays a dialog that asks the user what he wants to do with his scout
-     * in the indian settlement.
-     * 
-     * @param settlement The indian settlement that is being scouted.
-     * 
-     * @return ScoutAction.CANCEL if the action was cancelled,
-     *         ScoutAction.INDIAN_SETTLEMENT_SPEAK if he wants to
-     *         speak with the chief,
-     *         ScoutAction.INDIAN_SETTLEMENT_TRIBUTE if he wants to
-     *         demand tribute, ScoutAction.INDIAN_SETTLEMENT_ATTACK if
-     *         he wants to attack the settlement.
-     */
-    public ScoutAction showScoutIndianSettlementDialog(IndianSettlement settlement) {
-        StringBuilder text = new StringBuilder(400);
-        text.append(Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
-                                     "%nation%", settlement.getOwner().getNationAsString()));
-        text.append("\n\n");
-        int number = settlement.getOwner().getNumberOfSettlements();
-        text.append(Messages.message("scoutSettlement.greetings",
-                                     "%nation%", settlement.getOwner().getNationAsString(),
-                                     "%settlement%", settlement.getName(),
-                                     "%number%", String.valueOf(number)));
-        text.append(" ");
-        if (settlement.getLearnableSkill() != null) {
-            text.append(Messages.message("scoutSettlement.skill", "%skill%",
-                                         settlement.getLearnableSkill().getName()));
-            text.append(" ");
-        }
-        GoodsType[] wantedGoods = settlement.getWantedGoods();
-        if (wantedGoods[0] != null) {
-            text.append(Messages.message("scoutSettlement.trade",
-                                         "%goods1%", wantedGoods[0].getName(),
-                                         "%goods2%", wantedGoods[1].getName(),
-                                         "%goods3%", wantedGoods[2].getName()));
-            text.append("\n\n");
-        }
-
-        List<ChoiceItem<ScoutAction>> choices = new ArrayList<ChoiceItem<ScoutAction>>();
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.speak"),
-                                                ScoutAction.INDIAN_SETTLEMENT_SPEAK));
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.tribute"),
-                                                ScoutAction.INDIAN_SETTLEMENT_TRIBUTE));
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.attack"),
-                                                ScoutAction.INDIAN_SETTLEMENT_ATTACK));
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("cancel"),
-                                                ScoutAction.CANCEL));    
-        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog
-            = FreeColDialog.createChoiceDialog(text.toString(), null, choices);
-        return showFreeColDialog(scoutDialog, settlement.getTile()).getObject();
-    }
-
-    /**
-     * Displays a dialog that asks the user what he wants to do with his scout
-     * in the foreign colony.
-     * 
-     * @param colony The foreign colony that is being scouted.
-     * 
-     * @return ScoutAction.CANCEL if the action was cancelled,
-     *         ScoutAction.FOREIGN_COLONY_NEGOTIATE if he wants to
-     *         negotiate with the foreign power,
-     *         ScoutAction.FOREIGN_COLONY_SPY if he wants to spy the
-     *         colony, ScoutAction.FOREIGN_COLONY_ATTACK if he wants
-     *         to attack the colony.
-     */
-    public ScoutAction showScoutForeignColonyDialog(Colony colony, Unit unit) {
-        String mainText = Messages.message("scoutColony.text", 
-                                           "%unit%", unit.getName(), 
-                                           "%colony%", colony.getName());
-        List<ChoiceItem<ScoutAction>> choices = new ArrayList<ChoiceItem<ScoutAction>>();
-        
-        // We cannot negotiate with the REF
-        boolean isPlayersREF = colony.getOwner() == unit.getOwner().getREFPlayer();
-        if(!isPlayersREF){
-            choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.negotiate"), 
-                                                ScoutAction.FOREIGN_COLONY_NEGOTIATE));
-        }
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.spy"),
-                                                ScoutAction.FOREIGN_COLONY_SPY));
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutColony.attack"),
-                                                ScoutAction.FOREIGN_COLONY_ATTACK));
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("cancel"),
-                                                ScoutAction.CANCEL));
-        FreeColDialog<ChoiceItem<ScoutAction>> scoutDialog =
-            FreeColDialog.createChoiceDialog(mainText, null, choices);
-        return showFreeColDialog(scoutDialog, colony.getTile()).getObject();
-    }
-
-    /**
-     * Displays a dialog that asks the user what he wants to do with his armed
-     * unit in the indian settlement.
-     * 
-     * @param settlement The indian settlement that is going to be attacked or
-     *            demanded.
-     * 
-     * @return ScoutAction.CANCEL if the action was
-     *         cancelled, ScoutAction.INDIAN_SETTLEMENT_TRIBUTE if he
-     *         wants to demand tribute,
-     *         ScoutAction.INDIAN_SETTLEMENT_ATTACK if he wants to
-     *         attack the settlement.
-     */
-    public ScoutAction showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
-        String introText = Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
-                "%nation%", settlement.getOwner().getNationAsString());
-
-        List<ChoiceItem<ScoutAction>> choices = new ArrayList<ChoiceItem<ScoutAction>>();
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.tribute"),
-                                                ScoutAction.INDIAN_SETTLEMENT_TRIBUTE));
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("scoutSettlement.attack"),
-                                                ScoutAction.INDIAN_SETTLEMENT_ATTACK));
-        choices.add(new ChoiceItem<ScoutAction>(Messages.message("cancel"),
-                                                ScoutAction.CANCEL));
-        FreeColDialog<ChoiceItem<ScoutAction>> armedUnitDialog =
-            FreeColDialog.createChoiceDialog(introText, null, choices);
-        return showFreeColDialog(armedUnitDialog, settlement.getTile()).getObject();
-    }
-
-    /**
-     * Displays a dialog that asks the user what he wants to do with his
-     * missionary in the indian settlement.
-     * 
-     * @param settlement The indian settlement that is being visited.
-     * 
-     * @return ArrayList with an Integer and optionally a Player referencing the
-     *         player to attack in case of "incite indians". Integer can be any
-     *         of: FreeColDialog.MISSIONARY_ESTABLISH if he wants to establish a
-     *         mission, FreeColDialog.MISSIONARY_DENOUNCE_AS_HERESY if he wants
-     *         to denounce the existing (foreign) mission as heresy,
-     *         FreeColDialog.MISSIONARY_INCITE_INDIANS if he wants to incite the
-     *         indians (requests their support for war against another European
-     *         power), FreeColDialog.MISSIONARY_CANCEL if the action was
-     *         cancelled.
-     */
-    public List<Object> showUseMissionaryDialog(IndianSettlement settlement) {
-        Player player = freeColClient.getMyPlayer();
-        Unit missionary = settlement.getMissionary();
-        StringBuilder introText
-            = new StringBuilder(Messages.message(settlement.getAlarmLevelMessage(player),
-                                                 "%nation%", settlement.getOwner().getNationAsString()));
-        introText.append("\n\n");
-        introText.append(Messages.message("missionarySettlement.question",
-                                          "%settlement%", settlement.getName()));
-
-        List<ChoiceItem<MissionaryAction>> choices = new ArrayList<ChoiceItem<MissionaryAction>>();
-        if (missionary == null) {
-            choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.establish"),
-                                                         MissionaryAction.ESTABLISH_MISSION));
-        }
-        if (missionary != null && missionary.getOwner() != player) {
-            choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.heresy"),
-                                                         MissionaryAction.DENOUNCE_HERESY));
-        }
-        choices.add(new ChoiceItem<MissionaryAction>(Messages.message("missionarySettlement.incite"),
-                                                     MissionaryAction.INCITE_INDIANS));
-        choices.add(new ChoiceItem<MissionaryAction>(Messages.message("cancel"),
-                                                     MissionaryAction.CANCEL));
-        FreeColDialog<ChoiceItem<MissionaryAction>> missionaryDialog
-            = FreeColDialog.createChoiceDialog(introText.toString(), null, choices);
-        MissionaryAction response = showFreeColDialog(missionaryDialog, settlement.getTile()).getObject();
-        ArrayList<Object> returnValue = new ArrayList<Object>();
-        // TODO: Find a solution so that we can use a more specialized list.
-        returnValue.add(response);
-
-        if (MissionaryAction.INCITE_INDIANS.equals(response)) {
-            List<Player> enemies = new ArrayList<Player>(freeColClient.getGame().getEuropeanPlayers());
-            enemies.remove(freeColClient.getMyPlayer());
-            List<ChoiceItem<Player>> enemyChoices = new ArrayList<ChoiceItem<Player>>();
-            for (Player enemy : enemies) {
-                enemyChoices.add(new ChoiceItem<Player>(enemy.getNationAsString(), enemy));
-            }
-            Player enemy = showChoiceDialog(Messages.message("missionarySettlement.inciteQuestion"),
-                                            Messages.message("missionarySettlement.cancel"),
-                                            enemyChoices);
-            if (enemy == null) {
-                returnValue.clear();
-                returnValue.add(MissionaryAction.CANCEL);
-            } else {
-                returnValue.add(enemy);
-            }
-
-        }
-
-        return returnValue;
-    }
-
-    /**
-     * Displays a yes/no question to the user asking if he wants to pay the
-     * given amount to an indian tribe in order to have them declare war on the
-     * given player.
-     * 
-     * @param enemy The european player to attack.
-     * @param amount The amount of gold to pay.
-     * @param tile A tile to make visible (not under the dialog).
-     * 
-     * @return true if the players wants to pay, false otherwise.
-     */
-    public boolean showInciteDialog(Player enemy, int amount, Tile tile) {
-        String text = Messages.message("missionarySettlement.inciteConfirm",
-                                       "%player%", enemy.getName(),
-                                       "%amount%", String.valueOf(amount));
-        FreeColDialog<Boolean> confirmDialog
-            = FreeColDialog.createConfirmDialog(text,
-                                                Messages.message("yes"),
-                                                Messages.message("no"));
-        return showFreeColDialog(confirmDialog, tile);
-    }
-
-    /**
      * Displays a dialog with a text field and a ok/cancel option.
-     * 
+     *
      * @param text The text that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okText The text displayed on the "ok"-button.
@@ -1170,7 +807,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays a dialog with a text field and a ok/cancel option.
-     * 
+     *
      * @param text The text that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okText The text displayed on the "ok"-button.
@@ -1223,208 +860,8 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Displays a dialog with a text and a cancel-button, in addition to buttons
-     * for each of the objects returned for the given <code>Iterator</code>.
-     * 
-     * @param text The text that explains the choice for the user.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @param choices The <code>List</code> containing the ChoiceItems to
-     *            create buttons for.
-     * @return The chosen object, or <i>null</i> for the cancel-button.
-     */
-    public <T> T showChoiceDialog(String text, String cancelText, List<ChoiceItem<T>> choices) {
-
-        FreeColDialog<ChoiceItem<T>> choiceDialog = FreeColDialog.createChoiceDialog(text, cancelText, choices);
-        if (choiceDialog.getHeight() > getHeight() / 3) {
-            choiceDialog.setSize(choiceDialog.getWidth(), (getHeight() * 2) / 3);
-        }
-        ChoiceItem<T> response = showFreeColDialog(choiceDialog);
-        return (response == null) ? null : response.getObject();
-    }
-
-    /**
-     * Displays a dialog with a text and a cancel-button, in addition to buttons
-     * for each of the objects in the array.
-     * 
-     * @param text The text that explains the choice for the user.
-     * @param cancelText The text displayed on the "cancel"-button.
-     * @param objects The List containing the objects to create buttons for.
-     * @return The chosen object, or <i>null</i> for the cancel-button.
-     */
-    public <T> T showSimpleChoiceDialog(String text, String cancelText, List<T> objects) {
-
-        List<ChoiceItem<T>> choices = new ArrayList<ChoiceItem<T>>();
-        for (T object : objects) {
-            choices.add(new ChoiceItem<T>(object));
-        }
-
-        return showChoiceDialog(text, cancelText, choices);
-    }
-
-    /**
-     * Shows a status message that cannot be dismissed. The panel will be
-     * removed when another component is added to this <code>Canvas</code>.
-     * This includes all the <code>showXXX</code>-methods. In addition,
-     * {@link #closeStatusPanel()} also removes this panel.
-     * 
-     * @param message The text message to display on the status panel.
-     * @see StatusPanel
-     */
-    public void showStatusPanel(String message) {
-        statusPanel.setStatusMessage(message);
-        addCentered(statusPanel, STATUS_LAYER);
-    }
-
-    /**
-     * Closes the <code>StatusPanel</code>.
-     * 
-     * @see #showStatusPanel
-     */
-    public void closeStatusPanel() {
-        if (statusPanel.isVisible()) {
-            remove(statusPanel);
-        }
-    }
-
-    /**
-     * Displays the <code>EuropePanel</code>.
-     * 
-     * @see EuropePanel
-     */
-    public void showEuropePanel() {
-        closeMenus();
-
-        if (freeColClient.getGame() == null) {
-            errorMessage("europe.noGame");
-        } else {
-            europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
-            JInternalFrame f = addAsSimpleFrame(europePanel);
-            f.setBorder(null);
-            f.setSize(getWidth(), getHeight());
-            f.setLocation(0, 0);
-            f.moveToBack();
-        }
-    }
-
-    /**
-     * Displays one of the Europe Dialogs for Recruit, Purchase, Train.
-     * Closes any currently open Dialogs. 
-     * Does not return from this method before the panel is closed.
-     *    
-     * @param europeAction the type of panel to display
-     * @return <code>FreeColDialog.getResponseInt</code>.
-     */
-    public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
-        // Close any open Europe Dialog (Recruit, Purchase, Train)       
-        try {
-            if (europeOpenDialog != null) {
-                europeOpenDialog.setResponse(new Integer(-1));
-            }
-        } catch (NumberFormatException e) {
-            logger.warning("Canvas.showEuropeDialog: Invalid europeDialogType");
-        }
-        
-        FreeColDialog<Integer> localDialog = null;
-
-        // Open new Dialog
-        switch (europeAction) {
-        case EXIT:
-        case UNLOAD:
-        case SAIL:
-            return -1;
-        case RECRUIT:
-            localDialog = new RecruitDialog(this);
-            break;
-        case PURCHASE:
-        case TRAIN:
-            localDialog = new TrainDialog(this, europeAction);
-            break;
-        }
-        localDialog.initialize();
-        europeOpenDialog = localDialog; // Set the open dialog to the class variable
-        
-        int response = showFreeColDialog(localDialog);
-
-        if (europeOpenDialog == localDialog) {
-            europeOpenDialog = null;    // Clear class variable when it's closed
-        }
-        
-        return response;
-    }
-
-    /**
-     * Displays the colony panel of the given <code>Colony</code>.
-     * 
-     * @param colony The colony whose panel needs to be displayed.
-     * @see ColonyPanel
-     */
-    public void showColonyPanel(Colony colony) {
-        ColonyPanel panel = new ColonyPanel(this, colony);
-        showSubPanel(panel, getPopupPosition(colony.getTile()));
-    }
-
-    /**
-     * Displays the panel of the given native settlement.
-     *
-     * @param indianSettlement The <code>IndianSettlement</code> to display.
-     */
-    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
-        IndianSettlementPanel panel
-            = new IndianSettlementPanel(this, indianSettlement);
-        showSubPanel(panel, getPopupPosition(indianSettlement.getTile()));
-    }
-
-    /**
-     * Displays the panel for trading with an <code>IndianSettlement</code>.
-     * 
-     * @param settlement The native settlement to trade with.
-     * @param showBuy Show a "buy" option.
-     * @param showSell Show a "sell" option.
-     * @param showGift Show a "gift" option.
-     */
-    public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
-                                                       boolean showBuy, boolean showSell, boolean showGift) {
-        ArrayList<ChoiceItem<TradeAction>> choices = new ArrayList<ChoiceItem<TradeAction>>();
-        if (showBuy){
-            choices.add(new ChoiceItem<TradeAction>(Messages.message("tradeProposition.toBuy"),
-                                                    TradeAction.BUY));
-        }
-        if (showSell){
-            choices.add(new ChoiceItem<TradeAction>(Messages.message("tradeProposition.toSell"),
-                                                    TradeAction.SELL));
-        }
-        if (showGift){
-            choices.add(new ChoiceItem<TradeAction>(Messages.message("tradeProposition.toGift"),
-                                                    TradeAction.GIFT));
-        }
-        
-        String prompt = Messages.message("tradeProposition.welcome",
-                                         "%nation%", settlement.getOwner().getNationAsString(),
-                                         "%settlement%", settlement.getName()); 
-        TradeAction choice = showChoiceDialog(prompt,
-                                              Messages.message("tradeProposition.cancel"), 
-                                              choices);
-        
-        return choice;
-    }
-
-    /**
-     * Shows the panel that allows the user to choose which unit will emigrate
-     * from Europe. This method may only be called if the user has William
-     * Brewster in congress.
-     * 
-     * @param fountainOfYouth a <code>boolean</code> value
-     * @return The emigrant that was chosen by the user.
-     */
-    public int showEmigrationPanel(boolean fountainOfYouth) {
-        EmigrationPanel emigrationPanel = new EmigrationPanel(this);
-        emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope(), fountainOfYouth);
-        return showFreeColDialog(emigrationPanel);
-    }
-
-    /**
      * Removes the given component from this Container.
-     * 
+     *
      * @param comp The component to remove from this Container.
      */
     @Override
@@ -1434,7 +871,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Gets the internal frame for the given component.
-     * 
+     *
      * @param c The component.
      * @return The given component if this is an internal frame or the first
      *         parent that is an internal frame. Returns <code>null</code> if
@@ -1451,7 +888,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Removes the given component from this Container.
-     * 
+     *
      * @param comp The component to remove from this Container.
      * @param update The <code>Canvas</code> will be enabled, the graphics
      *            repainted and both the menubar and the actions will be updated
@@ -1487,7 +924,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Adds a component to this Canvas.
-     * 
+     *
      * @param comp The component to add
      * @return The component argument.
      */
@@ -1500,7 +937,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component centered on this Canvas. Removes the statuspanel if
      * visible (and <code>comp != statusPanel</code>).
-     * 
+     *
      * @param comp The component to add
      * @return The component argument.
      */
@@ -1512,35 +949,35 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component centered on this Canvas inside a frame. Removes the
      * statuspanel if visible (and <code>comp != statusPanel</code>).
-     * 
+     *
      * @param comp The component to add to this JInternalFrame.
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     public JInternalFrame addAsFrame(JComponent comp) {
         return addAsFrame(comp, false);
     }
-    
+
     /**
      * Adds a component centered on this Canvas inside a frame.
      * The frame is considered as a tool box (not counted as a frame
      * by the methods deciding if a panel is being displayed).
-     * 
+     *
      * <br><br>
-     * 
+     *
      * Removes the statuspanel if visible (and
      * <code>comp != statusPanel</code>).
-     * 
+     *
      * @param comp The component to add to this JInternalFrame.
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     public JInternalFrame addAsToolBox(JComponent comp) {
         return addAsFrame(comp, true);
     }
-    
+
     /**
      * Adds a component centered on this Canvas inside a frame. Removes the
      * statuspanel if visible (and <code>comp != statusPanel</code>).
-     * 
+     *
      * @param comp The component to add to this ToEuropePanel.
      * @param toolBox Should be set to true if the resulting frame
      *      is used as a toolbox (that is: it should not be counted
@@ -1554,7 +991,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component on this Canvas inside a frame. Removes the
      * statuspanel if visible (and <code>comp != statusPanel</code>).
-     * 
+     *
      * @param comp The component to add to this ToEuropePanel.
      * @param toolBox Should be set to true if the resulting frame
      *      is used as a toolbox (that is: it should not be counted
@@ -1641,16 +1078,16 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component centered on this Canvas inside a frame. Removes the
      * statuspanel if visible (and <code>comp != statusPanel</code>).
-     * 
+     *
      * The frame cannot be moved or resized.
-     * 
+     *
      * @param comp The component to add to this ToEuropePanel.
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     public JInternalFrame addAsSimpleFrame(JComponent comp) {
         final JInternalFrame f = new JInternalFrame();
         JScrollPane scrollPane =
-            new JScrollPane(comp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, 
+            new JScrollPane(comp, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         f.getContentPane().add(scrollPane);
         f.pack();
@@ -1675,7 +1112,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Removes the mouse listeners for moving the frame of the given component.
-     * 
+     *
      * @param c The component the listeners should be removed from.
      */
     public void deactivateMovable(JComponent c) {
@@ -1694,7 +1131,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component centered on this Canvas. Removes the statuspanel if
      * visible (and <code>comp != statusPanel</code>).
-     * 
+     *
      * @param comp The component to add to this ToEuropePanel.
      * @param i The layer to add the component to (see JLayeredPane).
      */
@@ -1708,7 +1145,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component to this Canvas. Removes the statuspanel if visible (and
      * <code>comp != statusPanel</code>).
-     * 
+     *
      * @param comp The component to add to this ToEuropePanel.
      * @param i The layer to add the component to (see JLayeredPane).
      */
@@ -1719,12 +1156,12 @@ public final class Canvas extends JDesktopPane {
     /**
      * Adds a component to this Canvas. Removes the statuspanel if visible (and
      * <code>comp != statusPanel</code>).
-     * 
+     *
      * @param comp The component to add to this ToEuropePanel.
      * @param i The layer to add the component to (see JLayeredPane).
      */
     public void add(Component comp, Integer i, boolean update) {
-        
+
         if (comp != statusPanel && !(comp instanceof JMenuItem) && !(comp instanceof FreeColDialog)
                 && statusPanel.isVisible()) {
             remove(statusPanel, false);
@@ -1758,7 +1195,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Gets the <code>EuropePanel</code>.
-     * 
+     *
      * @return The <code>EuropePanel</code>.
      */
     public EuropePanel getEuropePanel() {
@@ -1776,7 +1213,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows the given popup at the given position on the screen.
-     * 
+     *
      * @param popup The JPopupMenu to show.
      * @param x The x-coordinate at which to show the popup.
      * @param y The y-coordinate at which to show the popup.
@@ -1789,7 +1226,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows a tile popup.
-     * 
+     *
      * @param pos The coordinates of the Tile where the popup occurred.
      * @param x The x-coordinate on the screen where the popup needs to be
      *            placed.
@@ -1814,7 +1251,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays an error message.
-     * 
+     *
      * @param messageID The i18n-keyname of the error message to display.
      */
     public void errorMessage(String messageID) {
@@ -1823,7 +1260,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays an error message.
-     * 
+     *
      * @param messageID The i18n-keyname of the error message to display.
      * @param message An alternative message to display if the resource specified
      *            by <code>messageID</code> is unavailable.
@@ -1844,16 +1281,16 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows a message with some information and an "OK"-button.
-     * 
+     *
      * @param messageId The messageId of the message to display.
      */
     public void showInformationMessage(String messageId) {
         showInformationMessage(messageId, null, new String[0]);
     }
-    
+
     /**
      * Shows a message with some information and an "OK"-button.
-     * 
+     *
      * @param messageId The messageId of the message to display.
      * @param displayObject Optional object for displaying an icon
      */
@@ -1861,15 +1298,15 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(messageId, displayObject, new String[0]);
     }
 
-    
+
     /**
      * Shows a message with some information and an "OK"-button.
-     * 
+     *
      * <br>
      * <br>
      * <b>Example:</b> <br>
      * <code>canvas.showInformationMessage("noNeedForTheGoods", "%goods%", goods.getName());</code>
-     * 
+     *
      * @param messageId The messageId of the message to display.
      * @param replace All occurrences of <code>replace[2x]</code> in the
      *            message gets replaced by <code>replace[2x+1]</code>.
@@ -1877,7 +1314,7 @@ public final class Canvas extends JDesktopPane {
     public void showInformationMessage(String messageId, String... replace) {
         showInformationMessage(messageId, null, replace);
     }
-    
+
     /**
      * Shows a message with some information and an "OK"-button.
      *
@@ -1923,7 +1360,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Refreshes the screen at the specified Tile.
-     * 
+     *
      * @param x The x-coordinate of the Tile to refresh.
      * @param y The y-coordinate of the Tile to refresh.
      */
@@ -1935,7 +1372,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Refreshes the screen at the specified Tile.
-     * 
+     *
      * @param t The tile to refresh.
      */
     public void refreshTile(Tile t) {
@@ -1944,7 +1381,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Refreshes the screen at the specified Tile.
-     * 
+     *
      * @param p The position of the tile to refresh.
      */
     public void refreshTile(Position p) {
@@ -1962,7 +1399,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Shows the <code>MainPanel</code>.
-     * 
+     *
      * @see MainPanel
      */
     public void showMainPanel() {
@@ -1971,59 +1408,10 @@ public final class Canvas extends JDesktopPane {
         addCentered(mainPanel, MAIN_LAYER);
         mainPanel.requestFocus();
     }
-    
-    /**
-     * Shows the <code>VideoPanel</code>.
-     */
-    public void showOpeningVideoPanel() {
-        closeMenus();
-        final Video video = ResourceManager.getVideo("Opening.video");
-        boolean muteAudio = !getClient().canPlayMusic();
-        final VideoComponent vp = new VideoComponent(video, muteAudio);
-        addCentered(vp, MAIN_LAYER);
-        vp.play();
-        
-        final class AbortListener implements KeyListener, MouseListener, VideoListener {
-            public void stopped() {
-                execute();
-            }
-            
-            public void keyPressed(KeyEvent e) {
-                execute();
-            }
-
-            public void mouseClicked(MouseEvent e) {
-                execute();
-            }
-            
-            private void execute() {
-                removeKeyListener(this);
-                removeMouseListener(this);
-                vp.removeMouseListener(this);
-                vp.removeVideoListener(this);
-                vp.stop();
-                Canvas.this.remove(vp);
-                showMainPanel();
-                freeColClient.playMusic("intro");
-            }
-
-            public void keyReleased(KeyEvent e) {}
-            public void keyTyped(KeyEvent e) {}
-            public void mouseEntered(MouseEvent e) {}
-            public void mouseExited(MouseEvent e) {}
-            public void mousePressed(MouseEvent e) {}
-            public void mouseReleased(MouseEvent e) {}
-        };
-        final AbortListener l = new AbortListener();
-        addMouseListener(l);
-        addKeyListener(l);
-        vp.addMouseListener(l);
-        vp.addVideoListener(l);
-    }
 
     /**
      * Gets the <code>MainPanel</code>.
-     * 
+     *
      * @return The <code>MainPanel</code>.
      * @see MainPanel
      */
@@ -2047,7 +1435,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Gets the <code>StartGamePanel</code> that lies in this container.
-     * 
+     *
      * @return The <code>StartGamePanel</code>.
      * @see StartGamePanel
      */
@@ -2057,7 +1445,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Tells the map controls that a chat message was received.
-     * 
+     *
      * @param sender The player who sent the chat message to the server.
      * @param message The chat message.
      * @param privateChat 'true' if the message is a private one, 'false'
@@ -2070,7 +1458,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Displays a chat message originating from this client.
-     * 
+     *
      * @param message The chat message.
      */
     public void displayChatMessage(String message) {
@@ -2136,7 +1524,7 @@ public final class Canvas extends JDesktopPane {
         for (int i = 0; i < mouseMotionListeners.length; ++i) {
             removeMouseMotionListener(mouseMotionListeners[i]);
         }
-        
+
         // change to default view mode
         // Must be done before removing jMenuBar to prevent exception (crash)
         getGUI().getViewMode().changeViewMode(ViewMode.MOVE_UNITS_MODE);
@@ -2144,12 +1532,12 @@ public final class Canvas extends JDesktopPane {
         for (Component c : getComponents()) {
             remove(c, false);
         }
-        
+
     }
 
     /**
      * Checks if this <code>Canvas</code> contains any ingame components.
-     * 
+     *
      * @return <code>true</code> if there is a single ingame component.
      */
     public boolean containsInGameComponents() {
@@ -2173,7 +1561,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Returns this <code>Canvas</code>'s <code>GUI</code>.
-     * 
+     *
      * @return The <code>GUI</code>.
      */
     public GUI getGUI() {
@@ -2182,7 +1570,7 @@ public final class Canvas extends JDesktopPane {
 
     /**
      * Returns the freeColClient.
-     * 
+     *
      * @return The <code>freeColClient</code> associated with this
      *         <code>Canvas</code>.
      */
@@ -2204,6 +1592,778 @@ public final class Canvas extends JDesktopPane {
         removeInGameComponents();
         showPanel(new NewPanel(this));
     }
+
+
+    // A variety of special purpose panels/dialogs follow
+
+    /**
+     * Displays the <code>StartGamePanel</code>.
+     *
+     * @param game The <code>Game</code> that is about to start.
+     * @param player The <code>Player</code> using this client.
+     * @param singlePlayerMode 'true' if the user wants to start a single player
+     *            game, 'false' otherwise.
+     * @see StartGamePanel
+     */
+    public void showStartGamePanel(Game game, Player player, boolean singlePlayerMode) {
+        closeMenus();
+
+        if (game != null && player != null) {
+            startGamePanel.initialize(singlePlayerMode);
+            showSubPanel(startGamePanel);
+        } else {
+            logger.warning("Tried to open 'StartGamePanel' without having 'game' and/or 'player' set.");
+        }
+    }
+
+    /**
+     * Displays the <code>ServerListPanel</code>.
+     *
+     * @param username The username that should be used when connecting to one
+     *            of the servers on the list.
+     * @param serverList The list containing the servers retrieved from the
+     *            metaserver.
+     * @see ServerListPanel
+     */
+    public void showServerListPanel(String username, ArrayList<ServerInfo> serverList) {
+        closeMenus();
+
+        serverListPanel.initialize(username, serverList);
+        showSubPanel(serverListPanel);
+    }
+
+    /**
+     * Gets the <code>LoadingSavegameDialog</code>.
+     *
+     * @return The <code>LoadingSavegameDialog</code>.
+     */
+    public LoadingSavegameDialog getLoadingSavegameDialog() {
+        return loadingSavegameDialog;
+    }
+
+    /**
+     * Displays a dialog for setting options when loading a savegame. The
+     * settings can be retrieved directly from {@link LoadingSavegameDialog}
+     * after calling this method.
+     *
+     * @param publicServer Default value.
+     * @param singleplayer Default value.
+     * @return <code>true</code> if the "ok"-button was pressed and
+     *         <code>false</code> otherwise.
+     */
+    public boolean showLoadingSavegameDialog(boolean publicServer, boolean singleplayer) {
+        loadingSavegameDialog.initialize(publicServer, singleplayer);
+        return showFreeColDialog(loadingSavegameDialog);
+    }
+
+    /**
+     * Displays a dialog for setting client options.
+     *
+     * @return <code>true</code> if the client options have been modified, and
+     *         <code>false</code> otherwise.
+     */
+    public boolean showClientOptionsDialog() {
+        clientOptionsDialog.initialize();
+        clientOptionsDialogShowing = true;
+        boolean r = showFreeColDialog(clientOptionsDialog);
+        clientOptionsDialogShowing = false;
+        freeColClient.getActionManager().update();
+        return r;
+    }
+
+    /**
+     * Displays a dialog for setting the map generator options.
+     *
+     * @param editable The options are only allowed to be changed if this
+     *            variable is <code>true</code>.
+     * @return <code>true</code> if the options have been modified, and
+     *         <code>false</code> otherwise.
+     */
+    public boolean showMapGeneratorOptionsDialog(boolean editable) {
+        final MapGeneratorOptions mgo = freeColClient.getPreGameController().getMapGeneratorOptions();
+        return showMapGeneratorOptionsDialog(editable, mgo);
+    }
+
+    /**
+     * Displays a dialog for setting the map generator options.
+     *
+     * @param editable The options are only allowed to be changed if this
+     *            variable is <code>true</code>.
+     * @return <code>true</code> if the options have been modified, and
+     *         <code>false</code> otherwise.
+     */
+    public boolean showMapGeneratorOptionsDialog(boolean editable, MapGeneratorOptions mgo) {
+        MapGeneratorOptionsDialog mapGeneratorOptionsDialog = new MapGeneratorOptionsDialog(this);
+        mapGeneratorOptionsDialog.initialize(editable, mgo);
+        return showFreeColDialog(mapGeneratorOptionsDialog);
+    }
+
+    /**
+     * Displays a dialog where the user may choose a file. This is the same as
+     * calling:
+     *
+     * <br>
+     * <br>
+     * <code>
+     * showLoadDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()});
+     * </code>
+     *
+     * @param directory The directory containing the files.
+     * @return The <code>File</code>.
+     * @see FreeColDialog
+     */
+    public File showLoadDialog(File directory) {
+        return showLoadDialog(directory, new FileFilter[] { FreeColDialog.getFSGFileFilter() });
+    }
+
+    /**
+     * Displays a dialog where the user may choose a file.
+     *
+     * @param directory The directory containing the files.
+     * @param fileFilters The file filters which the user can select in the
+     *            dialog.
+     * @return The <code>File</code>.
+     * @see FreeColDialog
+     */
+    public File showLoadDialog(File directory, FileFilter[] fileFilters) {
+        FreeColDialog<File> loadDialog = FreeColDialog.createLoadDialog(directory, fileFilters);
+
+        File response = null;
+        showSubPanel(loadDialog);
+        for (;;) {
+            response = (File) loadDialog.getResponse();
+            if (response != null && response.isFile()) break;
+            errorMessage("noSuchFile");
+        }
+        remove(loadDialog);
+
+        return response;
+    }
+
+    /**
+     * Displays a dialog where the user may choose a filename. This is the same
+     * as calling:
+     *
+     * <br>
+     * <br>
+     * <code>
+     * showSaveDialog(directory, new FileFilter[] {FreeColDialog.getFSGFileFilter()}, defaultName);
+     * </code>
+     *
+     * @param directory The directory containing the files in which the user may
+     *            overwrite.
+     * @param defaultName Default filename for the savegame.
+     * @return The <code>File</code>.
+     * @see FreeColDialog
+     */
+    public File showSaveDialog(File directory, String defaultName) {
+        return showSaveDialog(directory, ".fsg", new FileFilter[] { FreeColDialog.getFSGFileFilter() }, defaultName);
+    }
+
+    /**
+     * Displays a dialog where the user may choose a filename.
+     *
+     * @param directory The directory containing the files in which the user may
+     *            overwrite.
+     * @param standardName This extension will be added to the specified
+     *            filename (if not added by the user).
+     * @param fileFilters The available file filters in the dialog.
+     * @param defaultName Default filename for the savegame.
+     * @return The <code>File</code>.
+     * @see FreeColDialog
+     */
+    public File showSaveDialog(File directory, String standardName, FileFilter[] fileFilters, String defaultName) {
+        FreeColDialog<File> saveDialog = FreeColDialog.createSaveDialog(directory, standardName, fileFilters, defaultName);
+        return showFreeColDialog(saveDialog);
+    }
+
+    /**
+     * Displays the <code>ChatPanel</code>.
+     *
+     * @see ChatPanel
+     */
+    public void showChatPanel() {
+        // TODO: does it have state, or can we create a new one?
+        if (freeColClient.isSingleplayer()) {
+            return; // In single player, no chat available
+        }
+        showPanel(chatPanel);
+    }
+
+    /**
+     * Show the new turn report.
+     *
+     * @param messages The <code>ModelMessage</code>s to show.
+     */
+    public void showReportTurnPanel(ModelMessage... messages) {
+        showPanel(new ReportTurnPanel(this, messages));
+    }
+
+    /**
+     * Display a dialog allowing the user to select a destination for
+     * a given unit.
+     *
+     * @param unit The <code>Unit</code> to select a destination for.
+     * @return A destination for the unit, or null.
+     */
+    public Location showSelectDestinationDialog(Unit unit) {
+        return showFreeColDialog(new SelectDestinationDialog(this, unit),
+                                 unit.getTile());
+    }
+
+    /**
+     * Display an event panel.
+     *
+     * @param type The <code>EventType</code>.
+     */
+    public void showEventPanel(EventType type) {
+        showEventPanel(null, type);
+    }
+
+    /**
+     * Display an event panel.
+     *
+     * @param tile An optional <code>Tile</code> to make visible.
+     * @param type The <code>EventType</code>.
+     */
+    public void showEventPanel(Tile tile, EventType type) {
+        showFreeColDialog(new EventPanel(this, type), tile);
+    }
+
+    /**
+     * Display a dialog following declaration of independence.
+     */
+    public void showDeclarationDialog() {
+        showFreeColDialog(new DeclarationDialog(this));
+    }
+
+    /**
+     * Display a dialog to confirm a declaration of independence.
+     *
+     * @return A list of names for a new nation.
+     */
+    public List<String> showConfirmDeclarationDialog() {
+        return showFreeColDialog(new ConfirmDeclarationDialog(this));
+    }
+
+    /**
+     * Display a dialog to confirm a combat.
+     *
+     * @param attacker The attacking <code>Unit</code>.
+     * @param defender The defending <code>Unit</code> if any.
+     * @param settlement The defending <code>Settlement</code> if any.
+     * @return True if the combat is to proceed.
+     */
+    public boolean showPreCombatDialog(Unit attacker, Unit defender,
+                                       Settlement settlement) {
+        return showFreeColDialog(new PreCombatDialog(this, attacker, defender,
+                                                     settlement),
+                                 attacker.getTile());
+    }
+
+    /**
+     * Display a dialog to select a trade route for a unit.
+     *
+     * @param unit The <code>Unit</code> to select a trade route for.
+     * @return A trade route, or null.
+     */
+    public TradeRoute showTradeRouteDialog(Unit unit) {
+        return showFreeColDialog(new TradeRouteDialog(this, unit.getTradeRoute()),
+                                 unit.getTile());
+    }
+
+    /**
+     * Displays a dialog that asks the user whether to pay arrears for
+     * boycotted goods or to dump them instead.
+     *
+     * @param goods a <code>Goods</code> value
+     * @param europe an <code>Europe</code> value
+     * @return a <code>boolean</code> value
+     */
+    public BoycottAction showBoycottedGoodsDialog(Goods goods, Europe europe) {
+        int arrears = europe.getOwner().getArrears(goods.getType());
+        List<ChoiceItem<BoycottAction>> choices
+            = new ArrayList<ChoiceItem<BoycottAction>>();
+        choices.add(new ChoiceItem<BoycottAction>(
+                Messages.message("boycottedGoods.payArrears"),
+                BoycottAction.PAY_ARREARS));
+        choices.add(new ChoiceItem<BoycottAction>(
+                Messages.message("boycottedGoods.dumpGoods"),
+                BoycottAction.DUMP_CARGO));
+        BoycottAction result = showChoiceDialog(null,
+                Messages.message("boycottedGoods.text",
+                                 "%goods%", goods.getName(),
+                                 "%europe%", europe.getName(),
+                                 "%amount%", String.valueOf(arrears)),
+                Messages.message("cancel"),
+                choices);
+        return (result == null) ? BoycottAction.CANCEL : result;
+    }
+
+    /**
+     * Displays a dialog that asks the user what he wants to do with
+     * his scout in a native settlement.
+     *
+     * @param settlement The <code>IndianSettlement</code> to be scouted.
+     * @return The chosen action, speak, tribute, attack or cancel.
+     */
+    public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement) {
+        StringBuilder text = new StringBuilder(400);
+        text.append(Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
+                                     "%nation%", settlement.getOwner().getNationAsString()));
+        text.append("\n\n");
+        int number = settlement.getOwner().getNumberOfSettlements();
+        text.append(Messages.message("scoutSettlement.greetings",
+                                     "%nation%", settlement.getOwner().getNationAsString(),
+                                     "%settlement%", settlement.getName(),
+                                     "%number%", String.valueOf(number)));
+        text.append(" ");
+        if (settlement.getLearnableSkill() != null) {
+            text.append(Messages.message("scoutSettlement.skill", "%skill%",
+                                         settlement.getLearnableSkill().getName()));
+            text.append(" ");
+        }
+        GoodsType[] wantedGoods = settlement.getWantedGoods();
+        if (wantedGoods[0] != null) {
+            text.append(Messages.message("scoutSettlement.trade",
+                                         "%goods1%", wantedGoods[0].getName(),
+                                         "%goods2%", wantedGoods[1].getName(),
+                                         "%goods3%", wantedGoods[2].getName()));
+            text.append("\n\n");
+        }
+
+        List<ChoiceItem<ScoutIndianSettlementAction>> choices
+            = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.speak"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_SPEAK));
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.tribute"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.attack"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
+        ScoutIndianSettlementAction result = showChoiceDialog(settlement.getTile(),
+                text.toString(),
+                Messages.message("cancel"),
+                choices);
+        return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
+    }
+
+    /**
+     * Displays the <code>NegotiationDialog</code>.
+     *
+     * @param unit The <code>Unit</code> that is negotiating.
+     * @param settlement A <code>Settlement</code> that is negotiating.
+     * @param agreement The current <code>DiplomaticTrade</code> agreement.
+     * @return An updated agreement.
+     * @see NegotiationDialog
+     */
+    public DiplomaticTrade showNegotiationDialog(Unit unit, Settlement settlement, DiplomaticTrade agreement) {
+        NegotiationDialog negotiationDialog
+            = new NegotiationDialog(this, unit, settlement, agreement);
+        negotiationDialog.initialize();
+        return showFreeColDialog(negotiationDialog, unit.getTile());
+    }
+
+    /**
+     * Displays a dialog that asks the user what he wants to do with his scout
+     * in the foreign colony.
+     *
+     * @param colony The <code>Colony</code> to be scouted.
+     * @param unit The <code>Unit</code> that is scouting.
+     * @return The selected action, either negotiate, spy, attack or cancel.
+     */
+    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony, Unit unit) {
+        List<ChoiceItem<ScoutColonyAction>> choices
+            = new ArrayList<ChoiceItem<ScoutColonyAction>>();
+        // We cannot negotiate with the REF
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.negotiate"),
+                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE,
+                colony.getOwner() != unit.getOwner().getREFPlayer()));
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.spy"),
+                ScoutColonyAction.FOREIGN_COLONY_SPY));
+        choices.add(new ChoiceItem<ScoutColonyAction>(
+                Messages.message("scoutColony.attack"),
+                ScoutColonyAction.FOREIGN_COLONY_ATTACK));
+        ScoutColonyAction result = showChoiceDialog(unit.getTile(),
+                Messages.message("scoutColony.text",
+                                 "%unit%", unit.getName(),
+                                 "%colony%", colony.getName()),
+                Messages.message("cancel"),
+                choices);
+        return (result == null) ? ScoutColonyAction.CANCEL : result;
+    }
+
+    /**
+     * Displays a dialog that asks the user what he wants to do with his armed
+     * unit in a native settlement.
+     *
+     * @param settlement The <code>IndianSettlement</code> to consider.
+     * @return The chosen action, tribute, attack or cancel.
+     */
+    public ScoutIndianSettlementAction showArmedUnitIndianSettlementDialog(IndianSettlement settlement) {
+        List<ChoiceItem<ScoutIndianSettlementAction>> choices
+            = new ArrayList<ChoiceItem<ScoutIndianSettlementAction>>();
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.tribute"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_TRIBUTE));
+        choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
+                Messages.message("scoutSettlement.attack"),
+                ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
+        ScoutIndianSettlementAction result = showChoiceDialog(settlement.getTile(),
+                Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
+                                 "%nation%", settlement.getOwner().getNationAsString()),
+                Messages.message("cancel"),
+                choices);
+        return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
+    }
+
+    /**
+     * Displays a dialog that asks the user what he wants to do with his
+     * missionary in the indian settlement.
+     *
+     * @param unit The <code>Unit</code> speaking to the settlement.
+     * @param settlement The <code>IndianSettlement</code> being visited.
+     * @return The chosen action, establish mission, denounce, incite
+     *         or cancel.
+     */
+    public MissionaryAction showUseMissionaryDialog(Unit unit, IndianSettlement settlement) {
+        Player player = unit.getOwner();
+        Unit missionary = settlement.getMissionary();
+        List<ChoiceItem<MissionaryAction>> choices
+            = new ArrayList<ChoiceItem<MissionaryAction>>();
+        choices.add(new ChoiceItem<MissionaryAction>(
+                Messages.message("missionarySettlement.establish"),
+                MissionaryAction.ESTABLISH_MISSION,
+                missionary == null));
+        choices.add(new ChoiceItem<MissionaryAction>(
+                Messages.message("missionarySettlement.heresy"),
+                MissionaryAction.DENOUNCE_HERESY,
+                missionary != null && missionary.getOwner() != player));
+        choices.add(new ChoiceItem<MissionaryAction>(
+                Messages.message("missionarySettlement.incite"),
+                MissionaryAction.INCITE_INDIANS,
+                true));
+        StringBuilder introText
+            = new StringBuilder(Messages.message(settlement.getAlarmLevelMessage(unit.getOwner()),
+                                                 "%nation%", settlement.getOwner().getNationAsString()));
+        introText.append("\n\n");
+        introText.append(Messages.message("missionarySettlement.question",
+                                          "%settlement%", settlement.getName()));
+        MissionaryAction result = showChoiceDialog(unit.getTile(),
+                introText.toString(),
+                Messages.message("cancel"),
+                choices);
+        return (result == null) ? MissionaryAction.CANCEL : result;
+    }
+
+    /**
+     * Shows a status message that cannot be dismissed. The panel will be
+     * removed when another component is added to this <code>Canvas</code>.
+     * This includes all the <code>showXXX</code>-methods. In addition,
+     * {@link #closeStatusPanel()} also removes this panel.
+     *
+     * @param message The text message to display on the status panel.
+     * @see StatusPanel
+     */
+    public void showStatusPanel(String message) {
+        statusPanel.setStatusMessage(message);
+        addCentered(statusPanel, STATUS_LAYER);
+    }
+
+    /**
+     * Closes the <code>StatusPanel</code>.
+     *
+     * @see #showStatusPanel
+     */
+    public void closeStatusPanel() {
+        if (statusPanel.isVisible()) {
+            remove(statusPanel);
+        }
+    }
+
+    /**
+     * Displays the <code>EuropePanel</code>.
+     *
+     * @see EuropePanel
+     */
+    public void showEuropePanel() {
+        closeMenus();
+
+        if (freeColClient.getGame() == null) {
+            errorMessage("europe.noGame");
+        } else {
+            europePanel.initialize(freeColClient.getMyPlayer().getEurope(), freeColClient.getGame());
+            JInternalFrame f = addAsSimpleFrame(europePanel);
+            f.setBorder(null);
+            f.setSize(getWidth(), getHeight());
+            f.setLocation(0, 0);
+            f.moveToBack();
+        }
+    }
+
+    /**
+     * Displays one of the Europe Dialogs for Recruit, Purchase, Train.
+     * Closes any currently open Dialogs.
+     * Does not return from this method before the panel is closed.
+     *
+     * @param europeAction the type of panel to display
+     * @return <code>FreeColDialog.getResponseInt</code>.
+     */
+    public int showEuropeDialog(EuropePanel.EuropeAction europeAction) {
+        // Close any open Europe Dialog (Recruit, Purchase, Train)
+        try {
+            if (europeOpenDialog != null) {
+                europeOpenDialog.setResponse(new Integer(-1));
+            }
+        } catch (NumberFormatException e) {
+            logger.warning("Canvas.showEuropeDialog: Invalid europeDialogType");
+        }
+
+        FreeColDialog<Integer> localDialog = null;
+
+        // Open new Dialog
+        switch (europeAction) {
+        case EXIT:
+        case UNLOAD:
+        case SAIL:
+            return -1;
+        case RECRUIT:
+            localDialog = new RecruitDialog(this);
+            break;
+        case PURCHASE:
+        case TRAIN:
+            localDialog = new TrainDialog(this, europeAction);
+            break;
+        }
+        localDialog.initialize();
+        europeOpenDialog = localDialog; // Set the open dialog to the class variable
+
+        int response = showFreeColDialog(localDialog);
+
+        if (europeOpenDialog == localDialog) {
+            europeOpenDialog = null;    // Clear class variable when it's closed
+        }
+
+        return response;
+    }
+
+    /**
+     * Displays the colony panel of the given <code>Colony</code>.
+     *
+     * @param colony The colony whose panel needs to be displayed.
+     * @see ColonyPanel
+     */
+    public void showColonyPanel(Colony colony) {
+        ColonyPanel panel = new ColonyPanel(this, colony);
+        showSubPanel(panel, getPopupPosition(colony.getTile()));
+    }
+
+    /**
+     * Displays the panel of the given native settlement.
+     *
+     * @param indianSettlement The <code>IndianSettlement</code> to display.
+     */
+    public void showIndianSettlementPanel(IndianSettlement indianSettlement) {
+        IndianSettlementPanel panel
+            = new IndianSettlementPanel(this, indianSettlement);
+        showSubPanel(panel, getPopupPosition(indianSettlement.getTile()));
+    }
+
+    /**
+     * Displays the panel for trading with an <code>IndianSettlement</code>.
+     *
+     * @param settlement The native settlement to trade with.
+     * @param showBuy Show a "buy" option.
+     * @param showSell Show a "sell" option.
+     * @param showGift Show a "gift" option.
+     */
+    public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
+                                                       boolean showBuy, boolean showSell, boolean showGift) {
+        ArrayList<ChoiceItem<TradeAction>> choices
+            = new ArrayList<ChoiceItem<TradeAction>>();
+        choices.add(new ChoiceItem<TradeAction>(
+                Messages.message("tradeProposition.toBuy"),
+                TradeAction.BUY,
+                showBuy));
+        choices.add(new ChoiceItem<TradeAction>(
+                Messages.message("tradeProposition.toSell"),
+                TradeAction.SELL,
+                showSell));
+        choices.add(new ChoiceItem<TradeAction>(
+                Messages.message("tradeProposition.toGift"),
+                TradeAction.GIFT,
+                showGift));
+        TradeAction result = showChoiceDialog(settlement.getTile(),
+                Messages.message("tradeProposition.welcome",
+                                 "%nation%", settlement.getOwner().getNationAsString(),
+                                 "%settlement%", settlement.getName()),
+                Messages.message("tradeProposition.cancel"),
+                choices);
+        return (result == null) ? TradeAction.CANCEL : result;
+    }
+
+
+    /**
+     * Displays the panel for negotiating a purchase from a settlement.
+     *
+     * @param unit The <code>Unit</code> that is buying.
+     * @param settlement The <code>Settlement</code> to buy from.
+     * @param goods The <code>Goods</code> to buy.
+     * @param gold The current negotiated price.
+     * @return The chosen action, buy or haggle, or null.
+     */
+    public BuyAction showBuyDialog(Unit unit, Settlement settlement,
+                                   Goods goods, int gold) {
+        List<ChoiceItem<BuyAction>> choices
+            = new ArrayList<ChoiceItem<BuyAction>>();
+        choices.add(new ChoiceItem<BuyAction>(
+                Messages.message("buy.takeOffer"),
+                BuyAction.BUY,
+                gold <= unit.getOwner().getGold()));
+        choices.add(new ChoiceItem<BuyAction>(
+                Messages.message("buy.moreGold"),
+                BuyAction.HAGGLE,
+                true));
+        BuyAction result = showChoiceDialog(unit.getTile(),
+                Messages.message("buy.text",
+                                 "%nation%", settlement.getOwner().getNationAsString(),
+                                 "%goods%", goods.toString(),
+                                 "%gold%", Integer.toString(gold)),
+                Messages.message("buyProposition.cancel"),
+                choices);
+        return (result == null) ? BuyAction.CANCEL : result;
+    }
+
+    /**
+     * Displays the panel for negotiating a sale to a settlement.
+     *
+     * @param unit The <code>Unit</code> that is selling.
+     * @param settlement The <code>Settlement</code> to sell to.
+     * @param goods The <code>Goods</code> to sell.
+     * @param gold The current negotiated price.
+     * @return The chosen action, sell, gift or haggle, or null.
+     */
+    public SellAction showSellDialog(Unit unit, Settlement settlement,
+                                     Goods goods, int gold) {
+        List<ChoiceItem<SellAction>> choices
+            = new ArrayList<ChoiceItem<SellAction>>();
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message("sell.takeOffer"),
+                SellAction.SELL));
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message("sell.moreGold"),
+                SellAction.HAGGLE));
+        choices.add(new ChoiceItem<SellAction>(
+                Messages.message("sell.gift",
+                                 "%goods%", goods.getName()),
+                SellAction.GIFT));
+        SellAction result = showChoiceDialog(unit.getTile(),
+                Messages.message("sell.text",
+                                 "%nation%", settlement.getOwner().getNationAsString(),
+                                 "%goods%", goods.getName(),
+                                 "%gold%", Integer.toString(gold)),
+                Messages.message("sellProposition.cancel"),
+                choices);
+        return (result == null) ? SellAction.CANCEL : result;
+    }
+
+    /**
+     * Display the panel for claiming land.
+     *
+     * @param tile The <code>Tile</code> to claim.
+     * @param player The <code>Player</code> that is claiming.
+     * @param price An asking price, if any.
+     * @param owner The <code>Player</code> that owns the land.
+     * @return The chosen action, accept or steal, or null.
+     */
+    public ClaimAction showClaimDialog(Tile tile, Player player, int price,
+                                       Player owner) {
+        List<ChoiceItem<ClaimAction>> choices
+            = new ArrayList<ChoiceItem<ClaimAction>>();
+        choices.add(new ChoiceItem<ClaimAction>(
+                Messages.message("indianLand.pay",
+                                 "%amount%", Integer.toString(price)),
+                ClaimAction.ACCEPT,
+                price <= player.getGold()));
+        choices.add(new ChoiceItem<ClaimAction>(
+                Messages.message("indianLand.take"),
+                ClaimAction.STEAL,
+                true));
+        ClaimAction result = showChoiceDialog(tile,
+                Messages.message("indianLand.text",
+                                 "%player%", owner.getNationAsString()),
+                Messages.message("indianLand.cancel"),
+                choices);
+        return (result == null) ? ClaimAction.CANCEL : result;
+    }
+
+    /**
+     * Shows the panel that allows the user to choose which unit will emigrate
+     * from Europe. This method may only be called if the user has William
+     * Brewster in congress.
+     *
+     * @param fountainOfYouth a <code>boolean</code> value
+     * @return The emigrant that was chosen by the user.
+     */
+    public int showEmigrationPanel(boolean fountainOfYouth) {
+        EmigrationPanel emigrationPanel = new EmigrationPanel(this);
+        emigrationPanel.initialize(freeColClient.getMyPlayer().getEurope(), fountainOfYouth);
+        return showFreeColDialog(emigrationPanel);
+    }
+
+    /**
+     * Shows the <code>VideoPanel</code>.
+     */
+    public void showOpeningVideoPanel() {
+        closeMenus();
+        final Video video = ResourceManager.getVideo("Opening.video");
+        boolean muteAudio = !getClient().canPlayMusic();
+        final VideoComponent vp = new VideoComponent(video, muteAudio);
+        addCentered(vp, MAIN_LAYER);
+        vp.play();
+
+        final class AbortListener implements KeyListener, MouseListener, VideoListener {
+            public void stopped() {
+                execute();
+            }
+
+            public void keyPressed(KeyEvent e) {
+                execute();
+            }
+
+            public void mouseClicked(MouseEvent e) {
+                execute();
+            }
+
+            private void execute() {
+                removeKeyListener(this);
+                removeMouseListener(this);
+                vp.removeMouseListener(this);
+                vp.removeVideoListener(this);
+                vp.stop();
+                Canvas.this.remove(vp);
+                showMainPanel();
+                freeColClient.playMusic("intro");
+            }
+
+            public void keyReleased(KeyEvent e) {}
+            public void keyTyped(KeyEvent e) {}
+            public void mouseEntered(MouseEvent e) {}
+            public void mouseExited(MouseEvent e) {}
+            public void mousePressed(MouseEvent e) {}
+            public void mouseReleased(MouseEvent e) {}
+        };
+        final AbortListener l = new AbortListener();
+        addMouseListener(l);
+        addKeyListener(l);
+        vp.addMouseListener(l);
+        vp.addVideoListener(l);
+    }
+
 
     /**
      * A class for frames being used as tool boxes.
