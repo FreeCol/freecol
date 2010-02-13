@@ -266,6 +266,20 @@ public class StringTemplate {
     }
 
     /**
+     * Add a StringTemplate to this "label" StringTemplate.
+     *
+     * @param key a <code>String</code> value
+     * @param template a <code>StringTemplate</code> value
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate addStringTemplate(StringTemplate template) {
+        createLists();
+        localize.add(true);
+	replacements.add(template);
+	return this;
+    }
+
+    /**
      * Whether this StringTemplate is a "label" template.
      *
      * @return a <code>boolean</code> value

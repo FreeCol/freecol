@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -229,9 +230,9 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public void paintComponent(Graphics g) {
 
         String name = unit.getName();
-        String equipmentLabel = unit.getEquipmentLabel();
+        StringTemplate equipmentLabel = unit.getEquipmentLabel();
         if (equipmentLabel != null) {
-            name = name + " (" + equipmentLabel + ")";
+            name = name + " (" + Messages.localize(equipmentLabel) + ")";
         }
         setToolTipText(name);
 

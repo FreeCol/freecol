@@ -2570,25 +2570,25 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *
      * @return a <code>String</code> value
      */
-    public String getEquipmentLabel() {
+    public StringTemplate getEquipmentLabel() {
         if (equipment != null && !equipment.isEmpty()) {
-            List<String> equipmentStrings = new ArrayList<String>();
+            StringTemplate result = new StringTemplate("/");
             for (java.util.Map.Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
                 EquipmentType type = entry.getKey();
                 int amount = entry.getValue().intValue();
                 if (type.getGoodsRequired().isEmpty()) {
-                    equipmentStrings.add(Messages.message("model.goods.goodsAmount",
-                                                          "%goods%", type.getName(),
-                                                          "%amount%", Integer.toString(amount)));
+                    result.addStringTemplate(new StringTemplate("model.goods.goodsAmount")
+                                             .add("%goods%", type.getNameKey())
+                                             .addName("%amount%", Integer.toString(amount)));
                 } else {
                     for (AbstractGoods goods : type.getGoodsRequired()) {
-                        equipmentStrings.add(Messages.message("model.goods.goodsAmount",
-                                                              "%goods%", goods.getType().getName(),
-                                                              "%amount%", Integer.toString(amount * goods.getAmount())));
+                        result.addStringTemplate(new StringTemplate("model.goods.goodsAmount")
+                                                 .add("%goods%", goods.getType().getNameKey())
+                                                 .addName("%amount%", Integer.toString(amount * goods.getAmount())));
                     }
                 }
             }
-            return Utils.join("/", equipmentStrings.toArray(new String[equipmentStrings.size()]));
+            return result;
         } else {
             return null;
         }
