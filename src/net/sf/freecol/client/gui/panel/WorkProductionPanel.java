@@ -77,7 +77,7 @@ public class WorkProductionPanel extends FreeColPanel {
                 modifiers.add(colony.getProductionModifier(goodsType));
             }
 
-            add(new JLabel(colonyTile.getLabel()), "span, align center, wrap 30");
+            add(localizedLabel(colonyTile.getLabel()), "span, align center, wrap 30");
 
             TileType tileType = colonyTile.getWorkTile().getType();
             int width = canvas.getClient().getImageLibrary().getTerrainImageWidth(tileType);

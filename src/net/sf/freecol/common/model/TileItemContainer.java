@@ -359,23 +359,19 @@ public class TileItemContainer extends FreeColGameObject {
      * Returns a description of the tile, with the name of the tile
      * and any improvements made to it (road/plow)
      *
-     * @param separator The separator to be used (e.g. "/")
      * @return The description label for this tile
      */
-    public String getLabel(String separator) {
-        String label = new String();
+    public StringTemplate getLabel() {
+        StringTemplate label = new StringTemplate("/");
         for (TileItem item : tileItems) {
-            if (item instanceof Resource
-                || (item instanceof TileImprovement
-                    && ((TileImprovement) item).isComplete())) {
-                label += separator + Messages.message(item.getName());
+            if (item instanceof Resource) {
+                label.add(((Resource) item).getType().getNameKey());
+            } else if (item instanceof TileImprovement
+                       && ((TileImprovement) item).isComplete()) {
+                label.add(((TileImprovement) item).getType().getNameKey());
             }
         }
         return label;
-    }
-
-    public String getLabel() {
-        return getLabel("/");
     }
 
     // ------------------------------------------------------------ add/remove from container

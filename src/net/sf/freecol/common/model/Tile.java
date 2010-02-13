@@ -261,11 +261,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * and any improvements on it (road/plow/etc) from <code>TileItemContainer</code>.
      * @return The description label for this tile
      */
-    public String getLabel() {
+    public StringTemplate getLabel() {
         if (tileItemContainer == null) {
-            return getName();
+            return new StringTemplate(type.getNameKey());
         } else {
-            return getName() + tileItemContainer.getLabel();
+            return new StringTemplate("/")
+                .add(type.getNameKey())
+                .addStringTemplate(tileItemContainer.getLabel());
         }
     }
     

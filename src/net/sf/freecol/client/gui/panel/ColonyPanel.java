@@ -82,6 +82,7 @@ import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.TradeRoute;
@@ -1405,7 +1406,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * If a unit is on it update the tooltip of it instead
              */
             private void updateDescriptionLabel(UnitLabel unit, boolean toAdd) {
-                String tileDescription = this.colonyTile.getLabel();
+                String tileDescription = Messages.localize(this.colonyTile.getLabel());
 
                 if (unit == null) {
                     setToolTipText(tileDescription);
@@ -1468,10 +1469,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             if (colonyTile != bestTile
                                 && (colonyTile.getProductionOf(unit, workType)
                                     < bestTile.getProductionOf(unit, workType))) {
-                                getCanvas().showInformationMessage("colonyPanel.notBestTile",
-                                                                   "%unit%", unit.getName(),
-                                                                   "%goods%", workType.getName(),
-                                                                   "%tile%", bestTile.getLabel());
+                                getCanvas()
+                                    .showInformationMessage(new StringTemplate("colonyPanel.notBestTile")
+                                                            .add("%unit%", unit.getName())
+                                                            .add("%goods%", workType.getNameKey())
+                                                            .addStringTemplate("%tile%", bestTile.getLabel()));
                             }
                         } else {
                             // could not add the unit on the tile

@@ -135,7 +135,7 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      *
      * @return The description label for this tile
      */
-    public String getLabel() {
+    public StringTemplate getLabel() {
         return workTile.getLabel();
     }
 
