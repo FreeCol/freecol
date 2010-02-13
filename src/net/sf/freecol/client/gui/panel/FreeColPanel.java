@@ -24,7 +24,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
@@ -67,10 +66,10 @@ import net.sf.freecol.client.control.InGameController;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.ImageLibrary;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 
 /**
  * Superclass for all panels in FreeCol.
@@ -359,6 +358,27 @@ public class FreeColPanel extends JPanel implements ActionListener {
         header.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         return header;
     }
+
+    /**
+     * Return a JLabel with Messages.message(key) as text.
+     *
+     * @param key a <code>String</code> value
+     * @return a <code>JLabel</code> value
+     */
+    public JLabel localizedLabel(String key) {
+        return new JLabel(Messages.message(key));
+    }
+
+    /**
+     * Return a JLabel with Messages.localize(template) as text.
+     *
+     * @param template a <code>StringTemplate</code> value
+     * @return a <code>JLabel</code> value
+     */
+    public JLabel localizedLabel(StringTemplate template) {
+        return new JLabel(Messages.localize(template));
+    }
+
 
     /**
      * Make the given button the CANCEL button.
