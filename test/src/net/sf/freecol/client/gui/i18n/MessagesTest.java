@@ -22,6 +22,9 @@ package net.sf.freecol.client.gui.i18n;
 import java.util.Locale;
 
 import net.sf.freecol.util.test.FreeColTestCase;
+import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.StringTemplate;
 
 public class MessagesTest extends FreeColTestCase {
 
@@ -115,4 +118,45 @@ public class MessagesTest extends FreeColTestCase {
         }
         assertEquals(errMsg, expected, message);
     }
+
+    public void testStringTemplates() {
+
+        Messages.setMessageBundle(Locale.US);
+
+        // template with key not in message bundle
+	StringTemplate s1 = new StringTemplate("!no.such.string.template");
+        assertEquals(s1.getValue(), Messages.localize(s1));
+
+	StringTemplate s2 = new StringTemplate("model.tile.plains.name");
+        assertEquals("Plains", Messages.localize(s2));
+
+	StringTemplate t1 = new StringTemplate("model.goods.goodsAmount")
+	    .add("%goods%", "model.goods.food.name")
+	    .add("%amount%", "100", false);
+        assertEquals(2, t1.getKeys().size());
+        assertEquals(2, t1.getReplacements().size());
+        assertTrue(t1.localize(0));
+        assertFalse(t1.localize(1));
+        assertFalse(t1.isLabelTemplate());
+        assertEquals("model.goods.goodsAmount", t1.getValue());
+        assertEquals("%amount% %goods%", Messages.message(t1.getValue()));
+        assertEquals("100 Food", Messages.localize(t1));
+
+	StringTemplate t2 = new StringTemplate("/")
+	    .add("model.goods.food.name")
+	    .addName("xyz");
+        assertEquals("Food/xyz", Messages.localize(t2));
+
+        Game game = getGame();
+    	game.setMap(getTestMap());
+    	Colony colony = getStandardColony();
+        assertEquals("New Amsterdam", colony.getName());
+
+	StringTemplate t3 = new StringTemplate("inLocation")
+	    .addName("%location%", colony.getName());
+        assertEquals("In New Amsterdam", Messages.localize(t3));
+
+    }
+
+
 }

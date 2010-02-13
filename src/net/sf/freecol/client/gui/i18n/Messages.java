@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.model.StringTemplate;
 
 /**
  * Represents a collection of messages in a particular locale. <p/>
@@ -190,6 +191,43 @@ public class Messages {
                 logger.warning("Unable to load resource file " + resourceFile.getPath());
             }
         }
+    }
+
+    public static String localize(StringTemplate template) {
+        if (template.isLabelTemplate()) {
+	    String result = "";
+            if (template.getReplacements() == null) {
+                return message(template.getValue());
+            } else {
+                for (int index = 0; index < template.getReplacements().size(); index++) {
+                    Object object = template.getReplacements().get(index);
+                    if (object instanceof StringTemplate) {
+                        result += template.getValue() + localize((StringTemplate) object);
+                    } else if (template.localize(index)) {
+                        result += template.getValue() + message((String) object);
+                    } else {
+                        result += template.getValue() + object;
+                    }
+                }
+                return result.substring(1);
+            }
+        } else {
+	    String result = message(template.getValue());
+	    for (int index = 0; index < template.getKeys().size(); index++) {
+		if (template.getReplacements().get(index) instanceof StringTemplate) {
+		    result = result.replace(template.getKeys().get(index),
+					    localize((StringTemplate) template.getReplacements().get(index)));
+		} else if (template.localize(index)) {
+		    result = result.replace(template.getKeys().get(index), 
+					    message((String) template.getReplacements().get(index)));
+                } else {
+		    result = result.replace(template.getKeys().get(index), 
+					    template.getReplacements().get(index).toString());
+		}
+	    }
+	    return result;
+	}
+
     }
 
 }
