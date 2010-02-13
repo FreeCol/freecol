@@ -142,10 +142,10 @@ public class MessagesTest extends FreeColTestCase {
         assertEquals("%amount% %goods%", Messages.message(t1.getValue()));
         assertEquals("100 Food", Messages.localize(t1));
 
-	StringTemplate t2 = new StringTemplate("/")
+	StringTemplate t2 = new StringTemplate(" / ")
 	    .add("model.goods.food.name")
 	    .addName("xyz");
-        assertEquals("Food/xyz", Messages.localize(t2));
+        assertEquals("Food / xyz", Messages.localize(t2));
 
         Game game = getGame();
     	game.setMap(getTestMap());

@@ -209,7 +209,7 @@ public class Messages {
                         result += template.getValue() + object;
                     }
                 }
-                return result.substring(1);
+                return result.substring(template.getValue().length());
             }
         } else {
 	    String result = message(template.getValue());
