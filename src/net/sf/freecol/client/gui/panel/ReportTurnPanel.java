@@ -255,7 +255,7 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = button;
         } else if (source instanceof Tile) {
             final Tile tile = (Tile) source;
-            JButton button = new JButton(tile.getLocationName());
+            JButton button = new JButton(Messages.message(tile.getLocationName()));
             button.addActionListener(this);
             button.setActionCommand(tile.getId());
             headline = button;

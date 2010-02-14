@@ -134,7 +134,7 @@ public class TradeRouteStop {
         if (location == null) {
             return null;
         } else {
-            return location.getLocationName();
+            return location.getLocationName().getId();
         }
     }
 

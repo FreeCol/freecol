@@ -44,7 +44,7 @@ public interface Location {
      * 
      * @return The name of this location.
      */
-    public String getLocationName();
+    public StringTemplate getLocationName();
 
     /**
      * Adds a <code>Locatable</code> to this Location.

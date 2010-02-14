@@ -62,7 +62,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         // Test the colony
         assertEquals(map.getTile(6, 8), colony.getTile());
 
-        assertEquals("New Amsterdam", colony.getLocationName());
+        assertEquals("New Amsterdam", colony.getName());
 
         assertEquals(colony, colony.getTile().getSettlement());
 
@@ -125,7 +125,7 @@ public class ColonyProductionTest extends FreeColTestCase {
         // Test the colony
         assertEquals(map.getTile(6, 8), colony.getTile());
 
-        assertEquals("New Amsterdam", colony.getLocationName());
+        assertEquals("New Amsterdam", colony.getName());
 
         assertEquals(colony, colony.getTile().getSettlement());
 

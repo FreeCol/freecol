@@ -1406,7 +1406,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * If a unit is on it update the tooltip of it instead
              */
             private void updateDescriptionLabel(UnitLabel unit, boolean toAdd) {
-                String tileDescription = Messages.localize(this.colonyTile.getLabel());
+                String tileDescription = Messages.message(this.colonyTile.getLabel());
 
                 if (unit == null) {
                     setToolTipText(tileDescription);
@@ -1470,7 +1470,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                                 && (colonyTile.getProductionOf(unit, workType)
                                     < bestTile.getProductionOf(unit, workType))) {
                                 getCanvas()
-                                    .showInformationMessage(new StringTemplate("colonyPanel.notBestTile")
+                                    .showInformationMessage(StringTemplate.template("colonyPanel.notBestTile")
                                                             .add("%unit%", unit.getName())
                                                             .add("%goods%", workType.getNameKey())
                                                             .addStringTemplate("%tile%", bestTile.getLabel()));

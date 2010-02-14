@@ -124,37 +124,38 @@ public class MessagesTest extends FreeColTestCase {
         Messages.setMessageBundle(Locale.US);
 
         // template with key not in message bundle
-	StringTemplate s1 = new StringTemplate("!no.such.string.template");
-        assertEquals(s1.getValue(), Messages.localize(s1));
+	StringTemplate s1 = StringTemplate.key("!no.such.string.template");
+        assertEquals(s1.getId(), Messages.message(s1));
 
-	StringTemplate s2 = new StringTemplate("model.tile.plains.name");
-        assertEquals("Plains", Messages.localize(s2));
+	StringTemplate s2 = StringTemplate.key("model.tile.plains.name");
+        assertEquals("Plains", Messages.message(s2));
 
-	StringTemplate t1 = new StringTemplate("model.goods.goodsAmount")
+	StringTemplate t1 = StringTemplate.template("model.goods.goodsAmount")
 	    .add("%goods%", "model.goods.food.name")
-	    .add("%amount%", "100", false);
+	    .addName("%amount%", "100");
         assertEquals(2, t1.getKeys().size());
         assertEquals(2, t1.getReplacements().size());
-        assertTrue(t1.localize(0));
-        assertFalse(t1.localize(1));
-        assertFalse(t1.isLabelTemplate());
-        assertEquals("model.goods.goodsAmount", t1.getValue());
-        assertEquals("%amount% %goods%", Messages.message(t1.getValue()));
-        assertEquals("100 Food", Messages.localize(t1));
+        assertEquals(StringTemplate.TemplateType.KEY,
+                     t1.getReplacements().get(0).getTemplateType());
+        assertEquals(StringTemplate.TemplateType.NAME,
+                     t1.getReplacements().get(1).getTemplateType());
+        assertEquals("model.goods.goodsAmount", t1.getId());
+        assertEquals("%amount% %goods%", Messages.message(t1.getId()));
+        assertEquals("100 Food", Messages.message(t1));
 
-	StringTemplate t2 = new StringTemplate(" / ")
+	StringTemplate t2 = StringTemplate.label(" / ")
 	    .add("model.goods.food.name")
 	    .addName("xyz");
-        assertEquals("Food / xyz", Messages.localize(t2));
+        assertEquals("Food / xyz", Messages.message(t2));
 
         Game game = getGame();
     	game.setMap(getTestMap());
     	Colony colony = getStandardColony();
         assertEquals("New Amsterdam", colony.getName());
 
-	StringTemplate t3 = new StringTemplate("inLocation")
+	StringTemplate t3 = StringTemplate.template("inLocation")
 	    .addName("%location%", colony.getName());
-        assertEquals("In New Amsterdam", Messages.localize(t3));
+        assertEquals("In New Amsterdam", Messages.message(t3));
 
     }
 

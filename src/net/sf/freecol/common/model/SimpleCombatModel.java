@@ -1015,7 +1015,7 @@ public class SimpleCombatModel implements CombatModel {
     private void damageShip(Unit damagedShip, Colony attackerColony, Unit attackerUnit, Location repairLocation) {
         String nation = damagedShip.getApparentOwnerName();
         String repairLocationName = (repairLocation == null) ? ""
-            : repairLocation.getLocationName();
+            : Messages.message(repairLocation.getLocationName());
 
         if (attackerColony != null) {
             attackerColony.addModelMessage(attackerColony,
@@ -1188,7 +1188,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param enemyUnit a <code>Unit</code> that is capturing
      */
     private void captureUnit(Unit unit, Unit enemyUnit) {
-        String locationName = unit.getLocation().getLocationName();
+        String locationName = Messages.message(unit.getLocation().getLocationName());
         Player loser = unit.getOwner();
         String nation = loser.getNationAsString();
         String oldName = unit.getName();
@@ -1232,7 +1232,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param enemyUnit a <code>Unit</code> that caused the demotion
      */
     private void demoteUnit(Unit unit, UnitType downgrade, Unit enemyUnit) {
-        String locationName = unit.getLocation().getLocationName();
+        String locationName = Messages.message(unit.getLocation().getLocationName());
         String nation = unit.getOwner().getNationAsString();
         String oldName = unit.getName();
         String enemyNation = enemyUnit.getOwner().getNationAsString();
@@ -1268,7 +1268,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param enemyUnit a <code>Unit</code> that is disarming
      */
     private void disarmUnit(Unit unit, EquipmentType typeToLose, Unit enemyUnit) {
-        String locationName = unit.getLocation().getLocationName();
+        String locationName = Messages.message(unit.getLocation().getLocationName());
         String nation = unit.getOwner().getNationAsString();
         String oldName = unit.getName();
         String enemyNation = enemyUnit.getOwner().getNationAsString();
@@ -1374,7 +1374,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param enemyUnit a <code>Unit</code> that is slaughtering
      */
     private void slaughterUnit(Unit unit, Unit enemyUnit) {
-        String locationName = enemyUnit.getLocation().getLocationName();
+        String locationName = Messages.message(enemyUnit.getLocation().getLocationName());
         Player loser = unit.getOwner();
         String nation = loser.getNationAsString();
         String enemyNation = enemyUnit.getOwner().getNationAsString();

@@ -401,8 +401,9 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * 
      * @return A name for this unit, as a location.
      */
-    public String getLocationName() {
-        return Messages.message("onBoard", "%unit%", getName());
+    public StringTemplate getLocationName() {
+        return StringTemplate.template("onBoard")
+            .addName("%unit%", getName());
     }
 
     /**
@@ -2572,17 +2573,17 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public StringTemplate getEquipmentLabel() {
         if (equipment != null && !equipment.isEmpty()) {
-            StringTemplate result = new StringTemplate("/");
+            StringTemplate result = StringTemplate.label("/");
             for (java.util.Map.Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
                 EquipmentType type = entry.getKey();
                 int amount = entry.getValue().intValue();
                 if (type.getGoodsRequired().isEmpty()) {
-                    result.addStringTemplate(new StringTemplate("model.goods.goodsAmount")
+                    result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
                                              .add("%goods%", type.getNameKey())
                                              .addName("%amount%", Integer.toString(amount)));
                 } else {
                     for (AbstractGoods goods : type.getGoodsRequired()) {
-                        result.addStringTemplate(new StringTemplate("model.goods.goodsAmount")
+                        result.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
                                                  .add("%goods%", goods.getType().getNameKey())
                                                  .addName("%amount%", Integer.toString(amount * goods.getAmount())));
                     }
@@ -3328,7 +3329,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                             Messages.getKey(getId() + ".noMoreTools", 
                                             "model.unit.noMoreTools"),
                             "%unit%", getName(),
-                            "%location%", getLocation().getLocationName());
+                            "%location%", getLocation().getLocationName().getId());
         }
     }
 

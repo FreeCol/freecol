@@ -232,7 +232,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         String name = unit.getName();
         StringTemplate equipmentLabel = unit.getEquipmentLabel();
         if (equipmentLabel != null) {
-            name = name + " (" + Messages.localize(equipmentLabel) + ")";
+            name = name + " (" + Messages.message(equipmentLabel) + ")";
         }
         setToolTipText(name);
 

@@ -362,7 +362,7 @@ public class TileItemContainer extends FreeColGameObject {
      * @return The description label for this tile
      */
     public StringTemplate getLabel() {
-        StringTemplate label = new StringTemplate("/");
+        StringTemplate label = StringTemplate.label("/");
         for (TileItem item : tileItems) {
             if (item instanceof Resource) {
                 label.add(((Resource) item).getType().getNameKey());

@@ -376,7 +376,7 @@ public class FreeColPanel extends JPanel implements ActionListener {
      * @return a <code>JLabel</code> value
      */
     public JLabel localizedLabel(StringTemplate template) {
-        return new JLabel(Messages.localize(template));
+        return new JLabel(Messages.message(template));
     }
 
 

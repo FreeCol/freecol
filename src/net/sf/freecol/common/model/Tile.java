@@ -263,9 +263,9 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      */
     public StringTemplate getLabel() {
         if (tileItemContainer == null) {
-            return new StringTemplate(type.getNameKey());
+            return StringTemplate.key(type.getNameKey());
         } else {
-            return new StringTemplate("/")
+            return StringTemplate.label("/")
                 .add(type.getNameKey())
                 .addStringTemplate(tileItemContainer.getLabel());
         }
@@ -276,7 +276,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * 
      * @return The name of this location.
      */
-    public String getLocationName() {
+    public StringTemplate getLocationName() {
         if (settlement == null) {
             Settlement nearSettlement = null;
             int radius = 8; // more than 8 tiles away is no longer "near"
@@ -284,15 +284,18 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             while (mapIterator.hasNext()) {
                 nearSettlement = getMap().getTile(mapIterator.nextPosition()).getSettlement();
                 if (nearSettlement != null) {
-                    return getName() + " ("
-                        + Messages.message("nearLocation", "%location%",
-                                           nearSettlement.getName()) + ")";
+                    return StringTemplate.template("nameLocation")
+                        .add("%name%", type.getNameKey())
+                        .addStringTemplate("%location%", StringTemplate.template("nearLocation")
+                                           .addName("%location%", nearSettlement.getName()));
                 }
             }
             if (region != null && region.getName() != null) {
-                return getName() + " (" + region.getName() + ")";
+                return StringTemplate.template("nameLocation")
+                    .add("%name%", type.getNameKey())
+                    .add("%location%", region.getNameKey());
             } else {
-                return getName();
+                return StringTemplate.key(type.getNameKey());
             }
         } else {
             return settlement.getLocationName();

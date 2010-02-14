@@ -205,8 +205,8 @@ public class IndianSettlement extends Settlement {
      * Returns a suitable (non-unique) name.
      * @return The name of this settlement.
      */
-    public String getLocationName() {
-        return getName();
+    public StringTemplate getLocationName() {
+        return StringTemplate.name(getName());
     }
 
     /**
@@ -1489,7 +1489,7 @@ public class IndianSettlement extends Settlement {
     }
     
     public String toString() {
-        StringBuilder s = new StringBuilder(getLocationName());
+        StringBuilder s = new StringBuilder(getName());
         s.append(" at (").append(tile.getX()).append(",").append(tile.getY()).append(")"); 
         return s.toString();
     }

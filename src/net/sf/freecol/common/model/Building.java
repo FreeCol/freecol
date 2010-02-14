@@ -163,8 +163,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * 
      * @return The name of this location.
      */
-    public String getLocationName() {
-        return Messages.message("inLocation", "%location%", getName());
+    public StringTemplate getLocationName() {
+        return StringTemplate.template("inLocation")
+            .addName("%location%", getName());
     }
 
     /**
@@ -500,7 +501,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                     addModelMessage(this, ModelMessage.MessageType.DEFAULT, this,
                                     "model.unit.unitRepaired",
                                     "%unit%", unit.getName(),
-                                    "%repairLocation%", getLocationName());
+                                    "%repairLocation%", Messages.message(getLocationName()));
                 }
             }
         }

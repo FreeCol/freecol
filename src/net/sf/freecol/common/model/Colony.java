@@ -1126,8 +1126,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * 
      * @return The name of this location.
      */
-    public String getLocationName() {
-        return getName();
+    public StringTemplate getLocationName() {
+        return StringTemplate.name(getName());
     }
     
     /**

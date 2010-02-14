@@ -491,7 +491,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
                     addModelMessage(this, ModelMessage.MessageType.DEFAULT, unit, "model.unit.shipRepaired", "%unit%",
-                            unit.getName(), "%repairLocation%", getLocationName());
+                                    unit.getName(), "%repairLocation%", getLocationName().getId());
                 }
             }
         }
@@ -502,8 +502,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * 
      * @return The name of this location.
      */
-    public String getLocationName() {
-        return toString();
+    public StringTemplate getLocationName() {
+        return StringTemplate.name(getName());
     }
 
     /**

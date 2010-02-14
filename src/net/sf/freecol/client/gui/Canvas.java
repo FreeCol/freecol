@@ -1368,7 +1368,7 @@ public final class Canvas extends JDesktopPane {
      * @param displayObject Optional object for displaying an icon
      */
     public void showInformationMessage(StringTemplate template, FreeColObject displayObject) {
-        String text = Messages.localize(template);
+        String text = Messages.message(template);
         ImageIcon icon = null;
         if (displayObject != null) {
             icon = getImageIcon(displayObject, false);

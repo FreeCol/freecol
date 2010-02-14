@@ -120,12 +120,13 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
      * Returns the (non-unique) name of this <code>ColonyTile</code>.
      * @return The name of this ColonyTile.
      */
-    public String getLocationName() {
+    public StringTemplate getLocationName() {
         String name = getColony().getName();
         if (isColonyCenterTile()) {
-            return name;
+            return StringTemplate.name(name);
         } else {
-            return Messages.message("nearLocation", "%location%", name);
+            return StringTemplate.template("nearLocation")
+                .addName("%location%", name);
         }
     }
     

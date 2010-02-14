@@ -169,7 +169,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
 
         // Europe next
         if (player.getEurope() != null) {
-            String europeName = player.getEurope().getLocationName();
+            String europeName = player.getEurope().getName();
             handleLocation(europeName, true);
             otherNames.remove(europeName);
         }
@@ -205,7 +205,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
         }
         otherNames = new ArrayList<String>();
         if (player.getEurope() != null) {
-            otherNames.add(player.getEurope().getLocationName());
+            otherNames.add(player.getEurope().getName());
         }
 
         for (Unit unit : player.getUnits()) {
@@ -230,7 +230,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
             }
 
 
-            String locationName = unit.getLocation().getLocationName();
+            String locationName = Messages.message(unit.getLocation().getLocationName());
             if (unit.getState() == UnitState.TO_AMERICA) {
                 locationName = Messages.message("goingToAmerica");
             } else if (unit.getState() == UnitState.TO_EUROPE) {
@@ -270,7 +270,7 @@ public final class ReportMilitaryPanel extends ReportPanel {
             for (Unit unit : unitList) {
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas(), true);
                 if (unit.getDestination() != null) {
-                    String destination = unit.getDestination().getLocationName();
+                    String destination = Messages.message(unit.getDestination().getLocationName());
                     unitLabel.setToolTipText("<html>" + unitLabel.getToolTipText() + "<br>" +
                                              Messages.message("goingTo", "%location%", destination) +
                                              "</html>");

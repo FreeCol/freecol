@@ -23,6 +23,10 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
 /**
  * The <code>StringTemplate</code> represents a non-localized string
  * that can be localized by looking up its value in a message bundle
@@ -35,15 +39,22 @@ import java.util.List;
  *
  * @version 1.0
  */
-public class StringTemplate {
+public class StringTemplate extends FreeColObject {
 
     /**
-     * The String value of this Template. Either a key that refers to
-     * some localized string, or a separator in case of a "Label"
-     * Template. In the latter case, the separator will be used to
-     * join the replacement values.
+     * The type of this StringTemplate, either NAME, a proper name
+     * that must not be localized (e.g. "George Washington"), or KEY,
+     * a string that must be localized (e.g. "model.goods.food.name"),
+     * or TEMPLATE, a key with replacements to apply to the localized
+     * value of the key, or LABEL, a separator string that will be
+     * used to join the replacement values.
      */
-    private String value;
+    public static enum TemplateType { NAME, KEY, TEMPLATE, LABEL }
+
+    /**
+     * The TemplateType of this StringTemplate. Defaults to KEY.
+     */
+    private TemplateType templateType = TemplateType.KEY;
 
     /**
      * The keys to replace within the string template.
@@ -53,70 +64,51 @@ public class StringTemplate {
     /**
      * The values with which to replace the keys in the string template.
      */
-    private List<Object> replacements;
+    private List<StringTemplate> replacements;
 
-    /**
-     * Whether to localize the replacement values.
-     */
-    private List<Boolean> localize;
-
-    
     /**
      * Creates a new <code>Template</code> instance.
      *
      * @param template a <code>String</code> value
+     * @param TemplateType a <code>TemplateType</code> value
      */
-    public StringTemplate(String template) {
-	value = template;
-    }
-
-    /**
-     * Creates a new <code>StringTemplate</code> instance.
-     *
-     * @param template a <code>String</code> value
-     * @param data a list of keys and replacement strings
-     */
-    public StringTemplate(String template, String... data) {
-        value = template;
-	if (data.length % 2 != 0) {
-	    throw new IllegalArgumentException("wrong number of arguments");
-	}
-        createLists();
-	for (int index = 0; index < data.length; index += 2) {
-            keys.add(data[index]);
-            localize.add(true);
-	    replacements.add(data[index + 1]);
-	}
-    }
-
-    /**
-     * Create Lists for keys, localize and replacement fields.
-     *
-     */
-    private void createLists() {
-        if (keys == null) {
+    protected StringTemplate(String template, TemplateType templateType) {
+	setId(template);
+        this.templateType = templateType;
+        switch (templateType) {
+        case TEMPLATE:
             keys = new ArrayList<String>();
-            localize = new ArrayList<Boolean>();
-            replacements = new ArrayList<Object>();
+        case LABEL:            
+            replacements = new ArrayList<StringTemplate>();
         }
     }
 
-    /**
-     * Get the <code>Value</code> value.
-     *
-     * @return a <code>String</code> value
-     */
-    public final String getValue() {
-        return value;
+    // Factory methods
+
+    public static StringTemplate name(String value) {
+        return new StringTemplate(value, TemplateType.NAME);
     }
 
+    public static StringTemplate key(String value) {
+        return new StringTemplate(value, TemplateType.KEY);
+    }
+
+    public static StringTemplate template(String value) {
+        return new StringTemplate(value, TemplateType.TEMPLATE);
+    }
+
+    public static StringTemplate label(String value) {
+        return new StringTemplate(value, TemplateType.LABEL);
+    }
+
+
     /**
-     * Set the <code>Value</code> value.
+     * Get the <code>TemplateType</code> value.
      *
-     * @param newValue The new Value value.
+     * @return a <code>TemplateType</code> value
      */
-    public final void setValue(final String newValue) {
-        this.value = newValue;
+    public final TemplateType getTemplateType() {
+        return templateType;
     }
 
     /**
@@ -129,124 +121,86 @@ public class StringTemplate {
     }
 
     /**
-     * Set the <code>Keys</code> value.
-     *
-     * @param newKeys The new Keys value.
-     */
-    public final void setKeys(final List<String> newKeys) {
-        this.keys = newKeys;
-    }
-
-    /**
-     * Whether to localize the replacement value at index.
-     *
-     * @param index an <code>int</code> value
-     * @return a <code>boolean</code> value
-     */
-    public boolean localize(int index) {
-        return localize.get(index);
-    }
-
-    /**
      * Get the <code>Replacements</code> value.
      *
-     * @return a <code>List<Object></code> value
+     * @return a <code>List<StringTemplate></code> value
      */
-    public final List<Object> getReplacements() {
+    public final List<StringTemplate> getReplacements() {
         return replacements;
     }
 
     /**
-     * Set the <code>Replacements</code> value.
-     *
-     * @param newReplacements The new Replacements value.
-     */
-    public final void setReplacements(final List<Object> newReplacements) {
-        this.replacements = newReplacements;
-    }
-
-    /**
-     * Add a new key and replacement to the StringTemplate.
-     *
-     * @param key a <code>String</code> value
-     * @param value a <code>String</code> value
-     * @param localized a <code>boolean</code> value
-     * @return a <code>StringTemplate</code> value
-     */
-    public StringTemplate add(String key, String value, boolean localized) {
-        createLists();
-        keys.add(key);
-        localize.add(localized);
-        replacements.add(value);
-	return this;
-    }
-
-    /**
-     * Add a replacement value without a key to the StringTemplate.
-     * This is only possible if the StringTemplate is a "label"
-     * template.
-     *
-     * @param value a <code>String</code> value
-     * @param localized a <code>boolean</code> value
-     * @return a <code>StringTemplate</code> value
-     */
-    public StringTemplate add(String value, boolean localized) {
-	if (isLabelTemplate()) {
-            createLists();
-            localize.add(localized);
-	    replacements.add(value);
-	} else {
-	    throw new IllegalArgumentException("Can't add single string to template with keys.");
-	}
-	return this;
-    }
-
-    /**
-     * Add a localized replacement value without a key to the
-     * StringTemplate. This is only possible if the StringTemplate is
-     * a "label" template.
-     *
-     * @param value a <code>String</code> value
-     * @return a <code>StringTemplate</code> value
-     */
-    public StringTemplate add(String value) {
-	return add(value, true);
-    }
-
-    /**
-     * Add a non-localized replacement value (such as a proper name)
-     * without a key to the StringTemplate. This is only possible if
-     * the StringTemplate is a "label" template.
-     *
-     * @param value a <code>String</code> value
-     * @return a <code>StringTemplate</code> value
-     */
-    public StringTemplate addName(String value) {
-	return add(value, false);
-    }
-
-    /**
-     * Add a new key and localized replacement value to the
-     * StringTemplate.
+     * Add a new key and replacement to the StringTemplate. This is
+     * only possible if the StringTemplate is of type TEMPLATE.
      *
      * @param key a <code>String</code> value
      * @param value a <code>String</code> value
      * @return a <code>StringTemplate</code> value
      */
     public StringTemplate add(String key, String value) {
-	return add(key, value, true);
+        if (templateType == TemplateType.TEMPLATE) {
+            keys.add(key);
+            replacements.add(new StringTemplate(value, TemplateType.KEY));
+        } else {
+            throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
+                                               + templateType.toString());
+        }
+        return this;
     }
 
     /**
-     * Add a new key and non-localized replacement value (such as a
-     * proper name) to the StringTemplate.
+     * Add a replacement value without a key to the StringTemplate.
+     * This is only possible if the StringTemplate is of type LABEL.
+     *
+     * @param value a <code>String</code> value
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate add(String value) {
+	if (templateType == TemplateType.LABEL) {
+	    replacements.add(new StringTemplate(value, TemplateType.KEY));
+	} else {
+	    throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
+                                               + templateType.toString());
+	}
+	return this;
+    }
+
+    /**
+     * Add a new key and replacement to the StringTemplate. The
+     * replacement must be a proper name. This is only possible if the
+     * StringTemplate is of type TEMPLATE.
      *
      * @param key a <code>String</code> value
      * @param value a <code>String</code> value
      * @return a <code>StringTemplate</code> value
      */
     public StringTemplate addName(String key, String value) {
-	return add(key, value, false);
+        if (templateType == TemplateType.TEMPLATE) {
+            keys.add(key);
+            replacements.add(new StringTemplate(value, TemplateType.NAME));
+        } else {
+            throw new IllegalArgumentException("Cannot add key-value pair to StringTemplate type "
+                                               + templateType.toString());
+        }
+        return this;
+    }
+
+    /**
+     * Add a replacement value without a key to the StringTemplate.
+     * The replacement must be a proper name.  This is only possible
+     * if the StringTemplate is of type LABEL.
+     *
+     * @param value a <code>String</code> value
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate addName(String value) {
+	if (templateType == TemplateType.LABEL) {
+	    replacements.add(new StringTemplate(value, TemplateType.NAME));
+	} else {
+	    throw new IllegalArgumentException("Cannot add a single string to StringTemplate type "
+                                               + templateType.toString());
+	}
+	return this;
     }
 
     /**
@@ -258,54 +212,72 @@ public class StringTemplate {
      * @return a <code>StringTemplate</code> value
      */
     public StringTemplate addStringTemplate(String key, StringTemplate template) {
-        createLists();
-        keys.add(key);
-        localize.add(true);
-	replacements.add(template);
+        if (templateType == TemplateType.TEMPLATE) {
+            keys.add(key);
+            replacements.add(template);
+        } else {
+            throw new IllegalArgumentException("Cannot add a key-template pair to a StringTemplate type "
+                                               + templateType.toString());
+        }
 	return this;
     }
 
     /**
-     * Add a StringTemplate to this "label" StringTemplate.
+     * Add a StringTemplate to this LABEL StringTemplate.
      *
-     * @param key a <code>String</code> value
      * @param template a <code>StringTemplate</code> value
      * @return a <code>StringTemplate</code> value
      */
     public StringTemplate addStringTemplate(StringTemplate template) {
-        createLists();
-        localize.add(true);
-	replacements.add(template);
+        if (templateType == TemplateType.LABEL) {
+            replacements.add(template);
+        } else {
+	    throw new IllegalArgumentException("Cannot add a StringTemplate to StringTemplate type "
+                                               + templateType.toString());
+        }            
 	return this;
     }
 
-    /**
-     * Whether this StringTemplate is a "label" template.
-     *
-     * @return a <code>boolean</code> value
-     */
-    public boolean isLabelTemplate() {
-        return (keys == null || keys.isEmpty());
-    }
-
     public String toString() {
-	String result = "";
-        if (isLabelTemplate()) {
+        String result = templateType.toString() + ": ";
+        switch (templateType) {
+        case LABEL:
             if (replacements == null) {
-                result = value;
+                result += getId();
             } else {
-                for (Object object : replacements) {
-                    result += object + value;
+                for (StringTemplate object : replacements) {
+                    result += object + getId();
                 }
             }
-        } else {
-            result += value + " [";
+            break;
+        case TEMPLATE:
+            result += getId() + " [";
             for (int index = 0; index < keys.size(); index++) {
-                result += "[" + keys.get(index) + " (" + localize.get(index)
-                    + ") " + replacements.get(index) + "]";
+                result += "[" + keys.get(index) + ": "
+                    + replacements.get(index).toString() + "]";
             }
             result += "]";
-	}
-	return result;
+            break;
+        case KEY:
+        case NAME:
+        default:
+            result += getId();
+        }
+        return result;
     }
+
+    /**
+     * This method writes an XML-representation of this object to
+     * the given stream.
+     *
+     * @param out The target stream.
+     * @throws XMLStreamException if there are any problems writing
+     *      to the stream.
+     */
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
+        // TODO: write me
+    }
+
+
+
 }

@@ -145,6 +145,39 @@ public class Messages {
     }
 
     /**
+     * Localizes a StringTemplate.
+     *
+     * @param template a <code>StringTemplate</code> value
+     * @return a <code>String</code> value
+     */
+    public static String message(StringTemplate template) {
+        String result = "";
+        switch (template.getTemplateType()) {
+        case LABEL:
+            if (template.getReplacements() == null) {
+                return message(template.getId());
+            } else {
+                for (StringTemplate other : template.getReplacements()) {
+                    result += template.getId() + message(other);
+                }
+                return result.substring(template.getId().length());
+            }
+        case TEMPLATE:
+	    result = message(template.getId());
+	    for (int index = 0; index < template.getKeys().size(); index++) {
+                result = result.replace(template.getKeys().get(index),
+                                        message(template.getReplacements().get(index)));
+	    }
+	    return result;
+        case KEY:
+            return message(template.getId());
+        case NAME:
+        default:
+            return template.getId();
+        }
+    }
+
+    /**
      * Returns true if the message bundle contains the given key.
      *
      * @param key a <code>String</code> value
@@ -191,43 +224,6 @@ public class Messages {
                 logger.warning("Unable to load resource file " + resourceFile.getPath());
             }
         }
-    }
-
-    public static String localize(StringTemplate template) {
-        if (template.isLabelTemplate()) {
-	    String result = "";
-            if (template.getReplacements() == null) {
-                return message(template.getValue());
-            } else {
-                for (int index = 0; index < template.getReplacements().size(); index++) {
-                    Object object = template.getReplacements().get(index);
-                    if (object instanceof StringTemplate) {
-                        result += template.getValue() + localize((StringTemplate) object);
-                    } else if (template.localize(index)) {
-                        result += template.getValue() + message((String) object);
-                    } else {
-                        result += template.getValue() + object;
-                    }
-                }
-                return result.substring(template.getValue().length());
-            }
-        } else {
-	    String result = message(template.getValue());
-	    for (int index = 0; index < template.getKeys().size(); index++) {
-		if (template.getReplacements().get(index) instanceof StringTemplate) {
-		    result = result.replace(template.getKeys().get(index),
-					    localize((StringTemplate) template.getReplacements().get(index)));
-		} else if (template.localize(index)) {
-		    result = result.replace(template.getKeys().get(index), 
-					    message((String) template.getReplacements().get(index)));
-                } else {
-		    result = result.replace(template.getKeys().get(index), 
-					    template.getReplacements().get(index).toString());
-		}
-	    }
-	    return result;
-	}
-
     }
 
 }
