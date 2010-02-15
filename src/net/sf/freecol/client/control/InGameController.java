@@ -2384,9 +2384,14 @@ public final class InGameController implements NetworkConstants {
         Map map = freeColClient.getGame().getMap();
         IndianSettlement settlement
             = (IndianSettlement) getSettlementAt(unit.getTile(), direction);
+        Unit missionary = settlement.getMissionary();
+        boolean canEstablish = missionary == null;
+        boolean canDenounce = missionary != null
+            && missionary.getOwner() != unit.getOwner();
 
         // Offer the choices.
-        switch (canvas.showUseMissionaryDialog(unit, settlement)) {
+        switch (canvas.showUseMissionaryDialog(unit, settlement,
+                                               canEstablish, canDenounce)) {
         case CANCEL:
             return;
         case ESTABLISH_MISSION:
@@ -2498,8 +2503,8 @@ public final class InGameController implements NetworkConstants {
     private void moveScoutColony(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
         Colony colony = (Colony) getSettlementAt(unit.getTile(), direction);
-
-        switch (canvas.showScoutForeignColonyDialog(colony, unit)) {
+        boolean canNeg = colony.getOwner() != unit.getOwner().getREFPlayer();
+        switch (canvas.showScoutForeignColonyDialog(colony, unit, canNeg)) {
         case CANCEL:
             break;
         case FOREIGN_COLONY_ATTACK:
@@ -2810,7 +2815,9 @@ public final class InGameController implements NetworkConstants {
                 }
 
                 // Show dialog for buy proposal
-                switch (canvas.showBuyDialog(unit, settlement, goods, gold)) {
+                boolean canBuy = gold <= player.getGold();
+                switch (canvas.showBuyDialog(unit, settlement, goods, gold,
+                                             canBuy)) {
                 case CANCEL: // User cancelled
                     return;
                 case BUY: // Accept price, make purchase
@@ -3065,10 +3072,10 @@ public final class InGameController implements NetworkConstants {
 
 
     /**
-     * Claim a piece of land.
+     * Claim a tile.
      *
-     * @param tile The land to claim.
-     * @param colony An optional <code>Colony</code> to own the land.
+     * @param tile The <code>Tile</code> to claim.
+     * @param colony An optional <code>Colony</code> to own the tile.
      * @param offer An offer to pay.
      * @return True if the claim succeeded.
      */
@@ -3090,7 +3097,9 @@ public final class InGameController implements NetworkConstants {
             } else if (offer < 0) { // plan to steal
                 price = ClaimLandMessage.STEAL_LAND;
             } else {
-                switch (canvas.showClaimDialog(tile, player, price, owner)) {
+                boolean canAccept = price <= player.getGold();
+                switch (canvas.showClaimDialog(tile, player, price,
+                                               owner, canAccept)) {
                 case CANCEL:
                     return false;
                 case ACCEPT: // accepted price

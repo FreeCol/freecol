@@ -587,7 +587,6 @@ public final class InGameInputHandler extends InputHandler {
         Element unitElement = (Element) element.getFirstChild();
         Unit convert = new Unit(getGame(), unitElement);
         tile.add(convert);
-        
         ModelMessage message = new ModelMessage(convert,
                                                 ModelMessage.MessageType.UNIT_ADDED,
                                                 convert,

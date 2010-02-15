@@ -2007,16 +2007,18 @@ public final class Canvas extends JDesktopPane {
      *
      * @param colony The <code>Colony</code> to be scouted.
      * @param unit The <code>Unit</code> that is scouting.
+     * @param canNegotiate True if negotation is a valid choice.
      * @return The selected action, either negotiate, spy, attack or cancel.
      */
-    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony, Unit unit) {
+    public ScoutColonyAction showScoutForeignColonyDialog(Colony colony,
+                                                          Unit unit,
+                                                          boolean canNegotiate) {
         List<ChoiceItem<ScoutColonyAction>> choices
             = new ArrayList<ChoiceItem<ScoutColonyAction>>();
         // We cannot negotiate with the REF
         choices.add(new ChoiceItem<ScoutColonyAction>(
                 Messages.message("scoutColony.negotiate"),
-                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE,
-                colony.getOwner() != unit.getOwner().getREFPlayer()));
+                ScoutColonyAction.FOREIGN_COLONY_NEGOTIATE, canNegotiate));
         choices.add(new ChoiceItem<ScoutColonyAction>(
                 Messages.message("scoutColony.spy"),
                 ScoutColonyAction.FOREIGN_COLONY_SPY));
@@ -2048,7 +2050,8 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
                 Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
-        ScoutIndianSettlementAction result = showChoiceDialog(settlement.getTile(),
+        ScoutIndianSettlementAction result
+            = showChoiceDialog(settlement.getTile(),
                 Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
                                  "%nation%", settlement.getOwner().getNationAsString()),
                 Messages.message("cancel"),
@@ -2062,26 +2065,27 @@ public final class Canvas extends JDesktopPane {
      *
      * @param unit The <code>Unit</code> speaking to the settlement.
      * @param settlement The <code>IndianSettlement</code> being visited.
+     * @param canEstablish Is establish a valid option.
+     * @param canDenounce Is denounce a valid option.
      * @return The chosen action, establish mission, denounce, incite
      *         or cancel.
      */
-    public MissionaryAction showUseMissionaryDialog(Unit unit, IndianSettlement settlement) {
+    public MissionaryAction showUseMissionaryDialog(Unit unit,
+                                                    IndianSettlement settlement,
+                                                    boolean canEstablish,
+                                                    boolean canDenounce) {
         Player player = unit.getOwner();
-        Unit missionary = settlement.getMissionary();
         List<ChoiceItem<MissionaryAction>> choices
             = new ArrayList<ChoiceItem<MissionaryAction>>();
         choices.add(new ChoiceItem<MissionaryAction>(
                 Messages.message("missionarySettlement.establish"),
-                MissionaryAction.ESTABLISH_MISSION,
-                missionary == null));
+                MissionaryAction.ESTABLISH_MISSION, canEstablish));
         choices.add(new ChoiceItem<MissionaryAction>(
                 Messages.message("missionarySettlement.heresy"),
-                MissionaryAction.DENOUNCE_HERESY,
-                missionary != null && missionary.getOwner() != player));
+                MissionaryAction.DENOUNCE_HERESY, canDenounce));
         choices.add(new ChoiceItem<MissionaryAction>(
                 Messages.message("missionarySettlement.incite"),
-                MissionaryAction.INCITE_INDIANS,
-                true));
+                MissionaryAction.INCITE_INDIANS));
         StringBuilder introText
             = new StringBuilder(Messages.message(settlement.getAlarmLevelMessage(unit.getOwner()),
                                                  "%nation%", settlement.getOwner().getNationAsString()));
@@ -2212,26 +2216,26 @@ public final class Canvas extends JDesktopPane {
      * Displays the panel for trading with an <code>IndianSettlement</code>.
      *
      * @param settlement The native settlement to trade with.
-     * @param showBuy Show a "buy" option.
-     * @param showSell Show a "sell" option.
-     * @param showGift Show a "gift" option.
+     * @param canBuy Show a "buy" option.
+     * @param canSell Show a "sell" option.
+     * @param canGift Show a "gift" option.
+     * @return The chosen action, buy, sell, gift or cancel.
      */
     public TradeAction showIndianSettlementTradeDialog(Settlement settlement,
-                                                       boolean showBuy, boolean showSell, boolean showGift) {
+                                                       boolean canBuy,
+                                                       boolean canSell,
+                                                       boolean canGift) {
         ArrayList<ChoiceItem<TradeAction>> choices
             = new ArrayList<ChoiceItem<TradeAction>>();
         choices.add(new ChoiceItem<TradeAction>(
                 Messages.message("tradeProposition.toBuy"),
-                TradeAction.BUY,
-                showBuy));
+                TradeAction.BUY, canBuy));
         choices.add(new ChoiceItem<TradeAction>(
                 Messages.message("tradeProposition.toSell"),
-                TradeAction.SELL,
-                showSell));
+                TradeAction.SELL, canSell));
         choices.add(new ChoiceItem<TradeAction>(
                 Messages.message("tradeProposition.toGift"),
-                TradeAction.GIFT,
-                showGift));
+                TradeAction.GIFT, canGift));
         TradeAction result = showChoiceDialog(settlement.getTile(),
                 Messages.message("tradeProposition.welcome",
                                  "%nation%", settlement.getOwner().getNationAsString(),
@@ -2249,20 +2253,19 @@ public final class Canvas extends JDesktopPane {
      * @param settlement The <code>Settlement</code> to buy from.
      * @param goods The <code>Goods</code> to buy.
      * @param gold The current negotiated price.
-     * @return The chosen action, buy or haggle, or null.
+     * @param canBuy True if buy is a valid option.
+     * @return The chosen action, buy, haggle, or cancel.
      */
     public BuyAction showBuyDialog(Unit unit, Settlement settlement,
-                                   Goods goods, int gold) {
+                                   Goods goods, int gold, boolean canBuy) {
         List<ChoiceItem<BuyAction>> choices
             = new ArrayList<ChoiceItem<BuyAction>>();
         choices.add(new ChoiceItem<BuyAction>(
                 Messages.message("buy.takeOffer"),
-                BuyAction.BUY,
-                gold <= unit.getOwner().getGold()));
+                BuyAction.BUY, canBuy));
         choices.add(new ChoiceItem<BuyAction>(
                 Messages.message("buy.moreGold"),
-                BuyAction.HAGGLE,
-                true));
+                BuyAction.HAGGLE));
         BuyAction result = showChoiceDialog(unit.getTile(),
                 Messages.message("buy.text",
                                  "%nation%", settlement.getOwner().getNationAsString(),
@@ -2313,21 +2316,20 @@ public final class Canvas extends JDesktopPane {
      * @param player The <code>Player</code> that is claiming.
      * @param price An asking price, if any.
      * @param owner The <code>Player</code> that owns the land.
-     * @return The chosen action, accept or steal, or null.
+     * @param canAccept True if accept is a valid option.
+     * @return The chosen action, accept, steal or cancel.
      */
     public ClaimAction showClaimDialog(Tile tile, Player player, int price,
-                                       Player owner) {
+                                       Player owner, boolean canAccept) {
         List<ChoiceItem<ClaimAction>> choices
             = new ArrayList<ChoiceItem<ClaimAction>>();
         choices.add(new ChoiceItem<ClaimAction>(
                 Messages.message("indianLand.pay",
                                  "%amount%", Integer.toString(price)),
-                ClaimAction.ACCEPT,
-                price <= player.getGold()));
+                ClaimAction.ACCEPT, canAccept));
         choices.add(new ChoiceItem<ClaimAction>(
                 Messages.message("indianLand.take"),
-                ClaimAction.STEAL,
-                true));
+                ClaimAction.STEAL));
         ClaimAction result = showChoiceDialog(tile,
                 Messages.message("indianLand.text",
                                  "%player%", owner.getNationAsString()),
