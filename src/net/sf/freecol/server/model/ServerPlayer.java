@@ -168,7 +168,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * Claim the given land.
      *
      * @param tile The <code>Tile</code> to claim.
-     * @param colony The <code>Settlement</code> that will own the tile, if any.
+     * @param settlement The <code>Settlement</code> that will own the
+     *                   tile, if any.
      * @param price The price to pay for the land, which must agree with
      *              the owner valuation, unless negative which denotes stealing.
      */

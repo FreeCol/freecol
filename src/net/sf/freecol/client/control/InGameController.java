@@ -1175,6 +1175,8 @@ public final class InGameController implements NetworkConstants {
         if (askBuildColony(name, unit) && tile.getSettlement() != null) {
             player.invalidateCanSeeTiles();
             freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
+            gui.setActiveUnit(null);
+            gui.setSelectedTile(tile.getPosition());
 
             // Check units present for treasure cash-in as they are now
             // suddenly in-colony.
@@ -1182,9 +1184,6 @@ public final class InGameController implements NetworkConstants {
             for (Unit unitInTile : units) {
                 checkCashInTreasureTrain(unitInTile);
             }
-
-            gui.setActiveUnit(null);
-            gui.setSelectedTile(tile.getPosition());
         }
     }
 
@@ -1364,10 +1363,6 @@ public final class InGameController implements NetworkConstants {
         // Proceed to abandon
         Tile tile = colony.getTile();
         if (askAbandonColony(colony) && tile.getSettlement() == null) {
-            // TODO: move to server, Player.settlements is *not* currently
-            // communicated between client and server.
-            player.removeSettlement(colony);
-
             player.invalidateCanSeeTiles();
             GUI gui = freeColClient.getGUI();
             gui.setActiveUnit(null);

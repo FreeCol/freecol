@@ -1815,6 +1815,7 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             owningSettlement = null;
         }
 
+        Settlement oldSettlement = settlement;
         settlement = null;
         units.clear();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
@@ -1853,6 +1854,17 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
                                " loading tile with ID " +
                                getId());
                 in.nextTag();
+            }
+        }
+
+        // Player settlement list is not passed in player updates
+        // so do it here.  TODO: something better.
+        if (settlement != oldSettlement) {
+            if (oldSettlement != null) {
+                oldSettlement.getOwner().removeSettlement(oldSettlement);
+            }
+            if (settlement != null) {
+                settlement.getOwner().addSettlement(settlement);
             }
         }
 
