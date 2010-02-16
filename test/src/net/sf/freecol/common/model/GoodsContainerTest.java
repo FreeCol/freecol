@@ -105,6 +105,7 @@ public class GoodsContainerTest extends FreeColTestCase {
     	final int lowLevel = 10;
     	final int highLevel = 90;
     	final int exportLevel = 50;
+    	final int overfullLevel = 201;
     	final boolean canExport = true;
     	int foodStart= lowLevel;
     	
@@ -131,6 +132,14 @@ public class GoodsContainerTest extends FreeColTestCase {
     	// Test new condition food below limits
     	colony.getGoodsContainer().cleanAndReport();
     	assertTrue("Player should have received one message", colony.getOwner().getModelMessages().size() == 1);
+
+      // Stuff the colony overfull with food.  This should *not* trigger
+      // a warning because upper limits are ignored for food.
+      colony.getGoodsContainer().addGoods(food, overfullLevel);
+      colony.getOwner().clearModelMessages();
+    	colony.getGoodsContainer().cleanAndReport();
+      assertTrue("Food does not have a storage limit", food.limitIgnored());
+      assertTrue("Player should not receive a message", colony.getOwner().getModelMessages().size() == 0);
     }
 
 }

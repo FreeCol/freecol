@@ -386,8 +386,7 @@ public class GoodsContainer extends FreeColGameObject {
         int adjustment = limit / CARGO_SIZE;
 
         for (GoodsType goodsType : storedGoods.keySet()) {
-        	boolean ignoreLimits = !goodsType.isFoodType() && goodsType.limitIgnored(); 
-            if (ignoreLimits || !goodsType.isStorable()) {
+            if (!goodsType.isStorable()) {
                 continue;
             }
             ExportData exportData = colony.getExportData(goodsType);
@@ -398,18 +397,21 @@ public class GoodsContainer extends FreeColGameObject {
             String messageId = null;
             int level = 0;
             int waste = 0;
-            if (amount > limit) {
-                // limit has been exceeded
-                waste = amount - limit;
-                setAmount(goodsType, limit);
-                messageId = "model.building.warehouseWaste";
-            } else if (amount == limit && oldAmount < limit) {
-                // limit has been reached during this turn
-                messageId = "model.building.warehouseOverfull";
-            } else if (amount > high && oldAmount <= high) {
-                messageId = "model.building.warehouseFull";
-                level = high;
-            } else if (amount < low && oldAmount >= low) {
+            if (!goodsType.limitIgnored()) {
+                if (amount > limit) {
+                    // limit has been exceeded
+                    waste = amount - limit;
+                    setAmount(goodsType, limit);
+                    messageId = "model.building.warehouseWaste";
+                } else if (amount == limit && oldAmount < limit) {
+                    // limit has been reached during this turn
+                    messageId = "model.building.warehouseOverfull";
+                } else if (amount > high && oldAmount <= high) {
+                    messageId = "model.building.warehouseFull";
+                    level = high;
+                }
+            }
+            if (amount < low && oldAmount >= low) {
                 messageId = "model.building.warehouseEmpty";
                 level = low;
             }
