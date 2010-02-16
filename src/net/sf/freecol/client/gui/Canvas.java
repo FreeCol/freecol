@@ -792,6 +792,7 @@ public final class Canvas extends JDesktopPane {
     /**
      * Displays a dialog with a text field and a ok/cancel option.
      *
+     * @param tile An optional tile to make visible (not under the dialog).
      * @param text The text that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okText The text displayed on the "ok"-button.
@@ -801,14 +802,17 @@ public final class Canvas extends JDesktopPane {
      *         to cancel the action.
      * @see FreeColDialog
      */
-    public String showInputDialog(String text, String defaultValue, String okText, String cancelText,
+    public String showInputDialog(Tile tile, String text, String defaultValue,
+                                  String okText, String cancelText,
                                   String... data) {
-        return showInputDialog(text, defaultValue, okText, cancelText, true, data);
+        return showInputDialog(tile, text, defaultValue, okText, cancelText,
+                               true, data);
     }
 
     /**
      * Displays a dialog with a text field and a ok/cancel option.
      *
+     * @param tile An optional tile to make visible (not under the dialog).
      * @param text The text that explains the action to the user.
      * @param defaultValue The default value appearing in the text field.
      * @param okText The text displayed on the "ok"-button.
@@ -819,7 +823,8 @@ public final class Canvas extends JDesktopPane {
      *         to cancel the action.
      * @see FreeColDialog
      */
-    public String showInputDialog(String text, String defaultValue, String okText, String cancelText,
+    public String showInputDialog(Tile tile, String text, String defaultValue,
+                                  String okText, String cancelText,
                                   boolean rejectEmptyString, String... data) {
         try {
             text = Messages.message(text, data);
@@ -832,31 +837,27 @@ public final class Canvas extends JDesktopPane {
             logger.warning("could not find message with id: " + text + ", " + okText + " or " + cancelText + ".");
         }
 
-        FreeColDialog<String> inputDialog = FreeColDialog.createInputDialog(text, defaultValue, okText, cancelText);
-        showSubPanel(inputDialog);
+        FreeColDialog<String> inputDialog
+            = FreeColDialog.createInputDialog(text, defaultValue,
+                                              okText, cancelText);
+        String response = null;
+        for (;;) {
+            response = showFreeColDialog(inputDialog, tile);
+            if (!rejectEmptyString || response == null || response.length() > 0) {
+                break;
+            }
 
-        String response = (String) inputDialog.getResponse();
-
-        // checks if the user entered some text.
-        while (rejectEmptyString && (response != null) && (response.length() == 0)) {
             String okTxt = "ok";
             String txt = "enterSomeText";
             try {
                 okTxt = Messages.message(okTxt);
                 txt = Messages.message(txt);
             } catch (MissingResourceException e) {
-                logger.warning("could not find message with id: " + txt + " or " + okTxt + ".");
+                logger.warning("could not find message with id: "
+                               + txt + " or " + okTxt + ".");
             }
-            remove(inputDialog);
-
-            showFreeColDialog(new InformationDialog(this, txt, null));
-
-            showSubPanel(inputDialog);
-            response = (String) inputDialog.getResponse();
+            showFreeColDialog(new InformationDialog(this, txt, null), tile);
         }
-
-        remove(inputDialog);
-
         return response;
     }
 

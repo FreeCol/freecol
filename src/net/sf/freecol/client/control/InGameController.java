@@ -1070,13 +1070,13 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         String name = null;
         if (object instanceof Colony) {
-            name = canvas.showInputDialog("renameColony.text",
-                                          object.getName(),
-                                          "renameColony.yes",
-                                          "renameColony.no");
-            if (name == null || name.length() == 0) {
-                return; // User cancelled
-            }
+            Colony colony = (Colony) object;
+            name = canvas.showInputDialog(colony.getTile(),
+                                          "renameColony.text",
+                                          colony.getName(),
+                                          "renameColony.yes", "renameColony.no",
+                                          true);
+            if (name == null) return; // User cancelled, 0-length invalid.
             if (player.getSettlement(name) != null) {
                 // Colony name must be unique.
                 canvas.showInformationMessage("nameColony.notUnique",
@@ -1085,14 +1085,13 @@ public final class InGameController implements NetworkConstants {
                 return;
             }
         } else if (object instanceof Unit) {
-            name = canvas.showInputDialog("renameUnit.text",
-                                          object.getName(),
-                                          "renameUnit.yes",
-                                          "renameUnit.no",
+            Unit unit = (Unit) object;
+            name = canvas.showInputDialog(unit.getTile(),
+                                          "renameUnit.text",
+                                          unit.getName(),
+                                          "renameUnit.yes", "renameUnit.no",
                                           false);
-            if (name == null) {
-                return; // User cancelled, zero-length return removes name.
-            }
+            if (name == null) return; // User cancelled, 0-length clears name.
         } else {
             logger.warning("Tried to rename an unsupported Nameable: "
                            + object.toString());
@@ -1159,10 +1158,11 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Get and check the name.
-        String name = canvas.showInputDialog("nameColony.text",
+        String name = canvas.showInputDialog(tile, "nameColony.text",
                                              player.getDefaultSettlementName(false),
-                                             "nameColony.yes", "nameColony.no");
-        if (name == null) return; // User cancelled.
+                                             "nameColony.yes", "nameColony.no",
+                                             true);
+        if (name == null) return; // User cancelled, 0-length invalid.
         if (player.getSettlement(name) != null) {
             // Colony name must be unique.
             canvas.showInformationMessage("nameColony.notUnique",
@@ -1610,10 +1610,14 @@ public final class InGameController implements NetworkConstants {
 
         ModelMessage m = null;
         if (reply.hasAttribute("nameNewLand")) {
-            String newLandName = reply.getAttribute("nameNewLand");
-            newLandName = canvas.showInputDialog("newLand.text",
-                                                 newLandName,
-                                                 "newLand.yes", null);
+            String defaultName = reply.getAttribute("nameNewLand");
+            String newLandName = canvas.showInputDialog(unit.getTile(),
+                                                        "newLand.text",
+                                                        defaultName,
+                                                        "newLand.yes", null,
+                                                        true);
+            // Default out on null, 0-length invalid.
+            if (newLandName == null) newLandName = defaultName;
             if (askNewLandName(newLandName)
                 && newLandName.equals(player.getNewLandName())) {
                 canvas.showEventPanel(unit.getTile(), EventType.FIRST_LANDING);
@@ -1633,12 +1637,16 @@ public final class InGameController implements NetworkConstants {
         }
         if (reply.hasAttribute("discoverRegion")
             && reply.hasAttribute("regionType")) {
-            String newRegionName = reply.getAttribute("discoverRegion");
             String newRegionType = reply.getAttribute("regionType");
-            newRegionName = canvas.showInputDialog("nameRegion.text",
-                                                   newRegionName,
-                                                   "ok", "cancel",
-                                                   "%name%", newRegionType);
+            String defaultName = reply.getAttribute("discoverRegion");
+            String newRegionName = canvas.showInputDialog(unit.getTile(),
+                                                          "nameRegion.text",
+                                                          defaultName,
+                                                          "ok", "cancel",
+                                                          true,
+                                                          "%name%", newRegionType);
+            // Default out on null, 0-length invalid.
+            if (newRegionName == null) newRegionName = defaultName;
             askNewRegionName(newRegionName, unit);
         }
 

@@ -276,9 +276,9 @@ public class DebugMenu extends JMenu {
         addCrosses.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     String response = freeColClient.getCanvas()
-                        .showInputDialog("menuBar.debug.addImmigration",
+                        .showInputDialog(null, "menuBar.debug.addImmigration",
                                          Integer.toString(100),
-                                         "ok", "cancel");
+                                         "ok", "cancel", true);
                     Player player = freeColClient.getMyPlayer();
                     int crosses = Integer.parseInt(response);
                     Player serverPlayer = (Player) freeColClient.getFreeColServer()
@@ -522,16 +522,17 @@ public class DebugMenu extends JMenu {
         }
         skipTurnsMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                	boolean isSkipping = freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns != 0;
-                    if(isSkipping){
-                    	freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns = 0;
-                    	return;
-                    }
-                	
-                	int skipTurns = Integer.parseInt(freeColClient.getCanvas().showInputDialog(
-                            "How many turns should be skipped:", Integer.toString(10), "ok", "cancel"));
-                    freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns = skipTurns;
-                    freeColClient.getInGameController().endTurn();
+                boolean isSkipping = freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns != 0;
+                if(isSkipping){
+                    freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns = 0;
+                    return;
+                }
+
+                Canvas canvas = freeColClient.getCanvas();
+                int skipTurns = Integer.parseInt(canvas.showInputDialog(null,
+                                                                        "How many turns should be skipped:", Integer.toString(10), "ok", "cancel", true));
+                freeColClient.getFreeColServer().getInGameController().debugOnlyAITurns = skipTurns;
+                freeColClient.getInGameController().endTurn();
             }
         });
         this.addChangeListener(new ChangeListener() {
