@@ -1414,10 +1414,10 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
             }
 
             if (resource.useQuantity(goodsType, unitType, potential) == 0) {
-                addModelMessage(settlement, ModelMessage.MessageType.WARNING,
-                                "model.tile.resourceExhausted", 
-                                "%resource%", resource.getName(),
-                                "%colony%", ((Colony) settlement).getName());
+                addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                 "model.tile.resourceExhausted", settlement)
+                                .add("%resource%", resource.getNameKey())
+                                .addName("%colony%", settlement.getName()));
                 tileItemContainer.removeTileItem(resource);
                 updatePlayerExploredTiles();
             }

@@ -23,6 +23,7 @@ package net.sf.freecol.common.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -65,6 +66,19 @@ public class StringTemplate extends FreeColObject {
      * The values with which to replace the keys in the string template.
      */
     private List<StringTemplate> replacements;
+
+
+
+    protected StringTemplate() {
+        // empty constructor
+    }
+
+    public StringTemplate(String id, StringTemplate template) {
+        setId(id);
+        this.templateType = template.templateType;
+        this.keys = template.keys;
+        this.replacements = template.replacements;
+    }
 
     /**
      * Creates a new <code>Template</code> instance.
@@ -204,6 +218,19 @@ public class StringTemplate extends FreeColObject {
     }
 
     /**
+     * Add a key and an integer value to replace it to this
+     * StringTemplate.
+     *
+     * @param key a <code>String</code> value
+     * @param amount an <code>int</code> value
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate addAmount(String key, int amount) {
+        addName(key, Integer.toString(amount));
+        return this;
+    }
+
+    /**
      * Add a key and a StringTemplate to replace it to this
      * StringTemplate.
      *
@@ -266,18 +293,81 @@ public class StringTemplate extends FreeColObject {
         return result;
     }
 
-    /**
-     * This method writes an XML-representation of this object to
-     * the given stream.
-     *
-     * @param out The target stream.
-     * @throws XMLStreamException if there are any problems writing
-     *      to the stream.
-     */
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // TODO: write me
+        out.writeStartElement(getXMLElementTagName());
+        writeAttributes(out);
+        writeChildren(out);
+        out.writeEndElement();
     }
 
+    public static String getXMLElementTagName() {
+        return "stringTemplate";
+    }
+
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
+        out.writeAttribute("templateType", templateType.toString());
+    }
+
+
+    public void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        if (keys != null) {
+            for (String key : keys) {
+                out.writeStartElement("key");
+                out.writeAttribute("value", key);
+                out.writeEndElement();
+            }
+        }
+        if (replacements != null) {
+            for (StringTemplate replacement : replacements) {
+                replacement.toXMLImpl(out);
+            }
+        }
+    }
+
+    public void readAttributes(XMLStreamReader in) throws XMLStreamException {
+        // TODO: remove compatibility code
+        String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+        if (id == null) {
+            id = in.getAttributeValue(null, ID_ATTRIBUTE);
+        }
+        setId(id);
+        String typeString = in.getAttributeValue(null, "templateType");
+        if (typeString == null) {
+            templateType = TemplateType.TEMPLATE;
+        } else {
+            templateType = Enum.valueOf(TemplateType.class, typeString);
+        }
+        // end compatibility code
+        switch (templateType) {
+        case TEMPLATE:
+            keys = new ArrayList<String>();
+        case LABEL:            
+            replacements = new ArrayList<StringTemplate>();
+        }
+    }
+
+
+    public void readChildren(XMLStreamReader in) throws XMLStreamException {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+            if ("key".equals(in.getLocalName())) {
+                keys.add(in.getAttributeValue(null, "value"));
+                in.nextTag();
+            } else if (getXMLElementTagName().equals(in.getLocalName())) {
+                StringTemplate replacement = new StringTemplate();
+                replacement.readFromXMLImpl(in);
+                replacements.add(replacement);
+            } else if ("data".equals(in.getLocalName())) {
+                // TODO: remove compatibility code
+                String[] data = readFromArrayElement("data", in, new String[0]);
+                for (int index = 0; index < data.length; index += 2) {
+                    keys.add(data[index]);
+                    replacements.add(new StringTemplate(data[index + 1], TemplateType.NAME));
+                }
+                // end compatibility code
+            }
+        }
+    }
 
 
 }

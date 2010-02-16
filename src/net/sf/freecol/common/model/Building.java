@@ -149,6 +149,10 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return buildingType.getName();
     }
 
+    public String getNameKey() {
+        return buildingType.getNameKey();
+    }
+
     /**
      * Returns the level of this building.
      *
@@ -498,10 +502,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 buildingType.hasAbility("model.ability.repairUnits", unit.getType())) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
-                    addModelMessage(this, ModelMessage.MessageType.DEFAULT, this,
-                                    "model.unit.unitRepaired",
-                                    "%unit%", unit.getName(),
-                                    "%repairLocation%", Messages.message(getLocationName()));
+                    addModelMessage(new ModelMessage("model.unit.unitRepaired", this)
+                                    .addName("%unit%", unit.getName())
+                                    .addStringTemplate("%repairLocation%", getLocationName()));
                 }
             }
         }
@@ -514,12 +517,12 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         final GoodsType goodsOutputType = getGoodsOutputType();
 
         if (goodsInput == 0 && !canAutoProduce() && getMaximumGoodsInput() > 0) {
-            addModelMessage(getColony(), ModelMessage.MessageType.MISSING_GOODS,
-                            goodsInputType,
-                            "model.building.notEnoughInput",
-                            "%inputGoods%", goodsInputType.getName(),
-                            "%building%", getName(),
-                            "%colony%", colony.getName());
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                             "model.building.notEnoughInput",
+                                             getColony(), goodsInputType)
+                            .add("%inputGoods%", goodsInputType.getNameKey())
+                            .add("%building%", getNameKey())
+                            .addName("%colony%", colony.getName()));
         }
 
         if (goodsOutput <= 0) {
@@ -581,10 +584,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     private boolean assignStudent(Unit teacher) {
         final Unit student = findStudent(teacher);
         if (student == null) {
-            addModelMessage(getColony(), ModelMessage.MessageType.WARNING, teacher,
-                            "model.building.noStudent",
-                            "%teacher%", teacher.getName(),
-                            "%colony%", colony.getName());
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                             "model.building.noStudent",
+                                             getColony(), teacher)
+                            .addName("%teacher%", teacher.getName())
+                            .addName("%colony%", colony.getName()));
             return false;
         } else {
             teacher.setStudent(student);

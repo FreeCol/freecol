@@ -348,78 +348,6 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     
     /**
-     * Creates a <code>ModelMessage</code> and uses
-     * <code>Player.addModelMessage(modelMessage)</code> to register
-     * it.
-     *
-     * <br><br><br>
-     *
-     * Example:<br><br>
-     *
-     * Using <code>addModelMessage(this, someType, "messageID",
-     * "%test1%", "ok1", "%test2%", "ok2")</code> with the entry
-     * "messageID=This is %test1% and %test2%" in {@link
-     * net.sf.freecol.client.gui.i18n.Messages Messages}, would give
-     * the following message: "This is ok1 and ok2".
-     *
-     * @param source The source of the message. This is what the
-     *               message should be associated with. In addition,
-     *               the owner of the source is the player getting the
-     *               message.
-     * @param type The type of message. This is used for filtering
-     * purposes.
-     * @param messageID The ID of the message to display. See: {@link
-     * net.sf.freecol.client.gui.i18n.Messages Messages}.
-     * @param data Contains the data to be displayed in the message.
-     * @see net.sf.freecol.client.gui.Canvas Canvas
-     * @see Player#addModelMessage(ModelMessage)
-     * @see ModelMessage
-     */    
-    protected void addModelMessage(FreeColGameObject source, ModelMessage.MessageType type,
-                                   String messageID, String... data) {
-        addModelMessage(source, type, null, messageID, data);
-    }
-
-    /**
-     * Creates a <code>ModelMessage</code> and uses
-     * <code>Player.addModelMessage(modelMessage)</code> to register
-     * it.
-     *
-     * <br><br><br>
-     *
-     * Example:<br><br>
-     *
-     * Using <code>addModelMessage(this, someType, someDisplay,
-     * "messageID", "%test1%", "ok1", "%test2%", "ok2")</code> with
-     * the entry "messageID=This is %test1% and %test2%" in {@link
-     * net.sf.freecol.client.gui.i18n.Messages Messages}, would give
-     * the following message: "This is ok1 and ok2".
-     *
-     * @param source The source of the message. This is what the
-     *               message should be associated with. In addition,
-     *               the owner of the source is the player getting the
-     *               message.
-     * @param type The type of message. This is used for filtering
-     * purposes.
-     * @param display The Object to display if that is not the
-     * source. A message about <code>Goods</code> in a
-     * <code>Colony</code> might wish to display the goods instead of
-     * the colony, for example.
-     * @param messageID The ID of the message to display. See: {@link
-     * net.sf.freecol.client.gui.i18n.Messages Messages}.
-     * @param data Contains the data to be displayed in the message.
-     * @see net.sf.freecol.client.gui.Canvas Canvas
-     * @see Player#addModelMessage(ModelMessage)
-     * @see ModelMessage
-     */    
-    protected void addModelMessage(FreeColGameObject source, ModelMessage.MessageType type, 
-                                   FreeColObject display, String messageID, String... data) {
-        ModelMessage message = new ModelMessage(source, type, display, messageID, data);
-        
-        addModelMessage(message);
-    }
-
-    /**
      * Receives a <code>ModelMessage</code> and uses
      * <code>Player.addModelMessage(modelMessage)</code> to register
      * it.
@@ -433,9 +361,9 @@ abstract public class FreeColGameObject extends FreeColObject {
      */
     protected void addModelMessage(ModelMessage message){
     	if (message.getSource() == null) {
-    		logger.warning("ModelMessage with ID " + message.getId() + " has null source.");
+            logger.warning("ModelMessage with ID " + message.getId() + " has null source.");
     	} else if (message.getOwner() == null) {
-    		logger.warning("ModelMessage with ID " + message.getId() + " has null owner.");
+            logger.warning("ModelMessage with ID " + message.getId() + " has null owner.");
     	}
     	message.getOwner().addModelMessage(message);
     }

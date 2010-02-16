@@ -339,11 +339,11 @@ public final class InGameController extends Controller {
 
         Element messages = doc.createElement("addMessages");
         element.appendChild(messages);
-        ModelMessage m = new ModelMessage(serverPlayer,
-                                          ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                          serverPlayer,
-                                          ((serverPlayer.isEuropean()) ? "model.diplomacy.dead.european" : "model.diplomacy.dead.native"),
-                                          "%nation%", serverPlayer.getNationAsString());
+        String messageId = serverPlayer.isEuropean() ? "model.diplomacy.dead.european"
+            : "model.diplomacy.dead.native";
+        ModelMessage m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                          messageId, serverPlayer)
+            .addName("%nation%", serverPlayer.getNationAsString());
         messages.appendChild(m.toXMLElement(doc));
 
         Element setDeadElement = doc.createElement("setDead");
@@ -1196,10 +1196,10 @@ public final class InGameController extends Controller {
         // where we did not select the unit type.
         // Fountain of Youth migrants have already been announced in bulk.
         return (fountain || validSlot) ? null
-            : new ModelMessage(player, ModelMessage.MessageType.UNIT_ADDED,
-                               unit, "model.europe.emigrate",
-                               "%europe%", europe.getName(),
-                               "%unit%", unit.getName());
+            : new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                               "model.europe.emigrate", player, unit)
+            .addName("%europe%", europe.getName())
+            .addName("%unit%", unit.getName());
     }
 
 
@@ -1447,83 +1447,68 @@ public final class InGameController extends Controller {
             Player indianPlayer = tile.getOwner();
             indianPlayer.modifyTension(serverPlayer, Tension.Level.HATEFUL.getLimit());
             result.add(indianPlayer);
-            result.add(new ModelMessage(serverPlayer,
-                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                        unit,
+            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.BurialGround",
-                                        "%nation%", indianPlayer.getNationAsString()));
+                                        serverPlayer, unit)
+                       .addName("%nation%", indianPlayer.getNationAsString()));
             break;
         case EXPEDITION_VANISHES:
             unit.dispose();
-            result.add(new ModelMessage(serverPlayer,
-                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                        null,
-                                        "lostCityRumour.ExpeditionVanishes"));
+            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        "lostCityRumour.ExpeditionVanishes", serverPlayer));
             break;
         case NOTHING:
-            result.add(new ModelMessage(serverPlayer,
-                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                        unit,
-                                        "lostCityRumour.Nothing"));
+            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        "lostCityRumour.Nothing", serverPlayer, unit));
             break;
         case LEARN:
             List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
             String oldName = unit.getName();
             unit.setType(learntUnitTypes.get(getPseudoRandom().nextInt(learntUnitTypes.size())));
-            result.add(new ModelMessage(serverPlayer,
-                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                        unit,
-                                        "lostCityRumour.Learn",
-                                        "%unit%", oldName,
-                                        "%type%", unit.getType().getName()));
+            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        "lostCityRumour.Learn", serverPlayer, unit)
+                       .addName("%unit%", oldName)
+                       .add("%type%", unit.getType().getNameKey()));
             break;
         case TRIBAL_CHIEF:
             int chiefAmount = getPseudoRandom().nextInt(dx * 10) + dx * 5;
             serverPlayer.modifyGold(chiefAmount);
             result.add(serverPlayer);
-            result.add(new ModelMessage(serverPlayer,
-                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                        unit,
-                                        "lostCityRumour.TribalChief",
-                                        "%money%", Integer.toString(chiefAmount)));
+            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        "lostCityRumour.TribalChief", serverPlayer, unit)
+                       .addAmount("%money%", chiefAmount));
             break;
         case COLONIST:
             List<UnitType> newUnitTypes = specification.getUnitTypesWithAbility("model.ability.foundInLostCity");
             newUnit = new Unit(game, tile, serverPlayer,
                                newUnitTypes.get(getPseudoRandom().nextInt(newUnitTypes.size())),
                                UnitState.ACTIVE);
-            result.add(new ModelMessage(serverPlayer,
-                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                        newUnit,
-                                        "lostCityRumour.Colonist"));
+            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                        "lostCityRumour.Colonist", serverPlayer, newUnit));
             break;
         case CIBOLA:
             String cityName = game.getCityOfCibola();
             if (cityName != null) {
                 int treasureAmount = getPseudoRandom().nextInt(dx * 600) + dx * 300;
-                String treasureString = String.valueOf(treasureAmount);
                 if (treasureUnitTypes == null) {
                     treasureUnitTypes = specification.getUnitTypesWithAbility("model.ability.carryTreasure");
                 }
                 unitType = treasureUnitTypes.get(getPseudoRandom().nextInt(treasureUnitTypes.size()));
                 newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
                 newUnit.setTreasureAmount(treasureAmount);
-                result.add(new ModelMessage(serverPlayer,
-                                            ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                            newUnit,
-                                            "lostCityRumour.Cibola",
-                                            "%city%", cityName,
-                                            "%money%", treasureString));
+                result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                            "lostCityRumour.Cibola", serverPlayer, newUnit)
+                           .addName("%city%", cityName)
+                           .addAmount("%money%", treasureAmount));
                 result.add(new HistoryEvent(game.getTurn().getNumber(),
                                             HistoryEvent.Type.CITY_OF_GOLD,
                                             "%city%", cityName,
-                                            "%treasure%", treasureString));
+                                            "%treasure%", Integer.toString(treasureAmount)));
                 break;
             }
             // Fall through, found all the cities of gold.
         case RUINS:
             int ruinsAmount = getPseudoRandom().nextInt(dx * 2) * 300 + 50;
-            String ruinsString = String.valueOf(ruinsAmount);
             if (ruinsAmount < 500) { // TODO remove magic number
                 serverPlayer.modifyGold(ruinsAmount);
                 result.add(serverPlayer);
@@ -1535,19 +1520,17 @@ public final class InGameController extends Controller {
                 newUnit = new Unit(game, tile, serverPlayer, unitType, UnitState.ACTIVE);
                 newUnit.setTreasureAmount(ruinsAmount);
             }
-            result.add(new ModelMessage(serverPlayer,
-                                        ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                        ((newUnit != null) ? newUnit : unit),
+            result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.Ruins",
-                                        "%money%", ruinsString));
+                                        serverPlayer, ((newUnit != null) ? newUnit : unit))
+                       .addAmount("%money%", ruinsAmount));
             break;
         case FOUNTAIN_OF_YOUTH:
             Europe europe = serverPlayer.getEurope();
             if (europe == null) {
-                result.add(new ModelMessage(serverPlayer,
-                                            ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                            unit,
-                                            "lostCityRumour.FountainOfYouthWithoutEurope"));
+                result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                            "lostCityRumour.FountainOfYouthWithoutEurope",
+                                            serverPlayer, unit));
             } else {
                 if (serverPlayer.hasAbility("model.ability.selectRecruit")
                     && !serverPlayer.isAI() // TODO: let the AI select
@@ -1561,10 +1544,9 @@ public final class InGameController extends Controller {
                     }
                     result.add(europe);
                 }
-                result.add(new ModelMessage(serverPlayer,
-                                            ModelMessage.MessageType.LOST_CITY_RUMOUR,
-                                            unit,
-                                            "lostCityRumour.FountainOfYouth"));
+                result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
+                                            "lostCityRumour.FountainOfYouth",
+                                            serverPlayer, unit));
             }
             break;
         case NO_SUCH_RUMOUR:
@@ -1908,9 +1890,9 @@ public final class InGameController extends Controller {
 
         // Failed, missionary dies.
         unit.dispose();
-        return new ModelMessage(player, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                unit, "indianSettlement.mission.noDenounce",
-                                "%nation%", settlement.getOwner().getNationAsString());
+        return new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                "indianSettlement.mission.noDenounce", player, unit)
+            .addName("%nation%", settlement.getOwner().getNationAsString());
     }
 
     /**
@@ -1949,9 +1931,9 @@ public final class InGameController extends Controller {
 
         // Report result.
         String messageId = "indianSettlement.mission." + tension.toString().toLowerCase();
-        return new ModelMessage(player, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                unit, messageId,
-                                "%nation%", settlement.getOwner().getNationAsString());
+        return new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                messageId, player, unit)
+            .addName("%nation%", settlement.getOwner().getNationAsString());
     }
 
     /**

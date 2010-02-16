@@ -133,16 +133,12 @@ public class DemandTributeMessage extends Message {
         }
         Element messages = doc.createElement("addMessages");
         reply.appendChild(messages);
-        ModelMessage m = (gold > 0)
-            ? new ModelMessage(unit,
-                               ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                               indianSettlement,
-                               "scoutSettlement.tributeAgree",
-                               "%amount%", Integer.toString(gold))
-            : new ModelMessage(unit,
-                               ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                               indianSettlement,
-                               "scoutSettlement.tributeDisagree");
+        String messageId = (gold > 0) ? "scoutSettlement.tributeAgree"
+            : "scoutSettlement.tributeDisagree";
+        ModelMessage m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                          messageId, unit, indianSettlement)
+            .addAmount("%amount%", gold);
+
         messages.appendChild(m.toXMLElement(player, doc));
         return reply;
     }

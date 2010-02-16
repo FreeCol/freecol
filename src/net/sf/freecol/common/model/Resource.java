@@ -107,6 +107,11 @@ public class Resource extends TileItem {
         return getType().getName();
     }
 
+    public String getNameKey() {
+        return getType().getNameKey();
+    }
+
+
     /**
      * Returns the <code>ResourceType</code> of this Resource.
      */

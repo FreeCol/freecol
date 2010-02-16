@@ -1486,13 +1486,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     // goods (e.g. hammers) are still missing
                     return;
                 }
-                messages.add(new ModelMessage(this, ModelMessage.MessageType.MISSING_GOODS,
-                                              requiredGoodsType,
+                messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                               "model.colony.buildableNeedsGoods",
-                                              "%colony%", getName(),
-                                              "%buildable%", buildable.getName(),
-                                              "%amount%", String.valueOf(required - available),
-                                              "%goodsType%", requiredGoodsType.getName()));
+                                              this, requiredGoodsType)
+                             .addName("%colony%", getName())
+                             .add("%buildable%", buildable.getNameKey())
+                             .addName("%amount%", String.valueOf(required - available))
+                             .add("%goodsType%", requiredGoodsType.getNameKey()));
             }
         }
        
@@ -1525,10 +1525,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             Unit unit = getGame().getModelController()
                 .createUnit(getId() + "buildUnit", getTile(), getOwner(),
                             (UnitType) buildable);
-            addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, unit,
-                            "model.colony.unitReady",
-                            "%colony%", getName(),
-                            "%unit%", unit.getName());
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                             "model.colony.unitReady", this, unit)
+                            .addName("%colony%", getName())
+                            .addName("%unit%", unit.getName()));
             if (buildQueue.size() > 1) {
                 // Remove the unit-to-build unless it is the last entry.
                 buildQueue.remove(0);
@@ -1541,28 +1541,27 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             } else {
                 getBuilding(upgradesFrom).upgrade();
             }
-            addModelMessage(this, ModelMessage.MessageType.BUILDING_COMPLETED, this,
-                            "model.colony.buildingReady", 
-                            "%colony%", getName(),
-                            "%building%", buildable.getName());
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.BUILDING_COMPLETED,
+                                             "model.colony.buildingReady", this)
+                            .addName("%colony%", getName())
+                            .add("%building%", buildable.getNameKey()));
             buildQueue.remove(0);
         }
             
         // Buildable can not be built at this time
         while (!buildQueue.isEmpty() && !canBuild()) {
-            addModelMessage(new ModelMessage(this, ModelMessage.MessageType.WARNING,
-                                             buildable,
-                                             "colonyPanel.unbuildable",
-                                             "%colony%", getName(),
-                                             "%object%", buildQueue.get(0).getName()));
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                             "colonyPanel.unbuildable", this, buildable)
+                            .addName("%colony%", getName())
+                            .addName("%object%", buildQueue.get(0).getName()));
             buildQueue.remove(0);
         }
 
         // warn player that no build queue is empty
         if (buildQueue.isEmpty()) {
-            addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
-                            "model.colony.cannotBuild", 
-                            "%colony%", getName());
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                             "model.colony.cannotBuild", this)
+                            .addName("%colony%", getName()));
         }
     }
 
@@ -1806,16 +1805,18 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             // Kill a colonist:
             getRandomUnit().dispose();
             removeFood(available);
-            addModelMessage(this, ModelMessage.MessageType.UNIT_LOST,
-                            "model.colony.colonistStarved", "%colony%", getName());
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                             "model.colony.colonistStarved",this)
+                            .addName("%colony%", getName()));
         } else {
             removeFood(required);
             if (required > production){
             	int turnsToLive = (available - required) / (required - production);
             	if(turnsToLive <= 3) {
-                    addModelMessage(this, ModelMessage.MessageType.WARNING,
-                                    "model.colony.famineFeared", "%colony%", getName(),
-                                    "%number%", String.valueOf(turnsToLive));
+                    addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                     "model.colony.famineFeared", this)
+                                    .addName("%colony%", getName())
+                                    .addName("%number%", String.valueOf(turnsToLive)));
             	}
             }
         }
@@ -1833,8 +1834,9 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                     .createUnit(getId() + "newTurn200food",
                                 getTile(), getOwner(), unitTypes.get(random));
                 removeFood(FOOD_PER_COLONIST);
-                addModelMessage(this, ModelMessage.MessageType.UNIT_ADDED, u,
-                                "model.colony.newColonist", "%colony%", getName());
+                addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                                 "model.colony.newColonist", this, u)
+                                .addName("%colony%", getName()));
                 logger.info("New colonist created in " + getName() + " with ID=" + u.getId());
             }
         }
@@ -1895,11 +1897,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 int waste = (goods.getAmount() + getProductionNetOf(goodsType) -
                              getWarehouseCapacity());
                 if (waste > 0) {
-                    addModelMessage(this, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
-                                    "model.building.warehouseSoonFull",
-                                    "%goods%", goods.getName(),
-                                    "%colony%", getName(),
-                                    "%amount%", String.valueOf(waste));
+                    addModelMessage(new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                                     "model.building.warehouseSoonFull", this, goodsType)
+                                    .add("%goods%", goods.getNameKey())
+                                    .addName("%colony%", getName())
+                                    .addName("%amount%", String.valueOf(waste)));
                 }
             }
         }
@@ -1908,22 +1910,14 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     private void createSoLMessages() {
         if (sonsOfLiberty / 10 != oldSonsOfLiberty / 10) {
-            if (sonsOfLiberty > oldSonsOfLiberty) {
-                addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
-                                FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                "model.colony.SoLIncrease", 
-                                "%oldSoL%", String.valueOf(oldSonsOfLiberty),
-                                "%newSoL%", String.valueOf(sonsOfLiberty),
-                                "%colony%", getName());
-            } else {
-                addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY,
-                                FreeCol.getSpecification().getGoodsType("model.goods.bells"),
-                                "model.colony.SoLDecrease", 
-                                "%oldSoL%", String.valueOf(oldSonsOfLiberty),
-                                "%newSoL%", String.valueOf(sonsOfLiberty),
-                                "%colony%", getName());
-
-            }
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
+                                             (sonsOfLiberty > oldSonsOfLiberty)
+                                             ? "model.colony.SoLIncrease"
+                                             : "model.colony.SoLDecrease", this,
+                                             FreeCol.getSpecification().getGoodsType("model.goods.bells"))
+                            .addAmount("%oldSoL%", oldSonsOfLiberty)
+                            .addAmount("%newSoL%", sonsOfLiberty)
+                            .addName("%colony%", getName()));
         }
 
 
@@ -2036,8 +2030,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         
         GoodsType bells = FreeCol.getSpecification().getGoodsType("model.goods.bells");
         return (msgId == null) ? null
-            : new ModelMessage(this, msgType, bells, msgId,
-                               "%colony%", getName());
+            : new ModelMessage(msgType, msgId, this, bells)
+            .addName("%colony%", getName());
     }
 
 
@@ -2102,17 +2096,17 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                         !goodsType.isStorable() &&
                         getProductionOf(goodsType) > 0) {
                         // production idle
-                        addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
-                                        "model.colony.cannotBuild", 
-                                        "%colony%", getName());
+                        addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                         "model.colony.cannotBuild", this)
+                                        .addName("%colony%", getName()));
                     }
                 }
             } else if (currentlyBuilding.getPopulationRequired() > getUnitCount()) {
                 // not enough units
-                addModelMessage(this, ModelMessage.MessageType.WARNING, this, 
-                                "model.colony.buildNeedPop", 
-                                "%colony%", getName(), 
-                                "%building%", currentlyBuilding.getName());
+                addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                 "model.colony.buildNeedPop", this)
+                                .addName("%colony%", getName())
+                                .add("%building%", currentlyBuilding.getNameKey()));
             }
         }
         

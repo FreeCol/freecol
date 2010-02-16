@@ -468,7 +468,7 @@ public final class Canvas extends JDesktopPane {
         }
         for (int i = 0; i < modelMessages.length; i++) {
             try {
-                messageText[i] = Messages.message(modelMessages[i].getId(), modelMessages[i].getData());
+                messageText[i] = Messages.message(modelMessages[i]);
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + modelMessages[i].getId() + ".");
             }
@@ -679,7 +679,7 @@ public final class Canvas extends JDesktopPane {
         for (int i = 0; i < messages.length; i++) {
             String id = messages[i].getId();
             try {
-                texts[i] = Messages.message(id, messages[i].getData());
+                texts[i] = Messages.message(messages[i]);
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + id + ".");
             }
@@ -1360,6 +1360,9 @@ public final class Canvas extends JDesktopPane {
         showInformationMessage(template, null);
     }
 
+    public void showInformationMessage(ModelMessage message) {
+        showInformationMessage(message, message.getDisplay());
+    }
 
     /**
      * Shows a message with some information and an "OK"-button.

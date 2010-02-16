@@ -587,12 +587,10 @@ public final class InGameInputHandler extends InputHandler {
         Element unitElement = (Element) element.getFirstChild();
         Unit convert = new Unit(getGame(), unitElement);
         tile.add(convert);
-        ModelMessage message = new ModelMessage(convert,
-                                                ModelMessage.MessageType.UNIT_ADDED,
-                                                convert,
-                                                "model.colony.newConvert",
-                                                "%nation%", nation,
-                                                "%colony%", colony.getName());
+        ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                                "model.colony.newConvert", convert)
+            .addName("%nation%", nation)
+            .addName("%colony%", colony.getName());
 
         getFreeColClient().getMyPlayer().addModelMessage(message);
         return null;
@@ -674,21 +672,19 @@ public final class InGameInputHandler extends InputHandler {
                                                           "%amount%", String.valueOf(gold)).confirm();
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
-                m = new ModelMessage(colony, ModelMessage.MessageType.ACCEPTED_DEMANDS,
-                                     unit,
-                                     "indianDemand.gold.text",
-                                     "%nation%", unit.getOwner().getNationAsString(),
-                                     "%colony%", colony.getName(),
-                                     "%amount%", String.valueOf(gold));
+                m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                                     "indianDemand.gold.text", colony, unit)
+                    .addName("%nation%", unit.getOwner().getNationAsString())
+                    .addName("%colony%", colony.getName())
+                    .addName("%amount%", String.valueOf(gold));
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
-                m = new ModelMessage(colony, ModelMessage.MessageType.REJECTED_DEMANDS,
-                                     unit,
-                                     "indianDemand.gold.text",
-                                     "%nation%", unit.getOwner().getNationAsString(),
-                                     "%colony%", colony.getName(),
-                                     "%amount%", String.valueOf(gold));
+                m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                                     "indianDemand.gold.text", colony, unit)
+                    .addName("%nation%", unit.getOwner().getNationAsString())
+                    .addName("%colony%", colony.getName())
+                    .addName("%amount%", String.valueOf(gold));
                 accepted = false;
                 break;
             default:
@@ -721,39 +717,35 @@ public final class InGameInputHandler extends InputHandler {
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 if (goods.getType().isFoodType()) {
-                    m = new ModelMessage(colony, ModelMessage.MessageType.ACCEPTED_DEMANDS,
-                                         unit,
-                                         "indianDemand.food.text",
-                                         "%nation%", unit.getOwner().getNationAsString(),
-                                         "%colony%", colony.getName(),
-                                         "%amount%", String.valueOf(goods.getAmount()));
+                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                                         "indianDemand.food.text", colony, unit)
+                        .addName("%nation%", unit.getOwner().getNationAsString())
+                        .addName("%colony%", colony.getName())
+                        .addName("%amount%", String.valueOf(goods.getAmount()));
                 } else {
-                    m = new ModelMessage(colony, ModelMessage.MessageType.ACCEPTED_DEMANDS,
-                                         unit,
-                                         "indianDemand.other.text",
-                                         "%nation%", unit.getOwner().getNationAsString(),
-                                         "%colony%", colony.getName(),
-                                         "%amount%", String.valueOf(goods.getAmount()),
-                                         "%goods%", goods.getName());
+                    m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
+                                         "indianDemand.other.text", colony, unit)
+                        .addName("%nation%", unit.getOwner().getNationAsString())
+                        .addName("%colony%", colony.getName())
+                        .addName("%amount%", String.valueOf(goods.getAmount()))
+                        .add("%goods%", goods.getNameKey());
                 }
                 accepted = true;
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
                 if (goods.getType().isFoodType()) {
-                    m = new ModelMessage(colony, ModelMessage.MessageType.REJECTED_DEMANDS,
-                                         unit,
-                                         "indianDemand.food.text",
-                                         "%nation%", unit.getOwner().getNationAsString(),
-                                         "%colony%", colony.getName(),
-                                         "%amount%", String.valueOf(goods.getAmount()));
+                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                                         "indianDemand.food.text", colony, unit)
+                        .addName("%nation%", unit.getOwner().getNationAsString())
+                        .addName("%colony%", colony.getName())
+                        .addName("%amount%", String.valueOf(goods.getAmount()));
                 } else {
-                    m = new ModelMessage(colony, ModelMessage.MessageType.REJECTED_DEMANDS,
-                                         unit,
-                                         "indianDemand.other.text",
-                                         "%nation%", unit.getOwner().getNationAsString(),
-                                         "%colony%", colony.getName(),
-                                         "%amount%", String.valueOf(goods.getAmount()),
-                                         "%goods%", goods.getName());
+                    m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
+                                         "indianDemand.other.text", colony, unit)
+                        .addName("%nation%", unit.getOwner().getNationAsString())
+                        .addName("%colony%", colony.getName())
+                        .addName("%amount%", String.valueOf(goods.getAmount()))
+                        .add("%goods%", goods.getNameKey());
                 }
                 accepted = false;
                 break;
@@ -792,10 +784,9 @@ public final class InGameInputHandler extends InputHandler {
             final int amount = new Integer(element.getAttribute("amount")).intValue();
             if (force) {
                 freeColClient.getMyPlayer().setTax(amount);
-                player.addModelMessage(new ModelMessage(player, "model.monarch.forceTaxRaise",
-                                                        new String[][] {
-                                                            {"%replace%", String.valueOf(amount) }},
-                                                        ModelMessage.MessageType.WARNING));
+                player.addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                        "model.monarch.forceTaxRaise", player)
+                                       .addName("%replace%", String.valueOf(amount)));
                 reply = null;
             } else {
                 reply = Message.createNewRootElement("acceptTax");
@@ -942,12 +933,11 @@ public final class InGameInputHandler extends InputHandler {
                    || player.hasAbility("model.ability.betterForeignAffairsReport")
                    || player.hasContacted(first)
                    || player.hasContacted(second)) {
-                player.addModelMessage(new ModelMessage(first,
-                        "model.diplomacy." + stance.toString().toLowerCase() + ".others",
-                        new String[][] {
-                            {"%attacker%", first.getNationAsString()},
-                            {"%defender%", second.getNationAsString()}},
-                        ModelMessage.MessageType.FOREIGN_DIPLOMACY));
+                player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                        "model.diplomacy." + stance.toString().toLowerCase() + ".others",
+                                                        first)
+                                       .addName("%attacker%", first.getNationAsString())
+                                       .addName("%defender%", second.getNationAsString()));
             }
 
         } else {
@@ -971,38 +961,34 @@ public final class InGameInputHandler extends InputHandler {
                     }
                 }
                 if (other.isEuropean() && !contactedEuro) {
-                    player.addModelMessage(new ModelMessage(player,
-                            ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                            other,
-                            "EventPanel.MEETING_EUROPEANS"));
+                    player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                            "EventPanel.MEETING_EUROPEANS",
+                                                            player, other));
                 } else if (!other.isIndian() && !contactedIndians) {
-                    player.addModelMessage(new ModelMessage(player,
+                    player.addModelMessage(new ModelMessage(
                             ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                            other,
-                            "EventPanel.MEETING_NATIVES"));
+                            "EventPanel.MEETING_NATIVES",
+                            player, other));
                 }
                 // Special cases for Aztec and Inca.  TODO: cleanup.
                 Specification spec = FreeCol.getSpecification();
                 if (other.getNationType()
                     == spec.getNationType("model.nationType.aztec")) {
-                    player.addModelMessage(new ModelMessage(player,
-                            ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                            other,
-                            "EventPanel.MEETING_AZTEC"));
+                    player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                            "EventPanel.MEETING_AZTEC",
+                                                            player, other));
                 } else if (other.getNationType()
                            == spec.getNationType("model.nationType.inca")) {
-                    player.addModelMessage(new ModelMessage(player,
-                            ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                            other,
-                            "EventPanel.MEETING_INCA"));
+                    player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                            "EventPanel.MEETING_INCA",
+                                                            player, other));
                 }
 
             } else { // Standard diplomacy message.
-                player.addModelMessage(new ModelMessage(first,
-                        "model.diplomacy." + stance.toString().toLowerCase() + ".declared",
-                        new String[][] {
-                            {"%nation%", other.getNationAsString()}},
-                        ModelMessage.MessageType.FOREIGN_DIPLOMACY));
+                player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                        "model.diplomacy." + stance.toString().toLowerCase() + ".declared",
+                                                        first)
+                                       .addName("%nation%", other.getNationAsString()));
             }
         }
 
@@ -1062,11 +1048,11 @@ public final class InGameInputHandler extends InputHandler {
             }
             colony.getFeatureContainer().addModifier(Modifier
                .createTeaPartyModifier(getGame().getTurn()));
-            new ShowModelMessageSwingTask(new ModelMessage(colony, ModelMessage.MessageType.WARNING,
-                                                           null, messageID,    
-                                                           "%colony%", colony.getName(),
-                                                           "%amount%", String.valueOf(goods.getAmount()),
-                                                           "%goods%", goods.getName())).invokeLater();
+            new ShowModelMessageSwingTask(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                           messageID, colony)
+                                          .addName("%colony%", colony.getName())
+                                          .addName("%amount%", String.valueOf(goods.getAmount()))
+                                          .add("%goods%", goods.getNameKey())).invokeLater();
         }
 
         return null;
@@ -1082,10 +1068,10 @@ public final class InGameInputHandler extends InputHandler {
         final Player player = getFreeColClient().getMyPlayer();
         final Player loser = (Player) getGame().getFreeColGameObject(element.getAttribute("loser"));
         final Player winner = (Player) getGame().getFreeColGameObject(element.getAttribute("winner"));
-        player.addModelMessage(new ModelMessage(winner, ModelMessage.MessageType.FOREIGN_DIPLOMACY,
-                                                null, "model.diplomacy.spanishSuccession",
-                                                "%loserNation%", loser.getNationAsString(),
-                                                "%nation%", winner.getNationAsString()));
+        player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
+                                                "model.diplomacy.spanishSuccession", winner)
+                               .addName("%loserNation%", loser.getNationAsString())
+                               .addName("%nation%", winner.getNationAsString()));
         loser.setDead(true);
         update(element);
         player.getHistory().add(new HistoryEvent(player.getGame().getTurn().getNumber(),

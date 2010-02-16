@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import java.util.List;
 import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -46,6 +47,7 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.BooleanOption;
@@ -85,11 +87,13 @@ public final class ReportTurnPanel extends ReportPanel {
 
         // count number of headlines
         for (final ModelMessage message : messages) {
-            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE && message.getSource() != source) {
+            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE
+                && message.getSource() != source) {
                 source = message.getSource();
                 headlines++;
-            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE && message.getType() != type) {
-                type = message.getType();
+            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE
+                       && message.getMessageType() != type) {
+                type = message.getMessageType();
                 headlines++;
             }
         }
@@ -104,12 +108,14 @@ public final class ReportTurnPanel extends ReportPanel {
         int row = 1;
         for (final ModelMessage message : messages) {
             // add headline if necessary
-            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE && message.getSource() != source) {
+            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE
+                && message.getSource() != source) {
                 source = message.getSource();
                 reportPanel.add(getHeadline(source), "newline 20, skip");
-            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE && message.getType() != type) {
-                type = message.getType();
-                JLabel headline = new JLabel(message.getTypeName());
+            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE
+                       && message.getMessageType() != type) {
+                type = message.getMessageType();
+                JLabel headline = localizedLabel(message.getMessageTypeName());
                 headline.setFont(smallHeaderFont);
                 reportPanel.add(headline, "newline 20, skip, span");
             }
@@ -155,9 +161,9 @@ public final class ReportTurnPanel extends ReportPanel {
 
             boolean ignore = false;
             final JComponent label = component;
-            if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
+            if (message.getMessageType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                 JButton ignoreButton = new JButton("x");
-                ignoreButton.setToolTipText(Messages.message("model.message.ignore", message.getData()));
+                ignoreButton.setToolTipText(Messages.message(new StringTemplate("model.message.ignore", message)));
                 ignoreButton.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
                         boolean flag = label.isEnabled();
@@ -186,7 +192,8 @@ public final class ReportTurnPanel extends ReportPanel {
             // Message type can be filtered
             if (filterOption != null) {
                 JButton filterButton = new JButton("X");
-                filterButton.setToolTipText(Messages.message("model.message.filter", "%type%", message.getTypeName()));
+                filterButton.setToolTipText(Messages.message("model.message.filter", "%type%",
+                                                             message.getMessageTypeName()));
                 filterButton.addActionListener(new ActionListener() {
 
                     public void actionPerformed(ActionEvent event) {
@@ -195,7 +202,7 @@ public final class ReportTurnPanel extends ReportPanel {
                         //textPane.setEnabled(!flag);
                         //label.setEnabled(!flag);
 
-                        setEnabledByType(message.getType(), !flag);
+                        setEnabledByType(message.getMessageType(), !flag);
                     }
 
                 });
@@ -210,7 +217,7 @@ public final class ReportTurnPanel extends ReportPanel {
 
     private void setEnabledByType(ModelMessage.MessageType type, boolean enabled) {
         for (int i = 0; i < _messages.length; i++) {
-            if (_messages[i].getType() == type) {
+            if (_messages[i].getMessageType() == type) {
                 for (JComponent textPane: textPanesByMessage.get(_messages[i].getId())) {
                     textPane.setEnabled(enabled);
                 }
@@ -337,18 +344,16 @@ public final class ReportTurnPanel extends ReportPanel {
     }
     
     private String[] findReplacementData(ModelMessage message, String variable) {
-        String[] data = message.getData();
-        if (data == null) {
-            // message with no variables
-            return null;
-        } else if (data.length % 2 == 0) {
-            for (int index = 0; index < data.length; index += 2) {
-                if (variable.equals(data[index])) {
-                    return new String[] { variable, data[index + 1] };
+        List<String> data = message.getKeys();
+        if (data != null) {
+            for (int index = 0; index < data.size(); index++) {
+                if (variable.equals(data.get(index))) {
+                    return new String[] {
+                        variable,
+                        Messages.message(message.getReplacements().get(index))
+                    };
                 }
             }
-        } else {
-            logger.warning("Data has a wrong format for message: " + message);
         }
         return null;
     }

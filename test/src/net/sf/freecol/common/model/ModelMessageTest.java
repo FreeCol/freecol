@@ -35,17 +35,17 @@ public class ModelMessageTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
         GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
         
-        ModelMessage mm1 = new ModelMessage(colony, "buildColony.landLocked", null, MessageType.MISSING_GOODS,
-                cotton);
-        ModelMessage mm2 = new ModelMessage(colony, "buildColony.landLocked", null, MessageType.MISSING_GOODS,
-                cotton);
+        ModelMessage mm1 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
+                                            colony, cotton);
+        ModelMessage mm2 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
+                                            colony, cotton);
         assertEquals(mm1, mm2);
         assertEquals(mm1.hashCode(), mm2.hashCode());
         
-        ModelMessage mm3 = new ModelMessage(colony, "buildColony.landLocked", null, MessageType.MISSING_GOODS,
-                cotton);
-        ModelMessage mm4 = new ModelMessage(colony, "buildColony.landLocked", null, MessageType.MISSING_GOODS,
-                cotton);
+        ModelMessage mm3 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
+                                            colony, cotton);
+        ModelMessage mm4 = new ModelMessage(MessageType.MISSING_GOODS, "buildColony.landLocked",
+                                            colony, cotton);
         assertNotSame(mm3, mm4);
         assertNotSame(mm3.hashCode(), mm4.hashCode());
     }
@@ -58,18 +58,21 @@ public class ModelMessageTest extends FreeColTestCase {
         Colony colony = getStandardColony(1);
         GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
         
-        ModelMessage mm1 = new ModelMessage(colony, "model.building.warehouseSoonFull",
-                                    new String [][] {{"%goods%", cotton.getName()},
-                                                     {"%colony%", colony.getName()},
-                                                     {"%amount%", String.valueOf(10)}},
-                                    MessageType.WAREHOUSE_CAPACITY,
-                                    cotton);
-        ModelMessage mm2 = new ModelMessage(colony, "model.building.warehouseSoonFull",
-                new String [][] {{"%goods%", cotton.getName()},
-                                 {"%colony%", colony.getName()},
-                                 {"%amount%", String.valueOf(10)}},
-                MessageType.WAREHOUSE_CAPACITY,
-                cotton);
+        ModelMessage mm1 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
+                                            "model.building.warehouseSoonFull",
+                                            colony, cotton)
+            .add("%goods%", cotton.getNameKey())
+            .addName("%colony%", colony.getName())
+            .addAmount("%amount%", 10);
+                                    
+ 
+        ModelMessage mm2 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
+                                            "model.building.warehouseSoonFull",
+                                            colony, cotton)
+            .add("%goods%", cotton.getNameKey())
+            .addName("%colony%", colony.getName())
+            .addAmount("%amount%", 10);
+
         HashSet<ModelMessage> set = new HashSet<ModelMessage>();
         assertEquals(mm1, mm2);
         assertEquals(mm1.hashCode(), mm2.hashCode());

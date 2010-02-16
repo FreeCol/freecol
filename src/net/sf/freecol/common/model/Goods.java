@@ -151,6 +151,10 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
                                 "%amount%", String.valueOf(amount));
     }
 
+    public String getNameKey() {
+        return getType().getNameKey();
+    }
+
     /**
      * Returns the name of this type of goods.
      *

@@ -1586,7 +1586,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         } else if (ColonyChangeEvent.BONUS_CHANGE.toString().equals(property)) {
             ModelMessage msg = getColony().checkForGovMgtChangeMessage();
             if (msg != null) {
-                getCanvas().showInformationMessage(msg.getId(), msg.getDisplay(), msg.getData());
+                getCanvas().showInformationMessage(msg);
             }
             updateSoLLabel();
         } else if (ColonyTile.UNIT_CHANGE.toString().equals(property)) {

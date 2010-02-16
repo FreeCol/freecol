@@ -1806,10 +1806,9 @@ public class Player extends FreeColGameObject implements Nameable {
 
         allFathers.add(father);
 
-        addModelMessage(this, ModelMessage.MessageType.DEFAULT,
-                        "model.player.foundingFatherJoinedCongress",
-                        "%foundingFather%", father.getName(),
-                        "%description%", father.getDescription());
+        addModelMessage(new ModelMessage("model.player.foundingFatherJoinedCongress", this)
+                        .addName("%foundingFather%", father.getName())
+                        .addName("%description%", father.getDescription()));
         history.add(new HistoryEvent(getGame().getTurn().getNumber(),
                                      HistoryEvent.Type.FOUNDING_FATHER,
                                      "%father%", father.getName()));
@@ -3081,13 +3080,12 @@ public class Player extends FreeColGameObject implements Nameable {
             if (numberOfColonies > 0) {
                 newSoL = newSoL / numberOfColonies;
                 if (oldSoL / 10 != newSoL / 10) {
-                    if (newSoL > oldSoL) {
-                        addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY, "model.player.SoLIncrease",
-                                        "%oldSoL%", String.valueOf(oldSoL), "%newSoL%", String.valueOf(newSoL));
-                    } else {
-                        addModelMessage(this, ModelMessage.MessageType.SONS_OF_LIBERTY, "model.player.SoLDecrease",
-                                        "%oldSoL%", String.valueOf(oldSoL), "%newSoL%", String.valueOf(newSoL));
-                    }
+                    addModelMessage(new ModelMessage(ModelMessage.MessageType.SONS_OF_LIBERTY,
+                                                     (newSoL > oldSoL)
+                                                     ? "model.player.SoLIncrease"
+                                                     : "model.player.SoLDecrease", this)
+                                    .addName("%oldSoL%", String.valueOf(oldSoL))
+                                    .addName("%newSoL%", String.valueOf(newSoL)));
                 }
             }
             // remember SoL for check changes at next turn

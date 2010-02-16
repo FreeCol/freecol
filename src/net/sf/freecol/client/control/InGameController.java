@@ -663,15 +663,13 @@ public final class InGameController implements NetworkConstants {
                 }
                 if (overflowMessage != null) {
                     Player player = freeColClient.getMyPlayer();
-                    ModelMessage m
-                        = new ModelMessage(player,
-                                           ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                           player,
-                                           overflowMessage,
-                                           "%colony%", locName,
-                                           "%unit%", unit.getName(),
-                                           "%overflow%", overflow,
-                                           "%goods%", goods.getName());
+                    ModelMessage m =
+                        new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                         overflowMessage, player)
+                        .add("%colony%", locName)
+                        .addName("%unit%", unit.getName())
+                        .addName("%overflow%", overflow)
+                        .add("%goods%", goods.getNameKey());
                     player.addModelMessage(m);
                 }
             }
@@ -1264,34 +1262,35 @@ public final class InGameController implements NetworkConstants {
 
         ArrayList<ModelMessage> messages = new ArrayList<ModelMessage>();
         if (landLocked) {
-            messages.add(new ModelMessage(unit, ModelMessage.MessageType.MISSING_GOODS,
-                                          FreeCol.getSpecification().getGoodsType("model.goods.fish"),
-                                          "buildColony.landLocked"));
+            messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                          "buildColony.landLocked", unit, 
+                                          FreeCol.getSpecification().getGoodsType("model.goods.fish")));
         }
         if (food < 8) {
-            messages.add(new ModelMessage(unit, ModelMessage.MessageType.MISSING_GOODS,
-                                          FreeCol.getSpecification().getGoodsType("model.goods.food"),
-                                          "buildColony.noFood"));
+            messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                          "buildColony.noFood", unit,
+                                          FreeCol.getSpecification().getGoodsType("model.goods.food")));
         }
         for (Entry<GoodsType, Integer> entry : goodsMap.entrySet()) {
             if (!entry.getKey().isFoodType() && entry.getValue().intValue() < 4) {
-                messages.add(new ModelMessage(unit, ModelMessage.MessageType.MISSING_GOODS, entry.getKey(),
+                messages.add(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
                                               "buildColony.noBuildingMaterials",
-                                              "%goods%", entry.getKey().getName()));
+                                              unit, entry.getKey())
+                             .add("%goods%", entry.getKey().getNameKey()));
             }
         }
 
         if (ownedBySelf) {
-            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING,
-                                          null, "buildColony.ownLand"));
+            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                          "buildColony.ownLand", unit));
         }
         if (ownedByEuropeans) {
-            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING,
-                                          null, "buildColony.EuropeanLand"));
+            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                          "buildColony.EuropeanLand", unit));
         }
         if (ownedByIndians) {
-            messages.add(new ModelMessage(unit, ModelMessage.MessageType.WARNING,
-                                          null, "buildColony.IndianLand"));
+            messages.add(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                          "buildColony.IndianLand", unit));
         }
 
         if (messages.isEmpty()) return true;
@@ -1618,13 +1617,13 @@ public final class InGameController implements NetworkConstants {
             if (askNewLandName(newLandName)
                 && newLandName.equals(player.getNewLandName())) {
                 canvas.showEventPanel(unit.getTile(), EventType.FIRST_LANDING);
-                String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient.getActionManager().getFreeColAction("buildColonyAction").getAccelerator());
-                m = new ModelMessage(player, ModelMessage.MessageType.TUTORIAL,
-                                     player,
-                                     "tutorial.buildColony",
-                                     "%build_colony_key%", key,
-                                     "%build_colony_menu_item%", Messages.message("unit.state.7"),
-                                     "%orders_menu_item%", Messages.message("menuBar.orders"));
+                String key = FreeColActionUI.getHumanKeyStrokeText(freeColClient.getActionManager()
+                                                                   .getFreeColAction("buildColonyAction").getAccelerator());
+                m = new ModelMessage(ModelMessage.MessageType.TUTORIAL,
+                                     "tutorial.buildColony", player)
+                    .addName("%build_colony_key%", key)
+                    .add("%build_colony_menu_item%", "unit.state.7")
+                    .add("%orders_menu_item%", "menuBar.orders");
                 player.addModelMessage(m);
             }
         }
@@ -2050,12 +2049,10 @@ public final class InGameController implements NetworkConstants {
                 convert.setLocation(convert.getLocation());
                 
                 String nation = defender.getOwner().getNationAsString();
-                ModelMessage message = new ModelMessage(convert,
-                                                        "model.unit.newConvertFromAttack",
-                                                        new String[][] {
-                                                            {"%nation%", nation},
-                                                            {"%unit%", convert.getName()}},
-                                                        ModelMessage.MessageType.UNIT_ADDED);
+                ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                                        "model.unit.newConvertFromAttack", convert)
+                    .addName("%nation%", nation)
+                    .addName("%unit%", convert.getName());
                 freeColClient.getMyPlayer().addModelMessage(message);
                 nextModelMessage();
             }
@@ -2082,12 +2079,10 @@ public final class InGameController implements NetworkConstants {
             	Player indianPlayer = defender.getOwner();
             	indianPlayer.surrenderTo(freeColClient.getMyPlayer());
             	//show message
-            	ModelMessage message = new ModelMessage(indianPlayer,
-                         "indianSettlement.capitalBurned",
-                         new String[][] {
-                             {"%name%", indianPlayer.getDefaultSettlementName(true)},
-                             {"%nation%", indianPlayer.getNationAsString()}},
-                         ModelMessage.MessageType.COMBAT_RESULT);
+            	ModelMessage message = new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
+                                                        "indianSettlement.capitalBurned", indianPlayer)
+                    .addName("%name%", indianPlayer.getDefaultSettlementName(true))
+                    .addName("%nation%", indianPlayer.getNationAsString());
             	freeColClient.getMyPlayer().addModelMessage(message);
             	nextModelMessage();
             }
@@ -4529,10 +4524,11 @@ public final class InGameController implements NetworkConstants {
      */
     public synchronized void ignoreMessage(ModelMessage message, boolean flag) {
         String key = message.getSource().getId();
-        String[] data = message.getData();
-        for (int index = 0; index < data.length; index += 2) {
-            if (data[index].equals("%goods%")) {
-                key += data[index + 1];
+        if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
+            for (String otherkey : message.getKeys()) {
+                if ("%goods%".equals(otherkey)) {
+                    key += otherkey;
+                }
                 break;
             }
         }
@@ -4566,13 +4562,14 @@ public final class InGameController implements NetworkConstants {
 
         for (ModelMessage message : inputList) {
             if (shouldAllowMessage(message)) {
-                if (message.getType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
+                if (message.getMessageType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
                     String key = message.getSource().getId();
-                    String[] data = message.getData();
-                    for (int index = 0; index < data.length; index += 2) {
-                        if (data[index].equals("%goods%")) {
-                            key += data[index + 1];
-                            break;
+                    if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
+                        for (String otherkey : message.getKeys()) {
+                            if ("%goods%".equals(otherkey)) {
+                                key += otherkey;
+                                break;
+                            }
                         }
                     }
 
@@ -4582,9 +4579,9 @@ public final class InGameController implements NetworkConstants {
                         message.setBeenDisplayed(true);
                         continue;
                     }
-                } else if (message.getType() == ModelMessage.MessageType.BUILDING_COMPLETED) {
+                } else if (message.getMessageType() == ModelMessage.MessageType.BUILDING_COMPLETED) {
                     freeColClient.playSound(SoundEffect.BUILDING_COMPLETE);
-                } else if (message.getType() == ModelMessage.MessageType.FOREIGN_DIPLOMACY) {
+                } else if (message.getMessageType() == ModelMessage.MessageType.FOREIGN_DIPLOMACY) {
                     if (message.getId().equals("EventPanel.MEETING_AZTEC")) {
                         freeColClient.playMusicOnce("aztec");
                     }
@@ -4662,7 +4659,7 @@ public final class InGameController implements NetworkConstants {
      */
     private boolean shouldAllowMessage(ModelMessage message) {
 
-        switch (message.getType()) {
+        switch (message.getMessageType()) {
         case DEFAULT:
             return true;
         case WARNING:

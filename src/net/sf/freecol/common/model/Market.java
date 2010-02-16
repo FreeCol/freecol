@@ -284,8 +284,9 @@ public final class Market extends FreeColGameObject implements Ownable {
                                type, getGame().getTurn());
             addGoodsToMarket(type, amount);
         } else {
-            addModelMessage(this, ModelMessage.MessageType.WARNING,
-                            "model.europe.market", "%goods%", type.getName());
+            addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                             "model.europe.market", this)
+                            .add("%goods%", type.getNameKey()));
         }
     }
 
@@ -413,16 +414,15 @@ public final class Market extends FreeColGameObject implements Ownable {
         int newPrice = data.getCostToBuy();
         int newSalePrice = data.getPaidForSale();
         return (oldPrice == newPrice) ? null
-            : new ModelMessage(this,
-                               ModelMessage.MessageType.MARKET_PRICES,
-                               goodsType,
+            : new ModelMessage(ModelMessage.MessageType.MARKET_PRICES,
                                ((newPrice > oldPrice)
                                 ? "model.market.priceIncrease"
                                 : "model.market.priceDecrease"),
-                               "%market%", owner.getMarketName(),
-                               "%goods%", goodsType.getName(),
-                               "%buy%", String.valueOf(newPrice),
-                               "%sell%", String.valueOf(newSalePrice));
+                               this, goodsType)
+            .addName("%market%", owner.getMarketName())
+            .add("%goods%", goodsType.getNameKey())
+            .addAmount("%buy%", newPrice)
+            .addAmount("%sell%", newSalePrice);
     }
 
     /**

@@ -757,9 +757,13 @@ public abstract class FreeColObject {
         throw new UnsupportedOperationException("Partial update of unsupported type.");
     }
 
-    // TODO: make these abstract
-    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {}
-    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {}
+    protected void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        // do nothing
+    }
+
+    protected void writeChildren(XMLStreamWriter out) throws XMLStreamException {
+        // do nothing
+    }
 
 
     //  ---------- PROPERTY CHANGE SUPPORT DELEGATES ----------

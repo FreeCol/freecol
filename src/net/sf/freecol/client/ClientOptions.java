@@ -454,7 +454,7 @@ public class ClientOptions extends OptionMap {
     private Comparator<ModelMessage> messageTypeComparator = new Comparator<ModelMessage>() {
         // sort according to message type
         public int compare(ModelMessage message1, ModelMessage message2) {
-            int dtype = message1.getType().ordinal() - message2.getType().ordinal();
+            int dtype = message1.getMessageType().ordinal() - message2.getMessageType().ordinal();
             if (dtype == 0 && message1.getSource() != message2.getSource()) {
                 return messageSourceComparator.compare(message1, message2);
             } else {
@@ -601,7 +601,7 @@ public class ClientOptions extends OptionMap {
      * @return a <code>BooleanOption</code> value
      */
     public BooleanOption getBooleanOption(ModelMessage message) {
-        switch (message.getType()) {
+        switch (message.getMessageType()) {
         case WARNING:
             return (BooleanOption) getObject(ClientOptions.SHOW_WARNING);
         case SONS_OF_LIBERTY:

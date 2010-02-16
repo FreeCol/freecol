@@ -215,10 +215,9 @@ public class ServerPlayer extends Player implements ServerModelObject {
         }
         europe.disposeUnitList();
         if (!unitNames.isEmpty()) {
-            result.add(new ModelMessage(this, ModelMessage.MessageType.UNIT_LOST,
-                                        this,
-                                        "model.player.independence.unitsSeized",
-                                        "%units%", Utils.join(", ", unitNames)));
+            result.add(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                        "model.player.independence.unitsSeized", this)
+                       .addName("%units%", Utils.join(", ", unitNames)));
         }
 
         // Generalized continental army muster
@@ -255,13 +254,13 @@ public class ServerPlayer extends Player implements ServerModelObject {
                             unit.setType(upgrades.get(entry.getKey()));
                             result.add(unit);
                         }
-                        result.add(new ModelMessage(this, ModelMessage.MessageType.UNIT_IMPROVED,
-                                                    colony,
+                        result.add(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
                                                     "model.player.continentalArmyMuster",
-                                                    "%colony%", colony.getName(),
-                                                    "%number%", String.valueOf(limit),
-                                                    "%oldUnit%", entry.getKey().getName(),
-                                                    "%unit%", upgrades.get(entry.getKey()).getName()));
+                                                    this, colony)
+                                   .addName("%colony%", colony.getName())
+                                   .addAmount("%number%", limit)
+                                   .addName("%oldUnit%", entry.getKey().getName())
+                                   .addName("%unit%", upgrades.get(entry.getKey()).getName()));
                     }
                 }
             }
@@ -289,9 +288,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         reinitialiseMarket();
         getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
                                           HistoryEvent.Type.INDEPENDENCE));
-        messages.add(new ModelMessage(this, ModelMessage.MessageType.DEFAULT,
-                                      this,
-                                      "model.player.independence"));
+        messages.add(new ModelMessage("model.player.independence", this));
         ArrayList<Unit> surrenderUnits = new ArrayList<Unit>();
         ArrayList<String> unitNames = new ArrayList<String>();
         for (Unit u : REFplayer.getUnits()) {
@@ -307,10 +304,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
             u.setOwner(this);
             unitNames.add(u.getName());
         }
-        messages.add(new ModelMessage(this, ModelMessage.MessageType.DEFAULT,
-                                      this,
-                                      "model.player.independence.unitsAcquired",
-                                      "%units%", Utils.join(", ", unitNames)));
+        messages.add(new ModelMessage("model.player.independence.unitsAcquired", this)
+                     .addName("%units%", Utils.join(", ", unitNames)));
         return messages;
     }
 
@@ -320,27 +315,19 @@ public class ServerPlayer extends Player implements ServerModelObject {
      * @param unit The treasure train <code>Unit</code> to cash in.
      */
     public ModelMessage cashInTreasureTrain(Unit unit) {
-        ModelMessage m;
         int fullAmount = unit.getTreasureAmount();
         int cashInAmount = (fullAmount - unit.getTransportFee())
             * (100 - getTax()) / 100;
 
         modifyGold(cashInAmount);
-        switch (getPlayerType()) {
-        case REBEL: case INDEPENDENT:
-            m = new ModelMessage(this, ModelMessage.MessageType.DEFAULT,
-                                 unit,
-                                 "model.unit.cashInTreasureTrain.independent",
-                                 "%amount%", Integer.toString(fullAmount));
-            break;
-        default:
-            m = new ModelMessage(this, ModelMessage.MessageType.DEFAULT,
-                                 unit,
-                                 "model.unit.cashInTreasureTrain.colonial",
-                                 "%amount%", Integer.toString(fullAmount),
-                                 "%cashInAmount%", Integer.toString(cashInAmount));
-            break;
+        String messageId = "model.unit.cashInTreasureTrain.colonial";
+        if (getPlayerType() == PlayerType.REBEL
+            || getPlayerType() == PlayerType.INDEPENDENT) {
+            messageId = "model.unit.cashInTreasureTrain.independent";
         }
+        ModelMessage m = new ModelMessage(messageId, this, unit)
+            .addAmount("%amount%", fullAmount)
+            .addAmount("%cashInAmount%", cashInAmount);
         unit.dispose();
         return m;
     }

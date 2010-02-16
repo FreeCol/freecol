@@ -395,33 +395,31 @@ public class GoodsContainer extends FreeColGameObject {
             int high = exportData.getHighLevel() * adjustment;
             int amount = storedGoods.get(goodsType).intValue();
             int oldAmount = getOldGoodsCount(goodsType);
+            String messageId = null;
+            int level = 0;
+            int waste = 0;
             if (amount > limit) {
                 // limit has been exceeded
-                int waste = amount - limit;
+                waste = amount - limit;
                 setAmount(goodsType, limit);
-                addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
-                                "model.building.warehouseWaste",
-                                "%goods%", goodsType.getName(),
-                                "%waste%", String.valueOf(waste),
-                                "%colony%", colony.getName());
+                messageId = "model.building.warehouseWaste";
             } else if (amount == limit && oldAmount < limit) {
                 // limit has been reached during this turn
-                addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
-                                "model.building.warehouseOverfull",
-                                "%goods%", goodsType.getName(),
-                                "%colony%", colony.getName());
+                messageId = "model.building.warehouseOverfull";
             } else if (amount > high && oldAmount <= high) {
-                addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
-                                "model.building.warehouseFull",
-                                "%goods%", goodsType.getName(),
-                                "%level%", String.valueOf(high),
-                                "%colony%", colony.getName());
+                messageId = "model.building.warehouseFull";
+                level = high;
             } else if (amount < low && oldAmount >= low) {
-                addModelMessage(colony, ModelMessage.MessageType.WAREHOUSE_CAPACITY, goodsType,
-                                "model.building.warehouseEmpty",
-                                "%goods%", goodsType.getName(),
-                                "%level%", String.valueOf(low),
-                                "%colony%", colony.getName());
+                messageId = "model.building.warehouseEmpty";
+                level = low;
+            }
+            if (messageId != null) {
+                addModelMessage(new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                                 messageId, colony, goodsType)
+                                .add("%goods%", goodsType.getNameKey())
+                                .addAmount("%waste%", waste)
+                                .addAmount("%level%", level)
+                                .addName("%colony%", colony.getName()));
             }
         }
 

@@ -266,8 +266,8 @@ public final class PreGameController {
         
         if (freeColClient.getGame().getTurn().getNumber() == 1) {
             Player player = freeColClient.getMyPlayer();
-            player.addModelMessage(new ModelMessage(player, ModelMessage.MessageType.TUTORIAL, 
-                                                    player, "tutorial.startGame"));
+            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.TUTORIAL, 
+                                                    "tutorial.startGame", player));
             // force view of tutorial message
             inGameController.nextModelMessage();
         }

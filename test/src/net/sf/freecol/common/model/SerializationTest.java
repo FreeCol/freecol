@@ -88,9 +88,7 @@ public class SerializationTest extends FreeColTestCase {
         colony.newTurn();
 
         try {
-            Validator validator = buildValidator("schema/data/data-player.xsd");
-
-            validator = buildValidator("schema/data/data-game.xsd");
+            Validator validator = buildValidator("schema/data/data-game.xsd");
             validator.validate(buildSource(game, player, true, true));
         } catch(SAXParseException e){
             String errMsg = e.getMessage() 
@@ -115,6 +113,32 @@ public class SerializationTest extends FreeColTestCase {
 
     public void testMapCaribbean() throws Exception {
         validateMap("data/maps/caribbean-basin.fsg");
+    }
+
+    public void testStringTemplate() throws Exception {
+
+	StringTemplate t1 = StringTemplate.template("model.goods.goodsAmount")
+	    .add("%goods%", "model.goods.food.name")
+	    .addName("%amount%", "100");
+        StringTemplate t2 = StringTemplate.template("model.goods.goodsAmount")
+            .addAmount("%amount%", 50)
+            .addStringTemplate("%goods%", t1);
+
+
+        Game game = getGame();
+        Player player = game.getPlayer("model.nation.dutch");
+
+        try {
+            Validator validator = buildValidator("schema/data/data-stringTemplate.xsd");
+            validator.validate(buildSource(t2, player, true, true));
+        } catch(SAXParseException e){
+            String errMsg = e.getMessage() 
+                + " at line=" + e.getLineNumber() 
+                + " column=" + e.getColumnNumber();
+            fail(errMsg);
+        }
+
+
     }
 
 }

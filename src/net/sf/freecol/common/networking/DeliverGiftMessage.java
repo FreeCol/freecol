@@ -188,14 +188,12 @@ public class DeliverGiftMessage extends Message {
             Element messages = doc.createElement("addMessages");
             gift.appendChild(messages);
             ModelMessage m
-                = new ModelMessage(settlement,
-                                   ModelMessage.MessageType.GIFT_GOODS,
-                                   goods.getType(),
-                                   "model.unit.gift",
-                                   "%player%", player.getNationAsString(),
-                                   "%type%", goods.getName(),
-                                   "%amount%", Integer.toString(goods.getAmount()),
-                                   "%colony%", settlement.getName());
+                = new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
+                                   "model.unit.gift", settlement, goods.getType())
+                .addName("%player%", player.getNationAsString())
+                .addName("%type%", goods.getName())
+                .addAmount("%amount%", goods.getAmount())
+                .addName("%colony%", settlement.getName());
             messages.appendChild(m.toXMLElement(receiver, doc));
             try {
                 receiver.getConnection().send(gift);
