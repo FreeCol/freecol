@@ -58,7 +58,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     public static enum UnitAction { ASSIGN,
             CLEAR_SPECIALITY, ACTIVATE_UNIT, FORTIFY, SENTRY,
-            COLOPEDIA, LEAVE_TOWN, WORK_TILE, WORK_BUILDING }
+            COLOPEDIA, LEAVE_TOWN, WORK_TILE, WORK_BUILDING, CLEAR_ORDERS }
 
     private final Unit unit;
 
@@ -353,6 +353,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 	case CLEAR_SPECIALITY:
 	    inGameController.clearSpeciality(unit);
 	    break;
+	case CLEAR_ORDERS:
+		inGameController.clearOrders(unit);
 	}
 	updateIcon();
     }

@@ -382,10 +382,20 @@ public final class DragListener extends MouseAdapter {
             menu.add(menuItem);
         }
 
+        UnitState unitState = tempUnit.getState();
         menuItem = new JMenuItem(Messages.message("sentryUnit"));
         menuItem.setActionCommand(UnitAction.SENTRY.toString());
         menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(tempUnit.getState() != UnitState.SENTRY);
+        menuItem.setEnabled(unitState != UnitState.SENTRY);
+        menu.add(menuItem);
+        
+        boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
+        menuItem = new JMenuItem(Messages.message("clearUnitOrders"));
+        menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
+        menuItem.addActionListener(unitLabel);
+        menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)
+        		&& unitState != UnitState.TO_AMERICA
+        		&& unitState != UnitState.TO_EUROPE);
         menu.add(menuItem);
 
         if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {
