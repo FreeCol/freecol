@@ -573,7 +573,7 @@ public class TransportMission extends Mission {
         }
         if (carrier.getLocation() instanceof Europe) {
             // Coming to/from Europe, do nothing
-            if (carrier.getState() == UnitState.TO_EUROPE || carrier.getState() == UnitState.TO_AMERICA) {
+            if (carrier.isBetweenEuropeAndNewWorld()) {
                 return;
             }
             // Actually in Europe
@@ -1189,9 +1189,7 @@ public class TransportMission extends Mission {
         boolean transportListChanged = false;
 
         //Sanitation
-        if(carrier.getLocation() instanceof Europe &&
-        		(carrier.getState() == UnitState.TO_EUROPE 
-        				|| carrier.getState() == UnitState.TO_AMERICA)){
+        if(carrier.isBetweenEuropeAndNewWorld()){
         	return false;
         }
         
@@ -1340,8 +1338,7 @@ public class TransportMission extends Mission {
             if (t instanceof AIUnit) {
                 AIUnit au = (AIUnit) t;
                 Unit u = au.getUnit();
-                if (u.getTile() == carrier.getTile() && carrier.getState() != UnitState.TO_EUROPE
-                        && carrier.getState() != UnitState.TO_AMERICA) {
+                if (u.getTile() == carrier.getTile() && !carrier.isBetweenEuropeAndNewWorld()) {
                     EmbarkMessage embark = new EmbarkMessage(u, carrier, null);
                     try {
                         connection.sendAndWait(embark.toXMLElement());
@@ -1353,8 +1350,7 @@ public class TransportMission extends Mission {
                 }
             } else if (t instanceof AIGoods) {
                 AIGoods ag = (AIGoods) t;
-                if (ag.getGoods().getTile() == carrier.getTile() && carrier.getState() != UnitState.TO_EUROPE
-                        && carrier.getState() != UnitState.TO_AMERICA) {
+                if (ag.getGoods().getTile() == carrier.getTile() && !carrier.isBetweenEuropeAndNewWorld()) {
                     if (carrier.getLocation() instanceof Europe) {
                         GoodsType goodsType = ag.getGoods().getType();
                         int goodsAmount = ag.getGoods().getAmount();

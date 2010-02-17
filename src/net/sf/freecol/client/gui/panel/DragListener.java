@@ -145,7 +145,7 @@ public final class DragListener extends MouseAdapter {
             if ((comp instanceof UnitLabel) && (((UnitLabel) comp).getUnit().isCarrier())) {
                 Unit u = ((UnitLabel) comp).getUnit();
                 if (parentPanel instanceof EuropePanel) {
-                    if (u.getState() != UnitState.TO_AMERICA && u.getState() != UnitState.TO_EUROPE) {
+                    if (!u.isBetweenEuropeAndNewWorld()) {
                         ((EuropePanel) parentPanel).setSelectedUnitLabel((UnitLabel) comp);
                     }
                 } else if (parentPanel instanceof ColonyPanel) {
@@ -394,8 +394,7 @@ public final class DragListener extends MouseAdapter {
         menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)
-        		&& unitState != UnitState.TO_AMERICA
-        		&& unitState != UnitState.TO_EUROPE);
+        		&& !tempUnit.isBetweenEuropeAndNewWorld());
         menu.add(menuItem);
 
         if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {

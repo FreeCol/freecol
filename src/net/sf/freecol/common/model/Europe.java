@@ -256,8 +256,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
             }
             Unit newUnit = (Unit) locatable;
             units.add(newUnit);
-            if (!(newUnit.getState() == Unit.UnitState.TO_EUROPE
-                  || newUnit.getState() == Unit.UnitState.TO_AMERICA)) {
+            if (!newUnit.isBetweenEuropeAndNewWorld()) {
                 newUnit.setState(Unit.UnitState.SENTRY);
             }
             firePropertyChange(UNIT_CHANGE, getUnitCount() - 1, getUnitCount());

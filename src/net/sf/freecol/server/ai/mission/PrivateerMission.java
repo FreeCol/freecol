@@ -116,13 +116,9 @@ public class PrivateerMission extends Mission {
     	Unit unit = getUnit();
         while(isValid() && unit.getMovesLeft() > 0){
         	// Unit is between Europe and America, nothing to do
-        	if(unit.getLocation() instanceof Europe){
-        		boolean isInHighSeas = unit.getState() == UnitState.TO_AMERICA 
-        								|| unit.getState() == UnitState.TO_EUROPE;
-        		if(isInHighSeas){
-        			unit.setMovesLeft(0);
-        			return;
-        		}
+        	if(unit.isBetweenEuropeAndNewWorld()){
+        		unit.setMovesLeft(0);
+        		return;
         	}
             switch(state){
                 case HUNTING:

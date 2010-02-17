@@ -2391,11 +2391,37 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     public boolean isInEurope() {
         if (location instanceof Unit) {
             return ((Unit) location).isInEurope();
-        } else {
-            return getLocation() instanceof Europe && 
-                getState() != UnitState.TO_EUROPE &&
-                getState() != UnitState.TO_AMERICA;
         }
+        
+        if(!(getLocation() instanceof Europe)){
+        	return false;
+        }
+        
+        if(isBetweenEuropeAndNewWorld()){
+        	return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Checks if this <code>Unit</code> is either a carrier or on one, bound to/from Europe
+     * 
+     * @return The result.
+     */
+    public boolean isBetweenEuropeAndNewWorld() {
+        if (location instanceof Unit) {
+            return ((Unit) location).isBetweenEuropeAndNewWorld();
+        }
+        
+        if(!(getLocation() instanceof Europe)){
+        	return false;
+        }
+        
+        if(getState() == UnitState.TO_EUROPE 
+        		|| getState() == UnitState.TO_AMERICA){
+        	return true;
+        }
+        return false;
     }
 
     /**
