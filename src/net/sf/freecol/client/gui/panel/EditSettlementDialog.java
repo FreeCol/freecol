@@ -171,7 +171,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
             Nation newNation = (Nation) owner.getSelectedItem();
             if (newNation != settlement.getOwner().getNation()) {
                 Player newPlayer = settlement.getGame().getPlayer(newNation.getId());
-                settlement.setOwner(newPlayer);
+                settlement.changeOwner(newPlayer);
                 MapEditorTransformPanel.setNativePlayer(newPlayer);
             }
             if (capital.isSelected() && !settlement.isCapital()) {

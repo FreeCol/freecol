@@ -1859,13 +1859,13 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
 
         // Player settlement list is not passed in player updates
         // so do it here.  TODO: something better.
-        if (settlement != oldSettlement) {
-            if (oldSettlement != null) {
-                oldSettlement.getOwner().removeSettlement(oldSettlement);
-            }
-            if (settlement != null) {
-                settlement.getOwner().addSettlement(settlement);
-            }
+        if (settlement == null && oldSettlement != null) {
+            Player owner = oldSettlement.getOwner();
+            oldSettlement.setOwner(null);
+            owner.removeSettlement(oldSettlement);
+        } else if (settlement != null && oldSettlement == null) {
+            Player owner = settlement.getOwner();
+            owner.addSettlement(settlement);
         }
 
         // compatibility mode

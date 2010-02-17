@@ -320,12 +320,22 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
     /**
      * Sets the owner of this <code>Settlement</code>.
      *
-     * @param owner The <code>Player</code> that shall own this <code>Settlement</code>.
+     * @param player The new owner of this <code>Settlement</code>.
+     */
+    public void setOwner(Player player) {
+        owner = player;
+    }
+
+    /**
+     * Change the owner of this <code>Settlement</code>.
+     *
+     * @param owner The <code>Player</code> that shall own this
+     *            <code>Settlement</code>.
      * @see #getOwner
      */
-    public void setOwner(Player owner) {
+    public void changeOwner(Player owner) {
         Player oldOwner = this.owner;        
-        this.owner = owner;
+        setOwner(owner);
         
         if (oldOwner.hasSettlement(this)) {
             oldOwner.removeSettlement(this);

@@ -498,7 +498,7 @@ public final class InGameController extends Controller {
                 element.setAttribute("winner", strongestAIPlayer.getId());
             }
             for (Colony colony : weakestAIPlayer.getColonies()) {
-                colony.setOwner(strongestAIPlayer);
+                colony.changeOwner(strongestAIPlayer);
                 for (Entry<Player, Element> entry : documentMap.entrySet()) {
                     if (entry.getKey().canSee(colony.getTile())) {
                         entry.getValue().appendChild(colony.toXMLElement(entry.getKey(),

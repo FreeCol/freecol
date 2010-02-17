@@ -405,8 +405,8 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @see Settlement#getOwner
      */
     @Override
-    public void setOwner(Player owner) {
-        // TODO: Erik - this only works if called on the server!
+    public void changeOwner(Player owner) {
+        // TODO: Move to the server
         super.setOwner(owner);
         for (Unit unit : getUnitList()) {
             unit.setOwner(owner);
@@ -2338,7 +2338,6 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         setName(in.getAttributeValue(null, "name"));
         owner = getFreeColGameObject(in, "owner", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
-        owner.addSettlement(this);
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
         oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);
         tories = getAttribute(in, "tories", 0);

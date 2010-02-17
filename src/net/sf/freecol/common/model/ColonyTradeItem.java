@@ -125,7 +125,7 @@ public class ColonyTradeItem extends TradeItem {
      * @return An item to be updated, or null if none required.
      */
     public List<FreeColGameObject> makeTrade() {
-        colony.setOwner(getDestination());
+        colony.changeOwner(getDestination());
         List<FreeColGameObject> result = new ArrayList<FreeColGameObject>();
         result.add(colony);
         return result;

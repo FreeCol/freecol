@@ -257,7 +257,7 @@ public final class TilePopup extends JPopupMenu {
                         final Game serverGame = freeColClient.getFreeColServer().getGame();
                         final Player serverPlayer = (Player) serverGame.getFreeColGameObject(freeColClient.getMyPlayer().getId());
                         final Tile serverTile = (Tile) serverGame.getFreeColGameObject(tile.getId());
-                        serverTile.getSettlement().setOwner(serverPlayer);
+                        serverTile.getSettlement().changeOwner(serverPlayer);
                         freeColClient.getConnectController().reconnect();
                     }
                 });

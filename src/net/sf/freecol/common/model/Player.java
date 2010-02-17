@@ -633,32 +633,30 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Adds the given <code>Settlement</code> to this <code>Player</code>'s
-     * list of settlements.
+     * Adds a given settlement to this player's list of settlements.
      *
-     * @param s
+     * @param settlement The <code>Settlement</code> to add.
      */
-    public void addSettlement(Settlement s) {
-        if (!settlements.contains(s)) {
-            settlements.add(s);
-            if (s.getOwner() != this) {
-                s.setOwner(this);
+    public void addSettlement(Settlement settlement) {
+        if (!hasSettlement(settlement)) {
+            if (settlement.getOwner() != this) {
+                throw new IllegalStateException("Player does not own settlement.");
             }
+            settlements.add(settlement);
         }
     }
 
     /**
-     * Removes the given <code>Settlement</code> from this <code>Player</code>'s
-     * list of settlements.
+     * Removes the given settlement from this player's list of settlements.
      *
-     * @param s The <code>Settlement</code> to remove.
+     * @param settlement The <code>Settlement</code> to remove.
      */
-    public void removeSettlement(Settlement s) {
-        if (settlements.contains(s)) {
-            if (s.getOwner() == this) {
-                throw new IllegalStateException("Cannot remove the ownership of the given settlement before it has been given to another player.");
+    public void removeSettlement(Settlement settlement) {
+        if (hasSettlement(settlement)) {
+            if (settlement.getOwner() == this) {
+                throw new IllegalStateException("Player still owns settlement.");
             }
-            settlements.remove(s);
+            settlements.remove(settlement);
         }
     }
 

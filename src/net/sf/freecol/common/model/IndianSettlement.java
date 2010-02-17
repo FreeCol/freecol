@@ -1330,9 +1330,6 @@ public class IndianSettlement extends Settlement {
         String name = in.getAttributeValue(null, "name");
         if (name == null) name = owner.getDefaultSettlementName(isCapital());
         setName(name);
-
-        owner.addSettlement(this);
-        
         ownedUnits.clear();
         
         for (int i = 0; i < wantedGoods.length; i++) {

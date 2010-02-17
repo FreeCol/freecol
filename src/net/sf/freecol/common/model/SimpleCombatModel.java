@@ -661,7 +661,7 @@ public class SimpleCombatModel implements CombatModel {
             defendingPlayer.divertModelMessages(colony, defendingPlayer);
 
             // This also changes over all of the units...
-            colony.setOwner(attackingPlayer);
+            colony.changeOwner(attackingPlayer);
             // However, not all units might be available
             for (Unit capturedUnit : colony.getUnitList()) {
                 defendingPlayer.divertModelMessages(capturedUnit, defendingPlayer);
