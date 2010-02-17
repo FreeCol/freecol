@@ -211,7 +211,7 @@ public class DebugMenu extends JMenu {
         while (it.hasNext()) {
             final Player p = it.next();
             if (p.isEuropean() && p.canBuildColonies()) {
-                JRadioButtonMenuItem cv2 = new JRadioButtonMenuItem(p.getNationAsString(),
+                JRadioButtonMenuItem cv2 = new JRadioButtonMenuItem(Messages.message(p.getNationName()),
                         gui.displayColonyValue && gui.displayColonyValuePlayer == p);
                 cv2.setOpaque(false);
                 cv2.setMnemonic(KeyEvent.VK_C);
@@ -342,7 +342,7 @@ public class DebugMenu extends JMenu {
                         units.put("To America", toAmerica);
                         
                         sb.append("\n==");
-                        sb.append(p.getNationAsString());
+                        sb.append(Messages.message(p.getNationName()));
                         sb.append("==\n");
 
                         for(Unit u : p.getEurope().getUnitList()){

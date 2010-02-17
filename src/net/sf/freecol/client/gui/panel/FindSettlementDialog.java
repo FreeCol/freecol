@@ -46,8 +46,9 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.plaf.FreeColComboBoxRenderer;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.IndianSettlement;
-import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -165,9 +166,12 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
         @Override
         public void setLabelValues(JLabel label, Object value) {
             Settlement settlement = (Settlement) value;
-            label.setText(settlement.getName()
-                          + (settlement.isCapital() ? "* (" : " (")
-                          + settlement.getOwner().getNationAsString() + ")");
+            String messageId = settlement.isCapital()
+                ? "indianCapitalOwner"
+                : "indianSettlementOwner";
+            label.setText(Messages.message(StringTemplate.template(messageId)
+                                           .addName("%name%", settlement.getName())
+                                           .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
             label.setIcon(new ImageIcon(getLibrary().getSettlementImage(settlement)
                                         .getScaledInstance(64, -1, Image.SCALE_SMOOTH)));
         }

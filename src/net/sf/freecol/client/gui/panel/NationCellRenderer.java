@@ -29,6 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 
@@ -98,7 +99,7 @@ public final class NationCellRenderer implements TableCellRenderer {
             }
             component = comboBox;
         } else {
-            component = new JLabel(player.getNationAsString());
+            component = new JLabel(Messages.message(player.getNationName()));
         }
 
         if (player.isReady()) {

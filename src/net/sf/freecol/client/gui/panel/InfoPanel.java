@@ -289,7 +289,7 @@ public final class InfoPanel extends FreeColPanel {
                     if (tile.getOwner() == null) {
                         add(new JLabel());
                     } else {
-                        JLabel ownerLabel = new JLabel(tile.getOwner().getNationAsString());
+                        JLabel ownerLabel = localizedLabel(tile.getOwner().getNationName());
                         ownerLabel.setFont(font);
                         add(ownerLabel);
                     }

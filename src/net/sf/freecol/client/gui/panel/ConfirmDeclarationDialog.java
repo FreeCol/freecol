@@ -32,6 +32,7 @@ import javax.swing.JTextField;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.StringTemplate;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -49,9 +50,9 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
         super(parent);
 
         final JTextField nationField =
-            new JTextField(Messages.message("declareIndependence.defaultNation",
-                                            "%nation%",
-                                            getMyPlayer().getNationAsString()), 20);
+            new JTextField(Messages.message(StringTemplate.template("declareIndependence.defaultNation")
+                                            .addStringTemplate("%nation%", getMyPlayer().getNationName())),
+                           20);
         final JTextField countryField =
             new JTextField(Messages.message("declareIndependence.defaultCountry",
                                             "%nation%",

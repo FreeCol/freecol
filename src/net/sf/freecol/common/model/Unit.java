@@ -2433,9 +2433,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *
      * @return The name of the owner of this Unit unless this is hidden.
      */
-    public String getApparentOwnerName() {
-        return (hasAbility("model.ability.piracy")) ? Player.UNKNOWN_ENEMY
-            : owner.getNationAsString();
+    public StringTemplate getApparentOwnerName() {
+        return (hasAbility("model.ability.piracy"))
+            ? StringTemplate.name(Player.UNKNOWN_ENEMY)
+            : owner.getNationName();
     }
 
     /**
@@ -2686,7 +2687,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * @return A String representation of this Unit.
      */
     public String toString() {
-        return getName() + " " + getMovesAsString();
+        return getId() + " [" + getType().getId() + " " + getMovesAsString() +"] "
+            + owner.getNationID() + " (" + getRole() + ")";
     }
 
     public String getMovesAsString() {
@@ -3016,7 +3018,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         setState(UnitState.TO_EUROPE);
         setLocation(getOwner().getEurope());
 
-        logger.info(getOwner().getNationAsString() + " " + getType().getName() + "(" + this.getId() + ") moving to Europe");
+        logger.info(toString() + " moving to Europe");
         
         // Clear the alreadyOnHighSea flag:
         alreadyOnHighSea = false;
@@ -3034,7 +3036,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
         setState(UnitState.TO_AMERICA);
 
-        logger.info(getOwner().getNationAsString() + " " + getType().getName() + "(" + this.getId() + " moving to America");
+        logger.info(toString() + " moving to America");
         
         // Clear the alreadyOnHighSea flag:
         alreadyOnHighSea = false;
@@ -3226,8 +3228,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
                 switch (state) {
                 case TO_EUROPE:
-                    logger.info(getOwner().getNationAsString() + " " + getType().getName() + "("
-                                + this.getId() + ") arrives in Europe");
+                    logger.info(toString() + " arrives in Europe");
                     // trade unit arrives in Europe
                     if (this.getTradeRoute() != null){
                         setMovesLeft(0);
@@ -3241,8 +3242,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     setState(UnitState.ACTIVE);
                     break;
                 case TO_AMERICA:
-                    logger.info(getOwner().getNationAsString() + " " + getType().getName()
-                                + "(" + this.getId() + ") arrives in America");
+                    logger.info(toString() + " arrives in America");
                     getGame().getModelController().setToVacantEntryLocation(this);
                     setState(UnitState.ACTIVE);
                     break;

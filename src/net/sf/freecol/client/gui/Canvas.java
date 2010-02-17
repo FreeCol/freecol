@@ -1948,14 +1948,14 @@ public final class Canvas extends JDesktopPane {
      */
     public ScoutIndianSettlementAction showScoutIndianSettlementDialog(IndianSettlement settlement) {
         StringBuilder text = new StringBuilder(400);
-        text.append(Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
-                                     "%nation%", settlement.getOwner().getNationAsString()));
+        text.append(Messages.message(StringTemplate.template(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()))
+                                     .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
         text.append("\n\n");
         int number = settlement.getOwner().getNumberOfSettlements();
-        text.append(Messages.message("scoutSettlement.greetings",
-                                     "%nation%", settlement.getOwner().getNationAsString(),
-                                     "%settlement%", settlement.getName(),
-                                     "%number%", String.valueOf(number)));
+        text.append(Messages.message(StringTemplate.template("scoutSettlement.greetings")
+                                     .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+                                     .addName("%settlement%", settlement.getName())
+                                     .addAmount("%number%", number)));
         text.append(" ");
         if (settlement.getLearnableSkill() != null) {
             text.append(Messages.message("scoutSettlement.skill", "%skill%",
@@ -2054,12 +2054,13 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<ScoutIndianSettlementAction>(
                 Messages.message("scoutSettlement.attack"),
                 ScoutIndianSettlementAction.INDIAN_SETTLEMENT_ATTACK));
+        String messageId = settlement.getAlarmLevelMessage(freeColClient.getMyPlayer());
         ScoutIndianSettlementAction result
             = showChoiceDialog(settlement.getTile(),
-                Messages.message(settlement.getAlarmLevelMessage(freeColClient.getMyPlayer()),
-                                 "%nation%", settlement.getOwner().getNationAsString()),
-                Messages.message("cancel"),
-                choices);
+                               Messages.message(StringTemplate.template(messageId)
+                                                .addStringTemplate("%nation%", settlement.getOwner().getNationName())),
+                               Messages.message("cancel"),
+                               choices);
         return (result == null) ? ScoutIndianSettlementAction.CANCEL : result;
     }
 
@@ -2090,9 +2091,10 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<MissionaryAction>(
                 Messages.message("missionarySettlement.incite"),
                 MissionaryAction.INCITE_INDIANS));
+        String messageId = settlement.getAlarmLevelMessage(unit.getOwner());
         StringBuilder introText
-            = new StringBuilder(Messages.message(settlement.getAlarmLevelMessage(unit.getOwner()),
-                                                 "%nation%", settlement.getOwner().getNationAsString()));
+            = new StringBuilder(Messages.message(StringTemplate.template(messageId)
+                                                 .addStringTemplate("%nation%", settlement.getOwner().getNationName())));
         introText.append("\n\n");
         introText.append(Messages.message("missionarySettlement.question",
                                           "%settlement%", settlement.getName()));
@@ -2240,12 +2242,13 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<TradeAction>(
                 Messages.message("tradeProposition.toGift"),
                 TradeAction.GIFT, canGift));
-        TradeAction result = showChoiceDialog(settlement.getTile(),
-                Messages.message("tradeProposition.welcome",
-                                 "%nation%", settlement.getOwner().getNationAsString(),
-                                 "%settlement%", settlement.getName()),
-                Messages.message("tradeProposition.cancel"),
-                choices);
+        TradeAction result =
+            showChoiceDialog(settlement.getTile(),
+                             Messages.message(StringTemplate.template("tradeProposition.welcome")
+                                              .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+                                              .addName("%settlement%", settlement.getName())),
+                             Messages.message("tradeProposition.cancel"),
+                             choices);
         return (result == null) ? TradeAction.CANCEL : result;
     }
 
@@ -2270,13 +2273,17 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<BuyAction>(
                 Messages.message("buy.moreGold"),
                 BuyAction.HAGGLE));
-        BuyAction result = showChoiceDialog(unit.getTile(),
-                Messages.message("buy.text",
-                                 "%nation%", settlement.getOwner().getNationAsString(),
-                                 "%goods%", goods.toString(),
-                                 "%gold%", Integer.toString(gold)),
-                Messages.message("buyProposition.cancel"),
-                choices);
+        StringTemplate goodsTemplate = StringTemplate.template("model.goods.goodsAmount")
+            .add("%goods%", goods.getType().getNameKey())
+            .addAmount("%amount%", goods.getAmount());
+        BuyAction result =
+            showChoiceDialog(unit.getTile(),
+                             Messages.message(StringTemplate.template("buy.text")
+                                              .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+                                              .addStringTemplate("%goods%", goodsTemplate)
+                                              .addAmount("%gold%", gold)),
+                             Messages.message("buyProposition.cancel"),
+                             choices);
         return (result == null) ? BuyAction.CANCEL : result;
     }
 
@@ -2303,13 +2310,14 @@ public final class Canvas extends JDesktopPane {
                 Messages.message("sell.gift",
                                  "%goods%", goods.getName()),
                 SellAction.GIFT));
-        SellAction result = showChoiceDialog(unit.getTile(),
-                Messages.message("sell.text",
-                                 "%nation%", settlement.getOwner().getNationAsString(),
-                                 "%goods%", goods.getName(),
-                                 "%gold%", Integer.toString(gold)),
-                Messages.message("sellProposition.cancel"),
-                choices);
+        SellAction result =
+            showChoiceDialog(unit.getTile(),
+                             Messages.message(StringTemplate.template("sell.text")
+                                              .addStringTemplate("%nation%", settlement.getOwner().getNationName())
+                                              .add("%goods%", goods.getNameKey())
+                                              .addAmount("%gold%", gold)),
+                             Messages.message("sellProposition.cancel"),
+                             choices);
         return (result == null) ? SellAction.CANCEL : result;
     }
 
@@ -2334,11 +2342,12 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<ClaimAction>(
                 Messages.message("indianLand.take"),
                 ClaimAction.STEAL));
-        ClaimAction result = showChoiceDialog(tile,
-                Messages.message("indianLand.text",
-                                 "%player%", owner.getNationAsString()),
-                Messages.message("indianLand.cancel"),
-                choices);
+        ClaimAction result =
+            showChoiceDialog(tile,
+                             Messages.message(StringTemplate.template("indianLand.text")
+                                              .addStringTemplate("%player%", owner.getNationName())),
+                             Messages.message("indianLand.cancel"),
+                             choices);
         return (result == null) ? ClaimAction.CANCEL : result;
     }
 

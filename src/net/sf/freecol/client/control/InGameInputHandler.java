@@ -667,14 +667,14 @@ public final class InGameInputHandler extends InputHandler {
                 accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                                                           "indianDemand.gold.text", "indianDemand.gold.yes",
                                                           "indianDemand.gold.no",
-                                                          "%nation%", unit.getOwner().getNationAsString(),
+                                                          "%nation%", Messages.message(unit.getOwner().getNationName()),
                                                           "%colony%", colony.getName(),
                                                           "%amount%", String.valueOf(gold)).confirm();
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:
                 m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
                                      "indianDemand.gold.text", colony, unit)
-                    .addName("%nation%", unit.getOwner().getNationAsString())
+                    .addStringTemplate("%nation%", unit.getOwner().getNationName())
                     .addName("%colony%", colony.getName())
                     .addName("%amount%", String.valueOf(gold));
                 accepted = true;
@@ -682,7 +682,7 @@ public final class InGameInputHandler extends InputHandler {
             case ClientOptions.INDIAN_DEMAND_RESPONSE_REJECT:
                 m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
                                      "indianDemand.gold.text", colony, unit)
-                    .addName("%nation%", unit.getOwner().getNationAsString())
+                    .addStringTemplate("%nation%", unit.getOwner().getNationName())
                     .addName("%colony%", colony.getName())
                     .addName("%amount%", String.valueOf(gold));
                 accepted = false;
@@ -702,14 +702,14 @@ public final class InGameInputHandler extends InputHandler {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                                                               "indianDemand.food.text", "indianDemand.food.yes",
                                                               "indianDemand.food.no",
-                                                              "%nation%", unit.getOwner().getNationAsString(),
+                                                              "%nation%", Messages.message(unit.getOwner().getNationName()),
                                                               "%colony%", colony.getName(),
                                                               "%amount%", String.valueOf(goods.getAmount())).confirm();
                 } else {
                     accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
                                                               "indianDemand.other.text", "indianDemand.other.yes",
                                                               "indianDemand.other.no",
-                                                              "%nation%", unit.getOwner().getNationAsString(),
+                                                              "%nation%", Messages.message(unit.getOwner().getNationName()),
                                                               "%colony%", colony.getName(),
                                                               "%amount%", String.valueOf(goods.getAmount()),
                                                               "%goods%", goods.getName()).confirm();
@@ -719,13 +719,13 @@ public final class InGameInputHandler extends InputHandler {
                 if (goods.getType().isFoodType()) {
                     m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
                                          "indianDemand.food.text", colony, unit)
-                        .addName("%nation%", unit.getOwner().getNationAsString())
+                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
                         .addName("%colony%", colony.getName())
                         .addName("%amount%", String.valueOf(goods.getAmount()));
                 } else {
                     m = new ModelMessage(ModelMessage.MessageType.ACCEPTED_DEMANDS,
                                          "indianDemand.other.text", colony, unit)
-                        .addName("%nation%", unit.getOwner().getNationAsString())
+                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
                         .addName("%colony%", colony.getName())
                         .addName("%amount%", String.valueOf(goods.getAmount()))
                         .add("%goods%", goods.getNameKey());
@@ -736,13 +736,13 @@ public final class InGameInputHandler extends InputHandler {
                 if (goods.getType().isFoodType()) {
                     m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
                                          "indianDemand.food.text", colony, unit)
-                        .addName("%nation%", unit.getOwner().getNationAsString())
+                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
                         .addName("%colony%", colony.getName())
                         .addName("%amount%", String.valueOf(goods.getAmount()));
                 } else {
                     m = new ModelMessage(ModelMessage.MessageType.REJECTED_DEMANDS,
                                          "indianDemand.other.text", colony, unit)
-                        .addName("%nation%", unit.getOwner().getNationAsString())
+                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
                         .addName("%colony%", colony.getName())
                         .addName("%amount%", String.valueOf(goods.getAmount()))
                         .add("%goods%", goods.getNameKey());
@@ -830,7 +830,8 @@ public final class InGameInputHandler extends InputHandler {
         case DECLARE_WAR:
             Player enemy = (Player) getGame().getFreeColGameObject(element.getAttribute("enemy"));
             player.changeRelationWithPlayer(enemy, Stance.WAR);
-            new ShowMonarchPanelSwingTask(action, "%nation%", enemy.getNationAsString())
+            new ShowMonarchPanelSwingTask(action,
+                                          "%nation%", Messages.message(enemy.getNationName()))
                 .confirm();
             break;
         case SUPPORT_LAND:
@@ -936,8 +937,8 @@ public final class InGameInputHandler extends InputHandler {
                 player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                                         "model.diplomacy." + stance.toString().toLowerCase() + ".others",
                                                         first)
-                                       .addName("%attacker%", first.getNationAsString())
-                                       .addName("%defender%", second.getNationAsString()));
+                                       .addStringTemplate("%attacker%", first.getNationName())
+                                       .addStringTemplate("%defender%", second.getNationName()));
             }
 
         } else {
@@ -988,7 +989,7 @@ public final class InGameInputHandler extends InputHandler {
                 player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                                         "model.diplomacy." + stance.toString().toLowerCase() + ".declared",
                                                         first)
-                                       .addName("%nation%", other.getNationAsString()));
+                                       .addStringTemplate("%nation%", other.getNationName()));
             }
         }
 
@@ -1070,14 +1071,14 @@ public final class InGameInputHandler extends InputHandler {
         final Player winner = (Player) getGame().getFreeColGameObject(element.getAttribute("winner"));
         player.addModelMessage(new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                                 "model.diplomacy.spanishSuccession", winner)
-                               .addName("%loserNation%", loser.getNationAsString())
-                               .addName("%nation%", winner.getNationAsString()));
+                               .addStringTemplate("%loserNation%", loser.getNationName())
+                               .addStringTemplate("%nation%", winner.getNationName()));
         loser.setDead(true);
         update(element);
         player.getHistory().add(new HistoryEvent(player.getGame().getTurn().getNumber(),
                                                  HistoryEvent.Type.SPANISH_SUCCESSION,
-                                                 "%nation%", winner.getNationAsString(),
-                                                 "%loserNation%", loser.getNationAsString()));
+                                                 "%nation%", Messages.message(winner.getNationName()),
+                                                 "%loserNation%", Messages.message(loser.getNationName())));
 
         return null;
     }

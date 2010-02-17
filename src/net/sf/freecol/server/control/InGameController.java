@@ -343,7 +343,7 @@ public final class InGameController extends Controller {
             : "model.diplomacy.dead.native";
         ModelMessage m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                           messageId, serverPlayer)
-            .addName("%nation%", serverPlayer.getNationAsString());
+            .addStringTemplate("%nation%", serverPlayer.getNationName());
         messages.appendChild(m.toXMLElement(doc));
 
         Element setDeadElement = doc.createElement("setDead");
@@ -390,7 +390,7 @@ public final class InGameController extends Controller {
             if (Player.checkForDeath(newPlayer)) {
                 Element element = killPlayerElement(newPlayer);
                 freeColServer.getServer().sendToAll(element, null);
-                logger.info(newPlayer.getNationAsString() + " is dead.");
+                logger.info(newPlayer.getNation() + " is dead.");
                 return nextPlayer();
             }
         }
@@ -989,7 +989,7 @@ public final class InGameController extends Controller {
             	// a new list must be created, since the original may be changed while iterating
             	List<Unit> unitList = new ArrayList<Unit>(tile.getUnitList());
             	for(Unit unit : unitList){
-            		logger.fine(colony.getName() + " found unit : " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
+                    logger.fine(colony.getName() + " found unit : " + unit.toString());
             		// we need to save the tile of the unit
             		//before the location of the unit can change
             		Tile unitTile = unit.getTile();
@@ -1004,11 +1004,13 @@ public final class InGameController extends Controller {
             		// ignore friendly units
             		if(currentPlayer.getStance(player) != Stance.WAR &&
             				!unit.hasAbility("model.ability.piracy")){
-                		logger.warning(colony.getName() + " found unit to not bombard: " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
+                            logger.warning(colony.getName() + " found unit to not bombard: "
+                                           + unit.toString());
             			continue;
             		}
 
-            		logger.warning(colony.getName() + " found enemy unit to bombard: " + unit.getName() + "(" + unit.getOwner().getNationAsString() + ")");
+            		logger.warning(colony.getName() + " found enemy unit to bombard: " +
+                                       unit.toString());
             		// generate bombardment result
             		CombatModel.CombatResult result = combatModel.generateAttackResult(colony, unit);
 
@@ -1450,7 +1452,7 @@ public final class InGameController extends Controller {
             result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.BurialGround",
                                         serverPlayer, unit)
-                       .addName("%nation%", indianPlayer.getNationAsString()));
+                       .addStringTemplate("%nation%", indianPlayer.getNationName()));
             break;
         case EXPEDITION_VANISHES:
             unit.dispose();
@@ -1892,7 +1894,7 @@ public final class InGameController extends Controller {
         unit.dispose();
         return new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                 "indianSettlement.mission.noDenounce", player, unit)
-            .addName("%nation%", settlement.getOwner().getNationAsString());
+            .addStringTemplate("%nation%", settlement.getOwner().getNationName());
     }
 
     /**
@@ -1933,7 +1935,7 @@ public final class InGameController extends Controller {
         String messageId = "indianSettlement.mission." + tension.toString().toLowerCase();
         return new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                 messageId, player, unit)
-            .addName("%nation%", settlement.getOwner().getNationAsString());
+            .addStringTemplate("%nation%", settlement.getOwner().getNationName());
     }
 
     /**

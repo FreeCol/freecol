@@ -160,8 +160,8 @@ public final class GUI {
 
             Font nameFont = getFont();
             FontMetrics nameFontMetrics = getFontMetrics(nameFont);
-            String message = Messages.message("waitingFor", "%nation%", player
-                    .getNationAsString());
+            String message = Messages.message("waitingFor", "%nation%",
+                                              Messages.message(player.getNationName()));
 
             Rectangle textBounds;
             int fontSize = DEFAULT_FONT_SIZE;
@@ -2472,7 +2472,7 @@ public final class GUI {
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_OWNERS:
             if (tile.getOwner() != null) {
-                String tileOwner = tile.getOwner().getNationAsString();
+                String tileOwner = Messages.message(tile.getOwner().getNationName());
                 g.setColor(Color.BLACK);
                 int b = getBreakingPoint(tileOwner);
                 if (b == -1) {

@@ -1178,7 +1178,8 @@ public final class FreeColServer {
             throw new IllegalStateException("Not an indianSettlement: " + settlementId);
         }
         if (!unit.getOwner().hasContacted(settlement.getOwner())) {
-            throw new IllegalStateException("Player has not established contact with the " + settlement.getOwner().getNationAsString());
+            throw new IllegalStateException("Player has not established contact with the "
+                                            + settlement.getOwner().getNation());
         }
         return (IndianSettlement) settlement;
     }

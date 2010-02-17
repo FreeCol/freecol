@@ -31,6 +31,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -55,12 +56,11 @@ public final class IndianSettlementPanel extends FreeColPanel {
         
         JLabel settlementLabel = new JLabel(canvas.getImageIcon(settlement, false));
         Player indian = settlement.getOwner();
-        String text = settlement.getName();
-        if (settlement.isCapital()){
-            text += ", " + Messages.message("indianCapital", "%nation%", indian.getNationAsString());
-        } else {
-            text += ", " + Messages.message("indianSettlement", "%nation%", indian.getNationAsString());
-        }
+        String text = settlement.getName() + ", "
+            + Messages.message(StringTemplate.template(settlement.isCapital()
+                                                       ? "indianCapital"
+                                                       : "indianSettlement")
+                               .addStringTemplate("%nation%", indian.getNationName()));
 
         Player player = getMyPlayer();
         boolean contacted = player.hasContacted(indian);
@@ -75,10 +75,10 @@ public final class IndianSettlementPanel extends FreeColPanel {
 
         Unit missionary = settlement.getMissionary();
         if (missionary != null) {
-            add(new JLabel(Messages.message("model.unit.nationUnit",
-                                            "%nation%", missionary.getOwner().getNationAsString(),
-                                            "%unit%", missionary.getName()),
-                           canvas.getImageIcon(missionary, true), JLabel.CENTER));
+            String missionaryName = Messages.message(StringTemplate.template("model.unit.nationUnit")
+                                                     .addStringTemplate("%nation%", missionary.getOwner().getNationName())
+                                                     .addName("%unit%", missionary.getName()));
+            add(new JLabel(missionaryName, canvas.getImageIcon(missionary, true), JLabel.CENTER));
         }
 
         add(new JLabel(Messages.message("indianSettlement.learnableSkill")), "newline");

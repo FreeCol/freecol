@@ -244,7 +244,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             loop: while ((end = input.indexOf('%', start + 1)) >= 0) {
                 String var = input.substring(start, end + 1);
                 if (var.equals("%nation%")) {
-                    insertText(sender.getNationAsString());
+                    insertText(Messages.message(sender.getNationName()));
                     start = end + 1;
                     continue loop;
                 } else if (var.equals("%offers%")) {

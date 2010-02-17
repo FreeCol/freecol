@@ -1386,10 +1386,10 @@ public class Player extends FreeColGameObject implements Nameable {
         if (name == null) {
             do {
                 String type = Messages.message("model.region." + regionType.toString().toLowerCase() + ".name");
-                name = Messages.message("model.region.default",
-                                        "%nation%", getNationAsString(),
-                                        "%type%", type,
-                                        "%index%", Integer.toString(index));
+                name = Messages.message(StringTemplate.template("model.region.default")
+                                        .addStringTemplate("%nation%", getNationName())
+                                        .addName("%type%", type)
+                                        .addAmount("%index%", index));
                 index++;
             } while (getGame().getMap().getRegionByName(name) != null);
         }
@@ -2103,7 +2103,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @return The name of this player.
      */
     public String toString() {
-        return getName();
+        return getName() + " (" + nationID + ")";
     }
 
     /**
@@ -2172,11 +2172,11 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return The nation of this player as a String.
      */
-    public String getNationAsString() {
+    public StringTemplate getNationName() {
         return (playerType == PlayerType.REBEL
                 || playerType == PlayerType.INDEPENDENT)
-            ? independentNationName
-            : Messages.message(nationID + ".name");
+            ? StringTemplate.name(independentNationName)
+            : StringTemplate.key(nationID + ".name");
     }
 
     /**

@@ -30,6 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.DiplomaticTrade;
 import net.sf.freecol.common.model.FreeColGameObject;
@@ -177,11 +178,11 @@ public class DiplomacyMessage extends Message {
         if (agreement != null) {
             if (agreement.getRecipient() != null
                 && agreement.getRecipient() != player) {
-                return agreement.getRecipient().getNationAsString();
+                return Messages.message(agreement.getRecipient().getNationName());
             }
             if (agreement.getSender() != null
                 && agreement.getSender() != player) {
-                return agreement.getSender().getNationAsString();
+                return Messages.message(agreement.getSender().getNationName());
             }
         }
         return null;

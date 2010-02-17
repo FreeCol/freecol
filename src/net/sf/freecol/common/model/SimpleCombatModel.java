@@ -639,19 +639,21 @@ public class SimpleCombatModel implements CombatModel {
 
         defendingPlayer.modifyTension(attacker.getOwner(), Tension.TENSION_ADD_MAJOR);
         if (attackingPlayer.isEuropean()) {
-            attackingPlayer.getHistory().add(new HistoryEvent(attackingPlayer.getGame().getTurn().getNumber(),
-                                                       HistoryEvent.Type.CONQUER_COLONY,
-                                                       "%nation%", defendingPlayer.getNationAsString(),
-                                                       "%colony%", colony.getName()));
-            defendingPlayer.getHistory().add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
-                                                    HistoryEvent.Type.COLONY_CONQUERED,
-                                                    "%colony%", colony.getName(),
-                                                    "%nation%", attackingPlayer.getNationAsString()));
+            attackingPlayer.getHistory()
+                .add(new HistoryEvent(attackingPlayer.getGame().getTurn().getNumber(),
+                                      HistoryEvent.Type.CONQUER_COLONY,
+                                      "%nation%", Messages.message(defendingPlayer.getNationName()),
+                                      "%colony%", colony.getName()));
+            defendingPlayer.getHistory()
+                .add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
+                                      HistoryEvent.Type.COLONY_CONQUERED,
+                                      "%colony%", colony.getName(),
+                                      "%nation%", Messages.message(attackingPlayer.getNationName())));
             defendingPlayer.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                              "model.unit.colonyCapturedBy", defendingPlayer)
                                             .addName("%colony%", colony.getName())
                                             .addAmount("%amount%", plunderGold)
-                                            .addName("%player%", attackingPlayer.getNationAsString()));
+                                            .addStringTemplate("%player%", attackingPlayer.getNationName()));
             damageAllShips(colony, attacker, repairLocation);
 
             attackingPlayer.modifyGold(plunderGold);
@@ -709,14 +711,14 @@ public class SimpleCombatModel implements CombatModel {
                 defendingPlayer.getHistory()
                     .add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
                                           HistoryEvent.Type.COLONY_DESTROYED,
-                                          "%nation%", attackingPlayer.getNationAsString(),
+                                          "%nation%", Messages.message(attackingPlayer.getNationName()),
                                           "%colony%", colony.getName()));
                 defendingPlayer
                     .addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                       "model.unit.colonyBurning", defendingPlayer)
                                      .addName("%colony%", colony.getName())
                                      .addAmount("%amount%", plunderGold)
-                                     .addName("%nation%", attackingPlayer.getNationAsString())
+                                     .addStringTemplate("%nation%", attackingPlayer.getNationName())
                                      .addName("%unit%", attacker.getName()));
                 attackingPlayer.modifyGold(plunderGold);
                 defendingPlayer.modifyGold(-plunderGold);
@@ -737,7 +739,7 @@ public class SimpleCombatModel implements CombatModel {
                                                                      "model.unit.colonistSlaughtered", colony)
                                                     .addName("%colony%", colony.getName())
                                                     .addName("%unit%", victim.getName())
-                                                    .addName("%nation%", attackingPlayer.getNationAsString())
+                                                    .addStringTemplate("%nation%", attackingPlayer.getNationName())
                                                     .addName("%enemyUnit%", attacker.getName()));
                     defendingPlayer.divertModelMessages(victim, defendingPlayer);
                     victim.dispose();
@@ -794,7 +796,7 @@ public class SimpleCombatModel implements CombatModel {
             }
         }
         
-        String nation = attacker.getOwner().getNationAsString();
+        StringTemplate nation = attacker.getOwner().getNationName();
         String unitName = attacker.getName();
         String colonyName = colony.getName();
         
@@ -807,7 +809,7 @@ public class SimpleCombatModel implements CombatModel {
                                                     "model.unit.buildingDamaged", colony)
                                    .add("%building%", building.getNameKey())
                                    .addName("%colony%", colonyName)
-                                   .addName("%enemyNation%", nation)
+                                   .addStringTemplate("%enemyNation%", nation)
                                    .addName("%enemyUnit%", unitName));
             building.damage();
         } else if (random < buildingList.size() + goodsList.size()) {
@@ -822,7 +824,7 @@ public class SimpleCombatModel implements CombatModel {
                                    .addAmount("%amount%", goods.getAmount())
                                    .add("%goods%", goods.getNameKey())
                                    .addName("%colony%", colonyName)
-                                   .addName("%enemyNation%", nation)
+                                   .addStringTemplate("%enemyNation%", nation)
                                    .addName("%enemyUnit%", unitName));
         } else if (random < buildingList.size() + goodsList.size() + shipList.size()) {
             Unit ship = shipList.get(random - buildingList.size() - goodsList.size());
@@ -835,7 +837,7 @@ public class SimpleCombatModel implements CombatModel {
                                                     "model.unit.indianPlunder", colony)
                                    .addAmount("%amount%", gold)
                                    .addName("%colony%", colonyName)
-                                   .addName("%enemyNation%", nation)
+                                   .addStringTemplate("%enemyNation%", nation)
                                    .addName("%enemyUnit%", unitName));
         }
     }
@@ -902,13 +904,13 @@ public class SimpleCombatModel implements CombatModel {
         attacker.getOwner().getHistory()
             .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
                                   HistoryEvent.Type.DESTROY_SETTLEMENT,
-                                  "%nation%", enemy.getNationAsString(),
+                                  "%nation%", Messages.message(enemy.getNationName()),
                                   "%settlement%", settlementName));
         if (enemy.getSettlements().isEmpty()) {
             attacker.getOwner().getHistory()
                 .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
                                       HistoryEvent.Type.DESTROY_NATION,
-                                      "%nation%", enemy.getNationAsString()));
+                                      "%nation%", Messages.message(enemy.getNationName())));
         }
     }
 
@@ -954,8 +956,8 @@ public class SimpleCombatModel implements CombatModel {
                 attacker.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                           "model.unit.burnMissions",
                                                           attacker, indianSettlement)
-                                         .addName("%nation%", attacker.getOwner().getNationAsString())
-                                         .addName("%enemyNation%", indianSettlement.getOwner().getNationAsString()));
+                                         .addStringTemplate("%nation%", attacker.getOwner().getNationName())
+                                         .addStringTemplate("%enemyNation%", indianSettlement.getOwner().getNationName()));
             }
         }
     }
@@ -968,32 +970,32 @@ public class SimpleCombatModel implements CombatModel {
      * @param attackerUnit A unit that may have attacked the defender
      **/
     private void evade(Unit defender, Colony attackerColony, Unit attackerUnit) {
-        String nation = defender.getApparentOwnerName();
+        StringTemplate nation = defender.getApparentOwnerName();
 
         if (attackerColony != null) {
             attackerColony.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                             "model.unit.shipEvadedBombardment", attackerColony)
                                            .addName("%colony%", attackerColony.getName())
                                            .addName("%unit%", defender.getName())
-                                           .addName("%nation%", nation));
+                                           .addStringTemplate("%nation%", nation));
             defender.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT, 
                                                       "model.unit.shipEvadedBombardment", defender)
                                      .addName("%colony%", attackerColony.getName())
                                      .addName("%unit%", defender.getName())
-                                     .addName("%nation%", nation));
+                                     .addStringTemplate("%nation%", nation));
         } else if (attackerUnit != null) {
-            String attackerNation = attackerUnit.getApparentOwnerName();
+            StringTemplate attackerNation = attackerUnit.getApparentOwnerName();
 
             attackerUnit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                           "model.unit.enemyShipEvaded", attackerUnit)
                                          .addName("%unit%", attackerUnit.getName())
                                          .addName("%enemyUnit%", defender.getName())
-                                         .addName("%enemyNation%", nation));
+                                         .addStringTemplate("%enemyNation%", nation));
             defender.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                       "model.unit.shipEvaded", defender)
                                      .addName("%unit%", defender.getName())
                                      .addName("%enemyUnit%", attackerUnit.getName())
-                                     .addName("%enemyNation%", attackerNation));
+                                     .addStringTemplate("%enemyNation%", attackerNation));
         }
     }
 
@@ -1005,7 +1007,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param attackerUnit A unit which may have damaged the ship
      */
     private void damageShip(Unit damagedShip, Colony attackerColony, Unit attackerUnit, Location repairLocation) {
-        String nation = damagedShip.getApparentOwnerName();
+        StringTemplate nation = damagedShip.getApparentOwnerName();
         StringTemplate repairLocationName = (repairLocation == null)
             ? StringTemplate.name("")
             : repairLocation.getLocationName();
@@ -1015,7 +1017,7 @@ public class SimpleCombatModel implements CombatModel {
                                                             "model.unit.enemyShipDamagedByBombardment",
                                                             attackerColony)
                                            .addName("%colony%", attackerColony.getName())
-                                           .addName("%nation%", nation)
+                                           .addStringTemplate("%nation%", nation)
                                            .addName("%unit%", damagedShip.getName()));
         		
             damagedShip.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -1024,13 +1026,13 @@ public class SimpleCombatModel implements CombatModel {
                                         .addName("%unit%", damagedShip.getName())
                                         .addStringTemplate("%repairLocation%", repairLocationName));
         } else if (attackerUnit != null) {
-            String attackerNation = attackerUnit.getApparentOwnerName();
+            StringTemplate attackerNation = attackerUnit.getApparentOwnerName();
             
             attackerUnit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                           "model.unit.enemyShipDamaged",
                                                           attackerUnit)
                                          .addName("%unit%", attackerUnit.getName())
-                                         .addName("%enemyNation%", nation)
+                                         .addStringTemplate("%enemyNation%", nation)
                                          .addName("%enemyUnit%", damagedShip.getName()));
             
             damagedShip.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -1038,7 +1040,7 @@ public class SimpleCombatModel implements CombatModel {
                                                          damagedShip)
                                         .addName("%unit%", damagedShip.getName())
                                         .addName("%enemyUnit%", attackerUnit.getName())
-                                        .addName("%enemyNation%", attackerNation)
+                                        .addStringTemplate("%enemyNation%", attackerNation)
                                         .addStringTemplate("%repairLocation%", repairLocationName));
         }
         damagedShip.setHitpoints(1);
@@ -1056,7 +1058,7 @@ public class SimpleCombatModel implements CombatModel {
      * @param attackerUnit The unit which may have attacked the ship
      */
     private void sinkShip(Unit sinkingShip, Colony attackerColony, Unit attackerUnit) {
-        String nation = sinkingShip.getApparentOwnerName();
+        StringTemplate nation = sinkingShip.getApparentOwnerName();
 
         if (attackerColony != null) {
             attackerColony.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
@@ -1064,27 +1066,27 @@ public class SimpleCombatModel implements CombatModel {
                                                             attackerColony)
                                            .addName("%colony%", attackerColony.getName())
                                            .addName("%unit%", sinkingShip.getName())
-                                           .addName("%nation%", nation));
+                                           .addStringTemplate("%nation%", nation));
             sinkingShip.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                          "model.unit.shipSunkByBombardment",
                                                          sinkingShip)
                                         .addName("%colony%", attackerColony.getName())
                                         .addName("%unit%", sinkingShip.getName()));
         } else if (attackerUnit != null) {
-            String attackerNation = attackerUnit.getApparentOwnerName();
+            StringTemplate attackerNation = attackerUnit.getApparentOwnerName();
 
             attackerUnit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                           "model.unit.enemyShipSunk",
                                                           attackerUnit)
                                          .addName("%unit%", attackerUnit.getName())
                                          .addName("%enemyUnit%", sinkingShip.getName())
-                                         .addName("%enemyNation%", nation));
+                                         .addStringTemplate("%enemyNation%", nation));
             sinkingShip.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                          "model.unit.shipSunk",
                                                          sinkingShip)
                                         .addName("%unit%", sinkingShip.getName())
                                         .addName("%enemyUnit%", attackerUnit.getName())
-                                        .addName("%enemyNation%", attackerNation));
+                                        .addStringTemplate("%enemyNation%", attackerNation));
         }
         sinkingShip.getOwner().divertModelMessages(sinkingShip,
                                                    sinkingShip.getTile());
@@ -1182,18 +1184,18 @@ public class SimpleCombatModel implements CombatModel {
     private void captureUnit(Unit unit, Unit enemyUnit) {
         StringTemplate locationName = unit.getLocation().getLocationName();
         Player loser = unit.getOwner();
-        String nation = loser.getNationAsString();
+        StringTemplate nation = loser.getNationName();
         String oldName = unit.getName();
-        String enemyNation = enemyUnit.getOwner().getNationAsString();
+        StringTemplate enemyNation = enemyUnit.getOwner().getNationName();
         String messageID = Messages.getKey(unit.getType().getId() + ".captured",
                                            "model.unit.unitCaptured");
 
         // unit is about to change sides, launch message now!
         unit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                               messageID, unit)
-                             .addName("%nation%", nation)
+                             .addStringTemplate("%nation%", nation)
                              .addName("%unit%", oldName)
-                             .addName("%enemyNation%", enemyNation)
+                             .addStringTemplate("%enemyNation%", enemyNation)
                              .addName("%enemyUnit%", enemyUnit.getName())
                              .addStringTemplate("%location%", locationName));
         loser.divertModelMessages(unit, unit.getTile());
@@ -1207,9 +1209,9 @@ public class SimpleCombatModel implements CombatModel {
         }
         enemyUnit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                    messageID, enemyUnit)
-                                  .addName("%nation%", nation)
+                                  .addStringTemplate("%nation%", nation)
                                   .addName("%unit%", oldName)
-                                  .addName("%enemyNation%", enemyNation)
+                                  .addStringTemplate("%enemyNation%", enemyNation)
                                   .addName("%enemyUnit%", enemyUnit.getName())
                                   .addStringTemplate("%location%", locationName));
     }
@@ -1223,27 +1225,27 @@ public class SimpleCombatModel implements CombatModel {
      */
     private void demoteUnit(Unit unit, UnitType downgrade, Unit enemyUnit) {
         StringTemplate locationName = unit.getLocation().getLocationName();
-        String nation = unit.getOwner().getNationAsString();
+        StringTemplate nation = unit.getOwner().getNationName();
         String oldName = unit.getName();
-        String enemyNation = enemyUnit.getOwner().getNationAsString();
+        StringTemplate enemyNation = enemyUnit.getOwner().getNationName();
         String messageID = Messages.getKey(unit.getType().getId() + ".demoted",
                                            "model.unit.unitDemoted");
 
         unit.setType(downgrade);
         enemyUnit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                    messageID, enemyUnit)
-                                  .addName("%nation%", nation)
+                                  .addStringTemplate("%nation%", nation)
                                   .addName("%oldName%", oldName)
                                   .addName("%unit%", unit.getName())
-                                  .addName("%enemyNation%", enemyNation)
+                                  .addStringTemplate("%enemyNation%", enemyNation)
                                   .addName("%enemyUnit%", enemyUnit.getName())
                                   .addStringTemplate("%location%", locationName));
         unit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                               messageID, unit)
-                             .addName("%nation%", nation)
+                             .addStringTemplate("%nation%", nation)
                              .addName("%oldName%", oldName)
                              .addName("%unit%", unit.getName())
-                             .addName("%enemyNation%", enemyNation)
+                             .addStringTemplate("%enemyNation%", enemyNation)
                              .addName("%enemyUnit%", enemyUnit.getName())
                              .addStringTemplate("%location%", locationName));
     }
@@ -1257,9 +1259,9 @@ public class SimpleCombatModel implements CombatModel {
      */
     private void disarmUnit(Unit unit, EquipmentType typeToLose, Unit enemyUnit) {
         StringTemplate locationName = unit.getLocation().getLocationName();
-        String nation = unit.getOwner().getNationAsString();
+        StringTemplate nation = unit.getOwner().getNationName();
         String oldName = unit.getName();
-        String enemyNation = enemyUnit.getOwner().getNationAsString();
+        StringTemplate enemyNation = enemyUnit.getOwner().getNationName();
         String messageID = Messages.getKey(unit.getType().getId() + ".demoted",
                                            "model.unit.unitDemoted");
 
@@ -1288,18 +1290,18 @@ public class SimpleCombatModel implements CombatModel {
         }
         enemyUnit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                    messageID, enemyUnit)
-                                  .addName("%nation%", nation)
+                                  .addStringTemplate("%nation%", nation)
                                   .addName("%oldName%", oldName)
                                   .addName("%unit%", unit.getName())
-                                  .addName("%enemyNation%", enemyNation)
+                                  .addStringTemplate("%enemyNation%", enemyNation)
                                   .addName("%enemyUnit%", enemyUnit.getName())
                                   .addStringTemplate("%location%", locationName));
         unit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                               messageID, unit)
-                             .addName("%nation%", nation)
+                             .addStringTemplate("%nation%", nation)
                              .addName("%oldName%", oldName)
                              .addName("%unit%", unit.getName())
-                             .addName("%enemyNation%", enemyNation)
+                             .addStringTemplate("%enemyNation%", enemyNation)
                              .addName("%enemyUnit%", enemyUnit.getName())
                              .addStringTemplate("%location%", locationName));
                
@@ -1342,7 +1344,7 @@ public class SimpleCombatModel implements CombatModel {
         enemyUnit.equipWith(newEquipType, 1, true);
         unit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                               "model.unit.equipmentCaptured", unit)
-                             .addName("%nation%", enemyUnit.getOwner().getNationAsString())
+                             .addStringTemplate("%nation%", enemyUnit.getOwner().getNationName())
                              .add("%equipment%", typeToLose.getNameKey()));
         IndianSettlement settlement = enemyUnit.getIndianSettlement();
         if (settlement != null) {
@@ -1361,23 +1363,23 @@ public class SimpleCombatModel implements CombatModel {
     private void slaughterUnit(Unit unit, Unit enemyUnit) {
         StringTemplate locationName = enemyUnit.getLocation().getLocationName();
         Player loser = unit.getOwner();
-        String nation = loser.getNationAsString();
-        String enemyNation = enemyUnit.getOwner().getNationAsString();
+        StringTemplate nation = loser.getNationName();
+        StringTemplate enemyNation = enemyUnit.getOwner().getNationName();
         String messageID = Messages.getKey(unit.getType().getId() + ".destroyed",
                                            "model.unit.unitSlaughtered");
 
         enemyUnit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                    messageID, enemyUnit)
-                                  .addName("%nation%", nation)
+                                  .addStringTemplate("%nation%", nation)
                                   .addName("%unit%", unit.getName())
-                                  .addName("%enemyNation%", enemyNation)
+                                  .addStringTemplate("%enemyNation%", enemyNation)
                                   .addName("%enemyUnit%", enemyUnit.getName())
                                   .addStringTemplate("%location%", locationName));
         unit.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                               messageID, unit)
-                             .addName("%nation%", nation)
+                             .addStringTemplate("%nation%", nation)
                              .addName("%unit%", unit.getName())
-                             .addName("%enemyNation%", enemyNation)
+                             .addStringTemplate("%enemyNation%", enemyNation)
                              .addName("%enemyUnit%", enemyUnit.getName())
                              .addStringTemplate("%location%", locationName));
         
@@ -1396,7 +1398,7 @@ public class SimpleCombatModel implements CombatModel {
      */
     private void promote(Unit unit) {
         String oldName = unit.getName();
-        String nation = unit.getOwner().getNationAsString();
+        StringTemplate nation = unit.getOwner().getNationName();
         UnitType newType = unit.getType().getUnitTypeChange(ChangeType.PROMOTION, unit.getOwner());
         
         if (newType != null && newType.isAvailableTo(unit.getOwner())) {
@@ -1407,7 +1409,7 @@ public class SimpleCombatModel implements CombatModel {
                                                       "model.unit.unitPromoted", unit)
                                      .addName("%oldName%", oldName)
                                      .addName("%unit%", unit.getName())
-                                     .addName("%nation%", nation));
+                                     .addStringTemplate("%nation%", nation));
             }
         }
     }

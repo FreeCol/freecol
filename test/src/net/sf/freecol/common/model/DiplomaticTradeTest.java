@@ -50,12 +50,13 @@ public class DiplomaticTradeTest extends FreeColTestCase {
 	 */
 	private void verifyTreatyResults(Player player1, Player player2, Stance expectedStance, int expectedTension){
 		        
-        assertFalse(player1.getNationAsString() + " player should not be at war",player1.isAtWar());
-        assertEquals(player1.getNationAsString() + " player should be at peace with " + player2.getNationAsString() + " player",player1.getStance(player2),expectedStance);
+        assertFalse(player1 + " player should not be at war",player1.isAtWar());
+        assertEquals(player1 + " player should be at peace with " + player2 + " player",
+                     player1.getStance(player2),expectedStance);
         
         int player1CurrTension = player1.getTension(player2).getValue();
                 
-        assertEquals(player1.getNationAsString() + " player tension values wrong",expectedTension,player1CurrTension);
+        assertEquals(player1 + " player tension values wrong",expectedTension,player1CurrTension);
 	}
 	
 	/**

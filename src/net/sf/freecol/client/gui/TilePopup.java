@@ -49,6 +49,7 @@ import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
@@ -348,9 +349,9 @@ public final class TilePopup extends JPopupMenu {
         String occ = unit.getDetailedOccupationIndicator();
         if (occ.length() > 0) occ = " (" + occ + ")";
         String text = (indent ? "    " : "")
-            + Messages.message("model.unit.nationUnit",
-                               "%nation%", unit.getOwner().getNationAsString(),
-                               "%unit%", unit.getName())
+            + Messages.message(StringTemplate.template("model.unit.nationUnit")
+                               .addStringTemplate("%nation%", unit.getOwner().getNationName())
+                               .addName("%unit%", unit.getName()))
             + occ;
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(new ActionListener() {

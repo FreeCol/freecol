@@ -43,6 +43,7 @@ import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.Role;
@@ -126,8 +127,8 @@ public final class ReportMilitaryPanel extends ReportPanel {
             }
         }
 
-        reportPanel.add(new JLabel(Messages.message("report.military.forces", "%nation%",
-                                                    player.getNationAsString())),
+        reportPanel.add(localizedLabel(StringTemplate.template("report.military.forces")
+                                       .addStringTemplate("%nation%", player.getNationName())),
                         "newline, span, split 2");
         reportPanel.add(new JSeparator(JSeparator.HORIZONTAL), "growx");
 

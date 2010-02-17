@@ -67,7 +67,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
                 coatLabel.setIcon(coatOfArms);
             }
             enemyPanel.add(coatLabel, "spany, aligny top");
-            enemyPanel.add(new JLabel(enemy.getNationAsString()), "wrap 12");
+            enemyPanel.add(localizedLabel(enemy.getNationName()), "wrap 12");
 
             enemyPanel.add(new JLabel(Messages.message("report.stance")), "newline");
             Stance stance = Enum.valueOf(Stance.class, enemyElement.getAttribute("stance"));

@@ -197,7 +197,7 @@ public final class InGameController implements NetworkConstants {
     public void saveGame() {
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
-        String fileName = player.getName() + "_" + player.getNationAsString()
+        String fileName = player.getName() + "_" + Messages.message(player.getNationName())
             + "_" + freeColClient.getGame().getTurn().toSaveGameString();
         fileName = fileName.replaceAll(" ", "_");
         if (freeColClient.canSaveCurrentGame()) {
@@ -1475,12 +1475,12 @@ public final class InGameController implements NetworkConstants {
         case MOVE_NO_ACCESS_BEACHED:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
             canvas.showInformationMessage("move.noAccessBeached", unit,
-                                          "%nation%", getNationAt(tile, direction));
+                                          "%nation%", Messages.message(getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_CONTACT:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
             canvas.showInformationMessage("move.noAccessContact", unit,
-                                          "%nation%", getNationAt(tile, direction));
+                                          "%nation%", Messages.message(getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_LAND:
             if (!moveDisembark(unit, direction)) {
@@ -1491,7 +1491,7 @@ public final class InGameController implements NetworkConstants {
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
             canvas.showInformationMessage("move.noAccessSettlement", unit,
                                           "%unit%", unit.getName(),
-                                          "%nation%", getNationAt(tile, direction));
+                                          "%nation%", Messages.message(getNationAt(tile, direction)));
             break;
         case MOVE_NO_ACCESS_SKILL:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
@@ -1500,13 +1500,15 @@ public final class InGameController implements NetworkConstants {
             break;
         case MOVE_NO_ACCESS_TRADE:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessTrade", unit,
-                                          "%nation%", getNationAt(tile, direction));
+            canvas.showInformationMessage(StringTemplate.template("move.noAccessTrade")
+                                          .addStringTemplate("%nation%", getNationAt(tile, direction)),
+                                          unit);
             break;
         case MOVE_NO_ACCESS_WAR:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessWar", unit,
-                                          "%nation%", getNationAt(tile, direction));
+            canvas.showInformationMessage(StringTemplate.template("move.noAccessWar")
+                                          .addStringTemplate("%nation%", getNationAt(tile, direction)),
+                                          unit);
             break;
         case MOVE_NO_ACCESS_WATER:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
@@ -1552,7 +1554,7 @@ public final class InGameController implements NetworkConstants {
      * @return The name of the nation controlling a settlement on the
      *         adjacent tile if any.
      */
-    private String getNationAt(Tile tile, Direction direction) {
+    private StringTemplate getNationAt(Tile tile, Direction direction) {
         Map map = freeColClient.getGame().getMap();
         Tile newTile = map.getNeighbourOrNull(direction, tile);
         Player player = null;
@@ -1563,7 +1565,7 @@ public final class InGameController implements NetworkConstants {
         } else { // should not happen
             player = freeColClient.getGame().getUnknownEnemy();
         }
-        return player.getNationAsString();
+        return player.getNationName();
     }
 
     /**
@@ -1601,11 +1603,12 @@ public final class InGameController implements NetworkConstants {
         Player player = freeColClient.getMyPlayer();
         if (reply.hasAttribute("slowedBy")) { // ship slowed
             Unit slowedBy = (Unit) game.getFreeColGameObject(reply.getAttribute("slowedBy"));
-            String enemy = slowedBy.getOwner().getNationAsString();
-            canvas.showInformationMessage("model.unit.slowed", slowedBy,
-                                          "%unit%", unit.getName(),
-                                          "%enemyUnit%", slowedBy.getName(),
-                                          "%enemyNation%", enemy);
+            StringTemplate enemy = slowedBy.getOwner().getNationName();
+            canvas.showInformationMessage(StringTemplate.template("model.unit.slowed")
+                                          .addName("%unit%", unit.getName())
+                                          .addName("%enemyUnit%", slowedBy.getName())
+                                          .addStringTemplate("%enemyNation%", enemy),
+                                          slowedBy);
         }
 
         ModelMessage m = null;
@@ -1908,7 +1911,7 @@ public final class InGameController implements NetworkConstants {
 
         // Confirm attack given current stance
         Canvas canvas = freeColClient.getCanvas();
-        String enemyNation = enemy.getNationAsString();
+        String enemyNation = Messages.message(enemy.getNationName());
         switch (attacker.getOwner().getStance(enemy)) {
         case UNCONTACTED: case PEACE:
             return canvas.showConfirmDialog(attacker.getTile(),
@@ -2056,10 +2059,10 @@ public final class InGameController implements NetworkConstants {
                 }
                 convert.setLocation(convert.getLocation());
                 
-                String nation = defender.getOwner().getNationAsString();
+                StringTemplate nation = defender.getOwner().getNationName();
                 ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                                         "model.unit.newConvertFromAttack", convert)
-                    .addName("%nation%", nation)
+                    .addStringTemplate("%nation%", nation)
                     .addName("%unit%", convert.getName());
                 freeColClient.getMyPlayer().addModelMessage(message);
                 nextModelMessage();
@@ -2090,7 +2093,7 @@ public final class InGameController implements NetworkConstants {
             	ModelMessage message = new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                         "indianSettlement.capitalBurned", indianPlayer)
                     .addName("%name%", indianPlayer.getDefaultSettlementName(true))
-                    .addName("%nation%", indianPlayer.getNationAsString());
+                    .addStringTemplate("%nation%", indianPlayer.getNationName());
             	freeColClient.getMyPlayer().addModelMessage(message);
             	nextModelMessage();
             }

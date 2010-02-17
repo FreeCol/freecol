@@ -46,6 +46,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileType;
 import net.sf.freecol.common.model.UnitType;
@@ -103,9 +104,9 @@ public final class TilePanel extends FreeColPanel {
             add(new JLabel(tile.getRegion().getDisplayName()));
         }
         if (tile.getOwner() != null) {
-            String ownerName = tile.getOwner().getNationAsString();
+            StringTemplate ownerName = tile.getOwner().getNationName();
             if (ownerName != null) {
-                add(new JLabel(ownerName));
+                add(localizedLabel(ownerName));
             }
         }
 

@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.io.FreeColSavegameFile;
@@ -337,7 +338,7 @@ public class MapGenerator implements IMapGenerator {
                         }
                         territoryMap.put(name, territory);
                         logger.fine("Allocated region " + name + " for " +
-                                    player.getNationAsString() + ". Center is " +
+                                    player + ". Center is " +
                                     territory.getCenter() + ".");
                         break;
                     }
@@ -440,7 +441,7 @@ public class MapGenerator implements IMapGenerator {
                 if (territory.region != null) {
                     name = territory.region.getNameKey();
                 }
-                logger.fine("Placing the " + territory.player.getNationAsString() + 
+                logger.fine("Placing the " + territory.player + 
                         " capital in region: " + name +
                         " at Tile: "+ tile.getPosition());
                 placeIndianSettlement(territory.player, true, tile.getPosition(), map);
@@ -473,7 +474,7 @@ public class MapGenerator implements IMapGenerator {
                 if (territory.region != null) {
                     name = territory.region.getNameKey();
                 }
-                logger.fine("Placing a " + territory.player.getNationAsString() + 
+                logger.fine("Placing a " + territory.player + 
                         " camp in region: " + name +
                         " at Tile: "+ tile.getPosition());
                 placeIndianSettlement(territory.player, false, tile.getPosition(), map);
@@ -648,14 +649,14 @@ public class MapGenerator implements IMapGenerator {
             }
             if (player.isEuropean()) {
                 europeanPlayers.add(player);
-                logger.finest("found European player " + player.getNationAsString());
+                logger.finest("found European player " + player);
             }
         }
         int startingPositions = europeanPlayers.size();
         List<Integer> startingYPositions = new ArrayList<Integer>();
 
         for (Player player : europeanPlayers) {
-            logger.fine("generating units for player " + player.getNationAsString());
+            logger.fine("generating units for player " + player);
 
             List<Unit> carriers = new ArrayList<Unit>();
             List<Unit> passengers = new ArrayList<Unit>();
@@ -675,7 +676,7 @@ public class MapGenerator implements IMapGenerator {
 
             boolean startAtSea = true;
             if (carriers.isEmpty()) {
-                logger.warning("No carriers defined for player " + player.getNationAsString());
+                logger.warning("No carriers defined for player " + player);
                 startAtSea = false;
             }
 
@@ -759,7 +760,7 @@ public class MapGenerator implements IMapGenerator {
                     }
                     unitType = FreeCol.getSpecification().getUnitType("model.unit.expertFarmer");
                     Unit buildColonyUnit = new Unit(game, colonyTile, player, unitType, UnitState.ACTIVE);
-                    String colonyName = player.getNationAsString()+" Colony";
+                    String colonyName = Messages.message(player.getNationName()) + " Colony";
                     Colony colony = new Colony(game, player, colonyName, colonyTile);
                     buildColonyUnit.buildColony(colony);
                     if (buildColonyUnit.getLocation() instanceof ColonyTile) {
@@ -904,7 +905,7 @@ public class MapGenerator implements IMapGenerator {
         }
         
         public String toString() {
-            return player.getNationAsString() + " territory at " + region.toString();
+            return player + " territory at " + region.toString();
         }
     }
 

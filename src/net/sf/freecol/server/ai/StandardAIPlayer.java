@@ -182,7 +182,7 @@ public class StandardAIPlayer extends AIPlayer {
      * returns.
      */
     public void startWorking() {
-        logger.fine("Entering AI code for: " + getPlayer().getNationAsString() + ", year " + getGame().getTurn().getYear());
+        logger.fine("Entering AI code for: " + getPlayer() + ", year " + getGame().getTurn().getYear());
 
         /** TODO: find some intelligent solution
         switch (player.getNation()) {
@@ -1220,10 +1220,7 @@ public class StandardAIPlayer extends AIPlayer {
 
             // Sanitation
             if (tension == null) {
-                logger.warning(getPlayer().getNationAsString() +
-                               " tension towards " +
-                               enemy.getNationAsString() +
-                               " is NULL");
+                logger.warning(getPlayer() + " tension towards " + enemy + " is NULL");
                 continue;
             }
 

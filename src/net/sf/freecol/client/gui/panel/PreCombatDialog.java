@@ -42,6 +42,7 @@ import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObjectType;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 import net.miginfocom.swing.MigLayout;
@@ -104,9 +105,9 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
 
         // left hand side: attacker
         // right hand side: defender
-        String attackerName = Messages.message("model.unit.nationUnit",
-                                               "%nation%", attacker.getOwner().getNationAsString(),
-                                               "%unit%", attacker.getName());
+        String attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
+                                               .addStringTemplate("%nation%", attacker.getOwner().getNationName())
+                                               .addName("%unit%", attacker.getName()));
         JLabel attackerLabel = new UnitLabel(attacker, parent, false, true);
 
         String defenderName;
@@ -115,9 +116,9 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
             defenderName = settlement.getName();
             defenderLabel = new JLabel(parent.getImageIcon(settlement, false));
         } else {
-            defenderName = Messages.message("model.unit.nationUnit",
-                                            "%nation%", defender.getOwner().getNationAsString(),
-                                            "%unit%", defender.getName());
+            defenderName = Messages.message(StringTemplate.template("model.unit.nationUnit")
+                                            .addStringTemplate("%nation%", defender.getOwner().getNationName())
+                                            .addName("%unit%", defender.getName()));
             defenderLabel = new UnitLabel(defender, parent, false, true);
         }
 

@@ -190,7 +190,7 @@ public class DeliverGiftMessage extends Message {
             ModelMessage m
                 = new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
                                    "model.unit.gift", settlement, goods.getType())
-                .addName("%player%", player.getNationAsString())
+                .addStringTemplate("%player%", player.getNationName())
                 .addName("%type%", goods.getName())
                 .addAmount("%amount%", goods.getAmount())
                 .addName("%colony%", settlement.getName());
