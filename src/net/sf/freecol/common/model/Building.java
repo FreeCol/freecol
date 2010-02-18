@@ -996,16 +996,29 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return getType().compareTo(other.getType());
     }
 
+
+    /**
+     * Dispose of this building.
+     *
+     * @return A list of disposed objects.
+     */
+    @Override
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        while (units.size() > 0) {
+            objects.addAll(units.remove(0).disposeList());
+        }
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
     /**
      * Disposes this building. All units that currently has this
      * <code>Building as it's location will be disposed</code>.
      */
     @Override
     public void dispose() {
-        for (Unit unit : new ArrayList<Unit>(units)) {
-            unit.dispose();
-        }
-        super.dispose();
+        disposeList();
     }
 
     /**

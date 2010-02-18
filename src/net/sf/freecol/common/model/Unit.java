@@ -3601,7 +3601,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Disposes all Units aboard this one.
-     *
      */
     public void disposeAllUnits() {
         // Copy the list first, as the Unit will try to remove itself
@@ -3613,11 +3612,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Removes all references to this object.
+     *
+     * @return A list of disposed objects.
      */
-    public void dispose() {
-        disposeAllUnits();
-        if (unitType.canCarryGoods()) {
-            goodsContainer.dispose();
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        while (units.size() > 0) {
+            objects.addAll(units.remove(0).disposeList());
         }
 
         if (location != null) {
@@ -3639,7 +3640,19 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         getOwner().invalidateCanSeeTiles();
         getOwner().removeUnit(this);
 
-        super.dispose();
+        if (unitType.canCarryGoods()) {
+            objects.addAll(goodsContainer.disposeList());
+        }
+
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+    /**
+     * Removes all references to this object.
+     */
+    public void dispose() {
+        disposeList();
     }
 
     /**

@@ -1131,20 +1131,31 @@ public class IndianSettlement extends Settlement {
     }
     
     /**
-     * Disposes this settlement and removes its claims to adjacent
-     * tiles.
+     * Dispose of this native settlement.
+     *
+     * @return A list of disposed objects.
      */
     @Override
-    public void dispose() {
+    public List<FreeColGameObject> disposeList() {
+        // Orphan the units whose home settlement this is.
         while (ownedUnits.size() > 0) {
             ownedUnits.remove(0).setIndianSettlement(null);
         }
-        // list can be changed inside loop, causing ConcurrentModificationExpections
-        List<Unit> unitLst = new ArrayList<Unit>(units);
-        for (Unit unit : unitLst) {
-            unit.dispose();
+
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        while (units.size() > 0) {
+            objects.addAll(units.remove(0).disposeList());
         }
-        super.dispose();
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+    /**
+     * Dispose of this native settlement.
+     */
+    @Override
+    public void dispose() {
+        disposeList();
     }
 
     /**
@@ -1330,6 +1341,9 @@ public class IndianSettlement extends Settlement {
         String name = in.getAttributeValue(null, "name");
         if (name == null) name = owner.getDefaultSettlementName(isCapital());
         setName(name);
+
+        owner.addSettlement(this);
+
         ownedUnits.clear();
         
         for (int i = 0; i < wantedGoods.length; i++) {

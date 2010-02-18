@@ -577,12 +577,25 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
 
-    public void dispose() {
+    /**
+     * Removes all references to this object.
+     *
+     * @return A list of disposed objects.
+     */
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         if (unit != null) {
-            unit.dispose();
+            objects.addAll(unit.disposeList());
         }
+        objects.addAll(super.disposeList());
+        return objects;
+    }
 
-        super.dispose();
+    /**
+     * Dispose of this ColonyTile.
+     */
+    public void dispose() {
+        disposeList();
     }
 
     /**

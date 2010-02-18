@@ -21,6 +21,8 @@ package net.sf.freecol.common.model;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamConstants;
@@ -162,13 +164,32 @@ abstract public class FreeColGameObject extends FreeColObject {
 
 
     /**
-     * Removes all references to this object.
+     * Low level base dispose.
      */
-    public void dispose() {
+    public void fundamentalDispose() {
         disposed = true;
         getGame().removeFreeColGameObject(getId());
     }
-    
+
+    /**
+     * Removes all references to this object.
+     *
+     * @return A list of disposed objects.
+     */
+    public List<FreeColGameObject> disposeList() {
+        fundamentalDispose();
+
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        objects.add(this);
+        return objects;
+    }
+
+    /**
+     * Removes all references to this object.
+     */
+    public void dispose() {
+        disposeList();
+    }
 
     /**
      * Checks if this object has been disposed.
@@ -563,6 +584,19 @@ abstract public class FreeColGameObject extends FreeColObject {
         removeElement.appendChild(this.toXMLElementPartial(doc));
     }
 
+    /**
+     * Convenience function to add a list of objects to an element
+     * intended to signal removal of the objects.
+     *
+     * @param removeElement The remove element.
+     * @param objects A list of objects to remove.
+     */
+    public static void addToRemoveElement(Element removeElement, List<FreeColGameObject> objects) {
+        Document doc = removeElement.getOwnerDocument();
+        for (FreeColGameObject o : objects) {
+            removeElement.appendChild(o.toXMLElementPartial(doc));
+        }
+    }
 
     /**
      * Gets the tag name of the root element representing this object.

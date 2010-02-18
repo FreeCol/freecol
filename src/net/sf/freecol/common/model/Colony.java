@@ -2228,20 +2228,32 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
 
     /**
-     * Disposes this <code>Colony</code>. All <code>WorkLocation</code>s
-     * owned by this <code>Colony</code> will also be destroyed.
+     * Dispose of this colony.
+     *
+     * @return A list of disposed objects.
      */
     @Override
-    public void dispose() {
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
         for (WorkLocation workLocation : getWorkLocations()) {
-            ((FreeColGameObject) workLocation).dispose();
+            objects.addAll(((FreeColGameObject) workLocation).disposeList());
         }
         TileItemContainer container = getTile().getTileItemContainer();
         TileImprovement road = container.getRoad();
         if (road != null && road.isVirtual()) {
             container.removeTileItem(road);
         }
-        super.dispose();
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+    /**
+     * Disposes this <code>Colony</code>. All <code>WorkLocation</code>s
+     * owned by this <code>Colony</code> will also be destroyed.
+     */
+    @Override
+    public void dispose() {
+        disposeList();
     }
 
     /**

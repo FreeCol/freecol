@@ -118,6 +118,15 @@ public class GoodsContainer extends FreeColGameObject {
     }
 
     /**
+     * Dispose of this GoodsContainer.
+     */
+    public void dispose() {
+        storedGoods.clear();
+        super.dispose();
+    }
+
+
+    /**
      * Adds a <code>Goods</code> to this containter.
      * @param g The Goods to add to this container.
      */

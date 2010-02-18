@@ -329,14 +329,26 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     /**
-     * Dispose of all units in this <code>Europe</code>.
+     * Dispose of this <code>Europe</code>.
+     *
+     * @return A list of disposed objects.
      */
-    public void disposeUnitList() {
-        while (!units.isEmpty()) {
-            Unit unit = units.remove(0);
-            unit.dispose();
+    public List<FreeColGameObject> disposeList() {
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        while (units.size() > 0) {
+            objects.addAll(units.remove(0).disposeList());
         }
         units = null;
+
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+    /**
+     * Removes all references to this object.
+     */
+    public void dispose() {
+        disposeList();
     }
 
     /**

@@ -407,40 +407,55 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
 
 
     /**
-     * Dispose of this <code>Settlement</code>.
+     * Get the tiles this settlement owns.
+     *
+     * @return A list of tiles.
      */
-    public void dispose() {
-        Player oldOwner = owner;
+    public List<Tile> getOwnedTiles() {
         Tile settlementTile = getTile();
         Map map = getGame().getMap();
-        ArrayList<Tile> lostTiles = new ArrayList<Tile>();
-        for (Tile tile : map.getSurroundingTiles(settlementTile, getRadius())) {
-            if (tile.getOwningSettlement() == this
-                || (tile.getOwningSettlement() == null && tile.getOwner() == owner)) {
-                tile.setOwningSettlement(null);
-                tile.setOwner(null);
-                tile.updatePlayerExploredTiles();
-                lostTiles.add(tile);
+        ArrayList<Tile> tiles = new ArrayList<Tile>();
+        for (Tile t : map.getSurroundingTiles(settlementTile, getRadius())) {
+            if (t.getOwningSettlement() == this
+                || (t.getOwningSettlement() == null && t.getOwner() == owner)) {
+                tiles.add(t);
             }
         }
-        settlementTile.setSettlement(null);
-        settlementTile.setOwner(null);
-        settlementTile.updatePlayerExploredTiles();
-        lostTiles.add(settlementTile);
+        tiles.add(settlementTile);
+        return tiles;
+    }
 
-        owner = null;
+    /**
+     * Dispose of this settlement.
+     *
+     * @return A list of disposed objects.
+     */
+    public List<FreeColGameObject> disposeList() {
+        // Get off the map
+        Tile settlementTile = getTile();
+        List<Tile> lostTiles = getOwnedTiles();
+        for (Tile tile : lostTiles) {
+            tile.setOwningSettlement(null);
+            tile.setOwner(null);
+            tile.updatePlayerExploredTiles();
+        }
+        settlementTile.setSettlement(null);
+
+        // The owner forgets about the settlement.
+        Player oldOwner = owner;
+        setOwner(null);
         oldOwner.removeSettlement(this);
         oldOwner.invalidateCanSeeTiles();
-        goodsContainer.dispose();
-        super.dispose();
 
         // Allow other settlements to claim the tiles we have just vacated.
+        Map map = getGame().getMap();
         for (Tile lostTile : lostTiles) {
             if (lostTile.getOwningSettlement() != null) continue;
             for (Tile t : map.getSurroundingTiles(lostTile, 1)) {
-                // Find any neighbouring settlements and give them a turn
-                // at reclaiming the tiles.  Perhaps favour certain types
-                // of settlements according to difficulty?
+                // Find any neighbouring settlements and give them a
+                // turn at reclaiming the tiles.
+                // TODO: perhaps favour certain types of settlements
+                // with difficulty?
                 Settlement settlement = t.getOwningSettlement();
                 if (settlement != null && settlement.canClaimTile(lostTile)) {
                     settlement.claimTile(lostTile);
@@ -448,6 +463,20 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
                 }
             }
         }
+
+        List<FreeColGameObject> objects = new ArrayList<FreeColGameObject>();
+        if (goodsContainer != null) {
+            objects.addAll(goodsContainer.disposeList());
+        }
+        objects.addAll(super.disposeList());
+        return objects;
+    }
+
+    /**
+     * Dispose of this <code>Settlement</code>.
+     */
+    public void dispose() {
+        disposeList();
     }
     
     /**

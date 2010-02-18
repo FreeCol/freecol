@@ -36,6 +36,7 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Ability;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
@@ -207,13 +208,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
         history.add(new HistoryEvent(getGame().getTurn().getNumber(),
                                      HistoryEvent.Type.DECLARE_INDEPENDENCE));
 
+        // Clean up unwanted connections
+        divertModelMessages(europe, null);
+
         // Dispose of units in Europe.
         ArrayList<String> unitNames = new ArrayList<String>();
-        for (Unit unit : europe.getUnitList()) {
-            unitNames.add(unit.getName());
-            result.add(unit);
+        List<FreeColGameObject> objects = europe.disposeList();
+        result.addAll(objects);
+        europe = null;
+        monarch = null; // "No more kings"
+        for (FreeColGameObject o : objects) {
+            if (o instanceof Unit) {
+                unitNames.add(((Unit) o).getName());
+            }
         }
-        europe.disposeUnitList();
         if (!unitNames.isEmpty()) {
             result.add(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                         "model.player.independence.unitsSeized", this)
@@ -265,12 +273,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 }
             }
         }
-
-        // Clean up unwanted connections
-        divertModelMessages(europe, null);
-        europe.dispose();
-        europe = null;
-        monarch = null; // "No more kings"
 
         // inelegant, but a lot happens here, once
         result.add(this);
@@ -328,7 +330,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
         ModelMessage m = new ModelMessage(messageId, this, unit)
             .addAmount("%amount%", fullAmount)
             .addAmount("%cashInAmount%", cashInAmount);
-        unit.dispose();
         return m;
     }
 
