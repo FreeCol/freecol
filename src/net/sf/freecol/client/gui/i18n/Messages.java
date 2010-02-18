@@ -160,7 +160,12 @@ public class Messages {
                 for (StringTemplate other : template.getReplacements()) {
                     result += template.getId() + message(other);
                 }
-                return result.substring(template.getId().length());
+                if (result.length() > template.getId().length()) {
+                    return result.substring(template.getId().length());
+                } else {
+                    logger.warning("Incorrect use of template with id " + template.getId());
+                    return result;
+                }
             }
         case TEMPLATE:
 	    result = message(template.getId());
