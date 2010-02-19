@@ -658,6 +658,31 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
     }
 
     /**
+     * Partial writer, so that "remove" messages can be brief.
+     *
+     * @param out The target stream.
+     * @param fields The fields to write.
+     * @throws XMLStreamException If there are problems writing the stream.
+     */
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
+        throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
+
+    /**
+     * Partial reader, so that "remove" messages can be brief.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException If there are problems reading the stream.
+     */
+    @Override
+    protected void readFromXMLPartialImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
      * Will return the position of the tile and the name of the colony in
      * addition to the FreeColObject.toString().
      * 

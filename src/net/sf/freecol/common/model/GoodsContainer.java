@@ -521,14 +521,30 @@ public class GoodsContainer extends FreeColGameObject {
 
 
     /**
-     * Gets the tag name of the root element representing this object.
-     * @return "goodsContainer".
+     * Partial writer, so that "remove" messages can be brief.
+     *
+     * @param out The target stream.
+     * @param fields The fields to write.
+     * @throws XMLStreamException If there are problems writing the stream.
      */
-    public static String getXMLElementTagName() {
-        return "goodsContainer";
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
+        throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
     }
-    
-    
+
+    /**
+     * Partial reader, so that "remove" messages can be brief.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException If there are problems reading the stream.
+     */
+    @Override
+    protected void readFromXMLPartialImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
     /**
      * Creates a <code>String</code> representation of this
      * <code>GoodsContainer</code>.    
@@ -542,4 +558,11 @@ public class GoodsContainer extends FreeColGameObject {
         return sb.toString();
     }
 
+    /**
+     * Gets the tag name of the root element representing this object.
+     * @return "goodsContainer".
+     */
+    public static String getXMLElementTagName() {
+        return "goodsContainer";
+    }
 }

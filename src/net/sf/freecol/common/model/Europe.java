@@ -637,6 +637,31 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
     }
 
     /**
+     * Partial writer, so that "remove" messages can be brief.
+     *
+     * @param out The target stream.
+     * @param fields The fields to write.
+     * @throws XMLStreamException If there are problems writing the stream.
+     */
+    @Override
+    protected void toXMLPartialImpl(XMLStreamWriter out, String[] fields)
+        throws XMLStreamException {
+        toXMLPartialByClass(out, getClass(), fields);
+    }
+
+    /**
+     * Partial reader, so that "remove" messages can be brief.
+     *
+     * @param in The input stream with the XML.
+     * @throws XMLStreamException If there are problems reading the stream.
+     */
+    @Override
+    protected void readFromXMLPartialImpl(XMLStreamReader in)
+        throws XMLStreamException {
+        readFromXMLPartialByClass(in, getClass());
+    }
+
+    /**
      * Gets the tag name of the root element representing this object.
      * 
      * @return "europe".
