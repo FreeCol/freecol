@@ -365,11 +365,14 @@ public final class DragListener extends MouseAdapter {
 
 
     private boolean addCommandItems(final UnitLabel unitLabel, final JPopupMenu menu) {
-        final Unit tempUnit = unitLabel.getUnit();
-        JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
+    	final Unit tempUnit = unitLabel.getUnit();
+        final boolean isUnitBetweenEuropeAndNewWorld = tempUnit.isBetweenEuropeAndNewWorld();
+    	
+    	JMenuItem menuItem = new JMenuItem(Messages.message("activateUnit"));
         menuItem.setActionCommand(UnitAction.ACTIVATE_UNIT.toString());
         menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(tempUnit.getState() != UnitState.ACTIVE);
+        menuItem.setEnabled(tempUnit.getState() != UnitState.ACTIVE
+        						&& !isUnitBetweenEuropeAndNewWorld);
         menu.add(menuItem);
 
         if (!(tempUnit.getLocation() instanceof Europe)) {
@@ -381,12 +384,13 @@ public final class DragListener extends MouseAdapter {
                                      tempUnit.getState() == UnitState.FORTIFYING));
             menu.add(menuItem);
         }
-
+ 
         UnitState unitState = tempUnit.getState();
         menuItem = new JMenuItem(Messages.message("sentryUnit"));
         menuItem.setActionCommand(UnitAction.SENTRY.toString());
         menuItem.addActionListener(unitLabel);
-        menuItem.setEnabled(unitState != UnitState.SENTRY);
+        menuItem.setEnabled(unitState != UnitState.SENTRY
+        						&& !isUnitBetweenEuropeAndNewWorld);
         menu.add(menuItem);
         
         boolean hasTradeRoute = tempUnit.getTradeRoute() != null;
@@ -394,7 +398,7 @@ public final class DragListener extends MouseAdapter {
         menuItem.setActionCommand(UnitAction.CLEAR_ORDERS.toString());
         menuItem.addActionListener(unitLabel);
         menuItem.setEnabled((unitState != UnitState.ACTIVE || hasTradeRoute)
-        		&& !tempUnit.isBetweenEuropeAndNewWorld());
+        						&& !isUnitBetweenEuropeAndNewWorld);
         menu.add(menuItem);
 
         if (tempUnit.canCarryTreasure() && !tempUnit.getColony().isLandLocked()) {
