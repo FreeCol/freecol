@@ -57,7 +57,7 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
 
     private static final Logger logger = Logger.getLogger(TradeRouteDialog.class.getName());
     
-    private static enum Action { OK, CANCEL, DEASSIGN }
+    private static enum Action { OK, CANCEL, DEASSIGN, DELETE }
 
     private final JButton ok = new JButton(Messages.message("ok"));
     private final JButton cancel = new JButton(Messages.message("cancel"));
@@ -120,11 +120,8 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
             });
 
         // button for deleting TradeRoute
-        removeRouteButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    listModel.removeElementAt(tradeRoutes.getSelectedIndex());
-                }
-            });
+        removeRouteButton.addActionListener(this);
+        removeRouteButton.setActionCommand(Action.DELETE.toString());
 
         Player player = getMyPlayer();
 
@@ -224,10 +221,23 @@ public final class TradeRouteDialog extends FreeColDialog<TradeRoute> implements
             setResponse(null);
             break;
         case DEASSIGN:
-            getCanvas().remove(this);
-            setResponse(TradeRoute.NO_TRADE_ROUTE);
-            break;
-        }
-    }
+        case DELETE:
+        	TradeRoute routeSelected = (TradeRoute) tradeRoutes.getSelectedValue();
+            if(routeSelected != null){
+            	for(Unit unit : routeSelected.getAssignedUnits()){
+            		getController().clearOrders(unit);
+            	}
+            }
+    		if(action == Action.DEASSIGN){
+            	getCanvas().remove(this);
+                setResponse(TradeRoute.NO_TRADE_ROUTE);
+                return;
+    		}
 
+    		if(routeSelected != null){
+    			listModel.removeElementAt(tradeRoutes.getSelectedIndex());
+    		}	
+            break;
+        }        
+    }
 }

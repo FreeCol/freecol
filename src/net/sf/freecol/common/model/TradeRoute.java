@@ -215,6 +215,18 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         return getName();
     }
 
+    public List<Unit> getAssignedUnits(){
+    	List<Unit> list = new ArrayList<Unit>();
+    	
+    	for(Unit unit : owner.getUnits()){
+    		if(unit.getTradeRoute() == this){
+    			list.add(unit);
+    		}
+    	}
+    	
+    	return list;
+    }
+    
     /**
      * Get the <code>Stops</code> value.
      * 
