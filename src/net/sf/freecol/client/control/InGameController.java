@@ -3178,7 +3178,9 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Update if cash in succeeds.
+        FreeColGameObject oldLocation = (FreeColGameObject) unit.getLocation();
         if (cash && askCashInTreasureTrain(unit) && unit.isDisposed()) {
+            oldLocation.firePropertyChange(Tile.UNIT_CHANGE, unit, null);
             canvas.updateGoldLabel();
             nextActiveUnit(tile);
             return true;
