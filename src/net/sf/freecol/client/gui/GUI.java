@@ -2495,7 +2495,7 @@ public final class GUI {
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_REGIONS:
             if (tile.getRegion() != null) {
-                String regionString = tile.getRegion().getDisplayName();
+                String regionString = Messages.message(tile.getRegion().getLabel());
                 g.setColor(Color.BLACK);
                 int b = getBreakingPoint(regionString);
                 if (b == -1) {

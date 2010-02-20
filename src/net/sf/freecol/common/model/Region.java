@@ -28,8 +28,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-
 /**
  * A named region on the map.
  */
@@ -188,18 +186,18 @@ public class Region extends FreeColGameObject implements Nameable {
      *
      * @return a <code>String</code> value
      */
-    public String getDisplayName() {
+    public StringTemplate getLabel() {
         if (prediscovered || isPacific()) {
-            return Messages.message(nameKey);
+            return StringTemplate.key(nameKey);
         } else if (name == null) {
-            return Messages.message("model.region." + type.toString().toLowerCase() + ".unknown");
+            return StringTemplate.key("model.region." + type.toString().toLowerCase() + ".unknown");
         } else {
-            return name;
+            return StringTemplate.name(name);
         }
     }
 
-    public String getTypeName() {
-        return Messages.message("model.region." + type.toString().toLowerCase() + ".name");
+    public String getTypeNameKey() {
+        return "model.region." + type.toString().toLowerCase() + ".name";
     }
 
     /**
@@ -422,7 +420,7 @@ public class Region extends FreeColGameObject implements Nameable {
         }
         HistoryEvent h = new HistoryEvent(turn.getNumber(),
                                           HistoryEvent.Type.DISCOVER_REGION,
-                                          "%region%", Messages.message(newName));
+                                          "%region%", newName);
         player.getHistory().add(h);
         return h;
     }

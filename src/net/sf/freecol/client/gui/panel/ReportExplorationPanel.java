@@ -81,7 +81,7 @@ public final class ReportExplorationPanel extends ReportPanel {
 
         for (Region region : regions) {
             reportPanel.add(new JLabel(region.getName()));
-            reportPanel.add(new JLabel(region.getTypeName()));
+            reportPanel.add(localizedLabel(region.getTypeNameKey()));
             reportPanel.add(new JLabel(region.getDiscoveredIn().toString()));
             reportPanel.add(localizedLabel(region.getDiscoveredBy().getNationName()));
             reportPanel.add(new JLabel(String.valueOf(region.getScoreValue())));

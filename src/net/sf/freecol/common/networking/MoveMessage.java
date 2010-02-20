@@ -329,7 +329,7 @@ public class MoveMessage extends Message {
                         controller.sendUpdateToAll(region, serverPlayer);
                     } else { // Ask player to name the region.
                         reply.setAttribute("discoverRegion", regionName);
-                        reply.setAttribute("regionType", region.getDisplayName());
+                        reply.setAttribute("regionType", Messages.message(region.getLabel()));
                     }
                 }
                 if (h != null) {
