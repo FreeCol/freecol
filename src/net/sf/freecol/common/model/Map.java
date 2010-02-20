@@ -514,17 +514,7 @@ public class Map extends FreeColGameObject {
             = new PriorityQueue<PathNode>(1024,
                 new Comparator<PathNode>() {
                     public int compare(PathNode o, PathNode p) {
-                        int i = o.getF() - p.getF();
-                        if (i != 0) {
-                            return i;
-                        } else {
-                            i = o.getTile().getX() - p.getTile().getX();
-                            if (i != 0) {
-                                return i;
-                            } else {
-                                return o.getTile().getY() - p.getTile().getY();
-                            }
-                        }
+                        return o.getF() - p.getF();
                     }
                 });
 
@@ -624,15 +614,12 @@ public class Map extends FreeColGameObject {
                         } else {
                             continue;
                         }
-                    //} else if (onCarrier && moveUnit == unit) {
-                    //    cost += extraCost * (1 + (carrier.getInitialMovesLeft()
-                    //            / ((double) unit.getInitialMovesLeft())));
                     } else {
                         cost += extraCost;
-                    }
-                    movesLeft = costDecider.getMovesLeft();
-                    if (costDecider.isNewTurn()) {
-                        turns++;
+                        movesLeft = costDecider.getMovesLeft();
+                        if (costDecider.isNewTurn()) {
+                            turns++;
+                        }
                     }
                 }
 
@@ -970,14 +957,8 @@ public class Map extends FreeColGameObject {
                 // Update parameters for the new tile.
                 int extraCost = costDecider.getCost(moveUnit,
                         currentTile, newTile, movesLeft, turns);
-                if (extraCost == CostDecider.ILLEGAL_MOVE) {
-                    continue;
-                //} else if (onCarrier && moveUnit == unit) {
-                //    cost += extraCost * (1 + (carrier.getInitialMovesLeft()
-                //            / ((double) unit.getInitialMovesLeft())));
-                } else {
-                    cost += extraCost;
-                }
+                if (extraCost == CostDecider.ILLEGAL_MOVE) continue;
+                cost += extraCost;
                 movesLeft = costDecider.getMovesLeft();
                 if (costDecider.isNewTurn()) {
                     turns++;

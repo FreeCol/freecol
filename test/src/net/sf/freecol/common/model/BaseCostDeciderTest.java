@@ -30,6 +30,7 @@ import net.sf.freecol.util.test.FreeColTestCase;
  */
 public class BaseCostDeciderTest extends FreeColTestCase {
     private UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
+    private UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     private UnitType galleonType = spec().getUnitType("model.unit.galleon");
     private GoodsType tradeGoodsType = spec().getGoodsType("model.goods.tradeGoods");
     
@@ -167,37 +168,56 @@ public class BaseCostDeciderTest extends FreeColTestCase {
         Tile unitTile = map.getTile(10, 9);
         assertFalse("Unit tile should be ocean",unitTile.isLand());
 
-        Unit unit = new Unit(game, unitTile, game.getCurrentPlayer(), galleonType, UnitState.ACTIVE);
+        Unit galleon = new Unit(game, unitTile, game.getCurrentPlayer(), galleonType, UnitState.ACTIVE);
         
         Tile settlementTile = map.getTile(9, 9);
-        assertTrue("Tile should be land",settlementTile.isLand());
+        assertTrue("Tile should be land", settlementTile.isLand());
         
         FreeColTestCase.IndianSettlementBuilder builder = new FreeColTestCase.IndianSettlementBuilder(game);
         Settlement settlement = builder.settlementTile(settlementTile).build();
 
-        // unit is trying go to settlement
-        unit.setDestination(settlementTile);
+        // galleon is trying go to settlement
+        galleon.setDestination(settlementTile);
         
+        CostDecider base = CostDeciders.avoidIllegal();
+        int cost;
+
         // Try to find a path
-        assertNull("Move should be invalid, no contact or goods to trade",
-                   map.findPath(unit, unitTile, settlementTile));
+        cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
+        assertTrue("Move should be invalid, no contact or goods to trade",
+                   cost == CostDecider.ILLEGAL_MOVE);
 
         // Add contact
-        unit.getOwner().setContacted(settlement.getOwner());
-        settlement.getOwner().setContacted(unit.getOwner());
-        assertNull("Move should be invalid, no goods to trade",
-                   map.findPath(unit, unitTile, settlementTile));
+        galleon.getOwner().setContacted(settlement.getOwner());
+        settlement.getOwner().setContacted(galleon.getOwner());
+        cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
+        assertTrue("Move should be invalid, no goods to trade",
+                   cost == CostDecider.ILLEGAL_MOVE);
 
         // Add goods to trade
         Goods goods = new Goods(game, null, tradeGoodsType, 50);
-        unit.add(goods);
-        assertNotNull("Move should be valid, has contact and goods to trade",
-                      map.findPath(unit, unitTile, settlementTile));
+        galleon.add(goods);
+        cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
+        assertTrue("Move should be valid, has contact and goods to trade",
+                   cost != CostDecider.ILLEGAL_MOVE);
+        assertTrue("Move should consume whole turn",
+                   base.isNewTurn());
+
+        // Try with colonist on galleon
+        Unit colonist = new Unit(game, galleon, game.getCurrentPlayer(),
+                                 colonistType, UnitState.ACTIVE);
+        cost = base.getCost(colonist, unitTile, settlementTile, 4,4);
+        assertTrue("Move invalid, direct from carrier to settlement",
+                   cost == CostDecider.ILLEGAL_MOVE);
+        assertNotNull("Path should be valid from carrier to settlement",
+                      map.findPath(colonist, unitTile, settlementTile,
+                                   galleon, base));
 
         // Set players at war
         Player indianPlayer = settlement.getOwner();
-        indianPlayer.changeRelationWithPlayer(unit.getOwner(), Stance.WAR);
-        assertNull("Move should be invalid, players at war",
-                   map.findPath(unit, unitTile, settlementTile));
+        indianPlayer.changeRelationWithPlayer(galleon.getOwner(), Stance.WAR);
+        cost = base.getCost(galleon, unitTile, settlementTile, 4,4);
+        assertTrue("Move should be invalid, players at war",
+                   cost == CostDecider.ILLEGAL_MOVE);
     }
 }
