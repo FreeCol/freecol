@@ -62,6 +62,7 @@ import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.EuropeanNationType;
+import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObjectType;
@@ -1090,7 +1091,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                     productionPanel.add(getGoodsButton(goodsType, bonus));
                 } catch(Exception e) {
                     // not a production bonus
-                    String bonus = productionBonus.getName()
+                    String bonus = getFeatureName(productionBonus)
                         + ": " + getModifierAsString(productionBonus);
                     productionPanel.add(new JLabel(bonus));
                 }
@@ -1249,7 +1250,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             String trueString = Messages.message("true");
             String falseString = Messages.message("false");
             for (Ability ability : abilities) {
-                detailPanel.add(new JLabel("* " + ability.getName()));
+                detailPanel.add(new JLabel("* " + getFeatureName(ability)));
                 String value = ability.getValue() ? trueString : falseString;
                 detailPanel.add(new JLabel(value));
             }
@@ -1258,7 +1259,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         if (!modifiers.isEmpty()) {
             detailPanel.add(new JLabel(Messages.message("modifiers")), "newline 20, span");
             for (Modifier modifier : modifiers) {
-                detailPanel.add(new JLabel("* " + modifier.getName()));
+                detailPanel.add(new JLabel("* " + getFeatureName(modifier)));
                 detailPanel.add(new JLabel(getModifierAsString(modifier)));
             }
         }
@@ -1366,6 +1367,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         textArea.setFocusable(false);
         textArea.setFont(defaultFont);
         return textArea;
+    }
+
+    private String getFeatureName(Feature feature) {
+        return Messages.message(feature.getNameKey());
     }
 
     public String getModifierAsString(Modifier modifier) {

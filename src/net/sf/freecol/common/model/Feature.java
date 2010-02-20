@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * The <code>Feature</code> class encapsulates a bonus or penalty
@@ -77,12 +76,12 @@ public abstract class Feature extends FreeColObject {
     }
 
     /**
-     * Describe <code>getName</code> method here.
+     * Describe <code>getNameKey</code> method here.
      *
      * @return a <code>String</code> value
      */
-    public String getName() {
-        return Messages.message(getId() + ".name");
+    public String getNameKey() {
+        return getId() + ".name";
     }
 
     /**
