@@ -19,8 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -131,7 +129,11 @@ public class HistoryEvent extends FreeColObject {
     }
 
     public String toString() {
-        return Messages.message("model.history." + type.toString(), strings);
+        String result = type.toString() + " [";
+        for (String string : strings) {
+            result += " " + string;
+        }
+        return result + "]";
     }
 
     /**
