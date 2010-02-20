@@ -181,6 +181,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     private Player owner;
 
+    private String nationality = null;
+
     private List<Unit> units = Collections.emptyList();
 
     private GoodsContainer goodsContainer;
@@ -314,6 +316,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             unitType = newType;
         }
         this.owner = owner;
+        this.nationality = owner.getNationID();
         naval = unitType.hasAbility("model.ability.navalUnit");
         setLocation(location);
 
