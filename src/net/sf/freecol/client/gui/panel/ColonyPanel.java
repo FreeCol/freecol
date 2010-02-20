@@ -141,6 +141,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
 
     private final BuildingsPanel buildingsPanel;
 
+    private final ConstructionPanel constructionPanel;
+
     private final DefaultTransferHandler defaultTransferHandler;
 
     private final MouseListener pressListener;
@@ -208,27 +210,30 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         populationPanel.add(royalistMemberLabel);
         populationPanel.add(royalistShield, "bottom");
 
+        constructionPanel = new ConstructionPanel(parent, colony);
+        constructionPanel.setOpaque(false);
+
         outsideColonyPanel = new OutsideColonyPanel();
-        outsideColonyPanel.setToolTipText(Messages.message("outsideColony"));
+//        outsideColonyPanel.setToolTipText(Messages.message("outsideColony"));
         outsideColonyPanel.setLayout(new GridLayout(0, 8));
 
         inPortPanel = new InPortPanel();
-        inPortPanel.setToolTipText(Messages.message("inPort"));
+//        inPortPanel.setToolTipText(Messages.message("inPort"));
         inPortPanel.setLayout(new GridLayout(0, 2));
 
         warehousePanel = new WarehousePanel(this);
-        warehousePanel.setToolTipText(Messages.message("goods"));
+//        warehousePanel.setToolTipText(Messages.message("goods"));
         warehousePanel.setLayout(new GridLayout(1, 0));
 
         tilePanel = new TilePanel(this);
-        tilePanel.setToolTipText(Messages.message("surroundingArea"));
+//        tilePanel.setToolTipText(Messages.message("surroundingArea"));
 
         buildingsPanel = new BuildingsPanel(this);
-        buildingsPanel.setToolTipText(Messages.message("buildings"));
+//        buildingsPanel.setToolTipText(Messages.message("buildings"));
 
         cargoPanel = new ColonyCargoPanel(parent);
         cargoPanel.setParentPanel(this);
-        cargoPanel.setToolTipText(Messages.message("cargoOnCarrier"));
+//        cargoPanel.setToolTipText(Messages.message("cargoOnCarrier"));
         cargoPanel.setLayout(new GridLayout(1, 0));
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
@@ -312,11 +317,12 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(tilesScroll, "width 390!, height 200!, top");
         add(buildingsScroll, "span 1 3, grow 200");
         add(populationPanel, "grow");
-        add(inPortScroll, "grow, height 60:100");
-        add(cargoScroll, "grow, height 60:100");
-        add(outsideColonyScroll, "grow, height 60:100");
+        add(constructionPanel, "grow");
+        add(inPortScroll, "split 2, grow");
+        add(cargoScroll, "grow");
+        add(outsideColonyScroll, "grow, height 121!");
         add(warehouseScroll, "span, height 40:60:80, growx");
-        add(unloadButton, "span, split 5, align center");
+        add(unloadButton, "span, split 4, align center");
         add(fillButton);
         add(warehouseButton);
         add(exitButton);
@@ -870,7 +876,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 aSingleBuildingPanel.addMouseListener(mouseAdapter);
                 add(aSingleBuildingPanel);
             }
-            add(new BuildingSitePanel(colony, getCanvas()));
+//            add(new BuildingSitePanel(colony, getCanvas()));
 
         }
 
@@ -969,7 +975,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
     }
 
     /**
-     * A panel that holds UnitsLabels that represent Units that are standing in
+     * A panel that holds UnitLabels that represent Units that are standing in
      * front of a colony.
      */
     public final class OutsideColonyPanel extends JPanel implements PropertyChangeListener {
