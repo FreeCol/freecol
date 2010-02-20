@@ -160,24 +160,6 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     }
 
     /**
-     * Returns a textual representation of the Good of type <code>type</code>.
-     * @param type  The type of good to return
-     * @return
-     *
-     *//*   COMEBACKHERE
-    public static String getName(GoodsType type) {
-        return type.getName();
-    }
-
-    public static String getName(GoodsType type, boolean sellable) {
-        if (sellable) {
-            return type.getName();
-        } else {
-            return type.getName() + " (" + Messages.message("model.goods.boycotted") + ")";
-        }
-    }
-*/
-    /**
     * Returns the <code>Tile</code> where this <code>Goods</code> is located,
     * or <code>null</code> if it's location is <code>Europe</code>.
     *
