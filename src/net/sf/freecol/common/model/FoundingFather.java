@@ -31,7 +31,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 
 /**
@@ -86,24 +85,6 @@ public class FoundingFather extends FreeColGameObjectType {
     }
 
     /**
-     * Return the localized text of this FoundingFather.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getText() {
-        return Messages.message(getId() + ".text");
-    }
-
-    /**
-     * Return the localized birth and death dates of this FoundingFather.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getBirthAndDeath() {
-        return Messages.message(getId() + ".birthAndDeath");
-    }
-
-    /**
      * Return the type of this FoundingFather.
      *
      * @return an <code>int</code> value
@@ -117,8 +98,8 @@ public class FoundingFather extends FreeColGameObjectType {
      *
      * @return a <code>String</code> value
      */
-    public String getTypeAsString() {
-        return getTypeAsString(type);
+    public String getTypeKey() {
+        return getTypeKey(type);
     }
 
     /**
@@ -127,8 +108,8 @@ public class FoundingFather extends FreeColGameObjectType {
      * @param type an <code>int</code> value
      * @return a <code>String</code> value
      */
-    public static String getTypeAsString(FoundingFatherType type) {
-        return Messages.message("model.foundingFather." + type.toString().toLowerCase());
+    public static String getTypeKey(FoundingFatherType type) {
+        return "model.foundingFather." + type.toString().toLowerCase();
     }
 
     /**

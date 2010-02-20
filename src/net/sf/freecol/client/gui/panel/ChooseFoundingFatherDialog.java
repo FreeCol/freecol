@@ -84,7 +84,7 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             FoundingFather father = possibleFoundingFathers.get(index);
             final FoundingFatherPanel panel = new FoundingFatherPanel(father.getType());
             panel.initialize(father);
-            tb.addTab(father.getTypeAsString(), null, panel, null);
+            tb.addTab(Messages.message(father.getTypeKey()), null, panel, null);
             if (!hasSelectedTab && panel.isEnabled()) {
                 tb.setSelectedIndex(index);
                 hasSelectedTab = true;
@@ -235,8 +235,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             if (father != null) {
                 header.setText(Messages.message(father.getNameKey()));
                 description.setText(Messages.message(father.getDescriptionKey()));
-                text.setText("\n" + "[" + father.getBirthAndDeath() + "] "
-                        + father.getText());
+                text.setText("\n" + "[" + Messages.message(father.getId() + ".birthAndDeath")
+                             + "] " + Messages.message(father.getId() + ".text"));
                 ok.setActionCommand(father.getId());
             }
         }

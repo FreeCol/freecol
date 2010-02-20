@@ -447,9 +447,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             fathersByType.get(foundingFather.getType()).add(foundingFather);
         }
         for (FoundingFatherType fatherType : FoundingFatherType.values()) {
+            String typeName = Messages.message(FoundingFather.getTypeKey(fatherType));
             DefaultMutableTreeNode node = 
-                new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS,
-                                                                 FoundingFather.getTypeAsString(fatherType)));
+                new DefaultMutableTreeNode(new ColopediaTreeItem(PanelType.FATHERS, typeName));
+                                                                 
             parent.add(node);
             for (FoundingFather father : fathersByType.get(fatherType)) {
                 buildFatherItem(father, node);
@@ -1125,7 +1126,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
         JLabel name = new JLabel(Messages.message(father.getNameKey())
-                                 + " (" + father.getTypeAsString() + ")");
+                                 + " (" + Messages.message(father.getTypeKey()) + ")");
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
@@ -1140,8 +1141,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.add(imageLabel, "top");
 
         String text = Messages.message(father.getDescriptionKey()) + "\n\n" + "["
-                + Messages.message(father.getBirthAndDeath()) + "] "
-                + Messages.message(father.getText());
+            + Messages.message(father.getId() + ".birthAndDeath") + "] "
+            + Messages.message(father.getId() + ".text");
         JTextArea description = getDefaultTextArea(text, 20);
         detailPanel.add(description, "top, growx");
 
