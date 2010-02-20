@@ -189,6 +189,10 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
             return;
         }
         JComponent component = (JComponent)e.getSource();
+        
+        MapEditorController controller = canvas.getClient().getMapEditorController();
+        boolean isTransformActive = controller.getMapTransform() != null; 
+        
         if(startPoint == null){
         	startPoint = e.getPoint();
         }
@@ -196,11 +200,21 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         	oldPoint = e.getPoint();
         }
         drawBox(component, startPoint, oldPoint);
-        if (gui.getFocus() != null) {
+        if (gui.getFocus() != null) {	
             Position start = gui.convertToMapCoordinates(startPoint.x, startPoint.y);
-            Position end = gui.convertToMapCoordinates(oldPoint.x, oldPoint.y);
-            MapEditorController controller = canvas.getClient().getMapEditorController();
-            Tile t;
+            Position end = start;
+            //Optimization, only check if the points are different
+            if(startPoint.x != oldPoint.x || startPoint.y != oldPoint.y){
+            	end = gui.convertToMapCoordinates(oldPoint.x, oldPoint.y);
+            }
+            
+            // no option selected, just center map
+            if(!isTransformActive){
+            	gui.setFocus(end);
+            	return;
+            }
+            
+            // find the area to transform
             int min_x, max_x, min_y, max_y;
             if (start.x < end.x) {
                 min_x = start.x;
@@ -216,6 +230,9 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
                 min_y = end.y;
                 max_y = start.y;
             }
+            
+            // apply transformation to all tiles in the area
+            Tile t = null;
             for (int x = min_x; x <= max_x; x++) {
                 for (int y = min_y; y <= max_y; y++) {
                     t = getMap().getTile(x, y);
@@ -289,6 +306,12 @@ public final class CanvasMapEditorMouseListener implements MouseListener, MouseM
         	return;
         }
         if(startPoint.distance(endPoint) == 0){
+        	return;
+        }
+        
+        // only bother to draw if a transformation is active
+        MapEditorController controller = canvas.getClient().getMapEditorController();
+        if(controller.getMapTransform() == null){ 
         	return;
         }
     	

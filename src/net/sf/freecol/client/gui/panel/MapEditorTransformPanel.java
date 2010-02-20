@@ -117,6 +117,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         listPanel = new JPanel(new GridLayout(2, 0));
 
         group = new ButtonGroup();
+        //Add an invisible, move button to de-select all others
+        group.add(new JToggleButton());
         buildList();
 
         JScrollPane sl = new JScrollPane(listPanel,
@@ -178,7 +180,16 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         group.add(button);
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                getClient().getMapEditorController().setMapTransform(mt);
+            	MapEditorController ctlr = getClient().getMapEditorController();
+            	MapTransform newMapTransform = null;
+            	if(ctlr.getMapTransform() != mt){
+            		newMapTransform = mt;
+            	}
+            	ctlr.setMapTransform(newMapTransform);
+            	if(newMapTransform == null && mt != null){
+            		//select the invisible button, de-selecting all others
+            		group.setSelected(group.getElements().nextElement().getModel(),true);
+            	}
             }
         });
         button.setBorder(null);
