@@ -20,10 +20,13 @@
 package net.sf.freecol.common.networking;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.server.ai.AIMain;
 
@@ -35,9 +38,35 @@ public class StatisticsMessage extends Message {
 
     public StatisticsMessage(Game game, AIMain aiMain) {
         // memory statistics
-        memoryStats = game.getMemoryStatistics();
+        memoryStats = new HashMap<String, Long>();
+        System.gc();
+        long free = Runtime.getRuntime().freeMemory()/(1024*1024);
+        long total = Runtime.getRuntime().totalMemory()/(1024*1024);
+        long max = Runtime.getRuntime().maxMemory()/(1024*1024);
+        memoryStats.put(Messages.message("menuBar.debug.memoryManager.free"), new Long(free));
+        memoryStats.put(Messages.message("menuBar.debug.memoryManager.total"), new Long(total));
+        memoryStats.put(Messages.message("menuBar.debug.memoryManager.max"), new Long(max));
         // game statistics
-        gameStats = game.getGameStatistics();
+        gameStats = new HashMap<String, Long>();
+        Iterator<FreeColGameObject> iter = game.getFreeColGameObjectIterator();
+        gameStats.put("disposed", new Long(0));
+        while (iter.hasNext()) {
+            FreeColGameObject obj = iter.next();
+            String className = obj.getClass().getSimpleName();
+            if (gameStats.containsKey(className)) {
+                Long count = gameStats.get(className);
+                count++;
+                gameStats.put(className, count);
+            } else {
+                Long count = new Long(1);
+                gameStats.put(className, count);
+            }
+            if (obj.isDisposed()) {
+                Long count = gameStats.get("disposed");
+                count++;
+                gameStats.put("disposed", count);
+            }
+        }
         // AI statistics
         if (aiMain!=null) {
             aiStats = aiMain.getAIStatistics();

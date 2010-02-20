@@ -961,45 +961,4 @@ public class Game extends FreeColGameObject {
         return this == o;
     }
     
-    /**
-     * Computes how many objects of each class have been created, 
-     * to track memory leaks over time
-     */
-    public HashMap<String, Long> getGameStatistics() {
-        
-        HashMap<String, Long> map = new HashMap<String, Long>();
-        Iterator<FreeColGameObject> iter = this.getFreeColGameObjectIterator();
-        map.put("disposed", new Long(0));
-        while (iter.hasNext()) {
-            FreeColGameObject obj = iter.next();
-            String className = obj.getClass().getSimpleName();
-            if (map.containsKey(className)) {
-                Long count = map.get(className);
-                count++;
-                map.put(className, count);
-            } else {
-                Long count = new Long(1);
-                map.put(className, count);
-            }
-            if (obj.isDisposed()) {
-                Long count = map.get("disposed");
-                count++;
-                map.put("disposed", count);
-            }
-        }
-        
-        return map;
-    }
-    
-    public HashMap<String, Long> getMemoryStatistics() {
-        System.gc();
-        long free = Runtime.getRuntime().freeMemory()/(1024*1024);
-        long total = Runtime.getRuntime().totalMemory()/(1024*1024);
-        long max = Runtime.getRuntime().maxMemory()/(1024*1024);
-        HashMap<String, Long> map = new HashMap<String, Long>();
-        map.put(Messages.message("menuBar.debug.memoryManager.free"), new Long(free));
-        map.put(Messages.message("menuBar.debug.memoryManager.total"), new Long(total));
-        map.put(Messages.message("menuBar.debug.memoryManager.max"), new Long(max));
-        return map;
-    }
 }
