@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.util.RandomChoice;
@@ -122,16 +121,16 @@ public class IndianNationType extends NationType {
      *
      * @return a <code>String</code> value
      */
-    public final String getSettlementTypeAsString() {
+    public final String getSettlementTypeKey() {
         switch (getTypeOfSettlement()) {
         case INCA_CITY:
         case AZTEC_CITY:
-            return Messages.message("settlementType.city");
+            return "settlementType.city";
         case INDIAN_VILLAGE:
-            return Messages.message("settlementType.village");
+            return "settlementType.village";
         case INDIAN_CAMP:
         default:
-            return Messages.message("settlementType.camp");
+            return "settlementType.camp";
         }
     }
 

@@ -71,22 +71,22 @@ public final class ReportIndianPanel extends ReportPanel {
         JPanel result = new JPanel(new MigLayout("wrap 4, fillx", "[]20px[]", ""));
         result.setOpaque(false);
 
-        result.add(new JLabel(Messages.message("report.indian.nameOfTribe")));
+        result.add(localizedLabel("report.indian.nameOfTribe"));
         result.add(localizedLabel(opponent.getNationName()), "span");
-        result.add(new JLabel(Messages.message("report.indian.chieftain")));
+        result.add(localizedLabel("report.indian.chieftain"));
         result.add(new JLabel(opponent.getName()), "span");
-        result.add(new JLabel(Messages.message("report.indian.typeOfSettlements")));
-        result.add(new JLabel(((IndianNationType) opponent.getNationType()).getSettlementTypeAsString()), "span");
-        result.add(new JLabel(Messages.message("report.indian.numberOfSettlements")));
+        result.add(localizedLabel("report.indian.typeOfSettlements"));
+        result.add(localizedLabel(((IndianNationType) opponent.getNationType()).getSettlementTypeKey()), "span");
+        result.add(localizedLabel("report.indian.numberOfSettlements"));
         result.add(new JLabel(String.valueOf(opponent.getSettlements().size())), "span");
         result.add(new JLabel(Messages.message("report.indian.tension")+":"));
         result.add(new JLabel(opponent.getTension(player).toString()), "span");
 
         result.add(new JSeparator(JSeparator.HORIZONTAL), "span, growx");
-        result.add(new JLabel(Messages.message("Settlement")), "newline 10");
-        result.add(new JLabel(Messages.message("report.indian.tension")));
-        result.add(new JLabel(Messages.message("report.indian.skillTaught")));
-        result.add(new JLabel(Messages.message("report.indian.tradeInterests")));
+        result.add(localizedLabel("Settlement"), "newline 10");
+        result.add(localizedLabel("report.indian.tension"));
+        result.add(localizedLabel("report.indian.skillTaught"));
+        result.add(localizedLabel("report.indian.tradeInterests"));
 
         for (IndianSettlement settlement : opponent.getIndianSettlements()) {
             String settlementName = Messages.message("indianSettlement.nameUnknown");
@@ -123,7 +123,7 @@ public final class ReportIndianPanel extends ReportPanel {
 
             GoodsType[] wantedGoods = settlement.getWantedGoods();
             if (wantedGoods[0] == null) {
-                result.add(new JLabel(Messages.message("indianSettlement.wantedGoodsUnknown")));
+                result.add(localizedLabel("indianSettlement.wantedGoodsUnknown"));
             } else {
                 JLabel goodsLabel = localizedLabel(wantedGoods[0].getNameKey());
                 goodsLabel.setIcon(getLibrary().getScaledImageIcon(getLibrary().getGoodsImageIcon(wantedGoods[0]), 0.66f));

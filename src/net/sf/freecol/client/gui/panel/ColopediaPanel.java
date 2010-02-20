@@ -1300,7 +1300,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                                                     .toLowerCase())));
 
         detailPanel.add(new JLabel(Messages.message("colopedia.nationType.typeOfSettlements")));
-        detailPanel.add(new JLabel(nationType.getSettlementTypeAsString(),
+        detailPanel.add(new JLabel(Messages.message(nationType.getSettlementTypeKey()),
                                    new ImageIcon(getLibrary().getSettlementImage(nationType.getTypeOfSettlement())),
                                    SwingConstants.CENTER));
 
