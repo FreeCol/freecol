@@ -22,6 +22,10 @@ package net.sf.freecol.client.gui.panel;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
+import java.awt.Graphics2D;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -119,7 +123,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         int width = 128;
         int height = 96;
 
-        Image bgImage = ResourceManager.getImage(building.getType().getId() + ".image");
+        BufferedImage bgImage = fadeImage(ResourceManager.getImage(building.getType().getId() + ".image"), 0.6f, 192.0f);
         if (bgImage != null) {
             g.drawImage(bgImage, 0, 0, this);
         } else {
@@ -136,6 +140,23 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
                 g.fillRect(0, 0, width, height);
             }
         }
+    }
+
+    public BufferedImage fadeImage(Image img, float fade, float target) {
+        int w = img.getWidth(null);
+        int h = img.getHeight(null);
+        BufferedImage bi = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.getGraphics();
+        g.drawImage(img, 0, 0, null);
+
+        float offset = target * (1.0f - fade);
+        float[] scales = { fade, fade, fade, 1.0f };
+        float[] offsets = { offset, offset, offset, 0.0f };
+        RescaleOp rop = new RescaleOp(scales, offsets, null);
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.drawImage(bi, rop, 0, 0);
+		return bi;
     }
 
     public Building getBuilding() {
