@@ -20,8 +20,6 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-
 public class Tension {
 
     /**
@@ -147,7 +145,7 @@ public class Tension {
      *      current tension level.
      */
     public String toString() {
-        return Messages.message(getLevel().toString().toLowerCase());
+        return getLevel().toString().toLowerCase();
     }    
 
 }
