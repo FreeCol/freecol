@@ -51,6 +51,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
+import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.CombatModel.CombatOdds;
 import net.sf.freecol.common.model.LostCityRumour.RumourType;
@@ -346,13 +347,42 @@ public final class TilePopup extends JPopupMenu {
      * @return an <code>int</code> value
      */
     private int addUnit(Container menu, final Unit unit, boolean enabled, boolean indent) {
-        String occ = unit.getDetailedOccupationIndicator();
-        if (occ.length() > 0) occ = " (" + occ + ")";
+        StringTemplate occ;
+        TradeRoute tradeRoute = unit.getTradeRoute();
+
+        if (unit.getState() == Unit.UnitState.ACTIVE
+            && unit.getMovesLeft() == 0) {
+            if (unit.isUnderRepair()) {
+                occ = StringTemplate.label(": ")
+                    .add("model.unit.occupation.underRepair")
+                    .add(Integer.toString(unit.getTurnsForRepair()));
+            } else if (tradeRoute != null) {
+                occ = StringTemplate.label(": ")
+                    .add("model.unit.occupation.inTradeRoute")
+                    .addName(tradeRoute.getName());
+            } else {
+                occ = StringTemplate.key("model.unit.occupation.activeNoMovesLeft");
+            }
+        } else if (unit.getState() == Unit.UnitState.IMPROVING
+                   && unit.getWorkImprovement() != null) {
+            occ = StringTemplate.label(": ")
+                .add(unit.getWorkImprovement().getId() + ".occupationString")
+                .add(Integer.toString(unit.getWorkLeft()));
+        } else if (tradeRoute != null) {
+            occ = StringTemplate.label(": ")
+                .add("model.unit.occupation.inTradeRoute")
+                .add(tradeRoute.getName());
+        } else if (unit.getDestination() != null) {
+            occ = StringTemplate.key("model.unit.occupation.goingSomewhere");
+        } else {
+            occ = StringTemplate.key("model.unit.occupation." + unit.getState().toString().toLowerCase());
+        }
+
         String text = (indent ? "    " : "")
             + Messages.message(StringTemplate.template("model.unit.nationUnit")
                                .addStringTemplate("%nation%", unit.getOwner().getNationName())
                                .addName("%unit%", unit.getName()))
-            + occ;
+            + " (" + Messages.message(occ) + ")";
         JMenuItem menuItem = new JMenuItem(text);
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {

@@ -31,7 +31,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 public final class TileImprovementType extends FreeColGameObjectType {
 
@@ -83,10 +82,6 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     public int getAddWorkTurns() {
         return addWorkTurns;
-    }
-
-    public String getOccupationString() {
-        return Messages.message(getId() + ".occupationString");
     }
 
     public String getArtOverlay() {

@@ -185,10 +185,6 @@ public class TileImprovement extends TileItem implements Named {
         }
     }
 
-    public String getOccupationString() {
-        return type.getOccupationString();
-    }
-
     /**
      * @return the current turns to completion.
      */

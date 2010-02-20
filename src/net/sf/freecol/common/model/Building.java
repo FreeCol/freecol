@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
 /**
  * Represents a building in a colony.
  */
-public final class Building extends FreeColGameObject implements WorkLocation, Ownable, //Named,
+public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named,
                                                                  Comparable<Building> {
 
     private static Logger logger = Logger.getLogger(Building.class.getName());

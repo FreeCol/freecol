@@ -2693,7 +2693,22 @@ public final class GUI {
                 && unit.isNaval()) {
             occupationString = Integer.toString(unit.getVisibleGoodsCount());
         } else {
-            occupationString = unit.getOccupationIndicator();
+            if (unit.getDestination() != null) {
+                if(unit.getTradeRoute() != null)
+                    occupationString = "model.unit.occupation.inTradeRoute";
+                else
+                    occupationString = "model.unit.occupation.goingSomewhere";
+            } else if (unit.getState() == UnitState.IMPROVING
+                       && unit.getWorkImprovement() != null) {
+                occupationString = unit.getWorkImprovement().getId() + ".occupationString";
+            } else if (unit.getState() == UnitState.ACTIVE && unit.getMovesLeft() == 0) {
+                if(unit.isUnderRepair())
+                    occupationString = "model.unit.occupation.underRepair";
+                else
+                    occupationString = "model.unit.occupation.activeNoMovesLeft";
+            } else {
+                occupationString = "model.unit.occupation." + unit.getState().toString().toLowerCase();
+            }
             if (unit.getState() == UnitState.FORTIFIED)
                 foregroundColor = Color.GRAY;
         }
