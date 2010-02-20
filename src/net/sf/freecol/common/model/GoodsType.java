@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 
 public final class GoodsType extends FreeColGameObjectType {
@@ -92,11 +91,12 @@ public final class GoodsType extends FreeColGameObjectType {
 
     // ----------------------------------------------------------- retriveal methods
 
-    public String getName(boolean sellable) {
+    public StringTemplate getLabel(boolean sellable) {
         if (sellable) {
-            return getName();
+            return StringTemplate.key(getNameKey());
         } else {
-            return getName() + " (" + Messages.message("model.goods.boycotted") + ")";
+            return StringTemplate.template("model.goods.goodsBoycotted")
+                .add("%goods%", getNameKey());
         }
     }
 

@@ -75,7 +75,7 @@ public class BuildingSiteToolTip extends JToolTip {
                 turns = ">" + Integer.toString(turnsToComplete*-1);
             }
             add(new JLabel(Messages.message("colonyPanel.currentlyBuilding",
-                                            "%buildable%", buildable.getName())),
+                                            "%buildable%", Messages.message(buildable.getNameKey()))),
                 "span, align center");
 
             add(new JLabel(Messages.message("turnsToComplete.long",

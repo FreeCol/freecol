@@ -76,7 +76,7 @@ public class ColonyProductionTest extends FreeColTestCase {
             if (type == muskets)
                 assertEquals(50, colony.getGoodsCount(type));
             else
-                assertEquals(type.getName(), 0, colony.getGoodsCount(type));
+                assertEquals(type.toString(), 0, colony.getGoodsCount(type));
         }
 
         // Test the state of the soldier
@@ -139,7 +139,7 @@ public class ColonyProductionTest extends FreeColTestCase {
             if (type == tools)
                 assertEquals(100, colony.getGoodsCount(type));
             else
-                assertEquals(type.getName(), 0, colony.getGoodsCount(type));
+                assertEquals(type.toString(), 0, colony.getGoodsCount(type));
         }
 
         // Test the state of the pioneer

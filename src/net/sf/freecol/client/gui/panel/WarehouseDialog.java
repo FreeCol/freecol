@@ -160,7 +160,8 @@ public final class WarehouseDialog extends FreeColDialog<Boolean> implements Act
 
             setLayout(new MigLayout("wrap 2", "", ""));
             setOpaque(false);
-            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(goodsType.getName()),
+            String goodsName = Messages.message(goodsType.getNameKey());
+            setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder(goodsName),
                     BorderFactory.createEmptyBorder(6, 6, 6, 6)));
 
             ExportData exportData = colony.getExportData(goodsType);

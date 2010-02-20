@@ -32,16 +32,18 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.util.Utils;
+import net.sf.freecol.common.model.StringTemplate;
 
 /**
  * The ProductionLabel represents Goods that are produced in a
  * WorkLocation or Settlement. It is similar to the GoodsLabel.
  */
 public final class ProductionMultiplesLabel extends JComponent {
+
     private static Logger logger = Logger.getLogger(ProductionMultiplesLabel.class.getName());
 
     private final Canvas parent;
@@ -238,11 +240,13 @@ public final class ProductionMultiplesLabel extends JComponent {
         if (goodsType == null || goodsType.length == 0 || totalProduction == 0) {
             setToolTipText(null);
         } else {
-            String[] parts = new String[goodsType.length];
+            StringTemplate template = StringTemplate.label(", ");
             for (int index = 0; index < goodsType.length; index++) {
-                parts[index] = Goods.toString(goodsType[index], production[index]);
+                template.addStringTemplate(StringTemplate.template("model.goods.goodsAmount")
+                                           .add("%goods%", goodsType[index].getNameKey())
+                                           .addAmount("%amount%", production[index]));
             }
-            String text = Utils.join(", ", parts);
+            String text = Messages.message(template);
             if (toolTipPrefix != null) {
                 text = toolTipPrefix + " " + text;
             }

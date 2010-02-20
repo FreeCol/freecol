@@ -712,7 +712,7 @@ public class PioneeringMission extends Mission {
                 if(tileImprovementPlan == null){
                     return "No target";
                 }
-                final String action = tileImprovementPlan.getType().getName();
+                final String action = tileImprovementPlan.getType().getNameKey();
                 return tileImprovementPlan.getTarget().getPosition().toString() + " " + action;
             case GET_TOOLS:
                 if (colonyWithTools == null) {

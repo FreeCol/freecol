@@ -38,6 +38,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
@@ -138,7 +139,7 @@ public final class ReportColonyPanel extends ReportPanel {
                 JLabel buildingLabel =
                     new JLabel(new ImageIcon(ResourceManager.getImage(building.getType().getId()
                                                                       + ".image", 0.66)));
-                buildingLabel.setToolTipText(building.getName());
+                buildingLabel.setToolTipText(Messages.message(building.getNameKey()));
                 reportPanel.add(buildingLabel, "span 2");
             }
 
@@ -148,8 +149,8 @@ public final class ReportColonyPanel extends ReportPanel {
                 JLabel buildableLabel =
                     new JLabel(new ImageIcon(ResourceManager.getImage(currentType.getId()
                                                                       + ".image", 0.66)));
-                buildableLabel.setToolTipText(Messages.message("colonyPanel.currentlyBuilding",
-                                                               "%buildable%", currentType.getName()));
+                buildableLabel.setToolTipText(Messages.message(StringTemplate.template("colonyPanel.currentlyBuilding")
+                                                               .add("%buildable%", currentType.getNameKey())));
                 buildableLabel.setIcon(buildableLabel.getDisabledIcon());
                 reportPanel.add(buildableLabel, "span 2");
             }

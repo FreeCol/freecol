@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.Position;
 
 import org.w3c.dom.Element;
 
@@ -143,6 +142,11 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
         super(game, id);
     }
     
+
+    // TODO: remove this again
+    public String getNameKey() {
+        return getName();
+    }
 
     /**
      * Gets the name of this <code>Settlement</code>.

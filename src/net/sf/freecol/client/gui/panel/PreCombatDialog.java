@@ -194,7 +194,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         FreeColGameObjectType source = modifier.getSource();
         String sourceName = "???";
         if (source != null) {
-            sourceName = source.getName();
+            sourceName = Messages.message(source.getNameKey());
         }
         add(new JLabel(sourceName), constraint);
         String bonus = getModifierFormat().format(modifier.getValue());

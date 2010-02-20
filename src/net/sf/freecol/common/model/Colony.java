@@ -39,12 +39,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.PlayerExploredTile;
-import net.sf.freecol.common.model.Region;
-import net.sf.freecol.common.model.Tile;
 
 import org.w3c.dom.Element;
 
@@ -1553,7 +1549,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
                                              "colonyPanel.unbuildable", this, buildable)
                             .addName("%colony%", getName())
-                            .addName("%object%", buildQueue.get(0).getName()));
+                            .add("%object%", buildQueue.get(0).getNameKey()));
             buildQueue.remove(0);
         }
 
@@ -1671,23 +1667,23 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param production production per turn
      * @return all warnings
      */
-    public Collection<String> getWarnings(GoodsType goodsType, int amount, int production) {
-        List<String> result = new LinkedList<String>();
+    public Collection<StringTemplate> getWarnings(GoodsType goodsType, int amount, int production) {
+        List<StringTemplate> result = new LinkedList<StringTemplate>();
 
         if (goodsType.isFoodType() && goodsType.isStorable()) {
             if (amount + production < 0) {
-                result.add(Messages.message("model.colony.famineFeared",
-                                            "%colony%", getName(),
-                                            "%number%", "0"));
+                result.add(StringTemplate.template("model.colony.famineFeared")
+                           .addName("%colony%", getName())
+                           .addAmount("%number%", 0));
             }
         } else {
             //food is never wasted -> new settler is produced
             int waste = (amount + production - getWarehouseCapacity());
             if (waste > 0 && !getExportData(goodsType).isExported() && !goodsType.limitIgnored()) {
-                result.add(Messages.message("model.building.warehouseSoonFull",
-                                            "%goods%", goodsType.getName(),
-                                            "%colony%", getName(),
-                                            "%amount%", String.valueOf(waste)));
+                result.add(StringTemplate.template("model.building.warehouseSoonFull")
+                           .add("%goods%", goodsType.getNameKey())
+                           .addName("%colony%", getName())
+                           .addAmount("%amount%", waste));
 
             }
         }
@@ -1696,11 +1692,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         if (currentlyBuilding != null) {
             for (AbstractGoods goods : currentlyBuilding.getGoodsRequired()) {
                 if (goods.getType().equals(goodsType) && amount < goods.getAmount()) {
-                    result.add(Messages.message("model.colony.buildableNeedsGoods",
-                                                "%colony%", getName(),
-                                                "%buildable%", currentlyBuilding.getName(),
-                                                "%amount%", String.valueOf(goods.getAmount() - amount),
-                                                "%goodsType%", goodsType.getName()));
+                    result.add(StringTemplate.template("model.colony.buildableNeedsGoods")
+                               .addName("%colony%", getName())
+                               .add("%buildable%", currentlyBuilding.getNameKey())
+                               .addAmount("%amount%", (goods.getAmount() - amount))
+                               .add("%goodsType%", goodsType.getNameKey()));
                 }
             }
         }
@@ -1722,7 +1718,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param warnings where to add the warnings
      * @param building for this building
      */
-    private void addInsufficientProductionMessage(List<String> warnings, Building building) {
+    private void addInsufficientProductionMessage(List<StringTemplate> warnings, Building building) {
         if (building != null) {
             int delta = building.getMaximumProduction() - building.getProductionNextTurn();
             if (delta > 0) {
@@ -1744,14 +1740,14 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * @param missingInput  missing input
      * @return message
      */
-    private String createInsufficientProductionMessage(GoodsType outputType, int missingOutput,
-                                                       GoodsType inputType, int missingInput) {
-        return Messages.message("model.colony.insufficientProduction",
-                                "%outputAmount%", String.valueOf(missingOutput),
-                                "%outputType%", outputType.getName(),
-                                "%colony%", getName(),
-                                "%inputAmount%", String.valueOf(missingInput),
-                                "%inputType%", inputType.getName());
+    private StringTemplate createInsufficientProductionMessage(GoodsType outputType, int missingOutput,
+                                                               GoodsType inputType, int missingInput) {
+        return StringTemplate.template("model.colony.insufficientProduction")
+            .addAmount("%outputAmount%", missingOutput)
+            .add("%outputType%", outputType.getNameKey())
+            .addName("%colony%", getName())
+            .addAmount("%inputAmount%", missingInput)
+            .add("%inputType%", inputType.getNameKey());
     }
 
     /**
@@ -2116,7 +2112,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         for (Building building : getBuildings()) {
             if (building.getType().hasAbility("model.ability.autoProduction")) {
                 // call auto-producing buildings immediately
-                logger.finest("Calling newTurn for building " + building.getName());
+                logger.finest("Calling newTurn for building " + building);
                 building.newTurn();
             } else if (building.getGoodsOutputType() != null &&
                        building.getGoodsOutputType().isFoodType()) {
@@ -2144,7 +2140,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
         // buildings that produce food (none in the standard rule set)
         for (Building building : buildingsProducingFood) {
-            logger.finest("Calling newTurn for building " + building.getName());
+            logger.finest("Calling newTurn for building " + building);
             building.newTurn();
         }
 
@@ -2157,7 +2153,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
         // buildings that produce building materials
         for (Building building : buildingsProducingBuildingMaterials) {
-            logger.finest("Calling newTurn for building " + building.getName());
+            logger.finest("Calling newTurn for building " + building);
             building.newTurn();
         }
 
@@ -2168,7 +2164,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         // buildings that do not produce building materials, but might
         // consume them
         for (Building building : otherBuildings) {
-            logger.finest("Calling newTurn for building " + building.getName());
+            logger.finest("Calling newTurn for building " + building);
             building.newTurn();
         }
 

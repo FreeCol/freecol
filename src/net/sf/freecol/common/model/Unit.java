@@ -39,7 +39,6 @@ import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.common.model.Map.PathType;
 import net.sf.freecol.common.model.Map.Position;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.TradeRoute.Stop;
@@ -1991,8 +1990,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 throw new IllegalArgumentException("ImprovementType must not be natural.");
             } else if (!impType.isTileTypeAllowed(getTile().getType())) {
                 // Check if improvement can be performed on this TileType
-                throw new IllegalArgumentException(impType.getName() + " not allowed on "
-                                                   + getTile().getType().getName());
+                throw new IllegalArgumentException(impType + " not allowed on "
+                                                   + getTile().getType());
             } else {
                 // TODO: This does not check if the tile (not TileType accepts the improvement)
 
@@ -2002,13 +2001,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     // No improvement found, check if worker can do it
                     if (!impType.isWorkerAllowed(this)) {
                         throw new IllegalArgumentException(getName() + " not allowed to perform "
-                                                           + improvement.getName());
+                                                           + improvement.toString());
                     }
                 } else {
                     // Has improvement, check if worker can contribute to it
                     if (!oldImprovement.isWorkerAllowed(this)) {
                         throw new IllegalArgumentException(getName() + " not allowed to perform "
-                                                           + improvement.getName());
+                                                           + improvement.toString());
                     }
                 }
             }
@@ -2235,14 +2234,14 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             throw new IllegalArgumentException("Amount must be a positive integer.");
         }
         if (!canBeEquippedWith(equipmentType)) {
-            logger.fine("Unable to equip unit " + getId() + " with " + equipmentType.getName());
+            logger.fine("Unable to equip unit " + getId() + " with " + equipmentType);
             return;
         }
         if (!(asResultOfCombat || 
               (getColony() != null && getColony().canBuildEquipment(equipmentType)) ||
               (isInEurope() && getOwner().getEurope().canBuildEquipment(equipmentType)) ||
               (getIndianSettlement() != null))) {
-            logger.fine("Unable to build equipment " + equipmentType.getName());
+            logger.fine("Unable to build equipment " + equipmentType);
             return;
         }
         if (!asResultOfCombat) {
@@ -2535,7 +2534,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             }
         } else {
             // ColonialRegulars only available after independence is declared
-            logger.warning(newUnitType.getName() + " is not available to " + owner.getPlayerType() +
+            logger.warning(newUnitType + " is not available to " + owner.getPlayerType() +
                            " player " + owner.getName());
         }
 
@@ -2640,7 +2639,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (Messages.containsKey(messageID)) {
             return Messages.message(messageID);
         } else {
-            return Messages.message("model.unit." + key + ".name", "%unit%", someType.getName());
+            return Messages.message("model.unit." + key + ".name", "%unit%",
+                                    Messages.message(someType.getNameKey()));
         }
     }
 
@@ -2651,6 +2651,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void setName(String newName) {
         this.name = newName;
+    }
+
+    // TODO: remove this again
+    public String getNameKey() {
+        return getName();
     }
 
     /**
@@ -3088,7 +3093,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void buildColony(Colony colony) {
         if (!canBuildColony()) {
-            throw new IllegalStateException("Unit " + getName() + " can not build colony on " + getTile().getName() + "!");
+            throw new IllegalStateException("Unit " + getName() + " can not build colony on "
+                                            + getTile().toString() + "!");
         }
         if (!getTile().getPosition().equals(colony.getTile().getPosition())) {
             throw new IllegalStateException("A Unit can only build a colony if on the same tile as the colony");
@@ -3105,7 +3111,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void buildIndianSettlement(IndianSettlement indianSettlement) {
         if (!canBuildColony()) {
-            throw new IllegalStateException("Unit " + getName() + " can not build settlement on " + getTile().getName() + "!");
+            throw new IllegalStateException("Unit " + getName() + " can not build settlement on "
+                                            + getTile().toString() + "!");
         }
         if (!getTile().getPosition().equals(indianSettlement.getTile().getPosition())) {
             throw new IllegalStateException("A Unit can only build a settlement if on the same tile as the settlement");

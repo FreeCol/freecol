@@ -185,7 +185,7 @@ public class TileImprovementPlan extends ValuedAIObject {
     }
 
     public String toString() {
-        return type.getName() + " on " + target + " (" + getValue() + ")";
+        return type.getNameKey() + " on " + target + " (" + getValue() + ")";
     }
 
     

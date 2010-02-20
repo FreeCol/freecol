@@ -1113,18 +1113,18 @@ public class ColonyPlan {
         sb.append(profile.getType().toString());
         sb.append("\n");
         for (GoodsType goodsType : profile.getPreferredProduction()) {
-            sb.append(goodsType.getName());
+            sb.append(goodsType.getNameKey());
             sb.append("\n");
         }
         sb.append("\n\nWORK LOCATIONS:\n");
         for (WorkLocationPlan p : getSortedWorkLocationPlans()) {
-            sb.append(p.getGoodsType().getName() + " (" + p.getWorkLocation() + ")\n");
+            sb.append(p.getGoodsType().getNameKey() + " (" + p.getWorkLocation() + ")\n");
         }
         sb.append("\n\nBUILD QUEUE:\n");
         final Iterator<BuildableType> it = getBuildable();
         while (it.hasNext()) {
             final BuildableType b = it.next();
-            sb.append(b.getName());
+            sb.append(b.getNameKey());
             sb.append('\n');
         }
         return sb.toString();

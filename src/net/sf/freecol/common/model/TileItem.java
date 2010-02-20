@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
 /**
  * Represents a <code>TileItem</code> item on a <code>Tile</code>.
  */
-public abstract class TileItem extends FreeColGameObject implements Locatable, Named {
+public abstract class TileItem extends FreeColGameObject implements Locatable {
 
     public static final int RESOURCE_ZINDEX = 400;
     public static final int RUMOUR_ZINDEX = 500;

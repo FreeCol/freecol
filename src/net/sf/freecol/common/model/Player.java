@@ -1805,11 +1805,11 @@ public class Player extends FreeColGameObject implements Nameable {
         allFathers.add(father);
 
         addModelMessage(new ModelMessage("model.player.foundingFatherJoinedCongress", this)
-                        .addName("%foundingFather%", father.getName())
-                        .addName("%description%", father.getDescription()));
+                        .add("%foundingFather%", father.getNameKey())
+                        .add("%description%", father.getDescriptionKey()));
         history.add(new HistoryEvent(getGame().getTurn().getNumber(),
                                      HistoryEvent.Type.FOUNDING_FATHER,
-                                     "%father%", father.getName()));
+                                     "%father%", Messages.message(father.getNameKey())));
         featureContainer.add(father.getFeatureContainer());
 
         List<AbstractUnit> units = father.getUnits();
@@ -2094,6 +2094,12 @@ public class Player extends FreeColGameObject implements Nameable {
     public String getName() {
         return name;
     }
+
+    // TODO: remove this again
+    public String getNameKey() {
+        return getName();
+    }
+
 
     /**
      * Returns the name of this player.

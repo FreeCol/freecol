@@ -404,7 +404,7 @@ public class IndianDemandMission extends Mission {
             return "[" + targetName + "] Getting gift: "
                     + getUnit().getIndianSettlement().getTile().getPosition();
         } else {
-            return "[" + targetName + "] " + getUnit().getGoodsIterator().next().getName();
+            return "[" + targetName + "] " + getUnit().getGoodsIterator().next().getNameKey();
         }
     }
 }

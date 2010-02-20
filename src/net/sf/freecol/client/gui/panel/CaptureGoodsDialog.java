@@ -41,6 +41,7 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.StringTemplate;
 
 /**
  * Panel for choosing the goods to capture.
@@ -234,7 +235,9 @@ public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> impleme
         }
 
         public String toString() {
-            return good.getAmount() + " " + good.getType().getName();
+            return Messages.message(StringTemplate.template("model.goods.goodsAmount")
+                                    .add("%goods%", good.getNameKey())
+                                    .addAmount("%amount%", good.getAmount()));
         }
     }
 }

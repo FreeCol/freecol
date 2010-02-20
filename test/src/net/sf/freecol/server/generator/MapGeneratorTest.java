@@ -56,7 +56,7 @@ public class MapGeneratorTest extends FreeColTestCase {
 
         for (Nation n : s.getNations()) {
             if (n.getType().isEuropean() && !n.getType().isREF()) {
-                g.addPlayer(new Player(g, n.getType().getName(), false, n));
+                g.addPlayer(new Player(g, n.getType().getNameKey(), false, n));
             }
         }
 
@@ -84,7 +84,7 @@ public class MapGeneratorTest extends FreeColTestCase {
         Nation nation = FreeCol.getSpecification().getNation(
                                                              "model.nation.dutch");
 
-        g.addPlayer(new Player(g, nation.getType().getName(), false, nation));
+        g.addPlayer(new Player(g, nation.getType().getNameKey(), false, nation));
 
         try {
             gen.createMap(g);
@@ -119,9 +119,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         for (Nation n : FreeCol.getSpecification().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
-                p = new Player(g, n.getType().getName(), false, n);
+                p = new Player(g, n.getType().getNameKey(), false, n);
             } else {
-                p = new Player(g, n.getType().getName(), false, true, n);
+                p = new Player(g, n.getType().getNameKey(), false, true, n);
             }
             g.addPlayer(p);
             players.add(p);
@@ -176,9 +176,9 @@ public class MapGeneratorTest extends FreeColTestCase {
         for (Nation n : FreeCol.getSpecification().getNations()) {
             Player p;
             if (n.getType().isEuropean() && !n.getType().isREF()){
-                p = new Player(g, n.getType().getName(), false, n);
+                p = new Player(g, n.getType().getNameKey(), false, n);
             } else {
-                p = new Player(g, n.getType().getName(), false, true, n);
+                p = new Player(g, n.getType().getNameKey(), false, true, n);
             }
             g.addPlayer(p);
             players.add(p);

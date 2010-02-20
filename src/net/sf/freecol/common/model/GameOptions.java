@@ -24,7 +24,6 @@ package net.sf.freecol.common.model;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.option.OptionMap;
 import org.w3c.dom.Element;

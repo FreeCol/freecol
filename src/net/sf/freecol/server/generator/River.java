@@ -287,7 +287,7 @@ public class River {
         Tile tile = map.getTile(position);
         if (!tile.getType().canHaveImprovement(riverType)) {
             // Mountains, ocean cannot have rivers
-            logger.fine("Tile (" + tile.getType().getName() + ") at "
+            logger.fine("Tile (" + tile.getType().toString() + ") at "
                         + position + " cannot have rivers.");
             return false;
         } else if (isNextToWater(position)) {
@@ -327,7 +327,7 @@ public class River {
             // is the tile suitable for this river?
             if (!nextTile.getType().canHaveImprovement(riverType)) {
                 // Mountains, ocean cannot have rivers
-                logger.fine("Tile (" + nextTile.getType().getName() + ") at "
+                logger.fine("Tile (" + nextTile.getType().toString() + ") at "
                             + newPosition + " cannot have rivers.");
                 continue;
             } else if (this.contains(newPosition)) {

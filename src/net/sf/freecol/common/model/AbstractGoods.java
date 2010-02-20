@@ -72,6 +72,10 @@ public class AbstractGoods extends FreeColObject {
         return type;
     }
 
+    public String getNameKey() {
+        return getType().getNameKey();
+    }
+
     /**
      * Set the <code>Type</code> value.
      *
@@ -137,7 +141,7 @@ public class AbstractGoods extends FreeColObject {
     }
 
     public String toString() {
-        return Integer.toString(amount) + " " + type.getName();
+        return Integer.toString(amount) + " " + type.getId();
     }
 
 }

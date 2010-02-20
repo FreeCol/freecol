@@ -54,6 +54,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StanceTradeItem;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TradeItem;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitTradeItem;
@@ -387,10 +388,11 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                     description = Messages.message("tradeItem.colony.long", 
                                                    "%colony%", ((ColonyTradeItem) item).getColonyName());
                 } else if (item instanceof GoodsTradeItem) {
-                    description = String.valueOf(((GoodsTradeItem) item).getGoods().getAmount()) + " " +
-                        ((GoodsTradeItem) item).getGoods().getName();
+                    description = Messages.message(StringTemplate.template("model.goods.goodsAmount")
+                                                   .addAmount("%amount%", ((GoodsTradeItem) item).getGoods().getAmount())
+                                                   .add("%goods%", ((GoodsTradeItem) item).getGoods().getNameKey()));
                 } else if (item instanceof UnitTradeItem) {
-                    description = ((UnitTradeItem) item).getUnit().getName();
+                    description = Messages.message(((UnitTradeItem) item).getUnit().getNameKey());
                 }
                 try {
                     JButton button = getLinkButton(description, null, String.valueOf(index));

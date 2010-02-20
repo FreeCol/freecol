@@ -88,29 +88,26 @@ public class GoodsTest extends FreeColTestCase {
 
         Goods g = new Goods(getGame(), wagon, cottonType, 75);
 
-        assertEquals("75 Cotton", g.toString());
+        assertEquals("75 model.goods.cotton", g.toString());
     }
 
-    /**
     public void testGetName() {
 
         Locale.setDefault(Locale.ENGLISH);
 
         Goods g = new Goods(getGame(), null, cottonType, 75);
 
-        assertEquals("75 Cotton", g.getName());
+        System.out.println(Messages.message(g.getLabel(true)));
+        assertEquals("75 Cotton", Messages.message(g.getLabel(true)));
 
-        assertEquals("75 Cotton (boycotted)", g.getName(false));
-
-        assertEquals("75 Cotton", g.getName(true));
+        assertEquals("75 Cotton (boycotted)", Messages.message(g.getLabel(false)));
 
         // Same as getName(int, boolean)
-        assertEquals(g.getName(), Goods.getName(cottonType));
-        assertEquals(g.getName(false), Goods.getName(cottonType, false));
-        assertEquals(g.getName(true), Goods.getName(cottonType, true));
+        //assertEquals(g.getName(), Goods.getName(cottonType));
+        //assertEquals(g.getName(false), Goods.getName(cottonType, false));
+        //assertEquals(g.getName(true), Goods.getName(cottonType, true));
 
     }
-    */
 
     public void testGetRawMaterial() {
     	GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");

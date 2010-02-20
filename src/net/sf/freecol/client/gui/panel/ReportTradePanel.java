@@ -26,6 +26,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 
 import javax.swing.JButton;
@@ -226,11 +227,11 @@ public final class ReportTradePanel extends ReportPanel {
                 }
 
                 StringBuffer toolTip = new StringBuffer();
-                for (String warning : colony.getWarnings(goodsType, amount, production)) {
+                for (StringTemplate warning : colony.getWarnings(goodsType, amount, production)) {
                     if (toolTip.length() > 0) {
                         toolTip.append(" - ");
                     }
-                    toolTip.append(warning);
+                    toolTip.append(Messages.message(warning));
                     productionLabel.setForeground(Color.MAGENTA);
                     productionLabel.setToolTipText(toolTip.toString());
                 }

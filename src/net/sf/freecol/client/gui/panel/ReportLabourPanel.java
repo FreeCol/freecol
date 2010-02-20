@@ -139,12 +139,13 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             int unitTypeCount = unitCount.getCount(unitType);
             if (unitTypeCount == 0) {
                 reportPanel.add(createUnitTypeLabel(unitType, role, 0));
-                JLabel unitName = new JLabel(unitType.getName());
+                JLabel unitName = localizedLabel(unitType.getNameKey());
                 unitName.setForeground(Color.GRAY);
                 reportPanel.add(unitName);
             } else {
                 reportPanel.add(createUnitTypeLabel(unitType, role, unitTypeCount));
-                JButton linkButton = getLinkButton(unitType.getName(), null, unitType.getId());
+                JButton linkButton = getLinkButton(Messages.message(unitType.getNameKey()),
+                                                   null, unitType.getId());
                 linkButton.addActionListener(this);
                 reportPanel.add(linkButton);
             }
@@ -165,7 +166,7 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             
         // summary
         detailPanel.add(new JLabel(getLibrary().getUnitImageIcon(unitType, role)), "spany");
-        detailPanel.add(new JLabel(unitType.getName()));
+        detailPanel.add(localizedLabel(unitType.getNameKey()));
         detailPanel.add(new JLabel(String.valueOf(unitCount.getCount(unitType))), "wrap 10");
         boolean canTrain = false;
         for (Colony colony : colonies) {

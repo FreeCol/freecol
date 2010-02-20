@@ -135,7 +135,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
         List<TileType> tileList = Specification.getSpecification().getTileTypeList();
         for (TileType type : tileList) {
             listPanel.add(buildButton(getLibrary().getScaledTerrainImage(type, 1f),
-                                      type.getName(), new TileTypeTransform(type)));
+                                      Messages.message(type.getNameKey()),
+                                      new TileTypeTransform(type)));
         }
         listPanel.add(buildButton(getLibrary().getRiverImage(10), Messages.message("minorRiver"),
                                   new RiverTransform(TileImprovement.SMALL_RIVER)));
@@ -345,7 +346,8 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                 default:
                     List<ChoiceItem<ResourceType>> choices = new ArrayList<ChoiceItem<ResourceType>>();
                     for (ResourceType resType : resList) {
-                        choices.add(new ChoiceItem<ResourceType>(resType.getName(), resType));
+                        String name = Messages.message(resType.getNameKey());
+                        choices.add(new ChoiceItem<ResourceType>(name, resType));
                     }
                     ResourceType choice = getCanvas().showChoiceDialog(null,
                                                                        Messages.message("ok"),

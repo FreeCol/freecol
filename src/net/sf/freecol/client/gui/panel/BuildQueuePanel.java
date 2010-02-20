@@ -76,6 +76,7 @@ import net.sf.freecol.common.model.BuildingType;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.FeatureContainer;
 import net.sf.freecol.common.model.FreeColGameObjectType;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.resources.ResourceManager;
 import net.sf.freecol.common.util.Utils;
@@ -241,7 +242,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                         && ability.getSource() != null
                         && !unbuildableTypes.contains(ability.getSource())) {
                         builderFound = true;
-                        lockReason.add(ability.getSource().getName());
+                        lockReason.add(Messages.message(ability.getSource().getNameKey()));
                         break;
                     }
                 }
@@ -262,7 +263,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                         unbuildableTypes.add(unitType);
                         continue loop;
                     } else {
-                        lockReason.add(sources.get(0).getName());
+                        lockReason.add(Messages.message(sources.get(0).getNameKey()));
                     }
                 }
             }
@@ -316,7 +317,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                         unbuildableTypes.add(buildingType);
                         continue loop;
                     } else {
-                        lockReason.add(sources.get(0).getName());
+                        lockReason.add(Messages.message(sources.get(0).getNameKey()));
                     }
                 }
             }
@@ -325,7 +326,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
                 && !current.contains(buildingType.getUpgradesFrom())) {
                 if (colonyBuilding == null
                     || colonyBuilding.getType() != buildingType.getUpgradesFrom()) {
-                    lockReason.add(buildingType.getUpgradesFrom().getName());
+                    lockReason.add(Messages.message(buildingType.getUpgradesFrom().getNameKey()));
                 }
             }
             if (lockReason.isEmpty()) {
@@ -450,10 +451,10 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             String command = event.getActionCommand();
             List<BuildableType> buildables = getBuildableTypes(buildQueueList);
             if (!buildables.isEmpty() && lockReasons.get(buildables.get(0)) != null) {
-                getCanvas().showInformationMessage("colonyPanel.unbuildable",
-                                                   buildables.get(0),
-                                                   "%colony%", colony.getName(),
-                                                   "%object%", buildables.get(0).getName());
+                getCanvas().showInformationMessage(StringTemplate.template("colonyPanel.unbuildable")
+                                                   .addName("%colony%", colony.getName())
+                                                   .add("%object%", buildables.get(0).getNameKey()),
+                                                   buildables.get(0));
                 return;
             }
             getController().setBuildQueue(colony, buildables);
@@ -756,7 +757,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
     class SimpleBuildQueueCellRenderer extends FreeColComboBoxRenderer {
 
         public void setLabelValues(JLabel c, Object value) {
-            c.setText(((BuildableType) value).getName());
+            c.setText(Messages.message(((BuildableType) value).getNameKey()));
         }
 
     }
@@ -792,7 +793,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
             ((ImageIcon) imageLabel.getIcon()).setImage(ResourceManager.getImage(item.getId() + ".image",
                                                                                  buildingDimension));
 
-            nameLabel.setText(item.getName());
+            nameLabel.setText(Messages.message(item.getNameKey()));
             panel.setToolTipText(lockReasons.get(item));
             panel.add(imageLabel, "span 1 2");
             if (lockReasons.get(item) == null) {

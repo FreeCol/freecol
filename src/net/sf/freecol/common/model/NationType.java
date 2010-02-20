@@ -117,8 +117,4 @@ public abstract class NationType extends FreeColGameObjectType {
         this.capitalRadius = newCapitalRadius;
     }
 
-    public String toString() {
-        return getName();
-    }
-
 }

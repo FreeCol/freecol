@@ -422,7 +422,7 @@ public final class CompactLabourReport extends ReportPanel {
         int notProducingStartRow = row;
 
         if (showBuildings && productionBuilding != null && row > buildingStartRow) {
-            JLabel buildingLabel = new JLabel(productionBuilding.getName());
+            JLabel buildingLabel = localizedLabel(productionBuilding.getNameKey());
             buildingLabel.setBorder(CELLBORDER);
             reportPanel.add(buildingLabel, "cell " + buildingStartRow + " " + BUILDING_COLUMN
                             + " 1 " + (row - buildingStartRow));
@@ -487,7 +487,7 @@ public final class CompactLabourReport extends ReportPanel {
                 String student = resultOfTraining.size() == 1 ?
                     Messages.message("report.labour.learning",
                                      "%unit%",
-                                     resultOfTraining.iterator().next().getName()) :
+                                     Messages.message(resultOfTraining.iterator().next().getNameKey())) :
                     Messages.message("report.labour.learningOther");
                 addRow(data,
                        data.getUnitData().getUnitName(),
@@ -499,7 +499,8 @@ public final class CompactLabourReport extends ReportPanel {
         }
 
         if (showBuildings && row > buildingStartRow) {
-            JLabel buildingLabel = new JLabel(schoolhouse != null ? schoolhouse.getName() : "");
+            JLabel buildingLabel = new JLabel(schoolhouse != null ?
+                                              Messages.message(schoolhouse.getNameKey()) : "");
             buildingLabel.setBorder(CELLBORDER);
             reportPanel.add(buildingLabel, "cell " + buildingStartRow + " " + BUILDING_COLUMN
                             + " 1 " + (row - buildingStartRow));

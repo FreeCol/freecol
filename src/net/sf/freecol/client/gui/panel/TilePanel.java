@@ -138,7 +138,7 @@ public final class TilePanel extends FreeColPanel {
                         label = new JLabel(String.valueOf(expertPotential),
                                            getLibrary().getGoodsImageIcon(goodsType),
                                            JLabel.CENTER);
-                        label.setToolTipText(expert.getName());
+                        label.setToolTipText(Messages.message(expert.getNameKey()));
                         if (first) {
                             add(label, "split");
                             first = false;
@@ -149,8 +149,8 @@ public final class TilePanel extends FreeColPanel {
                     } else {
                         label.setText(String.valueOf(potential) + "/" +
                                       String.valueOf(expertPotential));
-                        label.setToolTipText(colonist.getName() + "/" +
-                                             expert.getName());
+                        label.setToolTipText(Messages.message(colonist.getNameKey()) + "/" +
+                                             Messages.message(expert.getNameKey()));
                     }
                 }
             }

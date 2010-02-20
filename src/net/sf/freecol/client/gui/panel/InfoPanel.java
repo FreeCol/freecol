@@ -45,6 +45,7 @@ import net.sf.freecol.client.gui.panel.MapEditorTransformPanel.MapTransform;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Goods;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TileImprovement;
 import net.sf.freecol.common.model.Unit;
@@ -278,12 +279,12 @@ public final class InfoPanel extends FreeColPanel {
                                                       getClient().getGame().getMap(),
                                                       tile, 0, 0);
                 if (tile.isExplored()) {
-                    List<String> items = new ArrayList<String>();
-                    items.add(tile.getName());
+                    StringTemplate items = StringTemplate.label(", ");
+                    items.add(tile.getNameKey());
                     for (TileImprovement tileImprovement : tile.getCompletedTileImprovements()) {
-                        items.add(tileImprovement.getType().getDescription());
+                        items.add(tileImprovement.getType().getDescriptionKey());
                     }
-                    add(new JLabel(Utils.join(", ", items)), "span, align center");
+                    add(new JLabel(Messages.message(items)), "span, align center");
 
                     add(new JLabel(new ImageIcon(image)), "span 1 3");
                     if (tile.getOwner() == null) {
@@ -310,7 +311,7 @@ public final class InfoPanel extends FreeColPanel {
                         JLabel goodsLabel = new JLabel(String.valueOf(tile.potential(goods.getType(), null)),
                                                        getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.50f),
                                                        JLabel.RIGHT);
-                        goodsLabel.setToolTipText(goods.getType().getName());
+                        goodsLabel.setToolTipText(Messages.message(goods.getType().getNameKey()));
                         goodsLabel.setFont(font);
                         add(goodsLabel);
                     }
@@ -378,7 +379,9 @@ public final class InfoPanel extends FreeColPanel {
                 } else if (unit.isCarrier()) {
                     for (Goods goods : unit.getGoodsList()) {
                         JLabel goodsLabel = new JLabel(getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f));
-                        goodsLabel.setToolTipText(String.valueOf(goods.getAmount()) + " " + goods.getName());
+                        goodsLabel.setToolTipText(Messages.message(StringTemplate.template("model.goods.goodsAmount")
+                                                                   .addAmount("%amount%", goods.getAmount())
+                                                                   .add("%goods%", goods.getNameKey())));
                         add(goodsLabel);
                     }
                     for (Unit carriedUnit : unit.getUnitList()) {
@@ -391,12 +394,14 @@ public final class InfoPanel extends FreeColPanel {
                     for (EquipmentType equipment : unit.getEquipment().keySet()) {
                         for (AbstractGoods goods : equipment.getGoodsRequired()) {
                             int amount = goods.getAmount() * unit.getEquipment().getCount(equipment);
-                            String amountStr = String.valueOf(amount);
                             JLabel equipmentLabel = 
-                                new JLabel(amountStr,
+                                new JLabel(Integer.toString(amount),
                                            getLibrary().getScaledGoodsImageIcon(goods.getType(), 0.66f),
                                            JLabel.CENTER);
-                            equipmentLabel.setToolTipText(amountStr + " " + goods.getType().getName());
+                            equipmentLabel
+                                .setToolTipText(Messages.message(StringTemplate.template("model.goods.goodsAmount")
+                                                                 .addAmount("%amount%", amount)
+                                                                 .add("%goods%", goods.getNameKey())));
                             add(equipmentLabel);
                         }
                     }

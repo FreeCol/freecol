@@ -37,6 +37,7 @@ import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.ColonyTile;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 
@@ -129,7 +130,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     UnitType expert = FreeCol.getSpecification().getExpertForProducing(workType);
                     int expertIndex = expert.getIndex();
                     if (unitCount[index][expertIndex] == 0 && !expertWarning[expertIndex]) {
-                        addExpertWarning(doc, index, workType.getName(), expert);
+                        addExpertWarning(doc, index, workType, expert);
                         expertWarning[expertIndex] = true;
                         hasWarning = true;
                     }
@@ -145,7 +146,7 @@ public final class ReportRequirementsPanel extends ReportPanel {
                     if (building.getFirstUnit() != null &&
                         !expertWarning[expertIndex] &&
                         unitCount[index][expertIndex] == 0) {
-                        addExpertWarning(doc, index, goodsType.getName(), expert);
+                        addExpertWarning(doc, index, goodsType, expert);
                         expertWarning[expertIndex] = true;
                         hasWarning = true;
                     }
@@ -181,9 +182,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
     }
 
-    private void addExpertWarning(StyledDocument doc, int colonyIndex, String goods, UnitType workType) {
-        String expertName = workType.getName();
+    private void addExpertWarning(StyledDocument doc, int colonyIndex, GoodsType goodsType, UnitType workType) {
+        String expertName = Messages.message(workType.getNameKey());
         String colonyName = colonies.get(colonyIndex).getName();
+        String goods = Messages.message(goodsType.getNameKey());
         String newMessage = Messages.message("report.requirements.noExpert", "%colony%", colonyName, "%goods%", goods,
                 "%unit%", expertName);
 
@@ -241,10 +243,10 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
     private void addProductionWarning(StyledDocument doc, int colonyIndex, GoodsType output, GoodsType input) {
         String colonyName = colonies.get(colonyIndex).getName();
-        String newMessage = Messages.message("report.requirements.missingGoods",
-                "%colony%", colonyName,
-                "%goods%", output.getName(),
-                "%input%", input.getName());
+        String newMessage = Messages.message(StringTemplate.template("report.requirements.missingGoods")
+                                             .addName("%colony%", colonyName)
+                                             .add("%goods%", output.getNameKey())
+                                             .add("%input%", input.getNameKey()));
 
         try {
             doc.insertString(doc.getLength(), newMessage + "\n\n", doc.getStyle("regular"));
@@ -260,8 +262,9 @@ public final class ReportRequirementsPanel extends ReportPanel {
 
             if (!withSurplus.isEmpty()) {
                 doc.insertString(doc.getLength(),
-                        Messages.message("report.requirements.surplus", "%goods%", input.getName()) + " ",
-                        doc.getStyle("regular"));
+                                 Messages.message(StringTemplate.template("report.requirements.surplus")
+                                                  .add("%goods%", input.getNameKey())) + " ",
+                                 doc.getStyle("regular"));
                 for (int index = 0; index < withSurplus.size() - 1; index++) {
                     Colony colony = withSurplus.get(index);
                     String amount = " (" + theSurplus.get(index) + ")";

@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 /**
  * The base class for all types defined by the specification. It can
@@ -97,12 +96,8 @@ public class FreeColGameObjectType extends FreeColObject {
         return getId() + ".name";
     }
 
-    public final String getName() {
-        return Messages.message(getNameKey());
-    }
-
-    public final String getDescription() {
-        return Messages.message(getId() + ".description");
+    public final String getDescriptionKey() {
+        return getId() + ".description";
     }
 
     public boolean hasAbility(String id) {

@@ -196,7 +196,7 @@ public class WorkerWish extends Wish {
     }
     
     public String toString() {
-        return "WorkerWish: " + unitType.getName()
+        return "WorkerWish: " + unitType.getNameKey()
             + " (" + getValue() + (expertNeeded ? ", expert)" : ")");
     }
 }

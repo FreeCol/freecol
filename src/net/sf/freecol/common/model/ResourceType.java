@@ -20,7 +20,6 @@
 package net.sf.freecol.common.model;
 
 import java.util.Set;
-import java.util.Random;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -66,26 +65,6 @@ public final class ResourceType extends FreeColGameObjectType {
             }
         }
         return bestType;
-    }
-
-    /**
-     * Returns a <code>String</code> with the output/s of this ResourceType.
-     */
-    public String getOutputString() {
-        /** TODO: make something more useful
-        if (bonusGoods.size() == 0) {
-            return (new String("No Bonus"));
-        }
-        String s = new String("");
-        for (int i = 0; i < bonusGoods.size(); i++) {
-            if (i > 0) {
-                s += ", ";
-            }
-            s += bonusAmount.get(i).toString() + " " + bonusGoods.get(i);
-        }
-        return s;
-        */
-        return getName();
     }
 
     // ------------------------------------------------------------ API methods

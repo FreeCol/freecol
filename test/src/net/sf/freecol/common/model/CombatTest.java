@@ -572,7 +572,7 @@ public class CombatTest extends FreeColTestCase {
         
         for (AbstractGoods goods : muskets.getGoodsRequired()) {
             boolean goodsLost = colony.getGoodsCount(goods.getType()) < goodsAdded.get(goods.getType());
-            errMsg = "Colony should have lose " + goods.getType().getName();
+            errMsg = "Colony should have lose " + goods.getType().toString();
             assertTrue(errMsg,goodsLost);
         }
     }

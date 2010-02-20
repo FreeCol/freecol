@@ -82,7 +82,7 @@ public final class EditSettlementDialog extends FreeColDialog<IndianSettlement>
 
         public Component getListCellRendererComponent(JList list, Object value, int index,
                                                       boolean isSelected, boolean cellHasFocus) {
-            label.setText(((UnitType) value).getName());
+            label.setText(Messages.message(((UnitType) value).getNameKey()));
             return label;
         }
     }

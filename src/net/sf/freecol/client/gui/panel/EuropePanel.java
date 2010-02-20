@@ -59,6 +59,7 @@ import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TransactionListener;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.Unit.UnitState;
@@ -849,10 +850,10 @@ public final class EuropePanel extends FreeColPanel {
         
         public void logPurchase(GoodsType goodsType, int amount, int price) {
             int total = amount * price;
-            String text = Messages.message("transaction.purchase",
-                    "%goods%", goodsType.getName(),
-                    "%amount%", String.valueOf(amount),
-                    "%gold%", String.valueOf(price))
+            String text = Messages.message(StringTemplate.template("transaction.purchase")
+                                           .add("%goods%", goodsType.getNameKey())
+                                           .addAmount("%amount%", amount)
+                                           .addAmount("%gold%", price))
                 + "\n" + Messages.message("transaction.price",
                     "%gold%", String.valueOf(total));
             add(text);
@@ -863,10 +864,10 @@ public final class EuropePanel extends FreeColPanel {
             int totalTax = totalBeforeTax * tax / 100;
             int totalAfterTax = totalBeforeTax - totalTax;
             
-            String text = Messages.message("transaction.sale",
-                    "%goods%", goodsType.getName(),
-                    "%amount%", String.valueOf(amount),
-                    "%gold%", String.valueOf(price))
+            String text = Messages.message(StringTemplate.template("transaction.sale")
+                                           .add("%goods%", goodsType.getNameKey())
+                                           .addAmount("%amount%", amount)
+                                           .addAmount("%gold%", price))
                 + "\n" + Messages.message("transaction.price",
                     "%gold%", String.valueOf(totalBeforeTax))
                 + "\n" + Messages.message("transaction.tax",

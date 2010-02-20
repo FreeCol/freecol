@@ -443,7 +443,7 @@ public final class TilePopup extends JPopupMenu {
      * @param tile The tile that will be represented on the popup.
      */
     private void addTile(final Tile tile) {
-        JMenuItem menuItem = new JMenuItem(tile.getName());
+        JMenuItem menuItem = new JMenuItem(Messages.message(tile.getNameKey()));
         menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
                     canvas.showPanel(new TilePanel(canvas, tile));

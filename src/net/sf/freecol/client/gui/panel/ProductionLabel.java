@@ -31,8 +31,10 @@ import javax.swing.JComponent;
 
 import net.sf.freecol.client.ClientOptions;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
+import net.sf.freecol.common.model.StringTemplate;
 
 /**
  * The ProductionLabel represents Goods that are produced in a
@@ -240,7 +242,9 @@ public final class ProductionLabel extends JComponent {
         if (goodsType == null || production == 0) {
             setToolTipText(null);
         } else {
-            String text = Goods.toString(goodsType, production);
+            String text = Messages.message(StringTemplate.template("model.goods.goodsAmount")
+                                           .add("%goods%", goodsType.getNameKey())
+                                           .addAmount("%amount%", production));
             if (toolTipPrefix != null) {
                 text = toolTipPrefix + " " + text;
             }

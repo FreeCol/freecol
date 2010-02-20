@@ -527,6 +527,12 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         return getOwner().getEuropeName();
     }
 
+    // TODO: remove this again
+    public String getNameKey() {
+        return getName();
+    }
+
+
     /**
      * Returns a suitable name.
      */

@@ -272,7 +272,7 @@ public final class DragListener extends MouseAdapter {
             if (tempUnit.getWorkLocation() != building) { // Skip if currently working at this location
                 if (building.canAdd(tempUnit)) {
                     GoodsType goodsType = building.getGoodsOutputType();
-                    String locName = building.getName();
+                    String locName = Messages.message(building.getNameKey());
                     JMenuItem menuItem = new JMenuItem(locName);
                     if (goodsType != null) {
                         menuItem.setIcon(imageLibrary.getScaledGoodsImageIcon(goodsType, 0.66f));
@@ -283,7 +283,7 @@ public final class DragListener extends MouseAdapter {
                             // Not reaching full potential, show full potential
                             locName += "/" + potential;
                         }
-                        locName +=  " " + goodsType.getName()+")";
+                        locName +=  " " + Messages.message(goodsType.getNameKey()) +")";
                         menuItem.setText(locName);
                         if (addOutput == 0) {
                             menuItem.setForeground(FreeColPanel.LINK_COLOR);
@@ -559,7 +559,7 @@ public final class DragListener extends MouseAdapter {
         final InGameController inGameController = canvas.getClient().getInGameController();
         ImageLibrary imageLibrary = parentPanel.getLibrary();
         JPopupMenu menu = new JPopupMenu("Cargo");
-        JMenuItem name = new JMenuItem(goods.getName() + " (" +
+        JMenuItem name = new JMenuItem(Messages.message(goods.getNameKey()) + " (" +
                                        Messages.message("menuBar.colopedia") + ")", 
                                        imageLibrary.getScaledGoodsImageIcon(goods.getType(), 0.66f));
         name.addActionListener(new ActionListener() {

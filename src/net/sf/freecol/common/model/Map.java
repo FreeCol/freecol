@@ -39,8 +39,6 @@ import net.sf.freecol.common.model.pathfinding.CostDecider;
 import net.sf.freecol.common.model.pathfinding.CostDeciders;
 import net.sf.freecol.common.model.pathfinding.GoalDecider;
 
-import org.w3c.dom.Element;
-
 /**
  * An isometric map. The map is represented as a collection of tiles.
  */

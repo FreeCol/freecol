@@ -129,7 +129,7 @@ public class BuildingTest extends FreeColTestCase {
             
             for (int index = 0; index < maxUnits; index++) {
                 assertTrue("unable to add unit " + index + " to building type " +
-                           building.getType().getName(), building.canAdd(units.get(index)));
+                           building.getType(), building.canAdd(units.get(index)));
                 building.add(units.get(index));
             }
             assertFalse("able to add unit " + maxUnits + " to building type " +
@@ -247,7 +247,7 @@ public class BuildingTest extends FreeColTestCase {
 
         school.upgrade();
         
-        assertEquals(school.getType().getName(), school.getType(), spec().getBuildingType("model.building.University"));
+        assertEquals(school.getType().toString(), school.getType(), spec().getBuildingType("model.building.University"));
         
         // these can never teach
         assertFalse("able to add free colonist to University",

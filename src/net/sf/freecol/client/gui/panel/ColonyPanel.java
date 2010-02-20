@@ -683,12 +683,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             BuildableType buildable = colony.getCurrentlyBuilding();
             if (buildable != null
                 && buildable.getPopulationRequired() > colony.getUnitCount()
-                && !canvas.showConfirmDialog(null,
-                                             "colonyPanel.reducePopulation",
-                                             "ok", "cancel",
-                                             "%colony%", colony.getName(),
-                                             "%number%", String.valueOf(buildable.getPopulationRequired()),
-                                             "%buildable%", buildable.getName())) {
+                && !canvas.showConfirmDialog(null, StringTemplate.template("colonyPanel.reducePopulation")
+                                             .addName("%colony%", colony.getName())
+                                             .addAmount("%number%", buildable.getPopulationRequired())
+                                             .add("%buildable%", buildable.getNameKey()),
+                                             "ok", "cancel")) {
                 return;
             }
             canvas.remove(this);

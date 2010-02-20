@@ -645,7 +645,7 @@ public final class InGameController implements NetworkConstants {
                                                   "%unit%", unit.getName(),
                                                   "%colony%", locName,
                                                   "%amount%", overflow,
-                                                  "%goods%", goods.getName())) {
+                                                  "%goods%", Messages.message(goods.getNameKey()))) {
                         toUnload = atStop;
                     }
                     break;
@@ -2224,13 +2224,14 @@ public final class InGameController implements NetworkConstants {
             canvas.showInformationMessage("indianSettlement.noMoreSkill",
                                           settlement);
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            canvas.showInformationMessage("indianSettlement.cantLearnSkill",
-                                          settlement,
-                                          "%unit%", unit.getName(),
-                                          "%skill%", skill.getName());
-        } else if (canvas.showConfirmDialog(unit.getTile(), "learnSkill.text",
-                                            "learnSkill.yes", "learnSkill.no",
-                                            "%skill%", skill.getName())) {
+            canvas.showInformationMessage(StringTemplate.template("indianSettlement.cantLearnSkill")
+                                          .addName("%unit%", unit.getName())
+                                          .add("%skill%", skill.getNameKey()),
+                                          settlement);
+        } else if (canvas.showConfirmDialog(unit.getTile(),
+                                            StringTemplate.template("learnSkill.text")
+                                            .add("%skill%", skill.getNameKey()),
+                                            "learnSkill.yes", "learnSkill.no")) {
             if (askLearnSkill(unit, direction)) {
                 if (unit.isDisposed()) {
                     canvas.showInformationMessage("learnSkill.die",
@@ -2324,9 +2325,9 @@ public final class InGameController implements NetworkConstants {
                 nextActiveUnit(unitTile);
                 return;
             } else if ("expert".equals(result)) {
-                canvas.showInformationMessage("scoutSettlement.expertScout",
-                                              settlement,
-                                              "%unit%", unit.getType().getName());
+                canvas.showInformationMessage(StringTemplate.template("scoutSettlement.expertScout")
+                                              .add("%unit%", unit.getType().getNameKey()),
+                                              settlement);
             } else if ("tales".equals(result)) {
                 canvas.showInformationMessage("scoutSettlement.speakTales",
                                               settlement);
@@ -2928,9 +2929,9 @@ public final class InGameController implements NetworkConstants {
             for (;;) {
                 gold = askSellPriceToSettlement(unit, settlement, goods, gold);
                 if (gold == NO_NEED_FOR_THE_GOODS) {
-                    canvas.showInformationMessage("trade.noNeedForTheGoods",
-                                                  settlement,
-                                                  "%goods%", goods.getName());
+                    canvas.showInformationMessage(StringTemplate.template("trade.noNeedForTheGoods")
+                                                  .add("%goods%", goods.getNameKey()),
+                                                  settlement);
                     return;
                 } else if (gold == NO_TRADE) {
                     canvas.showInformationMessage("trade.noTrade",
@@ -3589,10 +3590,10 @@ public final class InGameController implements NetworkConstants {
 
         Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
         if (!canvas.showConfirmDialog(tile,
-                                      "clearSpeciality.areYouSure",
-                                      "yes", "no",
-                                      "%oldUnit%", unit.getName(),
-                                      "%unit%", newType.getName())) {
+                                      StringTemplate.template("clearSpeciality.areYouSure")
+                                      .addName("%oldUnit%", unit.getName())
+                                      .add("%unit%", newType.getNameKey()),
+                                      "yes", "no")) {
             return;
         }
 

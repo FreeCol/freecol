@@ -166,10 +166,6 @@ public class Nation extends FreeColGameObjectType {
         this.selectable = newSelectable;
     }
 
-    public String toString() {
-        return getName();
-    }
-
     public void readAttributes(XMLStreamReader in, Specification specification)
         throws XMLStreamException {
         setColor(new Color(Integer.decode(in.getAttributeValue(null, "color"))));

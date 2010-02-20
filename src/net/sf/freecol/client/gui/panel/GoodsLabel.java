@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.Goods;
@@ -63,7 +64,7 @@ public final class GoodsLabel extends JLabel {
     public GoodsLabel(Goods goods, Canvas parent) {
         super(parent.getImageLibrary().getGoodsImageIcon(goods.getType()));
         this.goods = goods;
-        setToolTipText(goods.getName());
+        setToolTipText(Messages.message(goods.getNameKey()));
         this.parent = parent;
         selected = false;
         partialChosen = false;
@@ -99,9 +100,9 @@ public final class GoodsLabel extends JLabel {
             || (location instanceof Colony
                 && player.getGameOptions().getBoolean(GameOptions.CUSTOM_IGNORE_BOYCOTT)
                 && ((Colony) location).hasAbility("model.ability.export"))) {
-            setToolTipText(goods.getName());
+            setToolTipText(Messages.message(goods.getNameKey()));
         } else {
-            setToolTipText(goods.getName(false));
+            setToolTipText(Messages.message(goods.getLabel(false)));
             setIcon(getDisabledIcon());
         }
         

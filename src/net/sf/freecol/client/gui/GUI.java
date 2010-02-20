@@ -2448,8 +2448,8 @@ public final class GUI {
         case ClientOptions.DISPLAY_TILE_TEXT_EMPTY:
             break;
         case ClientOptions.DISPLAY_TILE_TEXT_NAMES:
-            if (tile.getName() != null) {
-                String tileName = tile.getName();
+            if (tile.getNameKey() != null) {
+                String tileName = Messages.message(tile.getNameKey());
                 g.setColor(Color.BLACK);
                 int b = getBreakingPoint(tileName);
                 if (b == -1) {

@@ -340,11 +340,11 @@ public class ProductionCache {
             String result = "Cache entry: " + unit.getName() + "(" + unit.getId() + ") ";
             if (workLocation instanceof ColonyTile) {
                 return result
-                    + ((ColonyTile) workLocation).getTile().getName()
-                    + "(" + workLocation.getId() + ") " + goodsType.getName();
+                    + ((ColonyTile) workLocation).getTile().getNameKey()
+                    + "(" + workLocation.getId() + ") " + goodsType.getNameKey();
             } else if (workLocation instanceof Building) {
                 return result
-                    + ((Building) workLocation).getName() + "(" + workLocation.getId() + ") ";
+                    + ((Building) workLocation).getNameKey() + "(" + workLocation.getId() + ") ";
             } else {
                 return result;
             }

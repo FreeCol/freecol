@@ -59,9 +59,9 @@ public class GameTest extends FreeColTestCase {
             } else {
                 Player p;
                 if (n.getType().isEuropean() && !n.getType().isREF()) {
-                    p = new Player(game, n.getType().getName(), false, n);
+                    p = new Player(game, n.getType().getNameKey(), false, n);
                 } else {
-                    p = new Player(game, n.getType().getName(), false, true, n);
+                    p = new Player(game, n.getType().getNameKey(), false, true, n);
                 }
                 game.addPlayer(p);
                 players.add(p);

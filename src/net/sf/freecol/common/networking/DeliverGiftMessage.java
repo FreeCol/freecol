@@ -191,7 +191,7 @@ public class DeliverGiftMessage extends Message {
                 = new ModelMessage(ModelMessage.MessageType.GIFT_GOODS,
                                    "model.unit.gift", settlement, goods.getType())
                 .addStringTemplate("%player%", player.getNationName())
-                .addName("%type%", goods.getName())
+                .add("%type%", goods.getNameKey())
                 .addAmount("%amount%", goods.getAmount())
                 .addName("%colony%", settlement.getName());
             messages.appendChild(m.toXMLElement(receiver, doc));

@@ -33,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
@@ -56,9 +57,9 @@ public class BuildingToolTip extends JToolTip {
 
         setLayout(new MigLayout("fill", "", ""));
 
-        String buildingName = building.getName();
+        String buildingName = Messages.message(building.getNameKey());
         if (building.getMaxUnits() == 0) {
-            buildingName = "(" + building.getName() + ")";
+            buildingName = "(" + buildingName + ")";
         }
 
         boolean canTeach = building.getType().hasAbility("model.ability.teach");

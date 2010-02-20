@@ -34,7 +34,7 @@ public class NationTypeTest extends FreeColTestCase {
                 
         // Make sure that each nation has a type
         for (Nation n : s.getNations()){
-            assertNotNull(n.getName(), n.getType());
+            assertNotNull(n.toString(), n.getType());
         }
     }
         
@@ -85,7 +85,7 @@ public class NationTypeTest extends FreeColTestCase {
             spec().applyDifficultyLevel(difficulty);
             for (EuropeanNationType type : spec().getEuropeanNationTypes()) {
                 List<AbstractUnit> startingUnits = type.getStartingUnits();
-                assertEquals("Wrong number of starting units: " + type.getName(),
+                assertEquals("Wrong number of starting units: " + type.toString(),
                              3, startingUnits.size());
                 for (AbstractUnit unit : startingUnits) {
                     String unitTypeId = unit.getUnitType().getId();
@@ -93,31 +93,31 @@ public class NationTypeTest extends FreeColTestCase {
                     case SOLDIER:
                         if (difficulty == 0 || difficulty == 1
                             || "model.nationType.conquest".equals(type.getId())) {
-                            assertEquals("Wrong type of soldier: " + type.getName(),
+                            assertEquals("Wrong type of soldier: " + type.toString(),
                                          "model.unit.veteranSoldier", unitTypeId);
                         } else {
-                            assertFalse("Wrong type of soldier: " + type.getName(),
+                            assertFalse("Wrong type of soldier: " + type.toString(),
                                         "model.unit.veteranSoldier".equals(unitTypeId));
                         }
                         break;
                     case PIONEER:
                         if ("model.nationType.cooperation".equals(type.getId())) {
-                            assertEquals("Wrong type of pioneer: " + type.getName(),
+                            assertEquals("Wrong type of pioneer: " + type.toString(),
                                          "model.unit.hardyPioneer", unitTypeId);
                         } else {
-                            assertFalse("Wrong type of pioneer: " + type.getName(),
+                            assertFalse("Wrong type of pioneer: " + type.toString(),
                                         "model.unit.hardyPioneer".equals(unitTypeId));
                         }
                         break;
                     case DEFAULT:
-                        assertTrue("Ship is not naval: " + type.getName(),
+                        assertTrue("Ship is not naval: " + type.toString(),
                                    unit.getUnitType().hasAbility("model.ability.navalUnit"));
                         if ("model.nationType.trade".equals(type.getId())
                             || "model.nationType.naval".equals(type.getId())) {
-                            assertEquals("Wrong type of ship: " + type.getName(),
+                            assertEquals("Wrong type of ship: " + type.toString(),
                                          "model.unit.merchantman", unitTypeId);
                         } else {
-                            assertEquals("Wrong type of ship: " + type.getName(),
+                            assertEquals("Wrong type of ship: " + type.toString(),
                                          "model.unit.caravel", unitTypeId);
                         }
                         break;

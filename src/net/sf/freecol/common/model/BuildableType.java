@@ -26,11 +26,8 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
-import net.sf.freecol.common.util.Utils;
 
 /**
  * Contains information on buildable types.
@@ -55,20 +52,6 @@ public abstract class BuildableType extends FreeColGameObjectType {
      * Stores the abilities required by this Type.
      */
     private final HashMap<String, Boolean> requiredAbilities = new HashMap<String, Boolean>();
-
-    public String getGoodsRequiredAsString() {
-        if (goodsRequired == null || goodsRequired.isEmpty()) {
-            return "";
-        } else {
-            ArrayList<String> result = new ArrayList<String>();
-            for (AbstractGoods goods : goodsRequired) {
-                result.add(Messages.message("model.goods.goodsAmount",
-                                            "%amount%", String.valueOf(goods.getAmount()),
-                                            "%goods%", goods.getType().getName()));
-            }
-            return Utils.join(", ", result);
-        }
-    }
 
     /**
      * Get the <code>GoodsRequired</code> value.

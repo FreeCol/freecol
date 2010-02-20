@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;
@@ -608,7 +609,7 @@ public final class InGameController extends Controller {
                 FoundingFather father
                     = RandomChoice.getWeightedRandom(getPseudoRandom(), rc);
                 randomFathers.add(father);
-                logMessage += ":" + father.getName();
+                logMessage += ":" + father.getNameKey();
             }
         }
         logger.info(logMessage);
@@ -697,7 +698,8 @@ public final class InGameController extends Controller {
                                 return;
                             }
                             monarchActionElement.setAttribute("amount", String.valueOf(newTax));
-                            monarchActionElement.setAttribute("goods", goods.getName());
+                            // TODO: don't use localized name
+                            monarchActionElement.setAttribute("goods", Messages.message(goods.getNameKey()));
                             monarchActionElement.setAttribute("force", String.valueOf(false));
                             try {
                                 nextPlayer.setTax(newTax); // to avoid cheating
@@ -1772,7 +1774,7 @@ public final class InGameController extends Controller {
         }
         if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
             throw new IllegalStateException("Unit " + unit.getName()
-                                            + " can not learn skill " + skill.getName()
+                                            + " can not learn skill " + skill
                                             + " at " + settlement.getName());
         }
 

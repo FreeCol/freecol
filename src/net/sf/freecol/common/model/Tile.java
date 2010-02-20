@@ -36,7 +36,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.Map.CircleIterator;
 import net.sf.freecol.common.model.Map.Direction;
@@ -234,21 +233,21 @@ public final class Tile extends FreeColGameObject implements Location, Named, Ow
      * 
      * @return The name as a <code>String</code>.
      */
-    public String getName() {
+    public String getNameKey() {
         if (isViewShared()) {
             if (isExplored()) {
-                return getType().getName();
+                return getType().getNameKey();
             } else {
-                return Messages.message("unexplored");
+                return "unexplored";
             }
         } else {
             Player player = getGame().getCurrentPlayer();
             if (player != null) {
                 PlayerExploredTile pet = playerExploredTiles.get(player);
                 if (pet != null && pet.isExplored()) {
-                    return getType().getName();
+                    return getType().getNameKey();
                 }
-                return Messages.message("unexplored");
+                return "unexplored";
             } else {
                 logger.warning("player == null");
                 return "";

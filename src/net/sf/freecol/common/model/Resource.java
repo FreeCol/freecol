@@ -93,18 +93,10 @@ public class Resource extends TileItem {
      */
     public String toString() {
         if (quantity > -1) {
-            return Integer.toString(quantity) + " " + getName();
+            return Integer.toString(quantity) + " " + getType().getId();
         } else {
-            return getName();
+            return getType().getId();
         }
-    }
-
-    /**
-     * Returns the name of this <code>Resource</code>.
-     * @return The name of this Resource.
-     */
-    public String getName() {
-        return getType().getName();
     }
 
     public String getNameKey() {
@@ -117,13 +109,6 @@ public class Resource extends TileItem {
      */
     public ResourceType getType() {
         return type;
-    }
-
-    /**
-     * Returns a <code>String</code> with the output of this Resource.
-     */
-    public String getOutputString() {
-        return type.getOutputString();
     }
 
     /**

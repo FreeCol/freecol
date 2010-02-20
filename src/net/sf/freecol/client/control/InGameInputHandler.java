@@ -53,8 +53,10 @@ import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
+import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Turn;
@@ -582,14 +584,14 @@ public final class InGameInputHandler extends InputHandler {
     private Element newConvert(Element element) {
         Tile tile = (Tile) getGame().getFreeColGameObject(element.getAttribute("colonyTile"));
         Colony colony = tile.getColony();
-        String nation = Specification.getSpecification().getNation(element.getAttribute("nation")).getName();
+        Nation nation = Specification.getSpecification().getNation(element.getAttribute("nation"));
         
         Element unitElement = (Element) element.getFirstChild();
         Unit convert = new Unit(getGame(), unitElement);
         tile.add(convert);
         ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                                 "model.colony.newConvert", convert)
-            .addName("%nation%", nation)
+            .add("%nation%", nation.getNameKey())
             .addName("%colony%", colony.getName());
 
         getFreeColClient().getMyPlayer().addModelMessage(message);
@@ -706,13 +708,14 @@ public final class InGameInputHandler extends InputHandler {
                                                               "%colony%", colony.getName(),
                                                               "%amount%", String.valueOf(goods.getAmount())).confirm();
                 } else {
-                    accepted = new ShowConfirmDialogSwingTask(colony.getTile(),
-                                                              "indianDemand.other.text", "indianDemand.other.yes",
-                                                              "indianDemand.other.no",
-                                                              "%nation%", Messages.message(unit.getOwner().getNationName()),
-                                                              "%colony%", colony.getName(),
-                                                              "%amount%", String.valueOf(goods.getAmount()),
-                                                              "%goods%", goods.getName()).confirm();
+                    accepted =
+                        new ShowConfirmDialogSwingTask(colony.getTile(),
+                                                       Messages.message(StringTemplate.template("indianDemand.other.no")
+                                                                        .addStringTemplate("%nation%", unit.getOwner().getNationName())
+                                                                        .addName("%colony%", colony.getName())
+                                                                        .addAmount("%amount%", goods.getAmount())
+                                                                        .add("%goods%", goods.getNameKey())),
+                                                       "indianDemand.other.text", "indianDemand.other.yes").confirm();
                 }
                 break;
             case ClientOptions.INDIAN_DEMAND_RESPONSE_ACCEPT:

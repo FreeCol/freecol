@@ -257,7 +257,8 @@ public class DebugMenu extends JMenu {
                     List<ChoiceItem<FoundingFather>> fathers = new ArrayList<ChoiceItem<FoundingFather>>();
                     for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
                         if (!player.hasFather(father)) {
-                            fathers.add(new ChoiceItem<FoundingFather>(father.getName(), father));
+                            fathers.add(new ChoiceItem<FoundingFather>(Messages.message(father.getNameKey()),
+                                                                       father));
                         }
                     }
                     FoundingFather fatherToAdd = freeColClient.getCanvas()

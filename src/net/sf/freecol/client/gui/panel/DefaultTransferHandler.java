@@ -298,7 +298,8 @@ public final class DefaultTransferHandler extends TransferHandler {
                                 .getModifierSet("model.modifier.minimumColonySize");
                             for (Modifier modifier : modifierSet) {
                                 message += Messages.message("colonyPanel.minimumColonySize",
-                                                            "%object%", modifier.getSource().getName())
+                                                            "%object%",
+                                                            Messages.message(modifier.getSource().getNameKey()))
                                     + "\n";
                             }
                             canvas.showInformationMessage(message);

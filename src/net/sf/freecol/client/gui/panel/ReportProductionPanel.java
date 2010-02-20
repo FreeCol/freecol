@@ -70,7 +70,7 @@ public final class ReportProductionPanel extends ReportPanel {
         for (GoodsType goodsType : Specification.getSpecification().getGoodsTypeList()) {
             if (!goodsType.isFarmed()) {
                 goodsTypes.add(goodsType);
-                goodsNames.add(goodsType.getName());
+                goodsNames.add(Messages.message(goodsType.getNameKey()));
             }
         }
 
@@ -137,12 +137,12 @@ public final class ReportProductionPanel extends ReportPanel {
             reportPanel.add(newLabel, "newline 20");
 
             for (int index = 0; index < selectedTypes.size(); index++) {
-                newLabel = new JLabel(selectedTypes.get(index).getName());
+                newLabel = localizedLabel(selectedTypes.get(index).getNameKey());
                 newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
                 reportPanel.add(newLabel);
 
                 for (BuildingType buildingType : basicBuildingTypes.get(index)) {
-                    newLabel = new JLabel(buildingType.getName());
+                    newLabel = localizedLabel(buildingType.getNameKey());
                     newLabel.setBorder(FreeColPanel.TOPCELLBORDER);
                     reportPanel.add(newLabel);
                 }

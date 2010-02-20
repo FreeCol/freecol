@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Map.Direction;
-import net.sf.freecol.server.generator.River;
 
 import org.w3c.dom.Element;
 
@@ -36,7 +35,7 @@ import org.w3c.dom.Element;
 /**
  * Represents a tile improvement, such as a river or road.
  */
-public class TileImprovement extends TileItem {
+public class TileImprovement extends TileItem implements Named {
 
     private static Logger logger = Logger.getLogger(TileImprovement.class.getName());
 
@@ -166,6 +165,10 @@ public class TileImprovement extends TileItem {
         return getType().getId().equals("model.improvement.River");
     }
 
+    public String getNameKey() {
+        return getType().getNameKey();
+    }
+
     /**
      * Returns a textual representation of this object.
      * @return A <code>String</code> of either:
@@ -176,18 +179,10 @@ public class TileImprovement extends TileItem {
      */
     public String toString() {
         if (turnsToComplete > 0) {
-            return getName() + " (" + Integer.toString(turnsToComplete) + " turns left)";
+            return getType().getId() + " (" + Integer.toString(turnsToComplete) + " turns left)";
         } else {
-            return getName();
+            return getType().getId();
         }
-    }
-
-    /**
-     * Returns the name of this TileImprovement.
-     * @return The name of this TileImprovement.
-     */
-    public String getName() {
-        return getType().getName();
     }
 
     public String getOccupationString() {

@@ -91,7 +91,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
                     add(new JLabel(Messages.message("indianSettlement.skillUnknown")));
                 }
             } else {
-                add(new JLabel(skill.getName(), canvas.getImageIcon(skill, true), JLabel.CENTER));
+                add(new JLabel(Messages.message(skill.getNameKey()),
+                               canvas.getImageIcon(skill, true), JLabel.CENTER));
             }
         } else {
             add(new JLabel(Messages.message("indianSettlement.skillUnknown")));
@@ -102,7 +103,8 @@ public final class IndianSettlementPanel extends FreeColPanel {
         if (wantedGoods.length == 0 || wantedGoods[0] == null) {
             add(new JLabel(Messages.message("indianSettlement.wantedGoodsUnknown")));
         } else {
-            add(new JLabel(wantedGoods[0].getName(), canvas.getImageIcon(wantedGoods[0], false),
+            add(new JLabel(Messages.message(wantedGoods[0].getNameKey()),
+                           canvas.getImageIcon(wantedGoods[0], false),
                            JLabel.CENTER));
         }
 
@@ -114,12 +116,13 @@ public final class IndianSettlementPanel extends FreeColPanel {
             for (i = 2; i < wantedGoods.length; i++) {
                 if (wantedGoods[i] != null) n++;
             }
-            add(new JLabel(wantedGoods[1].getName(), canvas.getImageIcon(wantedGoods[1], false),
+            add(new JLabel(Messages.message(wantedGoods[1].getNameKey()),
+                           canvas.getImageIcon(wantedGoods[1], false),
                            JLabel.CENTER),
                 "split " + Integer.toString(n));
             for (i = 2; i < wantedGoods.length; i++) {
                 if (wantedGoods[i] != null) {
-                    add(new JLabel(wantedGoods[i].getName(),
+                    add(new JLabel(Messages.message(wantedGoods[i].getNameKey()),
                                    canvas.getImageIcon(wantedGoods[i], false),
                                    JLabel.CENTER));
                 }

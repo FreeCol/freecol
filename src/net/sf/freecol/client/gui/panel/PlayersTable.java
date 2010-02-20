@@ -230,7 +230,7 @@ public final class PlayersTable extends JTable {
                                                        boolean hasFocus, int row, int column) {
 
             Nation nation = (Nation) value;
-            setText(nation.getName());
+            setText(Messages.message(nation.getNameKey()));
             setIcon(library.getScaledImageIcon(library.getCoatOfArmsImageIcon(nation), 0.5f));
             return this;
         }

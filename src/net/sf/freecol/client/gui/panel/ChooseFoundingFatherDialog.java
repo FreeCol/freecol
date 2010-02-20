@@ -233,8 +233,8 @@ public final class ChooseFoundingFatherDialog extends FreeColDialog<FoundingFath
             this.foundingFather = father;
 
             if (father != null) {
-                header.setText(father.getName());
-                description.setText(father.getDescription());
+                header.setText(Messages.message(father.getNameKey()));
+                description.setText(Messages.message(father.getDescriptionKey()));
                 text.setText("\n" + "[" + father.getBirthAndDeath() + "] "
                         + father.getText());
                 ok.setActionCommand(father.getId());

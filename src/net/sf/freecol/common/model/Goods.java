@@ -19,7 +19,6 @@
 
 package net.sf.freecol.common.model;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -27,7 +26,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -146,22 +144,7 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
     }
 
     public static String toString(GoodsType goodsType, int amount) {
-        return Messages.message("model.goods.goodsAmount",
-                                "%goods%", goodsType.getName(),
-                                "%amount%", String.valueOf(amount));
-    }
-
-    public String getNameKey() {
-        return getType().getNameKey();
-    }
-
-    /**
-     * Returns the name of this type of goods.
-     *
-     * @return The name of this type of goods.
-     */
-    public String getName() {
-        return getType().getName();
+        return Integer.toString(amount) + " " + goodsType.getId();
     }
 
     /**
@@ -170,8 +153,10 @@ public class Goods extends AbstractGoods implements Locatable, Ownable, Named {
      * @param sellable Whether this type of goods is sellable;
      * @return The name of this type of goods.
      */
-    public String getName(boolean sellable) {
-        return getType().getName(sellable);
+    public StringTemplate getLabel(boolean sellable) {
+        return StringTemplate.template("model.goods.goodsAmount")
+            .addAmount("%amount%", getAmount())
+            .addStringTemplate("%goods%", getType().getLabel(sellable));
     }
 
     /**

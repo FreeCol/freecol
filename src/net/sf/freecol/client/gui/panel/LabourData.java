@@ -305,7 +305,7 @@ public class LabourData {
             if (isSummary()) {
                 return null;
             }
-            return Messages.message(unitType.getName());
+            return Messages.message(unitType.getNameKey());
         }
 
         public boolean hasDetails() {

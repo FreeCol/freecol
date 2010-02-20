@@ -145,7 +145,7 @@ public class GoodsContainer extends FreeColGameObject {
 
         if (newAmount < 0) {
             throw new IllegalStateException("Operation would leave " + (newAmount) + " goods of type " 
-                                            + type.getName() + " in Location " + parent);
+                                            + type.getNameKey() + " in Location " + parent);
         } else if (newAmount == 0) {
             storedGoods.remove(type);
         } else {
@@ -553,7 +553,7 @@ public class GoodsContainer extends FreeColGameObject {
         StringBuffer sb = new StringBuffer(200);
         sb.append("GoodsContainer with: ");
         for (Map.Entry<GoodsType, Integer> entry : storedGoods.entrySet()) {
-            sb.append(entry.getKey().getName() + "=" + entry.getValue() + ", ");
+            sb.append(entry.getKey() + "=" + entry.getValue() + ", ");
         }
         return sb.toString();
     }

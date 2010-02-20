@@ -267,8 +267,8 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                                     this, colony)
                                    .addName("%colony%", colony.getName())
                                    .addAmount("%number%", limit)
-                                   .addName("%oldUnit%", entry.getKey().getName())
-                                   .addName("%unit%", upgrades.get(entry.getKey()).getName()));
+                                   .add("%oldUnit%", entry.getKey().getNameKey())
+                                   .add("%unit%", upgrades.get(entry.getKey()).getNameKey()));
                     }
                 }
             }

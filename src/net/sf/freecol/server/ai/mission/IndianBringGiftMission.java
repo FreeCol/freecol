@@ -286,7 +286,7 @@ public class IndianBringGiftMission extends Mission {
             return "[" + target.getName() + "] Getting gift: "
                     + getUnit().getIndianSettlement().getTile().getPosition();
         } else {
-            return "[" + target.getName() + "] " + getUnit().getGoodsIterator().next().getName();
+            return "[" + target.getName() + "] " + getUnit().getGoodsIterator().next().getNameKey();
         }
     }
 }

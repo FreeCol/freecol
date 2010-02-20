@@ -401,9 +401,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             new HashMap<BuildingType, DefaultMutableTreeNode>();
         for (BuildingType buildingType : Specification.getSpecification().getBuildingTypeList()) {
             if (buildingType.getUpgradesFrom() == null) {
+                String name = Messages.message(buildingType.getNameKey());
                 DefaultMutableTreeNode item =
                     new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
-                                                                     buildingType.getName(),
+                                                                     name,
                                                                      buildingIcon));
                 buildingHash.put(buildingType, item);
                 parent.add(item);
@@ -417,9 +418,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                 BuildingType buildingType = iterator.next();
                 DefaultMutableTreeNode node = buildingHash.get(buildingType.getUpgradesFrom());
                 if (node != null) {
+                    String name = Messages.message(buildingType.getNameKey());
                     DefaultMutableTreeNode item =
                         new DefaultMutableTreeNode(new ColopediaTreeItem(buildingType, 
-                                                                         buildingType.getName(),
+                                                                         name,
                                                                          buildingIcon));
                     node.add(item);
                     buildingHash.put(buildingType, item);
@@ -489,8 +491,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildTerrainItem(TileType tileType, DefaultMutableTreeNode parent) {
         ImageIcon icon = new ImageIcon(getLibrary().getScaledTerrainImage(tileType, 0.25f));
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(tileType, 
-                                                                                       tileType.getName(), icon));
+        String name = Messages.message(tileType.getNameKey());
+        DefaultMutableTreeNode item =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(tileType, name, icon));
         parent.add(item);
     }
     
@@ -502,9 +505,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildResourceItem(ResourceType resType, DefaultMutableTreeNode parent) {
         ImageIcon icon = getLibrary().getScaledBonusImageIcon(resType, 0.75f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(resType,
-                                                                                       resType.getName(),
-                                                                                       icon));
+        String name = Messages.message(resType.getNameKey());
+        DefaultMutableTreeNode item =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(resType, name, icon));
         parent.add(item);
     }
     
@@ -517,8 +520,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildUnitItem(UnitType unitType, float scale, DefaultMutableTreeNode parent) {
         ImageIcon icon = getLibrary().getScaledImageIcon(getLibrary().getUnitImageIcon(unitType), 0.5f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(unitType,
-                                                                                       unitType.getName(), icon));
+        String name = Messages.message(unitType.getNameKey());
+        DefaultMutableTreeNode item =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(unitType, name, icon));
         parent.add(item);
     }
     
@@ -530,8 +534,9 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      */
     private void buildGoodsItem(GoodsType goodsType, DefaultMutableTreeNode parent) {
         ImageIcon icon = getLibrary().getScaledGoodsImageIcon(goodsType, 0.75f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType,
-                                                                                       goodsType.getName(), icon));
+        String name = Messages.message(goodsType.getNameKey());
+        DefaultMutableTreeNode item =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(goodsType, name, icon));
         parent.add(item);
     }
     
@@ -542,10 +547,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildFatherItem(FoundingFather foundingFather, DefaultMutableTreeNode parent) {
-        String name = foundingFather.getName();
+        String name = Messages.message(foundingFather.getNameKey());
         ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather,
-                                                                                       name, icon));
+        DefaultMutableTreeNode item =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(foundingFather, name, icon));
         parent.add(item);
     }
 
@@ -556,10 +561,10 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildNationItem(Nation nation, DefaultMutableTreeNode parent) {
-        String name = nation.getName();
+        String name = Messages.message(nation.getNameKey());
         ImageIcon icon = getLibrary().getScaledImageIcon(getLibrary().getCoatOfArmsImageIcon(nation), 0.5f);
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(nation,
-                                                                                       name, icon));
+        DefaultMutableTreeNode item =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(nation, name, icon));
         parent.add(item);
     }
 
@@ -570,16 +575,16 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
      * @param parent
      */
     private void buildNationTypeItem(NationType nationType, DefaultMutableTreeNode parent) {
-        String name = nationType.getName();
+        String name = Messages.message(nationType.getNameKey());
         //ImageIcon icon = getLibrary().getCoatOfArmsImageIcon(nation);
         ImageIcon icon = new ImageIcon(ResourceManager.getImage("model.goods.bells.image", 0.75f));
-        DefaultMutableTreeNode item = new DefaultMutableTreeNode(new ColopediaTreeItem(nationType,
-                                                                                       name, icon));
+        DefaultMutableTreeNode item =
+            new DefaultMutableTreeNode(new ColopediaTreeItem(nationType, name, icon));
         parent.add(item);
     }
 
     private JButton getButton(FreeColGameObjectType type, String text, ImageIcon icon) {
-        JButton button = getLinkButton(text == null ? type.getName() : text, icon, type.getId());
+        JButton button = getLinkButton(text == null ? Messages.message(type.getNameKey()) : text, icon, type.getId());
         button.addActionListener(this);
         return button;
     }
@@ -638,7 +643,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             defenseBonus = getModifierAsString(defenceModifiers.iterator().next());
         }
 
-        JLabel nameLabel = new JLabel(tileType.getName());
+        JLabel nameLabel = localizedLabel(tileType.getNameKey());
         nameLabel.setFont(smallHeaderFont);
         detailPanel.add(nameLabel, "span, align center");
 
@@ -687,7 +692,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         detailPanel.add(new JLabel(Messages.message("colopedia.terrain.description")));
-        detailPanel.add(getDefaultTextArea(tileType.getDescription(), 20), "span, growx");
+        detailPanel.add(getDefaultTextArea(Messages.message(tileType.getDescriptionKey()), 20),
+                        "span, growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -708,7 +714,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
-        JLabel name = new JLabel(type.getName());
+        JLabel name = localizedLabel(type.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
@@ -725,7 +731,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
                     if (scope.getType() != null) {
                         FreeColGameObjectType objectType = Specification.getSpecification()
                             .getType(scope.getType());
-                        scopeStrings.add(objectType.getName());
+                        scopeStrings.add(Messages.message(objectType.getNameKey()));
                     }
                 }
                 if (!scopeStrings.isEmpty()) {
@@ -740,7 +746,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         detailPanel.add(goodsPanel);
 
         detailPanel.add(new JLabel(Messages.message("colopedia.resource.description")), "newline 20");
-        detailPanel.add(getDefaultTextArea(type.getDescription(), 20), "growx");
+        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -761,7 +767,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
-        JLabel name = new JLabel(type.getName());
+        JLabel name = localizedLabel(type.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
@@ -869,7 +875,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.add(new JLabel(Messages.message("colopedia.unit.description")),
                         "newline 20");
-        detailPanel.add(getDefaultTextArea(type.getDescription(), 20), "growx");
+        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -890,7 +896,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gap 20", "", ""));
 
-        JLabel name = new JLabel(type.getName());
+        JLabel name = localizedLabel(type.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
@@ -913,14 +919,14 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
             if (improvements.size() == 0) {
                 detailPanel.add(new JLabel(none));
             } else if (improvements.size() == 1) {
-                detailPanel.add(new JLabel(improvements.get(0).getName() + " (" +
+                detailPanel.add(new JLabel(Messages.message(improvements.get(0).getNameKey()) + " (" +
                                            getModifierAsString(modifiers.get(0)) + ")"));
             } else {
-                detailPanel.add(new JLabel(improvements.get(0).getName() + " (" +
+                detailPanel.add(new JLabel(Messages.message(improvements.get(0).getNameKey()) + " (" +
                                            getModifierAsString(modifiers.get(0)) + ")"),
                                 "flowy, split " + improvements.size());
                 for (int index = 1; index < improvements.size(); index++) {
-                    detailPanel.add(new JLabel(improvements.get(index).getName() + " (" +
+                    detailPanel.add(new JLabel(Messages.message(improvements.get(index).getNameKey()) + " (" +
                                                getModifierAsString(modifiers.get(index)) + ")"));
                 }
             }
@@ -941,7 +947,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
 
         detailPanel.add(new JLabel(Messages.message("colopedia.goods.description")));
-        detailPanel.add(getDefaultTextArea(type.getDescription(), 20), "growx");
+        detailPanel.add(getDefaultTextArea(Messages.message(type.getDescriptionKey()), 20), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -977,7 +983,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
-        JLabel name = new JLabel(buildingType.getName());
+        JLabel name = localizedLabel(buildingType.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
@@ -1096,7 +1102,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         // Notes
         detailPanel.add(new JLabel(Messages.message("colopedia.buildings.notes")), "newline 20, top");
-        detailPanel.add(getDefaultTextArea(buildingType.getDescription(), 20), "growx");
+        detailPanel.add(getDefaultTextArea(Messages.message(buildingType.getDescriptionKey()), 20), "growx");
 
         detailPanel.revalidate();
         detailPanel.repaint();
@@ -1117,7 +1123,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.setLayout(new MigLayout("wrap 2, fillx, gapx 20", "", ""));
 
-        JLabel name = new JLabel(father.getName() + " (" + father.getTypeAsString() + ")");
+        JLabel name = new JLabel(Messages.message(father.getNameKey())
+                                 + " (" + father.getTypeAsString() + ")");
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
@@ -1131,7 +1138,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         }
         detailPanel.add(imageLabel, "top");
 
-        String text = Messages.message(father.getDescription()) + "\n\n" + "["
+        String text = Messages.message(father.getDescriptionKey()) + "\n\n" + "["
                 + Messages.message(father.getBirthAndDeath()) + "] "
                 + Messages.message(father.getText());
         JTextArea description = getDefaultTextArea(text, 20);
@@ -1163,7 +1170,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.setLayout(new MigLayout("wrap 3, fillx, gapx 20", "", ""));
 
-        JLabel name = new JLabel(nation.getName());
+        JLabel name = localizedLabel(nation.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
@@ -1215,7 +1222,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
-        JLabel name = new JLabel(nationType.getName());
+        JLabel name = localizedLabel(nationType.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 
@@ -1278,7 +1285,7 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
 
         detailPanel.setLayout(new MigLayout("wrap 2, gapx 20", "", ""));
 
-        JLabel name = new JLabel(nationType.getName());
+        JLabel name = localizedLabel(nationType.getNameKey());
         name.setFont(smallHeaderFont);
         detailPanel.add(name, "span, align center, wrap 40");
 

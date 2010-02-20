@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.Player;
@@ -166,11 +167,11 @@ public final class MarketLabel extends JLabel implements ActionListener {
     public void paintComponent(Graphics g) {
 
         Player player = market.getGame().getViewOwner();
-        String toolTipText = type.getName();
+        String toolTipText = Messages.message(type.getNameKey());
         if (player == null || player.canTrade(type)) {
             setEnabled(true);
         } else {
-            toolTipText = type.getName(false);
+            toolTipText = Messages.message(type.getLabel(false));
             setEnabled(false);
         }
         if (FreeCol.isInDebugMode()) {

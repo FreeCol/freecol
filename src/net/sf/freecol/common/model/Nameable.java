@@ -23,8 +23,14 @@ package net.sf.freecol.common.model;
 /**
  * An object with a name that can be changed.
  */
-public interface Nameable extends Named {
+public interface Nameable {
 
+
+    /**
+    * Gets the name of this <code>Named</code>.
+    * @return The name of the <code>Named</code>.
+    */
+    public String getName();
 
     /**
     * Sets the name for this <code>Nameable</code>.

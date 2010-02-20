@@ -107,7 +107,7 @@ public class WorkProductionPanel extends FreeColPanel {
             if (colony.getProductionBonus() != 0) {
                 modifiers.add(colony.getProductionModifier(goodsType));
             }
-            add(new JLabel(building.getName()), "span, align center, wrap 30");
+            add(localizedLabel(building.getNameKey()), "span, align center, wrap 30");
 
             add(new JLabel(ResourceManager.getImageIcon(building.getType().getId() + ".image")));
         }
@@ -121,11 +121,11 @@ public class WorkProductionPanel extends FreeColPanel {
             if (source == null) {
                 sourceName = "???";
             } else {
-                sourceName = source.getName();
+                sourceName = Messages.message(source.getNameKey());
                 if (unitType != null && modifier.hasScope()) {
                     for (Scope scope : modifier.getScopes()) {
                         if (scope.appliesTo(unitType)) {
-                            sourceName += " (" + unitType.getName() + ")";
+                            sourceName += " (" + Messages.message(unitType.getNameKey()) + ")";
                         }
                     }
                 }

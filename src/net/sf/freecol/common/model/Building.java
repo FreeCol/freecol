@@ -21,7 +21,6 @@ package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -32,14 +31,13 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
 /**
  * Represents a building in a colony.
  */
-public final class Building extends FreeColGameObject implements WorkLocation, Ownable, Named,
+public final class Building extends FreeColGameObject implements WorkLocation, Ownable, //Named,
                                                                  Comparable<Building> {
 
     private static Logger logger = Logger.getLogger(Building.class.getName());
@@ -140,15 +138,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         return colony.getTile();
     }
 
-    /**
-     * Gets the name of a building.
-     * 
-     * @return The name of the <code>Building</code>
-     */
-    public String getName() {
-        return buildingType.getName();
-    }
-
     public String getNameKey() {
         return buildingType.getNameKey();
     }
@@ -169,7 +158,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public StringTemplate getLocationName() {
         return StringTemplate.template("inLocation")
-            .addName("%location%", getName());
+            .add("%location%", getNameKey());
     }
 
     /**
@@ -179,9 +168,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The name of the improved building or <code>null</code> if the
      *         improvement does not exist.
      */
-    public String getNextName() {
+    public String getNextNameKey() {
         final BuildingType next = buildingType.getUpgradesTo();
-        return next == null ? null : next.getName();
+        return next == null ? null : next.getNameKey();
     }
 
     /**
@@ -333,7 +322,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      */
     public void add(final Locatable locatable) {
         if (!canAdd(locatable)) {
-            throw new IllegalStateException("Cannot add " + locatable + " to " + getName());
+            throw new IllegalStateException("Cannot add " + locatable + " to " + toString());
         } else if (!units.contains(locatable)) {
             if (units.equals(Collections.emptyList())) {
                 units = new ArrayList<Unit>();
@@ -1122,7 +1111,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
      * @return The name of the building.
      */
     public String toString() {
-        return getName();
+        return getType().getId() + " [" + colony.getName() + "]";
     }
 
     /**

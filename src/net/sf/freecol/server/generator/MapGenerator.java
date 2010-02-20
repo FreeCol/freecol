@@ -345,7 +345,7 @@ public class MapGenerator implements IMapGenerator {
                 }
                 if (territory == null) {
                     logger.warning("Failed to allocate preferred region " + regionNames.get(0) +
-                                   " for " + player.getNation().getName());
+                                   " for " + player.getNation());
                     outer: for (String name : regionNames) {
                         Territory otherTerritory = territoryMap.get(name);
                         for (String otherName : ((IndianNationType) otherTerritory.player.getNationType())
@@ -538,7 +538,7 @@ public class MapGenerator implements IMapGenerator {
                                  generateSkillForLocation(map, tile, player.getNationType()),
                                  new HashSet<Player>(), null);
         SettlementType kind = settlement.getTypeOfSettlement();
-        logger.fine("Generated skill: " + settlement.getLearnableSkill().getName());
+        logger.fine("Generated skill: " + settlement.getLearnableSkill());
 
         int unitCount = settlement.getGeneratedUnitCount();
         for (int i = 0; i < unitCount; i++) {

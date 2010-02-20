@@ -521,7 +521,7 @@ public final class Canvas extends JDesktopPane {
             try {
                 image = imageLibrary.getGoodsImage(goodsType);
             } catch (Exception e) {
-                logger.warning("could not find image for goods " + goodsType.getName());
+                logger.warning("could not find image for goods " + goodsType);
             }
         } else if (display instanceof Unit) {
             Unit unit = (Unit) display;
@@ -535,7 +535,7 @@ public final class Canvas extends JDesktopPane {
             try {
                 image = imageLibrary.getUnitImageIcon(unitType).getImage();
             } catch (Exception e) {
-                logger.warning("could not find image for unit " + unitType.getName());
+                logger.warning("could not find image for unit " + unitType);
             }
         } else if (display instanceof Settlement) {
             Settlement settlement = (Settlement) display;
@@ -648,6 +648,16 @@ public final class Canvas extends JDesktopPane {
                                                                    cancelText),
                                  tile);
     }
+
+    public boolean showConfirmDialog(Tile tile, StringTemplate template,
+                                     String okKey, String cancelKey) {
+        String text = Messages.message(template);
+        String okText = Messages.message(okKey);
+        String cancelText = Messages.message(cancelKey);
+        return showFreeColDialog(FreeColDialog.createConfirmDialog(text, okText, cancelText),
+                                 tile);
+    }
+
 
     /**
      * Displays a dialog with a text and a ok/cancel option.
@@ -1931,7 +1941,7 @@ public final class Canvas extends JDesktopPane {
                 BoycottAction.DUMP_CARGO));
         BoycottAction result = showChoiceDialog(null,
                 Messages.message("boycottedGoods.text",
-                                 "%goods%", goods.getName(),
+                                 "%goods%", Messages.message(goods.getNameKey()),
                                  "%europe%", europe.getName(),
                                  "%amount%", String.valueOf(arrears)),
                 Messages.message("cancel"),
@@ -1958,16 +1968,16 @@ public final class Canvas extends JDesktopPane {
                                      .addAmount("%number%", number)));
         text.append(" ");
         if (settlement.getLearnableSkill() != null) {
-            text.append(Messages.message("scoutSettlement.skill", "%skill%",
-                                         settlement.getLearnableSkill().getName()));
+            text.append(Messages.message(StringTemplate.template("scoutSettlement.skill")
+                                         .add("%skill%", settlement.getLearnableSkill().getNameKey())));
             text.append(" ");
         }
         GoodsType[] wantedGoods = settlement.getWantedGoods();
         if (wantedGoods[0] != null) {
-            text.append(Messages.message("scoutSettlement.trade",
-                                         "%goods1%", wantedGoods[0].getName(),
-                                         "%goods2%", wantedGoods[1].getName(),
-                                         "%goods3%", wantedGoods[2].getName()));
+            text.append(Messages.message(StringTemplate.template("scoutSettlement.trade")
+                                         .add("%goods1%", wantedGoods[0].getNameKey())
+                                         .add("%goods2%", wantedGoods[1].getNameKey())
+                                         .add("%goods3%", wantedGoods[2].getNameKey())));
             text.append("\n\n");
         }
 
@@ -2308,7 +2318,7 @@ public final class Canvas extends JDesktopPane {
                 SellAction.HAGGLE));
         choices.add(new ChoiceItem<SellAction>(
                 Messages.message("sell.gift",
-                                 "%goods%", goods.getName()),
+                                 "%goods%", Messages.message(goods.getNameKey())),
                 SellAction.GIFT));
         SellAction result =
             showChoiceDialog(unit.getTile(),

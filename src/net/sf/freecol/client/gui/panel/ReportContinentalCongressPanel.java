@@ -75,10 +75,10 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
             reportPanel.add(new JLabel(none), "wrap 20");
         } else {
             FoundingFather father = player.getCurrentFather();
-            JLabel currentFatherLabel = new JLabel(father.getName(),
+            JLabel currentFatherLabel = new JLabel(Messages.message(father.getNameKey()),
                                                    new ImageIcon(getLibrary().getFoundingFatherImage(father)),
                                                    JLabel.CENTER);
-            currentFatherLabel.setToolTipText(father.getDescription());
+            currentFatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
             currentFatherLabel.setVerticalTextPosition(JLabel.TOP);
             currentFatherLabel.setHorizontalTextPosition(JLabel.CENTER);
             reportPanel.add(currentFatherLabel);
@@ -98,12 +98,12 @@ public final class ReportContinentalCongressPanel extends ReportPanel {
         if (player.getFatherCount() > 0) {
             for (FoundingFather father : FreeCol.getSpecification().getFoundingFathers()) {
                 if (player.hasFather(father)) {
-                    JLabel fatherLabel = new JLabel(father.getName(),
+                    JLabel fatherLabel = new JLabel(Messages.message(father.getNameKey()),
                                                    new ImageIcon(getLibrary().getFoundingFatherImage(father)),
                                                    JLabel.CENTER);
                     fatherLabel.setVerticalTextPosition(JLabel.TOP);
                     fatherLabel.setHorizontalTextPosition(JLabel.CENTER);
-                    fatherLabel.setToolTipText(Messages.message(father.getDescription()));
+                    fatherLabel.setToolTipText(Messages.message(father.getDescriptionKey()));
                     reportPanel.add(fatherLabel);
                 }
             }
