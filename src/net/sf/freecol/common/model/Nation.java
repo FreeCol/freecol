@@ -24,7 +24,6 @@ import java.awt.Color;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 
 /**
@@ -126,8 +125,8 @@ public class Nation extends FreeColGameObjectType {
      *
      * @return a <code>String</code> value
      */
-    public final String getRulerName() {
-        return Messages.message(getId() + ".ruler");
+    public final String getRulerNameKey() {
+        return getId() + ".ruler";
     }
 
     /**

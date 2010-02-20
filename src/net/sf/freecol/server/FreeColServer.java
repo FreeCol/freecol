@@ -1192,7 +1192,7 @@ public final class FreeColServer {
      * @return a <code>ServerPlayer</code> value
      */
     public ServerPlayer addAIPlayer(Nation nation) {
-        String name = nation.getRulerName();
+        String name = nation.getRulerNameKey();
         DummyConnection theConnection = 
             new DummyConnection("Server connection - " + name, getInGameInputHandler());
         ServerPlayer aiPlayer = 

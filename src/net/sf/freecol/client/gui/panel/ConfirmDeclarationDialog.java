@@ -81,7 +81,7 @@ public class ConfirmDeclarationDialog extends FreeColDialog<List<String>> {
 
         add(getDefaultTextArea(Messages.message("declareIndependence.areYouSure.text",
                                                 "%monarch%",
-                                                getMyPlayer().getMonarch().getName())));
+                                                Messages.message(getMyPlayer().getMonarch().getNameKey()))));
         add(getDefaultTextArea(Messages.message("declareIndependence.enterCountry")));
         add(countryField);
         add(getDefaultTextArea(Messages.message("declareIndependence.enterNation")));

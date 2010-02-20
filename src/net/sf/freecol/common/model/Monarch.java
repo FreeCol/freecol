@@ -42,9 +42,9 @@ import org.w3c.dom.Element;
  * to the revolution include raising taxes, declaring war on other
  * European countries, and occasionally providing military support.
  */
-public final class Monarch extends FreeColGameObject {
+public final class Monarch extends FreeColGameObject implements Named {
 
-    /** The name of this monarch. */
+    /** The name key of this monarch. */
     private String name;
 
     /** The player of this monarch. */
@@ -181,7 +181,12 @@ public final class Monarch extends FreeColGameObject {
     }
 
 
-    public String getName() {
+    /**
+     * Return the name key of this Monarch.
+     *
+     * @return a <code>String</code> value
+     */
+    public String getNameKey() {
         return name;
     }
 
@@ -619,7 +624,7 @@ public final class Monarch extends FreeColGameObject {
         if (player == null) {
             player = new Player(getGame(), in.getAttributeValue(null, "player"));
         }
-        name = getAttribute(in, "name", player.getNation().getRulerName());
+        name = getAttribute(in, "name", player.getNation().getRulerNameKey());
         supportSea = Boolean.valueOf(in.getAttributeValue(null, "supportSea")).booleanValue();
 
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {

@@ -1179,8 +1179,8 @@ public final class ColopediaPanel extends FreeColPanel implements TreeSelectionL
         JLabel artLabel = new JLabel(getLibrary().getMonarchImageIcon(nation));
         detailPanel.add(artLabel, "spany, gap 40, top");
 
-        detailPanel.add(new JLabel(Messages.message("colopedia.nation.ruler")));
-        detailPanel.add(new JLabel(nation.getRulerName()));
+        detailPanel.add(localizedLabel("colopedia.nation.ruler"));
+        detailPanel.add(localizedLabel(nation.getRulerNameKey()));
 
         detailPanel.add(new JLabel(Messages.message("colopedia.nation.defaultAdvantage")));
         detailPanel.add(getButton(nation.getType()));

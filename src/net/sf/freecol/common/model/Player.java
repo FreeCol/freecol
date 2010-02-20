@@ -375,7 +375,7 @@ public class Player extends FreeColGameObject implements Nameable {
                 europe = new Europe(game, this);
                 if (!nationType.isREF()) {
                     // colonial nation
-                    monarch = new Monarch(game, this, newNation.getRulerName());
+                    monarch = new Monarch(game, this, newNation.getRulerNameKey());
                     playerType = PlayerType.COLONIAL;
                 } else {
                     // Royal expeditionary force
