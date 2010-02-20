@@ -29,7 +29,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
@@ -63,24 +62,6 @@ public class EuropeanNationType extends NationType {
      */
     public EuropeanNationType() {
         setTypeOfSettlement(SettlementType.SMALL_COLONY);
-    }
-
-    /**
-     * Returns the name of this Nation's Home Port.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getEuropeName() {
-        return Messages.message(getId() + ".europe");
-    }
-
-    /**
-     * Returns the name of this Nation's REF.
-     *
-     * @return a <code>String</code> value
-     */
-    public String getREFName() {
-        return Messages.message(getId() + ".ref");
     }
 
     /**
