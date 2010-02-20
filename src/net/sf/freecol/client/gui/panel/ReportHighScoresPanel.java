@@ -90,9 +90,9 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
                 reportPanel.add(new JLabel(Messages.message("report.highScores.nation")), "skip");
                 if (highScore.getIndependenceTurn() > 0) {
-                    reportPanel.add(new JLabel(String.valueOf(highScore.getNationName())));
+                    reportPanel.add(new JLabel(highScore.getNationName()));
                 } else {
-                    reportPanel.add(new JLabel(String.valueOf(highScore.getOldNationName())));
+                    reportPanel.add(new JLabel(Messages.message(highScore.getOldNationNameKey())));
                 }
 
                 reportPanel.add(new JLabel(Messages.message("report.highScores.nationType")), "skip");
