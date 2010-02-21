@@ -34,9 +34,12 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -1470,8 +1473,7 @@ public final class GUI {
                     if (!(settlement instanceof IndianSettlement)
                         ||(((IndianSettlement)settlement).hasBeenVisited(freeColClient.getMyPlayer()))) {
                         BufferedImage stringImage =
-                            createSettlementNameImage(g, settlement,
-                                                  lib.getTerrainImageWidth(tile.getType()) * 4/3, 16);
+                            createSettlementNameImage(g, settlement);
                         g.drawImage(stringImage, 
                                     xx + (lib.getTerrainImageWidth(tile.getType()) - 
                                           stringImage.getWidth())/2 + 1,
@@ -1643,13 +1645,13 @@ public final class GUI {
      * The class StringImageKey provide an identifier for looking up images
      */
     private class StringImageKey {
-        public Color color;
-        public Font font;
         public String text;
-        public StringImageKey(Color c, Font f, String t) {
-            this.color = c;
-            this.font = f;
+        public Font font;
+        public Color color;
+        public StringImageKey(String t, Font f, Color c) {
             this.text = t;
+            this.font = f;
+            this.color = c;
         }
         public int hashCode() {
             return text.hashCode();
@@ -1658,7 +1660,7 @@ public final class GUI {
             if (o==null || !(o instanceof StringImageKey))
                 return false;
             StringImageKey other = (StringImageKey) o;
-            return (other.color.equals(this.color)) && (other.font.equals(this.font)) && (other.text.equals(this.text));
+            return (other.text.equals(this.text)) && (other.font.equals(this.font)) && (other.color.equals(this.color));
         }
     }
     private HashMap<StringImageKey, BufferedImage> stringImageCache = new HashMap<StringImageKey, BufferedImage>();
@@ -1688,7 +1690,7 @@ public final class GUI {
 
         // Lookup in the cache if the image has been generated already
         Font nameFont = (c != null) ? c.getFont() : g.getFont();
-        StringImageKey key = new StringImageKey(color, nameFont, nameString);
+        StringImageKey key = new StringImageKey(nameString, nameFont, color);
         BufferedImage bi = stringImageCache.get(key);
         if (bi != null) {
             return bi;
@@ -1738,17 +1740,76 @@ public final class GUI {
         return bi;
     }
 
-    private BufferedImage createSettlementNameImage(Graphics g, Settlement settlement,
-                                                int maxWidth, int preferredFontSize) {        
-        Font oldFont = g.getFont();
-//      g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(Font.BOLD, 16));
-        g.setFont((Font)UIManager.get("BoldFont"));
-        BufferedImage result = createStringImage((Graphics2D) g,
+    /**
+     * Creates an image with a string of a given color and with 
+     * a black border around the glyphs.
+     *
+     * @param c A <code>JComponent</code>-object for getting a
+     *       <code>Font</code>.
+     * @param g A <code>Graphics</code>-object for getting a
+     *       <code>Font</code>.
+     * @param text The <code>String</code> to make an image of.
+     * @param font The font with which to render.
+     * @param color The <code>Color</code> to use when displaying 
+     *       the <code>text</code>.
+     * @return The image that was created.
+     */
+    private BufferedImage createStringImage(JComponent c, Graphics g, String text, Font font, Color color) {
+        if (color == null) {
+            logger.warning("createStringImage called with color null");
+            color = Color.WHITE;
+        }
+
+        // Lookup in the cache if the image has been generated already
+        StringImageKey key = new StringImageKey(text, font, color);
+        BufferedImage bi = stringImageCache.get(key);
+        if (bi != null) {
+            return bi;
+        }
+
+        // create an image of the appropriate size
+        FontRenderContext context = new FontRenderContext(null, true, true);
+        GlyphVector glyphs = font.createGlyphVector(context, text);
+        FontMetrics metrics = (c != null) ? c.getFontMetrics(font) : g.getFontMetrics(font);
+        Rectangle bounds = glyphs.getPixelBounds(context, 3.0f, (float)metrics.getMaxAscent());
+        bi = new BufferedImage(bounds.width + 6, metrics.getMaxAscent() + 6, BufferedImage.TYPE_INT_ARGB);
+
+        // set up the graphics
+        Color outlineColor = getStringBorderColor(color);
+        Graphics2D g2d = bi.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+
+        // draw the string
+        Shape textShape = glyphs.getOutline(3, metrics.getMaxAscent());
+//        g2d.setColor(Color.PINK);
+//        g2d.fillRect(-1000,-1000,2000,2000);
+//        g2d.setColor(Color.CYAN);
+//        g2d.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+        g2d.setStroke(new BasicStroke(2.0f));
+        g2d.setColor(outlineColor);
+        g2d.draw(textShape);
+        g2d.setColor(color);
+        g2d.fill(textShape);
+
+        this.stringImageCache.put(key, bi);
+        return bi;
+    }
+
+    private BufferedImage createSettlementNameImage(Graphics g, Settlement settlement) {        
+//        Font oldFont = g.getFont();
+//        g.setFont(((Font)UIManager.get("NormalFont")).deriveFont(18.0f));
+//        BufferedImage result = createStringImage((Graphics2D) g,
+//                settlement.getName(),
+//                settlement.getOwner().getColor(),
+//                -1,
+//                18);
+        BufferedImage result = createStringImage(null, (Graphics2D) g,
                 settlement.getName(),
-                settlement.getOwner().getColor(),
-                maxWidth,
-                preferredFontSize);
-        g.setFont(oldFont);
+                ((Font)UIManager.get("BoldFont")).deriveFont(18.0f),
+                settlement.getOwner().getColor());
+//        g.setFont(oldFont);
         return result;
     }
 
@@ -2310,6 +2371,7 @@ public final class GUI {
                         break;
                         }
 
+                        g.setFont(new Font("Dialog", Font.BOLD, 12));
                         BufferedImage stringImage = createStringImage(g, populationString, theColor, lib.getTerrainImageWidth(tile.getType()), 12);
                         g.drawImage(stringImage, x + (lib.getTerrainImageWidth(tile.getType()) - stringImage.getWidth())/2 + 1, y + ((lib.getTerrainImageHeight(tile.getType()) - stringImage.getHeight()) / 2) + 1, null);
                     }

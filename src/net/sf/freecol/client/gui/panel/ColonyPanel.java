@@ -848,8 +848,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 aSingleBuildingPanel.addMouseListener(mouseAdapter);
                 add(aSingleBuildingPanel);
             }
-//            add(new BuildingSitePanel(colony, getCanvas()));
-
         }
 
         public void removePropertyChangeListeners() {
