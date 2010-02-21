@@ -57,44 +57,28 @@ class BaseCostDecider implements CostDecider {
             final int turns) {
         newTurn = false;
               
-        // Not allowed to use an unexplored tile.
-        if (!newTile.isExplored()) {
+        // Not allowed to use an unexplored or illegal tile for a path.
+        if (!newTile.isExplored()
+            || !unit.getSimpleMoveType(oldTile, newTile, true).isLegal()) {
             return ILLEGAL_MOVE;
         }
         
-        // Disallow illegal moves.
-        // Special moves and moving off a carrier consume a whole turn.
-        switch (unit.getSimpleMoveType(oldTile, newTile, true)) {
-        case MOVE_HIGH_SEAS:
-            break;
-        case MOVE: case EXPLORE_LOST_CITY_RUMOUR:
-            if (!(unit.getLocation() instanceof Unit)) break;
-            // fall through
-        case ATTACK:
-        case EMBARK:
-        case ENTER_INDIAN_SETTLEMENT_WITH_FREE_COLONIST:
-        case ENTER_INDIAN_SETTLEMENT_WITH_SCOUT:
-        case ENTER_INDIAN_SETTLEMENT_WITH_MISSIONARY:
-        case ENTER_FOREIGN_COLONY_WITH_SCOUT:
-        case ENTER_SETTLEMENT_WITH_CARRIER_AND_GOODS:
-            movesLeft = unit.getInitialMovesLeft();
-            newTurn = true;
-            return movesLeftBefore;
-        default:
-            return ILLEGAL_MOVE;
-        }
-
         int moveCost = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
         if (moveCost <= movesLeftBefore) {
             movesLeft = movesLeftBefore - moveCost;
-        } else { // This move takes an extra turn to complete:
+        } else {
+            // This move takes an extra turn to complete:
             final int thisTurnMovesLeft = movesLeftBefore;
-            int initialMoves = unit.getInitialMovesLeft();
-            final int moveCostNextTurn = unit.getMoveCost(oldTile, newTile,
-                                                          initialMoves);
+            movesLeftBefore = unit.getInitialMovesLeft();
+            final int moveCostNextTurn = unit.getMoveCost(oldTile, newTile, movesLeftBefore);
             moveCost = thisTurnMovesLeft + moveCostNextTurn;
-            movesLeft = initialMoves - moveCostNextTurn;
+            movesLeft = movesLeftBefore - moveCostNextTurn;
             newTurn = true;
+        }
+        
+        moveType = unit.getMoveType(oldTile, newTile, movesLeftBefore, true);
+        if (!moveType.isLegal()) {
+            return ILLEGAL_MOVE;
         }
         
         return moveCost;

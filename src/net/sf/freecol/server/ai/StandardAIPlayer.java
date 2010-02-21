@@ -941,6 +941,7 @@ public class StandardAIPlayer extends AIPlayer {
         Iterator<AIColony> ci = getAIColonyIterator();
         while (ci.hasNext()) {
             AIColony c = ci.next();
+            if (c.getColony().getOwner() != getPlayer()) continue;
             ArrayList<Tile> oldWorkTiles = new ArrayList<Tile>();
             for (ColonyTile colonyTile : c.getColony().getColonyTiles()) {
                 if (colonyTile.getUnit() != null) {
