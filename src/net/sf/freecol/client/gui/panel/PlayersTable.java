@@ -335,7 +335,12 @@ public final class PlayersTable extends JTable {
                 Nation nation = (Nation) table.getValueAt(row, NATION_COLUMN);
                 label.setText(Messages.message(nation.getRulerNameKey()));
             } else {
-                label.setText(player.getName());
+                // TODO: fix this kludge
+                if (player.getName().startsWith("model.nation.")) {
+                    label.setText(Messages.message(player.getName()));
+                } else {
+                    label.setText(player.getName());
+                }
             }
             return label;
         }
