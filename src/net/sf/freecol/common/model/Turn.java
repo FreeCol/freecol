@@ -151,7 +151,7 @@ public class Turn {
      */
     public static Season getSeason(int turn) {
         int c = turn - OFFSET;
-        if (c < 0) {
+        if (c <= 1) {
             return Season.YEAR;
         } else if (c % 2 == 0) {
             return Season.SPRING;
