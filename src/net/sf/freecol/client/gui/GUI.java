@@ -2710,6 +2710,7 @@ public final class GUI {
             } else {
                 occupationString = "model.unit.occupation." + unit.getState().toString().toLowerCase();
             }
+            occupationString = Messages.message(occupationString);
             if (unit.getState() == UnitState.FORTIFIED)
                 foregroundColor = Color.GRAY;
         }
