@@ -1644,19 +1644,21 @@ public final class GUI {
      */
     private class StringImageKey {
         public Color color;
-        public String name;
-        public StringImageKey(Color c, String s) {
+        public Font font;
+        public String text;
+        public StringImageKey(Color c, Font f, String t) {
             this.color = c;
-            this.name = s;
+            this.font = f;
+            this.text = t;
         }
         public int hashCode() {
-            return name.hashCode();
+            return text.hashCode();
         }
         public boolean equals(Object o) {
             if (o==null || !(o instanceof StringImageKey))
                 return false;
             StringImageKey other = (StringImageKey) o;
-            return (other.color.equals(this.color)) && (other.name.equals(this.name));
+            return (other.color.equals(this.color)) && (other.font.equals(this.font)) && (other.text.equals(this.text));
         }
     }
     private HashMap<StringImageKey, BufferedImage> stringImageCache = new HashMap<StringImageKey, BufferedImage>();
@@ -1683,16 +1685,17 @@ public final class GUI {
             logger.warning("createStringImage called with color null");
             color = Color.WHITE;
         }
+        
+        Font nameFont = (c != null) ? c.getFont() : g.getFont();
+        FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
+
         BufferedImage bi = null;
         // Lookup in the cache if the image has been generated already
-        StringImageKey key = new StringImageKey(color, nameString);
+        StringImageKey key = new StringImageKey(color, nameFont, nameString);
         bi = stringImageCache.get(key);
         if (bi!=null) {
             return bi;
         }
-        
-        Font nameFont = (c != null) ? c.getFont() : g.getFont();
-        FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
 
         // create an image of the appropriate size
         int fontSize = preferredFontSize;
