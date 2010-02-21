@@ -22,9 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
-
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -48,13 +46,7 @@ public class NationOptions extends FreeColObject{
      * Nations may be available to all players, to AI players only, or
      * to no players.
      */
-    public static enum NationState {
-        AVAILABLE, AI_ONLY, NOT_AVAILABLE;
-
-        public String getName() {
-            return Messages.message("nationState." + toString());
-        }            
-    };
+    public static enum NationState { AVAILABLE, AI_ONLY, NOT_AVAILABLE }
 
     /**
      * Describe selectColors here.

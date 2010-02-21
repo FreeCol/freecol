@@ -249,7 +249,7 @@ public final class PlayersTable extends JTable {
          */
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                        boolean hasFocus, int row, int column) {
-            setText(((NationState) value).getName());
+            setText(Messages.message("nationState." + ((NationState) value).toString()));
             return this;
         }
     }
@@ -257,7 +257,7 @@ public final class PlayersTable extends JTable {
     class NationStateRenderer extends JLabel implements ListCellRenderer {
         public Component getListCellRendererComponent(JList list, Object value, int index,
                                                       boolean isSelected, boolean cellHasFocus) {
-            setText(((NationState) value).getName());
+            setText(Messages.message("nationState." + ((NationState) value).toString()));
             return this;
         }
     }
