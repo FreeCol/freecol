@@ -214,26 +214,20 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         constructionPanel.setOpaque(false);
 
         outsideColonyPanel = new OutsideColonyPanel();
-//        outsideColonyPanel.setToolTipText(Messages.message("outsideColony"));
         outsideColonyPanel.setLayout(new GridLayout(0, 8));
 
         inPortPanel = new InPortPanel();
-//        inPortPanel.setToolTipText(Messages.message("inPort"));
         inPortPanel.setLayout(new GridLayout(0, 2));
 
         warehousePanel = new WarehousePanel(this);
-//        warehousePanel.setToolTipText(Messages.message("goods"));
         warehousePanel.setLayout(new GridLayout(1, 0));
 
         tilePanel = new TilePanel(this);
-//        tilePanel.setToolTipText(Messages.message("surroundingArea"));
 
         buildingsPanel = new BuildingsPanel(this);
-//        buildingsPanel.setToolTipText(Messages.message("buildings"));
 
         cargoPanel = new ColonyCargoPanel(parent);
         cargoPanel.setParentPanel(this);
-//        cargoPanel.setToolTipText(Messages.message("cargoOnCarrier"));
         cargoPanel.setLayout(new GridLayout(1, 0));
 
         defaultTransferHandler = new DefaultTransferHandler(parent, this);
@@ -317,9 +311,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(tilesScroll, "width 390!, height 200!, top");
         add(buildingsScroll, "span 1 3, grow 200");
         add(populationPanel, "grow");
-        add(constructionPanel, "grow");
-        add(inPortScroll, "split 2, grow");
-        add(cargoScroll, "grow");
+        add(constructionPanel, "growx, top");
+        add(inPortScroll, "split 2, grow, height 121!");
+        add(cargoScroll, "grow, height 121!");
         add(outsideColonyScroll, "grow, height 121!");
         add(warehouseScroll, "span, height 40:60:80, growx");
         add(unloadButton, "span, split 4, align center");
@@ -412,43 +406,21 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         warehouseButton.setEnabled(isEditable());
         nameBox.setEnabled(isEditable());
 
-        //
-        // Remove the old components from the panels.
-        //
-
+        // update all the subpanels
         cargoPanel.removeAll();
         warehousePanel.removeAll();
         tilePanel.removeAll();
 
-        //
-        // Carriers in the colony
-        //
-        
         inPortPanel.initialize(preSelectedUnit);
-        
-        //
-        // Warehouse panel:
-        //
-
         warehousePanel.initialize();
-
-        //
-        // Units in buildings:
-        //
-
         buildingsPanel.initialize();
-
-        //
-        // TilePanel:
-        //
-
         tilePanel.initialize();
 
         updateProductionPanel();
         updateSoLLabel();
 
+		constructionPanel.setColony(colony);
         outsideColonyPanel.setColony(colony);
-
     }
 
     /**

@@ -59,7 +59,7 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
 
     private final Canvas parent;
 
-    private final Colony colony;
+    private Colony colony;
 
     private BuildableType buildable;
 
@@ -69,10 +69,19 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
      * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
      */
-    public ConstructionPanel(final Canvas parent, final Colony colony) {
+    public ConstructionPanel(final Canvas parent, Colony colony) {
 
-        this.colony = colony;
         this.parent = parent;
+        setLayout(new MigLayout("fill", "push[]10[]push", "0[]0"));
+        setColony(colony);
+    }
+
+    public void setColony(Colony newColony) {
+
+        if (colony != null) {
+            colony.removePropertyChangeListener(this);
+        }
+        this.colony = newColony;
 
         // we are interested in changes to the build queue, as well as
         // changes to the warehouse and the colony's production bonus
@@ -83,12 +92,10 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
                     parent.showSubPanel(queuePanel);
                 }
             });
-
-        setLayout(new MigLayout("fill", "0[]0", "0[]0"));
         initialize();
     }
 
-    public void initialize() {
+    private void initialize() {
    
         removeAll();
 
