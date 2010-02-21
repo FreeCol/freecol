@@ -85,6 +85,7 @@ import net.sf.freecol.common.model.TileImprovementType;
 import net.sf.freecol.common.model.TileItemContainer;
 import net.sf.freecol.common.model.TradeRoute;
 import net.sf.freecol.common.model.TransactionListener;
+import net.sf.freecol.common.model.Turn;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.model.WorkLocation;
@@ -198,7 +199,7 @@ public final class InGameController implements NetworkConstants {
         Canvas canvas = freeColClient.getCanvas();
         Player player = freeColClient.getMyPlayer();
         String fileName = player.getName() + "_" + Messages.message(player.getNationName())
-            + "_" + freeColClient.getGame().getTurn().toSaveGameString();
+            + "_" + getSaveGameString(freeColClient.getGame().getTurn());
         fileName = fileName.replaceAll(" ", "_");
         if (freeColClient.canSaveCurrentGame()) {
             final File file = canvas.showSaveDialog(FreeCol.getSaveDirectory(), fileName);
@@ -346,7 +347,7 @@ public final class InGameController implements NetworkConstants {
             if (savegamePeriod <= 1
                 || (savegamePeriod != 0 && turnNumber % savegamePeriod == 0)) {
                 String filename = Messages.message("clientOptions.savegames.autosave.fileprefix")
-                    + '-' + game.getTurn().toSaveGameString() + ".fsg";
+                    + '-' + getSaveGameString(game.getTurn()) + ".fsg";
                 File saveGameFile = new File(FreeCol.getAutosaveDirectory(),
                                              filename);
                 saveGame(saveGameFile);
@@ -4753,4 +4754,26 @@ public final class InGameController implements NetworkConstants {
         StatisticsMessage m = new StatisticsMessage(reply);
         return m;
     }
+
+    /**
+     * Returns a string representation of the given turn suitable for
+     * savegame files.
+     * @param turn a <code>Turn</code> value
+     * @return A string with the format: "<i>[season] year</i>".
+     *         Examples: "1602_1_Spring", "1503"...
+     */
+    public String getSaveGameString(Turn turn) {
+        int year = turn.getYear();
+        switch (turn.getSeason()) {
+        case SPRING:
+            return Integer.toString(year) + "_1_" + Messages.message("spring");
+        case AUTUMN:
+            return Integer.toString(year) + "_2_" + Messages.message("autumn");
+        case YEAR:
+        default:
+            return Integer.toString(year);
+        }
+    }
+
+
 }

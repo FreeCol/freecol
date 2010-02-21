@@ -55,7 +55,7 @@ public final class ReportHistoryPanel extends ReportPanel {
         reportPanel.setLayout(new MigLayout("wrap 2", "[]20[fill]", ""));
 
         for (HistoryEvent event : history) {
-            reportPanel.add(new JLabel(Turn.toString(event.getTurn())));
+            reportPanel.add(new JLabel(Messages.message(Turn.getLabel(event.getTurn()))));
             reportPanel.add(getDefaultTextArea(event.toString(), 40));
         }
     }

@@ -102,6 +102,7 @@ import net.sf.freecol.client.gui.action.ZoomInAction;
 import net.sf.freecol.client.gui.action.ZoomOutAction;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.menu.DebugMenu;
+import net.sf.freecol.common.model.StringTemplate;
 
 /**
  * This is the menu bar used in-game.
@@ -363,11 +364,11 @@ public class InGameMenuBar extends FreeColMenuBar {
                                  RenderingHints.VALUE_RENDER_QUALITY);
 
             String displayString =
-                Messages.message("menuBar.statusLine",
-                                 "%gold%", Integer.toString(freeColClient.getMyPlayer().getGold()),
-                                 "%tax%", Integer.toString(freeColClient.getMyPlayer().getTax()),
-                                 "%score%", Integer.toString(freeColClient.getMyPlayer().getScore()),
-                                 "%year%", freeColClient.getGame().getTurn().toString());
+                Messages.message(StringTemplate.template("menuBar.statusLine")
+                                 .addAmount("%gold%", freeColClient.getMyPlayer().getGold())
+                                 .addAmount("%tax%", freeColClient.getMyPlayer().getTax())
+                                 .addAmount("%score%", freeColClient.getMyPlayer().getScore())
+                                 .addStringTemplate("%year%", freeColClient.getGame().getTurn().getLabel()));
             Rectangle2D displayStringBounds = g2d.getFontMetrics().getStringBounds(displayString, g);
             int y = 15 + getInsets().top;
             g2d.drawString(displayString, getWidth() - 10 - (int) displayStringBounds.getWidth(), y);

@@ -20,17 +20,21 @@
 
 package net.sf.freecol.common.model;
 
-import net.sf.freecol.client.gui.i18n.Messages;
-
-
 /**
  * Represents a given turn in the game.
  */
 public class Turn {
 
+    public static enum Season { YEAR, SPRING, AUTUMN }
+
     public static final int STARTING_YEAR = 1492;
     public static final int SEASON_YEAR = 1600;
+    private static final int OFFSET = SEASON_YEAR - STARTING_YEAR - 1;
 
+    /**
+     * The numerical value of the Turn, never less than one.
+     *
+     */
     private int turn;
 
     public Turn(int turn) {
@@ -88,10 +92,11 @@ public class Turn {
      * Checks if this turn is equal to another turn.
      */
     public boolean equals(Object o) {
-
-        if ( ! (o instanceof Turn) ) { return false; }
-
-        return turn == ((Turn) o).turn;
+        if (o instanceof Turn) {
+            return turn == ((Turn) o).turn;
+        } else {
+            return false;
+        }
     }
 
     
@@ -101,12 +106,12 @@ public class Turn {
      *       number.
      */
     public static int getYear(int turn) {
-        if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
+        int c = turn - OFFSET;
+        if (c < 0) {
             return STARTING_YEAR + turn - 1;
+        } else {
+            return SEASON_YEAR + c/2 - 1;
         }
-
-        int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
-        return SEASON_YEAR + c/2 - 1;
     }
 
 
@@ -129,40 +134,60 @@ public class Turn {
         return toString(turn);
     }
 
-
     /**
-     * Returns a string representation of the given turn.
-     * @return A string with the format: "<i>[season] year</i>".
-     *         Examples: "Spring 1602", "1503"...
+     * Returns a non-localized string representation of the given turn.
+     * @return A string with the format: "<i>season year</i>".
+     *         Examples: "SPRING 1602", "YEAR 1503"...
      */
     public static String toString(int turn) {
-        if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
-            return Integer.toString(STARTING_YEAR + turn - 1);
-        }
-
-        int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
-        return ((c%2==0) ? Messages.message("spring") : Messages.message("autumn"))
-            + " " + Integer.toString(SEASON_YEAR + c/2 - 1);
+        return getSeason(turn).toString() + " " + Integer.toString(getYear(turn));
     }
 
     /**
-     * Returns a string representation of this turn suitable for
-     * savegame files.
-     * @return A string with the format: "<i>[season] year</i>".
-     *         Examples: "1602_1_Spring", "1503"...
+     * Return the Season of the given Turn number.
+     *
+     * @param turn an <code>int</code> value
+     * @return a <code>Season</code> value
      */
-    public String toSaveGameString() {
-        if (STARTING_YEAR + turn - 1 < SEASON_YEAR) {
-            return Integer.toString(STARTING_YEAR + turn - 1);
-        }
-
-        int c = turn - (SEASON_YEAR - STARTING_YEAR - 1);
-        String result = Integer.toString(SEASON_YEAR + c/2 - 1);
-        if (c % 2 == 0) {
-            result += "_1_" + Messages.message("spring");
+    public static Season getSeason(int turn) {
+        int c = turn - OFFSET;
+        if (c < 0) {
+            return Season.YEAR;
+        } else if (c % 2 == 0) {
+            return Season.SPRING;
         } else {
-            result += "_2_" + Messages.message("autumn");
+            return Season.AUTUMN;
         }
-        return result;
     }
+
+    /**
+     * Return the Season of this Turn.
+     *
+     * @return a <code>Season</code> value
+     */
+    public Season getSeason() {
+        return getSeason(turn);
+    }
+
+
+    /**
+     * Describe <code>getLabel</code> method here.
+     *
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate getLabel() {
+        return getLabel(turn);
+    }
+
+    /**
+     * Describe <code>getLabel</code> method here.
+     *
+     * @param turn an <code>int</code> value
+     * @return a <code>StringTemplate</code> value
+     */
+    public static StringTemplate getLabel(int turn) {
+        return StringTemplate.template("year." + getSeason(turn))
+            .addAmount("%year%", getYear(turn));
+    }
+
 }

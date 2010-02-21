@@ -84,8 +84,9 @@ public final class ReportHighScoresPanel extends ReportPanel {
 
                 reportPanel.add(new JLabel(Messages.message("report.highScores.independence")), "skip");
                 int independenceTurn = highScore.getIndependenceTurn();
-                String independence = independenceTurn > 0 ? Turn.toString(independenceTurn) :
-                    Messages.message("no");
+                String independence = independenceTurn > 0
+                    ? Messages.message(Turn.getLabel(independenceTurn))
+                    : Messages.message("no");
                 reportPanel.add(new JLabel(independence));
 
                 reportPanel.add(new JLabel(Messages.message("report.highScores.nation")), "skip");
