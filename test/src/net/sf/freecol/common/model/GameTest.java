@@ -78,6 +78,8 @@ public class GameTest extends FreeColTestCase {
     public void testTurn() {
         assertEquals(1492, Turn.getYear(1));
         assertEquals(Turn.Season.YEAR, Turn.getSeason(1));
+        assertEquals(1599, Turn.getYear(108));
+        assertEquals(Turn.Season.YEAR, Turn.getSeason(108));
         assertEquals(1600, Turn.getYear(109));
         assertEquals(Turn.Season.SPRING, Turn.getSeason(109));
         assertEquals(1600, Turn.getYear(110));
