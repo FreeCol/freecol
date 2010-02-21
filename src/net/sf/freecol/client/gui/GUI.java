@@ -1685,19 +1685,17 @@ public final class GUI {
             logger.warning("createStringImage called with color null");
             color = Color.WHITE;
         }
-        
-        Font nameFont = (c != null) ? c.getFont() : g.getFont();
-        FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
 
-        BufferedImage bi = null;
         // Lookup in the cache if the image has been generated already
+        Font nameFont = (c != null) ? c.getFont() : g.getFont();
         StringImageKey key = new StringImageKey(color, nameFont, nameString);
-        bi = stringImageCache.get(key);
-        if (bi!=null) {
+        BufferedImage bi = stringImageCache.get(key);
+        if (bi != null) {
             return bi;
         }
 
         // create an image of the appropriate size
+        FontMetrics nameFontMetrics = (c != null) ? c.getFontMetrics(nameFont) : g.getFontMetrics(nameFont);
         int fontSize = preferredFontSize;
         do {
             nameFont = nameFont.deriveFont(Font.BOLD, fontSize);
@@ -1716,19 +1714,19 @@ public final class GUI {
         big.drawString(nameString, 2, nameFontMetrics.getMaxAscent());
 
         // draw the border around letters
-        int playerColor = color.getRGB();
+        int textColor = color.getRGB();
         int borderColor = getStringBorderColor(color).getRGB();
-        for (int biX=0; biX<bi.getWidth(); biX++) {
-            for (int biY=0; biY<bi.getHeight(); biY++) {
+        for (int biX = 0; biX < bi.getWidth(); biX++) {
+            for (int biY = 0; biY < bi.getHeight(); biY++) {
                 int r = bi.getRGB(biX, biY);
 
-                if (r == playerColor) {
+                if (r == textColor) {
                     continue;
                 }
 
-                for (int cX=-1; cX <=1; cX++) {
-                    for (int cY=-1; cY <=1; cY++) {
-                        if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == playerColor) {
+                for (int cX = -1; cX <= 1; cX++) {
+                    for (int cY = -1; cY <= 1; cY++) {
+                        if (biX+cX >= 0 && biY+cY >= 0 && biX+cX < bi.getWidth() && biY+cY < bi.getHeight() && bi.getRGB(biX + cX, biY + cY) == textColor) {
                             bi.setRGB(biX, biY, borderColor);
                             continue;
                         }
