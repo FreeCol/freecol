@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.Border;
 
 import net.sf.freecol.client.gui.Canvas;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
@@ -153,7 +154,7 @@ public class ReportPanel extends FreeColPanel implements ActionListener {
         if (count == 0) {
             unitLabel.setForeground(Color.GRAY);
         }
-        unitLabel.setToolTipText(Unit.getName(unitType, role));
+        unitLabel.setToolTipText(Messages.message(Messages.getLabel(unitType, role)));
         return unitLabel;
     }
 

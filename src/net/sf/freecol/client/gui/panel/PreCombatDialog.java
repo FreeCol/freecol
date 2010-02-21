@@ -107,7 +107,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         // right hand side: defender
         String attackerName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                                                .addStringTemplate("%nation%", attacker.getOwner().getNationName())
-                                               .addName("%unit%", attacker.getName()));
+                                               .addStringTemplate("%unit%", attacker.getLabel()));
         JLabel attackerLabel = new UnitLabel(attacker, parent, false, true);
 
         String defenderName;
@@ -118,7 +118,7 @@ public class PreCombatDialog extends FreeColDialog<Boolean> {
         } else {
             defenderName = Messages.message(StringTemplate.template("model.unit.nationUnit")
                                             .addStringTemplate("%nation%", defender.getOwner().getNationName())
-                                            .addName("%unit%", defender.getName()));
+                                            .addStringTemplate("%unit%", defender.getLabel()));
             defenderLabel = new UnitLabel(defender, parent, false, true);
         }
 

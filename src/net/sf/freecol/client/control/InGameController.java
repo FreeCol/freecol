@@ -640,13 +640,14 @@ public final class InGameController implements NetworkConstants {
                     .getInteger(ClientOptions.UNLOAD_OVERFLOW_RESPONSE);
                 switch (option) {
                 case ClientOptions.UNLOAD_OVERFLOW_RESPONSE_ASK:
-                    if (!canvas.showConfirmDialog(colony.getTile(),
-                                                  "traderoute.warehouseCapacity",
-                                                  "yes", "no",
-                                                  "%unit%", unit.getName(),
-                                                  "%colony%", locName,
-                                                  "%amount%", overflow,
-                                                  "%goods%", Messages.message(goods.getNameKey()))) {
+                    StringTemplate template =
+                        StringTemplate.template("traderoute.warehouseCapacity")
+                        .addStringTemplate("%unit%", Messages.getLabel(unit))
+                        .addName("%colony%", locName)
+                        .addName("%amount%", overflow)
+                        .add("%goods%", goods.getNameKey());
+                    if (!canvas.showConfirmDialog(colony.getTile(), template,
+                                                  "yes", "no")) {
                         toUnload = atStop;
                     }
                     break;
@@ -668,7 +669,7 @@ public final class InGameController implements NetworkConstants {
                         new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
                                          overflowMessage, player)
                         .add("%colony%", locName)
-                        .addName("%unit%", unit.getName())
+                        .addStringTemplate("%unit%", Messages.getLabel(unit))
                         .addName("%overflow%", overflow)
                         .add("%goods%", goods.getNameKey());
                     player.addModelMessage(m);
@@ -1437,6 +1438,7 @@ public final class InGameController implements NetworkConstants {
             canvas.showInformationMessage("notYourTurn");
             return;
         }
+        StringTemplate template;
 
         // Consider all the move types
         Tile tile = unit.getTile();
@@ -1490,14 +1492,16 @@ public final class InGameController implements NetworkConstants {
             break;
         case MOVE_NO_ACCESS_SETTLEMENT:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessSettlement", unit,
-                                          "%unit%", unit.getName(),
-                                          "%nation%", Messages.message(getNationAt(tile, direction)));
+            template = StringTemplate.template("move.noAccessSettlement")
+                .addStringTemplate("%unit%", Messages.getLabel(unit))
+                .addStringTemplate("%nation%", getNationAt(tile, direction));
+            canvas.showInformationMessage(template, unit);
             break;
         case MOVE_NO_ACCESS_SKILL:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessSkill", unit,
-                                          "%unit%", unit.getName());
+            template = StringTemplate.template("move.noAccessSkill")
+                .addStringTemplate("%unit%", Messages.getLabel(unit));
+            canvas.showInformationMessage(template, unit);
             break;
         case MOVE_NO_ACCESS_TRADE:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
@@ -1513,8 +1517,9 @@ public final class InGameController implements NetworkConstants {
             break;
         case MOVE_NO_ACCESS_WATER:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
-            canvas.showInformationMessage("move.noAccessWater", unit,
-                                          "%unit%", unit.getName());
+            template = StringTemplate.template("move.noAccessWater")
+                .addStringTemplate("%unit%", Messages.getLabel(unit));
+            canvas.showInformationMessage(template, unit);
             break;
         default:
             freeColClient.playSound(SoundEffect.ILLEGAL_MOVE);
@@ -1584,11 +1589,11 @@ public final class InGameController implements NetworkConstants {
                 if (sentry.getState() == UnitState.SENTRY) {
                     if (sentry.getSpaceTaken() <= unit.getSpaceLeft()) {
                         boardShip(sentry, unit);
-                        logger.finest("Unit " + unit.getName()
-                                      + " loaded sentry " + sentry.getName());
+                        logger.finest("Unit " + unit.toString()
+                                      + " loaded sentry " + sentry.toString());
                     } else {
-                        logger.finest("Unit " + sentry.getName()
-                                      + " is too big to board " + unit.getName());
+                        logger.finest("Unit " + sentry.toString()
+                                      + " is too big to board " + unit.toString());
                     }
                 }
             }
@@ -1606,8 +1611,8 @@ public final class InGameController implements NetworkConstants {
             Unit slowedBy = (Unit) game.getFreeColGameObject(reply.getAttribute("slowedBy"));
             StringTemplate enemy = slowedBy.getOwner().getNationName();
             canvas.showInformationMessage(StringTemplate.template("model.unit.slowed")
-                                          .addName("%unit%", unit.getName())
-                                          .addName("%enemyUnit%", slowedBy.getName())
+                                          .addStringTemplate("%unit%", Messages.getLabel(unit))
+                                          .addStringTemplate("%enemyUnit%", Messages.getLabel(slowedBy))
                                           .addStringTemplate("%enemyNation%", enemy),
                                           slowedBy);
         }
@@ -2064,7 +2069,7 @@ public final class InGameController implements NetworkConstants {
                 ModelMessage message = new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                                         "model.unit.newConvertFromAttack", convert)
                     .addStringTemplate("%nation%", nation)
-                    .addName("%unit%", convert.getName());
+                    .addStringTemplate("%unit%", Messages.getLabel(convert));
                 freeColClient.getMyPlayer().addModelMessage(message);
                 nextModelMessage();
             }
@@ -2226,7 +2231,7 @@ public final class InGameController implements NetworkConstants {
                                           settlement);
         } else if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
             canvas.showInformationMessage(StringTemplate.template("indianSettlement.cantLearnSkill")
-                                          .addName("%unit%", unit.getName())
+                                          .addStringTemplate("%unit%", Messages.getLabel(unit))
                                           .add("%skill%", skill.getNameKey()),
                                           settlement);
         } else if (canvas.showConfirmDialog(unit.getTile(),
@@ -3583,16 +3588,16 @@ public final class InGameController implements NetworkConstants {
         UnitType newType = oldType.getUnitTypeChange(ChangeType.CLEAR_SKILL,
                                                      unit.getOwner());
         if (newType == null) {
-            canvas.showInformationMessage("clearSpeciality.impossible",
-                                          unit,
-                                          "%unit%", unit.getName());
+            StringTemplate template = StringTemplate.template("clearSpeciality.impossible")
+                .addStringTemplate("%unit%", Messages.getLabel(unit));
+            canvas.showInformationMessage(template, unit);
             return;
         }
 
         Tile tile = (canvas.isShowingSubPanel()) ? null : unit.getTile();
         if (!canvas.showConfirmDialog(tile,
                                       StringTemplate.template("clearSpeciality.areYouSure")
-                                      .addName("%oldUnit%", unit.getName())
+                                      .addStringTemplate("%oldUnit%", Messages.getLabel(unit))
                                       .add("%unit%", newType.getNameKey()),
                                       "yes", "no")) {
             return;

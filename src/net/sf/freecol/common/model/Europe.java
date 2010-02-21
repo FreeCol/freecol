@@ -211,7 +211,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         } else if (getRecruitPrice() > unit.getOwner().getGold()) {
-            throw new IllegalStateException("Not enough gold to recruit " + unit.getName() + ".");
+            throw new IllegalStateException("Not enough gold to recruit " + unit.toString() + ".");
         }
 
         unit.getOwner().modifyGold(-getRecruitPrice());
@@ -424,7 +424,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
         if (price <= 0) {
             throw new IllegalArgumentException("Unit price must be a positive integer.");
         } else if (getUnitPrice(unit.getType()) > unit.getOwner().getGold()) {
-            throw new IllegalStateException("Not enough gold to train " + unit.getName() + ".");
+            throw new IllegalStateException("Not enough gold to train " + unit.toString() + ".");
         }
 
         unit.getOwner().modifyGold(-price);
@@ -502,7 +502,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
                     addModelMessage(new ModelMessage("model.unit.shipRepaired", this, unit)
-                                    .addName("%unit%", unit.getName())
+                                    .addStringTemplate("%unit%", unit.getLabel())
                                     .addStringTemplate("%repairLocation%", getLocationName()));
                 }
             }

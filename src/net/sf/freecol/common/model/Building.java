@@ -492,7 +492,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
                     addModelMessage(new ModelMessage("model.unit.unitRepaired", this)
-                                    .addName("%unit%", unit.getName())
+                                    .addStringTemplate("%unit%", unit.getLabel())
                                     .addStringTemplate("%repairLocation%", getLocationName()));
                 }
             }
@@ -576,7 +576,7 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
                                              "model.building.noStudent",
                                              getColony(), teacher)
-                            .addName("%teacher%", teacher.getName())
+                            .addStringTemplate("%teacher%", teacher.getLabel())
                             .addName("%colony%", colony.getName()));
             return false;
         } else {

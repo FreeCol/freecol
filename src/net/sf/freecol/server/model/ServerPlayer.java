@@ -50,6 +50,7 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nation;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
@@ -212,20 +213,20 @@ public class ServerPlayer extends Player implements ServerModelObject {
         divertModelMessages(europe, null);
 
         // Dispose of units in Europe.
-        ArrayList<String> unitNames = new ArrayList<String>();
         List<FreeColGameObject> objects = europe.disposeList();
         result.addAll(objects);
         europe = null;
         monarch = null; // "No more kings"
+        StringTemplate seized = StringTemplate.label(", ");
         for (FreeColGameObject o : objects) {
             if (o instanceof Unit) {
-                unitNames.add(((Unit) o).getName());
+                seized.addStringTemplate(((Unit) o).getLabel());
             }
         }
-        if (!unitNames.isEmpty()) {
+        if (!seized.getReplacements().isEmpty()) {
             result.add(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                         "model.player.independence.unitsSeized", this)
-                       .addName("%units%", Utils.join(", ", unitNames)));
+                       .addStringTemplate("%units%", seized));
         }
 
         // Generalized continental army muster
@@ -292,10 +293,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                                           HistoryEvent.EventType.INDEPENDENCE));
         messages.add(new ModelMessage("model.player.independence", this));
         ArrayList<Unit> surrenderUnits = new ArrayList<Unit>();
-        ArrayList<String> unitNames = new ArrayList<String>();
         for (Unit u : REFplayer.getUnits()) {
             if (!u.isNaval()) surrenderUnits.add(u);
         }
+        StringTemplate surrender = StringTemplate.label(", ");
         for (Unit u : surrenderUnits) {
             if (u.getType().hasAbility("model.ability.refUnit")) {
                 // Make sure the independent player does not end up owning
@@ -304,10 +305,10 @@ public class ServerPlayer extends Player implements ServerModelObject {
                 if (downgrade != null) u.setType(downgrade);
             }
             u.setOwner(this);
-            unitNames.add(u.getName());
+            surrender.addStringTemplate(u.getLabel());
         }
         messages.add(new ModelMessage("model.player.independence.unitsAcquired", this)
-                     .addName("%units%", Utils.join(", ", unitNames)));
+                     .addStringTemplate("%units%", surrender));
         return messages;
     }
 

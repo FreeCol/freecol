@@ -823,7 +823,8 @@ public final class InGameInputHandler extends InputHandler {
                 AbstractUnit unit = new AbstractUnit();
                 unit.readFromXMLElement((Element) childElements.item(index));
                 units.add(unit);
-                unitNames.add(unit.getNumber() + " " + Unit.getName(unit.getUnitType(), unit.getRole()));
+                unitNames.add(unit.getNumber() + " "
+                              + Messages.message(Messages.getLabel(unit.getUnitType(), unit.getRole())));
             }
             monarch.addToREF(units);
             new ShowMonarchPanelSwingTask(action,
@@ -870,7 +871,8 @@ public final class InGameInputHandler extends InputHandler {
             for (int index = 0; index < childElements.getLength(); index++) {
                 AbstractUnit unit = new AbstractUnit();
                 unit.readFromXMLElement((Element) childElements.item(index));
-                mercenaries.add(unit.getNumber() + " " + Unit.getName(unit.getUnitType(), unit.getRole()));
+                mercenaries.add(unit.getNumber() + " "
+                                + Messages.message(Messages.getLabel(unit.getUnitType(), unit.getRole())));
             }
             if (new ShowMonarchPanelSwingTask(action,
                                               "%gold%", element.getAttribute("price"),

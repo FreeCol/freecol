@@ -1095,8 +1095,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 UnitLabel unitLabel = new UnitLabel(unit, getCanvas());
                 TradeRoute tradeRoute = unit.getTradeRoute();
                 if (tradeRoute != null) {
-                    unitLabel.setDescriptionLabel(unit.getName() + " ("
-                                                  + tradeRoute.getName() + ")");
+                    unitLabel.setDescriptionLabel(Messages.message(Messages.getLabel(unit))
+                                                  + " (" + tradeRoute.getName() + ")");
                 }
                 if (isEditable()) {
                     unitLabel.setTransferHandler(defaultTransferHandler);
@@ -1386,7 +1386,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                 if (unit == null) {
                     setToolTipText(tileDescription);
                 } else {
-                    String unitDescription = unit.getUnit().getName();
+                    String unitDescription = Messages.message(Messages.getLabel(unit.getUnit()));
                     if (toAdd) {
                         unitDescription = tileDescription + " [" + unitDescription + "]";
                     }
@@ -1444,11 +1444,11 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
                             if (colonyTile != bestTile
                                 && (colonyTile.getProductionOf(unit, workType)
                                     < bestTile.getProductionOf(unit, workType))) {
-                                getCanvas()
-                                    .showInformationMessage(StringTemplate.template("colonyPanel.notBestTile")
-                                                            .add("%unit%", unit.getName())
-                                                            .add("%goods%", workType.getNameKey())
-                                                            .addStringTemplate("%tile%", bestTile.getLabel()));
+                                StringTemplate template = StringTemplate.template("colonyPanel.notBestTile")
+                                    .addStringTemplate("%unit%", Messages.getLabel(unit))
+                                    .add("%goods%", workType.getNameKey())
+                                    .addStringTemplate("%tile%", bestTile.getLabel());
+                                getCanvas() .showInformationMessage(template);
                             }
                         } else {
                             // could not add the unit on the tile

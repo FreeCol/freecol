@@ -36,7 +36,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Map.Position;
@@ -405,7 +404,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public StringTemplate getLocationName() {
         return StringTemplate.template("onBoard")
-            .addName("%unit%", getName());
+            .addStringTemplate("%unit%", getLabel());
     }
 
     /**
@@ -888,7 +887,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         	this.student = newStudent;
         	newStudent.setTeacher(this);
         } else {
-            throw new IllegalStateException("unit can not be student: " + newStudent.getName());
+            throw new IllegalStateException("unit can not be student: " + newStudent);
         }
     }
 
@@ -928,7 +927,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             	this.teacher = newTeacher;
             	this.teacher.setStudent(this);
             } else {
-                throw new IllegalStateException("unit can not be teacher: " + newTeacher.getName());
+                throw new IllegalStateException("unit can not be teacher: " + newTeacher);
             }
         }
     }
@@ -1048,7 +1047,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public PathNode findPath(Tile end) {
         if (getTile() == null) {
-            logger.warning("getTile() == null for " + getName() + " at location: " + getLocation());
+            logger.warning("getTile() == null for " + toString() + " at location: " + getLocation());
         }
         return findPath(getTile(), end);
     }
@@ -1633,7 +1632,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // For debugging:
         if (!moveType.isProgress()) {
             throw new IllegalStateException("Illegal move requested: " + moveType
-                                            + " while trying to move a " + getName()
+                                            + " while trying to move a " + toString()
                                             + " located at " + getTile().getPosition().toString()
                                             + ". Direction: " + direction
                                             + " Moves Left: " + getMovesLeft());
@@ -1720,8 +1719,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (locatable instanceof Unit && canCarryUnits()) {
             Unit unit = (Unit) locatable;
             if (getSpaceLeft() < unit.getSpaceTaken()) {
-                throw new IllegalStateException("Not enough space for " + unit.getName()
-                                                + " left on " + getName());
+                throw new IllegalStateException("Not enough space for " + unit.toString()
+                                                + " left on " + toString());
             }
             if (units.contains(locatable)) {
             	logger.warning("Tried to add a 'Locatable' already in the carrier.");
@@ -1739,7 +1738,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             Goods goods = (Goods) locatable;
             if (getLoadableAmount(goods.getType()) < goods.getAmount()){
                 throw new IllegalStateException("Not enough space for " + goods.toString()
-                                                + " left on " + getName());
+                                                + " left on " + toString());
             }
             goodsContainer.addGoods(goods);
             firePropertyChange(CARGO_CHANGE, null, locatable);
@@ -2003,13 +2002,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                 if (oldImprovement == null) {
                     // No improvement found, check if worker can do it
                     if (!impType.isWorkerAllowed(this)) {
-                        throw new IllegalArgumentException(getName() + " not allowed to perform "
+                        throw new IllegalArgumentException(toString() + " not allowed to perform "
                                                            + improvement.toString());
                     }
                 } else {
                     // Has improvement, check if worker can contribute to it
                     if (!oldImprovement.isWorkerAllowed(this)) {
-                        throw new IllegalArgumentException(getName() + " not allowed to perform "
+                        throw new IllegalArgumentException(toString() + " not allowed to perform "
                                                            + improvement.toString());
                     }
                 }
@@ -2559,41 +2558,37 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
-     * Returns the name of a unit in a human readable format. The return value
-     * can be used when communicating with the user.
-     * 
-     * @return The given unit type as a String
+     * Describe <code>getName</code> method here.
+     *
+     * @return a <code>String</code> value
      */
     public String getName() {
-        String completeName = "";
-        String customName = "";
-        if (name != null) {
-            customName = " " + name + " ";
-        }
-
-        //Gets the type of the unit to be displayed with custom name
-        if (canCarryTreasure()) {
-            completeName = Messages.message(getType().getId() + ".gold", "%gold%",
-                                    String.valueOf(getTreasureAmount()));
-        } else if ((equipment == null || equipment.isEmpty()) &&
-                   getType().getDefaultEquipmentType() != null) {
-            completeName = getName(getType(), getRole()) + " (" +
-                Messages.message(getType().getDefaultEquipmentType().getId() + ".none") + ")";
-        } else {
-            completeName = getName(getType(), getRole());
-        }
-
-        //Adds the custom name to the type of the unit
-        int index = completeName.lastIndexOf(" (");
-        if (index < 0) {
-            completeName = completeName + customName;
-        } else {
-            completeName = completeName.substring(0, index) + customName + 
-                completeName.substring(index);
-        }
-
-        return completeName;
+        return name;
     }
+
+    /**
+     * Set the <code>Name</code> value.
+     *
+     * @param newName The new Name value.
+     */
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
+    /**
+     * Describe <code>getLabel</code> method here.
+     *
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate getLabel() {
+        StringTemplate result = StringTemplate.label(" ")
+            .add(getType().getNameKey());
+        if (name != null) {
+            result.addName(name);
+        }
+        return result;
+    }
+        
 
     /**
      * Return a description of the unit's equipment.
@@ -2624,42 +2619,6 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
     }
 
-
-    /**
-     * Returns the name of a unit in a human readable format. The return value
-     * can be used when communicating with the user.
-     * 
-     * @param someType an <code>UnitType</code> value
-     * @param someRole a <code>Role</code> value
-     * @return The given unit type as a String
-     */
-    public static String getName(UnitType someType, Role someRole) {
-        String key = someRole.toString().toLowerCase();
-        if (someRole == Role.DEFAULT) {
-            key = "name";
-        }
-        String messageID = someType.getId() +  "." + key;
-        if (Messages.containsKey(messageID)) {
-            return Messages.message(messageID);
-        } else {
-            return Messages.message("model.unit." + key + ".name", "%unit%",
-                                    Messages.message(someType.getNameKey()));
-        }
-    }
-
-    /**
-     * Set the <code>Name</code> value.
-     *
-     * @param newName The new Name value.
-     */
-    public void setName(String newName) {
-        this.name = newName;
-    }
-
-    // TODO: remove this again
-    public String getNameKey() {
-        return getName();
-    }
 
     /**
      * Gets the amount of moves this unit has at the beginning of each turn.
@@ -3032,7 +2991,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void buildColony(Colony colony) {
         if (!canBuildColony()) {
-            throw new IllegalStateException("Unit " + getName() + " can not build colony on "
+            throw new IllegalStateException("Unit " + toString() + " can not build colony on "
                                             + getTile().toString() + "!");
         }
         if (!getTile().getPosition().equals(colony.getTile().getPosition())) {
@@ -3050,7 +3009,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      */
     public void buildIndianSettlement(IndianSettlement indianSettlement) {
         if (!canBuildColony()) {
-            throw new IllegalStateException("Unit " + getName() + " can not build settlement on "
+            throw new IllegalStateException("Unit " + toString() + " can not build settlement on "
                                             + getTile().toString() + "!");
         }
         if (!getTile().getPosition().equals(indianSettlement.getTile().getPosition())) {
@@ -3298,10 +3257,11 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         // TODO: make this more generic
         EquipmentType tools = FreeCol.getSpecification().getEquipmentType("model.equipment.tools");
         if (!equipment.containsKey(tools)) {
+            String messageId = (getType().getDefaultEquipmentType() == type)
+                ? getId() + ".noMoreTools" : "model.unit.noMoreTools";
             addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                             Messages.getKey(getId() + ".noMoreTools", 
-                                                             "model.unit.noMoreTools"), this)
-                            .addName("%unit%", getName())
+                                             messageId, this)
+                            .addStringTemplate("%unit%", getLabel())
                             .addStringTemplate("%location%", getLocation().getLocationName()));
         }
     }
@@ -3406,7 +3366,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * 
      */
     public void train() {
-        String oldName = getName();
+        StringTemplate oldName = getLabel();
         UnitType skillTaught = FreeCol.getSpecification().getUnitType(getTeacher().getType().getSkillTaught());
         UnitType learning = getUnitTypeTeaching(skillTaught, unitType);
 
@@ -3414,13 +3374,13 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             setType(learning);
         }
 
-        String newName = getName();
+        StringTemplate newName = getLabel();
         if (!newName.equals(oldName)) {
             Colony colony = getTile().getColony();
             addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
                                              "model.unit.unitEducated", colony, this)
-                            .addName("%oldName%", oldName)
-                            .addName("%unit%", newName)
+                            .addStringTemplate("%oldName%", oldName)
+                            .addStringTemplate("%unit%", newName)
                             .addName("%colony%", colony.getName()));
         }
         this.setTurnsOfTraining(0);
@@ -3624,12 +3584,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
 
         logger.finest("About to change type of unit due to experience.");
-        String oldName = getName();
+        StringTemplate oldName = getLabel();
         setType(learnType);
         addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
                                          "model.unit.experience", getColony(), this)
-                        .addName("%oldName%", oldName)
-                        .addName("%unit%", getName())
+                        .addStringTemplate("%oldName%", oldName)
+                        .addStringTemplate("%unit%", getLabel())
                         .addName("%colony%", getColony().getName()));
     }
 
@@ -3649,7 +3609,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
             if (attrition > getType().getMaximumAttrition()) {
                 addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
                                                  "model.unit.attrition", this)
-                                .addName("%unit%", getName()));
+                                .addStringTemplate("%unit%", getLabel()));
                 dispose();
             }
         } else {

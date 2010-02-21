@@ -606,7 +606,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             if (newUnit.isColonist()) {
                 Occupation occupation = getOccupationFor(newUnit);
                 if (occupation == null) {
-                    logger.warning("Could not find a 'WorkLocation' for " + newUnit.getName()
+                    logger.warning("Could not find a 'WorkLocation' for " + newUnit.toString()
                                    + " in " + getName());
                     newUnit.putOutsideColony();
                 } else {
@@ -1524,7 +1524,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                              "model.colony.unitReady", this, unit)
                             .addName("%colony%", getName())
-                            .addName("%unit%", unit.getName()));
+                            .addStringTemplate("%unit%", unit.getLabel()));
             if (buildQueue.size() > 1) {
                 // Remove the unit-to-build unless it is the last entry.
                 buildQueue.remove(0);

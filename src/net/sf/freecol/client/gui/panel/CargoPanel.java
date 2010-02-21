@@ -199,7 +199,7 @@ public class CargoPanel extends FreeColPanel implements PropertyChangeListener {
         } else {
             int spaceLeft = carrier.getSpaceLeft();
             border.setTitle(Messages.message("cargoOnCarrierLong", 
-                                             "%name%", carrier.getName(),
+                                             "%name%", Messages.message(Messages.getLabel(carrier)),
                                              "%space%", String.valueOf(spaceLeft)));
         }
     }

@@ -371,7 +371,7 @@ public class UnitSeekAndDestroyMission extends Mission {
         } else {
             final String name;
             if (target instanceof Unit) {
-                name = ((Unit) target).getName();
+                name = ((Unit) target).toString();
             } else if (target instanceof Colony) {
                 name = ((Colony) target).getName();
             } else {

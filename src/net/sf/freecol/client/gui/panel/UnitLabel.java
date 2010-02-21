@@ -82,7 +82,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
         setIcon(lib.getUnitImageIcon(unit));
         setDisabledIcon(lib.getUnitImageIcon(unit, true));
         this.unit = unit;
-        setDescriptionLabel(unit.getName());
+        setDescriptionLabel(Messages.message(Messages.getLabel(unit)));
         this.parent = parent;
         selected = false;
 
@@ -229,7 +229,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
      */
     public void paintComponent(Graphics g) {
 
-        String name = unit.getName();
+        String name = getToolTipText();
         StringTemplate equipmentLabel = unit.getEquipmentLabel();
         if (equipmentLabel != null) {
             name = name + " (" + Messages.message(equipmentLabel) + ")";

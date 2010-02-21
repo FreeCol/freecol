@@ -256,7 +256,7 @@ public final class ReportTurnPanel extends ReportPanel {
             headline = button;
         } else if (source instanceof Unit) {
             final Unit unit = (Unit) source;
-            JButton button = new JButton(unit.getName());
+            JButton button = new JButton(Messages.message(unit.getLabel()));
             button.addActionListener(this);
             button.setActionCommand(unit.getLocation().getId());
             headline = button;

@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.StringTemplate;
+import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.model.UnitType;
 
 /**
  * Represents a collection of messages in a particular locale. <p/>
@@ -213,6 +215,77 @@ public class Messages {
         }
     }
 
+    /**
+     * Returns the name of a unit in a human readable format. The
+     * label consists of up to three items: If the unit has a role
+     * other than the unit type's default role, the current role, the
+     * proper name of the unit and the unit's type. Otherwise, the
+     * unit's type, the proper name of the unit, and additional
+     * information about gold (in the case of treasure trains), or
+     * equipment.
+     * 
+     * @param unit an <code>Unit</code> value
+     * @return A label to describe the given unit
+     */
+    public static StringTemplate getLabel(Unit unit) {
+        String typeKey = null;
+        String infoKey = null;
+
+        if (unit.canCarryTreasure()) {
+            typeKey = unit.getType().getNameKey();
+            infoKey = Integer.toString(unit.getTreasureAmount());
+        } else {
+            String key = (unit.getRole() == Unit.Role.DEFAULT) ? "name"
+                : unit.getRole().toString().toLowerCase();
+            String messageID = unit.getType().getId() + "." + key;
+            if (containsKey(messageID)) {
+                typeKey = messageID;
+                if ((unit.getEquipment() == null || unit.getEquipment().isEmpty()) &&
+                    unit.getType().getDefaultEquipmentType() != null) {
+                    infoKey = unit.getType().getDefaultEquipmentType().getId() + ".none";
+                }
+            } else {
+                typeKey = "model.unit.role." + key;
+                infoKey = unit.getType().getNameKey();
+            }
+        }
+
+        StringTemplate result = StringTemplate.label(" ")
+            .add(typeKey);
+        if (unit.getName() != null) {
+            result.addName(unit.getName());
+        }
+        if (infoKey != null) {
+            result.addStringTemplate(StringTemplate.label("")
+                                     .addName("(")
+                                     .add(infoKey)
+                                     .addName(")"));
+        }
+        return result;
+    }
+
+
+     /**
+     * Returns the name of a unit in a human readable format. The return value
+     * can be used when communicating with the user.
+     * 
+     * @param someType an <code>UnitType</code> value
+     * @param someRole a <code>Role</code> value
+     * @return The given unit type as a String
+     */
+    public static String getLabel(UnitType someType, Unit.Role someRole) {
+        String key = someRole.toString().toLowerCase();
+        if (someRole == Unit.Role.DEFAULT) {
+            key = "name";
+        }
+        String messageID = someType.getId() +  "." + key;
+        if (containsKey(messageID)) {
+            return message(messageID);
+        } else {
+            return message("model.unit." + key + ".name", "%unit%",
+                           Messages.message(someType.getNameKey()));
+        }
+    }
 
     /**
      * Calling this method can be used to replace the messages used currently

@@ -252,7 +252,8 @@ public abstract class Mission extends AIObject {
      */
     protected PathNode findTarget(int maxTurns) {
         if (!getUnit().isOffensiveUnit()) {
-            throw new IllegalStateException("A target can only be found for offensive units. You tried with: " + getUnit().getName());
+            throw new IllegalStateException("A target can only be found for offensive units. You tried with: "
+                                            + getUnit().toString());
         }
         
         GoalDecider gd = new GoalDecider() {

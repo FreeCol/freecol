@@ -528,7 +528,7 @@ public final class Canvas extends JDesktopPane {
             try {
                 image = imageLibrary.getUnitImageIcon(unit.getType()).getImage();
             } catch (Exception e) {
-                logger.warning("could not find image for unit " + unit.getName());
+                logger.warning("could not find image for unit " + unit.toString());
             }
         } else if (display instanceof UnitType) {
             UnitType unitType = (UnitType) display;
@@ -723,6 +723,13 @@ public final class Canvas extends JDesktopPane {
         ChoiceItem<T> response = showFreeColDialog(choiceDialog, tile);
         return (response == null) ? null : response.getObject();
     }
+
+    public <T> T showChoiceDialog(Tile tile, StringTemplate template, String cancelKey,
+                                  List<ChoiceItem<T>> choices) {
+        return showChoiceDialog(tile, Messages.message(template),
+                                Messages.message(cancelKey), choices);
+    }
+
 
     /**
      * Displays a dialog with a text and a cancel-button, in addition
@@ -2039,12 +2046,11 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<ScoutColonyAction>(
                 Messages.message("scoutColony.attack"),
                 ScoutColonyAction.FOREIGN_COLONY_ATTACK));
-        ScoutColonyAction result = showChoiceDialog(unit.getTile(),
-                Messages.message("scoutColony.text",
-                                 "%unit%", unit.getName(),
-                                 "%colony%", colony.getName()),
-                Messages.message("cancel"),
-                choices);
+        StringTemplate template = StringTemplate.template("scoutColony.text")
+            .addStringTemplate("%unit%", Messages.getLabel(unit))
+            .addName("%colony%", colony.getName());
+        ScoutColonyAction result =
+            showChoiceDialog(unit.getTile(), template, "cancel", choices);
         return (result == null) ? ScoutColonyAction.CANCEL : result;
     }
 

@@ -362,7 +362,7 @@ public final class InfoPanel extends FreeColPanel {
             removeAll();
             if (unit != null) {
                 add(new JLabel(getLibrary().getUnitImageIcon(unit)), "spany, gapafter 5px");
-                String name = unit.getName();
+                String name = Messages.message(Messages.getLabel(unit));
                 // TODO: this is too brittle!
                 int index = name.indexOf(" (");
                 if (index < 0) {
@@ -387,7 +387,7 @@ public final class InfoPanel extends FreeColPanel {
                     for (Unit carriedUnit : unit.getUnitList()) {
                         ImageIcon unitIcon = getLibrary().getUnitImageIcon(carriedUnit);
                         JLabel unitLabel = new JLabel(getLibrary().getScaledImageIcon(unitIcon, 0.5f));
-                        unitLabel.setToolTipText(carriedUnit.getName());
+                        unitLabel.setToolTipText(Messages.message(carriedUnit.getLabel()));
                         add(unitLabel);
                     }
                 } else {

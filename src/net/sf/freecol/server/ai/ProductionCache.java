@@ -337,7 +337,7 @@ public class ProductionCache {
         }
 
         public String toString() {
-            String result = "Cache entry: " + unit.getName() + "(" + unit.getId() + ") ";
+            String result = "Cache entry: " + unit.toString();
             if (workLocation instanceof ColonyTile) {
                 return result
                     + ((ColonyTile) workLocation).getTile().getNameKey()

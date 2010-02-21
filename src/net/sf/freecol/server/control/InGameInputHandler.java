@@ -1155,8 +1155,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
             throw new NullPointerException();
         }
         if (!workLocation.canAdd(unit)) {
-            throw new IllegalStateException("Can not add " + unit.getName() + "(" + unit.getId()
-                                            + ") to " + workLocation.toString() + "(" 
+            throw new IllegalStateException("Can not add " + unit.toString()
+                                            + " to " + workLocation.toString() + "(" 
                                             + workLocation.getId() + ")");
         }
         if (workLocation instanceof ColonyTile) {

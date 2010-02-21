@@ -170,7 +170,7 @@ public final class DragListener extends MouseAdapter {
         JPopupMenu menu = new JPopupMenu("Unit");
         ImageIcon unitIcon = imageLibrary.getUnitImageIcon(tempUnit);
 
-        JMenuItem name = new JMenuItem(tempUnit.getName() + " (" +
+        JMenuItem name = new JMenuItem(Messages.message(tempUnit.getLabel()) + " (" +
                                        Messages.message("menuBar.colopedia") + ")", 
                                        imageLibrary.getScaledImageIcon(unitIcon, 0.66f));
         name.setActionCommand(UnitAction.COLOPEDIA.toString());
@@ -227,7 +227,7 @@ public final class DragListener extends MouseAdapter {
             menu.add(cargo);
 
             for (Unit passenger : tempUnit.getUnitList()) {
-                JMenuItem menuItem = new JMenuItem("    " + passenger.getName());
+                JMenuItem menuItem = new JMenuItem("    " + Messages.message(passenger.getLabel()));
                 menuItem.setFont(menuItem.getFont().deriveFont(Font.ITALIC));
                 menu.add(menuItem);
             }

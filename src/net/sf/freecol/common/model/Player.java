@@ -3070,7 +3070,7 @@ public class Player extends FreeColGameObject implements Nameable {
              * Create new collection to avoid to concurrent modification.
              */
             for (Unit unit : new ArrayList<Unit>(units.values())) {
-                logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getId());
+                logger.finest("Calling newTurn for unit " + unit.toString());
                 unit.newTurn();
             }
 
@@ -3097,7 +3097,7 @@ public class Player extends FreeColGameObject implements Nameable {
             for (Iterator<Unit> unitIterator = getUnitIterator(); unitIterator.hasNext();) {
                 Unit unit = unitIterator.next();
                 if (logger.isLoggable(Level.FINEST)) {
-                    logger.finest("Calling newTurn for unit " + unit.getName() + " " + unit.getId());
+                    logger.finest("Calling newTurn for unit " + unit.toString());
                 }
                 unit.newTurn();
             }

@@ -66,6 +66,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
 import net.sf.freecol.common.model.Settlement;
+import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.TradeRoute.Stop;
@@ -1203,7 +1204,7 @@ public final class InGameController extends Controller {
             : new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                "model.europe.emigrate", player, unit)
             .addName("%europe%", europe.getName())
-            .addName("%unit%", unit.getName());
+            .addStringTemplate("%unit%", unit.getLabel());
     }
 
 
@@ -1467,11 +1468,11 @@ public final class InGameController extends Controller {
             break;
         case LEARN:
             List<UnitType> learntUnitTypes = unit.getType().getUnitTypesLearntInLostCity();
-            String oldName = unit.getName();
+            StringTemplate oldName = unit.getLabel();
             unit.setType(learntUnitTypes.get(getPseudoRandom().nextInt(learntUnitTypes.size())));
             result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.Learn", serverPlayer, unit)
-                       .addName("%unit%", oldName)
+                       .addStringTemplate("%unit%", oldName)
                        .add("%type%", unit.getType().getNameKey()));
             break;
         case TRIBAL_CHIEF:
@@ -1772,7 +1773,7 @@ public final class InGameController extends Controller {
                                             + settlement.getName());
         }
         if (!unit.getType().canBeUpgraded(skill, ChangeType.NATIVES)) {
-            throw new IllegalStateException("Unit " + unit.getName()
+            throw new IllegalStateException("Unit " + unit.toString()
                                             + " can not learn skill " + skill
                                             + " at " + settlement.getName());
         }

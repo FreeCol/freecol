@@ -511,10 +511,12 @@ public class TransportMission extends Mission {
      */
     protected PathNode findNavalTarget(final int maxTurns) {
         if (!getUnit().isOffensiveUnit()) {
-            throw new IllegalStateException("A target can only be found for offensive units. You tried with: " + getUnit().getName());
+            throw new IllegalStateException("A target can only be found for offensive units. You tried with: "
+                                            + getUnit().toString());
         }
         if (!getUnit().isNaval()) {
-            throw new IllegalStateException("A target can only be found for naval units. You tried with: " + getUnit().getName());
+            throw new IllegalStateException("A target can only be found for naval units. You tried with: "
+                                            + getUnit().toString());
         }
         
         final GoalDecider gd = new GoalDecider() {
