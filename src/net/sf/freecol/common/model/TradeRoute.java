@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 
 import org.w3c.dom.Element;
 
@@ -378,8 +377,7 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         */
 
         public String toString() {
-            Location l = getLocation();
-            return l != null ? l.getLocationName().getId() : Messages.message("traderouteDialog.invalidStop");
+            return (getLocation() == null) ? "invalid stop" : getLocation().toString();
         }
 
         public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
