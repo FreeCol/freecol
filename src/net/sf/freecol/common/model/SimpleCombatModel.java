@@ -641,14 +641,14 @@ public class SimpleCombatModel implements CombatModel {
         if (attackingPlayer.isEuropean()) {
             attackingPlayer.getHistory()
                 .add(new HistoryEvent(attackingPlayer.getGame().getTurn().getNumber(),
-                                      HistoryEvent.Type.CONQUER_COLONY,
-                                      "%nation%", Messages.message(defendingPlayer.getNationName()),
-                                      "%colony%", colony.getName()));
+                                      HistoryEvent.EventType.CONQUER_COLONY)
+                     .addStringTemplate("%nation%", defendingPlayer.getNationName())
+                     .addName("%colony%", colony.getName()));
             defendingPlayer.getHistory()
                 .add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
-                                      HistoryEvent.Type.COLONY_CONQUERED,
-                                      "%colony%", colony.getName(),
-                                      "%nation%", Messages.message(attackingPlayer.getNationName())));
+                                      HistoryEvent.EventType.COLONY_CONQUERED)
+                     .addName("%colony%", colony.getName())
+                     .addStringTemplate("%nation%", attackingPlayer.getNationName()));
             defendingPlayer.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                              "model.unit.colonyCapturedBy", defendingPlayer)
                                             .addName("%colony%", colony.getName())
@@ -710,9 +710,9 @@ public class SimpleCombatModel implements CombatModel {
             if (colony.getUnitCount() <= 1) {
                 defendingPlayer.getHistory()
                     .add(new HistoryEvent(defendingPlayer.getGame().getTurn().getNumber(),
-                                          HistoryEvent.Type.COLONY_DESTROYED,
-                                          "%nation%", Messages.message(attackingPlayer.getNationName()),
-                                          "%colony%", colony.getName()));
+                                          HistoryEvent.EventType.COLONY_DESTROYED)
+                         .addStringTemplate("%nation%", attackingPlayer.getNationName())
+                         .addName("%colony%", colony.getName()));
                 defendingPlayer
                     .addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                       "model.unit.colonyBurning", defendingPlayer)
@@ -903,14 +903,14 @@ public class SimpleCombatModel implements CombatModel {
         attacker.setLocation(newTile);
         attacker.getOwner().getHistory()
             .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
-                                  HistoryEvent.Type.DESTROY_SETTLEMENT,
-                                  "%nation%", Messages.message(enemy.getNationName()),
-                                  "%settlement%", settlementName));
+                                  HistoryEvent.EventType.DESTROY_SETTLEMENT)
+                 .addStringTemplate("%nation%", enemy.getNationName())
+                 .addName("%settlement%", settlementName));
         if (enemy.getSettlements().isEmpty()) {
             attacker.getOwner().getHistory()
                 .add(new HistoryEvent(attacker.getGame().getTurn().getNumber(),
-                                      HistoryEvent.Type.DESTROY_NATION,
-                                      "%nation%", Messages.message(enemy.getNationName())));
+                                      HistoryEvent.EventType.DESTROY_NATION)
+                     .addStringTemplate("%nation%", enemy.getNationName()));
         }
     }
 

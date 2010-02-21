@@ -358,16 +358,23 @@ public class StringTemplate extends FreeColObject {
                 replacement.readFromXMLImpl(in);
                 replacements.add(replacement);
             } else if ("data".equals(in.getLocalName())) {
-                // TODO: remove compatibility code
-                String[] data = readFromArrayElement("data", in, new String[0]);
-                for (int index = 0; index < data.length; index += 2) {
-                    keys.add(data[index]);
-                    replacements.add(new StringTemplate(data[index + 1], TemplateType.NAME));
-                }
+                // TODO: remove compatibility code for ModelMessage
+                readOldFormat(readFromArrayElement("data", in, new String[0]));
+                // end compatibility code
+            } else if ("strings".equals(in.getLocalName())) {
+                // TODO: remove compatibility code for HistoryEvent
+                readOldFormat(readFromArrayElement("strings", in, new String[0]));
                 // end compatibility code
             }
         }
     }
 
+    // TODO: remove compatibility code
+    private void readOldFormat(String[] data) {
+        for (int index = 0; index < data.length; index += 2) {
+            keys.add(data[index]);
+            replacements.add(new StringTemplate(data[index + 1], TemplateType.NAME));
+        }
+    }
 
 }

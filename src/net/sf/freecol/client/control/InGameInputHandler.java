@@ -1079,9 +1079,9 @@ public final class InGameInputHandler extends InputHandler {
         loser.setDead(true);
         update(element);
         player.getHistory().add(new HistoryEvent(player.getGame().getTurn().getNumber(),
-                                                 HistoryEvent.Type.SPANISH_SUCCESSION,
-                                                 "%nation%", Messages.message(winner.getNationName()),
-                                                 "%loserNation%", Messages.message(loser.getNationName())));
+                                                 HistoryEvent.EventType.SPANISH_SUCCESSION)
+                                .addStringTemplate("%nation%", winner.getNationName())
+                                .addStringTemplate("%loserNation%", loser.getNationName()));
 
         return null;
     }

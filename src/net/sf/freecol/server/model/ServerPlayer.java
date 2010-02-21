@@ -206,7 +206,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         getFeatureContainer().addAbility(new Ability("model.ability.independenceDeclared"));
         modifyScore(SCORE_INDEPENDENCE_DECLARED);
         history.add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                     HistoryEvent.Type.DECLARE_INDEPENDENCE));
+                                     HistoryEvent.EventType.DECLARE_INDEPENDENCE));
 
         // Clean up unwanted connections
         divertModelMessages(europe, null);
@@ -289,7 +289,7 @@ public class ServerPlayer extends Player implements ServerModelObject {
         setTax(0);
         reinitialiseMarket();
         getHistory().add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                          HistoryEvent.Type.INDEPENDENCE));
+                                          HistoryEvent.EventType.INDEPENDENCE));
         messages.add(new ModelMessage("model.player.independence", this));
         ArrayList<Unit> surrenderUnits = new ArrayList<Unit>();
         ArrayList<String> unitNames = new ArrayList<String>();

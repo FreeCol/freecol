@@ -109,9 +109,8 @@ public class AbandonColonyMessage extends Message {
 
         // Proceed to abandon
         colony.dispose();
-        HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
-                                          HistoryEvent.Type.ABANDON_COLONY,
-                                          "%colony%", name);
+        HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.ABANDON_COLONY)
+            .addName("%colony%", name);
         player.getHistory().add(h);
         server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
         // TODO: clean up trade routes?

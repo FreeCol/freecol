@@ -73,8 +73,8 @@ public class NewLandNameMessage extends Message {
     public Element handle(FreeColServer server, Player player,
                           Connection connection) {
         HistoryEvent h = new HistoryEvent(player.getGame().getTurn().getNumber(),
-                                          HistoryEvent.Type.DISCOVER_NEW_WORLD,
-                                          "%name%", newLandName);
+                                          HistoryEvent.EventType.DISCOVER_NEW_WORLD)
+            .addName("%name%", newLandName);
         player.getHistory().add(h);
         player.setNewLandName(newLandName);
         // TODO: send land name to other players?

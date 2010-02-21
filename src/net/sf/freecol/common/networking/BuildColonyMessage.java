@@ -141,8 +141,8 @@ public class BuildColonyMessage extends Message {
             unit.buildIndianSettlement((IndianSettlement)settlement);
         }
         HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
-                                          HistoryEvent.Type.FOUND_COLONY,
-                                          "%colony%", settlement.getName());
+                                          HistoryEvent.EventType.FOUND_COLONY)
+            .addName("%colony%", settlement.getName());
         player.getHistory().add(h);
         server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
 

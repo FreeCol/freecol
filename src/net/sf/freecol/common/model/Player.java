@@ -1807,9 +1807,8 @@ public class Player extends FreeColGameObject implements Nameable {
         addModelMessage(new ModelMessage("model.player.foundingFatherJoinedCongress", this)
                         .add("%foundingFather%", father.getNameKey())
                         .add("%description%", father.getDescriptionKey()));
-        history.add(new HistoryEvent(getGame().getTurn().getNumber(),
-                                     HistoryEvent.Type.FOUNDING_FATHER,
-                                     "%father%", Messages.message(father.getNameKey())));
+        history.add(new HistoryEvent(getGame().getTurn().getNumber(), HistoryEvent.EventType.FOUNDING_FATHER)
+                    .add("%father%", father.getNameKey()));
         featureContainer.add(father.getFeatureContainer());
 
         List<AbstractUnit> units = father.getUnits();

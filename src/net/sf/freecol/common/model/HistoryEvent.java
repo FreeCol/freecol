@@ -24,9 +24,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 
-public class HistoryEvent extends FreeColObject {
+public class HistoryEvent extends StringTemplate {
 
-    public static enum Type {
+    public static enum EventType {
         DISCOVER_NEW_WORLD,
         DISCOVER_REGION,
         MEET_NATION,
@@ -55,23 +55,16 @@ public class HistoryEvent extends FreeColObject {
     /**
      * The type of event.
      */
-    private Type type;
-
-    /**
-     * The details of the event.
-     */
-    private String[] strings = new String[0];
+    private EventType eventType;
 
     public HistoryEvent() {
         // empty constructor
-        setId("");
     }
 
-    public HistoryEvent(int turn, Type type, String... strings) {
-        setId("");
+    public HistoryEvent(int turn, EventType eventType) {
+        super("model.history." + eventType.toString(), TemplateType.TEMPLATE);
         this.turn = turn;
-        this.type = type;
-        this.strings = strings;
+        this.eventType = eventType;
     }        
 
     /**
@@ -93,47 +86,80 @@ public class HistoryEvent extends FreeColObject {
     }
 
     /**
-     * Get the <code>Type</code> value.
+     * Get the <code>EventType</code> value.
      *
-     * @return a <code>Type</code> value
+     * @return a <code>EventType</code> value
      */
-    public final Type getType() {
-        return type;
+    public final EventType getEventType() {
+        return eventType;
     }
 
     /**
-     * Set the <code>Type</code> value.
+     * Set the <code>EventType</code> value.
      *
-     * @param newType The new Type value.
+     * @param newEventType The new EventType value.
      */
-    public final void setType(final Type newType) {
-        this.type = newType;
+    public final void setEventType(final EventType newEventType) {
+        this.eventType = newEventType;
     }
 
     /**
-     * Get the <code>Strings</code> value.
+     * Add a new key and replacement to the HistoryEvent. This is
+     * only possible if the HistoryEvent is of type TEMPLATE.
      *
-     * @return a <code>String[]</code> value
+     * @param key a <code>String</code> value
+     * @param value a <code>String</code> value
+     * @return a <code>HistoryEvent</code> value
      */
-    public final String[] getStrings() {
-        return strings;
+    public HistoryEvent add(String key, String value) {
+        super.add(key, value);
+        return this;
     }
 
     /**
-     * Set the <code>Strings</code> value.
+     * Add a new key and replacement to the HistoryEvent. The
+     * replacement must be a proper name. This is only possible if the
+     * HistoryEvent is of type TEMPLATE.
      *
-     * @param newStrings The new Strings value.
+     * @param key a <code>String</code> value
+     * @param value a <code>String</code> value
+     * @return a <code>HistoryEvent</code> value
      */
-    public final void setStrings(final String[] newStrings) {
-        this.strings = newStrings;
+    public HistoryEvent addName(String key, String value) {
+        super.addName(key, value);
+        return this;
     }
+
+    /**
+     * Add a key and an integer value to replace it to this
+     * StringTemplate.
+     *
+     * @param key a <code>String</code> value
+     * @param amount an <code>int</code> value
+     * @return a <code>HistoryEvent</code> value
+     */
+    public HistoryEvent addAmount(String key, int amount) {
+        super.addAmount(key, amount);
+        return this;
+    }
+
+    /**
+     * Add a key and a StringTemplate to replace it to this
+     * StringTemplate.
+     *
+     * @param key a <code>String</code> value
+     * @param template a <code>StringTemplate</code> value
+     * @return a <code>HistoryEvent</code> value
+     */
+    public HistoryEvent addStringTemplate(String key, StringTemplate template) {
+        super.addStringTemplate(key, template);
+	return this;
+    }
+
 
     public String toString() {
-        String result = type.toString() + " [";
-        for (String string : strings) {
-            result += " " + string;
-        }
-        return result + "]";
+        return eventType.toString() + " (" + Turn.getYear(turn) + ") ["
+            + super.toString() + "]";
     }
 
     /**
@@ -150,17 +176,17 @@ public class HistoryEvent extends FreeColObject {
      * @exception XMLStreamException if there are any problems writing
      *      to the stream.
      */
-    protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
-        // Start element:
+    public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
-
-        out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
-        out.writeAttribute("turn", Integer.toString(turn));
-        out.writeAttribute("type", type.toString());
-
-        toArrayElement("strings", strings, out);
-
+        writeAttributes(out);
+        writeChildren(out);
         out.writeEndElement();
+    }
+
+    public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
+        super.writeAttributes(out);
+        out.writeAttribute("turn", Integer.toString(turn));
+        out.writeAttribute("eventType", eventType.toString());
     }
 
     /**
@@ -168,13 +194,19 @@ public class HistoryEvent extends FreeColObject {
      * @param in The input stream with the XML.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
-        setId(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+        super.readAttributes(in);
         turn = Integer.parseInt(in.getAttributeValue(null, "turn"));
-        type = Enum.valueOf(Type.class, in.getAttributeValue(null, "type"));
-
-        strings = readFromArrayElement("strings", in, new String[0]);
-
-        in.nextTag();
+        String eventString = in.getAttributeValue(null, "eventType");
+        // TODO: remove compatibility code
+        if (eventString == null) {
+            eventString = in.getAttributeValue(null, "type");
+        }
+        if ("".equals(getId())) {
+            setId("model.history." + eventString);
+        }
+        // end compatibility code
+        eventType = Enum.valueOf(EventType.class, eventString);
+        super.readChildren(in);
     }
 
     /**

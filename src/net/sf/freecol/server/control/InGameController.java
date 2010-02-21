@@ -1504,10 +1504,9 @@ public final class InGameController extends Controller {
                                             "lostCityRumour.Cibola", serverPlayer, newUnit)
                            .addName("%city%", cityName)
                            .addAmount("%money%", treasureAmount));
-                result.add(new HistoryEvent(game.getTurn().getNumber(),
-                                            HistoryEvent.Type.CITY_OF_GOLD,
-                                            "%city%", cityName,
-                                            "%treasure%", Integer.toString(treasureAmount)));
+                result.add(new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.CITY_OF_GOLD)
+                           .addName("%city%", cityName)
+                           .addAmount("%treasure%", treasureAmount));
                 break;
             }
             // Fall through, found all the cities of gold.

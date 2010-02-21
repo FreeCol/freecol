@@ -282,8 +282,8 @@ public class MoveMessage extends Message {
                 stance.setAttribute("second", other.getId());
                 // Add a history event for first contacts,
                 HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(),
-                                                  HistoryEvent.Type.MEET_NATION,
-                                                  "%nation%", Messages.message(other.getNationName()));
+                                                  HistoryEvent.EventType.MEET_NATION)
+                    .addStringTemplate("%nation%", other.getNationName());
                 serverPlayer.addHistory(h);
                 addHistory.appendChild(h.toXMLElement(player, doc));
             } else { // native player, Europe, Tile
