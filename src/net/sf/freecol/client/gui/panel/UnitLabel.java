@@ -83,6 +83,11 @@ public final class UnitLabel extends JLabel implements ActionListener {
         setDisabledIcon(lib.getUnitImageIcon(unit, true));
         this.unit = unit;
         setDescriptionLabel(Messages.message(Messages.getLabel(unit)));
+        StringTemplate label = unit.getEquipmentLabel();
+        if (label != null) {
+            setDescriptionLabel(getDescriptionLabel() + " (" 
+                                + Messages.message(label) + ")");
+        }
         this.parent = parent;
         selected = false;
 
@@ -230,11 +235,13 @@ public final class UnitLabel extends JLabel implements ActionListener {
     public void paintComponent(Graphics g) {
 
         String name = getToolTipText();
+        /*
         StringTemplate equipmentLabel = unit.getEquipmentLabel();
         if (equipmentLabel != null) {
             name = name + " (" + Messages.message(equipmentLabel) + ")";
         }
         setToolTipText(name);
+        */
 
         if (ignoreLocation || selected || (!unit.isCarrier() && unit.getState() != UnitState.SENTRY)) {
             setEnabled(true);
