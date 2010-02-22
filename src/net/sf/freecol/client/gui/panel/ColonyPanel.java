@@ -309,7 +309,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(nameBox, "height 48:, grow");
         add(rightProductionPanel);
         add(tilesScroll, "width 390!, height 200!, top");
-        add(buildingsScroll, "span 1 3, grow 200");
+        add(buildingsScroll, "span 1 3, grow");
         add(populationPanel, "grow");
         add(constructionPanel, "growx, top");
         add(inPortScroll, "split 2, grow, height 60:121:");
@@ -813,7 +813,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
          * @param colonyPanel The panel that holds this BuildingsPanel.
          */
         public BuildingsPanel(ColonyPanel colonyPanel) {
-            setLayout(new GridLayout(0, 4));
+            setLayout(new MigLayout("wrap 4, gap 0"));
             this.colonyPanel = colonyPanel;
         }
 

@@ -20,6 +20,7 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -101,7 +102,8 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
             add(unitLabel);
         }
 
-        setSize(getPreferredSize());
+//        setSize(getPreferredSize());
+        setSize(new Dimension(96,64));
         revalidate();
         repaint();
     }
