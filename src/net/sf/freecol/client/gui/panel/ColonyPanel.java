@@ -272,6 +272,8 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
             });
 
         buildingsScroll.setAutoscrolls(true);
+        buildingsScroll.getViewport().setOpaque(false);
+        buildingsPanel.setOpaque(false);
 
         /** Borders */
         tilesScroll.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));

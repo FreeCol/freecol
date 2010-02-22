@@ -103,7 +103,7 @@ public class BuildingPanel extends JPanel implements PropertyChangeListener {
         }
 
 //        setSize(getPreferredSize());
-        setSize(new Dimension(96,64));
+        setSize(new Dimension(96,76));
         revalidate();
         repaint();
     }
