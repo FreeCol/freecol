@@ -304,7 +304,7 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         addMouseListener(new MouseAdapter() {
             });
 
-        setLayout(new MigLayout("fill, wrap 2", "[390!][fill]", ""));
+        setLayout(new MigLayout("fill, wrap 2, insets 2", "[390!][fill]", "[][][][][growprio 200,shrinkprio 10][growprio 150,shrinkprio 50]"));
 
         add(nameBox, "height 48:, grow");
         add(rightProductionPanel);
@@ -312,9 +312,9 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
         add(buildingsScroll, "span 1 3, grow 200");
         add(populationPanel, "grow");
         add(constructionPanel, "growx, top");
-        add(inPortScroll, "split 2, grow, height 121!");
-        add(cargoScroll, "grow, height 121!");
-        add(outsideColonyScroll, "grow, height 121!");
+        add(inPortScroll, "split 2, grow, height 60:121:");
+        add(cargoScroll, "grow, height 60:121:");
+        add(outsideColonyScroll, "grow, height 60:121:");
         add(warehouseScroll, "span, height 40:60:80, growx");
         add(unloadButton, "span, split 4, align center");
         add(fillButton);
