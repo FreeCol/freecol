@@ -50,6 +50,7 @@ import net.sf.freecol.client.gui.Canvas.TradeAction;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.client.gui.option.FreeColActionUI;
+import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.sound.SoundLibrary.SoundEffect;
 import net.sf.freecol.client.networking.Client;
 import net.sf.freecol.common.model.AbstractGoods;
@@ -2192,10 +2193,14 @@ public final class InGameController implements NetworkConstants {
         // Pick units the user wants to disembark.
         Canvas canvas = freeColClient.getCanvas();
         while (disembarkable.size() > 0) {
-            Unit u = canvas.showSimpleChoiceDialog(unit.getTile(),
-                                                   "disembark.text",
-                                                   "disembark.cancel",
-                                                   disembarkable);
+            List<ChoiceItem<Unit>> choices = new ArrayList<ChoiceItem<Unit>>();
+            for (Unit dUnit : disembarkable) {
+                choices.add(new ChoiceItem<Unit>(Messages.message(Messages.getLabel(dUnit)), dUnit));
+            }
+            Unit u = canvas.showChoiceDialog(unit.getTile(),
+                                             Messages.message("disembark.text"),
+                                             Messages.message("disembark.cancel"),
+                                             choices);
             if (u == null) break; // Done
             // Call move() as while the destination tile is known to
             // be clear of settlements or other player units, it *may*
