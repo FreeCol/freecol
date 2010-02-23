@@ -118,6 +118,7 @@ public class ModelMessage extends StringTemplate {
         super(id, TemplateType.TEMPLATE);
         this.messageType = messageType;
         this.source = source;
+        this.display = display;
 
         this.sourceLocation = null;
         if (source instanceof Unit) {
