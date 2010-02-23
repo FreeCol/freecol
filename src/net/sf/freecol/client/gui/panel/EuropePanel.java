@@ -159,9 +159,9 @@ public final class EuropePanel extends FreeColPanel {
         marketPanel.addMouseListener(releaseListener);
         cargoPanel.addMouseListener(releaseListener);
 
-        toAmericaPanel.setLayout(new GridLayout(0, 3));
-        toEuropePanel.setLayout(new GridLayout(0, 3));
-        inPortPanel.setLayout(new GridLayout(0, 3));
+        toAmericaPanel.setLayout(new GridLayout(1, 0));
+        toEuropePanel.setLayout(new GridLayout(1, 0));
+        inPortPanel.setLayout(new GridLayout(0, 4));
         docksPanel.setLayout(new GridLayout(0, 5));
         cargoPanel.setLayout(new GridLayout(0, 4));
 
@@ -220,16 +220,16 @@ public final class EuropePanel extends FreeColPanel {
         logScroll.getViewport().setOpaque(false);
         log.setOpaque(false);
 
-        setLayout(new MigLayout("wrap 3, fill, top, center, insets 30",
-                                "[fill, 280:, sg][fill, sg][fill, 200:]", 
-                                "[fill, 124:, sg][fill, sg][fill, sg][fill][]"));
+        setLayout(new MigLayout("wrap 3, insets 30",
+                                "push[fill, :380:480][fill, :380:480][fill, 150:200:]push", 
+                                "push[fill, 124:][fill, 124:][fill, 124:][fill, 100:][fill, ::160][::40]push"));
         add(toAmericaScroll);
+        add(docksScroll, "spany 4");
+        add(whitePanel, "spany 4");
         add(toEuropeScroll);
-        add(whitePanel, "span 1 4");
         add(inPortScroll);
-        add(docksScroll, "span 1 2");
         add(cargoScroll);
-        add(marketScroll, "span 2");
+        add(marketScroll, "span");
 
         add(recruitButton, "span, split 6");
         add(purchaseButton);
