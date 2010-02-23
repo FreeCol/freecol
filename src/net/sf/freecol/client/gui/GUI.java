@@ -2763,7 +2763,7 @@ public final class GUI {
                     occupationString = "model.unit.occupation.goingSomewhere";
             } else if (unit.getState() == UnitState.IMPROVING
                        && unit.getWorkImprovement() != null) {
-                occupationString = unit.getWorkImprovement().getId() + ".occupationString";
+                occupationString = unit.getWorkImprovement().getType().getId() + ".occupationString";
             } else if (unit.getState() == UnitState.ACTIVE && unit.getMovesLeft() == 0) {
                 if(unit.isUnderRepair())
                     occupationString = "model.unit.occupation.underRepair";
