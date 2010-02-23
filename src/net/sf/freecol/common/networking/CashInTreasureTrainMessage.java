@@ -91,7 +91,6 @@ public class CashInTreasureTrainMessage extends Message {
 
         // Cash in
         ModelMessage m = serverPlayer.cashInTreasureTrain(unit);
-        server.getInGameController().sendRemoveUnitToAll(unit, serverPlayer);
 
         // Only need the partial player update for gold and score.
         // The sole action on the tile is to remove the treasure

@@ -112,7 +112,7 @@ public class AbandonColonyMessage extends Message {
         HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.ABANDON_COLONY)
             .addName("%colony%", name);
         player.getHistory().add(h);
-        server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
+        server.getInGameController().sendUpdateToAll(serverPlayer, tile);
         // TODO: clean up trade routes?
 
         // Reply, updating the surrounding tiles now owned by the colony.

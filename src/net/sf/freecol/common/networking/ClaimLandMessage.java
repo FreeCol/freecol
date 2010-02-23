@@ -138,7 +138,7 @@ public class ClaimLandMessage extends Message {
 
         // All is well
         serverPlayer.claimLand(tile, settlement, price);
-        server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
+        server.getInGameController().sendUpdateToAll(serverPlayer, tile);
 
         // Update the tile, and any now-angrier owners, and the player gold
         // if a price was paid.

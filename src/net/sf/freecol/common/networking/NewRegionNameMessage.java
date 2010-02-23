@@ -108,7 +108,7 @@ public class NewRegionNameMessage extends Message {
         HistoryEvent h = region.discover(serverPlayer,
                                          serverPlayer.getGame().getTurn(),
                                          newRegionName);
-        controller.sendUpdateToAll(region, serverPlayer);
+        controller.sendUpdateToAll(serverPlayer, region);
 
         // Reply, updating the region and history.
         Element reply = Message.createNewRootElement("multiple");

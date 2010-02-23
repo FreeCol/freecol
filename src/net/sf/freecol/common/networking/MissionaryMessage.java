@@ -147,7 +147,9 @@ public class MissionaryMessage extends Message {
         } catch (Exception e) {
             return Message.clientError(e.getMessage());
         }
-        igc.sendRemoveUnitToAll(unit, serverPlayer);
+        if (oldLocation instanceof Tile) {
+            igc.sendRemoveUnitToAll(serverPlayer, unit, (Tile) oldLocation);
+        }
         if (!unit.isDisposed()) {
             settlement.getTile().updateIndianSettlementInformation(player);
             unit.setMovesLeft(0);

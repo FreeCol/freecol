@@ -326,7 +326,7 @@ public class MoveMessage extends Message {
                         // TODO: here is another dubious AI shortcut.
                         h = region.discover(serverPlayer, game.getTurn(),
                                             regionName);
-                        controller.sendUpdateToAll(region, serverPlayer);
+                        controller.sendUpdateToAll(serverPlayer, region);
                     } else { // Ask player to name the region.
                         reply.setAttribute("discoverRegion", regionName);
                         reply.setAttribute("regionType", Messages.message(region.getLabel()));

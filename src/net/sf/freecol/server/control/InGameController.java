@@ -62,9 +62,11 @@ import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Modifier;
 import net.sf.freecol.common.model.Monarch;
 import net.sf.freecol.common.model.Nation;
+import net.sf.freecol.common.model.Ownable;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Player.PlayerType;
 import net.sf.freecol.common.model.Player.Stance;
+import net.sf.freecol.common.model.Region;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Tension;
@@ -129,19 +131,150 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Tell all players to remove a unit, optionally excluding one player.
-     * Only send if the unit is visible to the player.
+     * Build a generalized update.
      *
+     * @param serverPlayer The <code>ServerPlayer</code> to send the
+     *            update to.
+     * @param objects The objects to consider.
+     * @return An element encapsulating an update of the objects to
+     *         consider, or null if there is nothing to report.
+     */
+    public Element buildGeneralUpdate(ServerPlayer serverPlayer,
+                                      FreeColObject... objects) {
+        List<FreeColObject> objectList = new ArrayList<FreeColObject>();
+        for (FreeColObject o : objects) objectList.add(o);
+        return buildGeneralUpdate(serverPlayer, objectList);
+    }
+
+     /**
+      * Build a generalized update.
+      * Beware that removing an object does not necessarily update
+      * its tile correctly on the client side--- if a tile update
+      * is needed the tile should be supplied in the objects list.
+      *
+      * @param serverPlayer The <code>ServerPlayer</code> to send the
+      *            update to.
+      * @param objects A <code>List</code> of objects to consider.
+      * @return An element encapsulating an update of the objects to
+      *         consider, or null if there is nothing to report.
+      */
+    public Element buildGeneralUpdate(ServerPlayer serverPlayer,
+                                      List<FreeColObject> objects) {
+        Document doc = Message.createNewDocument();
+        Element multiple = doc.createElement("multiple");
+        Element update = doc.createElement("update");
+        Element messages = doc.createElement("addMessages");
+        Element history = doc.createElement("addHistory");
+        Element remove = doc.createElement("remove");
+        for (FreeColObject o : objects) {
+            if (o instanceof ModelMessage) {
+                // Always send message objects
+                o.addToOwnedElement(messages, serverPlayer);
+            } else if (o instanceof HistoryEvent) {
+                // Always send history objects
+                o.addToOwnedElement(history, serverPlayer);
+            } else if (o instanceof FreeColGameObject) {
+                FreeColGameObject fcgo = (FreeColGameObject) o;
+                if (fcgo.isDisposed()) {
+                    // Always remove disposed objects
+                    fcgo.addToRemoveElement(remove);
+                } else if (fcgo instanceof Ownable
+                           && ((ServerPlayer)((Ownable) fcgo).getOwner())
+                           == serverPlayer) {
+                    // Always update our own objects
+                    update.appendChild(fcgo.toXMLElement(serverPlayer, doc));
+                } else if (fcgo instanceof Unit) {
+                    // Only update units that can be seen
+                    Unit unit = (Unit) fcgo;
+                    if (unit.isVisibleTo(serverPlayer)) {
+                        update.appendChild(unit.toXMLElement(serverPlayer, doc));
+                    }
+                } else if (fcgo instanceof Settlement) {
+                    // Only update settlements that can be seen
+                    Tile tile = ((Settlement) fcgo).getTile();
+                    if (serverPlayer.canSee(tile)) {
+                        update.appendChild(fcgo.toXMLElement(serverPlayer, doc));
+                    }
+                } else if (fcgo instanceof Tile) {
+                    // Only update tiles that can be seen
+                    Tile tile = (Tile) fcgo;
+                    if (serverPlayer.canSee(tile)) {
+                        update.appendChild(tile.toXMLElement(serverPlayer, doc, false, false));
+                    }
+                } else if (fcgo instanceof Region) {
+                    // Always update regions
+                    update.appendChild(fcgo.toXMLElement(serverPlayer, doc));
+                } else {
+                    logger.warning("Attempt to update hidden object: "
+                                   + fcgo.getId());
+                }
+            } else {
+                throw new IllegalStateException("Bogus object");
+            }
+        }
+
+        // Decide what to return.  If there are several parts with children
+        // then return multiple, if there is one viable part, return that,
+        // else null.
+        int n = 0;
+        Element child = null;
+        if (update.hasChildNodes()) {
+            multiple.appendChild(update);
+            child = update;
+            n++;
+        }
+        if (messages.hasChildNodes()) {
+            multiple.appendChild(messages);
+            child = messages;
+            n++;
+        }
+        if (history.hasChildNodes()) {
+            multiple.appendChild(history);
+            child = history;
+            n++;
+        }
+        if (remove.hasChildNodes()) {
+            multiple.appendChild(remove);
+            child = remove;
+            n++;
+        }
+        switch (n) {
+        case 0:
+            return null;
+        case 1:
+            multiple.removeChild(child);
+            doc.appendChild(child);
+            return child;
+        default:
+            doc.appendChild(multiple);
+            return multiple;
+        }
+    }
+
+    /**
+     * Tell all players to remove a unit, optionally excluding one
+     * player.  Only send if the tile the unit was on is visible to
+     * the recipient player.  The unit may or may not have already
+     * been disposed of on the server side, but is known to have left
+     * the supplied tile so the client is told to remove it regardless.
+     *
+     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
      * @param unit The <code>Unit</code> to remove.
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     * @param tile The <code>Tile</code> the unit has left.
      */
-    public void sendRemoveUnitToAll(Unit unit, ServerPlayer serverPlayer) {
-        Element remove = Message.createNewRootElement("remove");
-        unit.addToRemoveElement(remove);
-        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
-            if (unit.isVisibleTo(enemyPlayer)) {
+    public void sendRemoveUnitToAll(ServerPlayer serverPlayer,
+                                    Unit unit, Tile tile) {
+        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
+            if (other.canSee(tile)) {
+                Element element = Message.createNewRootElement("multiple");
+                Document doc = element.getOwnerDocument();
+                Element update = doc.createElement("update");
+                update.appendChild(tile.toXMLElement(other, doc, false,false));
+                Element remove = doc.createElement("remove");
+                element.appendChild(remove);
+                unit.addToRemoveElement(remove);
                 try {
-                    enemyPlayer.getConnection().sendAndWait(remove);
+                    other.getConnection().sendAndWait(element);
                 } catch (IOException e) {
                     logger.warning(e.getMessage());
                 }
@@ -150,47 +283,26 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Unconditionally tell all players to update an object,
-     * optionally excluding one player.
+     * Send a generalized update to a list of players.
+     * Each player apart from the optional exclusion is informed of
+     * changes it can see.
      *
-     * @param obj The <code>FreeColGameObject</code> to update.
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
+     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
+     * @param objects A list of objects to consider.
      */
-    public void sendUpdateToAll(FreeColGameObject obj, ServerPlayer serverPlayer) {
-        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
-            Element update = Message.createNewRootElement("update");
-            Document doc = update.getOwnerDocument();
-            update.appendChild(obj.toXMLElement(enemyPlayer, doc));
-            try {
-                enemyPlayer.getConnection().sendAndWait(update);
-            } catch (IOException e) {
-                logger.warning(e.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Tell all players to update a tile, optionally excluding one player.
-     * Only send if the tile is visible.
-     *
-     * @param newTile The <code>Tile</code> to update.
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
-     */
-    public void sendUpdatedTileToAll(Tile newTile, ServerPlayer serverPlayer) {
-        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
-            if (enemyPlayer.canSee(newTile)) {
-                Element update = Message.createNewRootElement("update");
-                Document doc = update.getOwnerDocument();
-                update.appendChild(newTile.toXMLElement(enemyPlayer, doc));
+    public void sendUpdateToAll(ServerPlayer serverPlayer,
+                                FreeColObject... objects) {
+        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
+            Element element = buildGeneralUpdate(other, objects);
+            if (element != null) {
                 try {
-                    enemyPlayer.getConnection().sendAndWait(update);
+                    other.getConnection().sendAndWait(element);
                 } catch (IOException e) {
                     logger.warning(e.getMessage());
                 }
             }
         }
     }
-
 
 
     /**
@@ -1713,14 +1825,14 @@ public final class InGameController extends Controller {
             return false;
         }
 
-        Location sourceLocation = unit.getLocation();
+        Location oldLocation = unit.getLocation();
         unit.setLocation(carrier);
         unit.setMovesLeft(0); // unit.getMovesLeft() -  3
         unit.setState(UnitState.SENTRY);
 
         // Update others
-        if (sourceLocation instanceof Tile) {
-            sendRemoveUnitToAll(unit, serverPlayer);
+        if (oldLocation instanceof Tile) {
+            sendRemoveUnitToAll(serverPlayer, unit, (Tile) oldLocation);
         }
         return true;
     }
@@ -1745,8 +1857,8 @@ public final class InGameController extends Controller {
         unit.setState(UnitState.ACTIVE);
 
         // Update others, but not Europe.
-        if (!(destination instanceof Europe)) {
-            sendUpdatedTileToAll(destination.getTile(), serverPlayer);
+        if (destination.getTile() != null) {
+            sendUpdateToAll(serverPlayer, destination.getTile());
         }
         return true;
     }
@@ -2152,14 +2264,15 @@ public final class InGameController extends Controller {
         // There can be some restrictions that may prevent the
         // clearing of the speciality.  For example, teachers cannot
         // not be cleared of their speciality.
-        if (unit.getLocation() instanceof Building
-            && !((Building) unit.getLocation()).canAdd(newType)) {
+        Location oldLocation = unit.getLocation();
+        if (oldLocation instanceof Building
+            && !((Building) oldLocation).canAdd(newType)) {
             throw new IllegalStateException("Cannot clear speciality, building does not allow new unit type");
         }
 
         unit.setType(newType);
-        if (unit.getLocation() instanceof Tile) {
-            sendUpdatedTileToAll(unit.getTile(), serverPlayer);
+        if (oldLocation instanceof Tile) {
+            sendUpdateToAll(serverPlayer, (Tile) oldLocation);
         }
     }
 }

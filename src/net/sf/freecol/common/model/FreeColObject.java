@@ -137,6 +137,21 @@ public abstract class FreeColObject {
     }
 
     /**
+     * Convenience function to add an object to an element, where the
+     * object should have its "owner" field set.  This is useful for
+     * ModelMessage and HistoryEvent objects.
+     *
+     * @param element The <code>Element</code> to add to.
+     * @param player The owner <code>Player</code>.
+     */
+    public void addToOwnedElement(Element element, Player player) {
+        Document doc = element.getOwnerDocument();
+        Element child = this.toXMLElement(player, doc);
+        child.setAttribute("owner", player.getId());
+        element.appendChild(child);
+    }
+
+    /**
      * This method writes an XML-representation of this object to
      * the given stream.
      *

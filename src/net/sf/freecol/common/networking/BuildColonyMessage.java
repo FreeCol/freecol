@@ -144,7 +144,7 @@ public class BuildColonyMessage extends Message {
                                           HistoryEvent.EventType.FOUND_COLONY)
             .addName("%colony%", settlement.getName());
         player.getHistory().add(h);
-        server.getInGameController().sendUpdatedTileToAll(tile, serverPlayer);
+        server.getInGameController().sendUpdateToAll(serverPlayer, tile);
 
         // Reply, updating the surrounding tiles now owned by the colony.
         Element reply = Message.createNewRootElement("multiple");
