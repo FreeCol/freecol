@@ -410,7 +410,7 @@ public final class InGameController extends Controller {
         update.appendChild(market.toXMLElement(player, doc));
         Element mess = doc.createElement("addMessages");
         for (ModelMessage m : messages) {
-            mess.appendChild(m.toXMLElement(player, doc));
+            m.addToOwnedElement(mess, player);
         }
         if (mess.hasChildNodes()) {
             element.appendChild(mess);
@@ -458,7 +458,7 @@ public final class InGameController extends Controller {
         ModelMessage m = new ModelMessage(ModelMessage.MessageType.FOREIGN_DIPLOMACY,
                                           messageId, serverPlayer)
             .addStringTemplate("%nation%", serverPlayer.getNationName());
-        messages.appendChild(m.toXMLElement(doc));
+        m.addToOwnedElement(messages, serverPlayer);
 
         Element setDeadElement = doc.createElement("setDead");
         element.appendChild(setDeadElement);

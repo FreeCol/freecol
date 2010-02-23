@@ -82,11 +82,11 @@ public class NewLandNameMessage extends Message {
         Element reply = Message.createNewRootElement("multiple");
         Document doc = reply.getOwnerDocument();
         Element update = doc.createElement("update");
-        Element history = doc.createElement("addHistory");
         reply.appendChild(update);
-        reply.appendChild(history);
         update.appendChild(player.toXMLElementPartial(doc, "newLandName"));
-        history.appendChild(h.toXMLElement(player, doc));
+        Element history = doc.createElement("addHistory");
+        reply.appendChild(history);
+        h.addToOwnedElement(history, player);
         return reply;
     }
 

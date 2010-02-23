@@ -100,12 +100,12 @@ public class GiveIndependenceMessage extends Message {
         Element reply = Message.createNewRootElement("multiple");
         Document doc = reply.getOwnerDocument();
         Element update = doc.createElement("update");
-        Element messages = doc.createElement("addMessages");
         reply.appendChild(update);
-        reply.appendChild(messages);
         update.appendChild(independent.toXMLElement(doc));
+        Element messages = doc.createElement("addMessages");
+        reply.appendChild(messages);
         for (ModelMessage m : indeps) {
-            messages.appendChild(m.toXMLElement(doc));
+            m.addToOwnedElement(messages, player);
         }
         try {
             independentConnection.send(reply);

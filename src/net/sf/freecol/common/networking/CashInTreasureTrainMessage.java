@@ -99,7 +99,7 @@ public class CashInTreasureTrainMessage extends Message {
         Document doc = reply.getOwnerDocument();
         Element messages = doc.createElement("addMessages");
         reply.appendChild(messages);
-        messages.appendChild(m.toXMLElement(player, doc));
+        m.addToOwnedElement(messages, player);
         Element update = doc.createElement("update");
         reply.appendChild(update);
         update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));

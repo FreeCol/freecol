@@ -270,9 +270,9 @@ public class MoveMessage extends Message {
             if (object == player) { // Only returned if received gold
                 update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
             } else if (object instanceof ModelMessage) {
-                addMessages.appendChild(object.toXMLElement(player, doc));
+                object.addToOwnedElement(addMessages, player);
             } else if (object instanceof HistoryEvent) {
-                addHistory.appendChild(object.toXMLElement(player, doc));
+                object.addToOwnedElement(addHistory, player);
             } else if (object instanceof ServerPlayer && contacts.contains(object)) {
                 ServerPlayer other = (ServerPlayer) object;
                 Element stance = doc.createElement("setStance");
@@ -285,7 +285,7 @@ public class MoveMessage extends Message {
                                                   HistoryEvent.EventType.MEET_NATION)
                     .addStringTemplate("%nation%", other.getNationName());
                 serverPlayer.addHistory(h);
-                addHistory.appendChild(h.toXMLElement(player, doc));
+                h.addToOwnedElement(addHistory, player);
             } else { // native player, Europe, Tile
                 update.appendChild(object.toXMLElement(player, doc,
                                                         false, false));
@@ -334,7 +334,7 @@ public class MoveMessage extends Message {
                 }
                 if (h != null) {
                     serverPlayer.addHistory(h);
-                    addHistory.appendChild(h.toXMLElement(player, doc));
+                    h.addToOwnedElement(addHistory, player);
                     update.appendChild(region.toXMLElement(player, doc));
                 }
             }

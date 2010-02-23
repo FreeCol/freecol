@@ -118,11 +118,11 @@ public class DeclareIndependenceMessage extends Message {
         doc = reply.getOwnerDocument();
         Element update = doc.createElement("update");
         Element remove = doc.createElement("remove");
-        Element messages = doc.createElement("addMessages");
         reply.appendChild(update);
+        Element messages = doc.createElement("addMessages");
         for (FreeColObject obj : changes) {
             if (obj instanceof ModelMessage) {
-                messages.appendChild(obj.toXMLElement(player, doc));
+                obj.addToOwnedElement(messages, player);
             } else if (obj instanceof Unit && ((Unit) obj).isDisposed()) {
                 ((Unit) obj).addToRemoveElement(remove);
             } else {

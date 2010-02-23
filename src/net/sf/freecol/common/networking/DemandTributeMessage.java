@@ -139,7 +139,7 @@ public class DemandTributeMessage extends Message {
                                           messageId, unit, indianSettlement)
             .addAmount("%amount%", gold);
 
-        messages.appendChild(m.toXMLElement(player, doc));
+        m.addToOwnedElement(messages, player);
         return reply;
     }
 

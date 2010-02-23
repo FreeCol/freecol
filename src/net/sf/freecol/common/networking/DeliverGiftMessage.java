@@ -194,7 +194,7 @@ public class DeliverGiftMessage extends Message {
                 .add("%type%", goods.getNameKey())
                 .addAmount("%amount%", goods.getAmount())
                 .addName("%colony%", settlement.getName());
-            messages.appendChild(m.toXMLElement(receiver, doc));
+            m.addToOwnedElement(messages, receiver);
             try {
                 receiver.getConnection().send(gift);
             } catch (IOException e) {

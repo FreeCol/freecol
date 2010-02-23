@@ -165,7 +165,7 @@ public class MissionaryMessage extends Message {
         if (m != null) {
             Element messages = doc.createElement("addMessages");
             reply.appendChild(messages);
-            messages.appendChild(m.toXMLElement(player, doc));
+            m.addToOwnedElement(messages, player);
         }
         if (unit.isDisposed()) {
             Element remove = doc.createElement("remove");

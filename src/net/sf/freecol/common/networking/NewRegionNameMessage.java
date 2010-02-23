@@ -118,7 +118,7 @@ public class NewRegionNameMessage extends Message {
         update.appendChild(region.toXMLElement(player, doc));
         Element history = doc.createElement("addHistory");
         reply.appendChild(history);
-        history.appendChild(h.toXMLElement(player, doc));
+        h.addToOwnedElement(history, player);
         return reply;
     }
 

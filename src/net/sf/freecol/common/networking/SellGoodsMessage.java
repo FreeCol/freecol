@@ -161,7 +161,7 @@ public class SellGoodsMessage extends Message {
             update.appendChild(market.toXMLElement(player, doc));
             Element addMessages = doc.createElement("addMessages");
             reply.appendChild(addMessages);
-            addMessages.appendChild(message.toXMLElement(player, doc));
+            message.addToOwnedElement(addMessages, player);
         }
         return reply;
     }

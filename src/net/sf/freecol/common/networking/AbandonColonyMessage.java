@@ -128,7 +128,7 @@ public class AbandonColonyMessage extends Message {
         }
         Element history = doc.createElement("addHistory");
         reply.appendChild(history);
-        history.appendChild(h.toXMLElement(player, doc));
+        h.addToOwnedElement(history, player);
         return reply;
     }
 

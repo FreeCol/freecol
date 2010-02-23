@@ -106,7 +106,7 @@ public class EmigrateUnitMessage extends Message {
         if (m != null) {
             Element messages = doc.createElement("addMessages");
             reply.appendChild(messages);
-            messages.appendChild(m.toXMLElement(player, doc));
+            m.addToOwnedElement(messages, player);
         }
         return reply;
     }
