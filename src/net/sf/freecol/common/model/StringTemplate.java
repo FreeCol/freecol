@@ -293,6 +293,60 @@ public class StringTemplate extends FreeColObject {
         return result;
     }
 
+
+    public boolean equals(Object o) {
+        if (o instanceof StringTemplate) {
+            StringTemplate t = (StringTemplate) o;
+            if (!getId().equals(t.getId()) || templateType != t.templateType) {
+                return false;
+            }
+            if (templateType == TemplateType.LABEL) {
+                if (replacements.size() == t.replacements.size()) {
+                    for (int index = 0; index < replacements.size(); index++) {
+                        if (!replacements.get(index).equals(t.replacements.get(index))) {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+            } else if (templateType == TemplateType.TEMPLATE) {
+                if (keys.size() == t.keys.size()
+                    && replacements.size() == t.replacements.size()
+                    && keys.size() == replacements.size()) {
+                    for (int index = 0; index < replacements.size(); index++) {
+                        if (!keys.get(index).equals(t.keys.get(index))
+                            || !replacements.get(index).equals(t.replacements.get(index))) {
+                            return false;
+                        }
+                    }
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public int hashCode() {
+        int result = 17;
+        result = result * 31 + getId().hashCode();
+        result = result * 31 + templateType.ordinal();
+        if (templateType == TemplateType.LABEL) {
+            for (StringTemplate replacement : replacements) {
+                result = result * 31 + replacement.hashCode();
+            }
+        } else if (templateType == TemplateType.TEMPLATE) {
+            for (int index = 0; index < keys.size(); index++) {
+                result = result * 31 + keys.get(index).hashCode();
+                result = result * 31 + replacements.get(index).hashCode();
+            }
+        }
+        return result;
+    }
+
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         out.writeStartElement(getXMLElementTagName());
         writeAttributes(out);
