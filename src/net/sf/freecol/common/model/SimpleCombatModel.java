@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Player.Stance;
@@ -1204,12 +1203,12 @@ public class SimpleCombatModel implements CombatModel {
         StringTemplate oldName = unit.getLabel();
         Player enemy = enemyUnit.getOwner();
         StringTemplate enemyNation = enemy.getNationName();
-        String messageID = Messages.getKey(unit.getType().getId() + ".captured",
-                                           "model.unit.unitCaptured");
+        String messageID = unit.getType().getId() + ".captured";
 
         // unit is about to change sides, launch message now!
         loser.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                messageID, unit)
+                             .setDefaultId("model.unit.unitCaptured")
                              .addStringTemplate("%nation%", nation)
                              .addStringTemplate("%unit%", oldName)
                              .addStringTemplate("%enemyNation%", enemyNation)
@@ -1226,6 +1225,7 @@ public class SimpleCombatModel implements CombatModel {
         }
         enemy.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                messageID, enemyUnit)
+                                  .setDefaultId("model.unit.unitCaptured")
                                   .addStringTemplate("%nation%", nation)
                                   .addStringTemplate("%unit%", oldName)
                                   .addStringTemplate("%enemyNation%", enemyNation)
@@ -1247,12 +1247,12 @@ public class SimpleCombatModel implements CombatModel {
         StringTemplate oldName = unit.getLabel();
         Player enemy = enemyUnit.getOwner();
         StringTemplate enemyNation = enemy.getNationName();
-        String messageID = Messages.getKey(unit.getType().getId() + ".demoted",
-                                           "model.unit.unitDemoted");
+        String messageID = unit.getType().getId() + ".demoted";
 
         unit.setType(downgrade);
         enemy.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                messageID, enemyUnit)
+                                  .setDefaultId("model.unit.unitDemoted")
                                   .addStringTemplate("%nation%", nation)
                                   .addStringTemplate("%oldName%", oldName)
                                   .addStringTemplate("%unit%", unit.getLabel())
@@ -1261,6 +1261,7 @@ public class SimpleCombatModel implements CombatModel {
                                   .addStringTemplate("%location%", locationName));
         loser.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                messageID, unit)
+                             .setDefaultId("model.unit.unitDemoted")
                              .addStringTemplate("%nation%", nation)
                              .addStringTemplate("%oldName%", oldName)
                              .addStringTemplate("%unit%", unit.getLabel())
@@ -1283,8 +1284,7 @@ public class SimpleCombatModel implements CombatModel {
         StringTemplate oldName = unit.getLabel();
         Player enemy = enemyUnit.getOwner();
         StringTemplate enemyNation = enemy.getNationName();
-        String messageID = Messages.getKey(unit.getType().getId() + ".demoted",
-                                           "model.unit.unitDemoted");
+        String messageID = unit.getType().getId() + ".demoted";
 
         boolean hasAutoEquipment = unit.getEquipment().isEmpty() && unit.getAutomaticEquipment() != null;
 
@@ -1311,6 +1311,7 @@ public class SimpleCombatModel implements CombatModel {
         }
         enemy.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                messageID, enemyUnit)
+                                  .setDefaultId("model.unit.unitDemoted")
                                   .addStringTemplate("%nation%", nation)
                                   .addStringTemplate("%oldName%", oldName)
                                   .addStringTemplate("%unit%", unit.getLabel())
@@ -1319,6 +1320,7 @@ public class SimpleCombatModel implements CombatModel {
                                   .addStringTemplate("%location%", locationName));
         loser.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                messageID, unit)
+                             .setDefaultId("model.unit.unitDemoted")
                              .addStringTemplate("%nation%", nation)
                              .addStringTemplate("%oldName%", oldName)
                              .addStringTemplate("%unit%", unit.getLabel())
@@ -1388,11 +1390,11 @@ public class SimpleCombatModel implements CombatModel {
         StringTemplate nation = loser.getNationName();
         Player enemy = enemyUnit.getOwner();
         StringTemplate enemyNation = enemy.getNationName();
-        String messageID = Messages.getKey(unit.getType().getId() + ".destroyed",
-                                           "model.unit.unitSlaughtered");
+        String messageID = unit.getType().getId() + ".destroyed";
 
         enemy.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                messageID, enemyUnit)
+                                  .setDefaultId("model.unit.unitSlaughtered")
                                   .addStringTemplate("%nation%", nation)
                                   .addStringTemplate("%unit%", unit.getLabel())
                                   .addStringTemplate("%enemyNation%", enemyNation)
@@ -1400,6 +1402,7 @@ public class SimpleCombatModel implements CombatModel {
                                   .addStringTemplate("%location%", locationName));
         loser.addModelMessage(new ModelMessage(ModelMessage.MessageType.COMBAT_RESULT,
                                                messageID, unit)
+                             .setDefaultId("model.unit.unitSlaughtered")
                              .addStringTemplate("%nation%", nation)
                              .addStringTemplate("%unit%", unit.getLabel())
                              .addStringTemplate("%enemyNation%", enemyNation)
