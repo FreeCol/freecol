@@ -115,7 +115,7 @@ public final class ReportNavalPanel extends ReportPanel {
 
         // Europe next
         if (player.getEurope() != null) {
-            String europeName = player.getEurope().getName();
+            String europeName = Messages.message(player.getEurope().getNameKey());
             handleLocation(europeName, true);
             otherNames.remove(europeName);
         }
@@ -142,7 +142,7 @@ public final class ReportNavalPanel extends ReportPanel {
         }
         otherNames = new ArrayList<String>();
         if (player.getEurope() != null) {
-            otherNames.add(player.getEurope().getName());
+            otherNames.add(Messages.message(player.getEurope().getNameKey()));
         }
 
         for (Unit unit : player.getUnits()) {

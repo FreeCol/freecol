@@ -298,7 +298,7 @@ public final class SelectDestinationDialog extends FreeColDialog<Location>
             String name = "";
             if (location instanceof Europe) {
                 Europe europe = (Europe) location;
-                name = europe.getName();
+                name = Messages.message(europe.getNameKey());
                 label.setIcon(new ImageIcon(getLibrary().getCoatOfArmsImage(europe.getOwner().getNation())
                                             .getScaledInstance(-1, 48, Image.SCALE_SMOOTH)));
             } else if (location instanceof Settlement) {

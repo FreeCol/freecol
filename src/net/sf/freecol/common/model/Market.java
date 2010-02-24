@@ -419,7 +419,7 @@ public final class Market extends FreeColGameObject implements Ownable {
                                 ? "model.market.priceIncrease"
                                 : "model.market.priceDecrease"),
                                this, goodsType)
-            .addName("%market%", owner.getMarketName())
+            .addStringTemplate("%market%", owner.getMarketName())
             .add("%goods%", goodsType.getNameKey())
             .addAmount("%buy%", newPrice)
             .addAmount("%sell%", newSalePrice);

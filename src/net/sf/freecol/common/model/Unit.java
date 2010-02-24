@@ -3169,7 +3169,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                         
                     getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                      "model.unit.arriveInEurope", getOwner().getEurope(), this)
-                                    .addName("%europe%", getOwner().getEurope().getName()));
+                                    .add("%europe%", getOwner().getEurope().getNameKey()));
                     setState(UnitState.ACTIVE);
                     break;
                 case TO_AMERICA:

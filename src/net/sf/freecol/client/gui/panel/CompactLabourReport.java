@@ -280,11 +280,12 @@ public final class CompactLabourReport extends ReportPanel {
         }
         LabourData.LocationData europe = unitData.getUnitsInEurope();
         if (europe.getRowCount() > 0) {
-            JButton button = createButton(getMyPlayer().getEurope().getName(), new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    getCanvas().showEuropePanel();
-                }
-            });
+            JButton button = createButton(Messages.message(getMyPlayer().getEurope().getNameKey()),
+                                          new ActionListener() {
+                                              public void actionPerformed(ActionEvent e) {
+                                                  getCanvas().showEuropePanel();
+                                              }
+                                          });
             reportPanel.add(button, "cell " + COLONY_COLUMN + " " + row + " " + 1 + " " + europe.getRowCount());
             row = addLocationData(europe, null, row);
         }

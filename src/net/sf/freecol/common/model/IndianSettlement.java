@@ -1337,10 +1337,7 @@ public class IndianSettlement extends Settlement {
             owner = new Player(getGame(), in.getAttributeValue(null, "owner"));
         }
         setCapital(getAttribute(in, "isCapital", false));
-        // TODO: >=0.8.2, setName(in.getAttributeValue(null, "name"))
-        String name = in.getAttributeValue(null, "name");
-        if (name == null) name = owner.getDefaultSettlementName(isCapital());
-        setName(name);
+        setName(in.getAttributeValue(null, "name"));
 
         owner.addSettlement(this);
 

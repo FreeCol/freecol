@@ -239,7 +239,7 @@ public final class ReportTurnPanel extends ReportPanel {
                                       .addStringTemplate("%nation%", player.getNationName()));
         } else if (source instanceof Europe) {
             Europe europe = (Europe) source;
-            JButton button = new JButton(europe.getName());
+            JButton button = new JButton(Messages.message(europe.getNameKey()));
             button.addActionListener(this);
             button.setActionCommand(europe.getId());
             headline = button;
@@ -308,7 +308,8 @@ public final class ReportTurnPanel extends ReportPanel {
                             insertText(document, item[1]);
                         }
                     } else if (var.equals("%europe%")) {
-                        insertLinkButton(document, player.getEurope(), player.getEurope().getName());
+                        insertLinkButton(document, player.getEurope(),
+                                         Messages.message(player.getEurope().getNameKey()));
                     } else if (var.equals("%unit%") || var.equals("%newName%")) {
                         Tile tile = null;
                         if (message.getSource() instanceof Unit) {

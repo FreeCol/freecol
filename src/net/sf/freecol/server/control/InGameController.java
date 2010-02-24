@@ -1315,7 +1315,7 @@ public final class InGameController extends Controller {
         return (fountain || validSlot) ? null
             : new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
                                "model.europe.emigrate", player, unit)
-            .addName("%europe%", europe.getName())
+            .add("%europe%", europe.getNameKey())
             .addStringTemplate("%unit%", unit.getLabel());
     }
 

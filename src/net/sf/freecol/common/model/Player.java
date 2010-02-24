@@ -39,7 +39,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.Map.Direction;
@@ -614,11 +613,9 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return A name for the player's market.
      */
-    public String getMarketName() {
-        Europe europe = getEurope();
-
-        return (europe == null) ? Messages.message("model.market.independent")
-            : europe.getName();
+    public StringTemplate getMarketName() {
+        return (getEurope() == null) ? StringTemplate.key("model.market.independent")
+            : StringTemplate.key(nationID + ".europe");
     }
 
     /**
@@ -1257,15 +1254,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets the default new land name for this <code>Player</code>.
-     *
-     * @return A suitable default name.
-     */
-    public String getDefaultNewLandName() {
-        return Messages.message(nationID + ".newLandName");
-    }
-
-    /**
      * Gets the name this player has chosen for the new land.
      *
      * @return The name of the new world as chosen by the <code>Player</code>,
@@ -1276,17 +1264,6 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Gets a name for the new land, either the player choice or a default.
-     *
-     * @return A name for the new world.
-     */
-    public String getSafeNewLandName() {
-        return (newLandName != null) ? newLandName
-            : getDefaultNewLandName();
-    }
-
-
-    /**
      * Returns true if the player already selected a new name for the discovered
      * land.
      *
@@ -1295,104 +1272,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     public boolean isNewLandNamed() {
         return newLandName != null;
-    }
-
-    /**
-     * Creates a unique settlement name. This is done by fetching a new default
-     * settlement name from the list of default names.
-     *
-     * @param capital True if the name should be the national capital.
-     *
-     * @return A <code>String</code> containing a new unused name from
-     *         the list, if any is available, and otherwise an automatically
-     *         generated name.
-     */
-    public String getDefaultSettlementName(boolean capital) {
-        String prefix = nationID + ".settlementName.";
-        String name;
-
-        if (capital) return Messages.message(prefix + "0");
-
-        if (isIndian()) {
-            // TODO: Until the native names are in some sensible order, choose
-            // at random.  When they are fixed, remove this and use the European
-            // method below.
-            PseudoRandom random = getGame().getModelController().getPseudoRandom();
-            int upper = 100;
-            int lower = 1;
-            int i, n = 0;
-
-            for (i = 0; i < 5; i++) { // try at random five times
-                n = random.nextInt(upper - lower) + lower;
-                if (!Messages.containsKey(prefix + Integer.toString(n))) {
-                    if (n == lower) break;
-                    upper = n;
-                    continue;
-                }
-                name = Messages.message(prefix + Integer.toString(n));
-                if (getSettlement(name) == null) return name;
-            }
-            for (i = n+1; i < upper; i++) { // search up from last try
-                if (!Messages.containsKey(prefix + Integer.toString(i))) break;
-                name = Messages.message(prefix + Integer.toString(i));
-                if (getSettlement(name) == null) return name;
-            }
-            for (i = n-1; i > 0; i--) { // search down from last try
-                if (!Messages.containsKey(prefix + Integer.toString(i))) continue;
-                name = Messages.message(prefix + Integer.toString(i));
-                if (getSettlement(name) == null) return name;
-            }
-        } else {
-            while (Messages.containsKey(prefix + Integer.toString(settlementNameIndex))) {
-                name = Messages.message(prefix + Integer.toString(settlementNameIndex));
-                settlementNameIndex++;
-                if (getGame().getSettlement(name) == null) return name;
-            }
-        }
-
-        // Fallback method
-        String fallback = (isIndian()) ? "Settlement" : "Colony";
-        do {
-            name = Messages.message(fallback) + settlementNameIndex;
-            settlementNameIndex++;
-        } while (getGame().getSettlement(name) != null);
-        return name;
-    }
-
-    /**
-     * Creates a unique region name by fetching a new default name
-     * from the list of default names if possible.
-     *
-     * @param regionType a <code>RegionType</code> value
-     * @return a <code>String</code> value
-     */
-    public String getDefaultRegionName(RegionType regionType) {
-        String prefix = nationID + ".region." + regionType.toString().toLowerCase() + ".";
-        String name = null;
-        int index = 1;
-        Integer newIndex = regionNameIndex.get(regionType);
-        if (newIndex != null) {
-            index = newIndex.intValue();
-        }
-        do {
-            name = null;
-            if (Messages.containsKey(prefix + Integer.toString(index))) {
-                name = Messages.message(prefix + Integer.toString(index));
-                index++;
-            }
-        } while (name != null && getGame().getMap().getRegionByName(name) != null);
-        if (name == null) {
-            do {
-                String type = Messages.message("model.region." + regionType.toString().toLowerCase() + ".name");
-                name = Messages.message(StringTemplate.template("model.region.default")
-                                        .addStringTemplate("%nation%", getNationName())
-                                        .addName("%type%", type)
-                                        .addAmount("%index%", index));
-                index++;
-            } while (getGame().getMap().getRegionByName(name) != null);
-        }
-        regionNameIndex.put(regionType, index);
-        return name;
     }
 
     /**
@@ -1929,11 +1808,11 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return a <code>String</code> value
      */
-    public String getEuropeName() {
+    public String getEuropeNameKey() {
         if (europe == null) {
             return null;
         } else {
-            return Messages.message(nationID + ".europe");
+            return nationID + ".europe";
         }
     }
 
@@ -2187,8 +2066,8 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return a <code>String</code> value
      */
-    public final String getRulerName() {
-        return Messages.message(nationID + ".ruler");
+    public final String getRulerNameKey() {
+        return nationID + ".ruler";
     }
 
     /**
@@ -2874,16 +2753,6 @@ public class Player extends FreeColGameObject implements Nameable {
         return (player == null || stance.get(player.getId()) == null)
             ? Stance.UNCONTACTED
             : stance.get(player.getId());
-    }
-
-    /**
-     * Returns a string describing the given stance.
-     *
-     * @param stance The stance.
-     * @return A matching string.
-     */
-    public static String getStanceAsString(Stance stance) {
-        return Messages.message("model.stance." + stance.toString().toLowerCase());
     }
 
     /**

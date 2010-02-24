@@ -516,7 +516,7 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * @return The name of this location.
      */
     public StringTemplate getLocationName() {
-        return StringTemplate.name(getName());
+        return StringTemplate.key(getNameKey());
     }
 
     /**
@@ -524,15 +524,9 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
      * 
      * @return The name of this location.
      */
-    public String getName() {
-        return getOwner().getEuropeName();
-    }
-
-    // TODO: remove this again
     public String getNameKey() {
-        return getName();
+        return getOwner().getEuropeNameKey();
     }
-
 
     /**
      * Returns a suitable name.

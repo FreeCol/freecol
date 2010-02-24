@@ -185,8 +185,8 @@ public final class ReportLabourPanel extends ReportPanel implements ActionListen
             }
         }
         if (unitInEurope.getCount(unitType) > 0) {
-            JButton europeButton = getLinkButton(getMyPlayer().getEurope().getName(), null,
-                                                 getMyPlayer().getEurope().getId());
+            JButton europeButton = getLinkButton(Messages.message(getMyPlayer().getEurope().getNameKey()),
+                                                 null, getMyPlayer().getEurope().getId());
             europeButton.addActionListener(report);
             detailPanel.add(europeButton);
             JLabel countLabel = new JLabel(String.valueOf(unitInEurope.getCount(unitType)));

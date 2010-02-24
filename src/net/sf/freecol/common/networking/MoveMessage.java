@@ -301,7 +301,7 @@ public class MoveMessage extends Message {
             }
 
             if (newTile.isLand() && !player.isNewLandNamed()) {
-                String newLandName = player.getDefaultNewLandName();
+                String newLandName = Messages.getNewLandName(player);
                 if (player.isAI()) {
                     // TODO: Not convinced shortcutting the AI like
                     // this is a good idea--- even though this is
@@ -321,7 +321,7 @@ public class MoveMessage extends Message {
                     h = region.discover(serverPlayer, game.getTurn(),
                                         "model.region.pacific");
                 } else {
-                    String regionName = player.getDefaultRegionName(region.getType());
+                    String regionName = Messages.getDefaultRegionName(player, region.getType());
                     if (player.isAI()) {
                         // TODO: here is another dubious AI shortcut.
                         h = region.discover(serverPlayer, game.getTurn(),

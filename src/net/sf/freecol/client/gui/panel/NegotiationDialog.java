@@ -380,7 +380,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
                 foundItem = true;
                 String description = "";
                 if (item instanceof StanceTradeItem) {
-                    description = Player.getStanceAsString(((StanceTradeItem) item).getStance());
+                    description = Messages.getStanceAsString(((StanceTradeItem) item).getStance());
                 } else if (item instanceof GoldTradeItem) {
                     String gold = String.valueOf(((GoldTradeItem) item).getGold());
                     description = Messages.message("tradeItem.gold.long", "%amount%", gold);
@@ -709,7 +709,7 @@ public final class NegotiationDialog extends FreeColDialog<DiplomaticTrade> impl
             }
             
             public String toString() {
-                return Player.getStanceAsString(value);
+                return Messages.getStanceAsString(value);
             }
             
             Stance getValue() {

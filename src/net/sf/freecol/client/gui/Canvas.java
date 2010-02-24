@@ -1946,11 +1946,12 @@ public final class Canvas extends JDesktopPane {
         choices.add(new ChoiceItem<BoycottAction>(
                 Messages.message("boycottedGoods.dumpGoods"),
                 BoycottAction.DUMP_CARGO));
-        BoycottAction result = showChoiceDialog(null,
-                Messages.message("boycottedGoods.text",
-                                 "%goods%", Messages.message(goods.getNameKey()),
-                                 "%europe%", europe.getName(),
-                                 "%amount%", String.valueOf(arrears)),
+        BoycottAction result = 
+            showChoiceDialog(null,
+                             Messages.message(StringTemplate.template("boycottedGoods.text")
+                                              .add("%goods%", goods.getNameKey())
+                                              .add("%europe%", europe.getNameKey())
+                                              .addAmount("%amount%", arrears)),
                 Messages.message("cancel"),
                 choices);
         return (result == null) ? BoycottAction.CANCEL : result;

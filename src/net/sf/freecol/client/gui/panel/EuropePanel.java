@@ -351,7 +351,7 @@ public final class EuropePanel extends FreeColPanel {
             }
         }
 
-        String newLandName = getMyPlayer().getSafeNewLandName();
+        String newLandName = Messages.getNewLandName(getMyPlayer());
         ((TitledBorder) toAmericaPanel.getBorder()).setTitle(Messages.message("sailingTo", 
                 "%location%", newLandName));
     }
@@ -558,11 +558,10 @@ public final class EuropePanel extends FreeColPanel {
                     if (!autoload
                             && docksPanel.getComponentCount() > 0
                             && unit.getSpaceLeft() > 0) {
-                        boolean leave = getCanvas().showConfirmDialog(null,
-                                "europe.leaveColonists",
-                                "yes",
-                                "no",
-                                "%newWorld%", unit.getOwner().getSafeNewLandName());
+                        boolean leave = getCanvas()
+                            .showConfirmDialog(null, "europe.leaveColonists",
+                                               "yes", "no",
+                                               "%newWorld%", Messages.getNewLandName(unit.getOwner()));
                         if (!leave) { // Colonists remain in Europe.
                             return null;
                         }

@@ -26,6 +26,9 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.common.PseudoRandom;
+import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Region.RegionType;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.model.UnitType;
@@ -290,6 +293,119 @@ public class Messages {
                            Messages.message(someType.getNameKey()));
         }
     }
+
+    /**
+     * Returns a string describing the given stance.
+     *
+     * @param stance The stance.
+     * @return A matching string.
+     */
+    public static String getStanceAsString(Player.Stance stance) {
+        return message("model.stance." + stance.toString().toLowerCase());
+    }
+
+    public static String getNewLandName(Player player) {
+        if (player.getNewLandName() == null) {
+            return message(player.getNationID() + ".newLandName");
+        } else {
+            return player.getNewLandName();
+        }
+    }
+
+
+    /**
+     * Creates a unique settlement name. This is done by fetching a new default
+     * settlement name from the list of default names.
+     *
+     * @param capital True if the name should be the national capital.
+     *
+     * @return A <code>String</code> containing a new unused name from
+     *         the list, if any is available, and otherwise an automatically
+     *         generated name.
+     */
+    public static String getDefaultSettlementName(Player player, boolean capital) {
+        int settlementNameIndex = 0;
+        String prefix = player.getNationID() + ".settlementName.";
+        String name;
+
+        if (capital) return message(prefix + "0");
+
+        if (player.isIndian()) {
+            // TODO: Until the native names are in some sensible order, choose
+            // at random.  When they are fixed, remove this and use the European
+            // method below.
+            PseudoRandom random = player.getGame().getModelController().getPseudoRandom();
+            int upper = 100;
+            int lower = 1;
+            int i, n = 0;
+
+            for (i = 0; i < 5; i++) { // try at random five times
+                n = random.nextInt(upper - lower) + lower;
+                if (!containsKey(prefix + Integer.toString(n))) {
+                    if (n == lower) break;
+                    upper = n;
+                    continue;
+                }
+                name = message(prefix + Integer.toString(n));
+                if (player.getSettlement(name) == null) return name;
+            }
+            for (i = n+1; i < upper; i++) { // search up from last try
+                if (!containsKey(prefix + Integer.toString(i))) break;
+                name = message(prefix + Integer.toString(i));
+                if (player.getSettlement(name) == null) return name;
+            }
+            for (i = n-1; i > 0; i--) { // search down from last try
+                if (!containsKey(prefix + Integer.toString(i))) continue;
+                name = message(prefix + Integer.toString(i));
+                if (player.getSettlement(name) == null) return name;
+            }
+        } else {
+            while (containsKey(prefix + Integer.toString(settlementNameIndex))) {
+                name = message(prefix + Integer.toString(settlementNameIndex));
+                settlementNameIndex++;
+                if (player.getGame().getSettlement(name) == null) return name;
+            }
+        }
+
+        // Fallback method
+        String fallback = (player.isIndian()) ? "Settlement" : "Colony";
+        do {
+            name = message(fallback) + settlementNameIndex;
+            settlementNameIndex++;
+        } while (player.getGame().getSettlement(name) != null);
+        return name;
+    }
+
+    /**
+     * Creates a unique region name by fetching a new default name
+     * from the list of default names if possible.
+     *
+     * @param regionType a <code>RegionType</code> value
+     * @return a <code>String</code> value
+     */
+    public static String getDefaultRegionName(Player player, RegionType regionType) {
+        int index = 1;
+        String prefix = player.getNationID() + ".region." + regionType.toString().toLowerCase() + ".";
+        String name;
+        do {
+            name = null;
+            if (containsKey(prefix + Integer.toString(index))) {
+                name = Messages.message(prefix + Integer.toString(index));
+                index++;
+            }
+        } while (name != null && player.getGame().getMap().getRegionByName(name) != null);
+        if (name == null) {
+            do {
+                name = message(StringTemplate.template("model.region.default")
+                               .addStringTemplate("%nation%", player.getNationName())
+                               .add("%type%", "model.region." + regionType.toString().toLowerCase() + ".name")
+                               .addAmount("%index%", index));
+                index++;
+            } while (player.getGame().getMap().getRegionByName(name) != null);
+        }
+        return name;
+    }
+
 
     /**
      * Calling this method can be used to replace the messages used currently

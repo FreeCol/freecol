@@ -71,7 +71,7 @@ public final class ReportForeignAffairPanel extends ReportPanel {
 
             enemyPanel.add(new JLabel(Messages.message("report.stance")), "newline");
             Stance stance = Enum.valueOf(Stance.class, enemyElement.getAttribute("stance"));
-            enemyPanel.add(new JLabel(Player.getStanceAsString(stance)));
+            enemyPanel.add(new JLabel(Messages.getStanceAsString(stance)));
 
             enemyPanel.add(new JLabel(Messages.message("report.numberOfColonies")), "newline");
             enemyPanel.add(new JLabel(enemyElement.getAttribute("numberOfColonies")));
