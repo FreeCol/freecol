@@ -170,7 +170,11 @@ public class Messages {
                 }
             }
         case TEMPLATE:
-	    result = message(template.getId());
+            if (containsKey(template.getId())) {
+                result = message(template.getId());
+            } else if (template.getDefaultId() != null) {
+                result = message(template.getDefaultId());
+            }
 	    for (int index = 0; index < template.getKeys().size(); index++) {
                 result = result.replace(template.getKeys().get(index),
                                         message(template.getReplacements().get(index)));

@@ -58,6 +58,12 @@ public class StringTemplate extends FreeColObject {
     private TemplateType templateType = TemplateType.KEY;
 
     /**
+     * An alternative key to use if the Id is not contained in the
+     * message bundle.
+     */
+    private String defaultId;
+
+    /**
      * The keys to replace within the string template.
      */
     private List<String> keys;
@@ -95,6 +101,26 @@ public class StringTemplate extends FreeColObject {
         case LABEL:            
             replacements = new ArrayList<StringTemplate>();
         }
+    }
+
+    /**
+     * Get the <code>DefaultId</code> value.
+     *
+     * @return a <code>String</code> value
+     */
+    public final String getDefaultId() {
+        return defaultId;
+    }
+
+    /**
+     * Set the <code>DefaultId</code> value.
+     *
+     * @param newDefaultId The new DefaultId value.
+     * @return a <code>StringTemplate</code> value
+     */
+    public StringTemplate setDefaultId(final String newDefaultId) {
+        this.defaultId = newDefaultId;
+        return this;
     }
 
     // Factory methods
@@ -278,7 +304,11 @@ public class StringTemplate extends FreeColObject {
             }
             break;
         case TEMPLATE:
-            result += getId() + " [";
+            result += getId();
+            if (defaultId != null) {
+                result += " (" + defaultId + ")";
+            }
+            result += " [";
             for (int index = 0; index < keys.size(); index++) {
                 result += "[" + keys.get(index) + ": "
                     + replacements.get(index).toString() + "]";
@@ -286,6 +316,11 @@ public class StringTemplate extends FreeColObject {
             result += "]";
             break;
         case KEY:
+            result += getId();
+            if (defaultId != null) {
+                result += " (" + defaultId + ")";
+            }
+            break;
         case NAME:
         default:
             result += getId();
@@ -298,6 +333,15 @@ public class StringTemplate extends FreeColObject {
         if (o instanceof StringTemplate) {
             StringTemplate t = (StringTemplate) o;
             if (!getId().equals(t.getId()) || templateType != t.templateType) {
+                return false;
+            }
+            if (defaultId == null) {
+                if (t.defaultId != null) {
+                    return false;
+                }
+            } else if (t.defaultId == null) {
+                return false;
+            } else if (!defaultId.equals(t.defaultId)) {
                 return false;
             }
             if (templateType == TemplateType.LABEL) {
@@ -334,6 +378,9 @@ public class StringTemplate extends FreeColObject {
         int result = 17;
         result = result * 31 + getId().hashCode();
         result = result * 31 + templateType.ordinal();
+        if (defaultId != null) {
+            result = result * 31 + defaultId.hashCode();
+        }
         if (templateType == TemplateType.LABEL) {
             for (StringTemplate replacement : replacements) {
                 result = result * 31 + replacement.hashCode();
@@ -361,6 +408,9 @@ public class StringTemplate extends FreeColObject {
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         out.writeAttribute(ID_ATTRIBUTE_TAG, getId());
         out.writeAttribute("templateType", templateType.toString());
+        if (defaultId != null) {
+            out.writeAttribute("defaultId", defaultId);
+        }
     }
 
 
@@ -393,6 +443,7 @@ public class StringTemplate extends FreeColObject {
             templateType = Enum.valueOf(TemplateType.class, typeString);
         }
         // end compatibility code
+        defaultId = in.getAttributeValue(null, "defaultId");
         switch (templateType) {
         case TEMPLATE:
             keys = new ArrayList<String>();

@@ -146,6 +146,18 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
+     * Set the <code>DefaultId</code> value.
+     *
+     * @param newDefaultId The new DefaultId value.
+     * @return a <code>ModelMessage</code> value
+     */
+    @Override
+    public final ModelMessage setDefaultId(final String newDefaultId) {
+        super.setDefaultId(newDefaultId);
+        return this;
+    }
+
+    /**
      * Returns the default display object for the given type.
      * @param messageType the type for which to find the default display object.
      * @param source the source object

@@ -22,6 +22,7 @@ package net.sf.freecol.common.model;
 import java.util.HashSet;
 
 import net.sf.freecol.FreeCol;
+import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.ModelMessage.MessageType;
 import net.sf.freecol.util.test.FreeColTestCase;
 
@@ -78,6 +79,21 @@ public class ModelMessageTest extends FreeColTestCase {
         assertEquals(mm1.hashCode(), mm2.hashCode());
         set.add(mm1);
         assertTrue(set.remove(mm2));
+    }
+
+    public void testDefaultId() {
+    	Game game = getGame();
+    	game.setMap(getTestMap(plainsType,true));
+    	
+        Player player = game.getPlayer("model.nation.dutch");
+        
+        ModelMessage mm1 = new ModelMessage(MessageType.WAREHOUSE_CAPACITY,
+                                            "no.such.messageId",
+                                            player, null)
+            .setDefaultId("player");
+
+        assertEquals("Player", Messages.message(mm1));
+
     }
     
 }
