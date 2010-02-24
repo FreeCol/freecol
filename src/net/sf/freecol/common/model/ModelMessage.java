@@ -376,17 +376,15 @@ public class ModelMessage extends StringTemplate {
     */
     @Override
     public boolean equals(Object o) {
-        if ( ! (o instanceof ModelMessage) ) { return false; }
-        ModelMessage m = (ModelMessage) o;
-        // Check that the content of the data array is equal
-        /*
-        if (!Arrays.equals(data, m.data)) {
-            return false;
-        }
-        */
-        return ( source.equals(m.source)
+        if (o instanceof ModelMessage) {
+            ModelMessage m = (ModelMessage) o;
+            if (source.equals(m.source)
                 && getId().equals(m.getId())
-                && messageType == m.messageType );
+                && messageType == m.messageType) {
+                return super.equals(m);
+            }
+        }
+        return false;
     }
     
     @Override
@@ -394,29 +392,17 @@ public class ModelMessage extends StringTemplate {
         int value = 1;
         value = 37 * value + ((source == null) ? 0 : source.hashCode());
         value = 37 * value + getId().hashCode();
-        /*
-        if (data != null) {
-            for (String s : data) {
-                value = 37 * value + s.hashCode();
-            }
-        }
-        */
         value = 37 * value + messageType.ordinal();
+        value = 37 * value + super.hashCode();
         return value;
     }
     
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ModelMessage<");
-        sb.append(hashCode() + ", " + ((source == null) ? "null" : source.getId()) + ", " + getId() + ", "
-                  + ((display==null) ? "null" : display.getId()) + ", ");
-        /*
-        if (data != null) {
-            for (String s : data) {
-                sb.append(s + "/");
-            }
-        }
-        */
+        StringBuilder sb = new StringBuilder("ModelMessage<" + hashCode() + ", ");
+        sb.append(((source == null) ? "null" : source.getId()) + ", ");
+        sb.append(((display == null) ? "null" : display.getId()) + ", ");
+        sb.append(super.toString());
         sb.append(", " + messageType + " >");
         return sb.toString();
     }
