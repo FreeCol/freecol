@@ -425,8 +425,9 @@ public class GoodsContainer extends FreeColGameObject {
                 level = low;
             }
             if (messageId != null) {
-                addModelMessage(new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
-                                                 messageId, colony, goodsType)
+                Player owner = colony.getOwner();
+                owner.addModelMessage(new ModelMessage(ModelMessage.MessageType.WAREHOUSE_CAPACITY,
+                                                       messageId, colony, goodsType)
                                 .add("%goods%", goodsType.getNameKey())
                                 .addAmount("%waste%", waste)
                                 .addAmount("%level%", level)

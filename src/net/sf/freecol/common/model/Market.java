@@ -284,8 +284,8 @@ public final class Market extends FreeColGameObject implements Ownable {
                                type, getGame().getTurn());
             addGoodsToMarket(type, amount);
         } else {
-            addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                             "model.europe.market", this)
+            player.addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                    "model.europe.market", this)
                             .add("%goods%", type.getNameKey()));
         }
     }

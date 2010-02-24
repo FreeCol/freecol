@@ -501,7 +501,8 @@ public final class Europe extends FreeColGameObject implements Location, Ownable
             if (unit.isNaval() && unit.isUnderRepair()) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
-                    addModelMessage(new ModelMessage("model.unit.shipRepaired", this, unit)
+                    getOwner().addModelMessage(new ModelMessage("model.unit.shipRepaired",
+                                                                this, unit)
                                     .addStringTemplate("%unit%", unit.getLabel())
                                     .addStringTemplate("%repairLocation%", getLocationName()));
                 }

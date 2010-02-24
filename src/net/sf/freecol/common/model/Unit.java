@@ -3167,7 +3167,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                         return;
                     }
                         
-                    addModelMessage(new ModelMessage(ModelMessage.MessageType.DEFAULT,
+                    getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.DEFAULT,
                                                      "model.unit.arriveInEurope", getOwner().getEurope(), this)
                                     .addName("%europe%", getOwner().getEurope().getName()));
                     setState(UnitState.ACTIVE);
@@ -3259,8 +3259,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (!equipment.containsKey(tools)) {
             String messageId = (getType().getDefaultEquipmentType() == type)
                 ? getId() + ".noMoreTools" : "model.unit.noMoreTools";
-            addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                             messageId, this)
+            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                        messageId, this)
                             .addStringTemplate("%unit%", getLabel())
                             .addStringTemplate("%location%", getLocation().getLocationName()));
         }
@@ -3377,8 +3377,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         StringTemplate newName = getLabel();
         if (!newName.equals(oldName)) {
             Colony colony = getTile().getColony();
-            addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                             "model.unit.unitEducated", colony, this)
+            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
+                                                        "model.unit.unitEducated", colony, this)
                             .addStringTemplate("%oldName%", oldName)
                             .addStringTemplate("%unit%", newName)
                             .addName("%colony%", colony.getName()));
@@ -3586,8 +3586,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         logger.finest("About to change type of unit due to experience.");
         StringTemplate oldName = getLabel();
         setType(learnType);
-        addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
-                                         "model.unit.experience", getColony(), this)
+        getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_IMPROVED,
+                                                    "model.unit.experience", getColony(), this)
                         .addStringTemplate("%oldName%", oldName)
                         .addStringTemplate("%unit%", getLabel())
                         .addName("%colony%", getColony().getName()));
@@ -3607,8 +3607,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         if (location instanceof Tile && ((Tile) location).getSettlement() == null) {
             attrition++;
             if (attrition > getType().getMaximumAttrition()) {
-                addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
-                                                 "model.unit.attrition", this)
+                getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.UNIT_LOST,
+                                                            "model.unit.attrition", this)
                                 .addStringTemplate("%unit%", getLabel()));
                 dispose();
             }

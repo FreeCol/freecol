@@ -491,7 +491,8 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
                 buildingType.hasAbility("model.ability.repairUnits", unit.getType())) {
                 unit.setHitpoints(unit.getHitpoints() + 1);
                 if (!unit.isUnderRepair()) {
-                    addModelMessage(new ModelMessage("model.unit.unitRepaired", this)
+                    getOwner().addModelMessage(new ModelMessage("model.unit.unitRepaired",
+                                                                this)
                                     .addStringTemplate("%unit%", unit.getLabel())
                                     .addStringTemplate("%repairLocation%", getLocationName()));
                 }
@@ -506,9 +507,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         final GoodsType goodsOutputType = getGoodsOutputType();
 
         if (goodsInput == 0 && !canAutoProduce() && getMaximumGoodsInput() > 0) {
-            addModelMessage(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
-                                             "model.building.notEnoughInput",
-                                             getColony(), goodsInputType)
+            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.MISSING_GOODS,
+                                                        "model.building.notEnoughInput",
+                                                        getColony(), goodsInputType)
                             .add("%inputGoods%", goodsInputType.getNameKey())
                             .add("%building%", getNameKey())
                             .addName("%colony%", colony.getName()));
@@ -573,9 +574,9 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     private boolean assignStudent(Unit teacher) {
         final Unit student = findStudent(teacher);
         if (student == null) {
-            addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
-                                             "model.building.noStudent",
-                                             getColony(), teacher)
+            getOwner().addModelMessage(new ModelMessage(ModelMessage.MessageType.WARNING,
+                                                        "model.building.noStudent",
+                                                        getColony(), teacher)
                             .addStringTemplate("%teacher%", teacher.getLabel())
                             .addName("%colony%", colony.getName()));
             return false;

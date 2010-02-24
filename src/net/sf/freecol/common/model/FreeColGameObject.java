@@ -369,27 +369,6 @@ abstract public class FreeColGameObject extends FreeColObject {
 
     
     /**
-     * Receives a <code>ModelMessage</code> and uses
-     * <code>Player.addModelMessage(modelMessage)</code> to register
-     * it.
-     *     
-     * @param message The message to send. In addition, the owner of the source
-     *                is the player getting the message.
-     *               
-     * @see net.sf.freecol.client.gui.Canvas Canvas
-     * @see Player#addModelMessage(ModelMessage)
-     * @see ModelMessage
-     */
-    protected void addModelMessage(ModelMessage message){
-    	if (message.getSource() == null) {
-            logger.warning("ModelMessage with ID " + message.getId() + " has null source.");
-    	} else if (message.getOwner() == null) {
-            logger.warning("ModelMessage with ID " + message.getId() + " has null owner.");
-    	}
-    	message.getOwner().addModelMessage(message);
-    }
-    
-    /**
      * Checks if this object has the specified ID.
      *
      * @param id The ID to check against.
