@@ -568,47 +568,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         return result;
     }
 
-    /**
-     * Tell all players to remove a unit, optionally excluding one.
-     *
-     * @param unit The <code>Unit</code> to remove.
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
-     */
-    private void sendRemoveUnitToAll(Unit unit, ServerPlayer serverPlayer) {
-        Element remove = Message.createNewRootElement("remove");
-        unit.addToRemoveElement(remove);
-        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
-            if (unit.isVisibleTo(enemyPlayer)) {
-                try {
-                    enemyPlayer.getConnection().sendAndWait(remove);
-                } catch (IOException e) {
-                    logger.warning(e.getMessage());
-                }
-            }
-        }
-    }
-
-    /**
-     * Tell all players to update a tile, optionally excluding one.
-     *
-     * @param newTile The <code>Tile</code> to update.
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
-     */
-    private void sendUpdatedTileToAll(Tile newTile, ServerPlayer serverPlayer) {
-        for (ServerPlayer enemyPlayer : getOtherPlayers(serverPlayer)) {
-            if (enemyPlayer.canSee(newTile)) {
-                Element update = Message.createNewRootElement("update");
-                Document doc = update.getOwnerDocument();
-                update.appendChild(newTile.toXMLElement(enemyPlayer, doc));
-                try {
-                    enemyPlayer.getConnection().sendAndWait(update);
-                } catch (IOException e) {
-                    logger.warning(e.getMessage());
-                }
-            }
-        }
-    }
-
 
     /**
      * Handles a "createUnit"-message from a client.
@@ -1040,16 +999,20 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param moveToEuropeElement The element containing the request.
      */
     private Element moveToEurope(Connection connection, Element moveToEuropeElement) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(moveToEuropeElement.getAttribute("unit"));
-        if (unit.getOwner() != player) {
+        if (unit.getOwner() != serverPlayer) {
             throw new IllegalStateException("Not your unit!");
         }
-        // Inform other players the unit is moving off the map
-        sendRemoveUnitToAll(unit, player);
-        
+
+        // Move it off
         Tile oldTile = unit.getTile();
         unit.moveToEurope();
+
+        // Inform other players the unit is moving off the map
+        InGameController igc = getFreeColServer().getInGameController();
+        igc.sendRemoveUnitToAll(serverPlayer, unit, oldTile);
+
         return null;
     }
 
@@ -1133,7 +1096,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
 
         if (unit.getLocation() instanceof Tile) {
-            sendUpdatedTileToAll(unit.getTile(), player);
+            InGameController igc = getFreeColServer().getInGameController();
+            igc.sendUpdateToAll(player, unit.getTile());
         }
         return null;
     }
@@ -1171,14 +1135,15 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Location oldLocation = unit.getLocation();
         unit.work(workLocation);
         // For updating the number of colonist:
-        sendUpdatedTileToAll(unit.getTile(), serverPlayer);
+        InGameController igc = getFreeColServer().getInGameController();
+        igc.sendUpdateToAll(serverPlayer, unit.getTile());
         // oldLocation is empty now
         if (oldLocation instanceof ColonyTile) {
-            sendUpdatedTileToAll(((ColonyTile) oldLocation).getWorkTile(), serverPlayer);
+            igc.sendUpdateToAll(serverPlayer, ((ColonyTile) oldLocation).getWorkTile());
         }
         // workLocation is occupied now
         if (workLocation instanceof ColonyTile) {
-            sendUpdatedTileToAll(((ColonyTile) workLocation).getWorkTile(), serverPlayer);
+            igc.sendUpdateToAll(serverPlayer, ((ColonyTile) workLocation).getWorkTile());
         }
         return null;
     }
@@ -1308,7 +1273,9 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         colony.setBuildQueue(buildQueue);
         // TODO: what is the following line for?
-        sendUpdatedTileToAll(colony.getTile(), player);
+        // AFAICT, it is pointless, and I just broke it, and so
+        // commented it out.  --MTP
+        // sendUpdatedTileToAll(colony.getTile(), player);
         return null;
     }
 
@@ -1343,7 +1310,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                     + ". Possible cheating attempt (or bug)?");
         }
         // Send the updated tile anyway, we may have a synchronization issue
-        sendUpdatedTileToAll(oldTile, player);
+        InGameController igc = getFreeColServer().getInGameController();
+        igc.sendUpdateToAll(player, oldTile);
         return null;
     }
 
@@ -1362,7 +1330,6 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Location oldLocation = unit.getLocation();
         unit.putOutsideColony();
         // Don't send updated tile! Other players can't see the unit.
-        // sendUpdatedTileToAll(unit.getTile(), player);
         Element updateElement = Message.createNewRootElement("update");
         updateElement.appendChild(unit.getTile().toXMLElement(player, updateElement.getOwnerDocument()));
         if (oldLocation instanceof Building) {
@@ -1466,7 +1433,8 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         Tile oldTile = unit.getTile();
         unit.dispose();
-        sendUpdatedTileToAll(oldTile, player);
+        InGameController igc = getFreeColServer().getInGameController();
+        igc.sendRemoveUnitToAll(player, unit, oldTile);
         return null;
     }
 

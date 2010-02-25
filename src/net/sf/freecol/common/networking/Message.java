@@ -350,9 +350,42 @@ public class Message {
     }
 
     /**
+     * Convenience method: returns the first element with the specified
+     * tagname considering elements as a tree.
+     *
+     * @param element The root <code>Element</code> to search.
+     * @param tagName The tag name of the element to be found.
+     * @return The element with the given name.
+     */
+    public static Element getElement(Element element, String tagName) {
+        if (element.getTagName().equals(tagName)) return element;
+        NodeList nodes = element.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            if (nodes.item(i) instanceof Element) {
+                Element e = getElement((Element) nodes.item(i), tagName);
+                if (e != null) return e;
+            }
+        }
+
+        return null;
+    }
+
+    public static Element spliceIntoElement(Element root, String tagName,
+                                            Element child) {
+        Element parent = getElement(root, tagName);
+        if (parent == null) {
+            Document doc = root.getOwnerDocument();
+            parent = doc.createElement(tagName);
+            root.appendChild(parent);
+        }
+        parent.appendChild(child);
+        return parent;
+    }
+
+    /**
      * Convenience method: returns the first child element with the specified
      * tagname.
-     * 
+     *
      * @param element The <code>Element</code> to search for the child
      *            element.
      * @param tagName The tag name of the child element to be found.

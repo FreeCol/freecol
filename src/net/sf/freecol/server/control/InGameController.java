@@ -167,7 +167,9 @@ public final class InGameController extends Controller {
         Element history = doc.createElement("addHistory");
         Element remove = doc.createElement("remove");
         for (FreeColObject o : objects) {
-            if (o instanceof ModelMessage) {
+            if (o == null) {
+                continue;
+            } else if (o instanceof ModelMessage) {
                 // Always send message objects
                 o.addToOwnedElement(messages, serverPlayer);
             } else if (o instanceof HistoryEvent) {
@@ -288,13 +290,54 @@ public final class InGameController extends Controller {
      * changes it can see.
      *
      * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
-     * @param objects A list of objects to consider.
+     * @param objects The objects to consider.
      */
     public void sendUpdateToAll(ServerPlayer serverPlayer,
                                 FreeColObject... objects) {
         for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
             Element element = buildGeneralUpdate(other, objects);
             if (element != null) {
+                try {
+                    other.getConnection().sendAndWait(element);
+                } catch (IOException e) {
+                    logger.warning(e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Send a generalized update to a list of players.
+     * Each player apart from the optional exclusion is informed of
+     * changes it can see.
+     *
+     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
+     * @param objects A <code>List</code> of objects to consider.
+     */
+    public void sendUpdateToAll(ServerPlayer serverPlayer,
+                                List<FreeColObject> objects) {
+        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
+            Element element = buildGeneralUpdate(other, objects);
+            if (element != null) {
+                try {
+                    other.getConnection().sendAndWait(element);
+                } catch (IOException e) {
+                    logger.warning(e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Send an element to a list of players, apart from an optional
+     * exclusion.
+     *
+     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
+     * @param element An <code>Element</code> to send.
+     */
+    public void sendToAll(ServerPlayer serverPlayer, Element element) {
+        if (element != null) {
+            for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
                 try {
                     other.getConnection().sendAndWait(element);
                 } catch (IOException e) {
@@ -341,7 +384,7 @@ public final class InGameController extends Controller {
         if (winner != null && (!freeColServer.isSingleplayer() || !winner.isAI())) {
             Element gameEndedElement = Message.createNewRootElement("gameEnded");
             gameEndedElement.setAttribute("winner", winner.getId());
-            freeColServer.getServer().sendToAll(gameEndedElement, null);
+            sendToAll(null, gameEndedElement);
             
             // TODO: Remove when the server can properly revert to a pre-game state:
             if (FreeCol.getFreeColClient() == null) {
@@ -490,7 +533,7 @@ public final class InGameController extends Controller {
                 debugOnlyAITurns--;
             }
             Element newTurnElement = Message.createNewRootElement("newTurn");
-            freeColServer.getServer().sendToAll(newTurnElement, null);
+            sendToAll(null, newTurnElement);
         }
         
         ServerPlayer newPlayer = (ServerPlayer) getGame().getNextPlayer();
@@ -502,8 +545,9 @@ public final class InGameController extends Controller {
         
         synchronized (newPlayer) {
             if (Player.checkForDeath(newPlayer)) {
+                newPlayer.setDead(true);
                 Element element = killPlayerElement(newPlayer);
-                freeColServer.getServer().sendToAll(element, null);
+                sendToAll(null, element);
                 logger.info(newPlayer.getNation() + " is dead.");
                 return nextPlayer();
             }
@@ -574,7 +618,7 @@ public final class InGameController extends Controller {
         
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", newPlayer.getId());
-        freeColServer.getServer().sendToAll(setCurrentPlayerElement, null);
+        sendToAll(null, setCurrentPlayerElement);
         
         return newPlayer;
     }
