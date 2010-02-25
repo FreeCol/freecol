@@ -108,6 +108,9 @@ public class FreeColPanel extends JPanel implements ActionListener {
     // How many columns (em-widths) to use in the text area
     protected static final int COLUMNS = 20;
 
+    // The margin to use for HIGLayout
+    protected static final int margin = 3;
+
     // The color to use for links
     protected static final Color LINK_COLOR = new Color(122, 109, 82);
 
