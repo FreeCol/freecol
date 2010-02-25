@@ -20,6 +20,7 @@
 package net.sf.freecol.common.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,8 +33,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.PseudoRandom;
 import net.sf.freecol.common.model.NationOptions.NationState;
 
 /**
@@ -779,14 +778,10 @@ public class Game extends FreeColGameObject {
             // First time we have been asked for a City of Gold.
             // Pull them out of the messages file and randomize the order.
             citiesOfCibola = new ArrayList<String>();
-            PseudoRandom random = getModelController().getPseudoRandom();
-            String prefix = "lostCityRumour.cityName.";
-            String name;
-            int n = 0;
-            while (Messages.containsKey(name = prefix + Integer.toString(n))) {
-                citiesOfCibola.add(random.nextInt(n+1), Messages.message(name));
-                n++;
+            for (int index = 0; index < 7; index++) {
+                citiesOfCibola.add("lostCityRumour.cityName." + index);
             }
+            Collections.shuffle(citiesOfCibola);
         }
         return (citiesOfCibola == null || citiesOfCibola.size() == 0) ? null
             : citiesOfCibola.remove(0);

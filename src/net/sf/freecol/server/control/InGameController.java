@@ -1659,10 +1659,10 @@ public final class InGameController extends Controller {
                 newUnit.setTreasureAmount(treasureAmount);
                 result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                             "lostCityRumour.Cibola", serverPlayer, newUnit)
-                           .addName("%city%", cityName)
+                           .add("%city%", cityName)
                            .addAmount("%money%", treasureAmount));
                 result.add(new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.CITY_OF_GOLD)
-                           .addName("%city%", cityName)
+                           .add("%city%", cityName)
                            .addAmount("%treasure%", treasureAmount));
                 break;
             }
