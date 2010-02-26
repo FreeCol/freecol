@@ -246,9 +246,16 @@ public class ModelMessage extends StringTemplate {
      */
     public MessageType getMessageType() {
         return messageType;
-
     }
 
+    /**
+     * Sets the type of the message.
+     *
+     * @param messageType The new messageType.
+     */
+    public void setMessageType(MessageType messageType) {
+        this.messageType = messageType;
+    }
 
     public String getMessageTypeName() {
         return "model.message." + messageType.toString();

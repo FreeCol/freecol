@@ -1126,25 +1126,31 @@ public final class InGameInputHandler extends InputHandler {
     public Element addMessages(Element element) {
         Game game = getGame();
         NodeList nodes = element.getChildNodes();
-        String attr;
 
         for (int i = 0; i < nodes.getLength(); i++) {
             ModelMessage m = new ModelMessage();
             Element e = (Element) nodes.item(i);
 
             m.readFromXMLElement(e);
-            // ModelMessage.readFromXMLImpl does not handle the
-            // FreeColGameObject fields.
-            if ((attr = e.getAttribute("display")) != null) {
-                m.setDisplay(game.getFreeColGameObjectSafely(attr));
+
+            // ModelMessage.readFromXMLImpl does not exist yet.
+            ModelMessage.MessageType type = Enum.valueOf(ModelMessage.MessageType.class, e.getAttribute("messageType"));
+            if (type == null) type = ModelMessage.MessageType.DEFAULT;
+            m.setMessageType(type);
+            m.setSource(game.getFreeColGameObjectSafely(e.getAttribute("source")));
+            m.setDisplay(game.getFreeColGameObjectSafely(e.getAttribute("display")));
+
+            // Use the owner attribute.
+            String attr = e.getAttribute("owner");
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(attr);
+            if (fcgo instanceof Player) {
+                Player owner = (Player) fcgo;
+                m.setOwner(owner);
+                owner.addModelMessage(m);
+            } else {
+                logger.warning("addMessages with broken owner: "
+                               + ((attr == null) ? "(null)" : attr));
             }
-            if ((attr = e.getAttribute("owner")) != null) {
-                m.setOwner((Player) game.getFreeColGameObjectSafely(attr));
-            }
-            if ((attr = e.getAttribute("source")) != null) {
-                m.setSource(game.getFreeColGameObjectSafely(attr));
-            }
-            getFreeColClient().getMyPlayer().addModelMessage(m);
         }
         return null;
     }
@@ -1158,14 +1164,22 @@ public final class InGameInputHandler extends InputHandler {
     public Element addHistory(Element element) {
         Game game = getGame();
         NodeList nodes = element.getChildNodes();
-        String attr;
 
         for (int i = 0; i < nodes.getLength(); i++) {
             HistoryEvent h = new HistoryEvent();
             Element e = (Element) nodes.item(i);
 
             h.readFromXMLElement(e);
-            getFreeColClient().getMyPlayer().getHistory().add(h);
+
+            // Use the owner attribute.
+            String attr = e.getAttribute("owner");
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(attr);
+            if (fcgo instanceof Player) {
+                ((Player) fcgo).getHistory().add(h);
+            } else {
+                logger.warning("addHistory with broken owner: "
+                               + ((attr == null) ? "(null)" : attr));
+            }
         }
         return null;
     }
