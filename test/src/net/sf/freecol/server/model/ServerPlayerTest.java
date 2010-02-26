@@ -56,7 +56,6 @@ public class ServerPlayerTest extends FreeColTestCase {
     
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     UnitType hardyPioneerType = spec().getUnitType("model.unit.hardyPioneer");
-    UnitType treasureTrainType = spec().getUnitType("model.unit.treasureTrain");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     UnitType caravelType = spec().getUnitType("model.unit.caravel");
     UnitType galleonType = spec().getUnitType("model.unit.galleon");
@@ -148,68 +147,6 @@ public class ServerPlayerTest extends FreeColTestCase {
                    newPrice >= silverPrice);
     }
 
-    /*
-     * Tests worker allocation regarding building tasks
-     */
-    public void testCashInTreasure() {
-        if (server == null) {
-            server = ServerTestHelper.startServer(false, true);
-        }
-        Map map = getCoastTestMap(plains, true);
-        server.setMapGenerator(new MockMapGenerator(map));
-        Controller c = server.getController();
-        PreGameController pgc = (PreGameController)c;
-        try {
-            pgc.startGame();
-        } catch (FreeColException e) {
-            fail("Failed to start game");
-        }
-        Game game = server.getGame();
-        FreeColTestCase.setGame(game);
-        // we need to update the reference
-        map = game.getMap();
-     
-        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
-        Tile tile = map.getTile(10, 4);
-        Unit ship = new Unit(game, tile, dutch, galleonType, UnitState.ACTIVE, galleonType.getDefaultEquipment());
-        Unit treasure = new Unit(game, tile, dutch, treasureTrainType, UnitState.ACTIVE, treasureTrainType.getDefaultEquipment());
-        assertTrue(treasure.canCarryTreasure());
-        treasure.setTreasureAmount(100);
-        
-        assertFalse(treasure.canCashInTreasureTrain()); // from a tile
-        treasure.setLocation(ship);
-        assertFalse(treasure.canCashInTreasureTrain()); // from a ship
-        ship.setLocation(dutch.getEurope());    
-        assertTrue(treasure.canCashInTreasureTrain()); // from a ship in Europe
-        int fee = treasure.getTransportFee();
-        assertEquals(0, fee);
-        int oldGold = dutch.getGold();
-        dutch.cashInTreasureTrain(treasure);
-        assertEquals(100, dutch.getGold() - oldGold);
-
-        // Succeed from a port with a connection to Europe
-        Colony port = getStandardColony(1, 9, 4);
-        assertFalse(port.isLandLocked());
-        assertTrue(port.isConnected());
-        treasure.setLocation(port);
-        assertTrue(treasure.canCashInTreasureTrain());
-
-        // Fail from a landlocked colony
-        Colony inland = getStandardColony(1, 7, 7);
-        assertTrue(inland.isLandLocked());
-        assertFalse(inland.isConnected());
-        treasure.setLocation(inland);
-        assertFalse(treasure.canCashInTreasureTrain());
-
-        // Fail from a colony with a port but no connection to Europe
-        map.getTile(5, 5).setType(FreeCol.getSpecification().getTileType("model.tile.lake"));
-        Colony lake = getStandardColony(1, 4, 5);
-        assertFalse(lake.isLandLocked());
-        assertFalse(lake.isConnected());
-        treasure.setLocation(lake);
-        assertFalse(treasure.canCashInTreasureTrain());
-    }
-	
     public void testHasExploredTile() {
         if (server == null) {
             server = ServerTestHelper.startServer(false, true);

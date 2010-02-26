@@ -23,6 +23,7 @@ import java.io.File;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
+import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
@@ -48,7 +49,10 @@ import net.sf.freecol.util.test.FreeColTestCase;
 import net.sf.freecol.util.test.MockMapGenerator;
 
 public class InGameControllerTest extends FreeColTestCase {
+    TileType plains = spec().getTileType("model.tile.plains");
+    UnitType galleonType = spec().getUnitType("model.unit.galleon");
     UnitType missionaryType = spec().getUnitType("model.unit.jesuitMissionary");
+    UnitType treasureTrainType = spec().getUnitType("model.unit.treasureTrain");
 	
     FreeColServer server = null;
     
@@ -95,8 +99,8 @@ public class InGameControllerTest extends FreeColTestCase {
         camp.setAlarm(dutchPlayer, tension);
         
         assertEquals("Wrong camp alarm", tension, camp.getAlarm(dutchPlayer));
-        InGameController controller = (InGameController) server.getController();
-        controller.establishMission(camp,jesuit);
+        InGameController igc = (InGameController) server.getController();
+        igc.establishMission(camp,jesuit);
         boolean result = !jesuit.isDisposed();
 
         assertFalse("Mission creation should have failed",result);
@@ -141,4 +145,68 @@ public class InGameControllerTest extends FreeColTestCase {
         assertEquals("Privateer should no longer carry cotton", 0, privateer.getGoodsCount());
         assertNull("Cotton should have no location",cotton.getLocation());
     }
+
+    /*
+     * Tests worker allocation regarding building tasks
+     */
+    public void testCashInTreasure() {
+        if (server == null) {
+            server = ServerTestHelper.startServer(false, true);
+        }
+        Map map = getCoastTestMap(plains, true);
+        server.setMapGenerator(new MockMapGenerator(map));
+        Controller c = server.getController();
+        PreGameController pgc = (PreGameController)c;
+        try {
+            pgc.startGame();
+        } catch (FreeColException e) {
+            fail("Failed to start game");
+        }
+        Game game = server.getGame();
+        FreeColTestCase.setGame(game);
+        // we need to update the reference
+        map = game.getMap();
+
+        ServerPlayer dutch = (ServerPlayer) game.getPlayer("model.nation.dutch");
+        Tile tile = map.getTile(10, 4);
+        Unit ship = new Unit(game, tile, dutch, galleonType, UnitState.ACTIVE, galleonType.getDefaultEquipment());
+        Unit treasure = new Unit(game, tile, dutch, treasureTrainType, UnitState.ACTIVE, treasureTrainType.getDefaultEquipment());
+        assertTrue(treasure.canCarryTreasure());
+        treasure.setTreasureAmount(100);
+
+        InGameController igc = (InGameController) server.getController();
+        assertFalse(treasure.canCashInTreasureTrain()); // from a tile
+        treasure.setLocation(ship);
+        assertFalse(treasure.canCashInTreasureTrain()); // from a ship
+        ship.setLocation(dutch.getEurope());
+        assertTrue(treasure.canCashInTreasureTrain()); // from a ship in Europe
+        int fee = treasure.getTransportFee();
+        assertEquals(0, fee);
+        int oldGold = dutch.getGold();
+        igc.cashInTreasureTrain(dutch, treasure);
+        assertEquals(100, dutch.getGold() - oldGold);
+
+        // Succeed from a port with a connection to Europe
+        Colony port = getStandardColony(1, 9, 4);
+        assertFalse(port.isLandLocked());
+        assertTrue(port.isConnected());
+        treasure.setLocation(port);
+        assertTrue(treasure.canCashInTreasureTrain());
+
+        // Fail from a landlocked colony
+        Colony inland = getStandardColony(1, 7, 7);
+        assertTrue(inland.isLandLocked());
+        assertFalse(inland.isConnected());
+        treasure.setLocation(inland);
+        assertFalse(treasure.canCashInTreasureTrain());
+
+        // Fail from a colony with a port but no connection to Europe
+        map.getTile(5, 5).setType(FreeCol.getSpecification().getTileType("model.tile.lake"));
+        Colony lake = getStandardColony(1, 4, 5);
+        assertFalse(lake.isLandLocked());
+        assertFalse(lake.isConnected());
+        treasure.setLocation(lake);
+        assertFalse(treasure.canCashInTreasureTrain());
+    }
+
 }

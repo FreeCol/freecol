@@ -1232,6 +1232,40 @@ public final class InGameController extends Controller {
         }
     }
     
+    /**
+     * Cash in a treasure train.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> that is cashing in.
+     * @param unit The treasure train <code>Unit</code> to cash in.
+     * @return A list of objects to update.
+     */
+    public List<FreeColObject> cashInTreasureTrain(ServerPlayer serverPlayer,
+                                                    Unit unit) {
+        List<FreeColObject> objects = new ArrayList<FreeColObject>();
+
+        // Work out the cash in amount.
+        int fullAmount = unit.getTreasureAmount();
+        int cashInAmount = (fullAmount - unit.getTransportFee())
+            * (100 - serverPlayer.getTax()) / 100;
+        serverPlayer.modifyGold(cashInAmount);
+
+        // Generate a suitable message.
+        String messageId = (serverPlayer.getPlayerType() == PlayerType.REBEL
+            || serverPlayer.getPlayerType() == PlayerType.INDEPENDENT)
+            ? "model.unit.cashInTreasureTrain.independent"
+            : "model.unit.cashInTreasureTrain.colonial";
+        objects.add(new ModelMessage(messageId, serverPlayer, unit)
+                    .addAmount("%amount%", fullAmount)
+                    .addAmount("%cashInAmount%", cashInAmount));
+
+        // Dispose and return.
+        Location oldLocation = unit.getLocation();
+        objects.addAll(unit.disposeList());
+        objects.add((FreeColGameObject) oldLocation);
+        return objects;
+    }
+
+
     public java.util.Map<String,Object> getTransactionSession(Unit unit, Settlement settlement){
         java.util.Map<String, java.util.Map<String,Object>> unitTransactions = null;
 

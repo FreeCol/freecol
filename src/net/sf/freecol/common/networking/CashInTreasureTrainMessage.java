@@ -19,16 +19,22 @@
 
 package net.sf.freecol.common.networking;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
+import net.sf.freecol.common.model.Location;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 
@@ -65,15 +71,17 @@ public class CashInTreasureTrainMessage extends Message {
     /**
      * Handle a "cashInTreasureTrain"-message.
      *
-     * @param server The <code>FreeColServer</code> that is handling the message.
+     * @param server The <code>FreeColServer</code> handling the message.
      * @param player The <code>Player</code> the message applies to.
-     * @param connection The <code>Connection</code> the message was received on.
+     * @param connection The <code>Connection</code> message was received on.
      *
      * @return An update resulting from cashing in the treasure train,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
+
         Unit unit;
         try {
             unit = server.getUnitSafely(unitId, serverPlayer);
@@ -82,30 +90,24 @@ public class CashInTreasureTrainMessage extends Message {
         }
         if (!unit.canCarryTreasure()) {
             return Message.clientError("Can not cash in unit " + unitId
-                                       + " as it can not carry treasure.");
+                                       + ", can not carry treasure.");
         }
         if (!unit.canCashInTreasureTrain()) {
             return Message.clientError("Can not cash in unit " + unitId
-                                       + " as it is not in a suitable location.");
+                                       + ", unsuitable location.");
         }
 
-        // Cash in
-        ModelMessage m = serverPlayer.cashInTreasureTrain(unit);
+        // Cash in.  Do not bother updating other players as cash in
+        // only occurs in Colony or Europe where they can not see.
+        InGameController igc = server.getInGameController();
+        List<FreeColObject> objects = igc.cashInTreasureTrain(serverPlayer,
+                                                              unit);
 
         // Only need the partial player update for gold and score.
-        // The sole action on the tile is to remove the treasure
-        // train, which can be done concisely by a remove.
-        Element reply = Message.createNewRootElement("multiple");
+        Element reply = igc.buildGeneralUpdate(serverPlayer, objects);
         Document doc = reply.getOwnerDocument();
-        Element messages = doc.createElement("addMessages");
-        reply.appendChild(messages);
-        m.addToOwnedElement(messages, player);
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(player.toXMLElementPartial(doc, "gold", "score"));
-        Element remove = doc.createElement("remove");
-        reply.appendChild(remove);
-        unit.addToRemoveElement(remove);
+        spliceIntoElement(reply, "update",
+                          player.toXMLElementPartial(doc, "gold", "score"));
         return reply;
     }
 

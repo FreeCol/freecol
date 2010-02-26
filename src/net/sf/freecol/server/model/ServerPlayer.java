@@ -313,28 +313,6 @@ public class ServerPlayer extends Player implements ServerModelObject {
     }
 
     /**
-     * Cash in a treasure train.
-     *
-     * @param unit The treasure train <code>Unit</code> to cash in.
-     */
-    public ModelMessage cashInTreasureTrain(Unit unit) {
-        int fullAmount = unit.getTreasureAmount();
-        int cashInAmount = (fullAmount - unit.getTransportFee())
-            * (100 - getTax()) / 100;
-
-        modifyGold(cashInAmount);
-        String messageId = "model.unit.cashInTreasureTrain.colonial";
-        if (getPlayerType() == PlayerType.REBEL
-            || getPlayerType() == PlayerType.INDEPENDENT) {
-            messageId = "model.unit.cashInTreasureTrain.independent";
-        }
-        ModelMessage m = new ModelMessage(messageId, this, unit)
-            .addAmount("%amount%", fullAmount)
-            .addAmount("%cashInAmount%", cashInAmount);
-        return m;
-    }
-
-    /**
      * Add a HistoryEvent to this player.
      *
      * @param event The <code>HistoryEvent</code> to add.
