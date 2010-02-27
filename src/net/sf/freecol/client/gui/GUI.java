@@ -312,6 +312,8 @@ public final class GUI {
     private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
     // borders
+    private static final Direction[] riverDirections =
+        new Direction[] { Direction.NE, Direction.SE, Direction.SW, Direction.NW };
     private static final Direction[] borderDirections =
         new Direction[] { Direction.NW, Direction.NE, Direction.SE, Direction.SW };
     private EnumMap<Direction, Dimension> borderPoints =
@@ -2072,12 +2074,16 @@ public final class GUI {
                     g.drawImage(lib.getBorderImage(borderingTile.getType(), direction,
                                                     tile.getX(), tile.getY()),
                                                     x, y, null);
-                    if (borderingTile.getRiver() != null &&
+                    TileImprovement river = borderingTile.getRiver();
+                    if (river != null &&
                         (direction == Direction.SE || direction == Direction.SW ||
                          direction == Direction.NE || direction == Direction.NW)) {
-                        g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(),
-                                                           tile.getX(), tile.getY()),
-                                    x, y, null);
+                        int[] branches = river.getStyleBreakdown(riverDirections, 3);
+                        if (branches[direction.getReverseDirection().ordinal()] > 0) {
+                            g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(),
+                                                               tile.getX(), tile.getY()),
+                                        x, y, null);
+                        }
                     }
                } else if (tile.isExplored() && borderingTile.isExplored()) {
                     if (tile.getType().getArtBasic().equals(borderingTile.getType().getArtBasic())) {
