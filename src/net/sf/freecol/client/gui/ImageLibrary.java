@@ -61,7 +61,6 @@ import net.sf.freecol.common.model.Map.Direction;
 import net.sf.freecol.common.model.Settlement.SettlementType;
 import net.sf.freecol.common.model.Unit.Role;
 import net.sf.freecol.common.resources.ResourceManager;
-import net.sf.freecol.server.generator.River;
 
 /**
  * Holds various images that can be called upon by others in order to display
@@ -520,7 +519,7 @@ public final class ImageLibrary extends ImageProvider {
             throws FreeColException {
         logger.fine("loading river mouth images");
         deltas = new HashMap<String, ImageIcon>();
-        for (Direction d : River.directions) {
+        for (Direction d : Direction.longSides) {
             String key = deltaName + d + small;
             String filePath = dataDirectory + path + riverDirectory + key + extension;
             deltas.put(key, findImage(filePath, resourceLocator, doLookup));

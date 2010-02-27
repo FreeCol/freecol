@@ -46,9 +46,6 @@ public class LandGenerator {
     
     public final static int POLAR_HEIGHT = 2;
 
-    private final static Direction[] adjacentDirections = new Direction[] {
-        Direction.NE, Direction.SE, Direction.SW, Direction.NW };
-
     private final MapGeneratorOptions mapGeneratorOptions;
      
     private boolean[][] map;
@@ -209,7 +206,7 @@ public class LandGenerator {
 
         //add all valid neighbour positions to list
         p = new Position(x, y);  
-        for (Direction direction : adjacentDirections) {
+        for (Direction direction : Direction.longSides) {
             Position n = Map.getAdjacent(p, direction);
             if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
                 l.add(n);
@@ -228,7 +225,7 @@ public class LandGenerator {
                 size++;
                 
                 //add all valid neighbour positions to list    
-                for (Direction direction : adjacentDirections) {
+                for (Direction direction : Direction.longSides) {
                     Position n = Map.getAdjacent(p, direction);
                     if (Map.isValid(n, width, height) && isSingleTile(n.getX(),n.getY()) && n.getX()>preferredDistanceToEdge && n.getX()<width-preferredDistanceToEdge) {
                         l.add(n);
@@ -324,7 +321,7 @@ public class LandGenerator {
 
         Position p = new Position(x, y);
 
-        for (Direction direction : adjacentDirections) {
+        for (Direction direction : Direction.longSides) {
             Position n = Map.getAdjacent(p, direction);
             if (Map.isValid(n, width, height)) {
                 growLand(n.getX(), n.getY());

@@ -312,10 +312,6 @@ public final class GUI {
     private java.util.Map<Unit, JLabel> unitsOutForAnimationLabels;
 
     // borders
-    private static final Direction[] riverDirections =
-        new Direction[] { Direction.NE, Direction.SE, Direction.SW, Direction.NW };
-    private static final Direction[] borderDirections =
-        new Direction[] { Direction.NW, Direction.NE, Direction.SE, Direction.SW };
     private EnumMap<Direction, Dimension> borderPoints =
         new EnumMap<Direction, Dimension>(Direction.class);
     private EnumMap<Direction, Dimension> controlPoints =
@@ -2078,7 +2074,7 @@ public final class GUI {
                     if (river != null &&
                         (direction == Direction.SE || direction == Direction.SW ||
                          direction == Direction.NE || direction == Direction.NW)) {
-                        int[] branches = river.getStyleBreakdown(riverDirections, 3);
+                        int[] branches = river.getStyleBreakdown(Direction.longSides, 3);
                         if (branches[direction.getReverseDirection().ordinal()] > 0) {
                             g.drawImage(lib.getRiverMouthImage(direction, borderingTile.getRiver().getMagnitude(),
                                                                tile.getX(), tile.getY()),
@@ -2117,9 +2113,9 @@ public final class GUI {
                                        opaque ? 255 : 100);
             g.setColor(newColor);
             GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
-            path.moveTo(borderPoints.get(Direction.NW).width,
-                        borderPoints.get(Direction.NW).height);
-            for (Direction d : borderDirections) {
+            path.moveTo(borderPoints.get(Direction.longSides[0]).width,
+                        borderPoints.get(Direction.longSides[0]).height);
+            for (Direction d : Direction.longSides) {
                 Tile otherTile = tile.getNeighbourOrNull(d);
                 Direction next = d.getNextDirection();
                 Direction next2 = next.getNextDirection();

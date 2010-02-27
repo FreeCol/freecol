@@ -301,7 +301,7 @@ public final class MapEditorTransformPanel extends FreeColPanel {
                     tic.addRiver(magnitude, river.getStyle());
                     RiverSection mysection = new RiverSection(river.getStyle());
                     // for each neighboring tile
-                    for (Direction direction : River.directions) {
+                    for (Direction direction : Direction.longSides) {
                         Tile t = tile.getMap().getNeighbourOrNull(direction, tile);
                         if (t == null) {
                             continue;

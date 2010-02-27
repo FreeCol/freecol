@@ -61,6 +61,10 @@ public class Map extends FreeColGameObject {
         W  (-1,  0, -1,  0),
         NW ( 0, -1, -1, -1);
 
+        public final static Direction[] longSides = new Direction[] {
+            Direction.NE, Direction.SE, Direction.SW, Direction.NW
+        };
+
         private int oddDX, oddDY, evenDX, evenDY;
 
         Direction(int oddDX, int oddDY, int evenDX, int evenDY) {
@@ -100,26 +104,7 @@ public class Map extends FreeColGameObject {
          * @return The reverse direction of the given direction.
          */
         public Direction getReverseDirection() {
-            switch (this) {
-            case N:
-                return S;
-            case NE:
-                return SW;
-            case E:
-                return W;
-            case SE:
-                return NW;
-            case S:
-                return N;
-            case SW:
-                return NE;
-            case W:
-                return E;
-            case NW:
-                return SE;
-            default:
-                return null;
-            }
+            return values()[(ordinal() + 4) % 8];
         }
 
     }

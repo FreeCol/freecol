@@ -49,13 +49,6 @@ public class River {
         FreeCol.getSpecification().getTileImprovementType("model.improvement.River");
 
     /**
-     * Directions a river may flow in.
-     * @see net.sf.freecol.common.model.Map
-     */
-    public static final Direction[] directions = {
-        Direction.NE, Direction.SE, Direction.SW, Direction.NW};
-
-    /**
      * Possible direction changes for a river.
      * @see net.sf.freecol.common.model.Map
      */
@@ -145,9 +138,9 @@ public class River {
         this.map = map;
         this.riverMap = riverMap;
         this.region = region;
-        int length = directions.length;
-        int index = map.getGame().getModelController().getPseudoRandom().nextInt(length);
-        direction = directions[index];
+        int index = map.getGame().getModelController().getPseudoRandom()
+            .nextInt(Direction.longSides.length);
+        direction = Direction.longSides[index];
         logger.fine("Starting new river flowing " + direction.toString());
     }
 
@@ -231,7 +224,7 @@ public class River {
      * @return true if the given position is next to this river.
      */
     public boolean isNextToSelf(Map.Position p) {
-        for (Direction direction : directions) {
+        for (Direction direction : Direction.longSides) {
             Map.Position px = Map.getAdjacent(p, direction);
             if (this.contains(px)) {
                 return true;
@@ -247,7 +240,7 @@ public class River {
      * @return true if the given position is next to a river, lake or sea.
      */
     public boolean isNextToWater(Map.Position p) {
-        for (Direction direction : directions) {
+        for (Direction direction : Direction.longSides) {
             Map.Position px = Map.getAdjacent(p, direction);
             final Tile tile = map.getTile(px);
             if (tile == null) {

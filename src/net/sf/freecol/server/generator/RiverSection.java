@@ -40,11 +40,6 @@ public class RiverSection {
 //    private static final Logger logger = Logger.getLogger(RiverImprovementBuilder.class.getName());
 
     /**
-     * Directions a river is allowed to flow
-     */
-    private static Direction[] directions = {Direction.NE, Direction.SE, Direction.SW, Direction.NW};
-    
-    /**
      * Base numbers used to encode/decode the river style
      */
     private static int[] base = {1, 3, 9, 27};
@@ -150,11 +145,11 @@ public class RiverSection {
         if (size != TileImprovement.SMALL_RIVER) {
             size = TileImprovement.LARGE_RIVER;
         }
-        for (int i=0; i<directions.length; i++) {
+        for (int i=0; i<Direction.longSides.length; i++) {
             if (base[i] == 0) {
                 continue;                       // Skip this direction
             }
-            if (directions[i]==direction) {
+            if (Direction.longSides[i]==direction) {
                 branch[i] = size;
             }
         }
@@ -164,11 +159,11 @@ public class RiverSection {
      * Gets the size of a branch
      */
     public int getBranch(Direction direction) {
-        for (int i=0; i<directions.length; i++) {
+        for (int i=0; i<Direction.longSides.length; i++) {
             if (base[i] == 0) {
                 continue;                       // Skip this direction
             }
-            if (directions[i]==direction) {
+            if (Direction.longSides[i]==direction) {
                 return branch[i];
             }
         }
@@ -186,11 +181,11 @@ public class RiverSection {
      * Increases the size a branch
      */
     public void growBranch(Direction direction, int increment) {
-        for (int i=0; i<directions.length; i++) {
+        for (int i=0; i<Direction.longSides.length; i++) {
             if (base[i] == 0) {
                 continue;                       // Skip this direction
             }
-            if (directions[i]==direction) {
+            if (Direction.longSides[i]==direction) {
                 branch[i]+=increment;
                 if (branch[i]>TileImprovement.LARGE_RIVER)
                     branch[i] = TileImprovement.LARGE_RIVER;
