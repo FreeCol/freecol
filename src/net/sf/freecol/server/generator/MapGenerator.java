@@ -39,7 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Building;

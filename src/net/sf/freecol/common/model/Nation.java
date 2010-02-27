@@ -24,7 +24,6 @@ import java.awt.Color;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.Specification;
 
 /**
  * Represents one of the nations present in the game.

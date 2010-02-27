@@ -17,7 +17,7 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.common;
+package net.sf.freecol.common.model;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -37,25 +37,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.action.ImprovementActionType;
-import net.sf.freecol.common.model.Ability;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.DifficultyLevel;
-import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.EuropeanNationType;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.FreeColGameObjectType;
-import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.Goods;
-import net.sf.freecol.common.model.GoodsType;
-import net.sf.freecol.common.model.IndianNationType;
-import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.NationType;
-import net.sf.freecol.common.model.ResourceType;
-import net.sf.freecol.common.model.TileImprovementType;
-import net.sf.freecol.common.model.TileType;
-import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.common.option.AbstractOption;
 import net.sf.freecol.common.option.FileOption;
 import net.sf.freecol.common.option.IntegerOption;

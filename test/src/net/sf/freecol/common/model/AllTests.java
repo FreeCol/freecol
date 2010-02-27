@@ -26,6 +26,7 @@ public class AllTests {
 
     public static Test suite() {
 	TestSuite suite = new TestSuite("Test for net.sf.freecol.common.model");
+        suite.addTestSuite(SpecificationTest.class);
 	//$JUnit-BEGIN$
 	suite.addTestSuite(AbstractUnitTest.class);
 	suite.addTestSuite(BuildingTest.class);

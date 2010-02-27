@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.Specification;
 
 /**
  * Contains information on buildable types.

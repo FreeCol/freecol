@@ -25,7 +25,7 @@ import java.util.Vector;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GameOptions;
 import net.sf.freecol.common.model.IndianSettlement;

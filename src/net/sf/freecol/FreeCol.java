@@ -56,7 +56,7 @@ import net.sf.freecol.client.gui.plaf.FreeColLookAndFeel;
 import net.sf.freecol.client.gui.sound.MusicLibrary;
 import net.sf.freecol.client.gui.sound.SfxLibrary;
 import net.sf.freecol.common.FreeColException;
-import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.io.FreeColDataFile;
 import net.sf.freecol.common.io.FreeColSavegameFile;
 import net.sf.freecol.common.io.FreeColTcFile;

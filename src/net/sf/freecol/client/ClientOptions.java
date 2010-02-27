@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.model.Colony;

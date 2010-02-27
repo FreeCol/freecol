@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
 import net.sf.freecol.common.model.Building;

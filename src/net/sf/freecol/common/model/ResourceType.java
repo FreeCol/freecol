@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.Specification;
 
 public final class ResourceType extends FreeColGameObjectType {
 

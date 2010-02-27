@@ -20,7 +20,7 @@
 package net.sf.freecol.common.model;
 
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyTest extends FreeColTestCase {

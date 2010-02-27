@@ -30,7 +30,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Map.Direction;

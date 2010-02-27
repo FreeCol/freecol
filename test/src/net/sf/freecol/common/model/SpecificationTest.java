@@ -17,8 +17,9 @@
  *  along with FreeCol.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.sf.freecol.common;
+package net.sf.freecol.common.model;
 
+import java.io.FileInputStream;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -26,16 +27,6 @@ import java.util.Map.Entry;
 
 import junit.framework.TestCase;
 import net.sf.freecol.FreeCol;
-import net.sf.freecol.common.model.BuildingType;
-import net.sf.freecol.common.model.EquipmentType;
-import net.sf.freecol.common.model.EuropeanNationType;
-import net.sf.freecol.common.model.FoundingFather;
-import net.sf.freecol.common.model.GameOptions;
-import net.sf.freecol.common.model.IndianNationType;
-import net.sf.freecol.common.model.Modifier;
-import net.sf.freecol.common.model.Nation;
-import net.sf.freecol.common.model.UnitType;
-import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.option.IntegerOption;
 import net.sf.freecol.common.option.RangeOption;
 
@@ -47,7 +38,7 @@ public final class SpecificationTest extends TestCase {
      * 
      */
     public void testLoad() {
-    	
+
     	Specification spec = Specification.getSpecification();
     	
     	assertNotNull(spec);
@@ -111,7 +102,7 @@ public final class SpecificationTest extends TestCase {
 
         FoundingFather smith = spec.getFoundingFather("model.foundingFather.adamSmith");
         assertFalse(smith == null);
-        assertTrue(smith.getType() == FoundingFatherType.TRADE);
+        assertTrue(smith.getType() == FoundingFather.FoundingFatherType.TRADE);
         // weight is some value in [0, 10]
         assertTrue(smith.getWeight(1) >= 0);
         assertTrue(smith.getWeight(2) >= 0);
@@ -128,39 +119,40 @@ public final class SpecificationTest extends TestCase {
 
     // Check options presence and value
     public void testOptions() {
-      Specification spec = Specification.getSpecification();
+        Specification spec = Specification.getSpecification();
 
-      //assertTrue(spec.getIntegerOption(GameOptions.STARTING_MONEY).getValue() == 0);
+        //assertTrue(spec.getIntegerOption(GameOptions.STARTING_MONEY).getValue() == 0);
 
-      assertFalse(spec.getBooleanOption(GameOptions.CUSTOM_IGNORE_BOYCOTT).getValue());
-      assertFalse(spec.getBooleanOption(GameOptions.EXPERTS_HAVE_CONNECTIONS).getValue());
-      assertFalse(spec.getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
-      assertFalse(spec.getBooleanOption(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST).getValue());
+        assertFalse(spec.getBooleanOption(GameOptions.CUSTOM_IGNORE_BOYCOTT).getValue());
+        assertFalse(spec.getBooleanOption(GameOptions.EXPERTS_HAVE_CONNECTIONS).getValue());
+        assertFalse(spec.getBooleanOption(GameOptions.SAVE_PRODUCTION_OVERFLOW).getValue());
+        assertFalse(spec.getBooleanOption(GameOptions.EDUCATE_LEAST_SKILLED_UNIT_FIRST).getValue());
     }
 
     // Check difficulty levels presence and values
     public void testDifficultyLevels() {
-      Specification spec = Specification.getSpecification();
-      RangeOption diffOpt = (RangeOption) spec.getOption(GameOptions.DIFFICULTY);
+        Specification spec = Specification.getSpecification();
+        RangeOption diffOpt = (RangeOption) spec.getOption(GameOptions.DIFFICULTY);
 
-      assertTrue(diffOpt.getValue() == 2);
-      assertTrue(diffOpt.getItemValues().size() == 5);
+        assertTrue(diffOpt.getValue() == 2);
+        assertTrue(diffOpt.getItemValues().size() == 5);
 
-      IntegerOption option = null;
-      try {
-          // should fail, because it is part of uninitialized server difficulty options
-          option = spec.getIntegerOption("model.option.crossesIncrement");
-          fail();
-      } catch (IllegalArgumentException e) {
-      }
+        IntegerOption option = null;
 
-      // initializing server difficulty options
-      spec.applyDifficultyLevel(2);
+        try {
+            // should fail, because it is part of uninitialized server difficulty options
+            option = spec.getIntegerOption("model.option.crossesIncrement");
+            fail();
+        } catch (IllegalArgumentException e) {
+        }
+
+        // initializing server difficulty options
+        spec.applyDifficultyLevel(2);
       
-      // should succeed now
-      option = spec.getIntegerOption("model.option.crossesIncrement");
-      assertNotNull(option);
-      assertEquals(10, option.getValue());
+        // should succeed now
+        option = spec.getIntegerOption("model.option.crossesIncrement");
+        assertNotNull(option);
+        assertEquals(10, option.getValue());
     }
 
     public void testModifiers() {
@@ -244,17 +236,17 @@ public final class SpecificationTest extends TestCase {
         
         // Verify
         for (Entry<String, Map<String, Boolean>> entry : eqTypesAbilities.entrySet()){
-        	equipmentTypeStr = entry.getKey();
-        	expectAbilities = entry.getValue();
+            equipmentTypeStr = entry.getKey();
+            expectAbilities = entry.getValue();
 
-        	EquipmentType equipmentType = FreeCol.getSpecification().getEquipmentType(equipmentTypeStr);
+            EquipmentType equipmentType = FreeCol.getSpecification().getEquipmentType(equipmentTypeStr);
             abilitiesReq = equipmentType.getAbilitiesRequired();
-        	for (Entry<String, Boolean> ability : expectAbilities.entrySet()) {
-        		String key = ability.getKey();
-        		boolean hasAbility = abilitiesReq.containsKey(key);
-        		assertTrue(equipmentTypeStr + " missing req. ability " + key,hasAbility);
-        		assertEquals(equipmentTypeStr + " has wrong value for req. ability " + key,abilitiesReq.get(key),ability.getValue());
-        	}
+            for (Entry<String, Boolean> ability : expectAbilities.entrySet()) {
+                String key = ability.getKey();
+                boolean hasAbility = abilitiesReq.containsKey(key);
+                assertTrue(equipmentTypeStr + " missing req. ability " + key,hasAbility);
+                assertEquals(equipmentTypeStr + " has wrong value for req. ability " + key,abilitiesReq.get(key),ability.getValue());
+            }
         }
     }
 

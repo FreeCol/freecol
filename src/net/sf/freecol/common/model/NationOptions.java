@@ -22,7 +22,6 @@ package net.sf.freecol.common.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.freecol.common.Specification;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;

@@ -22,7 +22,7 @@ package net.sf.freecol.server.ai;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.freecol.common.Specification;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.GoodsType;
 
 public class ColonyProfile {

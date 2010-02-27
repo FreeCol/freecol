@@ -24,7 +24,6 @@ import java.awt.Image;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.resources.ResourceManager;
 
 /**

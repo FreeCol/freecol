@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.freecol.common.Specification;
 import net.sf.freecol.common.model.UnitTypeChange.ChangeType;
 
 public final class UnitType extends BuildableType implements Comparable<UnitType> {
