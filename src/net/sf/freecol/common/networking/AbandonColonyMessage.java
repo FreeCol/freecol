@@ -28,6 +28,7 @@ import java.util.Random;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HistoryEvent;
 import net.sf.freecol.common.model.Map;
@@ -35,6 +36,7 @@ import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.Settlement;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.FreeColServer;
+import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
 import org.w3c.dom.Document;
@@ -102,34 +104,21 @@ public class AbandonColonyMessage extends Message {
                                        + Integer.toString(colony.getUnitCount()));
         }
 
-        // Remember these before destroying the colony
-        String name = colony.getName();
-        Tile tile = colony.getTile();
-        int radius = colony.getRadius();
-
         // Proceed to abandon
-        colony.dispose();
-        HistoryEvent h = new HistoryEvent(game.getTurn().getNumber(), HistoryEvent.EventType.ABANDON_COLONY)
-            .addName("%colony%", name);
-        player.getHistory().add(h);
-        server.getInGameController().sendUpdateToAll(serverPlayer, tile);
-        // TODO: clean up trade routes?
+        InGameController igc = server.getInGameController();
+        List<FreeColObject> objects = igc.abandonSettlement(colony);
 
-        // Reply, updating the surrounding tiles now owned by the colony.
-        // TODO: Player.settlements is still being fixed on the client side.
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(tile.toXMLElement(player, doc));
-        Map map = game.getMap();
-        for (Tile t : map.getSurroundingTiles(tile, radius)) {
-            update.appendChild(t.toXMLElement(player, doc));
+        // Update others with vacated tiles and reference to the colony.
+        List<FreeColObject> otherObjects = new ArrayList<FreeColObject>();
+        for (FreeColObject o : objects) {
+            if (o instanceof Tile) otherObjects.add(o);
         }
-        Element history = doc.createElement("addHistory");
-        reply.appendChild(history);
-        h.addToOwnedElement(history, player);
-        return reply;
+        otherObjects.add(colony);
+        igc.sendUpdateToAll(serverPlayer, otherObjects);
+
+        // Reply.
+        // TODO: Player.settlements is still being fixed on the client side.
+        return igc.buildGeneralUpdate(serverPlayer, objects);
     }
 
     /**

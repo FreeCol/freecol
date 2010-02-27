@@ -2353,4 +2353,32 @@ public final class InGameController extends Controller {
             sendUpdateToAll(serverPlayer, (Tile) oldLocation);
         }
     }
+
+    /**
+     * Abandon a settlement.
+     *
+     * @param settlement The <code>Settlement</code> to abandon.
+     * @return A <code>List</code> of objects to update.
+     */
+    public List<FreeColObject> abandonSettlement(Settlement settlement) {
+        List<FreeColObject> objects = new ArrayList<FreeColObject>();
+
+        // Collect the tiles the settlement owns before disposing.
+        objects.addAll(settlement.getOwnedTiles());
+
+        // Add to the history before disposing.
+        if (settlement instanceof Colony) {
+            HistoryEvent h = new HistoryEvent(getGame().getTurn().getNumber(),
+                                              HistoryEvent.EventType.ABANDON_COLONY)
+                .addName("%colony%", settlement.getName());
+            settlement.getOwner().getHistory().add(h);
+            objects.add(h);
+        }
+
+        // Now do the dispose.
+        objects.addAll(settlement.disposeList());
+
+        return objects;
+    }
+
 }

@@ -435,35 +435,41 @@ abstract public class Settlement extends FreeColGameObject implements Location, 
      * @return A list of disposed objects.
      */
     public List<FreeColGameObject> disposeList() {
-        // Get off the map
-        Tile settlementTile = getTile();
-        List<Tile> lostTiles = getOwnedTiles();
-        for (Tile tile : lostTiles) {
-            tile.setOwningSettlement(null);
-            tile.setOwner(null);
-            tile.updatePlayerExploredTiles();
-        }
-        settlementTile.setSettlement(null);
+        if (owner != null && getTile() != null
+            && getTile().getSettlement() != null) {
+            // Defensive tests to handle transition from calling dispose()
+            // on both sides to when it is only called on server-side.
 
-        // The owner forgets about the settlement.
-        Player oldOwner = owner;
-        setOwner(null);
-        oldOwner.removeSettlement(this);
-        oldOwner.invalidateCanSeeTiles();
+            // Get off the map
+            Tile settlementTile = getTile();
+            List<Tile> lostTiles = getOwnedTiles();
+            for (Tile tile : lostTiles) {
+                tile.setOwningSettlement(null);
+                tile.setOwner(null);
+                tile.updatePlayerExploredTiles();
+            }
+            settlementTile.setSettlement(null);
 
-        // Allow other settlements to claim the tiles we have just vacated.
-        Map map = getGame().getMap();
-        for (Tile lostTile : lostTiles) {
-            if (lostTile.getOwningSettlement() != null) continue;
-            for (Tile t : map.getSurroundingTiles(lostTile, 1)) {
-                // Find any neighbouring settlements and give them a
-                // turn at reclaiming the tiles.
-                // TODO: perhaps favour certain types of settlements
-                // with difficulty?
-                Settlement settlement = t.getOwningSettlement();
-                if (settlement != null && settlement.canClaimTile(lostTile)) {
-                    settlement.claimTile(lostTile);
-                    break;
+            // The owner forgets about the settlement.
+            Player oldOwner = owner;
+            setOwner(null);
+            oldOwner.removeSettlement(this);
+            oldOwner.invalidateCanSeeTiles();
+
+            // Allow other settlements to claim the tiles we have just vacated.
+            Map map = getGame().getMap();
+            for (Tile lostTile : lostTiles) {
+                if (lostTile.getOwningSettlement() != null) continue;
+                for (Tile t : map.getSurroundingTiles(lostTile, 1)) {
+                    // Find any neighbouring settlements and give them a
+                    // turn at reclaiming the tiles.
+                    // TODO: perhaps favour certain types of settlements
+                    // with difficulty?
+                    Settlement settlement = t.getOwningSettlement();
+                    if (settlement != null && settlement.canClaimTile(lostTile)) {
+                        settlement.claimTile(lostTile);
+                        break;
+                    }
                 }
             }
         }
