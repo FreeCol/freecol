@@ -81,6 +81,7 @@ public class FoundingFather extends FreeColGameObjectType {
      */
     public FoundingFather() {
         setIndex(nextIndex++);
+        setModifierIndex(Modifier.FATHER_PRODUCTION_INDEX);
     }
 
     /**

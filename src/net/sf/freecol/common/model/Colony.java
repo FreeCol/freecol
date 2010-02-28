@@ -1099,8 +1099,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     public Modifier getProductionModifier(GoodsType goodsType) {
-        return new Modifier(goodsType.getId(), SOL_MODIFIER_SOURCE,
-                            productionBonus, Modifier.Type.ADDITIVE);
+        Modifier result = new Modifier(goodsType.getId(), SOL_MODIFIER_SOURCE,
+                                       productionBonus, Modifier.Type.ADDITIVE);
+        result.setIndex(Modifier.COLONY_PRODUCTION_INDEX);
+        return result;
     }
 
     /**

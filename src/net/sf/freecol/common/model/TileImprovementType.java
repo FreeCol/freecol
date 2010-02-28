@@ -67,6 +67,7 @@ public final class TileImprovementType extends FreeColGameObjectType {
 
     public TileImprovementType() {
         setIndex(nextIndex++);
+        setModifierIndex(Modifier.IMPROVEMENT_PRODUCTION_INDEX);
     }
 
     // ------------------------------------------------------------ retrieval methods

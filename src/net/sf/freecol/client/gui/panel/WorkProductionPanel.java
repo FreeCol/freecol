@@ -24,7 +24,10 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -64,19 +67,19 @@ public class WorkProductionPanel extends FreeColPanel {
         UnitType unitType = unit.getType();
 
         JLabel headline = new JLabel();
-        Set<Modifier> modifiers;
-        Set<Modifier> basicModifiers;
-        Set<Modifier> colonyModifiers = new LinkedHashSet<Modifier>();
+        List<Modifier> modifiers = new ArrayList<Modifier>();
         if (unit.getLocation() instanceof ColonyTile) {
             ColonyTile colonyTile = (ColonyTile) unit.getLocation();
             GoodsType goodsType = unit.getWorkType();
-            basicModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
-            modifiers = sortModifiers(basicModifiers);
-            basicModifiers.addAll(colony.getModifierSet(goodsType.getId()));
-            if (colony.getProductionBonus() != 0) {
-                modifiers.add(colony.getProductionModifier(goodsType));
+            Set<Modifier> basicModifiers = colonyTile.getProductionModifiers(goodsType, unitType);
+            if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(), basicModifiers) > 0) {
+                basicModifiers.addAll(unit.getModifierSet(goodsType.getId()));
+                if (colony.getProductionBonus() != 0) {
+                    basicModifiers.add(colony.getProductionModifier(goodsType));
+                }
+                basicModifiers.addAll(colony.getModifierSet(goodsType.getId()));
+                modifiers.addAll(basicModifiers);
             }
-
             add(localizedLabel(colonyTile.getLabel()), "span, align center, wrap 30");
 
             TileType tileType = colonyTile.getWorkTile().getType();
@@ -90,31 +93,27 @@ public class WorkProductionPanel extends FreeColPanel {
         } else {
             Building building = (Building) unit.getLocation();
             GoodsType goodsType = building.getGoodsOutputType();
-            basicModifiers = new LinkedHashSet<Modifier>();
             if (building.getType().getProductionModifier() != null) {
-                basicModifiers.add(building.getType().getProductionModifier());
+                modifiers.add(building.getType().getProductionModifier());
             }
-            if (goodsType != null) {
-                basicModifiers.addAll(unit.getType().getModifierSet(goodsType.getId()));
-            }
-            modifiers = sortModifiers(basicModifiers);
-            for (Modifier modifier : colony.getModifierSet(goodsType.getId())) {
-                if (modifier.getSource() != building.getType()) {
-                    colonyModifiers.add(modifier);
-                }
-            }
-            modifiers.addAll(sortModifiers(colonyModifiers));
             if (colony.getProductionBonus() != 0) {
                 modifiers.add(colony.getProductionModifier(goodsType));
             }
+
+            if (goodsType != null) {
+                modifiers.addAll(unit.getType().getModifierSet(goodsType.getId()));
+            }
+            modifiers.addAll(colony.getModifierSet(goodsType.getId()));
+
             add(localizedLabel(building.getNameKey()), "span, align center, wrap 30");
 
             add(new JLabel(ResourceManager.getImageIcon(building.getType().getId() + ".image")));
         }
+        Collections.sort(modifiers);
 
         add(new UnitLabel(unit, canvas, false, false), "wrap");
 
-        int totalPercentage = 0;
+        float result = 0;
         for (Modifier modifier : modifiers) {
             FreeColGameObjectType source = modifier.getSource();
             String sourceName;
@@ -149,19 +148,7 @@ public class WorkProductionPanel extends FreeColPanel {
                 break;
             default:
             }
-            if (modifier.getType() == Modifier.Type.PERCENTAGE) {
-                totalPercentage += modifier.getValue();
-            } else if (totalPercentage != 0) {
-                String result = getModifierFormat().format(totalPercentage);
-                if (totalPercentage > 0) {
-                    result = "+" + result;
-                }
-                JLabel resultLabel = new JLabel(result);
-                resultLabel.setBorder(border);
-                add(resultLabel, "skip");
-                add(new JLabel("%"));
-                totalPercentage = 0;
-            }
+            result = modifier.applyTo(result);
             add(new JLabel(sourceName), "newline");
             add(new JLabel(bonus));
             if (percentage) {
@@ -171,9 +158,11 @@ public class WorkProductionPanel extends FreeColPanel {
 
         Font bigFont = getFont().deriveFont(Font.BOLD, 16);
 
+        /*
         int result = (int) FeatureContainer.applyModifierSet(0, getGame().getTurn(), basicModifiers);
         result = (int) FeatureContainer.applyModifierSet(result, getGame().getTurn(), colonyModifiers);
         result += colony.getProductionBonus();
+        */
 
         JLabel finalLabel = new JLabel(Messages.message("model.source.finalResult.name"));
         finalLabel.setFont(bigFont);

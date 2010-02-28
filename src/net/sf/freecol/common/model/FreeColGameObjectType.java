@@ -38,6 +38,11 @@ public class FreeColGameObjectType extends FreeColObject {
     private int index = -1;
 
     /**
+     * The default index of Modifiers provided by this type.
+     */
+    private int modifierIndex = 100;
+
+    /**
      * Describe featureContainer here.
      */
     protected FeatureContainer featureContainer = new FeatureContainer();
@@ -131,6 +136,34 @@ public class FreeColGameObjectType extends FreeColObject {
         // do nothing
     }
 
+    /**
+     * Get the <code>ModifierIndex</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public final int getModifierIndex() {
+        return modifierIndex;
+    }
+
+    /**
+     * Get the index for the given Modifier.
+     *
+     * @param modifier a <code>Modifier</code> value
+     * @return an <code>int</code> value
+     */
+    public int getModifierIndex(Modifier modifier) {
+        return modifierIndex;
+    }
+
+    /**
+     * Set the <code>ModifierIndex</code> value.
+     *
+     * @param newModifierIndex The new ModifierIndex value.
+     */
+    public final void setModifierIndex(final int newModifierIndex) {
+        this.modifierIndex = newModifierIndex;
+    }
+
     protected void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
         // currently, FreeColGameObjectTypes are not serialized
     }
@@ -179,6 +212,9 @@ public class FreeColGameObjectType extends FreeColObject {
             Modifier modifier = new Modifier(in, specification);
             if (modifier.getSource() == null) {
                 modifier.setSource(this);
+            }
+            if (modifier.getIndex() < 0) {
+                modifier.setIndex(getModifierIndex(modifier));
             }
             addModifier(modifier); // Modifier close the element
             specification.addModifier(modifier);

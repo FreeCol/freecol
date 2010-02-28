@@ -638,6 +638,7 @@
       </xs:attribute>
       <xs:attribute name="value" use="required" type="xs:float"/>
       <xs:attribute name="source" type="xs:string"/>
+      <xs:attribute name="index" type="xs:nonNegativeInteger"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="scope">

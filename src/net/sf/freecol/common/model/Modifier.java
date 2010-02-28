@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * combat. The Modifier may be applicable only to certain Objects
  * specified by means of <code>Scope</code> objects.
  */
-public final class Modifier extends Feature {
+public final class Modifier extends Feature implements Comparable<Modifier> {
 
     public static final String OFFENCE = "model.modifier.offence";
     public static final String DEFENCE = "model.modifier.defence";
@@ -43,6 +43,16 @@ public final class Modifier extends Feature {
     public static final float UNKNOWN = Float.MIN_VALUE;
 
     public static enum Type { ADDITIVE, MULTIPLICATIVE, PERCENTAGE }
+
+    // index values for common modifier types
+    public static int BASIC_PRODUCTION_INDEX = 0;
+    public static int COLONY_PRODUCTION_INDEX = 10;
+    public static int EXPERT_PRODUCTION_INDEX = 20;
+    public static int FATHER_PRODUCTION_INDEX = 30;
+    public static int IMPROVEMENT_PRODUCTION_INDEX = 40;
+    public static int AUTO_PRODUCTION_INDEX = 50;
+    public static int BUILDING_PRODUCTION_INDEX = 60;
+    public static int NATION_PRODUCTION_INDEX = 70;
 
     private float value;
 
@@ -58,9 +68,15 @@ public final class Modifier extends Feature {
     private Type type;
 
     /**
-     * Describe incrementType here.
+     * The type of increment.
      */
     private Type incrementType;
+
+    /**
+     * The sorting index.
+     */
+    private int index = -1;
+
 
     // -- Constructors --
 
@@ -221,6 +237,24 @@ public final class Modifier extends Feature {
     }
 
     /**
+     * Get the <code>Index</code> value.
+     *
+     * @return an <code>int</code> value
+     */
+    public int getIndex() {
+        return index;
+    }
+
+    /**
+     * Set the <code>Index</code> value.
+     *
+     * @param newIndex The new Index value.
+     */
+    public void setIndex(final int newIndex) {
+        this.index = newIndex;
+    }
+
+    /**
      * Applies this Modifier to a number. This method does not take
      * scopes, increments or time limits into account.
      *
@@ -246,6 +280,7 @@ public final class Modifier extends Feature {
         hash = hash + 31 * Float.floatToIntBits(increment);
         hash = hash + 31 * (type == null ? 0 : type.hashCode());
         hash = hash + 31 * (incrementType == null ? 0 : incrementType.hashCode());
+        hash = hash + 31 * index;
         return hash;
     }
 
@@ -281,9 +316,26 @@ public final class Modifier extends Feature {
             } else if (!incrementType.equals(modifier.incrementType)) {
                 return false;
             }
-            return true;
+            return (index == modifier.index);
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Compares this object with the specified object for
+     * order. Returns a negative integer, zero, or a positive integer
+     * as this object is less than, equal to, or greater than the
+     * specified object.
+     *
+     * @param modifier a <code>Modifier</code> value
+     * @return an <code>int</code> value
+     */
+    public int compareTo(Modifier modifier) {
+        if (index == modifier.index) {
+            return type.compareTo(modifier.type);
+        } else {
+            return (index - modifier.index);
         }
     }
 
@@ -334,6 +386,7 @@ public final class Modifier extends Feature {
             setType(Enum.valueOf(Type.class, incrementString.toUpperCase()));
             increment = Float.parseFloat(in.getAttributeValue(null, "increment"));
         }
+        index = getAttribute(in, "index", -1);
     }
     
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
@@ -344,6 +397,7 @@ public final class Modifier extends Feature {
             out.writeAttribute("incrementType", incrementType.toString());
             out.writeAttribute("increment", String.valueOf(increment));
         }
+        out.writeAttribute("index", Integer.toString(index));
     }
     
     public String toString() {

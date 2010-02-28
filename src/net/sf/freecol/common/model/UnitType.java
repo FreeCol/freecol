@@ -134,6 +134,7 @@ public final class UnitType extends BuildableType implements Comparable<UnitType
      */
     public UnitType() {
         setIndex(nextIndex++);
+        setModifierIndex(Modifier.EXPERT_PRODUCTION_INDEX);
     }
 
     /**

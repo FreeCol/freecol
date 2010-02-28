@@ -21,6 +21,7 @@ package net.sf.freecol.common.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -261,6 +262,52 @@ public class FeatureContainer {
      * @param turn a <code>Turn</code> value
      * @return a <code>float</code> value
      */
+    public static float applyModifiers(float number, Turn turn, List<Modifier> modifierSet) {
+        if (modifierSet == null) {
+            return number;
+        }
+        float result = number;
+        for (Modifier modifier : modifierSet) {
+            float value = modifier.getValue();
+            if (value == Modifier.UNKNOWN) {
+                return Modifier.UNKNOWN;
+            }
+            if (modifier.hasIncrement() && turn != null) {
+                int diff = turn.getNumber() - modifier.getFirstTurn().getNumber();
+                switch(modifier.getIncrementType()) {
+                case ADDITIVE:
+                    value += modifier.getIncrement() * diff;
+                    break;
+                case MULTIPLICATIVE:
+                    value *= modifier.getIncrement() * diff;
+                    break;
+                case PERCENTAGE:
+                    value += (value * modifier.getIncrement() * diff) / 100;
+                    break;
+                }
+            }
+            switch(modifier.getType()) {
+            case ADDITIVE:
+                result += value;
+                break;
+            case MULTIPLICATIVE:
+                result *= value;
+                break;
+            case PERCENTAGE:
+                result += (result * value) / 100;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Applies a given Set of Modifiers to the given float value.
+     *
+     * @param number a <code>float</code> value
+     * @param turn a <code>Turn</code> value
+     * @return a <code>float</code> value
+     */
     public static float applyModifierSet(float number, Turn turn, Set<Modifier> modifierSet) {
         if (modifierSet == null) {
             return number;
@@ -303,7 +350,6 @@ public class FeatureContainer {
         result += (result * percentage) / 100;
         return result;
     }
-
 
     /**
      * Add the given Ability to the set of Abilities present. If the

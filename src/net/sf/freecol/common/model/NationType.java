@@ -49,6 +49,7 @@ public abstract class NationType extends FreeColGameObjectType {
      */
     public NationType() {
         setIndex(nextIndex++);
+        setModifierIndex(Modifier.NATION_PRODUCTION_INDEX);
     }
 
     /**

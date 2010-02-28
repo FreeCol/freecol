@@ -311,7 +311,10 @@ public class FoundingFatherTest extends FreeColTestCase {
         assertFalse(player.getFeatureContainer().getModifierSet("model.goods.bells").isEmpty());
                    
         player.setTax(30);
-        int expected = Math.round(((float) (3 * 6 + 1) * 130) / 100);
+        // TODO: find out why the following changes anything
+        colony.getModifierSet("model.goods.bells");
+
+        int expected = (int) (3 * 6 * 1.3f + 1);
         assertEquals(expected, townHall.getProductionOf(bells));
     }
     

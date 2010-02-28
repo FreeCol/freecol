@@ -565,11 +565,17 @@ public class ColonyTile extends FreeColGameObject implements WorkLocation, Ownab
         if (unit == null) {
             throw new IllegalArgumentException("Unit must not be 'null'.");
         } else if (workTile.isLand() || colony.hasAbility("model.ability.produceInWater")) {
-            int production = unit.getProductionOf(goodsType, workTile.potential(goodsType, unit.getType()));
-            if (production > 0) {
-                production = Math.max(1, production + colony.getProductionBonus());
+            Set<Modifier> modifiers = workTile.getProductionBonus(goodsType, unit.getType());
+            if (FeatureContainer.applyModifierSet(0f, getGame().getTurn(), modifiers) > 0) {
+                modifiers.addAll(unit.getModifierSet(goodsType.getId()));
+                modifiers.add(colony.getProductionModifier(goodsType));
+                modifiers.addAll(getColony().getModifierSet(goodsType.getId()));
+                List<Modifier> modifierList = new ArrayList<Modifier>(modifiers);
+                Collections.sort(modifierList);
+                return Math.max(1, (int) FeatureContainer.applyModifiers(0, getGame().getTurn(), modifierList));
+            } else {
+                return 0;
             }
-            return production;
         } else {
             return 0;
         }

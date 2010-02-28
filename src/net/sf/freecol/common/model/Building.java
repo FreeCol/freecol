@@ -660,7 +660,11 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     }
 
     private int getStoredInput() {
-        return colony.getGoodsCount(getGoodsInputType());
+        if (getGoodsInputType() == null) {
+            return 0;
+        } else {
+            return colony.getGoodsCount(getGoodsInputType());
+        }
     }
 
     /**
@@ -788,8 +792,6 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
     public int getProduction() {
         if (canAutoProduce()) {
             return getAutoProduction(getGoodsInput());
-        } else if (getGoodsInputType() == null) {
-            return getProductionAdding(0);
         } else {
             return getProductionAdding(getStoredInput());
         }
@@ -843,14 +845,16 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (getGoodsInputType() != null && availableInput < goodsOutput) {
             goodsOutput = availableInput;
         }
+
+        // apply modifiers, if any
+        goodsOutput = applyModifiers(goodsOutput);
         
         // auto-produced goods should not overflow    
         int availSpace = colony.getWarehouseCapacity() - colony.getGoodsCount(getGoodsOutputType());
         if (goodsOutput > availSpace) {
             goodsOutput = availSpace;
         }
-        
-        return applyModifiers(goodsOutput);
+        return goodsOutput;
     }
 
     /**
@@ -918,14 +922,15 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
             return 0;
         }
 
-        int base = buildingType.getBasicProduction();
-        int productivity = prodUnit.getProductionOf(getGoodsOutputType(), base);
+        int productivity = buildingType.getBasicProduction();
         if (productivity > 0) {
             productivity += colony.getProductionBonus();
-            if (productivity < 1)
-                productivity = 1;
+            return (int) prodUnit.getType().getFeatureContainer()
+                .applyModifier(Math.max(1, productivity),
+                               getGoodsOutputType().getId());
+        } else {
+            return 0;
         }
-        return productivity;
     }
 
     /**
@@ -977,9 +982,17 @@ public final class Building extends FreeColGameObject implements WorkLocation, O
         if (goodsOutputType == null) {
             return 0;
         }
+        /*
         return Math.round(colony.getFeatureContainer().applyModifier(productivity,
                                                                      goodsOutputType.getId(),
                                                                      buildingType, getGame().getTurn()));
+        */
+        List<Modifier> modifiers =
+            new ArrayList<Modifier>(colony.getFeatureContainer().
+                                    getModifierSet(goodsOutputType.getId(), buildingType, getGame().getTurn()));
+        Collections.sort(modifiers);
+        return (int) FeatureContainer.applyModifiers(productivity, getGame().getTurn(), modifiers);
+
     }
     
     public int compareTo(Building other) {

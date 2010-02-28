@@ -47,6 +47,7 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     
     public BuildingType() {
         setIndex(nextIndex++);
+        setModifierIndex(Modifier.BUILDING_PRODUCTION_INDEX);
     }
     
     public BuildingType getUpgradesFrom() {
@@ -104,6 +105,22 @@ public final class BuildingType extends BuildableType implements Comparable<Buil
     public int compareTo(BuildingType other) {
         return getIndex() - other.getIndex();
     }
+
+    /**
+     * Get the index for the given Modifier.
+     *
+     * @param modifier a <code>Modifier</code> value
+     * @return an <code>int</code> value
+     */
+    @Override
+    public final int getModifierIndex(Modifier modifier) {
+        if (produces != null && produces.getId().equals(modifier.getId())) {
+            return Modifier.AUTO_PRODUCTION_INDEX;
+        } else {
+            return getModifierIndex();
+        }
+    }
+
 
     public void readAttributes(XMLStreamReader in, Specification specification) throws XMLStreamException {
         if (hasAttribute(in, "upgradesFrom")) {
