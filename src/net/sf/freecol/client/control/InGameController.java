@@ -302,11 +302,6 @@ public final class InGameController implements NetworkConstants {
             return null;
         }
 
-        // Success!
-        if (tag.equals(reply.getTagName())) {
-            return reply;
-        }
-
         // Process explicit errors.
         // If debugging suppress the bland failure in favour of the
         // higher detail text.
@@ -319,6 +314,11 @@ public final class InGameController implements NetworkConstants {
             Connection conn = client.getConnection();
             freeColClient.getInGameInputHandler().handle(conn, reply);
             return null;
+        }
+
+        // Success!
+        if (tag == null || tag.equals(reply.getTagName())) {
+            return reply;
         }
 
         // Unexpected reply.  Whine and fail.
@@ -422,8 +422,7 @@ public final class InGameController implements NetworkConstants {
     private void askEmigrate(int slot) {
         Client client = freeColClient.getClient();
         EmigrateUnitMessage message = new EmigrateUnitMessage(slot);
-        Element reply = askExpecting(client, message.toXMLElement(),
-                                     "multiple");
+        Element reply = askExpecting(client, message.toXMLElement(), null);
         if (reply == null) return;
 
         Connection conn = client.getConnection();
@@ -1700,9 +1699,7 @@ public final class InGameController implements NetworkConstants {
                     || unit.getDestination().getTile() == tile.getTile())) {
                 canvas.showColonyPanel((Colony) tile.getSettlement());
             }
-            if (unit.getMovesLeft() <= 0) {
-                nextActiveUnit();
-            }
+            nextActiveUnit();
         }
     }
 

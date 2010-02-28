@@ -91,22 +91,18 @@ public class EmigrateUnitMessage extends Message {
             return Message.clientError("No emigrants available.");
         }
 
-        InGameController controller = (InGameController) server.getController();
-        ModelMessage m = controller.emigrate(serverPlayer, slot, fountain);
+        // Proceed to emigrate.
+        InGameController igc = server.getInGameController();
+        ModelMessage m = igc.emigrate(serverPlayer, slot, fountain);
 
-        Element reply = Message.createNewRootElement("multiple");
-        Document doc = reply.getOwnerDocument();
-        Element update = doc.createElement("update");
-        reply.appendChild(update);
-        update.appendChild(europe.toXMLElement(player, doc));
+        // Update with new state of Europe, the message, and potentially
+        // the changed player immigration state.
+        Element reply = igc.buildGeneralUpdate(serverPlayer, europe, m);
         if (!fountain) {
-            update.appendChild(player.toXMLElementPartial(doc, "immigration",
-                                                          "immigrationRequired"));
-        }
-        if (m != null) {
-            Element messages = doc.createElement("addMessages");
-            reply.appendChild(messages);
-            m.addToOwnedElement(messages, player);
+            Document doc = reply.getOwnerDocument();
+            spliceIntoElement(reply, "update",
+                              player.toXMLElementPartial(doc, "immigration",
+                                                         "immigrationRequired"));
         }
         return reply;
     }
