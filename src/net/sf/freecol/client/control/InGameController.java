@@ -4547,7 +4547,7 @@ public final class InGameController implements NetworkConstants {
      * @param flag whether to ignore the ModelMessage or not
      */
     public synchronized void ignoreMessage(ModelMessage message, boolean flag) {
-        String key = message.getSource().getId();
+        String key = message.getSourceId();
         if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
             for (String otherkey : message.getKeys()) {
                 if ("%goods%".equals(otherkey)) {
@@ -4587,7 +4587,7 @@ public final class InGameController implements NetworkConstants {
         for (ModelMessage message : inputList) {
             if (shouldAllowMessage(message)) {
                 if (message.getMessageType() == ModelMessage.MessageType.WAREHOUSE_CAPACITY) {
-                    String key = message.getSource().getId();
+                    String key = message.getSourceId();
                     if (message.getTemplateType() == StringTemplate.TemplateType.TEMPLATE) {
                         for (String otherkey : message.getKeys()) {
                             if ("%goods%".equals(otherkey)) {

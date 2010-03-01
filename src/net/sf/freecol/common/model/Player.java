@@ -536,7 +536,7 @@ public class Player extends FreeColGameObject implements Nameable {
     /**
      * Sometimes an event causes the source (and display) fields in an
      * accumulated model message to become invalid (e.g. Europe disappears
-     * on independence.  This routine is for cleaning up such cases.
+     * on independence).  This routine is for cleaning up such cases.
      *
      * @param source the source field that has become invalid
      * @param newSource a new source field to replace the old with, or
@@ -549,14 +549,11 @@ public class Player extends FreeColGameObject implements Nameable {
         modelMessagesList.addAll(modelMessages);
 
         for (ModelMessage modelMessage : modelMessagesList) {
-            if (modelMessage.getSource() == source) {
+            if (modelMessage.getSourceId() == source.getId()) {
                 if (newSource == null) {
                     modelMessages.remove(modelMessage);
                 } else {
-                    modelMessage.setSource(newSource);
-                    if (modelMessage.getDisplay() == source) {
-                        modelMessage.setDisplay(newSource);
-                    }
+                    modelMessage.divert(newSource);
                 }
             }
         }

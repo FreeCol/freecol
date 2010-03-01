@@ -55,9 +55,8 @@ public class ModelMessage extends StringTemplate {
     }
 
     private Player owner;
-    private FreeColGameObject source;
-    private Location sourceLocation;
-    private FreeColObject display;
+    private String sourceId;
+    private String displayId;
     private MessageType messageType;
     private boolean beenDisplayed = false;
 
@@ -70,9 +69,8 @@ public class ModelMessage extends StringTemplate {
      * Creates a new <code>ModelMessage</code>.
      *
      * @param id The ID of the message to display.
-     * @param source The source of the message. This is what the message should be
-     *               associated with. In addition, the owner of the source is the
-     *               player getting the message.
+     * @param source The source of the message. This is what the
+     *               message should be associated with.
      * @param display The Object to display.
      */
     public ModelMessage(String id, FreeColGameObject source, FreeColObject display) {
@@ -84,9 +82,8 @@ public class ModelMessage extends StringTemplate {
      *
      * @param messageType The type of this model message.
      * @param id The ID of the message to display.
-     * @param source The source of the message. This is what the message should be
-     *               associated with. In addition, the owner of the source is the
-     *               player getting the message.
+     * @param source The source of the message. This is what the
+     *               message should be associated with.
      */
     public ModelMessage(MessageType messageType, String id, FreeColGameObject source) {
         this(messageType, id, source, getDefaultDisplay(messageType, source));
@@ -96,9 +93,8 @@ public class ModelMessage extends StringTemplate {
      * Creates a new <code>ModelMessage</code>.
      *
      * @param id The ID of the message to display.
-     * @param source The source of the message. This is what the message should be
-     *               associated with. In addition, the owner of the source is the
-     *               player getting the message.
+     * @param source The source of the message. This is what the
+     *               message should be associated with.
      */
     public ModelMessage(String id, FreeColGameObject source) {
         this(MessageType.DEFAULT, id, source, getDefaultDisplay(MessageType.DEFAULT, source));
@@ -109,40 +105,18 @@ public class ModelMessage extends StringTemplate {
      *
      * @param messageType The type of this model message.
      * @param id The ID of the message to display.
-     * @param source The source of the message. This is what the message should be
-     *               associated with. In addition, the owner of the source is the
-     *               player getting the message.
-     * @param display The Object to display.
+     * @param source The source of the message. This is what the
+     *               message should be associated with.
+     * @param display The object to display.
      */
     public ModelMessage(MessageType messageType, String id, FreeColGameObject source, FreeColObject display) {
         super(id, TemplateType.TEMPLATE);
         this.messageType = messageType;
-        this.source = source;
-        this.display = display;
-
-        this.sourceLocation = null;
-        if (source instanceof Unit) {
-            Unit u = (Unit) source;
-            this.owner = u.getOwner();
-            if (u.getTile() != null) {
-                this.sourceLocation = u.getTile();
-            } else if (u.getColony() != null) {
-                this.sourceLocation = u.getColony().getTile();
-            } else if (u.getIndianSettlement() != null) {
-                this.sourceLocation = u.getIndianSettlement().getTile();
-            } else if (u.isInEurope()) {
-                this.sourceLocation = u.getOwner().getEurope();
-            }
-        } else if (source instanceof Settlement) {
-            this.owner = ((Settlement) source).getOwner();
-            this.sourceLocation = ((Settlement) source).getTile();
-        } else if (source instanceof Europe) {
-            this.owner = ((Europe) source).getOwner();
-        } else if (source instanceof Player) {
-            this.owner = (Player) source;
-        } else if (source instanceof Ownable) {
-            this.owner = ((Ownable) source).getOwner();
-        }
+        this.sourceId = source.getId();
+        this.displayId = (display != null) ? display.getId() : source.getId();
+        this.owner = (source instanceof Player) ? (Player) source
+            : (source instanceof Ownable) ? ((Ownable) source).getOwner()
+            : null;
     }
 
     /**
@@ -159,13 +133,15 @@ public class ModelMessage extends StringTemplate {
 
     /**
      * Returns the default display object for the given type.
-     * @param messageType the type for which to find the default display object.
-     * @param source the source object
-     * @return an object to be displayed for the message. 
+     *
+     * @param messageType The type to find the default display object for.
+     * @param source The source object
+     * @return An object to be displayed for the message.
      */
-    static private FreeColObject getDefaultDisplay(MessageType messageType, FreeColGameObject source) {
+    static private FreeColObject getDefaultDisplay(MessageType messageType,
+                                                   FreeColGameObject source) {
         FreeColObject newDisplay = null;
-        switch(messageType) {
+        switch (messageType) {
         case SONS_OF_LIBERTY:
         case GOVERNMENT_EFFICIENCY:
             newDisplay = FreeCol.getSpecification().getGoodsType("model.goods.bells");
@@ -200,7 +176,9 @@ public class ModelMessage extends StringTemplate {
 
     /**
      * Checks if this <code>ModelMessage</code> has been displayed.
-     * @return <i>true</i> if this <code>ModelMessage</code> has been displayed.
+     *
+     * @return <i>true</i> if this <code>ModelMessage</code> has been
+     * displayed.
      * @see #setBeenDisplayed
      */
     public boolean hasBeenDisplayed() {
@@ -209,8 +187,9 @@ public class ModelMessage extends StringTemplate {
 
 
     /**
-     * Sets the <code>beenDisplayed</code> value of this <code>ModelMessage</code>.
-     * This is used to avoid showing the same message twice.
+     * Sets the <code>beenDisplayed</code> value of this
+     * <code>ModelMessage</code>.  This is used to avoid showing the
+     * same message twice.
      * 
      * @param beenDisplayed Should be set to <code>true</code> after the
      *       message has been displayed.
@@ -221,27 +200,44 @@ public class ModelMessage extends StringTemplate {
 
 
     /**
-     * Gets the source of the message. This is what the message
-     * should be associated with. In addition, the owner of the source is the
-     * player getting the message.
+     * Gets the ID of the source of the message.
      *
      * @return The source of the message.
-     * @see #getOwner
      */
-    public FreeColGameObject getSource() {
-        return source;
+    public String getSourceId() {
+        return sourceId;
     }
 
     /**
-     * Sets the source of the message.
-     * @param newSource a new source for this message
+     * Sets the ID of the source object.
+     *
+     * @param sourceId A new source ID.
      */
-    public void setSource(FreeColGameObject newSource) {
-        source = newSource;
+    public void setSourceId(String source) {
+        this.sourceId = sourceId;
     }
     
     /**
+     * Gets the ID of the object to display.
+     *
+     * @return The ID of the object to display.
+     */
+    public String getDisplayId() {
+        return displayId;
+    }
+
+    /**
+     * Sets the ID of the object to display.
+     *
+     * @param displayId A new display ID.
+     */
+    public void setDisplayId(String displayId) {
+        this.displayId = displayId;
+    }
+
+    /**
      * Gets the messageType of the message to display.   
+     *
      * @return The messageType. 
      */
     public MessageType getMessageType() {
@@ -261,21 +257,15 @@ public class ModelMessage extends StringTemplate {
         return "model.message." + messageType.toString();
     }
 
-
     /**
-     * Gets the Object to display.
-     * @return The Object to display.
+     * Switch the source (and display if it is the same) to a new
+     * object.  Called when an object becomes invalid.
+     *
+     * @param newSource A new source.
      */
-    public FreeColObject getDisplay() {
-        return display;
-    }
-
-    /**
-     * Sets the Object to display.
-     * @param newDisplay the new object to display
-     */
-    public void setDisplay(FreeColGameObject newDisplay) {
-        display = newDisplay;
+    public void divert(FreeColGameObject newSource) {
+        if (displayId == sourceId) displayId = newSource.getId();
+        sourceId = newSource.getId();
     }
 
     /**
@@ -321,7 +311,7 @@ public class ModelMessage extends StringTemplate {
      */
     public ModelMessage add(String value) {
         super.add(value);
-	return this;
+        return this;
     }
 
     /**
@@ -348,7 +338,7 @@ public class ModelMessage extends StringTemplate {
      */
     public ModelMessage addName(String value) {
         super.addName(value);
-	return this;
+        return this;
     }
 
     /**
@@ -374,7 +364,7 @@ public class ModelMessage extends StringTemplate {
      */
     public ModelMessage addStringTemplate(String key, StringTemplate template) {
         super.addStringTemplate(key, template);
-	return this;
+        return this;
     }
 
     /**
@@ -385,19 +375,22 @@ public class ModelMessage extends StringTemplate {
      */
     public ModelMessage addStringTemplate(StringTemplate template) {
         super.addStringTemplate(template);
-	return this;
+        return this;
     }
 
 
     /**
-    * Checks if this <code>ModelMessage</code> is equal to another <code>ModelMessage</code>.
-    * @return <i>true</i> if the sources, message IDs and data are equal.
-    */
+     * Checks if this <code>ModelMessage</code> is equal to another
+     * <code>ModelMessage</code>.
+     *
+     * @param o The <code>Object</code> to compare.
+     * @return <i>true</i> if the sources, message IDs and data are equal.
+     */
     @Override
     public boolean equals(Object o) {
         if (o instanceof ModelMessage) {
             ModelMessage m = (ModelMessage) o;
-            if (source.equals(m.source)
+            if (sourceId.equals(m.sourceId)
                 && getId().equals(m.getId())
                 && messageType == m.messageType) {
                 return super.equals(m);
@@ -409,7 +402,7 @@ public class ModelMessage extends StringTemplate {
     @Override
     public int hashCode() {
         int value = 1;
-        value = 37 * value + ((source == null) ? 0 : source.hashCode());
+        value = 37 * value + sourceId.hashCode();
         value = 37 * value + getId().hashCode();
         value = 37 * value + messageType.ordinal();
         value = 37 * value + super.hashCode();
@@ -419,15 +412,11 @@ public class ModelMessage extends StringTemplate {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("ModelMessage<" + hashCode() + ", ");
-        sb.append(((source == null) ? "null" : source.getId()) + ", ");
-        sb.append(((display == null) ? "null" : display.getId()) + ", ");
+        sb.append(((sourceId == null) ? "null" : sourceId) + ", ");
+        sb.append(((displayId == null) ? "null" : displayId) + ", ");
         sb.append(super.toString());
         sb.append(", " + messageType + " >");
         return sb.toString();
-    }
-
-    public static String getXMLElementTagName() {
-        return "modelMessage";
     }
 
     public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
@@ -440,21 +429,9 @@ public class ModelMessage extends StringTemplate {
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
         out.writeAttribute("owner", owner.getId());
-        if (source != null) {
-            if ((source instanceof Unit && ((Unit)source).isDisposed())
-              ||(source instanceof Settlement && ((Settlement)source).isDisposed())) {
-                if (sourceLocation==null) {
-                    logger.warning("sourceLocation==null for source "+source.getId());
-                    out.writeAttribute("source", owner.getId());
-                } else {
-                    out.writeAttribute("source", sourceLocation.getId());
-                }
-            } else {
-                out.writeAttribute("source", source.getId());
-            }
-        }
-        if (display != null) {
-            out.writeAttribute("display", display.getId());
+        out.writeAttribute("source", sourceId);
+        if (displayId != null) {
+            out.writeAttribute("display", displayId);
         }
         out.writeAttribute("messageType", messageType.toString());
         out.writeAttribute("hasBeenDisplayed", String.valueOf(beenDisplayed));
@@ -475,32 +452,19 @@ public class ModelMessage extends StringTemplate {
          
         messageType = Enum.valueOf(MessageType.class, getAttribute(in, "messageType", MessageType.DEFAULT.toString()));
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
-
-        String sourceString = in.getAttributeValue(null, "source");
-        source = game.getFreeColGameObject(sourceString);
-        if (source == null) {
-            logger.warning("source null from string " + sourceString);
-            source = owner;
-        }
-        String displayString = in.getAttributeValue(null, "display");
-        if (displayString != null) {
-            // usually referring to a unit, colony or player
-            display = game.getFreeColGameObject(displayString);
-            if (display==null) {
-                // either the unit, colony has been killed/destroyed
-                // or the message refers to goods or building type
-                try {
-                    display = FreeCol.getSpecification().getType(displayString);
-                } catch (IllegalArgumentException e) {
-                    // do nothing
-                    display = owner;
-                    logger.warning("display null from string " + displayString);
-                }
-            }
-        }
+        sourceId = in.getAttributeValue(null, "source");
+        displayId = in.getAttributeValue(null, "display");
 
         super.readChildren(in);
         owner.addModelMessage(this);
     }
 
+    /**
+     * Gets the tag name of the root element representing this object.
+     *
+     * @return "modelMessage"
+     */
+    public static String getXMLElementTagName() {
+        return "modelMessage";
+    }
 }

@@ -43,6 +43,8 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.FreeColObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.Market;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Nameable;
@@ -84,17 +86,21 @@ public final class ReportTurnPanel extends ReportPanel {
         Object source = this;
         ModelMessage.MessageType type = null;
         int headlines = 0;
+        Game game = getClient().getGame();
 
         // count number of headlines
         for (final ModelMessage message : messages) {
-            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE
-                && message.getSource() != source) {
-                source = message.getSource();
-                headlines++;
-            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE
-                       && message.getMessageType() != type) {
-                type = message.getMessageType();
-                headlines++;
+            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE) {
+                FreeColGameObject messageSource = game.getMessageSource(message);
+                if (messageSource != source) {
+                    source = messageSource;
+                    headlines++;
+                }
+            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE) {
+                if (message.getMessageType() != type) {
+                    type = message.getMessageType();
+                    headlines++;
+                }
             }
         }
 
@@ -108,23 +114,26 @@ public final class ReportTurnPanel extends ReportPanel {
         int row = 1;
         for (final ModelMessage message : messages) {
             // add headline if necessary
-            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE
-                && message.getSource() != source) {
-                source = message.getSource();
-                reportPanel.add(getHeadline(source), "newline 20, skip");
-            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE
-                       && message.getMessageType() != type) {
-                type = message.getMessageType();
-                JLabel headline = localizedLabel(message.getMessageTypeName());
-                headline.setFont(smallHeaderFont);
-                reportPanel.add(headline, "newline 20, skip, span");
+            if (groupBy == ClientOptions.MESSAGES_GROUP_BY_SOURCE) {
+                FreeColGameObject messageSource = game.getMessageSource(message);
+                if (messageSource != source) {
+                    source = messageSource;
+                    reportPanel.add(getHeadline(source), "newline 20, skip");
+                }
+            } else if (groupBy == ClientOptions.MESSAGES_GROUP_BY_TYPE) {
+                if (message.getMessageType() != type) {
+                    type = message.getMessageType();
+                    JLabel headline = localizedLabel(message.getMessageTypeName());
+                    headline.setFont(smallHeaderFont);
+                    reportPanel.add(headline, "newline 20, skip, span");
+                }
             }
 
             JComponent component = new JLabel();
-            if (message.getDisplay() != null) {
-
+            FreeColObject messageDisplay = game.getMessageDisplay(message);
+            if (messageDisplay != null) {
                 // TODO: Scale icons relative to font size.
-                ImageIcon icon = getCanvas().getImageIcon(message.getDisplay(), false);
+                ImageIcon icon = getCanvas().getImageIcon(messageDisplay, false);
                 if (icon != null && icon.getIconHeight() > 40) {
                     Image image = icon.getImage();
                     int newWidth = (int)((double)image.getWidth(null)/image.getHeight(null)*40.0);
@@ -132,21 +141,21 @@ public final class ReportTurnPanel extends ReportPanel {
                     icon.setImage(image);
                 }
 
-                if (message.getDisplay() instanceof Colony) {
+                if (messageDisplay instanceof Colony) {
                     JButton button = new JButton();
                     button.setIcon(icon);
-                    button.setActionCommand(((Colony) message.getDisplay()).getId());
+                    button.setActionCommand(((Colony) messageDisplay).getId());
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
                     component = button;
-                } else if (message.getDisplay() instanceof Unit) {
+                } else if (messageDisplay instanceof Unit) {
                     JButton button = new JButton();
                     button.setIcon(icon);
-                    button.setActionCommand(((Unit) message.getDisplay()).getLocation().getId());
+                    button.setActionCommand(((Unit) messageDisplay).getLocation().getId());
                     button.addActionListener(this);
                     button.setBorder(BorderFactory.createEmptyBorder());
                     component = button;
-                } else if (message.getDisplay() instanceof Player) {
+                } else if (messageDisplay instanceof Player) {
                     component = new JLabel(icon);
                 } else {
                     component = new JLabel(icon);
@@ -296,14 +305,15 @@ public final class ReportTurnPanel extends ReportPanel {
             while ((end = input.indexOf('%', start + 1)) >= 0) {
                 String var = input.substring(start, end + 1);
                 String[] item = findReplacementData(message, var);
+                FreeColGameObject messageSource = getClient().getGame().getMessageSource(message);
                 if (item != null && var.equals(item[0])) {
                     // found variable to replace
                     if (var.equals("%colony%")) {
                         Colony colony = player.getColony(item[1]);
                         if (colony != null) {
                             insertLinkButton(document, colony, item[1]);
-                        } else if (message.getSource() instanceof Tile) {
-                            insertLinkButton(document, message.getSource(), item[1]);
+                        } else if (messageSource instanceof Tile) {
+                            insertLinkButton(document, messageSource, item[1]);
                         } else {
                             insertText(document, item[1]);
                         }
@@ -312,10 +322,10 @@ public final class ReportTurnPanel extends ReportPanel {
                                          Messages.message(player.getEurope().getNameKey()));
                     } else if (var.equals("%unit%") || var.equals("%newName%")) {
                         Tile tile = null;
-                        if (message.getSource() instanceof Unit) {
-                            tile = ((Unit) message.getSource()).getTile();
-                        } else if (message.getSource() instanceof Tile) {
-                            tile = (Tile)message.getSource();
+                        if (messageSource instanceof Unit) {
+                            tile = ((Unit) messageSource).getTile();
+                        } else if (messageSource instanceof Tile) {
+                            tile = (Tile) messageSource;
                         }
                         if (tile != null) {
                             insertLinkButton(document, tile, item[1]);

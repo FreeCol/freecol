@@ -1142,8 +1142,8 @@ public final class InGameInputHandler extends InputHandler {
             ModelMessage.MessageType type = Enum.valueOf(ModelMessage.MessageType.class, e.getAttribute("messageType"));
             if (type == null) type = ModelMessage.MessageType.DEFAULT;
             m.setMessageType(type);
-            m.setSource(game.getFreeColGameObjectSafely(e.getAttribute("source")));
-            m.setDisplay(game.getFreeColGameObjectSafely(e.getAttribute("display")));
+            m.setSourceId(e.getAttribute("source"));
+            m.setDisplayId(e.getAttribute("display"));
 
             // Use the owner attribute.
             String attr = e.getAttribute("owner");

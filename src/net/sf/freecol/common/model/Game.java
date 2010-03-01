@@ -788,6 +788,38 @@ public class Game extends FreeColGameObject {
     }
 
     /**
+     * Helper function to get the source object of a message in this game.
+     *
+     * @param message The <code>ModelMessage</code> to find the object in.
+     * @return The source object.
+     */
+    public FreeColGameObject getMessageSource(ModelMessage message) {
+        return getFreeColGameObjectSafely(message.getSourceId());
+    }
+
+    /**
+     * Helper function to get the object to display with a message in
+     * this game.
+     *
+     * @param message The <code>ModelMessage</code> to find the object in.
+     * @return An object to display.
+     */
+    public FreeColObject getMessageDisplay(ModelMessage message) {
+        String id = message.getDisplayId();
+        if (id == null) id = message.getSourceId();
+        FreeColObject o = getFreeColGameObjectSafely(id);
+        if (o == null) {
+            try {
+                o = FreeCol.getSpecification().getType(id);
+            } catch (Exception e) {
+                o = message.getOwner();
+            }
+        }
+        return o;
+    }
+
+
+    /**
      * This method writes an XML-representation of this object to the given
      * stream.
      * 

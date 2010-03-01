@@ -26,14 +26,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.sf.freecol.common.model.Specification;
+import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.io.Mods;
 import net.sf.freecol.common.io.FreeColModFile.ModInfo;
 import net.sf.freecol.common.model.Colony;
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.FreeColGameObject;
+import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
+import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.option.AudioMixerOption;
 import net.sf.freecol.common.option.BooleanOption;
@@ -419,11 +421,14 @@ public class ClientOptions extends OptionMap {
     private Comparator<ModelMessage> messageSourceComparator = new Comparator<ModelMessage>() {
         // sort according to message source
         public int compare(ModelMessage message1, ModelMessage message2) {
-            Object source1 = message1.getSource();
-            Object source2 = message2.getSource();
-            if (source1 == source2) {
+            String sourceId1 = message1.getSourceId();
+            String sourceId2 = message2.getSourceId();
+            if (sourceId1 == sourceId2) {
                 return messageTypeComparator.compare(message1, message2);
             }
+            Game game = FreeCol.getFreeColClient().getGame();
+            FreeColGameObject source1 = game.getMessageSource(message1);
+            FreeColGameObject source2 = game.getMessageSource(message2);
             int base = getClassIndex(source1) - getClassIndex(source2);
             if (base == 0) {
                 if (source1 instanceof Colony) {
@@ -455,7 +460,7 @@ public class ClientOptions extends OptionMap {
         // sort according to message type
         public int compare(ModelMessage message1, ModelMessage message2) {
             int dtype = message1.getMessageType().ordinal() - message2.getMessageType().ordinal();
-            if (dtype == 0 && message1.getSource() != message2.getSource()) {
+            if (dtype == 0 && message1.getSourceId() != message2.getSourceId()) {
                 return messageSourceComparator.compare(message1, message2);
             } else {
                 return dtype;

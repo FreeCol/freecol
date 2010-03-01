@@ -452,6 +452,7 @@ public final class Canvas extends JDesktopPane {
             } catch (IllegalArgumentException e) {} // ignore
         }
 
+        Game game = freeColClient.getGame();
         String okText = "ok";
         String cancelText = "display";
         String[] messageText = new String[modelMessages.length];
@@ -472,12 +473,11 @@ public final class Canvas extends JDesktopPane {
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + modelMessages[i].getId() + ".");
             }
-
-            messageIcon[i] = getImageIcon(modelMessages[i].getDisplay(), false);
+            messageIcon[i] = getImageIcon(game.getMessageDisplay(modelMessages[i]), false);
         }
 
         // source should be the same for all messages
-        FreeColGameObject source = modelMessages[0].getSource();
+        FreeColGameObject source = game.getMessageSource(modelMessages[0]);
         if ((source instanceof Europe && !europePanel.isShowing())
                 || (source instanceof Colony || source instanceof WorkLocation)) {
 
@@ -693,7 +693,7 @@ public final class Canvas extends JDesktopPane {
             } catch (MissingResourceException e) {
                 logger.warning("could not find message with id: " + id + ".");
             }
-            images[i] = getImageIcon(messages[i].getDisplay(), false);
+            images[i] = getImageIcon(freeColClient.getGame().getMessageDisplay(messages[i]), false);
         }
 
         FreeColDialog<Boolean> confirmDialog
@@ -1379,7 +1379,8 @@ public final class Canvas extends JDesktopPane {
     }
 
     public void showInformationMessage(ModelMessage message) {
-        showInformationMessage(message, message.getDisplay());
+        showInformationMessage(message,
+            freeColClient.getGame().getMessageDisplay(message));
     }
 
     /**
