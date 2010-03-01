@@ -102,7 +102,6 @@ abstract public class AbstractOption extends FreeColObject implements Option {
      * Returns a textual representation of this object.
      * 
      * @return The name of this <code>Option</code>.
-     * @see #getLocalizedName
      */
     public String toString() {
         return getName();
@@ -121,9 +120,8 @@ abstract public class AbstractOption extends FreeColObject implements Option {
     /**
      * Set the option group
      * 
-     * @param <code>OptionGroup</code> to set
+     * @param group <code>OptionGroup</code> to set
      * 
-     * @return The string prefix provided by the OptionGroup.
      */
     public void setGroup(String group) {
         if (group == null) {

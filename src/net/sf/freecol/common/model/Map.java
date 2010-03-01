@@ -421,10 +421,7 @@ public class Map extends FreeColGameObject {
      * the <code>end</code> will not be checked against validity (neither the
      * <code>options</code> nor allowed movement by the <code>unit</code>.
      * 
-     * @param currentUnit
-     *            The <code>Unit</code> that should be used to determine
-     *            whether or not a path is legal. The <code>options</code> are
-     *            used instead if <code>unit == null</code>.
+     * @param unit an <code>Unit</code> value
      * @param start
      *            The <code>Tile</code> in which the path starts from.
      * @param end
@@ -450,7 +447,8 @@ public class Map extends FreeColGameObject {
      *                if either <code>start</code> or <code>end</code> are
      *                <code>null</code>.
      * @exception IllegalArgumentException
-     *                if <code>start == end</code>.
+     *                if either <code>start</code> or <code>end</code> are
+     *                <code>null</code>.
      */
     private PathNode findPath(final Unit unit, final Tile start, final Tile end,
             final PathType type, final Unit carrier, final CostDecider costDecider) {
@@ -778,8 +776,7 @@ public class Map extends FreeColGameObject {
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
      * 
-     * @param currentUnit
-     *            The <code>Unit</code> to find the path for.
+     * @param unit an <code>Unit</code> value
      * @param startTile
      *            The <code>Tile</code> to start the search from.
      * @param gd
@@ -811,8 +808,7 @@ public class Map extends FreeColGameObject {
      * A <code>GoalDecider</code> is typically defined inline to serve a
      * specific need.
      * 
-     * @param currentUnit
-     *            The <code>Unit</code> to find the path for.
+     * @param unit an <code>Unit</code> value
      * @param startTile
      *            The <code>Tile</code> to start the search from.
      * @param gd

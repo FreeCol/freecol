@@ -37,7 +37,7 @@ import net.sf.freecol.client.gui.i18n.Messages;
  * <br><br>
  * 
  * This panel is only used when running in
- * {@link FreeColClient#isMapEditor() map editor mode}.
+ * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
  * 
  */
 public final class RiverStylePanel extends FreeColDialog<Integer> {

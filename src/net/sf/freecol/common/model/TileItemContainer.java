@@ -378,7 +378,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Adds a <code>TileItem</code> to this container.
      *
-     * @param t The TileItem to add to this container.
+     * @param item The TileItem to add to this container.
      * @return The added TileItem or the existing TileItem or <code>null</code> on error
      */
     public TileItem addTileItem(TileItem item) {
@@ -412,7 +412,7 @@ public class TileItemContainer extends FreeColGameObject {
     /**
      * Removes TileItem from this container.
      *
-     * @param t The TileItem to remove from this container.
+     * @param item The TileItem to remove from this container.
      * @return The TileItem that has been removed from this container (if any).
      */
     public TileItem removeTileItem(TileItem item) {
@@ -540,8 +540,8 @@ public class TileItemContainer extends FreeColGameObject {
 
     /**
      * Removes the river <code>TileImprovement</code> from this Tile/Container.
-     * Change neighbours' River Style with {@link #adjustNeighbourRiverStyle}.
      */
+    // Change neighbours' River Style with {@link #adjustNeighbourRiverStyle}.
     public TileImprovement removeRiver() {
         Iterator<TileItem> iterator = tileItems.iterator();
         while (iterator.hasNext()) {

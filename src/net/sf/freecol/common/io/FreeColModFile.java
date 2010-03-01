@@ -198,7 +198,6 @@ public class FreeColModFile extends FreeColDataFile {
         /**
          * Initiates a new <code>ModInfo</code> from XML.
          *
-         * @param id The mod to be loaded.
          * @param in The input stream containing the XML.
          * @throws XMLStreamException if a problem was encountered
          *      during parsing.
@@ -209,7 +208,7 @@ public class FreeColModFile extends FreeColDataFile {
         
         /**
          * Gets the parent of the mod.
-         * @return
+         * @return a <code>String</code> value
          */
         public String getParent() {
             return parent;

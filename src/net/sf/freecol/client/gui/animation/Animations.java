@@ -36,8 +36,9 @@ public class Animations {
      * Animates a unit attack.
      * 
      * @param canvas The canvas where the animation should be drawn.
-     * @param unit The attacking unit.
+     * @param attacker an <code>Unit</code> value
      * @param defender The defending unit.
+     * @param result a <code>CombatResultType</code> value
      */
     public static void unitAttack(final Canvas canvas,
             final Unit attacker,

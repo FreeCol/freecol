@@ -1898,8 +1898,7 @@ public class Player extends FreeColGameObject implements Nameable {
 
     /**
      * Gets the number of King's land units.
-     * @return The number of units of type
-     *      {@link Unit#KINGS_REGULAR} this player owns.
+     * @return The number of units
      */
     public int getNumberOfKingLandUnits() {
         int n = 0;
@@ -2212,7 +2211,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param taskId A taskId for getRandom().
      * @return A random unit type of a unit that is recruitable in Europe.
      *
-     * @todo This is correctly called from server pre and in-game controllers,
+     * TODO: This is correctly called from server pre and in-game controllers,
      *       but it is also still called client side when Brewster arrives.
      *       When fathers get moved server-side, revisit this routine.
      *
@@ -2532,7 +2531,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * not overlapping with) another friendly colony. Penalties for enemy
      * units/colonies are added as well.
      *
-     * @param tile The <code>Tile</code>
+     * @param t The <code>Tile</code>
      * @return The value of building a colony on the given tile.
      */
     public int getColonyValue(Tile t) {

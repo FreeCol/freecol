@@ -96,7 +96,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * A move type.
      * 
-     * @see Unit#getMoveType(Map#Direction)
+     * @see Unit#getMoveType(Map.Direction)
      */
     public static enum MoveType {
         MOVE(null, true),
@@ -256,7 +256,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     /**
      * Initiate a new <code>Unit</code> of a specified type with the state set
-     * to {@link #UnitState#ACTIVE} if a carrier and {@link #UnitState#SENTRY} otherwise. The
+     * to {@link UnitState#ACTIVE} if a carrier and {@link UnitState#SENTRY} otherwise. The
      * {@link Location} is set to <i>null</i>.
      * 
      * @param game The <code>Game</code> in which this <code>Unit</code>
@@ -293,8 +293,8 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      *            <code>Unit</code> upon.
      * @param owner The <code>Player</code> owning this unit.
      * @param type The type of the unit.
-     * @param state The initial state for this Unit (one of {@link #UnitState.ACTIVE},
-     *            {@link #FORTIFIED}...).
+     * @param state The initial state for this Unit (one of {@link UnitState#ACTIVE},
+     *            {@link UnitState#FORTIFIED}...).
      * @param initialEquipment The list of initial EquimentTypes
      */
     public Unit(Game game, Location location, Player owner, UnitType type, UnitState state, 
@@ -1622,7 +1622,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
      * Moves this unit in the specified direction.
      * 
      * @param direction The direction
-     * @see #getMoveType(Direction)
+     * @see #getMoveType(Map.Direction)
      * @exception IllegalStateException If the move is illegal.
      */
     public void move(Direction direction) {

@@ -71,7 +71,6 @@ import net.sf.freecol.server.generator.MapGeneratorOptions;
  * The menu bar that is displayed on the top left corner of the
  * <code>Canvas</code>.
  *
- * @see Canvas#setJMenuBar
  * @see InGameMenuBar
  */
 public class MapEditorMenuBar extends FreeColMenuBar {

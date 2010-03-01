@@ -130,7 +130,7 @@ public class ClientOptions extends OptionMap {
     /**
      * Whether to delay on a unit's last move or not.
      * 
-     * @Todo Add this option's name and short description to languages other than English.
+     * TODO: Add this option's name and short description to languages other than English.
      */
     public static final String UNIT_LAST_MOVE_DELAY = "model.option.unitLastMoveDelay";
     

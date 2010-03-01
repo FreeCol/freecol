@@ -71,7 +71,7 @@ import net.sf.freecol.server.generator.RiverSection;
  * <br><br>
  *
  * This panel is only used when running in
- * {@link SpecificationClient#isMapEditor() map editor mode}.
+ * {@link net.sf.freecol.client.FreeColClient#isMapEditor() map editor mode}.
  *
  * @see MapEditorController#getMapTransform()
  * @see MapTransform

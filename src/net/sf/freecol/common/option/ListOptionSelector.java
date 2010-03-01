@@ -33,7 +33,7 @@ public interface ListOptionSelector<T> {
      * in a <code>ListOption</code>.
      * 
      * @param t The id.
-     * @return
+     * @return String
      */
     public String getId(T t);
     

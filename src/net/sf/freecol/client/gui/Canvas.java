@@ -1522,7 +1522,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Quits the application. This method uses {@link #confirmQuitDialog()} in
+     * Quits the application. This method uses {@link #showConfirmDialog(String, String, String, String...)} in
      * order to get a "Are you sure"-confirmation from the user.
      */
     public void quit() {
@@ -1532,7 +1532,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Quits the application. This method uses {@link #confirmQuitDialog()} in
+     * Quits the application. This method uses {@link #showConfirmDialog(String, String, String, String...)} in
      * order to get a "Are you sure"-confirmation from the user.
      */
     public void retire() {

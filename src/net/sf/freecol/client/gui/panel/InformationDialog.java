@@ -43,10 +43,9 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * Returns an information dialog that shows the given 
      * texts and images, and an "OK" button.
      * 
+     * @param canvas The parent Canvas.
      * @param text The text to be displayed in the dialog.
      * @param image The image to be displayed in the dialog.
-     * @return An information dialog that shows the given text 
-     *       and an "OK" button.
      */
     public InformationDialog(Canvas canvas, String text, ImageIcon image) {
         this(canvas, new String[] { text }, new ImageIcon[] { image });
@@ -56,10 +55,9 @@ public class InformationDialog extends FreeColDialog<Boolean> {
      * Returns an information dialog that shows the given 
      * texts and images, and an "OK" button.
      * 
+     * @param parent The parent Canvas.
      * @param texts The texts to be displayed in the dialog.
      * @param images The images to be displayed in the dialog.
-     * @return An information dialog that shows the given text 
-     *       and an "OK" button.
      */
     public InformationDialog(Canvas parent, String[] texts, ImageIcon[] images) {
         super(parent);

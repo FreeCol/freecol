@@ -79,7 +79,7 @@ public class HistoryEvent extends StringTemplate {
     /**
      * Set the <code>int</code> value.
      *
-     * @param newint The new int value.
+     * @param newInt The new int value.
      */
     public final void setTurn(final int newInt) {
         this.turn = newInt;

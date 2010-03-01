@@ -21,7 +21,7 @@ package net.sf.freecol.client.gui.panel;
 
 /**
  * Can be used as a single choice for the
- * {@link FreeColDialog#createChoiceDialog(String, String, ChoiceItem...) choice dialog}.
+ * {@link FreeColDialog#createChoiceDialog(String, String, List) choice dialog}.
  */
 public class ChoiceItem<T> {
 

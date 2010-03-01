@@ -235,8 +235,8 @@ public class ClientModelController implements ModelController {
     
     /**
      * Tells the <code>ModelController</code> that a tile improvement was finished
-     * @param tile The <code>Tile</code> where the improvement was done
-     * @param type the <code>TileImprovementType</code> finished
+     * @param unit an <code>Unit</code> value
+     * @param improvement a <code>TileImprovement</code> value
      */
     public void tileImprovementFinished(Unit unit, TileImprovement improvement){
         // Perform TileType change if any

@@ -154,7 +154,7 @@ public final class FindSettlementDialog extends FreeColDialog implements ListSel
      * This function analyses an event and calls the right methods to take care
      * of the user's requests.
      * 
-     * @param event The incoming ActionEvent.
+     * @param e a <code>ListSelectionEvent</code> value
      */
     public void valueChanged(ListSelectionEvent e) {
         Settlement settlement = (Settlement) settlementList.getSelectedValue();

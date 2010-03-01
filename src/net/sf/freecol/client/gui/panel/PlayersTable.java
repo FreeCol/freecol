@@ -97,7 +97,9 @@ public final class PlayersTable extends JTable {
     /**
      * The constructor that will add the items to this panel.
      * 
-     * @param parent The parent of this panel.
+     * @param canvas a <code>Canvas</code> value
+     * @param nationOptions a <code>NationOptions</code> value
+     * @param myPlayer a <code>Player</code> value
      */
     public PlayersTable(final Canvas canvas, NationOptions nationOptions, Player myPlayer) {
         super();
@@ -390,7 +392,8 @@ public final class PlayersTable extends JTable {
          * 
          * @param pgc The PreGameController to use when updates need to be notified
          *            across the network.
-         * @param advantages an <code>Advantages</code> value
+         * @param nationOptions a <code>NationOptions</code> value
+         * @param owningPlayer a <code>Player</code> value
          */
         public PlayersTableModel(PreGameController pgc, NationOptions nationOptions, Player owningPlayer) {
             nations = new ArrayList<Nation>();

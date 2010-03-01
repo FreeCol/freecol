@@ -715,13 +715,13 @@ public class TransportMission extends Mission {
 		return null;
 	}
 
-	/**
-	 * Gets the default destination for the unit of this mission
-	 * First check the nearest colony
-	 * if no colony is available, try Europe
-	 * @return
-	 */
-	Destination getDefaultDestination() {
+    /**
+     * Gets the default destination for the unit of this mission
+     * First check the nearest colony
+     * if no colony is available, try Europe
+     * @return a <code>Destination</code> value
+     */
+    Destination getDefaultDestination() {
 		Unit unit = getUnit();
 		PathNode path = null;
 		

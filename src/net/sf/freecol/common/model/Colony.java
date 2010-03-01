@@ -1017,7 +1017,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      * each turn.
      *
      * @param goodsType a <code>GoodsType</code> value
-     * @return
+     * @return an <code>int</code> value
      */
     public int getConsumption(GoodsType goodsType) {
         // TODO: make this more generic

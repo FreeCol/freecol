@@ -58,7 +58,7 @@ public class ChatMessage extends Message {
      * Create a new <code>ChatMessage</code> with the
      * supplied message.
      *
-     * @param sender The player that is sending the message.
+     * @param player The player that is sending the message.
      * @param message The text of the message to send.
      * @param privateChat Whether this message is private.
      */

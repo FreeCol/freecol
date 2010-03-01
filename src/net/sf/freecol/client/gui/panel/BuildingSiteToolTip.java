@@ -52,9 +52,9 @@ public class BuildingSiteToolTip extends JToolTip {
     private static final Font arrowFont = new Font("Dialog", Font.BOLD, 24);
 
     /**
-     * Creates this BuildingToolTip.
+     * Creates this BuildingSiteToolTip.
      * 
-     * @param building The building to display information from.
+     * @param colony a <code>Colony</code> value
      * @param parent a <code>Canvas</code> value
      */
     public BuildingSiteToolTip(Colony colony, Canvas parent) {

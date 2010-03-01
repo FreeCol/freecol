@@ -499,7 +499,7 @@ public final class Market extends FreeColGameObject implements Ownable {
      *
      * @param in The input stream with the XML.
      * @throws XMLStreamException on problems with the stream.
-     * @todo Get rid of the for-priceGoods() when the server sends all
+     * TODO: Get rid of the for-priceGoods() when the server sends all
      * price changes.
      */
     protected void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {

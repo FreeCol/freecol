@@ -155,7 +155,7 @@ public class FreeColDialog<T> extends FreeColPanel {
     *
     * @param text The text that explains the choice for the user.
     * @param cancelText The text displayed on the "cancel"-button.
-    * @param objects The objects.
+    * @param choices The ChoiceItems.
     * @return The <code>FreeColDialog</code>.
     * @see ChoiceItem
     */

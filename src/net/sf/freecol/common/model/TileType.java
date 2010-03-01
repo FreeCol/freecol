@@ -172,7 +172,7 @@ public final class TileType extends FreeColGameObjectType {
      * @param goodsType a <code>GoodsType</code> value
      * @param unitType an <code>UnitType</code> value
      * @return an <code>int</code> value
-     * @see getProductionBonus(goodsType)
+     * @see #getProductionBonus(GoodsType)
      */
     public int getProductionOf(GoodsType goodsType, UnitType unitType) {
         return (int) featureContainer.applyModifier(0f, goodsType.getId(), unitType);

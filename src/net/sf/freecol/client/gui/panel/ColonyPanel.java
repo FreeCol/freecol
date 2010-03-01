@@ -358,8 +358,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
      * <code>initialize(colony, game, null)</code>.
      * 
      * @param colony The <code>Colony</code> to be displayed.
-     * @param game The <code>Game</code> in which the given
-     *            <code>Colony</code> is a part of.
      */
     public void initialize(Colony colony) {
         initialize(colony, null);
@@ -1331,7 +1329,6 @@ public final class ColonyPanel extends FreeColPanel implements ActionListener,Pr
              * Initialized the center of the colony panel tile. The one
              * containing the city.
              * 
-             * @param lib an ImageGetLibrary()
              */
             private void initializeAsCenterTile() {
 

@@ -499,8 +499,8 @@ public class TerrainGenerator {
      * Flood fill ocean regions.
      *
      * @param map The <code>Map</code> to fill in.
-     * @param pos A valid starting <code>Position</code>.
-     * @param region A <code>Region<code> to fill with.
+     * @param p A valid starting <code>Position</code>.
+     * @param region A <code>Region</code> to fill with.
      * @param bounds A <code>Rectangle</code> that bounds the filling.
      */
     private void fillOcean(Map map, Position p, Region region,
@@ -775,8 +775,8 @@ public class TerrainGenerator {
     /**
      * Places "high seas"-tiles on the border of the given map.
      * 
-     * All other tiles previously of type {@link Tile#HIGH_SEAS}
-     * will be set to {@link Tile#OCEAN}.
+     * All other tiles previously of type High Seas
+     * will be set to Ocean.
      * 
      * @param map The <code>Map</code> to create high seas on.
      * @param distToLandFromHighSeas The distance between the land

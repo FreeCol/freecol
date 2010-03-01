@@ -110,10 +110,8 @@ public final class ProductionMultiplesLabel extends JComponent {
     /**
      * Allow labels to include multiple goods.
      * This is especially useful for Food.
-     * 
-     * @param goodsType
-     * @param amount
-     * @param maximumProduction
+     *
+     * @param goods The goods to display. 
      * @param parent
      */
     public ProductionMultiplesLabel(List<AbstractGoods> goods, Canvas parent) {

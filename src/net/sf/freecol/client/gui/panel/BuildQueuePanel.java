@@ -704,7 +704,7 @@ public class BuildQueuePanel extends FreeColPanel implements ActionListener, Ite
 
             /**
              * Returns the build queue from the <code>Transferable</code>.
-             * @param flavor The data flavor to use.
+             *
              * @return The build queue from the <code>Transferable</code>.
              */
             public List<BuildableType> getBuildQueue() {

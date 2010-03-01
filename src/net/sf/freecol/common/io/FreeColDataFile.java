@@ -119,7 +119,8 @@ public class FreeColDataFile {
      *      should be relative towards the path of the directory. In case
      *      of a compressed archieve it should be the path within the
      *      archive. 
-     * @return
+     * @return an <code>InputStream</code> value
+     * @exception IOException if an error occurs
      */
     protected InputStream getInputStream(String filename) throws IOException {
         final URLConnection connection = getURL(filename).openConnection();

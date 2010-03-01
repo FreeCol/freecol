@@ -58,7 +58,7 @@ import org.w3c.dom.Element;
  *
  * <br><br>
  *
- * The game enters the state {@link FreeColServer#IN_GAME}, when
+ * The game enters the state {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}, when
  * the {@link #startGame} has successfully been invoked.
  *
  * @see InGameInputHandler
@@ -87,7 +87,7 @@ public final class PreGameController extends Controller {
      * <ol>
      *   <li>Generates the map.
      *   <li>Sends updated game information to the clients.
-     *   <li>Changes the game state to {@link FreeColServer#IN_GAME}.
+     *   <li>Changes the game state to {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME}.
      *   <li>Sends the "startGame"-message to the clients.
      * </ol>
      */

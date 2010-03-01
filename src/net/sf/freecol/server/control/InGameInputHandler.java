@@ -125,7 +125,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Handles the network messages that arrives while
- * {@link FreeColServer#IN_GAME in game}.
+ * {@link net.sf.freecol.server.FreeColServer.GameState#IN_GAME in game}.
  */
 public final class InGameInputHandler extends InputHandler implements NetworkConstants {
 

@@ -171,7 +171,7 @@ public class DiplomacyMessage extends Message {
     /**
      * Get the name of this message's other nation as a string.
      *
-     * @param This nation's player.
+     * @param player This nation's player.
      * @return The name of the other nation.
      */
     public String getOtherNationName(Player player) {
@@ -341,7 +341,7 @@ public class DiplomacyMessage extends Message {
      * that have been transferred in a successful diplomatic agreement.
      *
      * @param player The <code>Player</code> which will receive the update.
-     * @param items The array of <code>FreeColGameObject</code>s transferred.
+     * @param objects The List of <code>FreeColGameObject</code>s transferred.
      * @return An <code>Element</code> containing a suitable update message,
      *         or null if none is required.
      */

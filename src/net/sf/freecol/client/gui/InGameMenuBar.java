@@ -112,7 +112,6 @@ import net.sf.freecol.common.model.StringTemplate;
  * The menu bar that is displayed on the top left corner of the
  * <code>Canvas</code>.
  *
- * @see Canvas#setJMenuBar
  * @see MapEditorMenuBar
  */
 public class InGameMenuBar extends FreeColMenuBar {

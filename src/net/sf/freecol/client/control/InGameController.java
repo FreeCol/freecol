@@ -281,12 +281,12 @@ public final class InGameController implements NetworkConstants {
      * allowed (e.g. a move may result in the death of a unit rather
      * than actually moving).
      *
+     * @param client a <code>Client</code> value
      * @param element The <code>Element</code> (root element in a
      *        DOM-parsed XML tree) that holds all the information
      * @param tag The expected tag
      * @return The answer from the server if it has the specified tag,
      *         otherwise <code>null</code>.
-     * @see #ask
      */
     private Element askExpecting(Client client, Element element, String tag) {
         // Send the element, return null on failure or null return.

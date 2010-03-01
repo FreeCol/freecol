@@ -60,7 +60,7 @@ public class TileImprovement extends TileItem implements Named {
      * To store the style of multi-image TileImprovements (eg. rivers)
      * Rivers have 4 directions {NE=1, SE=3, SW=9, NW=27}, and 3 levels (see above)
      * @see Map
-     * @see River
+     * @see net.sf.freecol.server.generator.River
      */
     private int style;
 
@@ -363,7 +363,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Breaks the Style of this Improvement into 8 directions - used for Rivers (at the moment)
      * Possible TODO: Modify this later should we modify the usage of Style.
-     * @param base Use {@link getBase()}
+     * @param base Use {@link #getBase(Direction[], int)}
      * @return An int[] with the magnitude in each direction.
      */
     public int[] getStyleBreakdown(int[] base) {

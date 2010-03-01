@@ -925,8 +925,8 @@ public final class FreeColServer {
     /**
      * Gets the current state of the game.
      * 
-     * @return One of: {@link #STARTING_GAME}, {@link #IN_GAME} and
-     *         {@link #ENDING_GAME}.
+     * @return One of: {@link GameState#STARTING_GAME}, {@link GameState#IN_GAME} and
+     *         {@link GameState#ENDING_GAME}.
      */
     public GameState getGameState() {
         return gameState;
@@ -935,8 +935,8 @@ public final class FreeColServer {
     /**
      * Sets the current state of the game.
      * 
-     * @param state The new state to be set. One of: {@link #STARTING_GAME},
-     *            {@link #IN_GAME} and {@link #ENDING_GAME}.
+     * @param state The new state to be set. One of: {@link GameState#STARTING_GAME},
+     *            {@link GameState#IN_GAME} and {@link GameState#ENDING_GAME}.
      */
     public void setGameState(GameState state) {
         gameState = state;
@@ -1237,7 +1237,6 @@ public final class FreeColServer {
      * if possible.
      *
      * @param player a <code>Player</code> value
-     * @param nationName a <code>String</code> value
      * @return a <code>boolean</code> value
      */
     public boolean newHighScore(Player player) {

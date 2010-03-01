@@ -98,7 +98,6 @@ public final class ColorCellEditor extends AbstractCellEditor implements TableCe
     /**
     * The constructor to use.
     * @param canvas The top level component that holds all other components.
-    * @param parent The parent JPanel of the table
     */
     public ColorCellEditor(Canvas canvas) {
         this.canvas = canvas;

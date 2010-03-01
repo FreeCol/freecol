@@ -41,8 +41,6 @@ import net.sf.freecol.common.resources.ResourceManager;
 /**
  * The menu bar that is displayed on the top left corner of the
  * <code>Canvas</code>.
- * 
- * @see Canvas#setJMenuBar
  */
 public abstract class FreeColMenuBar extends JMenuBar {
 
