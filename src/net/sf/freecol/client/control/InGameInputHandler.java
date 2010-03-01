@@ -298,7 +298,7 @@ public final class InGameInputHandler extends InputHandler {
             try {
                 new UnitMoveAnimationCanvasSwingTask(unit, oldTile, newTile,
                                                      unit != lastAnimatedUnit)
-                    .invokeSpecial(client.getCanvas());
+                    .invokeSpecial();
             } catch (Exception exception) {
                 logger.warning("UnitMoveAnimationCanvasSwingTask raised "
                                + exception.toString());
@@ -533,8 +533,13 @@ public final class InGameInputHandler extends InputHandler {
      *            holds all the information.
      */
     private Element error(Element element) {
-        new ShowErrorMessageSwingTask(element.getAttribute("messageID"),
-                                      element.getAttribute("message")).show();
+        try {
+            new ShowErrorMessageSwingTask(element.getAttribute("messageID"),
+                                          element.getAttribute("message"))
+                .invokeSpecial();
+        } catch (Exception exception) {
+            logger.warning("error() raised " + exception.toString());
+        }
         return null;
     }
 
@@ -1244,6 +1249,23 @@ public final class InGameInputHandler extends InputHandler {
             SwingUtilities.invokeLater(this);
         }
 
+        /*
+         * Some calls can be required from both within the
+         * EventDispatchThread (when the client controller calls
+         * InGameInputHandler.handle() with replies to its requests to
+         * the server), and from outside of the thread when handling
+         * other player moves.  The former case must be done right
+         * now, the latter needs to be queued and waited for.
+         */
+        public void invokeSpecial()
+            throws InvocationTargetException {
+            if (SwingUtilities.isEventDispatchThread()) {
+                doWork();
+            } else {
+                this.invokeAndWait();
+            }
+        }
+
         /**
          * Mark started and set the synchronous flag.
          * 
@@ -1452,23 +1474,6 @@ public final class InGameInputHandler extends InputHandler {
             }
             Animations.unitMove(canvas, unit, sourceTile, destinationTile);
             canvas.refresh();
-        }
-
-        /*
-         * Movement animations can be required from both within the
-         * EventDispatchThread (when the client controller calls
-         * InGameInputHandler.handle() with replies to its requests to
-         * the server), and from outside of the thread when handling
-         * other player moves.  The former case must be done right
-         * now, the latter needs to be queued and waited for.
-         */
-        public void invokeSpecial(Canvas canvas)
-            throws InvocationTargetException {
-            if (SwingUtilities.isEventDispatchThread()) {
-                doWork(canvas);
-            } else {
-                this.invokeAndWait();
-            }
         }
     }
     

@@ -322,10 +322,13 @@ public final class InGameController implements NetworkConstants {
         }
 
         // Unexpected reply.  Whine and fail.
-        logger.warning("Received reply"
-                       + " with tag " + reply.getTagName()
-                       + " which should have been " + tag
-                       + " to message " + element);
+        String complaint = "Received reply with tag " + reply.getTagName()
+            + " which should have been " + tag
+            + " to message " + element;
+        logger.warning(complaint);
+        if (FreeCol.isInDebugMode()) {
+            freeColClient.getCanvas().errorMessage(null, complaint);
+        }            
         return null;
     }
 
