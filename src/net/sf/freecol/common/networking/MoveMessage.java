@@ -215,7 +215,7 @@ public class MoveMessage extends Message {
 
         // Plan to update tiles that could not be seen before but will
         // now be within the line-of-sight.
-        InGameController controller = server.getInGameController();
+        InGameController igc = server.getInGameController();
         List<FreeColObject> objects = new ArrayList<FreeColObject>();
         int los = unit.getLineOfSight();
         for (Tile tile : game.getMap().getSurroundingTiles(newTile, los)) {
@@ -224,14 +224,15 @@ public class MoveMessage extends Message {
             }
         }
 
-        // Collect the new contacts, and make the move (including
-        // resolving any rumours).
-        List<ServerPlayer> contacts
-            = controller.findAdjacentUncontacted(serverPlayer, newTile);
-        objects.addAll(controller.move(serverPlayer, unit, newTile));
+        // Collect the new contacts.
+        List<ServerPlayer> contacts = igc.findAdjacentUncontacted(serverPlayer,
+                                                                  newTile);
+
+        // Make the move (including resolving any rumours).
+        objects.addAll(igc.move(serverPlayer, unit, newTile));
 
         // Inform others about the move.
-        updateOthers(controller.getOtherPlayers(serverPlayer), contacts,
+        updateOthers(igc.getOtherPlayers(serverPlayer), contacts,
                      unit, oldLocation.getTile(), direction, newTile);
 
         // Begin building the reply,
@@ -243,21 +244,15 @@ public class MoveMessage extends Message {
         Element remove = doc.createElement("remove");
 
         // always updating the old location,
-        if (oldLocation instanceof Tile) {
-            update.appendChild(((Tile) oldLocation).toXMLElement(player, doc));
-        } else if (oldLocation instanceof Unit) {
-            update.appendChild(((Unit) oldLocation).toXMLElement(player, doc));
-            unit.setMovesLeft(0); // Disembark always consumes moves.
-        } else {
-            throw new IllegalArgumentException("Location not a tile or unit!?!: " + unit.getId());
+        update.appendChild(((FreeColGameObject) oldLocation).toXMLElement(player, doc));
+        if (oldLocation instanceof Unit) {
+            // Disembark always consumes moves.
+            unit.setMovesLeft(0);
         }
         // ...but delay doing the new location as more can happen there still.
 
         // If the unit dies, remove it, if not, animate the move.
-        if (unit.isDisposed()) {
-            remove = doc.createElement("remove");
-            unit.addToRemoveElement(remove);
-        } else {
+        if (!unit.isDisposed()) {
             Element animate = doc.createElement("animateMove");
             reply.appendChild(animate);
             animate.setAttribute("unit", unit.getId());
@@ -286,16 +281,22 @@ public class MoveMessage extends Message {
                     .addStringTemplate("%nation%", other.getNationName());
                 serverPlayer.addHistory(h);
                 h.addToOwnedElement(addHistory, player);
-            } else { // native player, Europe, Tile
-                update.appendChild(object.toXMLElement(player, doc,
-                                                        false, false));
+            } else if (object instanceof FreeColGameObject) {
+                if (((FreeColGameObject) object).isDisposed()) {
+                    ((FreeColGameObject) object).addToRemoveElement(remove);
+                } else { // native player, Europe, Tile
+                    update.appendChild(object.toXMLElement(player, doc,
+                                                           false, false));
+                }
+            } else {
+                throw new IllegalStateException("Bogus move object");
             }
         }
 
         // Add on a bunch of special attributes to trigger further
         // action by European player clients.
         if (!unit.isDisposed() && player.isEuropean()) {
-            Unit slowedBy = controller.getSlowedBy(unit, newTile);
+            Unit slowedBy = igc.getSlowedBy(unit, newTile);
             if (slowedBy != null) {
                 reply.setAttribute("slowedBy", slowedBy.getId());
             }
@@ -326,7 +327,7 @@ public class MoveMessage extends Message {
                         // TODO: here is another dubious AI shortcut.
                         h = region.discover(serverPlayer, game.getTurn(),
                                             regionName);
-                        controller.sendUpdateToAll(serverPlayer, region);
+                        igc.sendUpdateToAll(serverPlayer, region);
                     } else { // Ask player to name the region.
                         reply.setAttribute("discoverRegion", regionName);
                         reply.setAttribute("regionType", Messages.message(region.getLabel()));

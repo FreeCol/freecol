@@ -1648,7 +1648,7 @@ public final class InGameController extends Controller {
                        .addStringTemplate("%nation%", indianPlayer.getNationName()));
             break;
         case EXPEDITION_VANISHES:
-            unit.dispose();
+            result.addAll(unit.disposeList());
             result.add(new ModelMessage(ModelMessage.MessageType.LOST_CITY_RUMOUR,
                                         "lostCityRumour.ExpeditionVanishes", serverPlayer));
             break;
