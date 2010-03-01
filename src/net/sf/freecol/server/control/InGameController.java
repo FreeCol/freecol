@@ -1403,7 +1403,7 @@ public final class InGameController extends Controller {
      * Note that the unit moves are reduced here.
      *
      * @param unit The <code>Unit</code> that is moving.
-     * @param tile The <code>Tile</code> the unit is moving to.
+     * @param newTile The <code>Tile</code> the unit is moving to.
      * @return Either an enemy unit that causes a slowdown, or null if none.
      */
     public Unit getSlowedBy(Unit unit, Tile newTile) {
@@ -1461,7 +1461,7 @@ public final class InGameController extends Controller {
      * @param unit The <code>Unit</code> exploring the lost city rumour.
      * @param difficulty The difficulty level.
      * @return The type of rumour.
-     * @todo Move all the magic numbers in here to the specification.
+     * TODO: Move all the magic numbers in here to the specification.
      *       Also change the logic so that the special events appear a fixed number
      *       of times throughout the game, according to the specification.
      *       Names for the cities of gold is also on the wishlist.
@@ -1854,7 +1854,7 @@ public final class InGameController extends Controller {
      * @param player The <code>Player</code> demanding the tribute.
      * @param settlement The <code>IndianSettlement</code> demanded of.
      * @return The amount of gold offered as tribute.
-     * @todo Move TURNS_PER_TRIBUTE magic number to the spec.
+     * TODO: Move TURNS_PER_TRIBUTE magic number to the spec.
      */
     public int demandTribute(Player player, IndianSettlement settlement) {
         final int TURNS_PER_TRIBUTE = 5;
@@ -2144,7 +2144,7 @@ public final class InGameController extends Controller {
      *         <code>payingPlayer</code> to <code>attackingPlayer</code> in
      *         order for <code>attackingPlayer</code> to attack
      *         <code>targetPlayer</code>.
-     * @todo Magic numbers.
+     * TODO: Magic numbers.
      */
     public int getInciteAmount(Player payingPlayer, Player targetPlayer,
                                Player attackingPlayer) {
@@ -2166,7 +2166,7 @@ public final class InGameController extends Controller {
      * @param enemy The <code>Player</code> to be incited against.
      * @param gold The amount of gold in the bribe.
      * @return True if the incitement succeeded.
-     * @todo Magic numbers.
+     * TODO: Magic numbers.
      */
     public boolean inciteIndianSettlement(IndianSettlement settlement,
                                           Player inciter, Player enemy,

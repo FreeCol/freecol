@@ -1015,7 +1015,7 @@ public final class Canvas extends JDesktopPane {
      * @param toolBox Should be set to true if the resulting frame
      *      is used as a toolbox (that is: it should not be counted
      *      as a frame).
-     * @param centered a <code>boolean</code> value
+     * @param popupPosition a <code>PopupPosition</code> value
      * @return The <code>JInternalFrame</code> that was created and added.
      */
     private JInternalFrame addAsFrame(JComponent comp, boolean toolBox, PopupPosition popupPosition) {
@@ -1522,7 +1522,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Quits the application. This method uses {@link #showConfirmDialog(String, String, String, String...)} in
+     * Quits the application. This method uses {@link #showConfirmDialog} in
      * order to get a "Are you sure"-confirmation from the user.
      */
     public void quit() {
@@ -1532,7 +1532,7 @@ public final class Canvas extends JDesktopPane {
     }
 
     /**
-     * Quits the application. This method uses {@link #showConfirmDialog(String, String, String, String...)} in
+     * Quits the application. This method uses {@link #showConfirmDialog} in
      * order to get a "Are you sure"-confirmation from the user.
      */
     public void retire() {

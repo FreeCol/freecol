@@ -1643,7 +1643,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return How many more liberty points the <code>Player</code>
      *         needs in order to recruit the next founding father.
-     * @see Goods#BELLS
      * @see #incrementLiberty
      */
     public int getRemainingFoundingFatherCost() {
@@ -1658,7 +1657,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return Total number of liberty points the <code>Player</code>
      *         needs to recruit the next founding father.
-     * @see Goods#BELLS
      * @see #incrementLiberty
      */
     public int getTotalFoundingFatherCost() {
@@ -2857,7 +2855,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return This player's number of liberty earned towards the current Founding
      *         Father.
-     * @see Goods#BELLS
      * @see #incrementLiberty
      */
     public int getLiberty() {
@@ -2873,7 +2870,6 @@ public class Player extends FreeColGameObject implements Nameable {
      *
      * @return Total number of liberty this <code>Player</code>'s
      *         <code>Colony</code>s will make.
-     * @see Goods#BELLS
      * @see #incrementLiberty
      */
     public int getLibertyProductionNextTurn() {

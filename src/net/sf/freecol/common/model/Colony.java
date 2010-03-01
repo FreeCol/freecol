@@ -2206,7 +2206,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     /**
      * Returns the capacity of this colony's warehouse. All goods above this
-     * limit, except {@link Goods#FOOD}, will be removed when calling
+     * limit, except Food, will be removed when calling
      * {@link #newTurn}.
      * 
      * @return The capacity of this <code>Colony</code>'s warehouse.

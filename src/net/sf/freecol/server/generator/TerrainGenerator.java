@@ -218,7 +218,6 @@ public class TerrainGenerator {
      * Adds a terrain bonus with a probability determined by the
      * <code>MapGeneratorOptions</code>.
      * 
-     * @param game a <code>Game</code> value
      * @param t a <code>Tile</code> value
      * @param generateBonus a <code>boolean</code> value
      */

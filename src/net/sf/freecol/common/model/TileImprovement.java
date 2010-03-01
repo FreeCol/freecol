@@ -363,7 +363,7 @@ public class TileImprovement extends TileItem implements Named {
     /**
      * Breaks the Style of this Improvement into 8 directions - used for Rivers (at the moment)
      * Possible TODO: Modify this later should we modify the usage of Style.
-     * @param base Use {@link #getBase(Direction[], int)}
+     * @param base Use {@link #getBase}
      * @return An int[] with the magnitude in each direction.
      */
     public int[] getStyleBreakdown(int[] base) {

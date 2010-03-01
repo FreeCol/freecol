@@ -46,8 +46,7 @@ import net.sf.freecol.common.model.StringTemplate;
 /**
  * Panel for choosing the goods to capture.
  *
- * @see SimpleCombatModel#attack(Unit, Unit, net.sf.freecol.common.model.CombatModel.CombatResult, int,
- *  net.sf.freecol.common.model.Location)
+ * @see net.sf.freecol.common.model.SimpleCombatModel#attack
  */
 public final class CaptureGoodsDialog extends FreeColDialog<List<Goods>> implements ActionListener {
     @SuppressWarnings("unused")

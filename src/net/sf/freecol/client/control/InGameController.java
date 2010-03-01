@@ -981,7 +981,7 @@ public final class InGameController implements NetworkConstants {
     /**
      * Declares independence for the home country.
      *
-     * @todo Move magic 50% number to the spec.
+     * TODO: Move magic 50% number to the spec.
      */
     public void declareIndependence() {
         Canvas canvas = freeColClient.getCanvas();
@@ -1325,7 +1325,6 @@ public final class InGameController implements NetworkConstants {
     /**
      * Server query-response for joining a colony.
      *
-     * @param name The name for the colony.
      * @param unit The <code>Unit</code> that will join.
      * @param colony The <code>Colony</code> to join.
      * @return True if the server interaction succeeded.
@@ -1429,7 +1428,7 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param direction The direction in which to move the unit.
-     * @todo Unify trade and negotiation.
+     * TODO: Unify trade and negotiation.
      */
     public void move(Unit unit, Direction direction) {
         Canvas canvas = freeColClient.getCanvas();
@@ -1769,7 +1768,7 @@ public final class InGameController implements NetworkConstants {
      *
      * @param unit The <code>Unit</code> to be moved.
      * @param direction The direction in which to move.
-     * @todo Perhaps can throw away the AlreadyOnHighSeas flag?
+     * TODO: Perhaps can throw away the AlreadyOnHighSeas flag?
      */
     private void moveHighSeas(Unit unit, Direction direction) {
         // Confirm moving to Europe if told to move to a null tile

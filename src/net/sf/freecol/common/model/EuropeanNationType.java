@@ -122,7 +122,7 @@ public class EuropeanNationType extends NationType {
     /**
      * Applies the difficulty level to this nation type.
      *
-     * @param difficultyLevel difficulty level to apply
+     * @param difficulty difficulty level to apply
      */
     public void applyDifficultyLevel(String difficulty) {
         startingUnits = getStartingUnits(difficulty);

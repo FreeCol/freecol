@@ -90,7 +90,7 @@ public class StringTemplate extends FreeColObject {
      * Creates a new <code>Template</code> instance.
      *
      * @param template a <code>String</code> value
-     * @param TemplateType a <code>TemplateType</code> value
+     * @param templateType a <code>TemplateType</code> value
      */
     protected StringTemplate(String template, TemplateType templateType) {
 	setId(template);

@@ -79,7 +79,7 @@ public class ServerGame extends Game {
      * @param fcgos A list of <code>FreeColGameObject</code>s to be added to
      *            this <code>Game</code>.
      * @throws XMLStreamException if an error occurred during parsing.
-     * @see net.sf.freecol.server.FreeColServer#loadGame(File)
+     * @see net.sf.freecol.server.FreeColServer#loadGame
      */
     public ServerGame(FreeColGameObjectListener freeColGameObjectListener, ModelController modelController,
                 XMLStreamReader in, FreeColGameObject[] fcgos) throws XMLStreamException {

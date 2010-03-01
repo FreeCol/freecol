@@ -349,7 +349,7 @@ public final class TileType extends FreeColGameObjectType {
     /**
      * Applies the difficulty level to this TileType.
      *
-     * @param difficultyLevel difficulty level to apply
+     * @param difficulty difficulty level to apply
      */
     public void applyDifficultyLevel(String difficulty) {
         primaryGoods = getPrimaryGoods(difficulty);

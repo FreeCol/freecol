@@ -3004,7 +3004,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Makes this unit build the specified Indian settlement.
      * 
-     * @param settlement The settlement this unit shall build.
+     * @param indianSettlement The settlement this unit shall build.
      */
     public void buildIndianSettlement(IndianSettlement indianSettlement) {
         if (!canBuildColony()) {
@@ -3033,7 +3033,7 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Join existing settlement.
      *
-     * @param settlement a <code>IndianSettlement</code> value
+     * @param indianSettlement a <code>IndianSettlement</code> value
      */
     public void joinIndianSettlement(IndianSettlement indianSettlement) {
         setState(UnitState.IN_COLONY);

@@ -30,8 +30,8 @@ import net.sf.freecol.common.model.Unit.MoveType;
  * <br /><br />
  * 
  * This {@link CostDecider} is used as a default by
- * {@link Map#findPath(Unit, Tile, Tile) findPath} and 
- * {@link Map#search(Unit, Tile, GoalDecider, CostDecider, int, Unit) search} 
+ * {@link net.sf.freecol.common.model.Map#findPath(Unit, Tile, Tile) findPath} and 
+ * {@link net.sf.freecol.common.model.Map#search(Unit, Tile, GoalDecider, CostDecider, int, Unit) search} 
  * if no other <code>CostDecider</code> has been specified.
  */
 class BaseCostDecider implements CostDecider {

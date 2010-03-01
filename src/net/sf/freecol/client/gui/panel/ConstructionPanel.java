@@ -66,8 +66,8 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     /**
      * Creates this BuildingToolTip.
      * 
-     * @param building The building to display information from.
      * @param parent a <code>Canvas</code> value
+     * @param colony a <code>Colony</code> value
      */
     public ConstructionPanel(final Canvas parent, Colony colony) {
 
