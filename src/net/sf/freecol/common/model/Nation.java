@@ -29,6 +29,8 @@ import javax.xml.stream.XMLStreamReader;
  * Represents one of the nations present in the game.
  */
 public class Nation extends FreeColGameObjectType {
+	
+	static public String UNKNOWN_NATION_ID = "model.nation.unknownEnemy";
 
     private static int nextIndex = 0;
 
