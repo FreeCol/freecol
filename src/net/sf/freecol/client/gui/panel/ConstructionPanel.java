@@ -19,22 +19,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -45,12 +37,8 @@ import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
-
-import net.miginfocom.swing.MigLayout;
 
 /**
  * This panel represents a single building in a Colony.
@@ -77,21 +65,22 @@ public class ConstructionPanel extends JPanel implements PropertyChangeListener 
     }
 
     public void setColony(Colony newColony) {
+    	if(newColony != colony){
+    		if (colony != null) {
+    			colony.removePropertyChangeListener(this);
+    		}
+    		this.colony = newColony;
 
-        if (colony != null) {
-            colony.removePropertyChangeListener(this);
-        }
-        this.colony = newColony;
-
-        // we are interested in changes to the build queue, as well as
-        // changes to the warehouse and the colony's production bonus
-        colony.addPropertyChangeListener(this);
-        addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    BuildQueuePanel queuePanel = new BuildQueuePanel(colony, parent);
-                    parent.showSubPanel(queuePanel);
-                }
-            });
+    		// we are interested in changes to the build queue, as well as
+    		// changes to the warehouse and the colony's production bonus
+    		colony.addPropertyChangeListener(this);
+    		addMouseListener(new MouseAdapter() {
+    			public void mousePressed(MouseEvent e) {
+    				BuildQueuePanel queuePanel = new BuildQueuePanel(colony, parent);
+    				parent.showSubPanel(queuePanel);
+    			}
+    		});
+    	}
         initialize();
     }
 
