@@ -34,6 +34,7 @@ import net.sf.freecol.common.model.pathfinding.GoalDecider;
 import net.sf.freecol.common.model.PathNode;
 import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
+import net.sf.freecol.common.networking.CashInTreasureTrainMessage;
 import net.sf.freecol.common.networking.Connection;
 import net.sf.freecol.common.networking.Message;
 import net.sf.freecol.server.ai.AIMain;
@@ -104,13 +105,14 @@ public class CashInTreasureTrainMission extends Mission {
      * @param connection The <code>Connection</code> to the server.
      */
     public void doMission(Connection connection) {     
-        Map map = getUnit().getGame().getMap();
+        Unit unit = getUnit();
+    	Map map = unit.getGame().getMap();
                 
         if (!isValid()) {
             return;
         }
         
-        if (!getUnit().canCashInTreasureTrain()) {
+        if (!unit.canCashInTreasureTrain()) {
             GoalDecider destinationDecider = new GoalDecider() {
                 private PathNode best = null;
                 
@@ -131,7 +133,7 @@ public class CashInTreasureTrainMission extends Mission {
                     return false;
                 }
             };
-            PathNode bestPath = map.search(getUnit(), getUnit().getTile(),
+            PathNode bestPath = map.search(unit, unit.getTile(),
                     destinationDecider,
                     CostDeciders.avoidSettlementsAndBlockingUnits(),
                     Integer.MAX_VALUE);
@@ -141,11 +143,10 @@ public class CashInTreasureTrainMission extends Mission {
             }
         }
         
-        if (getUnit().canCashInTreasureTrain()) {
-            Element cashInTreasureTrainElement = Message.createNewRootElement("cashInTreasureTrain");
-            cashInTreasureTrainElement.setAttribute("unit", getUnit().getId());
+        if (unit.canCashInTreasureTrain()) {
+        	Message message = new CashInTreasureTrainMessage(unit);
             try {
-                connection.sendAndWait(cashInTreasureTrainElement);
+                connection.sendAndWait(message.toXMLElement());
             } catch (IOException e) {
                 logger.warning("Could not send message: \"cashInTreasureTrain\".");
             }
