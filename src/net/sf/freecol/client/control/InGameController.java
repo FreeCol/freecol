@@ -1701,7 +1701,7 @@ public final class InGameController implements NetworkConstants {
                     || unit.getDestination().getTile() == tile.getTile())) {
                 canvas.showColonyPanel((Colony) tile.getSettlement());
             }
-            nextActiveUnit();
+            if (unit.getMovesLeft() == 0) nextActiveUnit();
         }
     }
 
