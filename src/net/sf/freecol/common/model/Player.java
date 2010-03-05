@@ -168,9 +168,6 @@ public class Player extends FreeColGameObject implements Nameable {
      */
     private int liberty;
 
-    // only used to store the number of native settlements
-    private int numberOfSettlements;
-
     /** The market for Europe. */
     private Market market;
 
@@ -654,26 +651,21 @@ public class Player extends FreeColGameObject implements Nameable {
     }
 
     /**
-     * Returns the known number of settlements of this player.
-     * Note: For a client, this may differ from settlements.size()!
-     * 
-     * @return The known number of settlements          
-     */                    
-    public int getNumberOfSettlements() {
-        return numberOfSettlements;
-    }
-
-    public void setNumberOfSettlements(int number) {
-        numberOfSettlements = number;
-    }
-
-    /**
      * Returns a list of all Settlements this player owns.
      *
      * @return The settlements this player owns.
      */
     public List<Settlement> getSettlements() {
         return settlements;
+    }
+
+    /**
+     * Get the number of settlements.
+     *
+     * @return The number of settlements this player has.
+     */
+    public int getNumberOfSettlements() {
+        return getSettlements().size();
     }
 
     /**
@@ -3519,7 +3511,9 @@ public class Player extends FreeColGameObject implements Nameable {
         out.writeAttribute("playerType", playerType.toString());
         out.writeAttribute("ai", Boolean.toString(ai));
         out.writeAttribute("tax", Integer.toString(tax));
-        out.writeAttribute("numberOfSettlements", Integer.toString(numberOfSettlements));
+
+        // 0.9.x compatibility, no longer actually used
+        out.writeAttribute("numberOfSettlements", Integer.toString(getNumberOfSettlements()));
 
         if (getGame().isClientTrusted() || showAll || equals(player)) {
             out.writeAttribute("gold", Integer.toString(gold));
@@ -3620,7 +3614,6 @@ public class Player extends FreeColGameObject implements Nameable {
         ai = getAttribute(in, "ai", false);
         dead = getAttribute(in, "dead", false);
         tax = Integer.parseInt(in.getAttributeValue(null, "tax"));
-        numberOfSettlements = getAttribute(in, "numberOfSettlements", 0);
         playerType = Enum.valueOf(PlayerType.class, in.getAttributeValue(null, "playerType"));
         currentFather = FreeCol.getSpecification().getType(in, "currentFather", FoundingFather.class, null);
         immigrationRequired = getAttribute(in, "immigrationRequired", 12);
