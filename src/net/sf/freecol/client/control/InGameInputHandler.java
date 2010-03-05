@@ -1135,26 +1135,15 @@ public final class InGameInputHandler extends InputHandler {
         for (int i = 0; i < nodes.getLength(); i++) {
             ModelMessage m = new ModelMessage();
             Element e = (Element) nodes.item(i);
-
             m.readFromXMLElement(e);
 
-            // ModelMessage.readFromXMLImpl does not exist yet.
-            ModelMessage.MessageType type = Enum.valueOf(ModelMessage.MessageType.class, e.getAttribute("messageType"));
-            if (type == null) type = ModelMessage.MessageType.DEFAULT;
-            m.setMessageType(type);
-            m.setSourceId(e.getAttribute("source"));
-            m.setDisplayId(e.getAttribute("display"));
-
-            // Use the owner attribute.
-            String attr = e.getAttribute("owner");
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(attr);
+            String owner = e.getAttribute("owner");
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(owner);
             if (fcgo instanceof Player) {
-                Player owner = (Player) fcgo;
-                m.setOwner(owner);
-                owner.addModelMessage(m);
+                ((Player) fcgo).addModelMessage(m);
             } else {
                 logger.warning("addMessages with broken owner: "
-                               + ((attr == null) ? "(null)" : attr));
+                               + ((owner == null) ? "(null)" : owner));
             }
         }
         return null;
@@ -1173,17 +1162,16 @@ public final class InGameInputHandler extends InputHandler {
         for (int i = 0; i < nodes.getLength(); i++) {
             HistoryEvent h = new HistoryEvent();
             Element e = (Element) nodes.item(i);
-
             h.readFromXMLElement(e);
 
             // Use the owner attribute.
-            String attr = e.getAttribute("owner");
-            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(attr);
+            String owner = e.getAttribute("owner");
+            FreeColGameObject fcgo = game.getFreeColGameObjectSafely(owner);
             if (fcgo instanceof Player) {
                 ((Player) fcgo).getHistory().add(h);
             } else {
                 logger.warning("addHistory with broken owner: "
-                               + ((attr == null) ? "(null)" : attr));
+                               + ((owner == null) ? "(null)" : owner));
             }
         }
         return null;

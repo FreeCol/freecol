@@ -812,7 +812,7 @@ public class Game extends FreeColGameObject {
             try {
                 o = FreeCol.getSpecification().getType(id);
             } catch (Exception e) {
-                o = message.getOwner();
+                o = null; // Ignore
             }
         }
         return o;
@@ -951,8 +951,12 @@ public class Game extends FreeColGameObject {
                     map.readFromXML(in);
                 }
             } else if (in.getLocalName().equals(ModelMessage.getXMLElementTagName())) {
-                ModelMessage message = new ModelMessage();
-                message.readFromXML(in, this);
+                // 0.9.x save format compatibility.  Remove one day.
+                ModelMessage m = new ModelMessage();
+                m.readFromXML(in);
+                // When this goes, remove getOwnerId().
+                Player player = (Player) getFreeColGameObjectSafely(m.getOwnerId());
+                player.addModelMessage(m);
             } else if (in.getLocalName().equals("citiesOfCibola")) {
                 citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
             } else {

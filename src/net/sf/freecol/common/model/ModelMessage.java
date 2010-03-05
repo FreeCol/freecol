@@ -54,7 +54,7 @@ public class ModelMessage extends StringTemplate {
         REJECTED_DEMANDS
     }
 
-    private Player owner;
+    private String ownerId; /* deprecated */
     private String sourceId;
     private String displayId;
     private MessageType messageType;
@@ -114,9 +114,7 @@ public class ModelMessage extends StringTemplate {
         this.messageType = messageType;
         this.sourceId = source.getId();
         this.displayId = (display != null) ? display.getId() : source.getId();
-        this.owner = (source instanceof Player) ? (Player) source
-            : (source instanceof Ownable) ? ((Ownable) source).getOwner()
-            : null;
+        this.ownerId = null;
     }
 
     /**
@@ -185,7 +183,6 @@ public class ModelMessage extends StringTemplate {
         return beenDisplayed;
     }
 
-
     /**
      * Sets the <code>beenDisplayed</code> value of this
      * <code>ModelMessage</code>.  This is used to avoid showing the
@@ -197,7 +194,6 @@ public class ModelMessage extends StringTemplate {
     public void setBeenDisplayed(boolean beenDisplayed) {
         this.beenDisplayed = beenDisplayed;
     }
-
 
     /**
      * Gets the ID of the source of the message.
@@ -269,25 +265,11 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
-     * Returns the owner of this message. The owner of this method
-     * is the owner of the {@link #getSource source}.
-     *
-     * @return The owner of the message. This is the <code>Player</code>
-     *       who should receive the message.
+     * Compatibility hack.  Do not use.
      */
-    public Player getOwner() {
-        return owner;
+    public String getOwnerId() {
+        return ownerId;
     }
-
-    /**
-     * Set the owner of this message.
-     *
-     * @param newOwner A <code>Player</code> to own this message.
-     */
-    public void setOwner(Player newOwner) {
-        newOwner = owner;
-    }
-
 
     /**
      * Add a new key and replacement to the ModelMessage. This is
@@ -428,7 +410,9 @@ public class ModelMessage extends StringTemplate {
 
     public void writeAttributes(XMLStreamWriter out) throws XMLStreamException {
         super.writeAttributes(out);
-        out.writeAttribute("owner", owner.getId());
+        if (ownerId != null) {
+            out.writeAttribute("owner", ownerId);
+        }
         out.writeAttribute("source", sourceId);
         if (displayId != null) {
             out.writeAttribute("display", displayId);
@@ -439,16 +423,16 @@ public class ModelMessage extends StringTemplate {
 
     /**
      * Initialize this object from an XML-representation of this object.
+     *
      * @param in The input stream with the XML.
-     * @param game a <code>Game</code> value
      * @exception XMLStreamException if a problem was encountered
      *      during parsing.
      */
-    public void readFromXML(XMLStreamReader in, Game game) throws XMLStreamException {
+    public void readFromXMLImpl(XMLStreamReader in) throws XMLStreamException {
         super.readAttributes(in);
-        
-        String ownerPlayer = in.getAttributeValue(null, "owner");
-        owner = (Player)game.getFreeColGameObject(ownerPlayer);
+
+        // Remove this when the 0.9.x save hack (in Game.java) is gone.
+        ownerId = in.getAttributeValue(null, "owner");
          
         messageType = Enum.valueOf(MessageType.class, getAttribute(in, "messageType", MessageType.DEFAULT.toString()));
         beenDisplayed = Boolean.parseBoolean(in.getAttributeValue(null, "hasBeenDisplayed"));
@@ -456,7 +440,6 @@ public class ModelMessage extends StringTemplate {
         displayId = in.getAttributeValue(null, "display");
 
         super.readChildren(in);
-        owner.addModelMessage(this);
     }
 
     /**
