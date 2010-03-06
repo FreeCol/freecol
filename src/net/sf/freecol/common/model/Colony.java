@@ -586,10 +586,20 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         return null;
     }
 
+    /**
+     * Increment liberty points by amount given.
+     *
+     * @param amount an <code>int</code> value
+     */
     public void incrementLiberty(int amount) {
         liberty += amount;
     }
 
+    /**
+     * Increment immigration points by amount given.
+     *
+     * @param amount an <code>int</code> value
+     */
     public void incrementImmigration(int amount) {
         immigration += amount;
     }
@@ -803,7 +813,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         }
         return false;
     }
-    
+    /**
+     * Returns a list of all teachers currently present in the school
+     * building.
+     */
     public List<Unit> getTeachers() {
         List<Unit> teachers = new ArrayList<Unit>();
         for (Building building : buildingMap.values()) {
@@ -1004,7 +1017,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     }
 
     /**
-     * Describe <code>getImmigration</code> method here.
+     * Return the number of immigration points.
      *
      * @return an <code>int</code> value
      */
@@ -1099,6 +1112,13 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         return productionBonus;
     }
 
+    /**
+     * Returns the current production <code>Modifier</code>, which is
+     * generated from the current production bonus.
+     *
+     * @param goodsType a <code>GoodsType</code> value
+     * @return a <code>Modifier</code> value
+     */
     public Modifier getProductionModifier(GoodsType goodsType) {
         Modifier result = new Modifier(goodsType.getId(), SOL_MODIFIER_SOURCE,
                                        productionBonus, Modifier.Type.ADDITIVE);
