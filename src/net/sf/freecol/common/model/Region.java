@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamWriter;
 public class Region extends FreeColGameObject implements Nameable {
 
     public static final String PACIFIC_NAME_KEY = "model.region.pacific";
+    public static final String CHILD_TAG = "child";
 
     public static enum RegionType { OCEAN, COAST, LAKE, RIVER, LAND, MOUNTAIN, DESERT }
 
@@ -478,11 +479,11 @@ public class Region extends FreeColGameObject implements Nameable {
             out.writeAttribute("scoreValue", String.valueOf(scoreValue));
         }
         if (children != null) {
-            String[] childArray = new String[children.size()];
-            for (int index = 0; index < childArray.length; index++) {
-                childArray[index] = children.get(index).getId();
+            for (Region child : children) {
+                out.writeStartElement(CHILD_TAG);
+                out.writeAttribute(ID_ATTRIBUTE_TAG, child.getId());
+                out.writeEndElement();
             }
-            toArrayElement("children", childArray, out);
         }
         out.writeEndElement();
     }
@@ -509,14 +510,22 @@ public class Region extends FreeColGameObject implements Nameable {
         discoveredBy = getFreeColGameObject(in, "discoveredBy", Player.class, null);
         parent = getFreeColGameObject(in, "parent", Region.class);
 
+        children = new ArrayList<Region>();
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals("children")) {
+                // TODO: remove support for old format
                 String[] childArray = readFromArrayElement("children", in, new String[0]);
-                children = new ArrayList<Region>();
                 for (String child : childArray) {
                     children.add(getGame().getMap().getRegion(child));
                 }
+            } else if (CHILD_TAG.equals(in.getLocalName())) {
+                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                children.add(getGame().getMap().getRegion(id));
+                in.nextTag();
             }
+        }
+        if (children.isEmpty()) {
+            children = null;
         }
 
     }            

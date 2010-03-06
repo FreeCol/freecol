@@ -47,6 +47,8 @@ import net.sf.freecol.common.model.NationOptions.NationState;
  */
 public class Game extends FreeColGameObject {
 
+    public static final String CIBOLA_TAG = "cibola";
+
     private static final Logger logger = Logger.getLogger(Game.class.getName());
 
     /** 
@@ -862,7 +864,11 @@ public class Game extends FreeColGameObject {
         }
 
         if (citiesOfCibola != null) {
-            toListElement("citiesOfCibola", citiesOfCibola, out);
+            for (String cityName : citiesOfCibola) {
+                out.writeStartElement(CIBOLA_TAG);
+                out.writeAttribute(ID_ATTRIBUTE_TAG, cityName);
+                out.writeEndElement();
+            }
         }
         gameOptions.toXML(out);
         nationOptions.toXML(out);
@@ -920,6 +926,7 @@ public class Game extends FreeColGameObject {
         }
 
         gameOptions = null;
+        citiesOfCibola = new ArrayList<String>(7);
         while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(GameOptions.getXMLElementTagName())
                 || in.getLocalName().equals("game-options")) {
@@ -958,7 +965,11 @@ public class Game extends FreeColGameObject {
                 Player player = (Player) getFreeColGameObjectSafely(m.getOwnerId());
                 player.addModelMessage(m);
             } else if (in.getLocalName().equals("citiesOfCibola")) {
+                // TODO: remove support for old format
                 citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
+            } else if (CIBOLA_TAG.equals(in.getLocalName())) {
+                citiesOfCibola.add(in.getAttributeValue(null, ID_ATTRIBUTE_TAG));
+                in.nextTag();
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading game");
                 in.nextTag();

@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
  */
 public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable {
 
+    private static final String CARGO_TAG = "cargo";
+
     public static final TradeRoute NO_TRADE_ROUTE = new TradeRoute();
 
     // private static final Logger logger =
@@ -312,11 +314,21 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
 
         private Stop(XMLStreamReader in) throws XMLStreamException {
             locationId = in.getAttributeValue(null, "location");
-            List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
-            for (int cargoIndex : readFromArrayElement("cargo", in, new int[0])) {
-                addCargo(goodsList.get(cargoIndex));
+            while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+                if (in.getLocalName().equals(CARGO_TAG)) {
+                    String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                    if (id == null) {
+                        // TODO: remove support for old format
+                        List<GoodsType> goodsList = FreeCol.getSpecification().getGoodsTypeList();
+                        for (int cargoIndex : readFromArrayElement("cargo", in, new int[0])) {
+                            addCargo(goodsList.get(cargoIndex));
+                        }
+                    } else {
+                        addCargo(FreeCol.getSpecification().getGoodsType(id));
+                        in.nextTag();
+                    }
+                }
             }
-            in.nextTag();
         }
 
         /**
@@ -383,11 +395,11 @@ public class TradeRoute extends FreeColGameObject implements Cloneable, Ownable 
         public void toXMLImpl(XMLStreamWriter out) throws XMLStreamException {
             out.writeStartElement(getStopXMLElementTagName());
             out.writeAttribute("location", this.locationId);
-            int[] cargoIndexArray = new int[cargo.size()];
-            for (int index = 0; index < cargoIndexArray.length; index++) {
-                cargoIndexArray[index] = cargo.get(index).getIndex();
+            for (GoodsType cargoType : cargo) {
+                out.writeStartElement(CARGO_TAG);
+                out.writeAttribute(ID_ATTRIBUTE_TAG, cargoType.getId());
+                out.writeEndElement();
             }
-            toArrayElement("cargo", cargoIndexArray, out);
             out.writeEndElement();
         }
     }

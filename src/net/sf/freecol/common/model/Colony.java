@@ -52,6 +52,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
 
     private static final Logger logger = Logger.getLogger(Colony.class.getName());
 
+    public static final String BUILD_QUEUE_TAG = "buildQueueItem";
     public static final int LIBERTY_PER_REBEL = 200;
     public static final int FOOD_PER_COLONIST = 200;
 
@@ -2321,7 +2322,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             for (WorkLocation workLocation : getWorkLocations()) {
                 ((FreeColGameObject) workLocation).toXML(out, player, showAll, toSavedGame);
             }
-            toListElement("buildQueue", buildQueue, out);
+            for (BuildableType item : buildQueue) {
+                out.writeStartElement(BUILD_QUEUE_TAG);
+                out.writeAttribute(ID_ATTRIBUTE_TAG, item.getId());
+                out.writeEndElement();
+            }
             goodsContainer.toXML(out, player, showAll, toSavedGame);
         } else if (player.canSee(getTile())) {
             out.writeAttribute("owner", owner.getId());
@@ -2370,8 +2375,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
             featureContainer.addAbility(HAS_PORT);
         }
         unitCount = getAttribute(in, "unitCount", -1);
+        buildQueue.clear();
+
         // Read child elements:
-        loop: while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
+        while (in.nextTag() != XMLStreamConstants.END_ELEMENT) {
             if (in.getLocalName().equals(ColonyTile.getXMLElementTagName())) {
                 ColonyTile ct = (ColonyTile) getGame().getFreeColGameObject(in.getAttributeValue(null, "ID"));
                 if (ct == null) {
@@ -2409,7 +2416,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                 Modifier modifier = new Modifier(in, Specification.getSpecification());
                 featureContainer.addModifier(modifier);
             } else if ("buildQueue".equals(in.getLocalName())) {
-                buildQueue.clear();
+                // TODO: remove support for old format
                 int size = getAttribute(in, ARRAY_SIZE, 0);
                 if (size > 0) {
                     for (int x = 0; x < size; x++) {
@@ -2417,6 +2424,10 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
                         buildQueue.add(Specification.getSpecification().getType(typeId, BuildableType.class));
                     }
                 }
+                in.nextTag();
+            } else if (BUILD_QUEUE_TAG.equals(in.getLocalName())) {
+                String id = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                buildQueue.add(Specification.getSpecification().getType(id, BuildableType.class));
                 in.nextTag();
             } else {
                 logger.warning("Unknown tag: " + in.getLocalName() + " loading colony " + getName());
