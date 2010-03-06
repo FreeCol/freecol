@@ -29,10 +29,12 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
 	<xs:element name="tradeRouteStop">
 	  <xs:complexType>
-	    <xs:choice>
+	    <xs:choice minOccurs="0" maxOccurs="unbounded">
 	      <xs:element name="cargo">
 		<xs:complexType>
-		  <xs:attribute name="xLength" type="xs:int" use="required"/>
+                  <xs:attribute name="id" type="xs:string" use="optional"/>
+                  <!-- TODO: remove compatibility code and make id required -->
+		  <xs:attribute name="xLength" type="xs:int" use="optional"/>
 		  <xs:anyAttribute namespace="##local" processContents="skip">
 		    <xs:annotation>
 		      <xs:documentation>

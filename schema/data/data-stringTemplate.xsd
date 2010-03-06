@@ -24,24 +24,26 @@
 
   <xs:include schemaLocation="data-common.xsd" />
 
-  <xs:element name="stringTemplate">
+  <xs:element name="stringTemplate" type="StringTemplateType">
     <xs:annotation>
       <xs:documentation>
 	This class contains string templates to be localized.
       </xs:documentation>
     </xs:annotation>
-    <xs:complexType>
-
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element ref="key" />
-	<xs:element ref="stringTemplate" />
-      </xs:choice>
-
-      <xs:attribute name="id" type="xs:string" use="required" />
-      <xs:attribute name="templateType" type="TemplateType" use="required" />
-
-    </xs:complexType>
   </xs:element>
+
+
+  <xs:complexType name="StringTemplateType">
+
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="key" />
+      <xs:element ref="stringTemplate" />
+    </xs:choice>
+
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="templateType" type="TemplateType" use="required" />
+
+  </xs:complexType>
 
   <xs:simpleType name="TemplateType">
     <xs:restriction base="xs:NMTOKEN">

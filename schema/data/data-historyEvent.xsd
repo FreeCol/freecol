@@ -24,20 +24,27 @@
   </xs:annotation>
 
   <xs:include schemaLocation="data-common.xsd" />
+  <xs:include schemaLocation="data-stringTemplate.xsd" />
 
   <xs:element name="historyEvent">
     <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element name="strings">
-	  <xs:complexType>
-	    <xs:attribute name="xLength" type="xs:int" use="required"/>
-	    <xs:anyAttribute namespace="##local" processContents="skip"/>
-	  </xs:complexType>
-	</xs:element>
-      </xs:choice>
-      <xs:attribute name="id" type="xs:string" use="required"/>
-      <xs:attribute name="turn" type="xs:int" use="required"/>
-      <xs:attribute name="type" type="HistoryEventType" use="required"/>
+      <xs:complexContent>
+      <xs:extension base="StringTemplateType" >
+        <!-- TODO: remove compatibility code -->
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+	  <xs:element name="strings">
+	    <xs:complexType>
+	      <xs:attribute name="xLength" type="xs:int" use="required"/>
+	      <xs:anyAttribute namespace="##local" processContents="skip"/>
+	    </xs:complexType>
+	  </xs:element>
+        </xs:choice>
+        <xs:attribute name="turn" type="xs:int" use="required"/>
+        <!-- TODO: remove old attribute and make eventType required -->
+        <xs:attribute name="type" type="HistoryEventType" use="optional"/>
+        <xs:attribute name="eventType" type="HistoryEventType" use="optional"/>
+      </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
   </xs:element>
 
