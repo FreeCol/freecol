@@ -99,6 +99,7 @@
 		    default="false"/>
 
       <xs:attribute name="tax" type="xs:int" use="required"/>
+      <!-- TODO: remove this some time -->
       <xs:attribute name="numberOfSettlements" type="xs:int"
 		    use="optional" default="0"/>
       <xs:attribute name="playerType" type="PlayerType" use="required"/>
