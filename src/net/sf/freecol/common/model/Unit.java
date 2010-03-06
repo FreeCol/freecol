@@ -3862,16 +3862,12 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
         }
 
         if (!equipment.isEmpty()) {
-            out.writeStartElement(EQUIPMENT_TAG);
-            int index = 0;
-            for (EquipmentType type : equipment.keySet()) {
-                for (int index2 = 0; index2 < equipment.getCount(type); index2++) {
-                    out.writeAttribute("x" + Integer.toString(index), type.getId());
-                    index++;
-                }
+            for (Entry<EquipmentType, Integer> entry : equipment.getValues().entrySet()) {
+                out.writeStartElement(EQUIPMENT_TAG);
+                out.writeAttribute(ID_ATTRIBUTE_TAG, entry.getKey().getId());
+                out.writeAttribute("count", entry.getValue().toString());
+                out.writeEndElement();
             }
-            out.writeAttribute(ARRAY_SIZE, Integer.toString(index));
-            out.writeEndElement();
         }
 
         out.writeEndElement();
@@ -4001,10 +3997,18 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
                     goodsContainer = new GoodsContainer(getGame(), this, in);
                 }
             } else if (in.getLocalName().equals(EQUIPMENT_TAG)) {
-                int length = Integer.parseInt(in.getAttributeValue(null, ARRAY_SIZE));
-                for (int index = 0; index < length; index++) {
-                    String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
-                    equipment.incrementCount(FreeCol.getSpecification().getEquipmentType(equipmentId), 1);
+                String xLength = in.getAttributeValue(null, ARRAY_SIZE);
+                if (xLength == null) {
+                    String equipmentId = in.getAttributeValue(null, ID_ATTRIBUTE_TAG);
+                    int count = Integer.parseInt(in.getAttributeValue(null, "count"));
+                    equipment.incrementCount(Specification.getSpecification().getEquipmentType(equipmentId), count);
+                } else {
+                    // TODO: remove support for old format
+                    int length = Integer.parseInt(xLength);
+                    for (int index = 0; index < length; index++) {
+                        String equipmentId = in.getAttributeValue(null, "x" + String.valueOf(index));
+                        equipment.incrementCount(Specification.getSpecification().getEquipmentType(equipmentId), 1);
+                    }
                 }
                 in.nextTag();
             } else if (in.getLocalName().equals(TileImprovement.getXMLElementTagName())) {
