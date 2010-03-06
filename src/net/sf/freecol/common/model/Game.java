@@ -962,8 +962,11 @@ public class Game extends FreeColGameObject {
                 ModelMessage m = new ModelMessage();
                 m.readFromXML(in);
                 // When this goes, remove getOwnerId().
-                Player player = (Player) getFreeColGameObjectSafely(m.getOwnerId());
-                player.addModelMessage(m);
+                String owner = m.getOwnerId();
+                if (owner != null) {
+                    Player player = (Player) getFreeColGameObjectSafely(owner);
+                    player.addModelMessage(m);
+                }
             } else if (in.getLocalName().equals("citiesOfCibola")) {
                 // TODO: remove support for old format
                 citiesOfCibola = readFromListElement("citiesOfCibola", in, String.class);
