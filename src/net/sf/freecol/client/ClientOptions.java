@@ -370,9 +370,15 @@ public class ClientOptions extends OptionMap {
      * Comparators for sorting colonies.
      */
     private static Comparator<Colony> colonyAgeComparator = new Comparator<Colony>() {
-        // ID should indicate age
         public int compare(Colony s1, Colony s2) {
-            return s1.getIntegerID().compareTo(s2.getIntegerID());
+            if (s1.getEstablished().getNumber() > 0
+                && s2.getEstablished().getNumber() > 0) {
+                return s1.getEstablished().getNumber() - s2.getEstablished().getNumber();
+            } else {
+                // TODO: remove compatibility code
+                // ID should indicate age
+                return s1.getIntegerID().compareTo(s2.getIntegerID());
+            }
         }
     };
 

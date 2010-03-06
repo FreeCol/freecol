@@ -137,6 +137,11 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
     private int lastVisited = -1;
 
     /**
+     * The turn in which this colony was established.
+     */
+    private Turn established = new Turn(0);
+
+    /**
      * A list of Buildable items, which is NEVER empty.
      */
     private List<BuildableType> buildQueue = new ArrayList<BuildableType>();
@@ -156,6 +161,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         goodsContainer.addPropertyChangeListener(this);
         sonsOfLiberty = 0;
         oldSonsOfLiberty = 0;
+        established.setNumber(game.getTurn().getNumber());
         final Map map = game.getMap();
         tile.setOwner(owner);
         if (!tile.hasRoad()) {
@@ -602,6 +608,24 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
      */
     public void incrementImmigration(int amount) {
         immigration += amount;
+    }
+
+    /**
+     * Get the <code>Established</code> value.
+     *
+     * @return a <code>Turn</code> value
+     */
+    public Turn getEstablished() {
+        return established;
+    }
+
+    /**
+     * Set the <code>Established</code> value.
+     *
+     * @param newEstablished The new Established value.
+     */
+    public void setEstablished(final Turn newEstablished) {
+        this.established = newEstablished;
     }
 
     /**
@@ -2317,6 +2341,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         out.writeAttribute("ID", getId());
         out.writeAttribute("name", getName());
         out.writeAttribute("tile", tile.getId());
+        out.writeAttribute("established", Integer.toString(established.getNumber()));
         if (full) {
             out.writeAttribute("owner", owner.getId());
             out.writeAttribute("sonsOfLiberty", Integer.toString(sonsOfLiberty));
@@ -2383,6 +2408,7 @@ public final class Colony extends Settlement implements Nameable, PropertyChange
         setName(in.getAttributeValue(null, "name"));
         owner = getFreeColGameObject(in, "owner", Player.class);
         tile = getFreeColGameObject(in, "tile", Tile.class);
+        established.setNumber(getAttribute(in, "established", 0));
         sonsOfLiberty = getAttribute(in, "sonsOfLiberty", 0);
         oldSonsOfLiberty = getAttribute(in, "oldSonsOfLiberty", 0);
         tories = getAttribute(in, "tories", 0);

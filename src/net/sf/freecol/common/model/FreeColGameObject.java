@@ -319,6 +319,7 @@ abstract public class FreeColGameObject extends FreeColObject {
      *
      * @return The unique ID of this object.
      */
+    // TODO: remove compatibility code: use established instead
     public Integer getIntegerID() {
         String stringPart = getRealXMLElementTagName() + ":";
         return new Integer(getId().substring(stringPart.length()));
@@ -332,6 +333,7 @@ abstract public class FreeColGameObject extends FreeColObject {
         } catch (Exception e) {}
         return tagName;
     }
+    // end TODO
 
     /**
      * Sets the unique ID of this object. When setting a new ID to this object,
