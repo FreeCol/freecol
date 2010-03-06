@@ -186,6 +186,13 @@
 
   <!-- Game Object Types -->
 
+  <!-- Either a building type or a unit type -->
+  <xs:simpleType name="BuildQueueId">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="model\.(building|unit)\.([a-zA-Z])+" />
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="GoodsTypeId">
     <xs:restriction base="xs:string">
       <xs:pattern value="model\.goods\.([a-zA-Z])+" />
