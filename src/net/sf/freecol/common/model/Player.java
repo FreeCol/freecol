@@ -478,6 +478,7 @@ public class Player extends FreeColGameObject implements Nameable {
      * @param modelMessage The <code>ModelMessage</code>.
      */
     public void addModelMessage(ModelMessage modelMessage) {
+        modelMessage.setOwnerId(getId());
         modelMessages.add(modelMessage);
     }
 

@@ -22,6 +22,7 @@ package net.sf.freecol.common.networking;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -108,7 +109,7 @@ public class NewRegionNameMessage extends Message {
         HistoryEvent h = region.discover(serverPlayer,
                                          serverPlayer.getGame().getTurn(),
                                          newRegionName);
-        controller.sendUpdateToAll(serverPlayer, region);
+        controller.sendUpdateToAll(serverPlayer, (FreeColObject) region);
 
         // Reply, updating the region and history.
         Element reply = Message.createNewRootElement("multiple");

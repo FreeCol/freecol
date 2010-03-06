@@ -28,6 +28,7 @@ import java.util.Random;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.HistoryEvent;
@@ -144,7 +145,7 @@ public class BuildColonyMessage extends Message {
                                           HistoryEvent.EventType.FOUND_COLONY)
             .addName("%colony%", settlement.getName());
         player.getHistory().add(h);
-        server.getInGameController().sendUpdateToAll(serverPlayer, tile);
+        server.getInGameController().sendUpdateToAll(serverPlayer, (FreeColObject) tile);
 
         // Reply, updating the surrounding tiles now owned by the colony.
         Element reply = Message.createNewRootElement("multiple");

@@ -23,6 +23,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import net.sf.freecol.common.model.Colony;
+import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
 import net.sf.freecol.common.model.IndianSettlement;
 import net.sf.freecol.common.model.Player;
@@ -138,7 +139,7 @@ public class ClaimLandMessage extends Message {
 
         // All is well
         serverPlayer.claimLand(tile, settlement, price);
-        server.getInGameController().sendUpdateToAll(serverPlayer, tile);
+        server.getInGameController().sendUpdateToAll(serverPlayer, (FreeColObject) tile);
 
         // Update the tile, and any now-angrier owners, and the player gold
         // if a price was paid.

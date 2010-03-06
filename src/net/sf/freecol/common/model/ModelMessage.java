@@ -272,6 +272,13 @@ public class ModelMessage extends StringTemplate {
     }
 
     /**
+     * Compatibility hack.  Do not use.
+     */
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    /**
      * Add a new key and replacement to the ModelMessage. This is
      * only possible if the ModelMessage is of type TEMPLATE.
      *
