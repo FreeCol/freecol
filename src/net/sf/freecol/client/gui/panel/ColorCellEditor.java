@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
-import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 

@@ -61,7 +61,6 @@ import net.sf.freecol.common.model.Unit.UnitState;
 import net.sf.freecol.common.model.UnitType;
 import net.sf.freecol.server.FreeColServer;
 import net.sf.freecol.server.ai.AIMain;
-import net.sf.freecol.server.generator.River;
 import net.sf.freecol.server.generator.RiverSection;
 
 

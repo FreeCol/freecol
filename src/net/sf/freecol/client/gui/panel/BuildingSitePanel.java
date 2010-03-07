@@ -28,21 +28,14 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
 
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
-import net.sf.freecol.common.model.AbstractGoods;
 import net.sf.freecol.common.model.BuildableType;
-import net.sf.freecol.common.model.Building;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.Colony.ColonyChangeEvent;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.common.resources.ResourceManager;
 
 import net.miginfocom.swing.MigLayout;

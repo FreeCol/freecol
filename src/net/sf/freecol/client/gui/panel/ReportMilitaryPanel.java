@@ -19,17 +19,13 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -41,7 +37,6 @@ import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.common.model.AbstractUnit;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.EquipmentType;
 import net.sf.freecol.common.model.Player;
 import net.sf.freecol.common.model.StringTemplate;
 import net.sf.freecol.common.model.TypeCountMap;

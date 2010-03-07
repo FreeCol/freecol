@@ -19,11 +19,9 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.awt.Graphics2D;

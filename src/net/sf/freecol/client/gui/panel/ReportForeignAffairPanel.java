@@ -20,7 +20,6 @@
 package net.sf.freecol.client.gui.panel;
 
 import java.awt.GridLayout;
-import java.awt.event.ActionListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;

@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 
 import javax.swing.JComboBox;
 
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.i18n.Messages;
 import net.sf.freecol.common.model.Specification;

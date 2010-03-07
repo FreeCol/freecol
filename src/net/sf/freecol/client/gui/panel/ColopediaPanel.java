@@ -66,7 +66,6 @@ import net.sf.freecol.common.model.Feature;
 import net.sf.freecol.common.model.FoundingFather;
 import net.sf.freecol.common.model.FoundingFather.FoundingFatherType;
 import net.sf.freecol.common.model.FreeColGameObjectType;
-import net.sf.freecol.common.model.Goods;
 import net.sf.freecol.common.model.GoodsType;
 import net.sf.freecol.common.model.IndianNationType;
 import net.sf.freecol.common.model.Modifier;

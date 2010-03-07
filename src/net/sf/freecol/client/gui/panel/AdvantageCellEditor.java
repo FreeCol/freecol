@@ -27,7 +27,6 @@ import javax.swing.JComboBox;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.EuropeanNationType;
-import net.sf.freecol.common.model.NationType;
 
 /**
 * A table cell editor that can be used to select a nation.

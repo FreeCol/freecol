@@ -19,11 +19,8 @@
 
 package net.sf.freecol.client.gui.panel;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;

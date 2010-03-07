@@ -25,7 +25,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 
 import net.sf.freecol.client.gui.Canvas;

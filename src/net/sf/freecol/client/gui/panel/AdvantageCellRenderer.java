@@ -22,7 +22,6 @@ package net.sf.freecol.client.gui.panel;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JLabel;

@@ -34,12 +34,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import net.sf.freecol.FreeCol;
 import net.sf.freecol.client.control.ConnectController;

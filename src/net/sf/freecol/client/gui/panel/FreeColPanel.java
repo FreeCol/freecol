@@ -59,7 +59,6 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import javax.swing.SwingUtilities;
 
 import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.control.InGameController;
