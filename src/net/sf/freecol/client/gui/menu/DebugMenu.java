@@ -43,6 +43,7 @@ import net.sf.freecol.client.FreeColClient;
 import net.sf.freecol.client.gui.Canvas;
 import net.sf.freecol.client.gui.GUI;
 import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.client.gui.panel.ChoiceDialog;
 import net.sf.freecol.client.gui.panel.ChoiceItem;
 import net.sf.freecol.client.gui.panel.MonarchPanel;
 import net.sf.freecol.client.gui.panel.StatisticsPanel;
@@ -261,8 +262,11 @@ public class DebugMenu extends JMenu {
                                                                        father));
                         }
                     }
+                    ChoiceDialog<FoundingFather> choiceDialog =
+                        new ChoiceDialog<FoundingFather>(freeColClient.getCanvas(),
+                                                         "Select Founding Father", "Cancel", fathers);
                     FoundingFather fatherToAdd = freeColClient.getCanvas()
-                        .showChoiceDialog(null, "Select Founding Father", "cancel", fathers);
+                        .showFreeColDialog(choiceDialog, null);
                     player.addFather(fatherToAdd);
                     Player serverPlayer = (Player) freeColClient.getFreeColServer().getGame().
                         getFreeColGameObject(player.getId());
