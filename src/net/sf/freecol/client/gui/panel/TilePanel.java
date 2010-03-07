@@ -89,7 +89,7 @@ public final class TilePanel extends FreeColPanel {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, true), "released");
         SwingUtilities.replaceUIInputMap(okButton, JComponent.WHEN_IN_FOCUSED_WINDOW, inputMap);        
 
-        String name = tile.getLabel() + " (" + tile.getX() + ", " + tile.getY() + ")";
+        String name = Messages.message(tile.getLabel()) + " (" + tile.getX() + ", " + tile.getY() + ")";
         add(new JLabel(name));
 
         int width = getLibrary().getTerrainImageWidth(tileType);
