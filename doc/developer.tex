@@ -215,8 +215,7 @@ are the work of the devil!
 \begin{itemize}
 
 \item Make sure that all relevant changes have been committed to the
-  branch you are about to release. In particular, remember to merge
-  translations from trunk if the release is not made from trunk.
+  branch you are about to release.
 
 \item Create a copy of the branch you want to release in the tags
   folder. Subversion does not distinguish between tags and
@@ -233,10 +232,13 @@ are the work of the devil!
 \item Check out the newly created branch and do all further work in that
   new branch.
 
-\item Change the \verb$FREECOL_VERSION$ constant to match the release version in
-  FreeCol.java and commit the change. Start a clean compile, run all
-  tests and verify the specification(s). You can do that by calling
-  \verb+ant prepare-commit+.
+\item Merge translations from trunk if the release is not made from
+  trunk, with \verb+ant merge-translations+.
+
+\item Change the \verb$FREECOL_VERSION$ constant in FreeCol.java to
+  match the release version and commit the change. Start a clean
+  compile, run all tests and verify the specification(s). You can do
+  that by calling \verb+ant prepare-commit+.
 
 \item Call \verb+ant dist+ in order to build all packages. It might be
   necessary to increase the memory available for ant, for example by
@@ -258,6 +260,8 @@ are the work of the devil!
   PREFIX=freecol-$FREECOL_VERSION
   USERNAME=myUserName
 
+  cd dist
+
   sftp $USERNAME,freecol@frs.sourceforge.net <<FILE
   cd /home/frs/project/f/fr/freecol/freecol
   mkdir $PREFIX
@@ -274,11 +278,11 @@ are the work of the devil!
   FILE
 \end{verbatim}
 
-
 \item Compile the feature list for the news announcement (use the tracker
   and/or run the previous version for comparison).
 
 \item Update the release number in the "Version"-mambot.
+
   (http://www.freecol.org/administrator > Mambots > Site Mambots >
   Version)
 
@@ -286,16 +290,23 @@ are the work of the devil!
   (this page should only be displayed if the unstable version is the
   latest release).
 
-\item Add a news item to our website.
+\item Add a news item to our website, including a download button.
 
 \item Remove the download button from the previous release news item.
 
-\item Post release messages on our mailing lists: developers, translators
-  and users. Include information on savegame compatibility with previous versions 
-  on all messages.
+\item Post release messages on our mailing lists: developers,
+  translators and users.  The addresses are:
+
+\verb+freecol-{developers,translators,users}@lists.sourceforge.net+
+
+Include information on savegame compatibility with previous versions
+on all messages.  Beware that you may have to be subscribed to some
+lists to be able to post.
   
-\item Post release message to forum FreeCol. Include information on savegame compatibility with previous versions,
-  as well as information on how to post bug reports regarding the release in the bug tracker.
+\item Post a release message to the FreeCol forum. Include information
+  on savegame compatibility with previous versions, as well as
+  information on how to post bug reports regarding the release in the
+  bug tracker.
     
 \end{itemize}
 
@@ -310,7 +321,8 @@ The following items can be omitted for unstable releases:
   Bugs/Feature... > Preferences". Add redirects for "bugtracker/x.y.z"
   and "featuretracker/x.y.z". Create a new group for "In x.y.z".
 
-\item Update JavaDoc and User Documentation on
+\item Regenerate the JavaDoc (with \verb+ant javadoc\+) and update
+  JavaDoc and User Documentation on
   \href{freecol.org}{freecol.org}. You can do that with a script like
   this:
 
@@ -319,7 +331,7 @@ The following items can be omitted for unstable releases:
 
 USERNAME=myUserName
 
-cd docs
+cd doc
 
 {
     echo cd /home/groups/f/fr/freecol/htdocs
