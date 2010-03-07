@@ -56,12 +56,17 @@
   </xs:element>
   
 
-  <xs:element name="missionary" type="unitElementType">
+  <xs:element name="missionary">
     <xs:annotation>
       <xs:documentation>
         Unit specialization used in Indian settlements.
       </xs:documentation>
     </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="unit" />
+      </xs:sequence>
+    </xs:complexType>
   </xs:element>
 
   <xs:complexType name="unitElementType">

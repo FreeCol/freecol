@@ -31,19 +31,28 @@
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
-
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-	<xs:element name="data" />
-      </xs:choice>
-
-      <xs:attribute name="ID" type="xs:string" use="required" />
-      <xs:attribute name="owner" type="PlayerId" use="required" />
-      <xs:attribute name="source" type="SourceId" use="optional" />
-      <xs:attribute name="display" type="xs:string" use="optional" />
-      <xs:attribute name="hasBeenDisplayed" type="xs:boolean" use="optional"
-		    default="false" />
-      <xs:attribute name="type" type="ModelMessageType" use="required" />
-
+      <xs:complexContent>
+        <xs:extension base="StringTemplateType" >
+          <!-- TODO: remove compatibility code -->
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+	    <xs:element name="data">
+	      <xs:complexType>
+	        <xs:attribute name="xLength" type="xs:int" use="required"/>
+	        <xs:anyAttribute namespace="##local" processContents="skip"/>
+	      </xs:complexType>
+	    </xs:element>
+          </xs:choice>
+          <xs:attribute name="ID" type="xs:string" use="optional" />
+          <xs:attribute name="owner" type="PlayerId" use="required" />
+          <xs:attribute name="source" type="SourceId" use="optional" />
+          <xs:attribute name="display" type="xs:string" use="optional" />
+          <xs:attribute name="hasBeenDisplayed" type="xs:boolean" use="optional"
+		        default="false" />
+          <xs:attribute name="messageType" type="ModelMessageType" use="optional" />
+          <!-- TODO: remove support for old format and make messageType required -->
+          <xs:attribute name="type" type="ModelMessageType" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
     </xs:complexType>
   </xs:element>
 

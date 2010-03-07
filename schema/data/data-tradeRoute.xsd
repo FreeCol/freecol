@@ -32,7 +32,7 @@
 	    <xs:choice minOccurs="0" maxOccurs="unbounded">
 	      <xs:element name="cargo">
 		<xs:complexType>
-                  <xs:attribute name="id" type="xs:string" use="optional"/>
+                  <xs:attribute name="id" type="GoodsTypeId" use="optional"/>
                   <!-- TODO: remove compatibility code and make id required -->
 		  <xs:attribute name="xLength" type="xs:int" use="optional"/>
 		  <xs:anyAttribute namespace="##local" processContents="skip">
