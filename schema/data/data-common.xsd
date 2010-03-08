@@ -168,7 +168,7 @@
 
   <xs:simpleType name="TransportableId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="(goods|unit):([0-9])+" />
+      <xs:pattern value="(aiGoods:am|unit:)([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -180,7 +180,7 @@
 
   <xs:simpleType name="WishId">
     <xs:restriction base="xs:string">
-      <xs:pattern value="wish:([0-9])+" />
+      <xs:pattern value="(goods|worker)Wish:am([0-9])+" />
     </xs:restriction>
   </xs:simpleType>
 

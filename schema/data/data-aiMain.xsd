@@ -23,6 +23,8 @@
     </xs:documentation>
   </xs:annotation>
 
+  <xs:include schemaLocation="data-goods.xsd"/>
+
   <xs:include schemaLocation="data-common.xsd">
     <xs:annotation>
       <xs:documentation>
@@ -119,6 +121,12 @@
                   <xs:attribute name="colony" type="ColonyId" use="optional" />
                 </xs:complexType>
               </xs:element>
+              <xs:element name="tileImprovementPlanMission">
+                <xs:complexType>
+                  <xs:attribute name="unit" type="UnitId" use="required" />
+                  <xs:attribute name="tileImprovementPlan" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
             </xs:choice>
             <xs:attribute name="ID" type="UnitId" />
             <xs:attribute name="transport" type="UnitId" />
@@ -126,12 +134,65 @@
         </xs:element>
         <xs:element name="aiColony">
           <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="aiGoodsListElement">
+                <xs:complexType>
+                  <xs:attribute name="ID" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="tileimprovementplanListElement">
+                <xs:complexType>
+                  <xs:attribute name="ID" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
             <xs:attribute name="ID" type="ColonyId" />
           </xs:complexType>
         </xs:element>
         <xs:element name="aiPlayer">
           <xs:complexType>
             <xs:attribute name="ID" type="PlayerId" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="workerWish">
+          <xs:complexType>
+            <xs:attribute name="ID" type="xs:string" />
+            <xs:attribute name="destination" type="xs:string" />
+            <xs:attribute name="transportable" type="TransportableId" />
+            <xs:attribute name="value" type="xs:int" />
+            <xs:attribute name="unitType" type="UnitTypeId" />
+            <xs:attribute name="expertNeeded" type="xs:boolean" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="GoodsWish">
+          <xs:complexType>
+            <xs:attribute name="ID" type="xs:string" />
+            <xs:attribute name="destination" type="xs:string" />
+            <xs:attribute name="transportable" type="TransportableId" />
+            <xs:attribute name="value" type="xs:int" />
+            <xs:attribute name="goodsType" type="GoodsTypeId" />
+            <xs:attribute name="expertNeeded" type="xs:boolean" />
+            <xs:attribute name="amountRequested" type="xs:int" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="aiGoods">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="goods" />
+            </xs:sequence>
+            <xs:attribute name="ID" type="xs:string" />
+            <xs:attribute name="destination" type="xs:string" />
+            <xs:attribute name="transport" type="UnitId" />
+            <xs:attribute name="transportPriority" type="xs:int" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="tileimprovementplan">
+          <xs:complexType>
+            <xs:attribute name="ID" type="xs:string" />
+            <xs:attribute name="type" type="TileImprovementTypeId" />
+            <xs:attribute name="value" type="xs:int" />
+            <xs:attribute name="target" type="TileId" />
+            <xs:attribute name="pioneer" type="UnitId" />
           </xs:complexType>
         </xs:element>
       </xs:choice>
