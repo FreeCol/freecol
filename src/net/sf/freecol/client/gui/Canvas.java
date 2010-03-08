@@ -1789,7 +1789,7 @@ public final class Canvas extends JDesktopPane {
         showSubPanel(loadDialog);
         for (;;) {
             response = (File) loadDialog.getResponse();
-            if (response != null && response.isFile()) break;
+            if (response == null || response.isFile()) break;
             errorMessage("noSuchFile");
         }
         remove(loadDialog);
