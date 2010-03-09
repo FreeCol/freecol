@@ -321,10 +321,10 @@ The following items can be omitted for unstable releases:
   Bugs/Feature... > Preferences". Add redirects for "bugtracker/x.y.z"
   and "featuretracker/x.y.z". Create a new group for "In x.y.z".
 
-\item Regenerate the JavaDoc (with \verb+ant javadoc\+) and update
-  JavaDoc and User Documentation on
-  \href{freecol.org}{freecol.org}. You can do that with a script like
-  this:
+\item Regenerate the documentation (with \verb+ant manual+) and
+  JavaDoc (with \verb+ant javadoc+) and update JavaDoc and User
+  Documentation on \href{freecol.org}{freecol.org}. You can do that
+  with a script like this:
 
 \begin{verbatim}
 #!/bin/sh
@@ -343,6 +343,8 @@ cd doc
 
 \end{verbatim}
 
+Note that generating FreeCol.html requires \verb+htlatex+
+to be installed.
 
 
 \end{itemize}
