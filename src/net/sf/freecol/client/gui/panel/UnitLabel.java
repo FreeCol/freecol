@@ -66,6 +66,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
     private boolean selected;
 
+    private boolean isSmall = false;
+
     private boolean ignoreLocation;
 
     private InGameController inGameController;
@@ -182,6 +184,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
             setDisabledIcon(new ImageIcon(disabledImageIcon.getImage().getScaledInstance(
                     (imageIcon.getIconWidth() / 3) * 2, (imageIcon.getIconHeight() / 3) * 2, Image.SCALE_SMOOTH)));
             setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 0));
+            this.isSmall = true;
         } else {
             if (unit.getLocation() instanceof ColonyTile) {
                 TileType tileType = ((ColonyTile) unit.getLocation()).getTile().getType();
@@ -198,8 +201,8 @@ public final class UnitLabel extends JLabel implements ActionListener {
             } else {
                 setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
             }
+            this.isSmall = false;
         }
-
     }
 
     /**
@@ -368,8 +371,7 @@ public final class UnitLabel extends JLabel implements ActionListener {
 
 
     public void updateIcon() {
-        setIcon(parent.getImageLibrary().getUnitImageIcon(unit));
-        setDisabledIcon(parent.getImageLibrary().getUnitImageIcon(unit, true));
+        setSmall(isSmall);
 
         Component uc = getParent();
         while (uc != null) {
