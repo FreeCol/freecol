@@ -2940,8 +2940,8 @@ public class Player extends FreeColGameObject implements Nameable {
                                                      (newSoL > oldSoL)
                                                      ? "model.player.SoLIncrease"
                                                      : "model.player.SoLDecrease", this)
-                                    .addName("%oldSoL%", String.valueOf(oldSoL))
-                                    .addName("%newSoL%", String.valueOf(newSoL)));
+                                    .addAmount("%oldSoL%", oldSoL)
+                                    .addAmount("%newSoL%", newSoL));
                 }
             }
             // remember SoL for check changes at next turn
