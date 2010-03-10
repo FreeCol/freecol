@@ -2407,19 +2407,10 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     /**
      * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
      * 
-     * @return 'true' if this unit can carry other units, 'false' otherwise.
+     * @return 'true' if this unit can carry goods or other units,
+     * 'false' otherwise.
      */
     public boolean isCarrier() {
-        return isCarrier(unitType);
-    }
-
-    /**
-     * Checks if this <code>Unit</code> is able to carry {@link Locatable}s.
-     * 
-     * @param unitType The type used when checking.
-     * @return 'true' if the unit can carry other units, 'false' otherwise.
-     */
-    public static boolean isCarrier(UnitType unitType) {
         return unitType.canCarryGoods() ||
             unitType.canCarryUnits();
     }
