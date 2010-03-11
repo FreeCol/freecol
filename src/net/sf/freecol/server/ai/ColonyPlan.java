@@ -1012,8 +1012,7 @@ public class ColonyPlan {
             }
 
             // get  the production values if the unit is shifted 
-            int rawProd = colony.getProductionNextTurn(rawMat)
-                - ((ColonyTile) u.getLocation()).getProductionOf(u, rawMat);
+            int rawProd = colony.getProductionNextTurn(rawMat) - ((ColonyTile)u.getWorkTile()).getProductionOf(u, rawMat);
             int mfnProd = colony.getProductionNextTurn(producedGoods) + factory.getAdditionalProductionNextTurn(u);
             if(stockRawMat < 50 && rawProd < mfnProd){
                 return;

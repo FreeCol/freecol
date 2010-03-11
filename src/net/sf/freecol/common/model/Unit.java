@@ -932,6 +932,26 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
     }
 
     /**
+     * Gets the <code>Building</code> this unit is working in.
+     */
+    public Building getWorkLocation() {
+        if (getLocation() instanceof Building) {
+            return ((Building) getLocation());
+        }
+        return null;
+    }
+
+    /**
+     * Gets the <code>ColonyTile</code> this unit is working in.
+     */
+    public ColonyTile getWorkTile() {
+        if (getLocation() instanceof ColonyTile) {
+            return ((ColonyTile) getLocation());
+        }
+        return null;
+    }
+
+    /**
      * Gets the type of goods this unit is producing in its current occupation.
      * 
      * @return The type of goods this unit would produce.

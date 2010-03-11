@@ -884,7 +884,7 @@ public class UnitTest extends FreeColTestCase {
             }
         }
         assertTrue("Soldier should be in a work location in the colony",found);
-        ColonyTile workTile = (ColonyTile) soldier.getLocation();
+        ColonyTile workTile = soldier.getWorkTile();
         assertTrue("Soldier should be in a work tile in the colony",workTile != null);
         assertFalse("Soldier should not be working in central tile",workTile == colony.getColonyTile(colonyTile));
     }
@@ -901,7 +901,10 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("Colonist should not have any experience",0,colonist.getExperience());
         
         // colonist either in building or colony work tile
-        WorkLocation loc = (WorkLocation) colonist.getLocation();
+        WorkLocation loc = colonist.getWorkLocation();
+        if(loc == null){
+            loc = colonist.getWorkTile();
+        }
         // produces goods
         loc.newTurn();
         
