@@ -2676,16 +2676,18 @@ public class Unit extends FreeColGameObject implements Locatable, Location, Owna
 
     public String getMovesAsString() {
         String moves = "";
-        if (getMovesLeft() % 3 == 0 || getMovesLeft() / 3 > 0) {
-            moves += Integer.toString(getMovesLeft() / 3);
+        int quotient = getMovesLeft() / 3;
+        int remainder = getMovesLeft() % 3;
+        if (remainder == 0 || quotient > 0) {
+            moves += Integer.toString(quotient);
         }
 
-        if (getMovesLeft() % 3 != 0) {
-            if (getMovesLeft() / 3 > 0) {
+        if (remainder > 0) {
+            if (quotient > 0) {
                 moves += " ";
             }
 
-            moves += "(" + Integer.toString(getMovesLeft() - (getMovesLeft() / 3) * 3) + "/3) ";
+            moves += "(" + Integer.toString(remainder) + "/3) ";
         }
 
         moves += "/" + Integer.toString(getInitialMovesLeft() / 3);

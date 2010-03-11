@@ -1130,4 +1130,28 @@ public class UnitTest extends FreeColTestCase {
         assertEquals("Unit2 should not have horses",0,insideUnit2.getEquipmentCount(horsesType));
         assertEquals("Unit2 should have muskets",1,insideUnit2.getEquipmentCount(musketsType));
     }
+
+    public void testGetMovesAsString() {
+
+        Game game = getStandardGame();
+        Map map = getTestMap();
+        game.setMap(map);
+        
+        Colony colony = getStandardColony(1);
+        Unit unit = colony.getUnitList().get(0);
+        String initial = "/" + Integer.toString(unit.getInitialMovesLeft() / 3);
+
+        String[] expected = new String[] {
+            "0", "(1/3) ", "(2/3) ", "1", "1 (1/3) ", "1 (2/3) ",
+            "2", "2 (1/3) ", "2 (2/3) ", "3", "3 (1/3) ", "3 (2/3) "
+        };
+
+        for (int index = 0; index < expected.length; index++) {
+            unit.setMovesLeft(index);
+            String expectedString = expected[index] + initial;
+            String actualString = unit.getMovesAsString();
+            assertEquals(expectedString + " != " + actualString, expectedString, actualString );
+        }
+    }
+
 }
