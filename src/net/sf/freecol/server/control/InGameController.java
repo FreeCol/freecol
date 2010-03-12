@@ -115,8 +115,8 @@ public final class InGameController extends Controller {
     /**
      * Get a list of all server players, optionally excluding the supplied one.
      *
-     * @param serverPlayer A <code>ServerPlayer</code> to exclude (may be null).
-     * @return A list of all connected server players except one.
+     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
+     * @return A list of all connected server players, perhaps except one.
      */
     public List<ServerPlayer> getOtherPlayers(ServerPlayer serverPlayer) {
         List<ServerPlayer> result = new ArrayList<ServerPlayer>();
@@ -130,6 +130,93 @@ public final class InGameController extends Controller {
         return result;
     }
 
+    // Magic cookies to specify an overriding of the standard object
+    // handling in arguments to buildUpdate().
+    public static enum UpdateType {
+        ANIMATE,    // Animate a move
+        ATTRIBUTE,  // Set an attribute on the final result
+        PARTIAL,    // Do a partial update
+        PRIVATE,    // Marker for private objects
+        REMOVE,     // Remove an object
+        STANCE,     // Set stance
+        UPDATE      // The default mode
+    };
+
+    /**
+     * Helper function to add objects for an animation to a list.
+     *
+     * @param objects The list of objects to add to.
+     * @param unit The <code>Unit</code> that is moving.
+     * @param oldTile The old <code>Tile</code>.
+     * @param newTile The new <code>Tile</code>.
+     */
+    private static void addAnimate(List<Object> objects, Unit unit,
+                                   Tile oldTile, Tile newTile) {
+        addMore(objects, UpdateType.ANIMATE, unit, oldTile, newTile);
+    }
+
+    /**
+     * Helper function to add attributes to a list.
+     *
+     * @param objects The list of objects to add to.
+     * @param attr The attribute.
+     * @param value Its value.
+     */
+    private static void addAttribute(List<Object> objects, String attr,
+                                     String value) {
+        addMore(objects, UpdateType.ATTRIBUTE, attr, value);
+    }
+
+    /**
+     * Helper function to add objects to a list.
+     *
+     * @param objects The list of objects to add to.
+     * @param more The objects to add.
+     */
+    private static void addMore(List<Object> objects, Object... more) {
+        for (Object o : more) objects.add(o);
+    }
+
+    /**
+     * Helper function to add objects for a partial update to a list.
+     *
+     * @param objects The list of objects to add to.
+     * @param fco The object to be partially updated.
+     * @param more Strings for the fields to update.
+     */
+    private static void addPartial(List<Object> objects, FreeColObject fco,
+                                   String... more) {
+        addMore(objects, UpdateType.PARTIAL, fco);
+        for (Object o : more) objects.add(o);
+    }
+
+    /**
+     * Helper function to add a removal of an object to a list.
+     * Useful for updates to other players when the object is not
+     * really gone, just moves where it can not be seen.
+     *
+     * @param objects The list of objects to add to.
+     * @param fcgo The object to be removed.
+     * TODO: public until clean up use in InGameInputHandler.
+     */
+    public static void addRemove(List<Object> objects,
+                                  FreeColGameObject fcgo) {
+        addMore(objects, UpdateType.REMOVE, fcgo);
+    }
+
+    /**
+     * Helper function to add objects for a stance change to a list.
+     *
+     * @param objects The list of objects to add to.
+     * @param stance The <code>Stance</code> to change to.
+     * @param player1 The first <code>ServerPlayer</code>.
+     * @param player2 The second <code>ServerPlayer</code>.
+     */
+    private static void addStance(List<Object> objects, Stance stance,
+                                  ServerPlayer player1, ServerPlayer player2) {
+        addMore(objects, UpdateType.STANCE, stance, player1, player2);
+    }
+
     /**
      * Build a generalized update.
      *
@@ -139,50 +226,138 @@ public final class InGameController extends Controller {
      * @return An element encapsulating an update of the objects to
      *         consider, or null if there is nothing to report.
      */
-    public Element buildGeneralUpdate(ServerPlayer serverPlayer,
-                                      FreeColObject... objects) {
-        List<FreeColObject> objectList = new ArrayList<FreeColObject>();
-        for (FreeColObject o : objects) objectList.add(o);
-        return buildGeneralUpdate(serverPlayer, objectList);
+    public Element buildUpdate(ServerPlayer serverPlayer, Object... objects) {
+        List<Object> objectList = new ArrayList<Object>();
+        for (Object o : objects) objectList.add(o);
+        return buildUpdate(serverPlayer, objectList);
     }
 
-     /**
-      * Build a generalized update.
-      * Beware that removing an object does not necessarily update
-      * its tile correctly on the client side--- if a tile update
-      * is needed the tile should be supplied in the objects list.
-      *
-      * @param serverPlayer The <code>ServerPlayer</code> to send the
-      *            update to.
-      * @param objects A <code>List</code> of objects to consider.
-      * @return An element encapsulating an update of the objects to
-      *         consider, or null if there is nothing to report.
-      */
-    public Element buildGeneralUpdate(ServerPlayer serverPlayer,
-                                      List<FreeColObject> objects) {
+    /**
+     * Build a generalized update.
+     * Beware that removing an object does not necessarily update
+     * its tile correctly on the client side--- if a tile update
+     * is needed the tile should be supplied in the objects list.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to send the
+     *            update to.
+     * @param objects A <code>List</code> of objects to consider.
+     * @return An element encapsulating an update of the objects to
+     *         consider, or null if there is nothing to report.
+     */
+    public Element buildUpdate(ServerPlayer serverPlayer,
+                               List<Object> objects) {
         Document doc = Message.createNewDocument();
+        List<String> attributes = new ArrayList<String>();
+        List<Element> extras = new ArrayList<Element>();
         Element multiple = doc.createElement("multiple");
         Element update = doc.createElement("update");
         Element messages = doc.createElement("addMessages");
         Element history = doc.createElement("addHistory");
         Element remove = doc.createElement("remove");
-        for (FreeColObject o : objects) {
+
+        for (int i = 0; i < objects.size(); i++) {
+            Object o = objects.get(i);
             if (o == null) {
                 continue;
+            } else if (o instanceof UpdateType) {
+                switch ((UpdateType) o) {
+                case ANIMATE: // expect Unit Tile Tile
+                    if (i+3 < objects.size()
+                        && objects.get(i+1) instanceof Unit
+                        && objects.get(i+2) instanceof Tile
+                        && objects.get(i+3) instanceof Tile) {
+                        Unit unit = (Unit) objects.get(i+1);
+                        Tile oldTile = (Tile) objects.get(i+2);
+                        Tile newTile = (Tile) objects.get(i+3);
+                        Element animate = buildAnimate(serverPlayer, doc, unit,
+                                                       oldTile, newTile);
+                        if (animate != null) {
+                            extras.add(animate);
+                            // Clean up units that disappear.
+                            if (!unit.isVisibleTo(serverPlayer)) {
+                                unit.addToRemoveElement(remove);
+                            }
+                        }
+                        i += 3;
+                    } else {
+                        throw new IllegalArgumentException("bogus ANIMATE");
+                    }
+                    break;
+                case ATTRIBUTE: // expect String String
+                    if (i+2 < objects.size()
+                        && objects.get(i+1) instanceof String
+                        && objects.get(i+2) instanceof String) {
+                        attributes.add((String) objects.get(i+1));
+                        attributes.add((String) objects.get(i+2));
+                        i += 2;
+                    } else {
+                        throw new IllegalArgumentException("bogus ATTRIBUTE");
+                    }
+                    break;
+                case PARTIAL: // expect FCO String String...
+                    if (i+2 < objects.size()
+                        && objects.get(i+1) instanceof FreeColObject
+                        && objects.get(i+2) instanceof String) {
+                        FreeColObject fco = (FreeColObject) objects.get(i+1);
+                        // Count and collect the strings.
+                        int n;
+                        for (n = i+3; objects.get(n) instanceof String; n++);
+                        n -= i+2;
+                        String[] fields = new String[n];
+                        for (int j = 0; j < n; j++) {
+                            fields[j] = (String) objects.get(i+2+j);
+                        }
+                        // Make a partial update.
+                        update.appendChild(fco.toXMLElement(null, doc, true,
+                                                            false, fields));
+                        i += n+1;
+                    } else {
+                        throw new IllegalArgumentException("bogus PARTIAL");
+                    }
+                    break;
+                case PRIVATE: // ignore
+                    break;
+                case REMOVE: // expect FreeColGameObject
+                    if (i+1 < objects.size()
+                        && objects.get(i+1) instanceof FreeColGameObject) {
+                        FreeColGameObject fcgo = (FreeColGameObject) objects.get(i+1);
+                        fcgo.addToRemoveElement(remove);
+                        i += 1;
+                    } else {
+                        throw new IllegalArgumentException("bogus REMOVE");
+                    }
+                    break;
+                case STANCE: // expect Stance Player Player
+                    if (i+3 < objects.size()
+                        && objects.get(i+1) instanceof Stance
+                        && objects.get(i+2) instanceof ServerPlayer
+                        && objects.get(i+3) instanceof ServerPlayer) {
+                        Element setStance = buildStance(serverPlayer, doc,
+                                (Stance) objects.get(i+1),
+                                (ServerPlayer) objects.get(i+2),
+                                (ServerPlayer) objects.get(i+3));
+                        if (setStance != null) extras.add(setStance);
+                        i += 3;
+                    } else {
+                        throw new IllegalArgumentException("bogus STANCE");
+                    }
+                    break;
+                case UPDATE: // Syntactic sugar
+                    break;
+                }
             } else if (o instanceof ModelMessage) {
                 // Always send message objects
-                o.addToOwnedElement(messages, serverPlayer);
+                ((ModelMessage) o).addToOwnedElement(messages, serverPlayer);
             } else if (o instanceof HistoryEvent) {
                 // Always send history objects
-                o.addToOwnedElement(history, serverPlayer);
+                ((HistoryEvent) o).addToOwnedElement(history, serverPlayer);
             } else if (o instanceof FreeColGameObject) {
                 FreeColGameObject fcgo = (FreeColGameObject) o;
                 if (fcgo.isDisposed()) {
                     // Always remove disposed objects
                     fcgo.addToRemoveElement(remove);
                 } else if (fcgo instanceof Ownable
-                           && ((ServerPlayer)((Ownable) fcgo).getOwner())
-                           == serverPlayer) {
+                           && ((Ownable) fcgo).getOwner() == (Player) serverPlayer) {
                     // Always update our own objects
                     update.appendChild(fcgo.toXMLElement(serverPlayer, doc));
                 } else if (fcgo instanceof Unit) {
@@ -211,15 +386,22 @@ public final class InGameController extends Controller {
                                    + fcgo.getId());
                 }
             } else {
-                throw new IllegalStateException("Bogus object");
+                throw new IllegalStateException("Bogus object: "
+                                                + o.toString());
             }
         }
 
         // Decide what to return.  If there are several parts with children
         // then return multiple, if there is one viable part, return that,
-        // else null.
+        // else null.  Always put animate+setStance first, remove last.
         int n = 0;
         Element child = null;
+        Element result;
+        while (extras.size() > 0) {
+            child = extras.remove(0);
+            multiple.appendChild(child);
+            n++;
+        }
         if (update.hasChildNodes()) {
             multiple.appendChild(update);
             child = update;
@@ -246,11 +428,77 @@ public final class InGameController extends Controller {
         case 1:
             multiple.removeChild(child);
             doc.appendChild(child);
-            return child;
+            result = child;
+            break;
         default:
             doc.appendChild(multiple);
-            return multiple;
+            result = multiple;
+            break;
         }
+        // Finally add any attributes
+        for (int i = 0; i < attributes.size(); i += 2) {
+            result.setAttribute(attributes.get(i), attributes.get(i+1));
+        }
+
+        return result;
+    }
+
+    /**
+     * Build an "animateMove" element for an update.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to update.
+     * @param doc The owner <code>Document</code> to build the element in.
+     * @param unit The <code>Unit</code> that is moving.
+     * @param oldTile The <code>Tile</code> from which the unit is moving.
+     * @param newTile The <code>Tile</code> to which the unit is moving.
+     * @return An "animateMove" element, or null if the move can not be
+     *         seen by the serverPlayer.
+     */
+    private Element buildAnimate(ServerPlayer serverPlayer, Document doc,
+                                 Unit unit, Tile oldTile, Tile newTile) {
+        boolean seeOld = unit.getOwner() == serverPlayer
+            || (serverPlayer.canSee(oldTile) && oldTile.getSettlement()==null);
+        boolean seeNew = unit.isVisibleTo(serverPlayer);
+        if (seeOld || seeNew) {
+            Element element = doc.createElement("animateMove");
+            element.setAttribute("unit", unit.getId());
+            element.setAttribute("oldTile", oldTile.getId());
+            element.setAttribute("newTile", newTile.getId());
+            if (!seeOld) {
+                // We can not rely on the unit that is about to move
+                // being present on the client side, and it is needed
+                // before we can run the animation, so it is appended
+                // to animateMove.
+                element.appendChild(unit.toXMLElement(serverPlayer, doc));
+            }
+            return element;
+        }
+        return null;
+    }
+
+    /**
+     * Build an "setStance" element for an update.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to update.
+     * @param doc The owner <code>Document</code> to build the element in.
+     * @param stance The <code>Stance</code> to set.
+     * @param player1 The first <code>ServerPlayer</code> to set stance for.
+     * @param player2 The second <code>ServerPlayer</code> to set stance for.
+     * @return A "setStance" element, or null if the stance change is not
+     *         for the serverPlayer.
+     */
+    private Element buildStance(ServerPlayer serverPlayer, Document doc,
+                                Stance stance,
+                                ServerPlayer player1, ServerPlayer player2) {
+        if (serverPlayer == player1 || serverPlayer == player2
+            || stance == Stance.WAR) {
+            Element element = doc.createElement("setStance");
+            element.setAttribute("stance", stance.toString());
+            element.setAttribute("first", player1.getId());
+            element.setAttribute("second", player2.getId());
+            return element;
+        }
+        return null;
     }
 
     /**
@@ -285,64 +533,110 @@ public final class InGameController extends Controller {
     }
 
     /**
-     * Send a generalized update to a list of players.
-     * Each player apart from the optional exclusion is informed of
-     * changes it can see.
+     * Deprecated. Going away soon.
      *
-     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
      * @param objects The objects to consider.
      */
-    public void sendUpdateToAll(ServerPlayer serverPlayer,
-                                FreeColObject... objects) {
-        for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-            Element element = buildGeneralUpdate(other, objects);
-            if (element != null) {
-                try {
-                    other.getConnection().sendAndWait(element);
-                } catch (IOException e) {
-                    logger.warning(e.getMessage());
-                }
-            }
-        }
+    public void sendUpdateToAll(ServerPlayer serverPlayer, Object... objects) {
+        List<Object> objectList = new ArrayList<Object>();
+        for (Object o : objects) objectList.add(o);
+        sendToOthers(serverPlayer, objectList);
     }
 
     /**
-     * Send a generalized update to a list of players.
-     * Each player apart from the optional exclusion is informed of
-     * changes it can see.
+     * Deprecated. Going away soon.
      *
-     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
-     * @param objects A <code>List</code> of objects to consider.
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
+     * @param objects The objects to consider.
      */
-    public void sendUpdateToAll(ServerPlayer serverPlayer,
-                                List<FreeColObject> objects) {
+    public void sendUpdateToAll(ServerPlayer serverPlayer, List<Object> objects) {
+        sendToOthers(serverPlayer, objects);
+    }
+
+    /**
+     * Send an update to all players except one.
+     *
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
+     * @param objects The objects to consider.
+     */
+    public void sendToOthers(ServerPlayer serverPlayer, Object... objects) {
+        List<Object> objectList = new ArrayList<Object>();
+        for (Object o : objects) objectList.add(o);
+        sendToOthers(serverPlayer, objectList);
+    }
+
+    /**
+     * Send an update to all players except one.
+     *
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
+     * @param objects The objects to consider.
+     */
+    public void sendToOthers(ServerPlayer serverPlayer,
+                             List<Object> allObjects) {
+        // Strip off all objects at PRIVATE onward before updating.
+        List<Object> objects = new ArrayList<Object>();
+        for (Object o : allObjects) {
+            if (o == UpdateType.PRIVATE) break;
+            objects.add(o);
+        }
+        if (objects.isEmpty()) return;
+
+        // Now send each other player their update.
         for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-            Element element = buildGeneralUpdate(other, objects);
-            if (element != null) {
-                try {
-                    other.getConnection().sendAndWait(element);
-                } catch (IOException e) {
-                    logger.warning(e.getMessage());
-                }
-            }
+            sendElement(other, objects);
         }
     }
 
     /**
-     * Send an element to a list of players, apart from an optional
-     * exclusion.
+     * Send an element to all players except one.
      *
-     * @param serverPlayer An optional <code>ServerPlayer</code> to exclude.
+     * @param serverPlayer A <code>ServerPlayer</code> to exclude.
      * @param element An <code>Element</code> to send.
      */
-    public void sendToAll(ServerPlayer serverPlayer, Element element) {
+    public void sendToOthers(ServerPlayer serverPlayer, Element element) {
         if (element != null) {
             for (ServerPlayer other : getOtherPlayers(serverPlayer)) {
-                try {
-                    other.getConnection().sendAndWait(element);
-                } catch (IOException e) {
-                    logger.warning(e.getMessage());
-                }
+                sendElement(other, element);
+            }
+        }
+    }
+
+    /**
+     * Send an element to all players.
+     *
+     * @param element The <code>Element</code> to send.
+     */
+    public void sendToAll(Element element) {
+        if (element != null) {
+            for (ServerPlayer other : getOtherPlayers(null)) {
+                sendElement(other, element);
+            }
+        }
+    }
+
+    /**
+     * Send an element to a specific player.
+     *
+     * @param serverPlayer The <code>ServerPlayer</code> to update.
+     * @param objects A list of objects to build an <code>Element</code> with.
+     */
+    public void sendElement(ServerPlayer serverPlayer, List<Object> objects) {
+        sendElement(serverPlayer, buildUpdate(serverPlayer, objects));
+    }
+
+    /**
+     * Send an element to a specific player.
+     *
+     * @param player The <code>ServerPlayer</code> to update.
+     * @param element An <code>Element</code> containing the update.
+     */
+    public void sendElement(ServerPlayer player, Element element) {
+        if (element != null) {
+            try {
+                player.getConnection().sendAndWait(element);
+            } catch (Exception e) {
+                logger.warning(e.getMessage());
             }
         }
     }
@@ -384,7 +678,7 @@ public final class InGameController extends Controller {
         if (winner != null && (!freeColServer.isSingleplayer() || !winner.isAI())) {
             Element gameEndedElement = Message.createNewRootElement("gameEnded");
             gameEndedElement.setAttribute("winner", winner.getId());
-            sendToAll(null, gameEndedElement);
+            sendToAll(gameEndedElement);
             
             // TODO: Remove when the server can properly revert to a pre-game state:
             if (FreeCol.getFreeColClient() == null) {
@@ -533,7 +827,7 @@ public final class InGameController extends Controller {
                 debugOnlyAITurns--;
             }
             Element newTurnElement = Message.createNewRootElement("newTurn");
-            sendToAll(null, newTurnElement);
+            sendToAll(newTurnElement);
         }
         
         ServerPlayer newPlayer = (ServerPlayer) getGame().getNextPlayer();
@@ -547,7 +841,7 @@ public final class InGameController extends Controller {
             if (Player.checkForDeath(newPlayer)) {
                 newPlayer.setDead(true);
                 Element element = killPlayerElement(newPlayer);
-                sendToAll(null, element);
+                sendToAll(element);
                 logger.info(newPlayer.getNation() + " is dead.");
                 return nextPlayer();
             }
@@ -618,7 +912,7 @@ public final class InGameController extends Controller {
         
         Element setCurrentPlayerElement = Message.createNewRootElement("setCurrentPlayer");
         setCurrentPlayerElement.setAttribute("player", newPlayer.getId());
-        sendToAll(null, setCurrentPlayerElement);
+        sendToAll(setCurrentPlayerElement);
         
         return newPlayer;
     }
@@ -1237,17 +1531,18 @@ public final class InGameController extends Controller {
      *
      * @param serverPlayer The <code>ServerPlayer</code> that is cashing in.
      * @param unit The treasure train <code>Unit</code> to cash in.
-     * @return A list of objects to update.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public List<FreeColObject> cashInTreasureTrain(ServerPlayer serverPlayer,
-                                                    Unit unit) {
-        List<FreeColObject> objects = new ArrayList<FreeColObject>();
+    public Element cashInTreasureTrain(ServerPlayer serverPlayer, Unit unit) {
+        List<Object> objects = new ArrayList<Object>();
 
         // Work out the cash in amount.
         int fullAmount = unit.getTreasureAmount();
         int cashInAmount = (fullAmount - unit.getTransportFee())
             * (100 - serverPlayer.getTax()) / 100;
         serverPlayer.modifyGold(cashInAmount);
+        objects.add((FreeColGameObject) unit.getLocation());
+        addPartial(objects, (Player) serverPlayer, "gold", "score");
 
         // Generate a suitable message.
         String messageId = (serverPlayer.getPlayerType() == PlayerType.REBEL
@@ -1258,11 +1553,12 @@ public final class InGameController extends Controller {
                     .addAmount("%amount%", fullAmount)
                     .addAmount("%cashInAmount%", cashInAmount));
 
-        // Dispose and return.
-        Location oldLocation = unit.getLocation();
+        // Dispose.
         objects.addAll(unit.disposeList());
-        objects.add((FreeColGameObject) oldLocation);
-        return objects;
+
+        // Do not update others, they can not see cash-ins which
+        // happen in colony or in Europe.
+        return buildUpdate(serverPlayer, objects);
     }
 
 
@@ -1352,11 +1648,15 @@ public final class InGameController extends Controller {
     /**
      * A unit migrates from Europe.
      *
-     * @param player The <code>ServerPlayer</code> whose unit it will be.
+     * @param serverPlayer The <code>ServerPlayer</code> whose unit it will be.
      * @param slot The slot within <code>Europe</code> to select the unit from.
      * @param fountain True if this occurs as a result of a Fountain of Youth.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public ModelMessage emigrate(ServerPlayer player, int slot, boolean fountain) {
+    public Element emigrate(ServerPlayer serverPlayer, int slot,
+                            boolean fountain) {
+        List<Object> objects = new ArrayList<Object>();
+
         // Valid slots are in [1,3], recruitable indices are in [0,2].
         // An invalid slot is normal when the player has no control over
         // recruit type.
@@ -1365,36 +1665,46 @@ public final class InGameController extends Controller {
             : getPseudoRandom().nextInt(Europe.RECRUIT_COUNT);
 
         // Create the recruit, move it to the docks.
-        Europe europe = player.getEurope();
+        Europe europe = serverPlayer.getEurope();
         UnitType recruitType = europe.getRecruitable(index);
         Game game = getGame();
-        Unit unit = new Unit(game, europe, player, recruitType, UnitState.ACTIVE,
+        Unit unit = new Unit(game, europe, serverPlayer, recruitType,
+                             UnitState.ACTIVE,
                              recruitType.getDefaultEquipment());
         unit.setLocation(europe);
 
-        // Update immigration counters if this was an ordinary decision to migrate.
+        // Update immigration counters if this was an ordinary
+        // decision to migrate.
         if (!fountain) {
-            player.updateImmigrationRequired();
-            player.reduceImmigration();
+            serverPlayer.updateImmigrationRequired();
+            serverPlayer.reduceImmigration();
+            addPartial(objects, (Player) serverPlayer,
+                       "immigration", "immigrationRequired");
         }
 
         // Replace the recruit we used.
         // This annoying taskId stuff can go away when
         // addFather/generateRecruitable moves server-side.
-        String taskId = player.getId()
+        String taskId = serverPlayer.getId()
             + ".emigrate." + game.getTurn().toString()
             + ".slot." + Integer.toString(slot)
             + "." + Integer.toString(getPseudoRandom().nextInt(1000000));
-        europe.setRecruitable(index, player.generateRecruitable(taskId));
+        europe.setRecruitable(index, serverPlayer.generateRecruitable(taskId));
+        objects.add(europe);
 
         // Return an informative message only if this was an ordinary migration
         // where we did not select the unit type.
         // Fountain of Youth migrants have already been announced in bulk.
-        return (fountain || validSlot) ? null
-            : new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
-                               "model.europe.emigrate", player, unit)
-            .add("%europe%", europe.getNameKey())
-            .addStringTemplate("%unit%", unit.getLabel());
+        if (!fountain && !validSlot) {
+            objects.add(new ModelMessage(ModelMessage.MessageType.UNIT_ADDED,
+                                         "model.europe.emigrate",
+                                         serverPlayer, unit)
+                        .add("%europe%", europe.getNameKey())
+                        .addStringTemplate("%unit%", unit.getLabel()));
+        }
+
+        // Do not update others, emigration is private.
+        return buildUpdate(serverPlayer, objects);
     }
 
 
@@ -1936,7 +2246,7 @@ public final class InGameController extends Controller {
 
         // Update others, but not Europe.
         if (destination.getTile() != null) {
-            sendUpdateToAll(serverPlayer, destination.getTile());
+            sendToOthers(serverPlayer, destination.getTile());
         }
         return true;
     }
@@ -2350,35 +2660,42 @@ public final class InGameController extends Controller {
 
         unit.setType(newType);
         if (oldLocation instanceof Tile) {
-            sendUpdateToAll(serverPlayer, (Tile) oldLocation);
+            sendToOthers(serverPlayer, (Tile) oldLocation);
         }
     }
 
     /**
      * Abandon a settlement.
      *
+     * @param serverPlayer The <code>ServerPlayer</code> that is abandoning.
      * @param settlement The <code>Settlement</code> to abandon.
-     * @return A <code>List</code> of objects to update.
+     * @return An <code>Element</code> encapsulating this action.
      */
-    public List<FreeColObject> abandonSettlement(Settlement settlement) {
-        List<FreeColObject> objects = new ArrayList<FreeColObject>();
-
+    public Element abandonSettlement(ServerPlayer serverPlayer,
+                                     Settlement settlement) {
+        List<Object> objects = new ArrayList<Object>();
         // Collect the tiles the settlement owns before disposing.
         objects.addAll(settlement.getOwnedTiles());
 
-        // Add to the history before disposing.
+        HistoryEvent h = null;
+        // Create history event before disposing.
         if (settlement instanceof Colony) {
-            HistoryEvent h = new HistoryEvent(getGame().getTurn().getNumber(),
-                                              HistoryEvent.EventType.ABANDON_COLONY)
+            h = new HistoryEvent(getGame().getTurn().getNumber(),
+                                 HistoryEvent.EventType.ABANDON_COLONY)
                 .addName("%colony%", settlement.getName());
-            settlement.getOwner().getHistory().add(h);
-            objects.add(h);
         }
 
         // Now do the dispose.
         objects.addAll(settlement.disposeList());
 
-        return objects;
+        if (h != null) { // History is private.
+            objects.add(UpdateType.PRIVATE);
+            objects.add(h);
+        }
+
+        // TODO: Player.settlements is still being fixed on the client side.
+        sendToOthers(serverPlayer, objects);
+        return buildUpdate(serverPlayer, objects);
     }
 
 }

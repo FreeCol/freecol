@@ -19,23 +19,13 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import net.sf.freecol.common.model.FreeColObject;
-import net.sf.freecol.common.model.FreeColGameObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.Location;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -97,18 +87,9 @@ public class CashInTreasureTrainMessage extends Message {
                                        + ", unsuitable location.");
         }
 
-        // Cash in.  Do not bother updating other players as cash in
-        // only occurs in Colony or Europe where they can not see.
-        InGameController igc = server.getInGameController();
-        List<FreeColObject> objects = igc.cashInTreasureTrain(serverPlayer,
-                                                              unit);
-
-        // Only need the partial player update for gold and score.
-        Element reply = igc.buildGeneralUpdate(serverPlayer, objects);
-        Document doc = reply.getOwnerDocument();
-        spliceIntoElement(reply, "update",
-                          player.toXMLElementPartial(doc, "gold", "score"));
-        return reply;
+        // Cash in.
+        return server.getInGameController()
+            .cashInTreasureTrain(serverPlayer, unit);
     }
 
     /**

@@ -1010,8 +1010,12 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         unit.moveToEurope();
 
         // Inform other players the unit is moving off the map
+        // TODO: Add animation?
         InGameController igc = getFreeColServer().getInGameController();
-        igc.sendRemoveUnitToAll(serverPlayer, unit, oldTile);
+        List<Object> objects = new ArrayList<Object>();
+        igc.addRemove(objects, unit); // TODO: cleanup on encapsulate
+        objects.add(oldTile);
+        igc.sendToOthers(serverPlayer, objects);
 
         return null;
     }
@@ -1097,7 +1101,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
 
         if (unit.getLocation() instanceof Tile) {
             InGameController igc = getFreeColServer().getInGameController();
-            igc.sendUpdateToAll(player, unit.getTile());
+            igc.sendToOthers(player, unit.getTile());
         }
         return null;
     }
@@ -1123,6 +1127,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
                                             + " to " + workLocation.toString() + "(" 
                                             + workLocation.getId() + ")");
         }
+        InGameController igc = getFreeColServer().getInGameController();
         if (workLocation instanceof ColonyTile) {
             Tile tile = ((ColonyTile) workLocation).getWorkTile();
             Colony colony = workLocation.getColony();
@@ -1135,15 +1140,14 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         Location oldLocation = unit.getLocation();
         unit.work(workLocation);
         // For updating the number of colonist:
-        InGameController igc = getFreeColServer().getInGameController();
-        igc.sendUpdateToAll(serverPlayer, unit.getTile());
+        igc.sendToOthers(serverPlayer, unit.getTile());
         // oldLocation is empty now
         if (oldLocation instanceof ColonyTile) {
-            igc.sendUpdateToAll(serverPlayer, ((ColonyTile) oldLocation).getWorkTile());
+            igc.sendToOthers(serverPlayer, ((ColonyTile) oldLocation).getWorkTile());
         }
         // workLocation is occupied now
         if (workLocation instanceof ColonyTile) {
-            igc.sendUpdateToAll(serverPlayer, ((ColonyTile) workLocation).getWorkTile());
+            igc.sendToOthers(serverPlayer, ((ColonyTile) workLocation).getWorkTile());
         }
         return null;
     }
@@ -1311,7 +1315,7 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
         }
         // Send the updated tile anyway, we may have a synchronization issue
         InGameController igc = getFreeColServer().getInGameController();
-        igc.sendUpdateToAll(player, oldTile);
+        igc.sendToOthers(player, oldTile);
         return null;
     }
 
@@ -1422,20 +1426,20 @@ public final class InGameInputHandler extends InputHandler implements NetworkCon
      * @param element The element containing the request.
      */
     private Element disbandUnit(Connection connection, Element element) {
-        ServerPlayer player = getFreeColServer().getPlayer(connection);
+        ServerPlayer serverPlayer = getFreeColServer().getPlayer(connection);
         Unit unit = (Unit) getGame().getFreeColGameObject(element.getAttribute("unit"));
         if (unit == null) {
             throw new IllegalArgumentException("Could not find 'Unit' with specified ID: "
                     + element.getAttribute("unit"));
         }
-        if (unit.getOwner() != player) {
+        if (unit.getOwner() != serverPlayer) {
             throw new IllegalStateException("Not your unit!");
         }
-        Tile oldTile = unit.getTile();
+        Location oldLocation = unit.getLocation();
         unit.dispose();
         InGameController igc = getFreeColServer().getInGameController();
-        igc.sendRemoveUnitToAll(player, unit, oldTile);
-        return null;
+        igc.sendToOthers(serverPlayer, unit, oldLocation);
+        return igc.buildUpdate(serverPlayer, unit, oldLocation);
     }
 
     /**

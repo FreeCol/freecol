@@ -19,27 +19,12 @@
 
 package net.sf.freecol.common.networking;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
-import net.sf.freecol.FreeCol;
 import net.sf.freecol.common.model.Colony;
-import net.sf.freecol.common.model.FreeColObject;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.HistoryEvent;
-import net.sf.freecol.common.model.Map;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Settlement;
-import net.sf.freecol.common.model.Tile;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 
@@ -85,7 +70,8 @@ public class AbandonColonyMessage extends Message {
      *         and updating its surrounding tiles,
      *         or an error <code>Element</code> on failure.
      */
-    public Element handle(FreeColServer server, Player player, Connection connection) {
+    public Element handle(FreeColServer server, Player player,
+                          Connection connection) {
         Game game = player.getGame();
         ServerPlayer serverPlayer = server.getPlayer(connection);
 
@@ -105,20 +91,9 @@ public class AbandonColonyMessage extends Message {
         }
 
         // Proceed to abandon
-        InGameController igc = server.getInGameController();
-        List<FreeColObject> objects = igc.abandonSettlement(colony);
-
-        // Update others with vacated tiles and reference to the colony.
-        List<FreeColObject> otherObjects = new ArrayList<FreeColObject>();
-        for (FreeColObject o : objects) {
-            if (o instanceof Tile) otherObjects.add(o);
-        }
-        otherObjects.add(colony);
-        igc.sendUpdateToAll(serverPlayer, otherObjects);
-
-        // Reply.
         // TODO: Player.settlements is still being fixed on the client side.
-        return igc.buildGeneralUpdate(serverPlayer, objects);
+        return server.getInGameController()
+            .abandonSettlement(serverPlayer, colony);
     }
 
     /**

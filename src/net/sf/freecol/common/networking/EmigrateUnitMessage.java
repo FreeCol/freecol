@@ -19,17 +19,13 @@
 
 package net.sf.freecol.common.networking;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import net.sf.freecol.common.model.Europe;
 import net.sf.freecol.common.model.Game;
-import net.sf.freecol.common.model.ModelMessage;
 import net.sf.freecol.common.model.Player;
-import net.sf.freecol.common.model.Unit;
 import net.sf.freecol.server.FreeColServer;
-import net.sf.freecol.server.control.InGameController;
 import net.sf.freecol.server.model.ServerPlayer;
+
+import org.w3c.dom.Element;
 
 
 /**
@@ -73,12 +69,12 @@ public class EmigrateUnitMessage extends Message {
      */
     public Element handle(FreeColServer server, Player player, Connection connection) {
         ServerPlayer serverPlayer = server.getPlayer(connection);
-        Europe europe = player.getEurope();
-        boolean fountain;
 
+        Europe europe = player.getEurope();
         if (europe == null) {
             return Message.clientError("No Europe for a unit to migrate from.");
         }
+        boolean fountain;
         int remaining = serverPlayer.getRemainingEmigrants();
         if (remaining > 0) {
             // Check fountain-of-Youth emigrants first because the client side
@@ -92,19 +88,8 @@ public class EmigrateUnitMessage extends Message {
         }
 
         // Proceed to emigrate.
-        InGameController igc = server.getInGameController();
-        ModelMessage m = igc.emigrate(serverPlayer, slot, fountain);
-
-        // Update with new state of Europe, the message, and potentially
-        // the changed player immigration state.
-        Element reply = igc.buildGeneralUpdate(serverPlayer, europe, m);
-        if (!fountain) {
-            Document doc = reply.getOwnerDocument();
-            spliceIntoElement(reply, "update",
-                              player.toXMLElementPartial(doc, "immigration",
-                                                         "immigrationRequired"));
-        }
-        return reply;
+        return server.getInGameController()
+            .emigrate(serverPlayer, slot, fountain);
     }
 
     /**
