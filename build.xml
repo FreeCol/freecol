@@ -94,7 +94,8 @@
             optimize="on"
             deprecation="off"
             source="${java.target.version}"
-            target="${java.target.version}">
+            target="${java.target.version}"
+            includeantruntime="false">
           <compilerarg value="-Xlint:unchecked"/>
           <compilerarg value="-g"/>
         </javac>
