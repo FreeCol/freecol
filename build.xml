@@ -112,6 +112,7 @@
             deprecation="off"
             source="${java.target.version}"
             target="${java.target.version}"
+            includeantruntime="false"
         />
     </target>
 
@@ -607,7 +608,8 @@
                 cache="${freecol.build.dir}" />
         <javac srcdir="test/src" destdir="${freecol.build.dir}"
             classpathref="test.build.classpath" debug="on" deprecation="off"
-            source="${java.target.version}" target="${java.target.version}" />
+            source="${java.target.version}" target="${java.target.version}" 
+            includeantruntime="false"/>
     </target>
 
     <target name="validate" description="Validates the specification.">
