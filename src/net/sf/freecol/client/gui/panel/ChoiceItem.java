@@ -19,6 +19,14 @@
 
 package net.sf.freecol.client.gui.panel;
 
+
+import net.sf.freecol.client.gui.i18n.Messages;
+import net.sf.freecol.common.model.AbstractGoods;
+import net.sf.freecol.common.model.AbstractUnit;
+import net.sf.freecol.common.model.Player;
+
+
+
 /**
  * Can be used as a single choice for the
  * {@link FreeColDialog#createChoiceDialog(String, String, List) choice dialog}.
@@ -68,7 +76,16 @@ public class ChoiceItem<T> {
      *        choice.
      */
     public ChoiceItem(T object) {
-    	this(object.toString(), object, true);
+        this(Messages.message(object.toString()), object, true);
+        
+        // Check to see if we can improve upon object.toString()
+        if(object instanceof AbstractGoods) {
+            this.text = ((AbstractGoods)object).getAmount() + " " + Messages.message(((AbstractGoods)object).getNameKey());
+        } else if (object instanceof AbstractUnit) {
+            this.text = Messages.message(((AbstractUnit)object).getId());
+        } else if (object instanceof Player) {
+            this.text = Messages.message(((Player)object).getRulerNameKey()) + " (" + Messages.message(((Player)object).getNationName()) + ")";
+        }
     }
 
 
