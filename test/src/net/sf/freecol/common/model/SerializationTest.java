@@ -79,7 +79,7 @@ public class SerializationTest extends FreeColTestCase {
     public void testValidation() throws Exception {
 
         Game game = getGame();
-        Map map = getTestMap(plainsType,true);
+        Map map = getTestMap(true);
         game.setMap(map);
 
         Colony colony = getStandardColony(6);

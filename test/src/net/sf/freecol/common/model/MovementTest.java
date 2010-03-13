@@ -155,7 +155,7 @@ public class MovementTest extends FreeColTestCase {
 
     public void testScoutColony() {
     	Game game = getGame();
-    	Map map = getTestMap(plainsType,true);
+    	Map map = getTestMap(true);
     	game.setMap(map);
     	
         Player french = game.getPlayer("model.nation.french");
@@ -233,7 +233,7 @@ public class MovementTest extends FreeColTestCase {
 
     public void testEquipWith() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(6);
         BuildingType churchType = spec().getBuildingType("model.building.Chapel");

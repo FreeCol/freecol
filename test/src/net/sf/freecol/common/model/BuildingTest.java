@@ -35,18 +35,18 @@ import net.sf.freecol.util.test.FreeColTestCase;
 
 public class BuildingTest extends FreeColTestCase {
     
-    BuildingType printingPressType = FreeCol.getSpecification().getBuildingType("model.building.PrintingPress");
-    BuildingType newspaperType = FreeCol.getSpecification().getBuildingType("model.building.Newspaper");
+    BuildingType printingPressType = spec().getBuildingType("model.building.PrintingPress");
+    BuildingType newspaperType = spec().getBuildingType("model.building.Newspaper");
     
     public void testCanBuildNext() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
     	Colony colony = getStandardColony();
 
         // First check with a building that can be fully built with a
         // normal colony
-        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Depot");
+        BuildingType warehouseType = spec().getBuildingType("model.building.Depot");
         Building warehouse = new Building(getGame(), colony, warehouseType);
         colony.addBuilding(warehouse);
         assertTrue(warehouse.canBuildNext());
@@ -76,11 +76,11 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testInitialColony() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony();
 
-        BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
+        BuildingType warehouseType = spec().getBuildingType("model.building.Warehouse");
         Building warehouse = colony.getBuilding(warehouseType);
 
         // Is build as depot...
@@ -96,10 +96,10 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testChurch() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(6);
-        BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
+        BuildingType churchType = spec().getBuildingType("model.building.Chapel");
         assertFalse(churchType.hasAbility("model.ability.dressMissionary"));
 
         Building church = colony.getBuilding(churchType);
@@ -114,7 +114,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testCanAddToBuilding() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
@@ -162,7 +162,7 @@ public class BuildingTest extends FreeColTestCase {
         UnitType indianConvertType = spec().getUnitType("model.unit.indianConvert");
 
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony(10);
         
@@ -193,7 +193,7 @@ public class BuildingTest extends FreeColTestCase {
         carpenter.setType(masterCarpenterType);
         
         // Check school
-        BuildingType schoolType = FreeCol.getSpecification().getBuildingType("model.building.Schoolhouse");
+        BuildingType schoolType = spec().getBuildingType("model.building.Schoolhouse");
         Building school = colony.getBuilding(schoolType);
         assertTrue(school == null);
 
@@ -280,7 +280,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testSerialize() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(6);
         List<Unit> units = colony.getUnitList();
@@ -321,7 +321,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testCottonClothProduction() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(2);
         List<Unit> units = colony.getUnitList();
@@ -361,7 +361,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testAutoProduction() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(1);
         List<Unit> units = colony.getUnitList();
@@ -395,7 +395,7 @@ public class BuildingTest extends FreeColTestCase {
 
     public void testTownhallProduction() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony(6);
         Player owner = colony.getOwner();
@@ -462,7 +462,7 @@ public class BuildingTest extends FreeColTestCase {
     
     public void testPrintingPressBonus() {
         Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
+        game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony(6);
         Unit unit = colony.getRandomUnit();
@@ -487,7 +487,7 @@ public class BuildingTest extends FreeColTestCase {
     
     public void testNewspaperBonus() {
         Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
+        game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony(6);
         Unit unit = colony.getRandomUnit();

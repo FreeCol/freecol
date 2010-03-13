@@ -333,7 +333,7 @@ public class CombatTest extends FreeColTestCase {
 
     public void testAttackColonyWithVeteran() {
     	Game game = getGame();
-    	Map map = getTestMap(plainsType,true);
+    	Map map = getTestMap(true);
     	game.setMap(map);
     	
         Colony colony = getStandardColony();
@@ -405,7 +405,7 @@ public class CombatTest extends FreeColTestCase {
 
     public void testAttackColonyWithBrave() {
     	Game game = getGame();
-    	Map map = getTestMap(plainsType,true);
+    	Map map = getTestMap(true);
     	game.setMap(map);
     	
         Colony colony = getStandardColony(1, 5, 8);
@@ -465,7 +465,7 @@ public class CombatTest extends FreeColTestCase {
 
     public void testDefendColonyWithUnarmedColonist() {
     	Game game = getGame();
-    	Map map = getTestMap(plainsType,true);
+    	Map map = getTestMap(true);
     	game.setMap(map);
     	
         Colony colony = getStandardColony();
@@ -492,7 +492,7 @@ public class CombatTest extends FreeColTestCase {
 
     public void testDefendColonyWithRevere() {
     	Game game = getGame();
-    	Map map = getTestMap(plainsType,true);
+    	Map map = getTestMap(true);
     	game.setMap(map);
     	
         Colony colony = getStandardColony();
@@ -528,7 +528,7 @@ public class CombatTest extends FreeColTestCase {
     
     public void testLoseColonyDefenceWithRevere() {
         Game game = getGame();
-        Map map = getTestMap(plainsType,true);
+        Map map = getTestMap(true);
         game.setMap(map);
         
         Colony colony = getStandardColony();

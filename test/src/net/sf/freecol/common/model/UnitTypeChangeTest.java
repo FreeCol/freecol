@@ -99,7 +99,7 @@ public class UnitTypeChangeTest extends FreeColTestCase {
     public void testEnterColony() {
 
         Game game = getStandardGame();
-    	game.setMap(getTestMap(plainsType, true));
+    	game.setMap(getTestMap(true));
         Player dutch = game.getPlayer("model.nation.dutch");
         Colony colony = getStandardColony();
 

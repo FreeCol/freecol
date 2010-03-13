@@ -293,7 +293,7 @@ public class TileTest extends FreeColTestCase {
 
     public void testProductionModifiers() throws Exception {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony();
         

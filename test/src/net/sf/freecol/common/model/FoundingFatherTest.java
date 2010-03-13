@@ -104,7 +104,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testUpgrades() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
 
         Colony colony = getStandardColony(4);
         colony.getUnitList().get(0).setType(colonistType);
@@ -128,7 +128,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testBuildingEvent() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
 
         BuildingType press = spec().getBuildingType("model.building.PrintingPress");
 
@@ -150,7 +150,7 @@ public class FoundingFatherTest extends FreeColTestCase {
         BuildingType press = spec().getBuildingType("model.building.PrintingPress");
 
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Player dutch = game.getPlayer("model.nation.dutch");
 
@@ -172,7 +172,7 @@ public class FoundingFatherTest extends FreeColTestCase {
     
     public void testPeterStuyvesant() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
@@ -190,7 +190,7 @@ public class FoundingFatherTest extends FreeColTestCase {
     public void testAddAllFathers() {
         // check that all fathers can be added
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();
@@ -213,7 +213,7 @@ public class FoundingFatherTest extends FreeColTestCase {
     
     public void testLaSalle() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony(2);
         Player player = colony.getOwner();
@@ -245,7 +245,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testMinuit() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony();
         Unit unit = colony.getRandomUnit();
@@ -278,7 +278,7 @@ public class FoundingFatherTest extends FreeColTestCase {
 
     public void testPaine() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(4);
         Player player = colony.getOwner();

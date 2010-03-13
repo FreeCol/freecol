@@ -31,7 +31,7 @@ public class ModelMessageTest extends FreeColTestCase {
     public void testHashCode() {
     
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony(1);
         GoodsType cotton = FreeCol.getSpecification().getGoodsType("model.goods.cotton");
@@ -53,7 +53,7 @@ public class ModelMessageTest extends FreeColTestCase {
     
     public void testModelMapSet2() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Player player = game.getPlayer("model.nation.dutch");
         Colony colony = getStandardColony(1);
@@ -83,7 +83,7 @@ public class ModelMessageTest extends FreeColTestCase {
 
     public void testDefaultId() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Player player = game.getPlayer("model.nation.dutch");
         

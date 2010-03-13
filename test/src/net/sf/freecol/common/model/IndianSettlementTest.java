@@ -360,7 +360,7 @@ public class IndianSettlementTest extends FreeColTestCase {
      */
     public void testSettlementDoesNotOwnWaterTiles(){
         Game game = getStandardGame();
-        Map map = getCoastTestMap(plainsType);
+        Map map = getCoastTestMap(spec().getTileType("model.tile.plains"));
         game.setMap(map);
         
         Tile campTile = map.getTile(9, 9);

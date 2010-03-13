@@ -51,8 +51,6 @@ import net.sf.freecol.server.model.ServerGame;
  */
 public class FreeColTestCase extends TestCase {
 
-    public static final TileType plainsType = spec().getTileType("model.tile.plains");
-
     /**
      * use getGame to access this.
      */
@@ -192,6 +190,12 @@ public class FreeColTestCase extends TestCase {
         return builder.build();
     }
     
+    public static Map getTestMap(boolean explored) {
+        MapBuilder builder = new MapBuilder(getGame());
+        builder.setExploredByAll(explored);
+        return builder.build();
+    }
+    
     public static Map getCoastTestMap(TileType landTileType) {
         return getCoastTestMap(landTileType, false);
     }
@@ -297,7 +301,7 @@ public class FreeColTestCase extends TestCase {
         private void setStartingParams(){
             width = 20;
             height = 15;
-            baseTile = plainsType;
+            baseTile = spec().getTileType("model.tile.plains");
             exploredByAll = false;
             initiated = false;
             // set empty grid

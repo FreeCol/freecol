@@ -38,6 +38,8 @@ import net.sf.freecol.util.test.FreeColTestUtils;
 
 public class MapTest extends FreeColTestCase {
     TileType oceanType = spec().getTileType("model.tile.ocean");
+    TileType plainsType = spec().getTileType("model.tile.plains");
+
     UnitType colonistType = spec().getUnitType("model.unit.freeColonist");
     
     private Map getSingleLandPathMap(Game game){
@@ -320,7 +322,7 @@ public class MapTest extends FreeColTestCase {
     public void testMoveThroughTileWithEnemyUnit() {
         final UnitType pioneerType = spec().getUnitType("model.unit.hardyPioneer");
         Game game = getStandardGame();
-        Map map = getTestMap(plainsType);
+        Map map = getTestMap();
         game.setMap(map);
         
         //Setup
@@ -391,7 +393,7 @@ public class MapTest extends FreeColTestCase {
 
     public void testSearchForColony() {
         Game game = getStandardGame();
-        Map map = getCoastTestMap(plainsType, true);
+        Map map = getCoastTestMap(spec().getTileType("model.tile.plains"), true);
         game.setMap(map);
 
         Player dutchPlayer = game.getPlayer("model.nation.dutch");

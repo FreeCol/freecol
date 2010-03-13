@@ -24,19 +24,19 @@ import net.sf.freecol.common.model.Specification;
 import net.sf.freecol.util.test.FreeColTestCase;
 
 public class ColonyTest extends FreeColTestCase {
-    BuildingType depotType = FreeCol.getSpecification().getBuildingType("model.building.Depot");
-    BuildingType warehouseType = FreeCol.getSpecification().getBuildingType("model.building.Warehouse");
-    BuildingType warehouseExpansionType = FreeCol.getSpecification().getBuildingType("model.building.WarehouseExpansion");
-    BuildingType churchType = FreeCol.getSpecification().getBuildingType("model.building.Chapel");
-    BuildingType townHallType = FreeCol.getSpecification().getBuildingType("model.building.TownHall");
-    BuildingType carpenterHouseType =  FreeCol.getSpecification().getBuildingType("model.building.CarpenterHouse");
+    BuildingType depotType = spec().getBuildingType("model.building.Depot");
+    BuildingType warehouseType = spec().getBuildingType("model.building.Warehouse");
+    BuildingType warehouseExpansionType = spec().getBuildingType("model.building.WarehouseExpansion");
+    BuildingType churchType = spec().getBuildingType("model.building.Chapel");
+    BuildingType townHallType = spec().getBuildingType("model.building.TownHall");
+    BuildingType carpenterHouseType =  spec().getBuildingType("model.building.CarpenterHouse");
     UnitType wagonTrainType = spec().getUnitType("model.unit.wagonTrain");
     GoodsType hammerGoodsType = spec().getGoodsType("model.goods.hammers");
     GoodsType lumberGoodsType = spec().getGoodsType("model.goods.lumber");
     
     public void testCurrentlyBuilding() {
         Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
     	Colony colony = getStandardColony();
     	    	
@@ -49,7 +49,7 @@ public class ColonyTest extends FreeColTestCase {
     
     public void testBuildQueueDoesNotAcceptBuildingDoubles() {
         Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
+        game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony();
                 
@@ -68,7 +68,7 @@ public class ColonyTest extends FreeColTestCase {
     
     public void testBuildQueueAcceptsUnitDoubles() {
         Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
+        game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony();
                 
@@ -85,7 +85,7 @@ public class ColonyTest extends FreeColTestCase {
      */
     public void testBuildingCompletion() {
         Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
+        game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony();
         Building initialWarehouse = new Building(getGame(), colony, depotType);
@@ -103,7 +103,7 @@ public class ColonyTest extends FreeColTestCase {
     
     public void testNoBuildingMaterialsProductionWhenBuildingNothing(){
         Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
+        game.setMap(getTestMap(true));
         
         Colony colony = getStandardColony();
         Building carpenterHouse = new Building(getGame(), colony, carpenterHouseType);
@@ -136,7 +136,7 @@ public class ColonyTest extends FreeColTestCase {
         int population = 3;
 
         Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
+        game.setMap(getTestMap(true));
         Colony colony = getStandardColony(population);
         
         Building townHall = new Building(getGame(), colony, townHallType);
@@ -204,7 +204,7 @@ public class ColonyTest extends FreeColTestCase {
         BuildingType townHall = spec().getBuildingType("model.building.TownHall");
 
         Game game = getGame();
-        game.setMap(getTestMap(plainsType, true));
+        game.setMap(getTestMap(true));
         Colony colony = getStandardColony(population);
 
         assertTrue("colony produces less food than it consumes",
@@ -244,7 +244,7 @@ public class ColonyTest extends FreeColTestCase {
 
     public void testTeaParty() {
         Game game = getGame();
-        game.setMap(getTestMap(plainsType,true));
+        game.setMap(getTestMap(true));
         Colony colony = getStandardColony(5);
 
         colony.getFeatureContainer().addModifier(Modifier.createTeaPartyModifier(game.getTurn()));

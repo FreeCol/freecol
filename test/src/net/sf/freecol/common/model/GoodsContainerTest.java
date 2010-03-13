@@ -30,7 +30,7 @@ public class GoodsContainerTest extends FreeColTestCase {
 
     public void testContainer() {
     	Game game = getGame();
-    	game.setMap(getTestMap(plainsType,true));
+    	game.setMap(getTestMap(true));
     	
         Colony colony = getStandardColony();
         GoodsContainer container = new GoodsContainer(game, colony);

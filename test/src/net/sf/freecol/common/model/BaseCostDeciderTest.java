@@ -50,6 +50,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * Checks that the decider returns the right cost for a plain to plain move.
      */
     public void testGetCostLandLand() {
+        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getTestMap(plainsType);
         game.setMap(map);
     	
@@ -72,6 +73,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * a move.
      */
     public void testGetRemainingMovesAndNewTurn() {
+        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getTestMap(plainsType);
         game.setMap(map);
         
@@ -92,6 +94,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testInvalidMoveOfLandUnitToAnOceanTile() {
         // For this test we need a different map
+        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
         
@@ -114,6 +117,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testInvalidMoveOfNavalUnitToALandTile() {
         // For this test we need a different map
+        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
         
@@ -136,6 +140,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      * Verifies that is invalid
      */
     public void testInvalidMoveThroughTileWithSettlement() {
+        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getTestMap(plainsType);
         game.setMap(map);
 
@@ -162,6 +167,7 @@ public class BaseCostDeciderTest extends FreeColTestCase {
      */
     public void testNavalUnitMoveToTileWithSettlement() {
         // For this test we need a different map
+        TileType plainsType = spec().getTileType("model.tile.plains");
         Map map = getCoastTestMap(plainsType);
         game.setMap(map);
         
