@@ -289,8 +289,15 @@ public final class ReportTurnPanel extends ReportPanel {
     }
 
     private void insertMessage(StyledDocument document, ModelMessage message, Player player) {
+        String input;
         try {
-            String input = Messages.message(message.getId());
+            input = Messages.message(message.getDefaultId());
+        } catch (NullPointerException e) {
+//            Messages.message() return null if there is no match for DefaultId.
+            input = Messages.message(message.getId());
+        }
+
+        try {
             int start = input.indexOf('%');
             if (start == -1) {
                 // no variables present
@@ -353,7 +360,7 @@ public final class ReportTurnPanel extends ReportPanel {
             logger.warning(e.toString());
         }
     }
-    
+
     private String[] findReplacementData(ModelMessage message, String variable) {
         List<String> data = message.getKeys();
         if (data != null) {
